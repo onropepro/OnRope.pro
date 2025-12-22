@@ -428,174 +428,241 @@ export function DashboardOverview({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="shadow-sm" data-testid="card-active-projects">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg font-semibold">
+        {/* Active Projects Card - Professional Data-Dense Design */}
+        <div 
+          className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden"
+          data-testid="card-active-projects"
+        >
+          {/* Card Header */}
+          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               {t("dashboard.overview.activeProjectsTitle", "Active Projects")}
-            </CardTitle>
+            </h3>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => onNavigate("projects")}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
               data-testid="button-view-all-projects"
             >
               {t("dashboard.overview.viewAll", "View all")}
             </Button>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-4">
-              {displayProjects.length > 0 ? (
-                displayProjects.map((project) => (
-                  <div 
-                    key={project.id} 
-                    className="flex items-center gap-4"
-                    data-testid={`row-project-${project.id}`}
-                  >
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+          </div>
+          {/* Card Content - Project List */}
+          <div>
+            {displayProjects.length > 0 ? (
+              displayProjects.map((project, index) => (
+                <div 
+                  key={project.id}
+                  onClick={() => onNavigate("projects")}
+                  className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer ${
+                    index < displayProjects.length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''
+                  }`}
+                  data-testid={`row-project-${project.id}`}
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Status Dot with ring */}
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 shadow-sm shrink-0 mt-1.5" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">{project.name}</p>
-                      <p className="text-sm text-muted-foreground truncate">{project.client}</p>
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#0B64A3] dark:group-hover:text-blue-400 truncate transition-colors">
+                            {project.name}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {project.client}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                            <Users className="w-3.5 h-3.5" />
+                            <span>{project.teamCount}</span>
+                          </div>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            Due {project.dueDate}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Slim Progress Bar */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-[#0B64A3] rounded-full transition-all"
+                            style={{ width: `${project.progress}%` }}
+                          />
+                        </div>
+                        <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 w-7 text-right">
+                          {project.progress}%
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
-                      <Users className="w-4 h-4" />
-                      <span>{project.teamCount}</span>
-                    </div>
-                    <div className="text-sm text-muted-foreground shrink-0 w-20">
-                      Due {project.dueDate}
-                    </div>
-                    <div className="w-24 shrink-0">
-                      <div className="flex items-center gap-2">
-                        <Progress value={project.progress} className="h-2 flex-1" />
-                        <span className="text-xs text-muted-foreground w-8">{project.progress}%</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="px-4 py-8 text-center">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {t("dashboard.overview.noActiveProjects", "No active projects")}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {/* Today's Schedule Card - Professional Data-Dense Design */}
+          <div 
+            className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden"
+            data-testid="card-today-schedule"
+          >
+            {/* Card Header */}
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                {t("dashboard.overview.todaysSchedule", "Today's Schedule")}
+              </h3>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => onRouteNavigate("/schedule")}
+                className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
+                data-testid="button-full-calendar"
+              >
+                {t("dashboard.overview.fullCalendar", "Full calendar")}
+              </Button>
+            </div>
+            {/* Card Content - Schedule List */}
+            <div>
+              {todaySchedule.length > 0 ? (
+                todaySchedule.map((item, index) => (
+                  <div 
+                    key={item.id}
+                    className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer ${
+                      index < todaySchedule.length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''
+                    }`}
+                    data-testid={`row-schedule-${item.id}`}
+                  >
+                    <div className="flex items-start gap-0">
+                      {/* Time Column - Fixed Width */}
+                      <div className="w-10 shrink-0">
+                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                          {item.time}
+                        </span>
+                      </div>
+                      {/* Vertical Connector Line */}
+                      <div className="border-l-2 border-slate-100 dark:border-slate-700 group-hover:border-[#0B64A3]/30 dark:group-hover:border-blue-400/30 pl-3 transition-colors flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                          {item.title}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                          {item.location}
+                        </p>
+                        {/* Stacked Avatars */}
+                        <div className="flex items-center mt-2">
+                          {item.technicians.map((tech, idx) => (
+                            <Avatar 
+                              key={idx} 
+                              className="w-6 h-6 border-2 border-white dark:border-slate-900 -ml-1.5 first:ml-0"
+                            >
+                              <AvatarFallback className={`${tech.color} text-white text-[10px] font-medium`}>
+                                {tech.initials}
+                              </AvatarFallback>
+                            </Avatar>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-center text-muted-foreground py-4">
-                  {t("dashboard.overview.noActiveProjects", "No active projects")}
-                </p>
+                <div className="px-4 py-8 text-center">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {t("dashboard.overview.noSchedule", "No schedule items for today")}
+                  </p>
+                </div>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        <div className="space-y-6">
-          <Card className="shadow-sm" data-testid="card-today-schedule">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-semibold">
-                {t("dashboard.overview.todaysSchedule", "Today's Schedule")}
-              </CardTitle>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => onRouteNavigate("/schedule")}
-                className="text-muted-foreground hover:text-foreground"
-                data-testid="button-full-calendar"
-              >
-                {t("dashboard.overview.fullCalendar", "Full calendar")}
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-4">
-                {todaySchedule.map((item) => (
-                  <div 
-                    key={item.id} 
-                    className="flex items-start gap-4"
-                    data-testid={`row-schedule-${item.id}`}
-                  >
-                    <div className="text-sm font-medium text-muted-foreground w-12 shrink-0 pt-0.5">
-                      {item.time}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">{item.location}</p>
-                      <div className="flex items-center gap-1 mt-2">
-                        {item.technicians.map((tech, idx) => (
-                          <Avatar key={idx} className="w-6 h-6 border-2 border-background -ml-1 first:ml-0">
-                            <AvatarFallback className={`${tech.color} text-white text-[10px] font-medium`}>
-                              {tech.initials}
-                            </AvatarFallback>
-                          </Avatar>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm" data-testid="card-certification-alerts">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg font-semibold">
+          {/* Certification Alerts Card - Professional Data-Dense Design */}
+          <div 
+            className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden"
+            data-testid="card-certification-alerts"
+          >
+            {/* Card Header */}
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                 {t("dashboard.overview.certificationAlerts", "Certification Alerts")}
-              </CardTitle>
+              </h3>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => onNavigate("employees")}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
                 data-testid="button-view-all-certifications"
               >
                 {t("dashboard.overview.viewAll", "View all")}
               </Button>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-4">
-                {expiringCertifications.length > 0 ? (
-                  expiringCertifications.slice(0, 3).map((emp: any) => {
-                    const expiryDate = new Date(emp.irataExpiry);
-                    const now = new Date();
-                    const daysLeft = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                    const initials = `${emp.firstName?.charAt(0) || ''}${emp.lastName?.charAt(0) || ''}`.toUpperCase();
-                    const certLevel = emp.irataLevel ? `IRATA L${emp.irataLevel}` : 'IRATA';
-                    
-                    let badgeColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400";
-                    if (daysLeft <= 7) {
-                      badgeColor = "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400";
-                    } else if (daysLeft <= 14) {
-                      badgeColor = "bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-400";
-                    }
-                    
-                    return (
-                      <div 
-                        key={emp.id} 
-                        className="flex items-center gap-3"
-                        data-testid={`row-cert-alert-${emp.id}`}
-                      >
-                        <Avatar className="w-10 h-10">
-                          <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                            {initials}
-                          </AvatarFallback>
-                        </Avatar>
+            </div>
+            {/* Card Content - Certification List */}
+            <div>
+              {expiringCertifications.length > 0 ? (
+                expiringCertifications.slice(0, 3).map((emp: any, index: number) => {
+                  const expiryDate = new Date(emp.irataExpiry);
+                  const now = new Date();
+                  const daysLeft = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                  const initials = `${emp.firstName?.charAt(0) || ''}${emp.lastName?.charAt(0) || ''}`.toUpperCase();
+                  const certLevel = emp.irataLevel ? `IRATA L${emp.irataLevel}` : 'IRATA';
+                  
+                  const isCritical = daysLeft <= 7;
+                  const iconColors = isCritical 
+                    ? "bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-400"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400";
+                  const badgeColors = isCritical
+                    ? "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800 dark:bg-rose-900/30 dark:text-rose-400"
+                    : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400";
+                  
+                  return (
+                    <div 
+                      key={emp.id}
+                      onClick={() => onNavigate("employees")}
+                      className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer ${
+                        index < Math.min(expiringCertifications.length, 3) - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''
+                      }`}
+                      data-testid={`row-cert-alert-${emp.id}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Large Alert Icon Circle */}
+                        <div className={`w-9 h-9 rounded-full ${iconColors} flex items-center justify-center shrink-0`}>
+                          <span className="text-xs font-semibold">{initials}</span>
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground">
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
                             {emp.firstName} {emp.lastName}
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
                             {certLevel} expires {format(expiryDate, "MMM d")}
                           </p>
                         </div>
-                        <Badge 
-                          variant="secondary" 
-                          className={`${badgeColor} shrink-0`}
+                        {/* Outline Badge */}
+                        <span 
+                          className={`text-[10px] font-medium h-6 px-2 rounded-full border flex items-center shrink-0 ${badgeColors}`}
                           data-testid={`badge-days-left-${emp.id}`}
                         >
                           {daysLeft}d left
-                        </Badge>
+                        </span>
                       </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-center text-muted-foreground py-4">
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     {t("dashboard.overview.noCertificationAlerts", "No expiring certifications")}
                   </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
