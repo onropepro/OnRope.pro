@@ -449,7 +449,7 @@ export function DashboardOverview({
               displayProjects.map((project, index) => (
                 <div 
                   key={project.id}
-                  onClick={() => onNavigate("projects")}
+                  onClick={() => onRouteNavigate(`/projects/${project.id}`)}
                   className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer ${
                     index < displayProjects.length - 1 ? 'border-b border-slate-100 dark:border-slate-800' : ''
                   }`}
