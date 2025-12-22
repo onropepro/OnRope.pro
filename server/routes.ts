@@ -5301,12 +5301,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/property-managers/me/vendors", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
       const vendorSummaries = await storage.getPropertyManagerVendorSummaries(req.session.userId!);
+      console.log(`[PM Vendors] Fetched ${vendorSummaries.length} vendors for property manager ${req.session.userId}`);
       
       // Fetch CSR data for each vendor in parallel
       const vendorsWithCSR = await Promise.all(
         vendorSummaries.map(async (vendor) => {
           try {
             const csrData = await calculateCompanyCSR(vendor.id, storage, true);
+            console.log(`[PM Vendors] CSR for vendor ${vendor.companyName}: ${csrData.csrRating}% (${csrData.csrLabel})`);
             return {
               ...vendor,
               csrRating: csrData.csrRating,
@@ -5314,7 +5316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               csrColor: csrData.csrColor,
             };
           } catch (error) {
-            console.error(`Failed to calculate CSR for vendor ${vendor.id}:`, error);
+            console.error(`[PM Vendors] Failed to calculate CSR for vendor ${vendor.id}:`, error);
             return {
               ...vendor,
               csrRating: null,
@@ -5325,6 +5327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
       
+      console.log(`[PM Vendors] Returning vendors with CSR:`, vendorsWithCSR.map(v => ({ name: v.companyName, csrRating: v.csrRating })));
       res.json({ vendors: vendorsWithCSR });
     } catch (error) {
       console.error("Get property manager vendor summaries error:", error);
