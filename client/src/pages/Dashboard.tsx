@@ -3643,9 +3643,6 @@ export default function Dashboard() {
                         {getPageTitle()}
                       </h1>
                     )}
-                    {companyName && (
-                      <p className="text-xs text-muted-foreground font-medium truncate">{companyName}</p>
-                    )}
                   </div>
                   
                   {currentUser?.role === 'company' && (currentUser?.residentCode || currentUser?.propertyManagerCode) && (

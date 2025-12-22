@@ -320,31 +320,6 @@ export function DashboardSidebar({
         </Button>
       </div>
 
-      {/* Company Selector Card */}
-      <div className="px-3 py-3">
-        <button
-          className="w-full flex items-center gap-2.5 p-2.5 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-          data-testid="button-company-selector"
-        >
-          <Avatar className="h-8 w-8 rounded-md">
-            <AvatarFallback 
-              className="rounded-md text-white text-xs font-medium"
-              style={{ backgroundColor: getBrandColor() }}
-            >
-              {getInitials(displayCompanyName)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 text-left min-w-0">
-            <div className="font-medium text-sm text-slate-700 dark:text-slate-200 truncate">
-              {displayCompanyName}
-            </div>
-            <div className="text-[11px] text-slate-400">
-              {employeeCount} {employeeCount === 1 ? 'employee' : 'employees'}
-            </div>
-          </div>
-          <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
-        </button>
-      </div>
 
       {/* Dashboard Primary Link */}
       <div className="px-3 pb-2">
