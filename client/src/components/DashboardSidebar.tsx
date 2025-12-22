@@ -298,12 +298,12 @@ export function DashboardSidebar({
         ) : (
           <div className="flex items-center gap-2.5" data-testid="sidebar-default-logo">
             <div 
-              className="flex h-7 w-7 items-center justify-center rounded-md text-white font-semibold text-xs"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-white font-semibold text-sm"
               style={{ backgroundColor: getBrandColor() }}
             >
               OR
             </div>
-            <span className="font-medium text-sm text-slate-900 dark:text-slate-100">
+            <span className="font-medium text-base text-slate-900 dark:text-slate-100">
               OnRopePro
             </span>
           </div>
@@ -327,7 +327,7 @@ export function DashboardSidebar({
           onClick={() => onTabChange("home")}
           data-testid="sidebar-nav-dashboard"
           className={cn(
-            "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-[13px] font-medium transition-colors",
+            "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium transition-colors",
             isDashboardActive 
               ? "text-white shadow-sm"
               : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
@@ -344,7 +344,7 @@ export function DashboardSidebar({
         {filteredGroups.map((group) => (
           <div key={group.id} className="mb-4">
             {/* Group Header */}
-            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2">
+            <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider px-3 py-2">
               {group.label}
             </div>
             
@@ -360,7 +360,7 @@ export function DashboardSidebar({
                     onClick={() => handleItemClick(item)}
                     data-testid={`sidebar-nav-${item.id}`}
                     className={cn(
-                      "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-[13px] font-medium transition-colors",
+                      "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium transition-colors",
                       isActive 
                         ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
                         : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
@@ -371,7 +371,7 @@ export function DashboardSidebar({
                     {item.badge !== undefined && item.badge > 0 && (
                       <span
                         className={cn(
-                          "flex items-center justify-center rounded-full text-[10px] font-medium h-[18px] min-w-[18px] px-1.5",
+                          "flex items-center justify-center rounded-full text-sm font-medium h-5 min-w-5 px-1.5",
                           item.badgeType === "alert" 
                             ? "bg-rose-500 text-white"
                             : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
@@ -395,7 +395,7 @@ export function DashboardSidebar({
           <button
             onClick={() => setLocation("/profile")}
             data-testid="sidebar-nav-settings"
-            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-[13px] font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
           >
             <Settings className="h-4 w-4 shrink-0" />
             <span>{t("dashboard.sidebar.settings", "Settings")}</span>
@@ -403,7 +403,7 @@ export function DashboardSidebar({
           <button
             onClick={() => setLocation("/help")}
             data-testid="sidebar-nav-help"
-            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-[13px] font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
           >
             <HelpCircle className="h-4 w-4 shrink-0" />
             <span>{t("dashboard.sidebar.help", "Help Center")}</span>

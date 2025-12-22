@@ -358,7 +358,7 @@ export function DashboardOverview({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-sm text-muted-foreground" data-testid="text-dashboard-date">
+        <p className="text-base text-muted-foreground" data-testid="text-dashboard-date">
           {format(new Date(), "EEEE, MMMM d, yyyy")}
         </p>
         <Button 
@@ -373,7 +373,7 @@ export function DashboardOverview({
 
       {attentionItems.filter(item => item.visible).length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4" data-testid="text-attention-required">
+          <h2 className="text-base font-semibold text-muted-foreground uppercase tracking-wide mb-4" data-testid="text-attention-required">
             {t("dashboard.overview.attentionRequired", "ATTENTION REQUIRED")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -396,10 +396,10 @@ export function DashboardOverview({
                       </span>
                     </div>
                     <h3 className="font-semibold text-foreground mb-1">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
+                    <p className="text-base text-muted-foreground mb-3">{item.description}</p>
                     <button 
                       onClick={item.onAction}
-                      className={`text-sm font-medium ${item.actionColor} flex items-center gap-1`}
+                      className={`text-base font-medium ${item.actionColor} flex items-center gap-1`}
                       data-testid={`button-${item.id}-action`}
                     >
                       {item.actionLabel}
@@ -424,12 +424,12 @@ export function DashboardOverview({
               data-testid={`card-kpi-${metric.id}`}
             >
               <CardContent className="p-4">
-                <p className={`text-sm mb-1 ${csrColors ? csrColors.text : 'text-muted-foreground'}`}>{metric.label}</p>
+                <p className={`text-base mb-1 ${csrColors ? csrColors.text : 'text-muted-foreground'}`}>{metric.label}</p>
                 <div className="flex items-end justify-between">
                   <span className={`text-3xl font-bold ${csrColors ? csrColors.text : 'text-foreground'}`} data-testid={`text-${metric.id}-value`}>
                     {metric.value}
                   </span>
-                  <div className={`flex items-center gap-1 text-sm ${metric.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <div className={`flex items-center gap-1 text-base ${metric.isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
                     {metric.isPositive ? (
                       <TrendingUp className="w-4 h-4" />
                     ) : (
@@ -438,7 +438,7 @@ export function DashboardOverview({
                     <span data-testid={`text-${metric.id}-trend`}>{metric.trend}%</span>
                   </div>
                 </div>
-                <p className={`text-xs mt-1 ${csrColors ? csrColors.text : 'text-muted-foreground'}`}>{metric.trendLabel}</p>
+                <p className={`text-sm mt-1 ${csrColors ? csrColors.text : 'text-muted-foreground'}`}>{metric.trendLabel}</p>
               </CardContent>
             </Card>
             );
@@ -454,14 +454,14 @@ export function DashboardOverview({
         >
           {/* Card Header */}
           <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+            <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
               {t("dashboard.overview.activeProjectsTitle", "Active Projects")}
             </h3>
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => onNavigate("projects")}
-              className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
+              className="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
               data-testid="button-view-all-projects"
             >
               {t("dashboard.overview.viewAll", "View all")}
@@ -485,19 +485,19 @@ export function DashboardOverview({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#0B64A3] dark:group-hover:text-blue-400 truncate transition-colors">
+                          <p className="text-base font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#0B64A3] dark:group-hover:text-blue-400 truncate transition-colors">
                             {project.name}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                          <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
                             {project.client}
                           </p>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                          <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                          <div className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400">
                             <Users className="w-3.5 h-3.5" />
                             <span>{project.teamCount}</span>
                           </div>
-                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                          <span className="text-sm text-slate-500 dark:text-slate-400">
                             Due {project.dueDate}
                           </span>
                         </div>
@@ -510,7 +510,7 @@ export function DashboardOverview({
                             style={{ width: `${project.progress}%` }}
                           />
                         </div>
-                        <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 w-7 text-right">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400 w-8 text-right">
                           {project.progress}%
                         </span>
                       </div>
@@ -520,7 +520,7 @@ export function DashboardOverview({
               ))
             ) : (
               <div className="px-4 py-8 text-center">
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+                <p className="text-base text-slate-500 dark:text-slate-400">
                   {t("dashboard.overview.noActiveProjects", "No active projects")}
                 </p>
               </div>
@@ -536,14 +536,14 @@ export function DashboardOverview({
           >
             {/* Card Header */}
             <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+              <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
                 {t("dashboard.overview.todaysSchedule", "Today's Schedule")}
               </h3>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => onRouteNavigate("/schedule")}
-                className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
+                className="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
                 data-testid="button-full-calendar"
               >
                 {t("dashboard.overview.fullCalendar", "Full calendar")}
@@ -562,22 +562,22 @@ export function DashboardOverview({
                   >
                     <div className="flex items-start gap-0">
                       {/* Time Column - Fixed Width */}
-                      <div className="w-10 shrink-0">
-                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      <div className="w-12 shrink-0">
+                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                           {item.time}
                         </span>
                       </div>
                       {/* Vertical Connector Line */}
                       <div className="border-l-2 border-slate-100 dark:border-slate-700 group-hover:border-[#0B64A3]/30 dark:group-hover:border-blue-400/30 pl-3 transition-colors flex-1 min-w-0">
                         {item.jobType && (
-                          <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 tracking-wide mb-0.5">
+                          <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 tracking-wide mb-0.5">
                             {formatJobType(item.jobType)}
                           </p>
                         )}
-                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 truncate">
+                        <p className="text-base font-medium text-slate-500 dark:text-slate-400 truncate">
                           {item.title}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
                           {item.location}
                         </p>
                         {/* Stacked Avatars */}
@@ -587,7 +587,7 @@ export function DashboardOverview({
                               key={idx} 
                               className="w-6 h-6 border-2 border-white dark:border-slate-900 -ml-1.5 first:ml-0"
                             >
-                              <AvatarFallback className={`${tech.color} text-white text-[10px] font-medium`}>
+                              <AvatarFallback className={`${tech.color} text-white text-sm font-medium`}>
                                 {tech.initials}
                               </AvatarFallback>
                             </Avatar>
@@ -599,7 +599,7 @@ export function DashboardOverview({
                 ))
               ) : (
                 <div className="px-4 py-8 text-center">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-base text-slate-500 dark:text-slate-400">
                     {t("dashboard.overview.noSchedule", "No schedule items for today")}
                   </p>
                 </div>
@@ -614,14 +614,14 @@ export function DashboardOverview({
           >
             {/* Card Header */}
             <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+              <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200">
                 {t("dashboard.overview.certificationAlerts", "Certification Alerts")}
               </h3>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => onNavigate("employees")}
-                className="text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
+                className="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 h-auto py-1 px-2"
                 data-testid="button-view-all-certifications"
               >
                 {t("dashboard.overview.viewAll", "View all")}
@@ -657,19 +657,19 @@ export function DashboardOverview({
                       <div className="flex items-center gap-3">
                         {/* Large Alert Icon Circle */}
                         <div className={`w-9 h-9 rounded-full ${iconColors} flex items-center justify-center shrink-0`}>
-                          <span className="text-xs font-semibold">{initials}</span>
+                          <span className="text-sm font-semibold">{initials}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                          <p className="text-base font-medium text-slate-800 dark:text-slate-200 truncate">
                             {emp.firstName} {emp.lastName}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
                             {certLevel} expires {format(expiryDate, "MMM d")}
                           </p>
                         </div>
                         {/* Outline Badge */}
                         <span 
-                          className={`text-[10px] font-medium h-6 px-2 rounded-full border flex items-center shrink-0 ${badgeColors}`}
+                          className={`text-sm font-medium h-6 px-2 rounded-full border flex items-center shrink-0 ${badgeColors}`}
                           data-testid={`badge-days-left-${emp.id}`}
                         >
                           {daysLeft}d left
@@ -680,7 +680,7 @@ export function DashboardOverview({
                 })
               ) : (
                 <div className="px-4 py-8 text-center">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-base text-slate-500 dark:text-slate-400">
                     {t("dashboard.overview.noCertificationAlerts", "No expiring certifications")}
                   </p>
                 </div>
