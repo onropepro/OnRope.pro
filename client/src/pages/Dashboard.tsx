@@ -34,7 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, AlertTriangle } from "lucide-react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -1136,30 +1136,34 @@ function LicenseExpiryWarningBanner({ employees, onReviewClick }: { employees: a
 export default function Dashboard() {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage } = useLanguage();
-  const [location] = useLocation();
-  const [activeTab, setActiveTab] = useState("");
-  const [projectsSubTab, setProjectsSubTab] = useState<"active" | "past">("active");
+  const [, setLocation] = useLocation();
   
-  // Synchronize activeTab with URL query parameter
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab') || "";
-    if (tab !== activeTab) {
-      setActiveTab(tab);
-    }
-  }, [location]);
+  // Use wouter's useSearch hook to track query parameter changes
+  const searchString = useSearch();
+  
+  // Derive activeTab from the URL search params (single source of truth)
+  const activeTab = useMemo(() => {
+    const urlParams = new URLSearchParams(searchString);
+    return urlParams.get('tab') || "";
+  }, [searchString]);
+  
+  const [projectsSubTab, setProjectsSubTab] = useState<"active" | "past">("active");
   
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
   const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "hsl(var(--primary))";
 
-  // Scroll to top when changing tabs
+  // Scroll to top when changing tabs - navigate via URL
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
+    if (tab === "" || tab === "home") {
+      setLocation("/dashboard");
+    } else {
+      setLocation(`/dashboard?tab=${tab}`);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToNav = () => {
-    setActiveTab("");
+    setLocation("/dashboard");
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const [showProjectDialog, setShowProjectDialog] = useState(false);
@@ -1236,7 +1240,6 @@ export default function Dashboard() {
   const [progressPromptProjectId, setProgressPromptProjectId] = useState<string | null>(null);
   const [progressPromptCurrentValue, setProgressPromptCurrentValue] = useState(0);
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
   
   // Drag-and-drop sensors
   const sensors = useSensors(
@@ -2489,7 +2492,7 @@ export default function Dashboard() {
     setProjectDataForClient(null);
     
     // Switch to Clients tab and open the client dialog
-    setActiveTab("clients");
+    setLocation("/dashboard?tab=clients");
     setTimeout(() => {
       setShowClientDialog(true);
     }, 100);
