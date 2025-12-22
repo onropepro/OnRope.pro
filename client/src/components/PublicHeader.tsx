@@ -31,9 +31,11 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const [location, setLocation] = useLocation();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
   const [showTechnicianMenu, setShowTechnicianMenu] = useState(false);
+  const [showPropertyManagerMenu, setShowPropertyManagerMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileModulesExpanded, setMobileModulesExpanded] = useState(false);
   const [mobileTechnicianExpanded, setMobileTechnicianExpanded] = useState(false);
+  const [mobilePropertyManagerExpanded, setMobilePropertyManagerExpanded] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<'en' | 'fr' | 'es'>(() => {
     const lang = i18n.language;
     if (lang?.startsWith('fr')) return 'fr';
@@ -42,6 +44,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   });
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const technicianMenuRef = useRef<HTMLDivElement>(null);
+  const propertyManagerMenuRef = useRef<HTMLDivElement>(null);
   
   // Determine stakeholder color based on current path
   const getStakeholderColor = (): string | null => {
@@ -112,13 +115,16 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
       if (technicianMenuRef.current && !technicianMenuRef.current.contains(e.target as Node)) {
         setShowTechnicianMenu(false);
       }
+      if (propertyManagerMenuRef.current && !propertyManagerMenuRef.current.contains(e.target as Node)) {
+        setShowPropertyManagerMenu(false);
+      }
     };
     
-    if (showModulesMenu || showTechnicianMenu) {
+    if (showModulesMenu || showTechnicianMenu || showPropertyManagerMenu) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [showModulesMenu, showTechnicianMenu]);
+  }, [showModulesMenu, showTechnicianMenu, showPropertyManagerMenu]);
 
   const navItems = [
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
@@ -656,8 +662,70 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               )}
             </div>
             
-            {/* Other nav items (excluding employer and technician since they're handled above) */}
-            {navItems.filter(item => item.id !== "employer" && item.id !== "technician").map((item) => (
+            {/* Property Manager with dropdown */}
+            <div 
+              className="relative flex items-center" 
+              ref={propertyManagerMenuRef}
+              onMouseEnter={() => {
+                setShowPropertyManagerMenu(true);
+                setShowModulesMenu(false);
+                setShowTechnicianMenu(false);
+              }}
+              onMouseLeave={() => setShowPropertyManagerMenu(false)}
+            >
+              <Button
+                variant="ghost"
+                className={`text-sm font-medium gap-1 ${activeNav === "property-manager" ? "text-primary" : ""}`}
+                onClick={() => setLocation("/property-manager")}
+                data-testid="nav-property-manager"
+              >
+                {t('navigation.propertyManager', 'Property Manager')}
+                <ChevronDown className="w-3 h-3" />
+              </Button>
+              {showPropertyManagerMenu && (
+                <div className="absolute top-full left-0 pt-2 z-50">
+                  <div className="bg-card border border-border rounded-xl shadow-xl p-4 w-[340px]">
+                    <div className="space-y-3">
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
+                        onClick={() => {
+                          setLocation("/property-manager");
+                          setShowPropertyManagerMenu(false);
+                        }}
+                        data-testid="nav-pm-overview"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-[#6E9075]/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Globe className="w-5 h-5 text-[#6E9075]" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.pmOverview.title', 'Property Manager Overview')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.pmOverview.description', 'See how OnRopePro helps property managers')}</div>
+                        </div>
+                      </button>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
+                        onClick={() => {
+                          setLocation("/property-manager/company-safety-rating");
+                          setShowPropertyManagerMenu(false);
+                        }}
+                        data-testid="nav-pm-csr"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-[#6E9075]/20 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                          <Gauge className="w-5 h-5 text-[#6E9075]" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.pmCSR.title', 'Company Safety Rating')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.pmCSR.description', 'Portfolio-wide vendor safety compliance tracking')}</div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Other nav items (excluding employer, technician, and property-manager since they're handled above) */}
+            {navItems.filter(item => item.id !== "employer" && item.id !== "technician" && item.id !== "property-manager").map((item) => (
               <Button
                 key={item.id}
                 variant="ghost"
@@ -666,6 +734,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onMouseEnter={() => {
                   setShowModulesMenu(false);
                   setShowTechnicianMenu(false);
+                  setShowPropertyManagerMenu(false);
                 }}
                 data-testid={`nav-${item.id}`}
               >
@@ -865,8 +934,51 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               )}
             </div>
 
+            {/* Property Manager with expandable modules */}
+            <div>
+              <button
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left font-medium transition-colors hover-elevate ${
+                  activeNav === "property-manager" 
+                    ? "text-primary" 
+                    : ""
+                }`}
+                onClick={() => setMobilePropertyManagerExpanded(!mobilePropertyManagerExpanded)}
+                data-testid="nav-mobile-property-manager"
+              >
+                <span>{t('navigation.propertyManager', 'Property Manager')}</span>
+                <ChevronDown className={`w-5 h-5 transition-transform ${mobilePropertyManagerExpanded ? "rotate-180" : ""}`} />
+              </button>
+              
+              {mobilePropertyManagerExpanded && (
+                <div className="mt-2 ml-4 space-y-1">
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/property-manager");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-pm-overview"
+                  >
+                    <Globe className="w-5 h-5 text-[#6E9075]" />
+                    <span className="text-sm">{t('navigation.modules.pmOverview.title', 'Property Manager Overview')}</span>
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover-elevate"
+                    onClick={() => {
+                      setLocation("/property-manager/company-safety-rating");
+                      setMobileMenuOpen(false);
+                    }}
+                    data-testid="nav-mobile-pm-csr"
+                  >
+                    <Gauge className="w-5 h-5 text-[#6E9075]" />
+                    <span className="text-sm">{t('navigation.modules.pmCSR.title', 'Company Safety Rating')}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Other nav items */}
-            {navItems.filter(item => item.id !== "employer" && item.id !== "technician").map((item) => (
+            {navItems.filter(item => item.id !== "employer" && item.id !== "technician" && item.id !== "property-manager").map((item) => (
               <button
                 key={item.id}
                 className={`w-full px-4 py-3 rounded-lg text-left font-medium transition-colors hover-elevate ${
