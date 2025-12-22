@@ -5301,7 +5301,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/property-managers/me/vendors", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
       const vendorSummaries = await storage.getPropertyManagerVendorSummaries(req.session.userId!);
-      res.json({ vendors: vendorSummaries });
+      console.log(`[PM Vendors] Fetched ${vendorSummaries.length} vendors for property manager ${req.session.userId}`);
+      
+      // Fetch CSR data for each vendor in parallel
+      const vendorsWithCSR = await Promise.all(
+        vendorSummaries.map(async (vendor) => {
+          try {
+            const csrData = await calculateCompanyCSR(vendor.id, storage, true);
+            console.log(`[PM Vendors] CSR for vendor ${vendor.companyName}: ${csrData.csrRating}% (${csrData.csrLabel})`);
+            return {
+              ...vendor,
+              csrRating: csrData.csrRating,
+              csrLabel: csrData.csrLabel,
+              csrColor: csrData.csrColor,
+            };
+          } catch (error) {
+            console.error(`[PM Vendors] Failed to calculate CSR for vendor ${vendor.id}:`, error);
+            return {
+              ...vendor,
+              csrRating: null,
+              csrLabel: null,
+              csrColor: null,
+            };
+          }
+        })
+      );
+      
+      console.log(`[PM Vendors] Returning vendors with CSR:`, vendorsWithCSR.map(v => ({ name: v.companyName, csrRating: v.csrRating })));
+      res.json({ vendors: vendorsWithCSR });
     } catch (error) {
       console.error("Get property manager vendor summaries error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -16913,6 +16940,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+  // Property Manager: Get CSR history for a linked vendor company
+  app.get("/api/property-managers/vendors/:linkId/csr/history", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId } = req.params;
+      const propertyManagerId = req.session.userId!;
+      
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
+      }
+      
+      const companyId = ownedLink.companyId;
+      
+      // Get CSR history from storage
+      const history = await storage.getCsrRatingHistoryByCompany(companyId);
+      
+      res.json({ history });
+    } catch (error) {
+      console.error("Get vendor CSR history error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
   // Property Manager: Get vendor company documents (for viewing Certificate of Insurance, etc.)
   app.get("/api/property-managers/vendors/:linkId/documents", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
