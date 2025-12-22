@@ -338,6 +338,15 @@ export function DashboardOverview({
 
   const todaySchedule: ScheduleItem[] = todayScheduleData?.scheduleItems || [];
 
+  // Helper function to format job type from SCREAMING_SNAKE_CASE to Title Case
+  const formatJobType = (jobType: string): string => {
+    if (!jobType) return '';
+    return jobType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-2">
@@ -546,11 +555,11 @@ export function DashboardOverview({
                       {/* Vertical Connector Line */}
                       <div className="border-l-2 border-slate-100 dark:border-slate-700 group-hover:border-[#0B64A3]/30 dark:group-hover:border-blue-400/30 pl-3 transition-colors flex-1 min-w-0">
                         {item.jobType && (
-                          <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-0.5">
-                            {item.jobType}
+                          <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 tracking-wide mb-0.5">
+                            {formatJobType(item.jobType)}
                           </p>
                         )}
-                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 truncate">
                           {item.title}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
