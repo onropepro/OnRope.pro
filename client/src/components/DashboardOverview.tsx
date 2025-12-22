@@ -332,7 +332,7 @@ export function DashboardOverview({
     client: project.clientName || project.client || "Unknown Client",
     teamCount: project.assignedEmployees?.length || 0,
     dueDate: project.endDate ? format(new Date(project.endDate), "MMM d") : "TBD",
-    progress: project.progress || Math.floor(Math.random() * 70) + 20,
+    progress: typeof project.progress === 'number' ? project.progress : 0,
     status: project.status || "active",
   }));
 
