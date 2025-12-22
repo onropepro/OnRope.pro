@@ -3,7 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences } from "@shared/schema";
+import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, gt, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -3581,6 +3582,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // =====================================================================
   // END STRIPE ENDPOINTS
+  // =====================================================================
+
+  // =====================================================================
+  // DASHBOARD PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // Get available cards for user (permission-filtered)
+  app.get("/api/dashboard/available-cards", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const availableCards = getAvailableCardsForUser(user);
+      const groupedCards = getCardsByCategory();
+      
+      // Filter grouped cards by user permissions
+      const filteredGrouped: Record<string, any[]> = {};
+      for (const [category, cards] of Object.entries(groupedCards)) {
+        const filtered = cards.filter(card => {
+          if (card.permission === null) return true;
+          if (user.role === 'company') return true;
+          return user.permissions?.includes(card.permission.replace('can', 'view_').replace('manage', 'manage_'));
+        });
+        if (filtered.length > 0) {
+          filteredGrouped[category] = filtered.map(c => ({
+            id: c.id,
+            name: c.name,
+            description: c.description,
+            category: c.category,
+          }));
+        }
+      }
+
+      res.json({ 
+        cards: availableCards.map(c => ({
+          id: c.id,
+          name: c.name,
+          category: c.category,
+        })),
+        grouped: filteredGrouped,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get available cards error:', error);
+      res.status(500).json({ message: error.message || "Failed to get available cards" });
+    }
+  });
+
+  // Get user's dashboard layout
+  app.get("/api/dashboard/layout", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get saved preferences
+      const prefs = await db.select()
+        .from(dashboardPreferences)
+        .where(eq(dashboardPreferences.userId, userId))
+        .orderBy(asc(dashboardPreferences.position));
+
+      if (prefs.length === 0) {
+        // Return default layout for role
+        const defaultCards = getDefaultLayoutForRole(user.role);
+        return res.json({ 
+          cards: defaultCards.map((id, idx) => ({ id, position: idx })),
+          isDefault: true,
+        });
+      }
+
+      res.json({ 
+        cards: prefs.map(p => ({ id: p.cardId, position: p.position })),
+        isDefault: false,
+      });
+    } catch (error: any) {
+      console.error('[Dashboard] Get layout error:', error);
+      res.status(500).json({ message: error.message || "Failed to get dashboard layout" });
+    }
+  });
+
+  // Save user's dashboard layout
+  app.put("/api/dashboard/layout", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { cards } = req.body;
+
+      if (!Array.isArray(cards)) {
+        return res.status(400).json({ message: "cards must be an array of card IDs" });
+      }
+
+      // Validate all card IDs exist
+      const validCardIds = CARD_REGISTRY.map(c => c.id);
+      for (const cardId of cards) {
+        if (!validCardIds.includes(cardId)) {
+          return res.status(400).json({ message: `Invalid card ID: ${cardId}` });
+        }
+      }
+
+      // Delete existing preferences
+      await db.delete(dashboardPreferences)
+        .where(eq(dashboardPreferences.userId, userId));
+
+      // Insert new preferences
+      if (cards.length > 0) {
+        const inserts = cards.map((cardId: string, idx: number) => ({
+          userId,
+          cardId,
+          position: idx,
+        }));
+        await db.insert(dashboardPreferences).values(inserts);
+      }
+
+      res.json({ success: true, cards });
+    } catch (error: any) {
+      console.error('[Dashboard] Save layout error:', error);
+      res.status(500).json({ message: error.message || "Failed to save dashboard layout" });
+    }
+  });
+
+  // =====================================================================
+  // END DASHBOARD PREFERENCES ENDPOINTS
   // =====================================================================
   
   // Get current user

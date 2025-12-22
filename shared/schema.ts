@@ -3097,3 +3097,28 @@ export const insertResidentFeedbackPhotoQueueSchema = createInsertSchema(residen
 
 export type ResidentFeedbackPhotoQueue = typeof residentFeedbackPhotoQueue.$inferSelect;
 export type InsertResidentFeedbackPhotoQueue = z.infer<typeof insertResidentFeedbackPhotoQueueSchema>;
+
+// ============================================
+// DASHBOARD PREFERENCES
+// ============================================
+
+// Dashboard Preferences - Stores user's customized dashboard card layout
+export const dashboardPreferences = pgTable("dashboard_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  cardId: varchar("card_id", { length: 50 }).notNull(), // Card identifier (e.g., "proj-active", "safe-csr")
+  position: integer("position").notNull(), // Order position (0-indexed)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_dashboard_prefs_user").on(table.userId),
+]);
+
+export const insertDashboardPreferencesSchema = createInsertSchema(dashboardPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DashboardPreferences = typeof dashboardPreferences.$inferSelect;
+export type InsertDashboardPreferences = z.infer<typeof insertDashboardPreferencesSchema>;
