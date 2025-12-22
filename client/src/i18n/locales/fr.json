@@ -13089,5 +13089,338 @@
         "text": "Fait partie de la plateforme OnRopePro pour les entreprises d'entretien de bâtiments en accès sur corde."
       }
     }
+  },
+  "home": {
+    "hero": {
+      "badge": "Logiciel pour l'industrie de l'accès sur corde",
+      "headline1": "Une plateforme unifiée.",
+      "headline2": "Tout le monde connecté.",
+      "headline3": "Zéro chaos.",
+      "subheadline1": "Le système d'exploitation complet pour les entreprises d'accès sur corde. Du suivi de projet à la paie, de la conformité sécurité à la communication avec les résidents - tout sur une seule plateforme conçue spécifiquement pour les professionnels des travaux en hauteur.",
+      "subheadline2": "Arrêtez de jongler avec 10 outils différents. Commencez à gérer votre entreprise.",
+      "iAmA": "Je suis..."
+    },
+    "segments": {
+      "employer": {
+        "buttonLabel": "Propriétaire d'entreprise",
+        "headline": "Arrêtez de courir après votre entreprise. Commencez à la diriger.",
+        "subheadline": "Vous avez créé une entreprise d'accès sur corde pour faire de l'accès sur corde. Pas pour passer 80 heures par mois sur l'administration, les disputes de paie et les appels téléphoniques avec les gestionnaires immobiliers. OnRopePro centralise tout pour que vous puissiez vous concentrer sur ce que vous faites le mieux.",
+        "pillars": {
+          "0": {
+            "headline": "Économisez 80+ heures/mois",
+            "text": "Suivi du temps automatique, agrégation de la paie et documentation de conformité. Arrêtez le travail administratif."
+          },
+          "1": {
+            "headline": "Arrêtez les fuites d'argent",
+            "text": "Suivez les heures non facturables, éliminez les disputes de paie et établissez des devis précis. Connaissez vos vraies marges."
+          },
+          "2": {
+            "headline": "Toujours prêt pour l'audit",
+            "text": "Chaque inspection de harnais, réunion de sécurité et document enregistré et exportable. Gagnez le procès que vous espérez ne jamais avoir."
+          }
+        },
+        "primaryCta": "Essai gratuit de 30 jours",
+        "secondaryCta": "Voir les tarifs",
+        "secondarySubtext": "À partir de 99$/mois + 34,95$/tech",
+        "trustSignal": "Essai gratuit de 30 jours. Aucune carte de crédit requise. Accès complet à toutes les fonctionnalités."
+      },
+      "technician": {
+        "buttonLabel": "Technicien",
+        "headline": "Un profil. Chaque employeur. Toute votre carrière.",
+        "subheadline": "Vos heures IRATA, certifications et historique de travail - portables d'un emploi à l'autre. Plus de formulaires à remplir. Plus de carnets de bord perdus. Votre identité professionnelle vous suit.",
+        "pillars": {
+          "0": {
+            "headline": "Intégration instantanée",
+            "text": "Partagez votre profil une fois. Les employeurs obtiennent vos certifications, votre dossier de sécurité et votre expérience instantanément."
+          },
+          "1": {
+            "headline": "Suivi réel des heures",
+            "text": "Sessions de travail vérifiées par GPS. Votre carnet de bord se remplit tout seul. Exportez pour la recertification à tout moment."
+          },
+          "2": {
+            "headline": "Visibilité de carrière",
+            "text": "Construisez votre réputation. Scores de sécurité, compétences et expérience vérifiée qui vous suivent."
+          }
+        },
+        "primaryCta": "Créer un profil technicien gratuit",
+        "secondaryCta": "En savoir plus",
+        "trustSignal": "Gratuit pour toujours. Aucune carte de crédit requise. Connectez-vous à plusieurs employeurs."
+      },
+      "propertyManager": {
+        "buttonLabel": "Gestionnaire immobilier",
+        "headline": "Voyez tout. Ne gérez rien.",
+        "subheadline": "Visibilité en temps réel des projets sans les appels téléphoniques. Sachez exactement ce qui se passe dans chaque bâtiment, quand ça se passe et quand ce sera terminé.",
+        "pillars": {
+          "0": {
+            "headline": "Tableaux de bord en temps réel",
+            "text": "Suivez la progression des projets en direct. Le suivi des 4 élévations montre exactement quels côtés sont terminés."
+          },
+          "1": {
+            "headline": "Exports de conformité",
+            "text": "Audits d'assurance? Documentation de sécurité? Un clic. 400 pages de preuves."
+          },
+          "2": {
+            "headline": "Portail résident",
+            "text": "Vos résidents soumettent leurs commentaires directement. Moins d'appels pour vous. Résolution plus rapide pour tous."
+          }
+        },
+        "primaryCta": "Demander l'accès",
+        "primaryCtaSubtext": "Nécessite une invitation de votre fournisseur d'accès sur corde",
+        "secondaryCta": "En savoir plus",
+        "trustSignal": "Gratuit pour les gestionnaires immobiliers. Votre fournisseur d'accès sur corde vous donne l'accès."
+      },
+      "buildingManager": {
+        "buttonLabel": "Gestionnaire d'immeuble",
+        "headline": "Moins d'appels. Réponses plus rapides. Résidents plus heureux.",
+        "subheadline": "Arrêtez de jouer au messager entre les résidents et les équipes d'accès sur corde. Donnez à tous une visibilité sur les horaires, la progression et les commentaires - et récupérez votre temps.",
+        "pillars": {
+          "0": {
+            "headline": "Libre-service résident",
+            "text": "Les résidents suivent la progression et soumettent leurs commentaires eux-mêmes. Vous arrêtez de répondre aux questions."
+          },
+          "1": {
+            "headline": "Mises à jour automatiques",
+            "text": "Changements d'horaire, photos de complétion, retards météo - tout le monde voit les mêmes informations."
+          },
+          "2": {
+            "headline": "Renouvellement de contrats",
+            "text": "Résidents satisfaits = conseils satisfaits. Le professionnalisme visible génère 95% de taux de renouvellement."
+          }
+        },
+        "primaryCta": "Accéder au portail immeuble",
+        "secondaryCta": "En savoir plus",
+        "trustSignal": "Accès gratuit fourni par le fournisseur de services d'accès sur corde de votre immeuble."
+      },
+      "resident": {
+        "buttonLabel": "Résident",
+        "headline": "Sachez quand ils arrivent. Voyez quand c'est terminé.",
+        "subheadline": "Plus besoin de vous demander quand les laveurs de vitres atteindront votre unité. Suivez la progression, voyez les photos et soumettez vos commentaires - le tout depuis votre téléphone.",
+        "pillars": {
+          "0": {
+            "headline": "Visibilité de la progression",
+            "text": "Suivez la progression du projet en temps réel. Sachez quelles élévations sont terminées et lesquelles sont à venir."
+          },
+          "1": {
+            "headline": "Documentation photo",
+            "text": "Photos avant et après de vos fenêtres. Preuve visuelle du travail accompli."
+          },
+          "2": {
+            "headline": "Commentaires directs",
+            "text": "Fenêtre manquée? Soumettez un commentaire avec une photo. Résolution le jour même, pas des semaines d'appels."
+          }
+        },
+        "primaryCta": "Accéder au portail résident",
+        "secondaryCta": "En savoir plus",
+        "trustSignal": "Gratuit pour les résidents. Demandez le code d'accès à la gestion de votre immeuble."
+      }
+    },
+    "socialProof": {
+      "title": "Créé par l'accès sur corde. Pour l'accès sur corde.",
+      "description": "OnRopePro a été créé par un technicien IRATA niveau 3 et directeur des opérations qui en avait assez de gérer une entreprise d'accès sur corde avec des tableurs, WhatsApp et de bonnes intentions. Chaque fonctionnalité existe parce que nous en avions besoin nous-mêmes."
+    },
+    "problem": {
+      "title": "Le problème avec votre façon actuelle de gérer les choses",
+      "chaos": {
+        "title": "Le chaos",
+        "subtitle": "Où va vraiment votre temps",
+        "items": {
+          "0": "Courir après les feuilles de temps qui ne correspondent pas aux chantiers",
+          "1": "Répondre aux mêmes appels « quand venez-vous? »",
+          "2": "Reconstruire des tableurs que quelqu'un a cassés",
+          "3": "Chercher cette inspection de harnais de mars",
+          "4": "Expliquer les écarts de paie pour la troisième fois",
+          "5": "Croiser manuellement les horaires entre les bâtiments",
+          "6": "Créer des devis de mémoire en espérant ne pas sous-évaluer"
+        },
+        "conclusion": "Vous avez créé une entreprise d'accès sur corde pour faire de l'accès sur corde. Pas de la saisie de données."
+      },
+      "leaks": {
+        "title": "Les fuites",
+        "subtitle": "L'argent qui disparaît chaque mois",
+        "items": {
+          "0": { "amount": "3 500-7 500$/an", "desc": "en heures non facturables non facturées" },
+          "1": { "amount": "4 000-12 000$/an", "desc": "en disputes et corrections de paie" },
+          "2": { "amount": "5 000-10 000$/an", "desc": "en contrats sous-évalués par estimation" },
+          "3": { "amount": "2 500-5 000$/an", "desc": "en heures d'admin qui devraient prendre 10" },
+          "4": { "amount": "7 000-10 000$/an", "desc": "en contrats perdus par manque de professionnalisme" }
+        },
+        "total": "Total: 22 000-45 000$/an en pertes évitables."
+      },
+      "fix": {
+        "title": "La solution",
+        "subtitle": "Une plateforme. Tout connecté.",
+        "items": {
+          "0": "Suivi du temps qui correspond au GPS des chantiers",
+          "1": "Portails clients qui répondent aux questions avant qu'ils appellent",
+          "2": "Documents de sécurité exportés en 4 minutes, pas 4 heures",
+          "3": "Paie qui s'agrège automatiquement, zéro dispute",
+          "4": "Outils de devis utilisant des données historiques réelles",
+          "5": "Planification que tout le monde peut voir et faire confiance"
+        },
+        "conclusion": "OnRopePro coûte <strong>99$/mois + 34,95$/tech</strong>. Les fuites que vous colmatez valent 10 fois plus."
+      }
+    },
+    "modules": {
+      "title": "18 modules. Une plateforme. Tout connecté. Tout inclus.",
+      "subtitle": "Tout ce dont vous avez besoin pour gérer une entreprise d'accès sur corde rentable, du premier devis au paiement final et chaque descente entre les deux.",
+      "categories": {
+        "all": "Tous les modules",
+        "operations": "Opérations",
+        "safety": "Sécurité",
+        "team": "Équipe",
+        "financial": "Financier",
+        "communication": "Communication"
+      },
+      "items": {
+        "projectManagement": {
+          "name": "Gestion de projets",
+          "desc": "Suivi des 4 élévations avec barres de progression visuelles et affectation d'équipe"
+        },
+        "workSession": {
+          "name": "Sessions de travail",
+          "desc": "Pointage GPS, suivi des descentes, agrégation automatique des heures"
+        },
+        "scheduling": {
+          "name": "Planification",
+          "desc": "Calendrier glisser-déposer avec détection de conflits et retards météo"
+        },
+        "gearInventory": {
+          "name": "Inventaire d'équipement",
+          "desc": "Suivi des numéros de série, historique d'affectation, flux de retrait"
+        },
+        "whiteLabel": {
+          "name": "Marque blanche",
+          "desc": "Image de marque personnalisée pour les portails et exports clients"
+        },
+        "safetyCompliance": {
+          "name": "Conformité sécurité",
+          "desc": "Formulaires numériques, plans PDF et documentation prête pour l'audit"
+        },
+        "companySafetyRating": {
+          "name": "Score de sécurité",
+          "desc": "Score de sécurité en temps réel basé sur les inspections et la conformité"
+        },
+        "irataSpratLogging": {
+          "name": "Enregistrement IRATA/SPRAT",
+          "desc": "Enregistrement des heures le jour même avec import OCR et dossiers portables"
+        },
+        "documentManagement": {
+          "name": "Documents",
+          "desc": "Signatures numériques, pistes d'audit immuables, rapports de conformité"
+        },
+        "employeeManagement": {
+          "name": "Gestion des employés",
+          "desc": "Identités portables, suivi des certifications, permissions par rôle"
+        },
+        "technicianPassport": {
+          "name": "Passeport technicien",
+          "desc": "Historique de travail et certifications portables entre employeurs"
+        },
+        "jobBoard": {
+          "name": "Tableau d'emplois",
+          "desc": "Explorateur de talents avec publications illimitées et offres directes"
+        },
+        "userAccess": {
+          "name": "Accès utilisateur",
+          "desc": "Permissions granulaires et pistes d'audit pour chaque action"
+        },
+        "payrollFinancial": {
+          "name": "Paie",
+          "desc": "Agrégation automatique des heures avec calcul des heures supplémentaires et exports"
+        },
+        "quotingSales": {
+          "name": "Devis",
+          "desc": "Devis multi-services avec documentation photo et données historiques"
+        },
+        "crm": {
+          "name": "CRM",
+          "desc": "Gestion de la relation client avec historique des contacts et notes"
+        },
+        "residentPortal": {
+          "name": "Portail résident",
+          "desc": "Suivi de progression et soumission de commentaires pour les résidents"
+        },
+        "propertyManagerInterface": {
+          "name": "Portail gestionnaire immobilier",
+          "desc": "Tableaux de bord en temps réel et exports de conformité pour les gestionnaires"
+        }
+      },
+      "seeAllCta": "Voir toutes les fonctionnalités et tarifs"
+    },
+    "roi": {
+      "title": "Le calcul est simple",
+      "investment": {
+        "title": "L'investissement",
+        "basePrice": "99$",
+        "basePriceSuffix": "/mois de base",
+        "perTechPrice": "+ 34,95$",
+        "perTechPriceSuffix": "/mois par technicien",
+        "equals": "= Votre coût mensuel",
+        "comparison1": "34,95$ c'est ce que vous payez un technicien pour <strong>une heure</strong> de travail.",
+        "comparison2": "Cette plateforme fait économiser à chaque tech <strong>10+ heures</strong> par mois.",
+        "mathSimple": "Le calcul est simple.",
+        "stressElimination": "Élimination du stress? Inestimable."
+      },
+      "return": {
+        "title": "Le retour",
+        "metricHeader": "Métrique",
+        "withoutHeader": "Sans",
+        "withHeader": "Avec OnRopePro"
+      },
+      "beforeAfter": {
+        "0": { "metric": "Heures admin/semaine", "before": "20+", "after": "3-5" },
+        "1": { "metric": "Temps de préparation paie", "before": "4+ heures", "after": "30 min" },
+        "2": { "metric": "Capture heures facturables", "before": "68%", "after": "95%+" },
+        "3": { "metric": "Taux de renouvellement", "before": "60%", "after": "95%" },
+        "4": { "metric": "Temps de préparation audit", "before": "Jours", "after": "Minutes" }
+      },
+      "exampleTitle": "Exemple de ROI: 10 techniciens",
+      "example": {
+        "0": { "label": "Coût mensuel (10 techs)", "value": "448,50$" },
+        "1": { "label": "Économies de temps (80 h × 35$)", "value": "2 800$/mois" },
+        "2": { "label": "Récupération facturable", "value": "2 100$/mois" },
+        "3": { "label": "Élimination des disputes", "value": "833$/mois" },
+        "4": { "label": "Valeur rétention contrats", "value": "2 745$/mois" }
+      },
+      "totalAnnualValue": "Valeur annuelle totale",
+      "netBenefit": "Bénéfice net",
+      "roiLabel": "ROI"
+    },
+    "trust": {
+      "title": "Pourquoi les entreprises comme la vôtre font confiance à OnRopePro",
+      "builtBy": {
+        "title": "Créé par l'accès sur corde",
+        "description": "Créé par un technicien IRATA niveau 3. Chaque fonctionnalité conçue pour le fonctionnement réel des entreprises d'accès sur corde, pas adaptée d'un logiciel de service générique."
+      },
+      "dataControl": {
+        "title": "Vos données, votre contrôle",
+        "description": "Chiffrement de niveau bancaire. Sauvegardes quotidiennes. Exportez tout ce que vous avez entré à tout moment. Vous n'êtes jamais enfermé."
+      },
+      "noContracts": {
+        "title": "Pas de contrats, pas de surprises",
+        "description": "Facturation mensuelle. Annulez à tout moment. Pas de frais d'installation. Pas de frais par projet. Nous préférons mériter votre confiance chaque mois plutôt que de vous enfermer dans un contrat."
+      }
+    },
+    "finalCta": {
+      "title": "Prêt à arrêter le chaos?",
+      "subtitle": "Essai gratuit de 30 jours. Aucune carte de crédit requise. Accès complet à toutes les fonctionnalités.",
+      "startTrial": "Commencer votre essai gratuit",
+      "scheduleDemo": "Planifier une démo de 15 minutes"
+    },
+    "footer": {
+      "simplePricing": {
+        "title": "Tarification simple",
+        "description": "99$/mois + 34,95$/technicien. Tout inclus."
+      },
+      "noLockIn": {
+        "title": "Pas d'engagement",
+        "description": "Facturation mensuelle. Annulez à tout moment. Exportez vos données quand vous voulez."
+      },
+      "realSupport": {
+        "title": "Support réel",
+        "description": "Réponse par courriel le jour même. Documentation qui aide vraiment."
+      },
+      "tagline": "OnRopePro - Créé par l'accès sur corde, pour l'accès sur corde"
+    }
   }
 }

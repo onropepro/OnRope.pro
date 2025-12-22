@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -61,422 +62,226 @@ type Segment =
   | "building-manager"
   | "resident";
 
-const segmentContent = {
+const segmentIcons = {
   employer: {
-    headline: "Stop Chasing Your Business. Start Running It.",
-    subheadline:
-      "You didn't start a rope access company to spend 22 hours a week on spreadsheets, text threads, and payroll chaos. One platform. Everything connected. Reclaim your time.",
-    pillars: [
-      {
-        icon: Clock,
-        headline: "87-93% Less Payroll Time",
-        text: "One-click payroll prep. Automatic overtime. Zero calculation errors.",
-      },
-      {
-        icon: DollarSign,
-        headline: "$22K-45K Recovered Annually",
-        text: "Unbilled hours tracked. Payroll errors eliminated. Quotes that don't underbid.",
-      },
-      {
-        icon: Shield,
-        headline: "Audit-Ready in 4 Minutes",
-        text: "Every document, every inspection, every certification. Exportable. Defensible.",
-      },
-    ],
-    primaryCta: { text: "Start Free Trial", href: "/register" },
-    secondaryCta: { text: "See How It Works", href: "/pricing" },
-    secondarySubtext: "15-minute demo with someone who's been on the ropes",
-    trustSignal: "30 days free. No credit card.",
+    pillars: [Clock, DollarSign, Shield],
   },
   technician: {
-    headline: "Your Career. Your Data. Your Platform.",
-    subheadline:
-      "Your IRATA/SPRAT hours are yours, not your employer's. Build a portable professional identity that follows you from company to company, job to job, for your entire career.",
-    pillars: [
-      {
-        icon: Ticket,
-        headline: "Portable Work Passport",
-        text: "Your hours, certifications, and work history travel with you. Change jobs without losing your record.",
-      },
-      {
-        icon: BarChart3,
-        headline: "Automatic Hour Logging",
-        text: "Connected to an employer? Hours, drops, and tasks log automatically. No more end-of-week paperwork.",
-      },
-      {
-        icon: Rocket,
-        headline: "Level Up Faster",
-        text: "Track progress toward L2 and L3. Know exactly how many hours you need and in which task categories.",
-      },
-    ],
-    primaryCta: { text: "Create Free Account", href: "/technician" },
-    secondaryCta: { text: "How It Works for Techs", href: "/technician" },
-    trustSignal:
-      "PLUS features unlock free when you refer one other technician",
+    pillars: [Ticket, BarChart3, Rocket],
   },
   "property-manager": {
-    headline: "Know Your Vendors Before the Incident, Not After.",
-    subheadline:
-      "Stop accepting vendor safety claims at face value. See real compliance data. Compare vendors objectively. Protect your portfolio with documented due diligence.",
-    pillars: [
-      {
-        icon: BarChart3,
-        headline: "Company Safety Ratings",
-        text: "Three compliance percentages: documentation, toolbox meetings, harness inspections. At a glance.",
-      },
-      {
-        icon: Scale,
-        headline: "Liability Protection",
-        text: 'Documented vendor vetting. When insurance asks "what due diligence did you perform?" You have the answer.',
-      },
-      {
-        icon: ClipboardList,
-        headline: "Portfolio Dashboard",
-        text: "All your buildings. All your vendors. All their safety data. One screen.",
-      },
-    ],
-    primaryCta: {
-      text: "Create Free Account",
-      href: "/property-manager",
-      subtext: "Free for property managers",
-    },
-    secondaryCta: {
-      text: "See Vendor Comparison Demo",
-      href: "/property-manager",
-    },
-    trustSignal:
-      "Join 50+ property managers already using OnRopePro for vendor oversight",
+    pillars: [BarChart3, Scale, ClipboardList],
   },
   "building-manager": {
-    headline: "Stop Being the Middleman.",
-    subheadline:
-      "Every resident complaint shouldn't flow through you. Every progress question shouldn't require three phone calls. Get visibility without the coordination burden.",
-    pillars: [
-      {
-        icon: Phone,
-        headline: "70% Fewer Calls",
-        text: 'Residents see project progress in real-time. They stop calling you to ask "when will they do my side?"',
-      },
-      {
-        icon: RefreshCw,
-        headline: "24-Hour Resolution",
-        text: "Residents submit feedback directly to vendors. You see everything without handling every back-and-forth.",
-      },
-      {
-        icon: TrendingUp,
-        headline: "Proof for Council",
-        text: "Generate professional vendor performance reports in 2 minutes instead of 2 hours.",
-      },
-    ],
-    primaryCta: { text: "Create Free Account", href: "/building-portal" },
-    secondaryCta: {
-      text: "See Building Manager Portal",
-      href: "/building-portal",
-    },
-    trustSignal: "Free for building managers",
+    pillars: [Phone, RefreshCw, TrendingUp],
   },
   resident: {
-    headline: "Know What's Happening. Report What's Wrong.",
-    subheadline:
-      "No more wondering when the window cleaners will reach your unit. No more calling the building manager just to find out what's going on.",
-    pillars: [
-      {
-        icon: Eye,
-        headline: "Real-Time Progress",
-        text: "See which building elevations are complete and when work will reach your unit. Plan accordingly.",
-      },
-      {
-        icon: Camera,
-        headline: "Direct Feedback",
-        text: "Notice a problem? Submit it with photos. Track status until it's resolved. No more unanswered emails.",
-      },
-      {
-        icon: Timer,
-        headline: "Faster Resolution",
-        text: "Average issue resolution: 24 hours vs. 3-5 days with traditional phone tag.",
-      },
-    ],
-    primaryCta: { text: "Create Free Account", href: "/resident" },
-    secondaryCta: { text: "How the Resident Portal Works", href: "/resident" },
-    trustSignal: "Free for residents",
+    pillars: [Eye, Camera, Timer],
   },
 };
 
-// Module categories for filtering
-const moduleCategories = [
-  { id: "all", label: "All", icon: LayoutGrid, color: "text-foreground" },
-  {
-    id: "operations",
-    label: "Operations",
-    icon: Settings,
-    color: "text-blue-600",
+const segmentHrefs = {
+  employer: {
+    primaryCta: "/register",
+    secondaryCta: "/pricing",
   },
-  { id: "safety", label: "Safety", icon: HeartPulse, color: "text-red-600" },
-  { id: "team", label: "Team", icon: Users, color: "text-violet-600" },
-  {
-    id: "financial",
-    label: "Financial & Sales",
-    icon: Wallet,
-    color: "text-emerald-600",
+  technician: {
+    primaryCta: "/technician",
+    secondaryCta: "/technician",
   },
-  {
-    id: "communication",
-    label: "Communication",
-    icon: MessageSquare,
-    color: "text-rose-600",
+  "property-manager": {
+    primaryCta: "/property-manager",
+    secondaryCta: "/property-manager",
   },
-];
+  "building-manager": {
+    primaryCta: "/building-portal",
+    secondaryCta: "/building-portal",
+  },
+  resident: {
+    primaryCta: "/resident",
+    secondaryCta: "/resident",
+  },
+};
 
-const modules = [
-  // Operations (5)
-  {
-    name: "Project Management",
-    desc: "Create, assign, track, and close jobs. Every building. Every drop. Every hour.",
-    icon: FolderOpen,
-    category: "operations",
-  },
-  {
-    name: "Work Session & Time Tracking",
-    desc: "GPS-verified clock in/out. Automatic overtime. Zero disputed hours.",
-    icon: Clock,
-    category: "operations",
-  },
-  {
-    name: "Scheduling & Calendar",
-    desc: "Drag-and-drop crew assignments. Conflict detection. Time-off management.",
-    icon: Calendar,
-    category: "operations",
-  },
-  {
-    name: "Gear Inventory Management",
-    desc: "Every harness, rope, and descender tracked. Serial numbers. Service life alerts.",
-    icon: Package,
-    category: "operations",
-  },
-  {
-    name: "White-Label Branding",
-    desc: "Your logo, your colors. Professional client-facing portal.",
-    icon: Palette,
-    category: "operations",
-  },
-  // Safety (4)
-  {
-    name: "Safety & Compliance",
-    desc: "SWMS, Toolbox Meetings, Anchor Certs, JHAs. Audit-ready in 4 minutes.",
-    icon: Shield,
-    category: "safety",
-  },
-  {
-    name: "Company Safety Rating",
-    desc: "Aggregate safety score. Differentiate in bids. Impress building managers.",
-    icon: Gauge,
-    category: "safety",
-  },
-  {
-    name: "IRATA/SPRAT Task Logging",
-    desc: "Automatic hour logging toward certification. Exportable for assessments.",
-    icon: ClipboardCheck,
-    category: "safety",
-  },
-  {
-    name: "Document Management",
-    desc: "Insurance certs, training records, rope access plans. Upload once, access anywhere.",
-    icon: FileText,
-    category: "safety",
-  },
-  // Team (4)
-  {
-    name: "Employee Management",
-    desc: "Profiles, certifications, hourly rates, permissions. Onboard in minutes.",
-    icon: UserCog,
-    category: "team",
-  },
-  {
-    name: "Technician Passport",
-    desc: "Portable work history and certifications. Access from any employer.",
-    icon: IdCard,
-    category: "team",
-  },
-  {
-    name: "Job Board Ecosystem",
-    desc: "Find qualified technicians. Post jobs. Connect with talent industry-wide.",
-    icon: Search,
-    category: "team",
-  },
-  {
-    name: "User Access & Authentication",
-    desc: "Role-based permissions. Multi-level access control. Secure data.",
-    icon: Lock,
-    category: "team",
-  },
-  // Financial & Sales (3)
-  {
-    name: "Payroll & Financial",
-    desc: "One-click prep. 87-93% faster. Export to QuickBooks or download CSVs.",
-    icon: DollarSign,
-    category: "financial",
-  },
-  {
-    name: "Quoting & Sales Pipeline",
-    desc: "Multi-service quotes with historical pricing. Pipeline tracking. Stop underbidding.",
-    icon: Briefcase,
-    category: "financial",
-  },
-  {
-    name: "Client Relationship Management",
-    desc: "Building database with service history. Know every building's quirks.",
-    icon: Building2,
-    category: "financial",
-  },
-  // Communication (2)
-  {
-    name: "Resident Portal",
-    desc: "Residents submit feedback with photos. 70% fewer calls to building managers.",
-    icon: Home,
-    category: "communication",
-  },
-  {
-    name: "Property Manager Interface",
-    desc: "Vendor oversight, CSR visibility, and due diligence tools for property managers.",
-    icon: Globe,
-    category: "communication",
-  },
-];
+const moduleCategoryIds = ["all", "operations", "safety", "team", "financial", "communication"];
+const moduleCategoryIcons = {
+  all: LayoutGrid,
+  operations: Settings,
+  safety: HeartPulse,
+  team: Users,
+  financial: Wallet,
+  communication: MessageSquare,
+};
+const moduleCategoryColors = {
+  all: "text-foreground",
+  operations: "text-blue-600",
+  safety: "text-red-600",
+  team: "text-violet-600",
+  financial: "text-emerald-600",
+  communication: "text-rose-600",
+};
 
-const chaosItems = [
-  "6-10 hours/week processing payroll from scattered timesheets",
-  "45+ minutes finding documents when building managers ask",
-  "2-3 hours per quote because you're guessing at historical costs",
-  "Endless text threads tracking who's where and when",
-  "Spreadsheets for certifications that nobody actually updates",
-  "Paper inspection forms that live in filing cabinets (maybe)",
-  "Phone ringing all day with complaints you're tracking in a notebook (or written on your hand while driving)",
-];
-
-const leakItems = [
-  { amount: "$1,200-3,600/year", desc: "in payroll calculation errors" },
-  {
-    amount: "$12,600+/year",
-    desc: "in unbilled hours (forgot to log, disputed, lost)",
-  },
-  {
-    amount: "$5,000-15,000/year",
-    desc: "from underbid quotes (no historical data)",
-  },
-  { amount: "$2,000-4,000/year", desc: "in lost or untracked equipment" },
-  {
-    amount: "10-20% higher insurance",
-    desc: "because you can't document your safety program",
-  },
-];
-
-const fixItems = [
-  "Payroll prep in 30-45 minutes (not 6-10 hours)",
-  "Every document searchable and exportable in seconds",
-  "Historical job costing per building eliminates underbidding",
-  "Scheduling, time tracking, and projects: all linked",
-  "Equipment inventory with service life alerts",
-  "Safety documentation that impresses building managers",
-];
-
-const beforeAfterData = [
-  {
-    metric: "Weekly payroll time",
-    before: "6-10 hours",
-    after: "30-45 minutes",
-  },
-  { metric: "Finding documents", before: "45+ minutes", after: "4 minutes" },
-  { metric: "Creating quotes", before: "2-3 hours", after: "30 minutes" },
-  {
-    metric: "Audit preparation",
-    before: "2-3 days scrambling",
-    after: "4 minutes",
-  },
-  {
-    metric: "Certification tracking",
-    before: "Spreadsheet chaos",
-    after: "Automatic alerts",
-  },
-];
-
-const roiExample = [
-  { label: "Annual platform cost", value: "$5,388" },
-  { label: "Time savings value (owner hours reclaimed)", value: "$79,200" },
-  { label: "Payroll errors eliminated", value: "$2,400" },
-  { label: "Unbilled hours recovered", value: "$12,600" },
-  { label: "Quote accuracy improvement", value: "$7,500" },
+const moduleData = [
+  { key: "projectManagement", icon: FolderOpen, category: "operations" },
+  { key: "workSession", icon: Clock, category: "operations" },
+  { key: "scheduling", icon: Calendar, category: "operations" },
+  { key: "gearInventory", icon: Package, category: "operations" },
+  { key: "whiteLabel", icon: Palette, category: "operations" },
+  { key: "safetyCompliance", icon: Shield, category: "safety" },
+  { key: "companySafetyRating", icon: Gauge, category: "safety" },
+  { key: "irataSpratLogging", icon: ClipboardCheck, category: "safety" },
+  { key: "documentManagement", icon: FileText, category: "safety" },
+  { key: "employeeManagement", icon: UserCog, category: "team" },
+  { key: "technicianPassport", icon: IdCard, category: "team" },
+  { key: "jobBoard", icon: Search, category: "team" },
+  { key: "userAccess", icon: Lock, category: "team" },
+  { key: "payrollFinancial", icon: DollarSign, category: "financial" },
+  { key: "quotingSales", icon: Briefcase, category: "financial" },
+  { key: "crm", icon: Building2, category: "financial" },
+  { key: "residentPortal", icon: Home, category: "communication" },
+  { key: "propertyManagerInterface", icon: Globe, category: "communication" },
 ];
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const [activeSegment, setActiveSegment] = useState<Segment | null>(null);
-  const [selectedModuleCategory, setSelectedModuleCategory] =
-    useState<string>("all");
-  const content = activeSegment ? segmentContent[activeSegment] : null;
+  const [selectedModuleCategory, setSelectedModuleCategory] = useState<string>("all");
 
-  // Filter modules based on selected category
   const filteredModules =
     selectedModuleCategory === "all"
-      ? modules
-      : modules.filter((m) => m.category === selectedModuleCategory);
+      ? moduleData
+      : moduleData.filter((m) => m.category === selectedModuleCategory);
 
   const segmentButtons: {
     id: Segment;
     label: string;
     icon: typeof Briefcase;
   }[] = [
-    { id: "employer", label: "Rope Access Company", icon: Briefcase },
-    { id: "technician", label: "Technician", icon: HardHat },
-    { id: "property-manager", label: "Property Manager", icon: Users },
-    { id: "building-manager", label: "Building Manager", icon: Building2 },
-    { id: "resident", label: "Building Resident", icon: Home },
+    { id: "employer", label: t("home.segments.employer.buttonLabel"), icon: Briefcase },
+    { id: "technician", label: t("home.segments.technician.buttonLabel"), icon: HardHat },
+    { id: "property-manager", label: t("home.segments.propertyManager.buttonLabel"), icon: Users },
+    { id: "building-manager", label: t("home.segments.buildingManager.buttonLabel"), icon: Building2 },
+    { id: "resident", label: t("home.segments.resident.buttonLabel"), icon: Home },
+  ];
+
+  const getSegmentContent = (segment: Segment) => {
+    const segmentKey = segment === "property-manager" ? "propertyManager" : segment === "building-manager" ? "buildingManager" : segment;
+    return {
+      headline: t(`home.segments.${segmentKey}.headline`),
+      subheadline: t(`home.segments.${segmentKey}.subheadline`),
+      pillars: [
+        {
+          icon: segmentIcons[segment].pillars[0],
+          headline: t(`home.segments.${segmentKey}.pillars.0.headline`),
+          text: t(`home.segments.${segmentKey}.pillars.0.text`),
+        },
+        {
+          icon: segmentIcons[segment].pillars[1],
+          headline: t(`home.segments.${segmentKey}.pillars.1.headline`),
+          text: t(`home.segments.${segmentKey}.pillars.1.text`),
+        },
+        {
+          icon: segmentIcons[segment].pillars[2],
+          headline: t(`home.segments.${segmentKey}.pillars.2.headline`),
+          text: t(`home.segments.${segmentKey}.pillars.2.text`),
+        },
+      ],
+      primaryCta: {
+        text: t(`home.segments.${segmentKey}.primaryCta`),
+        href: segmentHrefs[segment].primaryCta,
+        subtext: segment === "property-manager" ? t(`home.segments.${segmentKey}.primaryCtaSubtext`) : undefined,
+      },
+      secondaryCta: {
+        text: t(`home.segments.${segmentKey}.secondaryCta`),
+        href: segmentHrefs[segment].secondaryCta,
+      },
+      secondarySubtext: segment === "employer" ? t(`home.segments.${segmentKey}.secondarySubtext`) : undefined,
+      trustSignal: t(`home.segments.${segmentKey}.trustSignal`),
+    };
+  };
+
+  const content = activeSegment ? getSegmentContent(activeSegment) : null;
+
+  const chaosItems = [
+    t("home.problem.chaos.items.0"),
+    t("home.problem.chaos.items.1"),
+    t("home.problem.chaos.items.2"),
+    t("home.problem.chaos.items.3"),
+    t("home.problem.chaos.items.4"),
+    t("home.problem.chaos.items.5"),
+    t("home.problem.chaos.items.6"),
+  ];
+
+  const leakItems = [
+    { amount: t("home.problem.leaks.items.0.amount"), desc: t("home.problem.leaks.items.0.desc") },
+    { amount: t("home.problem.leaks.items.1.amount"), desc: t("home.problem.leaks.items.1.desc") },
+    { amount: t("home.problem.leaks.items.2.amount"), desc: t("home.problem.leaks.items.2.desc") },
+    { amount: t("home.problem.leaks.items.3.amount"), desc: t("home.problem.leaks.items.3.desc") },
+    { amount: t("home.problem.leaks.items.4.amount"), desc: t("home.problem.leaks.items.4.desc") },
+  ];
+
+  const fixItems = [
+    t("home.problem.fix.items.0"),
+    t("home.problem.fix.items.1"),
+    t("home.problem.fix.items.2"),
+    t("home.problem.fix.items.3"),
+    t("home.problem.fix.items.4"),
+    t("home.problem.fix.items.5"),
+  ];
+
+  const beforeAfterData = [
+    { metric: t("home.roi.beforeAfter.0.metric"), before: t("home.roi.beforeAfter.0.before"), after: t("home.roi.beforeAfter.0.after") },
+    { metric: t("home.roi.beforeAfter.1.metric"), before: t("home.roi.beforeAfter.1.before"), after: t("home.roi.beforeAfter.1.after") },
+    { metric: t("home.roi.beforeAfter.2.metric"), before: t("home.roi.beforeAfter.2.before"), after: t("home.roi.beforeAfter.2.after") },
+    { metric: t("home.roi.beforeAfter.3.metric"), before: t("home.roi.beforeAfter.3.before"), after: t("home.roi.beforeAfter.3.after") },
+    { metric: t("home.roi.beforeAfter.4.metric"), before: t("home.roi.beforeAfter.4.before"), after: t("home.roi.beforeAfter.4.after") },
+  ];
+
+  const roiExample = [
+    { label: t("home.roi.example.0.label"), value: t("home.roi.example.0.value") },
+    { label: t("home.roi.example.1.label"), value: t("home.roi.example.1.value") },
+    { label: t("home.roi.example.2.label"), value: t("home.roi.example.2.value") },
+    { label: t("home.roi.example.3.label"), value: t("home.roi.example.3.value") },
+    { label: t("home.roi.example.4.label"), value: t("home.roi.example.4.value") },
   ];
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header Navigation */}
       <PublicHeader />
-      {/* Hero Section */}
       <section
         className="relative text-white pb-[120px]"
         style={{
           backgroundImage: "linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)",
         }}
       >
-        {/* Pattern overlay */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnY0em0wLTZ2LTRoLTJ2NGgyek0zNCAyNGgydjRoLTJ2LTR6TTI0IDI0aDJ2NGgtMnYtNHptMCA2aDJ2NGgtMnYtNHptMCA2aDJ2NGgtMnYtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
 
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
-            {/* Pre-headline badge */}
             <Badge
               className="bg-white/20 text-white border-white/30 text-sm px-4 py-1"
               data-testid="badge-preheadline"
             >
-              The rope access industry's only purpose-built software
+              {t("home.hero.badge")}
             </Badge>
 
-            {/* Primary Headline */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              One Unified Platform.
+              {t("home.hero.headline1")}
               <br />
-              Everyone Connected.
+              {t("home.hero.headline2")}
               <br />
-              <span className="text-blue-100">Zero Chaos.</span>
+              <span className="text-blue-100">{t("home.hero.headline3")}</span>
             </h1>
 
-            {/* Subheadline */}
             <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
-              Projects. Payroll. Safety. Scheduling. Compliance. Logging. All in
-              one place.
+              {t("home.hero.subheadline1")}
               <br />
               <br />
-              Built by a Level 3 technician and Operations Manager who got tired
-              of watching good companies drown in paperwork and stress.
+              {t("home.hero.subheadline2")}
             </p>
 
-            {/* Segment Selector */}
             <div className="pt-8">
-              <p className="text-lg font-medium mb-4">I'm a...</p>
+              <p className="text-lg font-medium mb-4">{t("home.hero.iAmA")}</p>
               <div className="flex flex-wrap justify-center gap-2 md:gap-3">
                 {segmentButtons.map((btn) => (
                   <Button
@@ -498,7 +303,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Segment-specific content - only shown when a segment is selected */}
           {content && (
             <div className="mt-12 text-center max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
               <div>
@@ -513,7 +317,6 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Value Pillars */}
               <div className="grid md:grid-cols-3 gap-6 pt-4">
                 {content.pillars.map((pillar, i) => (
                   <Card
@@ -531,7 +334,6 @@ export default function HomePage() {
                 ))}
               </div>
 
-              {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <div className="flex flex-col items-center gap-1">
                   <Button
@@ -544,12 +346,11 @@ export default function HomePage() {
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Link>
                   </Button>
-                  {"subtext" in content.primaryCta &&
-                    content.primaryCta.subtext && (
-                      <span className="text-xs text-blue-100">
-                        {content.primaryCta.subtext}
-                      </span>
-                    )}
+                  {content.primaryCta.subtext && (
+                    <span className="text-xs text-blue-100">
+                      {content.primaryCta.subtext}
+                    </span>
+                  )}
                 </div>
                 <div className="flex flex-col items-center gap-1">
                   <Button
@@ -562,16 +363,14 @@ export default function HomePage() {
                       {content.secondaryCta.text}
                     </Link>
                   </Button>
-                  {"secondarySubtext" in content &&
-                    content.secondarySubtext && (
-                      <span className="text-xs text-blue-100">
-                        {content.secondarySubtext}
-                      </span>
-                    )}
+                  {content.secondarySubtext && (
+                    <span className="text-xs text-blue-100">
+                      {content.secondarySubtext}
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/* Trust Signal */}
               <p className="text-sm text-blue-100 italic">
                 {content.trustSignal}
               </p>
@@ -579,7 +378,6 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Wave separator */}
         <div className="absolute -bottom-[1px] left-0 right-0 z-10">
           <svg
             viewBox="0 0 1440 120"
@@ -595,38 +393,32 @@ export default function HomePage() {
           </svg>
         </div>
       </section>
-      {/* Social Proof Section */}
+
       <section className="bg-white dark:bg-slate-950 py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Built by Rope Access. For Rope Access.
+            {t("home.socialProof.title")}
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            OnRopePro was created by a Level 3 IRATA technician and Operations
-            Manager who spent years watching good companies drown in
-            administrative chaos. Every feature exists because rope access
-            operators asked for it. Every workflow was tested on actual job
-            sites. This isn't adapted HR software. It's the system we wished
-            existed when we were running crews.
+            {t("home.socialProof.description")}
           </p>
         </div>
       </section>
-      {/* Problem/Solution Section */}
+
       <section className="bg-muted/30 py-16 md:py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            The Problem With How You're Running Things Now
+            {t("home.problem.title")}
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Column 1: The Chaos */}
             <Card className="bg-card">
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold mb-2 text-foreground">
-                  The Chaos
+                  {t("home.problem.chaos.title")}
                 </h3>
                 <p className="text-sm font-medium text-muted-foreground mb-4">
-                  Where Your Time Actually Goes
+                  {t("home.problem.chaos.subtitle")}
                 </p>
                 <ul className="space-y-3">
                   {chaosItems.map((item, i) => (
@@ -637,20 +429,18 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <p className="mt-6 text-base font-medium text-muted-foreground italic">
-                  You started a rope access company to do rope access. Not data
-                  entry.
+                  {t("home.problem.chaos.conclusion")}
                 </p>
               </CardContent>
             </Card>
 
-            {/* Column 2: The Leaks */}
             <Card className="bg-card">
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold mb-2 text-foreground">
-                  The Leaks
+                  {t("home.problem.leaks.title")}
                 </h3>
                 <p className="text-sm font-medium text-muted-foreground mb-4">
-                  Money Disappearing Every Month
+                  {t("home.problem.leaks.subtitle")}
                 </p>
                 <ul className="space-y-3">
                   {leakItems.map((item, i) => (
@@ -664,19 +454,18 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <p className="mt-6 text-lg font-bold text-rose-600">
-                  Total: $22,000-45,000/year in preventable losses.
+                  {t("home.problem.leaks.total")}
                 </p>
               </CardContent>
             </Card>
 
-            {/* Column 3: The Fix */}
             <Card className="bg-card border-2 border-[#0B64A3]">
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold mb-2 text-[#0B64A3]">
-                  The Fix
+                  {t("home.problem.fix.title")}
                 </h3>
                 <p className="text-sm font-medium text-muted-foreground mb-4">
-                  One Platform. Everything Connected.
+                  {t("home.problem.fix.subtitle")}
                 </p>
                 <ul className="space-y-3">
                   {fixItems.map((item, i) => (
@@ -687,58 +476,49 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <p className="mt-6 text-base font-medium text-muted-foreground">
-                  OnRopePro costs <strong>$99/month + $34.95/tech</strong>. The
-                  leaks you're plugging are worth 10x that.
+                  {t("home.problem.fix.conclusion")}
                 </p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
-      {/* Features Section - 18 Modules */}
+
       <section className="bg-white dark:bg-slate-950 py-16 md:py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              18 Modules. One Platform. All Connected. All Included.
+              {t("home.modules.title")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to run a profitable rope access company, from
-              first quote to final payment and every drop inbetween.
+              {t("home.modules.subtitle")}
             </p>
           </div>
 
-          {/* Category Filter Tabs */}
           <div className="mb-8">
             <ScrollArea className="w-full">
               <div className="flex gap-2 pb-2 justify-center">
-                {moduleCategories.map((category) => {
+                {moduleCategoryIds.map((categoryId) => {
                   const modulesInCategory =
-                    category.id === "all"
-                      ? modules.length
-                      : modules.filter((m) => m.category === category.id)
-                          .length;
-                  const isSelected = selectedModuleCategory === category.id;
+                    categoryId === "all"
+                      ? moduleData.length
+                      : moduleData.filter((m) => m.category === categoryId).length;
+                  const isSelected = selectedModuleCategory === categoryId;
+                  const Icon = moduleCategoryIcons[categoryId as keyof typeof moduleCategoryIcons];
+                  const color = moduleCategoryColors[categoryId as keyof typeof moduleCategoryColors];
 
                   return (
                     <Button
-                      key={category.id}
+                      key={categoryId}
                       variant={isSelected ? "default" : "outline"}
-                      variant={
-                        selectedModuleCategory === category.id
-                          ? "default"
-                          : "outline"
-                      }
                       size="sm"
-                      onClick={() => setSelectedModuleCategory(category.id)}
+                      onClick={() => setSelectedModuleCategory(categoryId)}
                       className="gap-2 whitespace-nowrap"
-                      data-testid={`button-module-category-${category.id}`}
+                      data-testid={`button-module-category-${categoryId}`}
                     >
-                      <category.icon
-                        className={`w-4 h-4 ${isSelected ? "" : category.color}`}
-                      />
-                      {category.label}
-                      {category.id !== "all" && (
+                      <Icon className={`w-4 h-4 ${isSelected ? "" : color}`} />
+                      {t(`home.modules.categories.${categoryId}`)}
+                      {categoryId !== "all" && (
                         <Badge
                           variant="secondary"
                           className="ml-1 min-w-[20px] h-5 text-xs"
@@ -761,7 +541,7 @@ export default function HomePage() {
             <AnimatePresence mode="popLayout">
               {filteredModules.map((module) => (
                 <motion.div
-                  key={module.name}
+                  key={module.key}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -770,7 +550,7 @@ export default function HomePage() {
                 >
                   <Card
                     className="hover-elevate h-full"
-                    data-testid={`card-module-${module.name.toLowerCase().replace(/\s+/g, "-")}`}
+                    data-testid={`card-module-${module.key}`}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
@@ -779,10 +559,10 @@ export default function HomePage() {
                         </div>
                         <div>
                           <h3 className="font-semibold text-foreground mb-1">
-                            {module.name}
+                            {t(`home.modules.items.${module.key}.name`)}
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            {module.desc}
+                            {t(`home.modules.items.${module.key}.desc`)}
                           </p>
                         </div>
                       </div>
@@ -800,65 +580,61 @@ export default function HomePage() {
               asChild
             >
               <Link href="/pricing">
-                See All Features & Pricing
+                {t("home.modules.seeAllCta")}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
           </div>
         </div>
       </section>
-      {/* ROI Section */}
+
       <section className="bg-muted/30 py-16 md:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            The Math Is Simple
+            {t("home.roi.title")}
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* The Investment */}
             <Card className="bg-card">
               <CardContent className="p-8 text-center">
-                <h3 className="text-xl font-bold mb-6">The Investment</h3>
+                <h3 className="text-xl font-bold mb-6">{t("home.roi.investment.title")}</h3>
                 <div className="bg-muted/50 rounded-xl p-6 mb-6">
                   <div className="text-4xl font-bold text-[#0B64A3] mb-2">
-                    $99<span className="text-xl font-normal">/month base</span>
+                    {t("home.roi.investment.basePrice")}<span className="text-xl font-normal">{t("home.roi.investment.basePriceSuffix")}</span>
                   </div>
                   <div className="text-2xl font-semibold mb-2">
-                    + $34.95
+                    {t("home.roi.investment.perTechPrice")}
                     <span className="text-base font-normal">
-                      /month per technician
+                      {t("home.roi.investment.perTechPriceSuffix")}
                     </span>
                   </div>
                   <div className="text-lg text-muted-foreground">
-                    = Your monthly cost
+                    {t("home.roi.investment.equals")}
                   </div>
                 </div>
                 <p className="text-base text-muted-foreground">
-                  $34.95 is what you pay a technician for{" "}
-                  <strong>one hour</strong> of work.
+                  {t("home.roi.investment.comparison1")}
                   <br />
-                  This platform saves each tech <strong>10+ hours</strong> per
-                  month.
+                  {t("home.roi.investment.comparison2")}
                 </p>
                 <p className="text-base text-muted-foreground mt-4">
-                  <strong>The math is simple.</strong>
+                  <strong>{t("home.roi.investment.mathSimple")}</strong>
                   <br />
-                  Stress elimination? Priceless.
+                  {t("home.roi.investment.stressElimination")}
                 </p>
               </CardContent>
             </Card>
 
-            {/* The Return - Before/After */}
             <Card className="bg-card">
               <CardContent className="p-8">
                 <h3 className="text-xl font-bold mb-6 text-center">
-                  The Return
+                  {t("home.roi.return.title")}
                 </h3>
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-2 text-sm font-medium text-muted-foreground pb-2 border-b">
-                    <span>Metric</span>
-                    <span className="text-center">Without</span>
-                    <span className="text-center">With OnRopePro</span>
+                    <span>{t("home.roi.return.metricHeader")}</span>
+                    <span className="text-center">{t("home.roi.return.withoutHeader")}</span>
+                    <span className="text-center">{t("home.roi.return.withHeader")}</span>
                   </div>
                   {beforeAfterData.map((row, i) => (
                     <div
@@ -879,11 +655,10 @@ export default function HomePage() {
             </Card>
           </div>
 
-          {/* ROI Example */}
           <Card className="bg-card border-2 border-[#0B64A3]">
             <CardContent className="p-8">
               <h3 className="text-xl font-bold mb-6 text-center">
-                ROI Example: 10 Technicians
+                {t("home.roi.exampleTitle")}
               </h3>
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-3">
@@ -903,20 +678,20 @@ export default function HomePage() {
                 </div>
                 <div className="flex flex-col justify-center items-center bg-[#0B64A3]/5 rounded-xl p-6">
                   <div className="text-sm uppercase tracking-wide text-muted-foreground mb-2">
-                    Total Annual Value
+                    {t("home.roi.totalAnnualValue")}
                   </div>
                   <div className="text-3xl font-bold text-[#0B64A3] mb-4">
                     $101,700
                   </div>
                   <div className="text-sm uppercase tracking-wide text-muted-foreground mb-2">
-                    Net Benefit
+                    {t("home.roi.netBenefit")}
                   </div>
                   <div className="text-2xl font-bold text-emerald-600 mb-4">
                     $96,312
                   </div>
                   <div className="bg-[#0B64A3] text-white px-6 py-3 rounded-full">
                     <span className="text-2xl font-bold">1,788%</span>{" "}
-                    <span className="text-lg">ROI</span>
+                    <span className="text-lg">{t("home.roi.roiLabel")}</span>
                   </div>
                 </div>
               </div>
@@ -924,11 +699,11 @@ export default function HomePage() {
           </Card>
         </div>
       </section>
-      {/* Trust Section */}
+
       <section className="bg-white dark:bg-slate-950 py-16 md:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Why Companies Like Yours Trust OnRopePro
+            {t("home.trust.title")}
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -937,11 +712,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 rounded-full bg-[#0B64A3]/10 flex items-center justify-center mx-auto mb-4">
                   <HardHat className="w-8 h-8 text-[#0B64A3]" />
                 </div>
-                <h3 className="text-xl font-bold mb-3">Built by Rope Access</h3>
+                <h3 className="text-xl font-bold mb-3">{t("home.trust.builtBy.title")}</h3>
                 <p className="text-base text-muted-foreground">
-                  Created by a Level 3 IRATA technician. Every feature designed
-                  for how rope access companies actually work, not adapted from
-                  generic field service software.
+                  {t("home.trust.builtBy.description")}
                 </p>
               </CardContent>
             </Card>
@@ -952,11 +725,10 @@ export default function HomePage() {
                   <Lock className="w-8 h-8 text-emerald-600" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">
-                  Your Data, Your Control
+                  {t("home.trust.dataControl.title")}
                 </h3>
                 <p className="text-base text-muted-foreground">
-                  Bank-level encryption. Daily backups. Export everything you've
-                  ever entered at any time. You're never locked in.
+                  {t("home.trust.dataControl.description")}
                 </p>
               </CardContent>
             </Card>
@@ -967,19 +739,17 @@ export default function HomePage() {
                   <HeartHandshake className="w-8 h-8 text-violet-600" />
                 </div>
                 <h3 className="text-xl font-bold mb-3">
-                  No Contracts, No Surprises
+                  {t("home.trust.noContracts.title")}
                 </h3>
                 <p className="text-base text-muted-foreground">
-                  Monthly billing. Cancel anytime. No setup fees. No per-project
-                  charges. We'd rather earn your business every month than trap
-                  you in a contract.
+                  {t("home.trust.noContracts.description")}
                 </p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
-      {/* Final CTA Section */}
+
       <section
         className="relative text-white py-16 md:py-24 px-4"
         style={{
@@ -988,11 +758,10 @@ export default function HomePage() {
       >
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Stop the Chaos?
+            {t("home.finalCta.title")}
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            30-day free trial. No credit card required. Full access to every
-            feature.
+            {t("home.finalCta.subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
@@ -1001,7 +770,7 @@ export default function HomePage() {
               asChild
             >
               <Link href="/register">
-                Start Your Free Trial
+                {t("home.finalCta.startTrial")}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
@@ -1011,47 +780,46 @@ export default function HomePage() {
               className="border-white/40 text-white hover:bg-white/10"
               asChild
             >
-              <Link href="/pricing">Schedule a 15-minute demo</Link>
+              <Link href="/pricing">{t("home.finalCta.scheduleDemo")}</Link>
             </Button>
           </div>
         </div>
       </section>
-      {/* Footer Value Props */}
+
       <section className="bg-slate-900 text-slate-300 py-12 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
               <DollarSign className="w-8 h-8 mx-auto mb-3 text-slate-400" />
               <h4 className="text-lg font-semibold text-white mb-2">
-                Simple Pricing
+                {t("home.footer.simplePricing.title")}
               </h4>
               <p className="text-base">
-                $99/month + $34.95/technician. Everything included.
+                {t("home.footer.simplePricing.description")}
               </p>
             </div>
             <div>
               <Lock className="w-8 h-8 mx-auto mb-3 text-slate-400" />
               <h4 className="text-lg font-semibold text-white mb-2">
-                No Lock-In
+                {t("home.footer.noLockIn.title")}
               </h4>
               <p className="text-base">
-                Monthly billing. Cancel anytime. Export your data whenever you
-                want.
+                {t("home.footer.noLockIn.description")}
               </p>
             </div>
             <div>
               <Mail className="w-8 h-8 mx-auto mb-3 text-slate-400" />
               <h4 className="text-lg font-semibold text-white mb-2">
-                Real Support
+                {t("home.footer.realSupport.title")}
               </h4>
               <p className="text-base">
-                Same-day email response. Documentation that actually helps.
+                {t("home.footer.realSupport.description")}
               </p>
             </div>
           </div>
           <div className="text-center mt-8 pt-8 border-t border-slate-700">
             <p className="text-sm text-slate-500">
-              OnRopePro - Built by Rope Access, for Rope Access
+              {t("home.footer.tagline")}
             </p>
           </div>
         </div>

@@ -12422,5 +12422,338 @@
         "text": "Part of the OnRopePro platform for rope access building maintenance companies."
       }
     }
+  },
+  "home": {
+    "hero": {
+      "badge": "Rope Access Industry Software",
+      "headline1": "One Unified Platform.",
+      "headline2": "Everyone Connected.",
+      "headline3": "Zero Chaos.",
+      "subheadline1": "The complete business operating system for rope access companies. From project tracking to payroll, safety compliance to resident communication - everything in one platform built specifically for high-angle professionals.",
+      "subheadline2": "Stop juggling 10 different tools. Start running your business.",
+      "iAmA": "I am a..."
+    },
+    "segments": {
+      "employer": {
+        "buttonLabel": "Business Owner",
+        "headline": "Stop Chasing Your Business. Start Running It.",
+        "subheadline": "You started a rope access company to do rope access. Not to spend 80 hours a month on admin, payroll disputes, and playing phone tag with property managers. OnRopePro puts everything in one place so you can focus on what you actually do best.",
+        "pillars": {
+          "0": {
+            "headline": "Save 80+ Hours/Month",
+            "text": "Automatic time tracking, payroll aggregation, and compliance documentation. Stop doing admin work."
+          },
+          "1": {
+            "headline": "Stop the Money Leaks",
+            "text": "Track non-billable hours, eliminate payroll disputes, and quote jobs accurately. Know your real margins."
+          },
+          "2": {
+            "headline": "Audit-Ready Always",
+            "text": "Every harness inspection, toolbox meeting, and safety doc logged and exportable. Win the lawsuit you hope never comes."
+          }
+        },
+        "primaryCta": "Start Free 30-Day Trial",
+        "secondaryCta": "See Pricing",
+        "secondarySubtext": "From $99/month + $34.95/tech",
+        "trustSignal": "30-day free trial. No credit card required. Full access to every feature."
+      },
+      "technician": {
+        "buttonLabel": "Technician",
+        "headline": "One Profile. Every Employer. Your Entire Career.",
+        "subheadline": "Your IRATA hours, certifications, and work history - portable across every job. No more re-filling paperwork. No more lost logbooks. Your professional identity travels with you.",
+        "pillars": {
+          "0": {
+            "headline": "Instant Onboarding",
+            "text": "Share your profile once. Employers get your certs, safety record, and experience instantly."
+          },
+          "1": {
+            "headline": "Real Hour Tracking",
+            "text": "GPS-verified work sessions. Your logbook fills itself. Export for re-certification anytime."
+          },
+          "2": {
+            "headline": "Career Visibility",
+            "text": "Build your reputation. Safety scores, skills, and verified experience that follow you."
+          }
+        },
+        "primaryCta": "Create Free Technician Profile",
+        "secondaryCta": "Learn More",
+        "trustSignal": "Free forever. No credit card required. Connect with multiple employers."
+      },
+      "propertyManager": {
+        "buttonLabel": "Property Manager",
+        "headline": "See Everything. Manage Nothing.",
+        "subheadline": "Real-time project visibility without the phone calls. Know exactly what's happening at every building, when it's happening, and when it will be done.",
+        "pillars": {
+          "0": {
+            "headline": "Real-Time Dashboards",
+            "text": "Watch project progress live. 4-elevation tracking shows exactly which sides are done."
+          },
+          "1": {
+            "headline": "Compliance Exports",
+            "text": "Insurance audits? Safety documentation? One click. 400 pages of proof."
+          },
+          "2": {
+            "headline": "Resident Portal",
+            "text": "Your residents submit feedback directly. Fewer calls to you. Faster resolution for everyone."
+          }
+        },
+        "primaryCta": "Request Access",
+        "primaryCtaSubtext": "Requires invitation from your rope access provider",
+        "secondaryCta": "Learn More",
+        "trustSignal": "Free for property managers. Your rope access provider gives you access."
+      },
+      "buildingManager": {
+        "buttonLabel": "Building Manager",
+        "headline": "Fewer Calls. Faster Answers. Happier Residents.",
+        "subheadline": "Stop playing messenger between residents and rope access crews. Give everyone visibility into schedules, progress, and feedback - and get your time back.",
+        "pillars": {
+          "0": {
+            "headline": "Resident Self-Service",
+            "text": "Residents track progress and submit feedback themselves. You stop fielding questions."
+          },
+          "1": {
+            "headline": "Automatic Updates",
+            "text": "Schedule changes, completion photos, weather delays - everyone sees the same info."
+          },
+          "2": {
+            "headline": "Contract Renewals",
+            "text": "Happy residents = happy councils. Visible professionalism drives 95% renewal rates."
+          }
+        },
+        "primaryCta": "Access Building Portal",
+        "secondaryCta": "Learn More",
+        "trustSignal": "Free access provided by your building's rope access service provider."
+      },
+      "resident": {
+        "buttonLabel": "Resident",
+        "headline": "Know When They're Coming. See When They're Done.",
+        "subheadline": "No more wondering when the window cleaners will reach your unit. Track progress, see photos, and submit feedback - all from your phone.",
+        "pillars": {
+          "0": {
+            "headline": "Progress Visibility",
+            "text": "Watch the project progress in real-time. Know which elevations are done and which are next."
+          },
+          "1": {
+            "headline": "Photo Documentation",
+            "text": "Before and after photos of your windows. Visual proof of completed work."
+          },
+          "2": {
+            "headline": "Direct Feedback",
+            "text": "Missed a window? Submit feedback with a photo. Same-day resolution, not weeks of phone tag."
+          }
+        },
+        "primaryCta": "Access Resident Portal",
+        "secondaryCta": "Learn More",
+        "trustSignal": "Free for residents. Ask your building management for the access code."
+      }
+    },
+    "socialProof": {
+      "title": "Built by Rope Access. For Rope Access.",
+      "description": "OnRopePro was created by a Level 3 IRATA technician and operations manager who got tired of running a rope access company with spreadsheets, WhatsApp, and good intentions. Every feature exists because we needed it ourselves."
+    },
+    "problem": {
+      "title": "The Problem With How You're Running Things Now",
+      "chaos": {
+        "title": "The Chaos",
+        "subtitle": "Where Your Time Actually Goes",
+        "items": {
+          "0": "Chasing timesheets that don't match job sites",
+          "1": "Answering the same \"when are you coming?\" calls",
+          "2": "Rebuilding spreadsheets that someone broke",
+          "3": "Hunting for that one harness inspection from March",
+          "4": "Explaining payroll discrepancies for the third time",
+          "5": "Manually cross-referencing schedules across buildings",
+          "6": "Creating quotes from memory and hoping you didn't underbid"
+        },
+        "conclusion": "You started a rope access company to do rope access. Not data entry."
+      },
+      "leaks": {
+        "title": "The Leaks",
+        "subtitle": "Money Disappearing Every Month",
+        "items": {
+          "0": { "amount": "$3,500-7,500/yr", "desc": "in unbilled non-billable hours" },
+          "1": { "amount": "$4,000-12,000/yr", "desc": "in payroll disputes and corrections" },
+          "2": { "amount": "$5,000-10,000/yr", "desc": "in underbid jobs from guessing" },
+          "3": { "amount": "$2,500-5,000/yr", "desc": "in admin hours that should take 10" },
+          "4": { "amount": "$7,000-10,000/yr", "desc": "in lost contracts from looking unprofessional" }
+        },
+        "total": "Total: $22,000-45,000/year in preventable losses."
+      },
+      "fix": {
+        "title": "The Fix",
+        "subtitle": "One Platform. Everything Connected.",
+        "items": {
+          "0": "Time tracking that matches GPS to job sites",
+          "1": "Client portals that answer questions before they call",
+          "2": "Safety docs that export in 4 minutes, not 4 hours",
+          "3": "Payroll that aggregates automatically, with zero disputes",
+          "4": "Quoting tools that use real historical data",
+          "5": "Scheduling that everyone can see and trust"
+        },
+        "conclusion": "OnRopePro costs <strong>$99/month + $34.95/tech</strong>. The leaks you're plugging are worth 10x that."
+      }
+    },
+    "modules": {
+      "title": "18 Modules. One Platform. All Connected. All Included.",
+      "subtitle": "Everything you need to run a profitable rope access company, from first quote to final payment and every drop inbetween.",
+      "categories": {
+        "all": "All Modules",
+        "operations": "Operations",
+        "safety": "Safety",
+        "team": "Team",
+        "financial": "Financial",
+        "communication": "Communication"
+      },
+      "items": {
+        "projectManagement": {
+          "name": "Project Management",
+          "desc": "4-elevation tracking with visual progress bars and crew assignment"
+        },
+        "workSession": {
+          "name": "Work Sessions",
+          "desc": "GPS clock-in, drop tracking, automatic hour aggregation"
+        },
+        "scheduling": {
+          "name": "Scheduling",
+          "desc": "Drag-and-drop calendar with conflict detection and weather delays"
+        },
+        "gearInventory": {
+          "name": "Gear Inventory",
+          "desc": "Serial number tracking, assignment history, retirement workflows"
+        },
+        "whiteLabel": {
+          "name": "White Label",
+          "desc": "Custom branding for client-facing portals and exports"
+        },
+        "safetyCompliance": {
+          "name": "Safety Compliance",
+          "desc": "Digital forms, PDF plans, and audit-ready documentation"
+        },
+        "companySafetyRating": {
+          "name": "Safety Rating",
+          "desc": "Real-time company safety score based on inspections and compliance"
+        },
+        "irataSpratLogging": {
+          "name": "IRATA/SPRAT Logging",
+          "desc": "Same-day hour logging with OCR import and career-portable records"
+        },
+        "documentManagement": {
+          "name": "Documents",
+          "desc": "Digital signatures, immutable audit trails, compliance reporting"
+        },
+        "employeeManagement": {
+          "name": "Employee Management",
+          "desc": "Portable identities, certification tracking, role-based permissions"
+        },
+        "technicianPassport": {
+          "name": "Technician Passport",
+          "desc": "Portable work history and certifications across employers"
+        },
+        "jobBoard": {
+          "name": "Job Board",
+          "desc": "Talent browser with unlimited postings and direct offers"
+        },
+        "userAccess": {
+          "name": "User Access",
+          "desc": "Granular permissions and audit trails for every action"
+        },
+        "payrollFinancial": {
+          "name": "Payroll",
+          "desc": "Automatic hour aggregation with overtime calculation and exports"
+        },
+        "quotingSales": {
+          "name": "Quoting",
+          "desc": "Multi-service quotes with photo documentation and historical data"
+        },
+        "crm": {
+          "name": "CRM",
+          "desc": "Client relationship management with contact history and notes"
+        },
+        "residentPortal": {
+          "name": "Resident Portal",
+          "desc": "Progress tracking and feedback submission for building residents"
+        },
+        "propertyManagerInterface": {
+          "name": "Property Manager Portal",
+          "desc": "Real-time dashboards and compliance exports for property managers"
+        }
+      },
+      "seeAllCta": "See All Features & Pricing"
+    },
+    "roi": {
+      "title": "The Math Is Simple",
+      "investment": {
+        "title": "The Investment",
+        "basePrice": "$99",
+        "basePriceSuffix": "/month base",
+        "perTechPrice": "+ $34.95",
+        "perTechPriceSuffix": "/month per technician",
+        "equals": "= Your monthly cost",
+        "comparison1": "$34.95 is what you pay a technician for <strong>one hour</strong> of work.",
+        "comparison2": "This platform saves each tech <strong>10+ hours</strong> per month.",
+        "mathSimple": "The math is simple.",
+        "stressElimination": "Stress elimination? Priceless."
+      },
+      "return": {
+        "title": "The Return",
+        "metricHeader": "Metric",
+        "withoutHeader": "Without",
+        "withHeader": "With OnRopePro"
+      },
+      "beforeAfter": {
+        "0": { "metric": "Admin hours/week", "before": "20+", "after": "3-5" },
+        "1": { "metric": "Payroll prep time", "before": "4+ hours", "after": "30 min" },
+        "2": { "metric": "Billable hour capture", "before": "68%", "after": "95%+" },
+        "3": { "metric": "Contract renewal rate", "before": "60%", "after": "95%" },
+        "4": { "metric": "Audit prep time", "before": "Days", "after": "Minutes" }
+      },
+      "exampleTitle": "ROI Example: 10 Technicians",
+      "example": {
+        "0": { "label": "Monthly cost (10 techs)", "value": "$448.50" },
+        "1": { "label": "Time savings (80 hrs × $35)", "value": "$2,800/mo" },
+        "2": { "label": "Billable recapture", "value": "$2,100/mo" },
+        "3": { "label": "Dispute elimination", "value": "$833/mo" },
+        "4": { "label": "Contract retention value", "value": "$2,745/mo" }
+      },
+      "totalAnnualValue": "Total Annual Value",
+      "netBenefit": "Net Benefit",
+      "roiLabel": "ROI"
+    },
+    "trust": {
+      "title": "Why Companies Like Yours Trust OnRopePro",
+      "builtBy": {
+        "title": "Built by Rope Access",
+        "description": "Created by a Level 3 IRATA technician. Every feature designed for how rope access companies actually work, not adapted from generic field service software."
+      },
+      "dataControl": {
+        "title": "Your Data, Your Control",
+        "description": "Bank-level encryption. Daily backups. Export everything you've ever entered at any time. You're never locked in."
+      },
+      "noContracts": {
+        "title": "No Contracts, No Surprises",
+        "description": "Monthly billing. Cancel anytime. No setup fees. No per-project charges. We'd rather earn your business every month than trap you in a contract."
+      }
+    },
+    "finalCta": {
+      "title": "Ready to Stop the Chaos?",
+      "subtitle": "30-day free trial. No credit card required. Full access to every feature.",
+      "startTrial": "Start Your Free Trial",
+      "scheduleDemo": "Schedule a 15-minute demo"
+    },
+    "footer": {
+      "simplePricing": {
+        "title": "Simple Pricing",
+        "description": "$99/month + $34.95/technician. Everything included."
+      },
+      "noLockIn": {
+        "title": "No Lock-In",
+        "description": "Monthly billing. Cancel anytime. Export your data whenever you want."
+      },
+      "realSupport": {
+        "title": "Real Support",
+        "description": "Same-day email response. Documentation that actually helps."
+      },
+      "tagline": "OnRopePro - Built by Rope Access, for Rope Access"
+    }
   }
 }
