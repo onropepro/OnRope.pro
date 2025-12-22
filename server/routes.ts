@@ -20877,62 +20877,84 @@ Do not include any other text, just the JSON object.`
       irataValid: false,
       spratValid: false,
       hasValidCertification: false,
+      certificationPoints: 0,
+      certificationMax: 40,
       yearsExperience: 0,
+      experiencePoints: 0,
+      experienceMax: 15,
       hasResume: false,
+      resumePoints: 0,
+      resumeMax: 5,
     };
     
-    // 1. IRATA Certification (up to 40 points)
+    // 1. Certification Score (up to 40 points) - BEST OF IRATA or SPRAT
+    // Having both certifications is a personal/regional choice, not a safety advantage
+    // We use the best score from either certification
+    maxPoints += 40;
+    
+    let irataScore = 0;
+    let spratScore = 0;
+    
+    // Calculate IRATA score
     if (tech.irataLevel) {
-      maxPoints += 40;
       const irataExpDate = tech.irataExpirationDate ? new Date(tech.irataExpirationDate) : null;
       if (irataExpDate && irataExpDate > now) {
-        // Valid IRATA certification
-        totalPoints += 40;
+        // Valid IRATA certification - full points
+        irataScore = 40;
         breakdown.irataValid = true;
-        breakdown.hasValidCertification = true;
       } else if (irataExpDate && irataExpDate <= now) {
         // Expired - partial credit (10 points for having it at all)
-        totalPoints += 10;
+        irataScore = 10;
       }
     }
     
-    // 2. SPRAT Certification (up to 40 points)
+    // Calculate SPRAT score
     if (tech.spratLevel) {
-      maxPoints += 40;
       const spratExpDate = tech.spratExpirationDate ? new Date(tech.spratExpirationDate) : null;
       if (spratExpDate && spratExpDate > now) {
-        // Valid SPRAT certification
-        totalPoints += 40;
+        // Valid SPRAT certification - full points
+        spratScore = 40;
         breakdown.spratValid = true;
-        breakdown.hasValidCertification = true;
       } else if (spratExpDate && spratExpDate <= now) {
         // Expired - partial credit (10 points for having it at all)
-        totalPoints += 10;
+        spratScore = 10;
       }
     }
     
-    // If no certifications at all, use baseline score
-    if (!tech.irataLevel && !tech.spratLevel) {
-      maxPoints = 100;
-      // No certifications = 20 points baseline
-      totalPoints = 20;
+    // Use the BEST score from either certification
+    const certificationScore = Math.max(irataScore, spratScore);
+    totalPoints += certificationScore;
+    breakdown.certificationPoints = certificationScore;
+    
+    // If they have any valid certification, mark it
+    if (breakdown.irataValid || breakdown.spratValid) {
+      breakdown.hasValidCertification = true;
     }
     
-    // 3. Experience points (up to 15 points)
+    // If no certifications at all, give baseline score (20 out of 40)
+    if (!tech.irataLevel && !tech.spratLevel) {
+      totalPoints = 20; // Baseline for no certification
+      breakdown.certificationPoints = 20;
+    }
+    
+    // 2. Experience points (up to 15 points)
     maxPoints += 15;
     if (tech.ropeAccessStartDate) {
       const startDate = new Date(tech.ropeAccessStartDate);
       const yearsExp = Math.floor((now.getTime() - startDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
       breakdown.yearsExperience = yearsExp;
       // 3 points per year, max 15
-      totalPoints += Math.min(15, yearsExp * 3);
+      const expPoints = Math.min(15, yearsExp * 3);
+      totalPoints += expPoints;
+      breakdown.experiencePoints = expPoints;
     }
     
-    // 4. Resume uploaded (5 points)
+    // 3. Resume uploaded (5 points)
     maxPoints += 5;
     if (tech.resumeDocuments && tech.resumeDocuments.length > 0) {
       totalPoints += 5;
       breakdown.hasResume = true;
+      breakdown.resumePoints = 5;
     }
     
     // Calculate percentage
