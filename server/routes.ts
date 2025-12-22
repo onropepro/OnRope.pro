@@ -1058,20 +1058,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Create session
+      // Create session and auto-login the user
       req.session.userId = user.id;
       req.session.role = user.role;
+      
+      console.log(`[Register] Session created for ${user.role}: ${user.id}, email: ${user.email}`);
       
       // Save session before responding (critical for production)
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
+          if (err) {
+            console.error(`[Register] Session save error:`, err);
+            reject(err);
+          } else {
+            console.log(`[Register] Session saved successfully for ${user.email}`);
+            resolve();
+          }
         });
       });
       
       // Return user without password
       const { passwordHash, ...userWithoutPassword } = user;
+      console.log(`[Register] Returning success response for ${user.role}: ${user.email}`);
       res.json({ user: userWithoutPassword });
     } catch (error) {
       if (error instanceof z.ZodError) {
