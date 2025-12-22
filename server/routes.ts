@@ -3099,6 +3099,148 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
+   * Create Stripe embedded checkout session for in-app payment
+   * POST /api/stripe/create-embedded-checkout
+   * Returns clientSecret for Stripe EmbeddedCheckout component
+   */
+  app.post("/api/stripe/create-embedded-checkout", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can purchase subscriptions" });
+      }
+
+      const { tier, currency = 'usd' } = req.body;
+
+      if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
+        return res.status(400).json({ message: "Invalid subscription tier" });
+      }
+
+      if (!['usd', 'cad'].includes(currency)) {
+        return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      }
+
+      // Get or create Stripe customer
+      const customerId = await stripeService.getOrCreateCustomer(user);
+
+      // Update user with customer ID if new
+      if (customerId !== user.stripeCustomerId) {
+        await storage.updateUser(user.id, { stripeCustomerId: customerId });
+      }
+
+      // Get price ID for selected tier and currency
+      const tierConfig = TIER_CONFIG[tier as TierName];
+      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+
+      // Construct base URL from request
+      const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
+      const host = req.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
+      // Create embedded checkout session with ui_mode: 'embedded'
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        ui_mode: 'embedded',
+        return_url: `${baseUrl}/profile?subscription=success&session_id={CHECKOUT_SESSION_ID}`,
+        metadata: {
+          userId: user.id.toString(),
+          tier,
+          currency,
+        },
+        subscription_data: {
+          trial_period_days: 30,
+          metadata: {
+            userId: user.id.toString(),
+            tier,
+            currency,
+          },
+        },
+        allow_promotion_codes: true,
+        billing_address_collection: 'auto',
+      });
+
+      console.log(`[Stripe] Embedded checkout session created for user ${user.id}: ${session.id}`);
+      res.json({ clientSecret: session.client_secret });
+    } catch (error: any) {
+      console.error('[Stripe] Create embedded checkout error:', error);
+      res.status(500).json({ message: error.message || "Failed to create embedded checkout" });
+    }
+  });
+
+  /**
+   * Create Stripe embedded checkout for NEW customers (no auth required)
+   * POST /api/stripe/create-embedded-license-checkout
+   */
+  app.post("/api/stripe/create-embedded-license-checkout", async (req: Request, res: Response) => {
+    try {
+      const { tier, currency = 'usd' } = req.body;
+
+      if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
+        return res.status(400).json({ message: "Invalid subscription tier" });
+      }
+
+      if (!['usd', 'cad'].includes(currency)) {
+        return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      }
+
+      // Get price ID for selected tier and currency
+      const tierConfig = TIER_CONFIG[tier as TierName];
+      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+
+      // Construct base URL from request
+      const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
+      const host = req.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
+      // Create embedded checkout session
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        ui_mode: 'embedded',
+        return_url: `${baseUrl}/complete-registration?session_id={CHECKOUT_SESSION_ID}`,
+        metadata: {
+          tier,
+          currency,
+          newCustomer: 'true',
+        },
+        subscription_data: {
+          trial_period_days: 30,
+          metadata: {
+            tier,
+            currency,
+          },
+        },
+        allow_promotion_codes: true,
+        billing_address_collection: 'required',
+      });
+
+      console.log(`[Stripe] Embedded license checkout session created: ${session.id}`);
+      res.json({ clientSecret: session.client_secret });
+    } catch (error: any) {
+      console.error('[Stripe] Create embedded license checkout error:', error);
+      res.status(500).json({ message: error.message || "Failed to create embedded checkout" });
+    }
+  });
+
+  /**
    * Create Stripe checkout session for NEW customers (license purchase)
    * POST /api/stripe/create-license-checkout
    * No authentication required - this is for new customers
