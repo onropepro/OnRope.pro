@@ -2340,7 +2340,7 @@ export default function Quotes() {
                     const gstRate = Number(q.gstRate) || 0;
                     const pstRate = Number(q.pstRate) || 0;
                     const hstRate = Number(q.hstRate) || 0;
-                    setEditTaxInfo({
+                    const taxInfoFromQuote = {
                       region: q.taxRegion || "",
                       regionName: q.taxRegion || "",
                       country: q.taxCountry || "CA",
@@ -2349,9 +2349,13 @@ export default function Quotes() {
                       pstRate,
                       hstRate,
                       totalRate: gstRate + pstRate + hstRate
-                    });
+                    };
+                    setEditTaxInfo(taxInfoFromQuote);
+                    // Also set currentTaxInfo so restore buttons have access to original rates
+                    setCurrentTaxInfo(taxInfoFromQuote);
                   } else {
                     setEditTaxInfo(null);
+                    setCurrentTaxInfo(null);
                   }
                   
                   setIsEditDialogOpen(true);
@@ -2954,73 +2958,203 @@ export default function Quotes() {
                           </div>
 
                           {editTaxInfo ? (
-                            <div className="grid grid-cols-2 gap-4">
-                              {(editTaxInfo.gstRate > 0 || editTaxInfo.taxType?.includes('GST')) && (
-                                <div>
-                                  <Label className="text-sm text-muted-foreground">GST Rate (%)</Label>
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    step="0.01"
-                                    value={editTaxInfo.gstRate}
-                                    onChange={(e) => {
-                                      const newGst = parseFloat(e.target.value) || 0;
-                                      setEditTaxInfo({
-                                        ...editTaxInfo,
-                                        gstRate: newGst,
-                                        totalRate: newGst + editTaxInfo.pstRate + editTaxInfo.hstRate
-                                      });
-                                    }}
-                                    className="h-10"
-                                    data-testid="input-edit-gst-rate"
-                                  />
-                                </div>
-                              )}
-                              {(editTaxInfo.pstRate > 0 || editTaxInfo.taxType?.includes('PST')) && (
-                                <div>
-                                  <Label className="text-sm text-muted-foreground">PST Rate (%)</Label>
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    step="0.01"
-                                    value={editTaxInfo.pstRate}
-                                    onChange={(e) => {
-                                      const newPst = parseFloat(e.target.value) || 0;
-                                      setEditTaxInfo({
-                                        ...editTaxInfo,
-                                        pstRate: newPst,
-                                        totalRate: editTaxInfo.gstRate + newPst + editTaxInfo.hstRate
-                                      });
-                                    }}
-                                    className="h-10"
-                                    data-testid="input-edit-pst-rate"
-                                  />
-                                </div>
-                              )}
-                              {(editTaxInfo.hstRate > 0 || editTaxInfo.taxType?.includes('HST')) && (
-                                <div>
-                                  <Label className="text-sm text-muted-foreground">HST Rate (%)</Label>
-                                  <Input
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    step="0.01"
-                                    value={editTaxInfo.hstRate}
-                                    onChange={(e) => {
-                                      const newHst = parseFloat(e.target.value) || 0;
-                                      setEditTaxInfo({
-                                        ...editTaxInfo,
-                                        hstRate: newHst,
-                                        totalRate: editTaxInfo.gstRate + editTaxInfo.pstRate + newHst
-                                      });
-                                    }}
-                                    className="h-10"
-                                    data-testid="input-edit-hst-rate"
-                                  />
-                                </div>
-                              )}
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                {(editTaxInfo.gstRate > 0 || editTaxInfo.taxType?.includes('GST')) && (
+                                  <div>
+                                    <Label className="text-sm text-muted-foreground">GST Rate (%)</Label>
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        value={editTaxInfo.gstRate}
+                                        onChange={(e) => {
+                                          const newGst = parseFloat(e.target.value) || 0;
+                                          setEditTaxInfo({
+                                            ...editTaxInfo,
+                                            gstRate: newGst,
+                                            totalRate: newGst + editTaxInfo.pstRate + editTaxInfo.hstRate
+                                          });
+                                        }}
+                                        className="h-10 flex-1"
+                                        data-testid="input-edit-gst-rate"
+                                      />
+                                      {editTaxInfo.gstRate === 0 ? (
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="icon"
+                                          onClick={() => {
+                                            const defaultRate = currentTaxInfo?.gstRate || 5;
+                                            setEditTaxInfo({
+                                              ...editTaxInfo,
+                                              gstRate: defaultRate,
+                                              totalRate: defaultRate + editTaxInfo.pstRate + editTaxInfo.hstRate
+                                            });
+                                          }}
+                                          data-testid="button-restore-gst"
+                                          title="Restore default GST rate"
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </Button>
+                                      ) : (
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => {
+                                            const newTotal = editTaxInfo.pstRate + editTaxInfo.hstRate;
+                                            if (newTotal === 0) {
+                                              setEditTaxInfo(null);
+                                            } else {
+                                              setEditTaxInfo({
+                                                ...editTaxInfo,
+                                                gstRate: 0,
+                                                totalRate: newTotal
+                                              });
+                                            }
+                                          }}
+                                          data-testid="button-remove-gst"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                {(editTaxInfo.pstRate > 0 || editTaxInfo.taxType?.includes('PST') || editTaxInfo.taxType?.includes('QST')) && (
+                                  <div>
+                                    <Label className="text-sm text-muted-foreground">
+                                      {editTaxInfo.taxType === 'GST+QST' ? 'QST' : (editTaxInfo.country === 'US' ? 'State Tax' : 'PST')} Rate (%)
+                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        value={editTaxInfo.pstRate}
+                                        onChange={(e) => {
+                                          const newPst = parseFloat(e.target.value) || 0;
+                                          setEditTaxInfo({
+                                            ...editTaxInfo,
+                                            pstRate: newPst,
+                                            totalRate: editTaxInfo.gstRate + newPst + editTaxInfo.hstRate
+                                          });
+                                        }}
+                                        className="h-10 flex-1"
+                                        data-testid="input-edit-pst-rate"
+                                      />
+                                      {editTaxInfo.pstRate === 0 ? (
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="icon"
+                                          onClick={() => {
+                                            const defaultRate = currentTaxInfo?.pstRate || 7;
+                                            setEditTaxInfo({
+                                              ...editTaxInfo,
+                                              pstRate: defaultRate,
+                                              totalRate: editTaxInfo.gstRate + defaultRate + editTaxInfo.hstRate
+                                            });
+                                          }}
+                                          data-testid="button-restore-pst"
+                                          title="Restore default PST rate"
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </Button>
+                                      ) : (
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => {
+                                            const newTotal = editTaxInfo.gstRate + editTaxInfo.hstRate;
+                                            if (newTotal === 0) {
+                                              setEditTaxInfo(null);
+                                            } else {
+                                              setEditTaxInfo({
+                                                ...editTaxInfo,
+                                                pstRate: 0,
+                                                totalRate: newTotal
+                                              });
+                                            }
+                                          }}
+                                          data-testid="button-remove-pst"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                {(editTaxInfo.hstRate > 0 || editTaxInfo.taxType?.includes('HST')) && (
+                                  <div>
+                                    <Label className="text-sm text-muted-foreground">HST Rate (%)</Label>
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        value={editTaxInfo.hstRate}
+                                        onChange={(e) => {
+                                          const newHst = parseFloat(e.target.value) || 0;
+                                          setEditTaxInfo({
+                                            ...editTaxInfo,
+                                            hstRate: newHst,
+                                            totalRate: editTaxInfo.gstRate + editTaxInfo.pstRate + newHst
+                                          });
+                                        }}
+                                        className="h-10 flex-1"
+                                        data-testid="input-edit-hst-rate"
+                                      />
+                                      {editTaxInfo.hstRate === 0 ? (
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="icon"
+                                          onClick={() => {
+                                            const defaultRate = currentTaxInfo?.hstRate || 13;
+                                            setEditTaxInfo({
+                                              ...editTaxInfo,
+                                              hstRate: defaultRate,
+                                              totalRate: editTaxInfo.gstRate + editTaxInfo.pstRate + defaultRate
+                                            });
+                                          }}
+                                          data-testid="button-restore-hst"
+                                          title="Restore default HST rate"
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </Button>
+                                      ) : (
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => {
+                                            const newTotal = editTaxInfo.gstRate + editTaxInfo.pstRate;
+                                            if (newTotal === 0) {
+                                              setEditTaxInfo(null);
+                                            } else {
+                                              setEditTaxInfo({
+                                                ...editTaxInfo,
+                                                hstRate: 0,
+                                                totalRate: newTotal
+                                              });
+                                            }
+                                          }}
+                                          data-testid="button-remove-hst"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                               <div className="col-span-2">
                                 <Button
                                   type="button"
