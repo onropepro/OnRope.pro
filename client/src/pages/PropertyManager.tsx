@@ -44,6 +44,20 @@ type VendorSummary = {
   strataNumber: string | null;
   whitelabelBrandingActive: boolean;
   brandingColors: string | null;
+  csrRating: number | null;
+  csrLabel: string | null;
+  csrColor: string | null;
+};
+
+type CsrRatingHistory = {
+  id: string;
+  companyId: string;
+  previousScore: number;
+  newScore: number;
+  delta: number;
+  category: string;
+  reason: string;
+  createdAt: string;
 };
 
 export default function PropertyManager() {
@@ -59,6 +73,7 @@ export default function PropertyManager() {
   const [uploadingAnchorInspection, setUploadingAnchorInspection] = useState(false);
   const [vendorToRemove, setVendorToRemove] = useState<VendorSummary | null>(null);
   const [selectedComplaint, setSelectedComplaint] = useState<any | null>(null);
+  const [csrHistoryVendor, setCsrHistoryVendor] = useState<VendorSummary | null>(null);
   const [editBuildingInstructionsOpen, setEditBuildingInstructionsOpen] = useState(false);
   const [buildingInstructionsForm, setBuildingInstructionsForm] = useState({
     buildingAccess: "",
@@ -370,6 +385,26 @@ export default function PropertyManager() {
       return data;
     },
     enabled: !!selectedVendor?.linkId,
+    retry: false,
+  });
+
+  // Fetch CSR history for a vendor when history dialog is open
+  const { data: csrHistoryData, isLoading: isLoadingCsrHistory } = useQuery<{
+    history: CsrRatingHistory[];
+  }>({
+    queryKey: ["/api/property-managers/vendors", csrHistoryVendor?.linkId, "csr", "history"],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/property-managers/vendors/${csrHistoryVendor!.linkId}/csr/history`,
+        { credentials: 'include' }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch CSR history');
+      }
+      return data;
+    },
+    enabled: !!csrHistoryVendor?.linkId,
     retry: false,
   });
 
@@ -825,10 +860,29 @@ export default function PropertyManager() {
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <h3 className="font-semibold truncate" data-testid={`text-vendor-name-${vendor.id}`}>
                                 {vendor.companyName}
                               </h3>
+                              {vendor.csrRating !== null && (
+                                <Badge
+                                  variant="outline"
+                                  className={`cursor-pointer gap-1 text-xs ${
+                                    vendor.csrRating >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
+                                    vendor.csrRating >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black border-yellow-600 dark:border-yellow-400" :
+                                    vendor.csrRating >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
+                                    "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400"
+                                  }`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCsrHistoryVendor(vendor);
+                                  }}
+                                  data-testid={`badge-vendor-csr-${vendor.id}`}
+                                >
+                                  <Shield className="w-3 h-3" />
+                                  <span>CSR: {vendor.csrRating}%</span>
+                                </Badge>
+                              )}
                             </div>
                             <div className="space-y-1 text-sm text-muted-foreground">
                               <div className="flex items-center gap-2">
@@ -1988,6 +2042,107 @@ export default function PropertyManager() {
                 data-testid="button-confirm-remove-vendor"
               >
                 {removeVendorMutation.isPending ? t('propertyManager.removeVendor.removing', 'Removing...') : t('propertyManager.removeVendor.remove', 'Remove Vendor')}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* CSR History Dialog */}
+        <Dialog open={csrHistoryVendor !== null} onOpenChange={(open) => !open && setCsrHistoryVendor(null)}>
+          <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col" data-testid="dialog-csr-history">
+            <DialogHeader>
+              <DialogTitle data-testid="text-csr-history-title">
+                {t('propertyManager.csrHistory.title', 'Company Safety Rating History')}
+              </DialogTitle>
+              <DialogDescription data-testid="text-csr-history-description">
+                {csrHistoryVendor?.companyName} - {t('propertyManager.csrHistory.description', 'View how the safety rating has changed over time')}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex-1 overflow-y-auto">
+              {/* Current CSR Rating */}
+              {csrHistoryVendor?.csrRating !== null && (
+                <div className="mb-6 p-4 rounded-lg bg-muted/50">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t('propertyManager.csrHistory.currentRating', 'Current Rating')}</p>
+                      <p className="text-2xl font-bold">{csrHistoryVendor?.csrRating}%</p>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={`gap-1.5 px-3 py-1.5 ${
+                        (csrHistoryVendor?.csrRating ?? 0) >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
+                        (csrHistoryVendor?.csrRating ?? 0) >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black border-yellow-600 dark:border-yellow-400" :
+                        (csrHistoryVendor?.csrRating ?? 0) >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
+                        "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400"
+                      }`}
+                      data-testid="badge-csr-current"
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span>{csrHistoryVendor?.csrLabel || 'N/A'}</span>
+                    </Badge>
+                  </div>
+                </div>
+              )}
+
+              {/* History Timeline */}
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm text-muted-foreground">{t('propertyManager.csrHistory.ratingChanges', 'Rating Changes')}</h4>
+                
+                {isLoadingCsrHistory ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : csrHistoryData?.history && csrHistoryData.history.length > 0 ? (
+                  <div className="space-y-3">
+                    {csrHistoryData.history.map((entry) => (
+                      <div
+                        key={entry.id}
+                        className="p-3 rounded-lg border bg-card"
+                        data-testid={`csr-history-entry-${entry.id}`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge
+                                variant="outline"
+                                className={entry.delta >= 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-300 dark:border-green-700" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border-red-300 dark:border-red-700"}
+                              >
+                                {entry.delta >= 0 ? '+' : ''}{entry.delta.toFixed(1)}%
+                              </Badge>
+                              <span className="text-xs text-muted-foreground capitalize">{entry.category}</span>
+                            </div>
+                            <p className="text-sm">{entry.reason}</p>
+                            <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                              <span>{entry.previousScore.toFixed(1)}%</span>
+                              <span className="text-muted-foreground/50">-&gt;</span>
+                              <span className="font-medium">{entry.newScore.toFixed(1)}%</span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-muted-foreground whitespace-nowrap">
+                            {formatTimestampDate(entry.createdAt)}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Shield className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                    <p>{t('propertyManager.csrHistory.noHistory', 'No rating changes recorded yet')}</p>
+                    <p className="text-xs mt-1">{t('propertyManager.csrHistory.noHistoryHint', 'Changes will appear here as the company updates their safety documentation')}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex justify-end pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => setCsrHistoryVendor(null)}
+                data-testid="button-close-csr-history"
+              >
+                {t('common.close', 'Close')}
               </Button>
             </div>
           </DialogContent>
