@@ -487,6 +487,10 @@
         "title": "Passeport technicien",
         "description": "Historique de travail portable, certifications, dossiers de carrière"
       },
+      "passportLogbook": {
+        "title": "Passeport et carnet de bord",
+        "description": "Votre historique de travail portable, certifications et suivi de carrière"
+      },
       "employerJobBoard": {
         "title": "Écosystème d'offres d'emploi",
         "description": "Navigateur de talents, publications illimitées, offres directes"

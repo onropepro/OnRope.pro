@@ -487,6 +487,10 @@
         "title": "Technician Passport",
         "description": "Portable work history, certifications, career-long records"
       },
+      "passportLogbook": {
+        "title": "Passport & Log Book",
+        "description": "Your portable work history, certifications, and career tracking"
+      },
       "employerJobBoard": {
         "title": "Job Board Ecosystem",
         "description": "Talent browser, unlimited postings, direct offers"

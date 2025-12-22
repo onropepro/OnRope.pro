@@ -781,6 +781,10 @@
         "title": "Pasaporte del Tecnico",
         "description": "Credenciales portatiles, historial de trabajo"
       },
+      "passportLogbook": {
+        "title": "Pasaporte y libro de registro",
+        "description": "Tu historial de trabajo portátil, certificaciones y seguimiento de carrera"
+      },
       "employerJobBoard": {
         "title": "Bolsa de Trabajo para Empleadores",
         "description": "Publicacion de empleos, reclutamiento"
