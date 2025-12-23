@@ -22,31 +22,31 @@ export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <UserX className="w-5 h-5" style={{ color: accentColor }} />
             Not Clocked In
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse h-20 bg-muted rounded" />
         </CardContent>
-      </>
+      </div>
     );
   }
 
   const hasData = data && data.count > 0;
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <UserX className="w-5 h-5" style={{ color: accentColor }} />
           Not Clocked In
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {hasData ? (
           <div className="space-y-3">
             <div className="text-center mb-3">
@@ -55,7 +55,7 @@ export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
               </p>
               <p className="text-sm text-muted-foreground">Scheduled but not started</p>
             </div>
-            <div className="space-y-2 max-h-32 overflow-y-auto">
+            <div className="space-y-2">
               {data!.employees.slice(0, 3).map((emp) => (
                 <div
                   key={emp.id}
@@ -84,13 +84,13 @@ export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-4 text-center">
+          <div className="h-full flex flex-col items-center justify-center text-center">
             <Users className="w-10 h-10 text-muted-foreground/50 mb-2" />
             <p className="text-base text-muted-foreground">All scheduled employees clocked in</p>
             <p className="text-sm text-muted-foreground/70">No missing check-ins</p>
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }

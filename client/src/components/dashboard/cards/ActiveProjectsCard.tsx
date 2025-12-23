@@ -15,8 +15,8 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
   const displayProjects = activeProjects.slice(0, 4);
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Briefcase className="w-5 h-5" style={{ color: accentColor }} />
@@ -27,9 +27,11 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {displayProjects.length === 0 ? (
-          <p className="text-base text-muted-foreground">No active projects</p>
+          <div className="h-full flex items-center justify-center">
+            <p className="text-base text-muted-foreground">No active projects</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {displayProjects.map((project: any) => {
@@ -67,6 +69,6 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }

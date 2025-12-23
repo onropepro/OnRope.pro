@@ -25,33 +25,33 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
 
   if (!hasAccess) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <CalendarRange className="w-5 h-5" style={{ color: accentColor }} />
             Week at a Glance
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
-      </>
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <CalendarRange className="w-5 h-5" style={{ color: accentColor }} />
             Week at a Glance
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse h-20 bg-muted rounded" />
         </CardContent>
-      </>
+      </div>
     );
   }
 
@@ -71,8 +71,8 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
   const totalJobs = days.reduce((sum, d) => sum + d.jobCount, 0);
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <CalendarRange className="w-5 h-5" style={{ color: accentColor }} />
@@ -83,7 +83,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col justify-between">
         <div className="grid grid-cols-7 gap-1 mb-3">
           {days.map((day) => (
             <div 
@@ -113,6 +113,6 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
           <ChevronRight className="w-4 h-4" />
         </Button>
       </CardContent>
-    </>
+    </div>
   );
 }

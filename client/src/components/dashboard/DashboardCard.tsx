@@ -9,8 +9,14 @@ interface DashboardCardProps {
   onRemove: () => void;
   dragHandleProps?: DraggableProvidedDragHandleProps | null;
   isDragging?: boolean;
+  size?: 'single' | 'double';
   children: React.ReactNode;
 }
+
+const CARD_HEIGHT = {
+  single: 'h-[200px]',
+  double: 'h-[416px]', // 200 * 2 + 16px gap
+};
 
 export function DashboardCard({
   cardId,
@@ -18,11 +24,12 @@ export function DashboardCard({
   onRemove,
   dragHandleProps,
   isDragging,
+  size = 'single',
   children,
 }: DashboardCardProps) {
   return (
     <Card
-      className={`relative rounded-2xl shadow-md transition-all duration-200 ${
+      className={`relative rounded-2xl shadow-md transition-all duration-200 flex flex-col ${CARD_HEIGHT[size]} ${
         isDragging ? "shadow-lg ring-2 ring-primary/20" : ""
       } ${isEditMode ? "ring-1 ring-dashed ring-muted-foreground/30" : ""}`}
       data-testid={`card-${cardId}`}
@@ -47,7 +54,9 @@ export function DashboardCard({
           </Button>
         </div>
       )}
-      {children}
+      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+        {children}
+      </div>
     </Card>
   );
 }
