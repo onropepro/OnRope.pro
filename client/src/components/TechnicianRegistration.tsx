@@ -12,7 +12,7 @@ import {
   User, ArrowRight, ArrowLeft, Award, Loader2, 
   Check, Upload, Shield, Copy, Mail, MessageSquare,
   Briefcase, FileText, Clock, Bell, ChevronRight,
-  HardHat, X, CheckCircle, Eye, EyeOff
+  HardHat, X, CheckCircle, Eye, EyeOff, Lock, LockOpen
 } from "lucide-react";
 
 type RegistrationStep = "welcome" | "accountDetails" | "certification" | "referral" | "employer" | "success";
@@ -751,9 +751,36 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   {/* PLUS benefits section - locked/grayed with animated checkmarks */}
                   <div className="mb-8">
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-medium">
-                      {t('techReg.plusSection.header', 'Unlock PLUS for free by referring 1 other tech:')}
-                    </p>
+                    <div className="flex items-center gap-2 mb-2">
+                      <motion.div
+                        initial={{ rotate: 0 }}
+                        animate={{ rotate: [0, -15, 0] }}
+                        transition={{ 
+                          delay: 0.3,
+                          duration: 0.4,
+                          ease: "easeOut"
+                        }}
+                      >
+                        <motion.div
+                          initial={{ opacity: 1 }}
+                          animate={{ opacity: 0 }}
+                          transition={{ delay: 0.7, duration: 0.2 }}
+                          className="absolute"
+                        >
+                          <Lock className="w-4 h-4 text-amber-500" />
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.7, duration: 0.3, type: "spring" }}
+                        >
+                          <LockOpen className="w-4 h-4 text-green-500" />
+                        </motion.div>
+                      </motion.div>
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                        {t('techReg.plusSection.header', 'Unlock PLUS for free by referring 1 other tech:')}
+                      </p>
+                    </div>
                     <div className="space-y-1.5">
                       {plusBenefits.map((benefit, i) => (
                         <motion.div 
