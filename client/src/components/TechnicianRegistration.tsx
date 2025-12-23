@@ -803,27 +803,28 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {/* Employer Connection Info Screen (Page 4) */}
               {step === "employer" && (
                 <div className="max-w-lg mx-auto">
-                  <div className="mb-6 text-center">
+                  <div className="mb-8 text-center">
+                    <p className="text-muted-foreground mb-2">{t('techReg.employer.question', 'Does Your Employer Use OnRopePro?')}</p>
                     <h2 className="text-2xl font-bold">{t('techReg.employer.title', 'Good alone. Unstoppable together.')}</h2>
                     <p className="text-muted-foreground mt-1">{t('techReg.employer.subtitle', 'Everything you do manually? Now it\'s automatic.')}</p>
                   </div>
 
-                  <div className="space-y-3 mb-6">
+                  <div className="space-y-3 mb-8">
                     {employerBenefits.slice(0, 6).map((benefit, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-md bg-muted/50">
+                      <div key={i} className="flex items-start gap-3 p-4 rounded-md bg-muted/50">
                         <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0 mt-0.5">
                           <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                         </div>
                         <div>
-                          <p className="font-medium text-sm">{benefit.title}</p>
-                          <p className="text-xs text-muted-foreground">{benefit.desc}</p>
+                          <p className="font-medium text-base">{benefit.title}</p>
+                          <p className="text-sm text-muted-foreground">{benefit.desc}</p>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   <div className="p-4 rounded-md bg-muted/30 border border-border mb-6">
-                    <p className="text-sm text-muted-foreground text-center">
+                    <p className="text-base text-muted-foreground text-center">
                       {t('techReg.employer.cta', 'Your account works great standalone. When your employer joins OnRopePro, everything becomes automatic.')}
                     </p>
                   </div>
