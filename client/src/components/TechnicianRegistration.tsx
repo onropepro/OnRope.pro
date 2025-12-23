@@ -313,7 +313,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   // Employer-connected benefits for Page 4
   const employerBenefits = [
-    { title: t('techReg.employer.autoHours', 'Hours log automatically'), desc: t('techReg.employer.autoHoursDesc', 'No manual entry — clock in/out and everything logs itself') },
+    { title: t('techReg.employer.autoHours', 'Hours log automatically'), desc: t('techReg.employer.autoHoursDesc', 'No manual entry — clock in/out and everything logs itself. Drops. Payroll. Safety Meetings.') },
     { title: t('techReg.employer.gpsVerified', 'GPS-verified clock in/out'), desc: t('techReg.employer.gpsVerifiedDesc', 'Location-stamped records protect you and your employer') },
     { title: t('techReg.employer.dashboard', 'Work Dashboard with projects & shifts'), desc: t('techReg.employer.dashboardDesc', 'See your schedule, projects, and tasks in one place') },
     { title: t('techReg.employer.digitalForms', 'Digital toolbox talks & safety forms'), desc: t('techReg.employer.digitalFormsDesc', 'Safety meetings delivered to your phone, sign once, recorded forever') },
@@ -835,12 +835,12 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="mb-8 text-center">
                     <p className="text-muted-foreground mb-2">{t('techReg.employer.question', 'Does Your Employer Use OnRopePro?')}</p>
                     <h2 className="text-2xl font-bold">{t('techReg.employer.title', 'Good alone. Unstoppable together.')}</h2>
-                    <p className="text-muted-foreground mt-1">{t('techReg.employer.subtitle', 'Everything you do manually? Now it\'s automatic.')}</p>
+                    <p className="text-muted-foreground mt-1">{t('techReg.employer.subtitle', 'Everything you do manually? Not anymore.')}</p>
                   </div>
 
-                  <div className="space-y-2 mb-8">
+                  <div className="space-y-1 mb-8">
                     {employerBenefits.slice(0, 6).map((benefit, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-md bg-muted/50">
+                      <div key={i} className="flex items-start gap-3 py-2 px-3 rounded-md bg-muted/50">
                         <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0 mt-0.5">
                           <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                         </div>
@@ -854,7 +854,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   <div className="p-4 rounded-md bg-muted/30 border border-border mb-6">
                     <p className="text-base text-muted-foreground text-center">
-                      {t('techReg.employer.cta', 'Your account works great standalone. When your employer joins OnRopePro, everything becomes automatic.')}
+                      {t('techReg.employer.cta', 'Your account works great standalone. When your employer uses OnRopePro, everything becomes seamlessly automatic.')}
                     </p>
                   </div>
 
