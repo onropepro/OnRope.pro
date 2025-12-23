@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { GripVertical, Plus, X, Settings, Check, RotateCcw } from "lucide-react";
+import { GripVertical, Plus, X, Settings, Check, RotateCcw, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
@@ -267,16 +267,34 @@ export function DashboardGrid({
                   {currentUser?.residentCode && (
                     <div className="flex items-center gap-1.5">
                       <span className="text-muted-foreground font-medium">Resident:</span>
-                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-resident-code">
+                      <Badge 
+                        variant="outline" 
+                        className="font-mono text-xs px-2 py-0.5 cursor-pointer hover-elevate" 
+                        data-testid="badge-resident-code"
+                        onClick={() => {
+                          navigator.clipboard.writeText(currentUser.residentCode);
+                          toast({ title: "Copied", description: "Resident code copied to clipboard" });
+                        }}
+                      >
                         {currentUser.residentCode}
+                        <Copy className="w-3 h-3 ml-1.5 text-muted-foreground" />
                       </Badge>
                     </div>
                   )}
                   {currentUser?.propertyManagerCode && (
                     <div className="flex items-center gap-1.5">
                       <span className="text-muted-foreground font-medium">Property Mgr:</span>
-                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-property-manager-code">
+                      <Badge 
+                        variant="outline" 
+                        className="font-mono text-xs px-2 py-0.5 cursor-pointer hover-elevate" 
+                        data-testid="badge-property-manager-code"
+                        onClick={() => {
+                          navigator.clipboard.writeText(currentUser.propertyManagerCode);
+                          toast({ title: "Copied", description: "Property Manager code copied to clipboard" });
+                        }}
+                      >
                         {currentUser.propertyManagerCode}
+                        <Copy className="w-3 h-3 ml-1.5 text-muted-foreground" />
                       </Badge>
                     </div>
                   )}
