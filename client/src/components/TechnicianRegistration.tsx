@@ -551,7 +551,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
               {/* Certification Screen */}
               {step === "certification" && (
-                <div className="max-w-lg mx-auto">
+                <div className="max-w-lg mx-auto flex flex-col justify-center min-h-full">
                   <div className="mb-6">
                                         <h2 className="text-2xl font-bold">{t('techReg.certification.title', 'Verify Your Certification')}</h2>
                     <p className="text-muted-foreground mt-1">{t('techReg.certification.subtitle', 'Select your certification type')}</p>
@@ -735,6 +735,18 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <p className="text-muted-foreground mt-1">{t('techReg.referral.subtitle', 'Got a referral code from a friend?')}</p>
                   </div>
 
+                  {/* Referral Code Input */}
+                  <div className="mb-6">
+                    <Label className="text-sm mb-2 block">{t('techReg.referral.inputLabel', 'Enter referral code (optional)')}</Label>
+                    <Input
+                      placeholder={t('techReg.referral.inputPlaceholder', 'Enter referral code')}
+                      value={data.referralCodeInput}
+                      onChange={(e) => setData({ ...data, referralCodeInput: e.target.value.toUpperCase() })}
+                      className="text-center tracking-widest text-lg"
+                      data-testid="input-referral-code"
+                    />
+                  </div>
+
                   {/* PLUS benefits section - locked/grayed */}
                   <div className="mb-6">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-medium">
@@ -752,18 +764,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <p className="text-xs text-muted-foreground mt-2 text-center">
                       {t('techReg.plusSection.hint', 'Refer one tech after signup to unlock instantly')}
                     </p>
-                  </div>
-
-                  {/* Referral Code Input */}
-                  <div className="mb-6">
-                    <Label className="text-sm mb-2 block">{t('techReg.referral.inputLabel', 'Enter referral code (optional)')}</Label>
-                    <Input
-                      placeholder={t('techReg.referral.inputPlaceholder', 'Enter referral code')}
-                      value={data.referralCodeInput}
-                      onChange={(e) => setData({ ...data, referralCodeInput: e.target.value.toUpperCase() })}
-                      className="text-center tracking-widest text-lg"
-                      data-testid="input-referral-code"
-                    />
                   </div>
 
                   {error && (
