@@ -296,7 +296,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   const plusBenefits = [
     t('techReg.plusBenefits.expiryAlerts', 'Certification expiry alerts (60 & 30 day warnings)'),
     t('techReg.plusBenefits.multiEmployers', 'Connect with multiple employers at once'),
-    t('techReg.plusBenefits.jobBoard', 'Job board access'),
+    t('techReg.plusBenefits.jobBoard', 'Rope Access Job Board'),
     t('techReg.plusBenefits.priorityVisibility', 'Priority profile visibility to employers'),
   ];
 
