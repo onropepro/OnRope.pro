@@ -380,7 +380,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   {/* PLUS benefits section - locked/grayed */}
                   <div className="mb-4">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">
-                      {t('techReg.plusSection.header', 'Unlock with 1 referral:')}
+                      {t('techReg.plusSection.header', 'Unlock PLUS for free by referring 1 other tech:')}
                     </p>
                     <div className="space-y-1">
                       {plusBenefits.map((benefit, i) => (
