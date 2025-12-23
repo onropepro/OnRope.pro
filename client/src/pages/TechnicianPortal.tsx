@@ -119,6 +119,7 @@ import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { QuizSection } from "@/components/QuizSection";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 
 type Language = 'en' | 'fr' | 'es';
 
@@ -2378,6 +2379,12 @@ export default function TechnicianPortal() {
               </div>
             </div>
           </div>
+          
+          {/* Search - hidden on mobile */}
+          <div className="hidden md:flex flex-1 max-w-md">
+            <DashboardSearch />
+          </div>
+          
           <div className="flex items-center gap-2">
             {/* Referral Code in Top Bar */}
             {user?.referralCode && (
