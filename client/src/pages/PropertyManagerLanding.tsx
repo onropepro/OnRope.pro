@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 const PM_COLOR = "#6E9075";
@@ -33,6 +34,7 @@ const PM_GRADIENT = "linear-gradient(135deg, #6E9075 0%, #5A7A60 100%)";
 export default function PropertyManagerLanding() {
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
+  const [showRegistration, setShowRegistration] = useState(false);
   
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -65,11 +67,9 @@ export default function PropertyManagerLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#6E9075] hover:bg-green-50" asChild>
-                <Link href="/register" data-testid="button-create-account-hero">
-                  {t('propertyManagerLanding.cta.createFreeAccount')}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
+              <Button size="lg" className="bg-white text-[#6E9075] hover:bg-green-50" onClick={() => setShowRegistration(true)} data-testid="button-create-account-hero">
+                {t('propertyManagerLanding.cta.createFreeAccount')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
                 <Link href="#how-it-works" data-testid="button-learn-how">
@@ -108,11 +108,9 @@ export default function PropertyManagerLanding() {
         </div>
         
         <div className="mt-8 text-center">
-          <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" asChild>
-            <Link href="/register" data-testid="button-create-account-hook">
-              {t('propertyManagerLanding.cta.createFreeAccount')}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+          <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" onClick={() => setShowRegistration(true)} data-testid="button-create-account-hook">
+            {t('propertyManagerLanding.cta.createFreeAccount')}
+            <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </section>
@@ -396,11 +394,9 @@ export default function PropertyManagerLanding() {
         </p>
 
         <div className="mt-8 text-center">
-          <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" asChild>
-            <Link href="/register" data-testid="button-create-account-steps">
-              {t('propertyManagerLanding.cta.createFreeAccount')}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+          <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" onClick={() => setShowRegistration(true)} data-testid="button-create-account-steps">
+            {t('propertyManagerLanding.cta.createFreeAccount')}
+            <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </section>
@@ -427,11 +423,9 @@ export default function PropertyManagerLanding() {
         </div>
 
         <div className="mt-8 text-center">
-          <Button size="lg" variant="outline" style={{borderColor: PM_COLOR, color: PM_COLOR}} asChild>
-            <Link href="/register" data-testid="button-get-free-access">
-              {t('propertyManagerLanding.cta.getFreeAccess')}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+          <Button size="lg" variant="outline" style={{borderColor: PM_COLOR, color: PM_COLOR}} onClick={() => setShowRegistration(true)} data-testid="button-get-free-access">
+            {t('propertyManagerLanding.cta.getFreeAccess')}
+            <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </section>
@@ -496,11 +490,9 @@ export default function PropertyManagerLanding() {
         </div>
 
         <div className="mt-8 text-center">
-          <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" asChild>
-            <Link href="/register" data-testid="button-create-account-time">
-              {t('propertyManagerLanding.cta.createFreeAccount')}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+          <Button size="lg" style={{backgroundColor: PM_COLOR}} className="text-white hover:opacity-90" onClick={() => setShowRegistration(true)} data-testid="button-create-account-time">
+            {t('propertyManagerLanding.cta.createFreeAccount')}
+            <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </section>
@@ -663,11 +655,9 @@ export default function PropertyManagerLanding() {
             {t('propertyManagerLanding.finalCta.free')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: PM_COLOR}} asChild>
-              <Link href="/register" data-testid="button-create-account-final">
-                {t('propertyManagerLanding.cta.createFreeAccount')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: PM_COLOR}} onClick={() => setShowRegistration(true)} data-testid="button-create-account-final">
+              {t('propertyManagerLanding.cta.createFreeAccount')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
               <Link href="/contact" data-testid="button-tell-vendor">
@@ -698,6 +688,9 @@ export default function PropertyManagerLanding() {
           </div>
         </div>
       </footer>
+
+      {/* Registration Modal */}
+      <PropertyManagerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
     </div>
   );
 }
