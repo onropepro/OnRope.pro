@@ -785,6 +785,12 @@ export default function PropertyManager() {
     if (data.email && data.email !== userData?.user?.email) {
       updateData.email = data.email;
     }
+    // Check phone number changes (allow clearing by comparing with empty string)
+    const currentPhone = userData?.user?.propertyManagerPhoneNumber || '';
+    const newPhone = data.propertyManagerPhoneNumber || '';
+    if (newPhone !== currentPhone) {
+      updateData.propertyManagerPhoneNumber = newPhone;
+    }
     if (data.newPassword) {
       updateData.currentPassword = data.currentPassword;
       updateData.newPassword = data.newPassword;
