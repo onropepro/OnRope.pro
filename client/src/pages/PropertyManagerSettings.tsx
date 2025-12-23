@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Plus, Building2 } from "lucide-react";
+import { Trash2, Plus, Building2, Phone, Loader2 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import {
   Dialog,
@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/use-auth";
 
 interface CompanyLink {
   id: string;
@@ -27,9 +28,41 @@ interface CompanyLink {
 
 export default function PropertyManagerSettings() {
   const { t } = useTranslation();
+  const { user, refetch: refetchUser } = useAuth();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newCompanyCode, setNewCompanyCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const { toast } = useToast();
+
+  // Initialize phone number from user data
+  useEffect(() => {
+    if (user?.propertyManagerPhoneNumber) {
+      setPhoneNumber(user.propertyManagerPhoneNumber);
+    }
+  }, [user?.propertyManagerPhoneNumber]);
+
+  // Update phone number mutation
+  const updatePhoneMutation = useMutation({
+    mutationFn: async (newPhone: string) => {
+      return await apiRequest("/api/property-managers/me/account", "PATCH", { 
+        propertyManagerPhoneNumber: newPhone 
+      });
+    },
+    onSuccess: () => {
+      refetchUser();
+      toast({
+        title: t('propertyManagerSettings.successTitle', 'Success'),
+        description: t('propertyManagerSettings.phoneUpdated', 'Phone number updated successfully'),
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('propertyManagerSettings.errorTitle', 'Error'),
+        description: error.message || t('propertyManagerSettings.failedToUpdatePhone', 'Failed to update phone number'),
+        variant: "destructive",
+      });
+    },
+  });
 
   // Fetch company links
   const { data: linksData, isLoading, error, refetch } = useQuery<{ links: CompanyLink[] }>({
@@ -107,6 +140,52 @@ export default function PropertyManagerSettings() {
           {t('propertyManagerSettings.subtitle', 'Manage your access to rope access companies')}
         </p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Phone className="h-5 w-5 text-muted-foreground" />
+            <CardTitle>{t('propertyManagerSettings.smsNotifications', 'SMS Notifications')}</CardTitle>
+          </div>
+          <CardDescription>
+            {t('propertyManagerSettings.smsDescription', 'Receive SMS notifications when companies send you quotes')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1">
+              <Label htmlFor="phoneNumber" className="sr-only">
+                {t('propertyManagerSettings.phoneNumber', 'Phone Number')}
+              </Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder={t('propertyManagerSettings.phoneNumberPlaceholder', '604-123-4567')}
+                data-testid="input-phone-number"
+              />
+            </div>
+            <Button
+              onClick={() => updatePhoneMutation.mutate(phoneNumber)}
+              disabled={updatePhoneMutation.isPending || phoneNumber === (user?.propertyManagerPhoneNumber || "")}
+              data-testid="button-save-phone"
+            >
+              {updatePhoneMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {t('propertyManagerSettings.saving', 'Saving...')}
+                </>
+              ) : (
+                t('propertyManagerSettings.savePhone', 'Save Phone')
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            {t('propertyManagerSettings.phoneHint', 'Leave empty to disable SMS notifications')}
+          </p>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
