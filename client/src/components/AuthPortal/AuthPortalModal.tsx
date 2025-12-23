@@ -10,6 +10,7 @@ import { RegisterForm } from "./RegisterForm";
 import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
+import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
 import { HardHat, Building2, Home, Users, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -209,23 +210,18 @@ export function AuthPortalModal() {
         open={activeRegistrationModal === "resident"} 
         onOpenChange={(open) => !open && handleCloseRegistrationModal()}
       >
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="text-center pb-2">
-            <div className="flex justify-center mb-4">
-              <img
-                src={onRopeProLogo}
-                alt="OnRopePro"
-                className="h-8 w-auto brightness-0 dark:invert opacity-80"
-              />
-            </div>
-            <DialogTitle className="text-xl font-semibold">
-              {t("auth.residentRegistration", "Resident Registration")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("auth.residentDescription", "Create your resident account to access building services")}
-            </DialogDescription>
-          </DialogHeader>
-          <RegisterForm userType="resident" onSuccess={handleAuthSuccess} />
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-0">
+          <ResidentSlidingSignup 
+            onClose={handleCloseRegistrationModal}
+            onShowSignIn={() => {
+              handleCloseRegistrationModal();
+              setMode("login");
+              setTimeout(() => {
+                // Re-open auth portal in login mode
+                window.dispatchEvent(new CustomEvent('openAuthPortal', { detail: { mode: 'login' } }));
+              }, 100);
+            }}
+          />
         </DialogContent>
       </Dialog>
     </>
