@@ -272,7 +272,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-3" style={{backgroundColor: `${SAGE_GREEN}10`, borderColor: `${SAGE_GREEN}30`}}>
                       <Building2 className="w-4 h-4" style={{color: SAGE_GREEN}} />
                       <span className="text-xs font-medium text-center leading-tight" style={{color: SAGE_GREEN}}>
-                        For Building & Property Managers
+                        For Property Managers
                       </span>
                     </div>
                     <h1 className="text-2xl font-bold mb-1">Still Chasing Vendors Through Email and Voicemail?</h1>
@@ -322,7 +322,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
-                    Add Your Building
+                    Get Started
                     <ArrowRight className="w-4 h-4" />
                   </Button>
 
