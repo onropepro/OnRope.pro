@@ -2346,101 +2346,83 @@ export default function TechnicianPortal() {
       
       {/* Main content wrapper - offset for sidebar on desktop */}
       <div className="lg:pl-60">
-        <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="w-full px-4 md:px-6 xl:px-8 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img 
-              src={onRopeProLogo} 
-              alt="OnRopePro" 
-              className="h-8 object-contain"
-            />
-            <div className="hidden sm:block">
-              <h1 className="font-semibold text-sm">{t.technicianPortal}</h1>
-              <div className="flex items-center gap-1.5">
-                <p className="text-xs text-muted-foreground">{user.name}</p>
-                {/* PLUS Badge - Only shown for technicians with PLUS access */}
-                {user.role === 'rope_access_tech' && user.hasPlusAccess && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Badge 
-                        variant="default" 
-                        className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
-                        data-testid="badge-pro"
-                      >
-                        <Crown className="w-2.5 h-2.5 mr-0.5 fill-current" />
-                        {t.proBadge}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{t.proBadgeTooltip}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
+        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            {/* Left Side: Search */}
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div className="hidden md:flex flex-1 max-w-xl">
+                <DashboardSearch />
               </div>
             </div>
-          </div>
-          
-          {/* Search - hidden on mobile */}
-          <div className="hidden md:flex flex-1 max-w-md">
-            <DashboardSearch />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {/* Referral Code in Top Bar */}
-            {user?.referralCode && (
-              <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 border border-primary/20">
-                <button
-                  onClick={() => setShowReferralInfoDialog(true)}
-                  className="text-xs text-muted-foreground cursor-pointer underline decoration-dotted underline-offset-2 hover:text-primary transition-colors"
-                  data-testid="button-referral-info"
-                >
-                  {t.yourReferralCode}:
-                </button>
-                <span className="font-mono font-bold text-sm text-primary" data-testid="header-referral-code">
-                  {user.referralCode}
-                </span>
+            
+            {/* Right Side: Actions Group */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              {/* PLUS Badge - Technicians with PLUS access */}
+              {user.role === 'rope_access_tech' && user.hasPlusAccess && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge 
+                      variant="default" 
+                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-xs px-2 py-0.5 font-bold border-0 cursor-help" 
+                      data-testid="badge-pro"
+                    >
+                      <Crown className="w-3 h-3 mr-1 fill-current" />
+                      {t.proBadge}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t.proBadgeTooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              
+              {/* Return to Dashboard button - Only show for company owners */}
+              {user.role === 'company' && (
                 <Button
-                  variant={codeCopied ? "default" : "ghost"}
-                  size="icon"
-                  onClick={handleCopyReferralCode}
-                  className="h-6 w-6"
-                  data-testid="button-header-copy-code"
+                  variant="default"
+                  size="sm"
+                  onClick={() => setLocation('/dashboard')}
+                  className="gap-1.5"
+                  data-testid="button-return-dashboard"
                 >
-                  {codeCopied ? (
-                    <CheckCircle2 className="w-3 h-3" />
-                  ) : (
-                    <Copy className="w-3 h-3" />
-                  )}
+                  <span className="material-icons text-base">dashboard</span>
+                  <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : language === 'es' ? 'Panel' : 'Tableau de bord'}</span>
                 </Button>
-              </div>
-            )}
-            {/* Return to Dashboard button - Only show for company owners */}
-            {user.role === 'company' && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={() => setLocation('/dashboard')}
-                className="gap-1.5"
-                data-testid="button-return-dashboard"
+              )}
+              
+              {/* Language Selector */}
+              <LanguageDropdown />
+              
+              {/* User Profile - Clickable to go to Profile tab */}
+              <button 
+                onClick={() => setActiveTab('profile')}
+                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                data-testid="link-user-profile"
               >
-                <span className="material-icons text-base">dashboard</span>
-                <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : language === 'es' ? 'Panel' : 'Tableau de bord'}</span>
+                <Avatar className="w-8 h-8 bg-[#AB4521]">
+                  <AvatarFallback className="bg-[#AB4521] text-white text-xs font-medium">
+                    {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
+                  <p className="text-xs text-slate-400 leading-tight">{language === 'en' ? 'Technician' : language === 'es' ? 'Tecnico' : 'Technicien'}</p>
+                </div>
+              </button>
+              
+              {/* Logout Button */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                data-testid="button-logout" 
+                onClick={handleLogout} 
+                className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <LogOut className="w-5 h-5" />
               </Button>
-            )}
-            <LanguageDropdown />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-              className="gap-2"
-              data-testid="button-logout"
-            >
-              <LogOut className="w-4 h-4" />
-              {t.signOut}
-            </Button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       {/* Certification Expiry Warning Banner - Shows when cert expires within 30 days (PLUS feature) */}
       {(() => {
@@ -3638,6 +3620,53 @@ export default function TechnicianPortal() {
                   </div>
                 </CardContent>
               </Card>
+            )}
+            
+            {/* Referral Code Section - Moved from header */}
+            {user?.referralCode && (
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-lg bg-primary/10">
+                      <Share2 className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => setShowReferralInfoDialog(true)}
+                        className="text-sm font-semibold text-slate-900 dark:text-slate-100 cursor-pointer underline decoration-dotted underline-offset-2 hover:text-primary transition-colors"
+                        data-testid="button-referral-info-profile"
+                      >
+                        {t.yourReferralCode}
+                      </button>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{language === 'en' ? 'Share with friends to earn rewards' : language === 'es' ? 'Comparte con amigos para ganar recompensas' : 'Partagez avec vos amis pour gagner des récompenses'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-lg text-primary" data-testid="profile-referral-code">
+                      {user.referralCode}
+                    </span>
+                    <Button
+                      variant={codeCopied ? "default" : "outline"}
+                      size="sm"
+                      onClick={handleCopyReferralCode}
+                      className="gap-1.5"
+                      data-testid="button-profile-copy-code"
+                    >
+                      {codeCopied ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4" />
+                          {language === 'en' ? 'Copied!' : language === 'es' ? 'Copiado!' : 'Copié!'}
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          {language === 'en' ? 'Copy' : language === 'es' ? 'Copiar' : 'Copier'}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
             
             <Card>
