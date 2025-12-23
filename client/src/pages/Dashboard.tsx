@@ -3122,11 +3122,11 @@ export default function Dashboard() {
       });
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
-      // Redirect technicians to technician login, others to regular login
+      // Redirect technicians to technician landing, others to home page
       if (userRole === 'rope_access_tech') {
         setLocation("/technician");
       } else {
-        setLocation("/login");
+        setLocation("/");
       }
     } catch (error) {
       toast({ title: t('dashboard.toast.error', 'Error'), description: t('dashboard.toast.logoutFailed', 'Failed to logout'), variant: "destructive" });

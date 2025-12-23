@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { useAuthPortal, type UserType } from "@/hooks/use-auth-portal";
 import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe, BookOpen, Settings, HeartPulse, Wallet } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -24,6 +25,7 @@ const STAKEHOLDER_COLORS = {
 export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
+  const { openAuthPortal } = useAuthPortal();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
   const [showTechnicianMenu, setShowTechnicianMenu] = useState(false);
   const [showPropertyManagerMenu, setShowPropertyManagerMenu] = useState(false);
@@ -34,6 +36,55 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const technicianMenuRef = useRef<HTMLDivElement>(null);
   const propertyManagerMenuRef = useRef<HTMLDivElement>(null);
+  
+  const getDefaultUserType = (): UserType => {
+    const path = location.toLowerCase();
+    
+    if (path.startsWith('/technician') || 
+        path.startsWith('/help/for-technicians') ||
+        path.startsWith('/help/technician') ||
+        path.startsWith('/modules/technician-job-board') ||
+        path.startsWith('/modules/technician-passport') ||
+        path.startsWith('/modules/work-session') ||
+        path.startsWith('/modules/irata')) {
+      return 'technician';
+    }
+    
+    if (path.startsWith('/property-manager') ||
+        path.startsWith('/help/for-property-managers') ||
+        path.startsWith('/help/property-manager') ||
+        path.startsWith('/modules/csr-property-manager') ||
+        path.startsWith('/modules/property-manager-interface')) {
+      return 'property_manager';
+    }
+    
+    if (path.startsWith('/building-portal') || 
+        path.startsWith('/building-manager') ||
+        path.startsWith('/help/for-building-managers') ||
+        path.startsWith('/help/building-manager')) {
+      return 'building_manager';
+    }
+    
+    if (path.startsWith('/resident') ||
+        path.startsWith('/help/for-residents') ||
+        path.startsWith('/help/resident') ||
+        path.startsWith('/modules/resident-portal')) {
+      return 'resident';
+    }
+    
+    return 'company';
+  };
+  
+  const handleSignInClick = () => {
+    if (onSignInClick) {
+      onSignInClick();
+    } else {
+      openAuthPortal({
+        mode: 'login',
+        initialUserType: getDefaultUserType(),
+      });
+    }
+  };
   
   // Determine stakeholder color based on current path
   const getStakeholderColor = (): string | null => {
@@ -123,7 +174,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             variant="ghost"
             size="sm"
             className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={onSignInClick || (() => setLocation("/login"))}
+            onClick={handleSignInClick}
             data-testid="button-sign-in-header"
           >
             {t('login.header.signIn', 'Sign In')}

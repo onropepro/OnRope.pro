@@ -212,7 +212,7 @@ function SidebarContents() {
   const handleLogout = async () => {
     await fetch("/api/logout", { method: "POST", credentials: "include" });
     queryClient.clear();
-    setLocation("/login");
+    setLocation("/");
   };
 
   return (
