@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useEffect, useCallback } from 'react';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { SUPPORTED_LANGUAGES, normalizeLanguageCode, type Language } from '@/i18n/config';
 
 interface User {
   id: string;
@@ -35,19 +36,20 @@ export function useLanguage() {
   }, [user?.preferredLanguage, i18n]);
 
   const changeLanguage = useCallback(async (language: string) => {
-    i18n.changeLanguage(language);
-    localStorage.setItem('i18nextLng', language);
+    const normalizedLang = normalizeLanguageCode(language);
+    i18n.changeLanguage(normalizedLang);
+    localStorage.setItem('i18nextLng', normalizedLang);
     
     if (user?.id) {
       try {
-        await updateLanguageMutation.mutateAsync(language);
+        await updateLanguageMutation.mutateAsync(normalizedLang);
       } catch (error) {
         console.error('Failed to update language preference:', error);
       }
     }
   }, [i18n, user?.id, updateLanguageMutation]);
 
-  const currentLanguage = i18n.language || 'en';
+  const currentLanguage = normalizeLanguageCode(i18n.language);
 
   return {
     t,
@@ -55,9 +57,6 @@ export function useLanguage() {
     currentLanguage,
     changeLanguage,
     isUpdating: updateLanguageMutation.isPending,
-    supportedLanguages: [
-      { code: 'en', name: 'English', nativeName: 'English' },
-      { code: 'fr', name: 'French', nativeName: 'Français' },
-    ],
+    supportedLanguages: SUPPORTED_LANGUAGES as Language[],
   };
 }
