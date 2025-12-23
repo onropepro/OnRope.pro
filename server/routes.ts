@@ -5635,7 +5635,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const { name, email, propertyManagerPhoneNumber, currentPassword, newPassword } = validationResult.data;
+      const { name, email, propertyManagerPhoneNumber, propertyManagerSmsOptIn, currentPassword, newPassword } = validationResult.data;
       
       // Get current property manager data
       const currentUser = await storage.getUserById(propertyManagerId);
@@ -5676,6 +5676,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (propertyManagerPhoneNumber !== undefined) {
         await db.update(users)
           .set({ propertyManagerPhoneNumber: propertyManagerPhoneNumber || null })
+          .where(eq(users.id, propertyManagerId));
+      }
+      
+      // Update SMS opt-in if provided
+      if (propertyManagerSmsOptIn !== undefined) {
+        await db.update(users)
+          .set({ propertyManagerSmsOptIn })
           .where(eq(users.id, propertyManagerId));
       }
       
@@ -5897,6 +5904,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .set({ pipelineStage: 'approved', stageUpdatedAt: new Date() })
         .where(eq(quotes.id, quoteId));
       
+      // Notify company via WebSocket
+      wsHub.notifyQuoteAccepted(quote.companyId, {
+        id: quote.id,
+        quoteNumber: quote.quoteNumber,
+        buildingName: quote.buildingName,
+        strataPlanNumber: quote.strataPlanNumber,
+        propertyManagerName: senderName,
+      });
+      
       res.json({ success: true, message: "Quote accepted successfully" });
     } catch (error) {
       console.error("Accept quote error:", error);
@@ -5949,6 +5965,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await db.update(quotes)
         .set({ pipelineStage: 'lost', stageUpdatedAt: new Date() })
         .where(eq(quotes.id, quoteId));
+      
+      // Notify company via WebSocket
+      wsHub.notifyQuoteDeclined(quote.companyId, {
+        id: quote.id,
+        quoteNumber: quote.quoteNumber,
+        buildingName: quote.buildingName,
+        strataPlanNumber: quote.strataPlanNumber,
+        propertyManagerName: senderName,
+        reason: reason || null,
+      });
       
       res.json({ success: true, message: "Quote declined" });
     } catch (error) {

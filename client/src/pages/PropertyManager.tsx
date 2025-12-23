@@ -791,6 +791,11 @@ export default function PropertyManager() {
     if (newPhone !== currentPhone) {
       updateData.propertyManagerPhoneNumber = newPhone;
     }
+    // Check SMS opt-in changes
+    const currentSmsOptIn = userData?.user?.propertyManagerSmsOptIn ?? false;
+    if (data.propertyManagerSmsOptIn !== currentSmsOptIn) {
+      updateData.propertyManagerSmsOptIn = data.propertyManagerSmsOptIn;
+    }
     if (data.newPassword) {
       updateData.currentPassword = data.currentPassword;
       updateData.newPassword = data.newPassword;
