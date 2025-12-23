@@ -20518,8 +20518,8 @@ Do not include any other text, just the JSON object.`
           // Link the quote to this property manager so they can view it
           await storage.updateQuote(quote.id, { recipientPropertyManagerId: propertyManager.id } as any);
           
-          // If they have a phone number, send SMS notification
-          if (propertyManager.propertyManagerPhoneNumber) {
+          // If they have a phone number AND opted-in to SMS, send SMS notification
+          if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
             // Build the deep link URL to the specific quote
             const baseUrl = process.env.REPLIT_DEV_DOMAIN 
               ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
@@ -20540,6 +20540,8 @@ Do not include any other text, just the JSON object.`
               console.warn(`[SMS] Failed to send quote notification: ${smsResponse.error}`);
               smsResult = { sent: false, error: smsResponse.error };
             }
+          } else if (propertyManager.propertyManagerPhoneNumber && !propertyManager.propertyManagerSmsOptIn) {
+            console.log(`[SMS] Skipped - property manager ${recipientEmail} has not opted-in to SMS notifications`);
           }
         }
       } catch (smsError: any) {
