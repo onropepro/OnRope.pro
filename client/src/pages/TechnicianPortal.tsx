@@ -2460,14 +2460,14 @@ export default function TechnicianPortal() {
                 <div className="flex items-center gap-3 flex-wrap">
                   <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                    <p className="font-semibold text-base text-amber-700 dark:text-amber-400 flex items-center gap-2">
                       {t.certificationExpiryBannerTitle}
                       <Badge variant="secondary" className="gap-1">
                         <Star className="w-3 h-3" />
                         PLUS
                       </Badge>
                     </p>
-                    <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-0.5">{t.plusLockedDesc}</p>
+                    <p className="text-sm text-amber-600/80 dark:text-amber-400/80 mt-0.5">{t.plusLockedDesc}</p>
                   </div>
                 </div>
               </div>
@@ -2481,8 +2481,8 @@ export default function TechnicianPortal() {
               <div className="flex items-center gap-3 flex-wrap">
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm">{t.certificationExpiryBannerTitle}</p>
-                  <div className="text-xs mt-0.5 space-y-0.5">
+                  <p className="font-semibold text-base">{t.certificationExpiryBannerTitle}</p>
+                  <div className="text-sm mt-0.5 space-y-0.5">
                     {urgentCerts.map((cert) => (
                       <p key={cert.type}>
                         {t.certificationExpiryBannerMessage
@@ -2513,7 +2513,7 @@ export default function TechnicianPortal() {
                       </div>
                       <div>
                         <p className={`font-semibold ${!user.companyId || user.terminatedDate ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.accessProjects}</p>
+                        <p className="text-base text-slate-500 dark:text-slate-400">{t.accessProjects}</p>
                       </div>
                     </div>
                     <Button
@@ -2533,7 +2533,7 @@ export default function TechnicianPortal() {
                     </Button>
                   </div>
                   {(!user.companyId || user.terminatedDate) && (
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                    <p className="text-base text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                       {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
                     </p>
                   )}
@@ -2558,7 +2558,7 @@ export default function TechnicianPortal() {
                         <h3 className="font-semibold text-slate-900 dark:text-slate-100">
                           {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
                         </h3>
-                        <span className="text-sm font-semibold text-[#0B64A3]">{profileCompletion.percentage}%</span>
+                        <span className="text-base font-semibold text-[#0B64A3]">{profileCompletion.percentage}%</span>
                       </div>
                       <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mb-3">
                         <div 
@@ -2566,7 +2566,7 @@ export default function TechnicianPortal() {
                           style={{ width: `${profileCompletion.percentage}%` }}
                         />
                       </div>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                      <p className="text-base text-slate-500 dark:text-slate-400 mb-3">
                         {language === 'en' 
                           ? 'Complete your profile to connect with employers instantly' 
                           : language === 'es'
@@ -2605,8 +2605,8 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-3">
                   <Briefcase className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.jobBoard}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t.browseJobs}</p>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.jobBoard}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.browseJobs}</p>
               </button>
               
               {/* Profile - Slate theme */}
@@ -2618,8 +2618,8 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
                   <User className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.tabProfile}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t.editProfile}</p>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.tabProfile}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.editProfile}</p>
               </button>
               
               {/* Feedback - Pink theme */}
@@ -2637,8 +2637,8 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-pink-50 dark:bg-pink-900/30 flex items-center justify-center mb-3">
                   <MessageSquare className="w-5 h-5 text-pink-600 dark:text-pink-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.feedback}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.feedback}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   {totalUnreadFeedback > 0 ? t.viewMyFeedback : t.sendFeedback}
                 </p>
                 {totalUnreadFeedback > 0 && (
@@ -2657,8 +2657,8 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center mb-3">
                   <Clock className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.myLoggedHours}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t.viewLoggedHoursDesc}</p>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.myLoggedHours}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.viewLoggedHoursDesc}</p>
                 {(combinedTotalHours > 0 || workSessionHours > 0) && (
                   <p className="text-sm font-bold text-[#0B64A3] mt-1" data-testid="text-home-total-logged-hours">
                     {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
@@ -2675,8 +2675,8 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center mb-3">
                   <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.personalSafetyDocs}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t.personalSafetyDocsDesc}</p>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.personalSafetyDocs}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.personalSafetyDocsDesc}</p>
               </button>
             </div>
 
@@ -2717,7 +2717,7 @@ export default function TechnicianPortal() {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold">{t.employerProfileTitle}</h2>
-                      <p className="text-sm text-muted-foreground">{t.employerProfileDesc}</p>
+                      <p className="text-base text-muted-foreground">{t.employerProfileDesc}</p>
                     </div>
                   </div>
                   {!isEditingEmployerProfile ? (
@@ -2752,7 +2752,7 @@ export default function TechnicianPortal() {
                     </div>
                     <div>
                       <p className="font-medium">{t.visibilityStatus}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-base text-muted-foreground">
                         {user.isVisibleToEmployers ? t.visibleToEmployers : t.hiddenFromEmployers}
                       </p>
                     </div>
@@ -2932,7 +2932,7 @@ export default function TechnicianPortal() {
                             );
                           })}
                           {(user.ropeAccessSpecialties || []).length === 0 && (
-                            <p className="text-sm text-muted-foreground italic">{t.addYourFirstSpecialty}</p>
+                            <p className="text-base text-muted-foreground italic">{t.addYourFirstSpecialty}</p>
                           )}
                         </div>
 
@@ -3022,7 +3022,7 @@ export default function TechnicianPortal() {
                           })
                         ) : (
                           <div className="text-center w-full py-4">
-                            <p className="text-sm text-muted-foreground italic mb-2">{t.addYourFirstSpecialty}</p>
+                            <p className="text-base text-muted-foreground italic mb-2">{t.addYourFirstSpecialty}</p>
                             <Button
                               variant="outline"
                               size="sm"
@@ -3086,7 +3086,7 @@ export default function TechnicianPortal() {
                       </div>
                       <div>
                         <p className="font-medium">{t.jobBoard}</p>
-                        <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
+                        <p className="text-base text-muted-foreground">{t.jobBoardDesc}</p>
                       </div>
                     </div>
                     <Button
@@ -3129,7 +3129,7 @@ export default function TechnicianPortal() {
                       </div>
                       <div>
                         <p className="font-medium">{t.feedback}</p>
-                        <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
+                        <p className="text-base text-muted-foreground">{t.feedbackDesc}</p>
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2">
@@ -3370,7 +3370,7 @@ export default function TechnicianPortal() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">{t.noReferralsYet}</p>
+                    <p className="text-base text-muted-foreground">{t.noReferralsYet}</p>
                   )}
                 </div>
               )}
@@ -3388,7 +3388,7 @@ export default function TechnicianPortal() {
                 </div>
                 <div className="flex-1">
                   <CardTitle className="text-lg">PSR</CardTitle>
-                  <p className="text-xs text-muted-foreground">{t.performanceSafetyRating}</p>
+                  <p className="text-sm text-muted-foreground">{t.performanceSafetyRating}</p>
                 </div>
               </div>
             </CardHeader>
@@ -3450,19 +3450,19 @@ export default function TechnicianPortal() {
                       <p className="text-xl font-semibold" data-testid="text-harness-compliance">
                         {performanceData.summary.harnessCompliance}%
                       </p>
-                      <p className="text-xs text-muted-foreground">{t.harnessCompliance}</p>
+                      <p className="text-sm text-muted-foreground">{t.harnessCompliance}</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50 text-center">
                       <p className="text-xl font-semibold" data-testid="text-document-compliance">
                         {performanceData.summary.documentCompliance}%
                       </p>
-                      <p className="text-xs text-muted-foreground">{t.documentCompliance}</p>
+                      <p className="text-sm text-muted-foreground">{t.documentCompliance}</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50 text-center">
                       <p className="text-xl font-semibold" data-testid="text-sessions-count">
                         {performanceData.summary.totalSessions}
                       </p>
-                      <p className="text-xs text-muted-foreground">{t.sessionsAnalyzed}</p>
+                      <p className="text-sm text-muted-foreground">{t.sessionsAnalyzed}</p>
                     </div>
                   </div>
                 </div>
@@ -3470,7 +3470,7 @@ export default function TechnicianPortal() {
                 <div className="text-center py-6">
                   <Shield className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
                   <p className="font-medium text-muted-foreground">{t.noPerformanceData}</p>
-                  <p className="text-sm text-muted-foreground">{t.noPerformanceDataDesc}</p>
+                  <p className="text-base text-muted-foreground">{t.noPerformanceDataDesc}</p>
                 </div>
               )}
             </CardContent>
@@ -3541,7 +3541,7 @@ export default function TechnicianPortal() {
                     <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">{t.yourCompensation}</p>
+                    <p className="text-sm text-muted-foreground">{t.yourCompensation}</p>
                     <p className="text-lg font-semibold">
                       {user.isSalary && user.salary ? (
                         <>
@@ -4328,7 +4328,7 @@ export default function TechnicianPortal() {
                               </p>
                             </>
                           ) : (
-                            <p className="text-sm text-muted-foreground italic">{t.addExperience}</p>
+                            <p className="text-base text-muted-foreground italic">{t.addExperience}</p>
                           )}
                         </div>
                       </div>
@@ -4784,7 +4784,7 @@ export default function TechnicianPortal() {
                         </div>
                         <div className="space-y-1">
                           <p className="font-semibold text-base">{t.myLoggedHours}</p>
-                          <p className="text-sm text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                          <p className="text-base text-muted-foreground">{t.viewLoggedHoursDesc}</p>
                           <p className="text-xs text-primary/80 font-medium">{t.loggedHoursFeatures}</p>
                           {(combinedTotalHours > 0 || workSessionHours > 0) && (
                             <div className="pt-2">
