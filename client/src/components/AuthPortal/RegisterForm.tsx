@@ -3,13 +3,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import { UserType } from "@/hooks/use-auth-portal";
-import { Loader2, Mail, User, KeyRound, CreditCard, Building2, Phone } from "lucide-react";
+import { UserType, useAuthPortal } from "@/hooks/use-auth-portal";
+import { Loader2, Mail, User, KeyRound, CreditCard, Building2, Phone, ArrowRight, CreditCard as CardIcon } from "lucide-react";
 
 interface RegisterFormProps {
   userType: UserType;
@@ -90,7 +91,34 @@ const roleByUserType: Record<UserType, string> = {
 export function RegisterForm({ userType, onSuccess }: RegisterFormProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const { closeAuthPortal } = useAuthPortal();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleGoToPricing = () => {
+    closeAuthPortal();
+    setLocation("/pricing");
+  };
+
+  if (userType === "company") {
+    return (
+      <div className="space-y-6 py-4 text-center">
+        <div className="space-y-2">
+          <CardIcon className="h-12 w-12 mx-auto text-primary" />
+          <h3 className="text-lg font-semibold">
+            {t("auth.companyRegistration", "Company Registration")}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {t("auth.companyRegistrationDescription", "To register your rope access company, please start by choosing a subscription plan. You'll create your account during the checkout process.")}
+          </p>
+        </div>
+        <Button onClick={handleGoToPricing} className="w-full" data-testid="button-go-to-pricing">
+          {t("auth.viewPricingPlans", "View Pricing Plans")}
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
 
   const schema = schemaByUserType[userType];
 
@@ -309,7 +337,7 @@ export function RegisterForm({ userType, onSuccess }: RegisterFormProps) {
           </>
         )}
 
-        {(userType === "property_manager" || userType === "company") && (
+        {userType === "property_manager" && (
           <>
             <FormField
               control={form.control}
