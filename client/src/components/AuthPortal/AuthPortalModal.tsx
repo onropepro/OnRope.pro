@@ -116,41 +116,40 @@ export function AuthPortalModal() {
             </TabsTrigger>
           </TabsList>
 
-          <div className="mb-4">
-            <p className="text-sm text-muted-foreground mb-3 text-center">
-              {t("auth.iAmA", "I am a...")}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {(Object.keys(userTypeConfig) as UserType[]).map((type) => {
-                const config = userTypeConfig[type];
-                const Icon = config.icon;
-                const isSelected = userType === type;
-
-                return (
-                  <Button
-                    key={type}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setUserType(type)}
-                    className={cn(
-                      "flex flex-col items-center gap-1 h-auto py-3 px-2",
-                      isSelected && "border-primary bg-primary/5 toggle-elevate toggle-elevated"
-                    )}
-                    data-testid={`button-usertype-${type}`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span className="text-xs font-medium">{config.label}</span>
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-
           <TabsContent value="login" className="mt-0">
-            <LoginForm key={`login-${userType}`} userType={userType} onSuccess={handleAuthSuccess} />
+            <LoginForm onSuccess={handleAuthSuccess} />
           </TabsContent>
 
           <TabsContent value="register" className="mt-0">
+            <div className="mb-4">
+              <p className="text-sm text-muted-foreground mb-3 text-center">
+                {t("auth.iAmA", "I am a...")}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {(Object.keys(userTypeConfig) as UserType[]).map((type) => {
+                  const config = userTypeConfig[type];
+                  const Icon = config.icon;
+                  const isSelected = userType === type;
+
+                  return (
+                    <Button
+                      key={type}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setUserType(type)}
+                      className={cn(
+                        "flex flex-col items-center gap-1 h-auto py-3 px-2",
+                        isSelected && "border-primary bg-primary/5 toggle-elevate toggle-elevated"
+                      )}
+                      data-testid={`button-usertype-${type}`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="text-xs font-medium">{config.label}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
             <RegisterForm key={`register-${userType}`} userType={userType} onSuccess={handleAuthSuccess} />
           </TabsContent>
         </Tabs>

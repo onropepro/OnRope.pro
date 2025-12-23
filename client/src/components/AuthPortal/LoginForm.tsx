@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +10,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { UserType } from "@/hooks/use-auth-portal";
 import { Loader2, Mail, CreditCard, Building2, KeyRound } from "lucide-react";
 import { Link } from "wouter";
 
@@ -22,19 +21,10 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
-  userType: UserType;
   onSuccess: (user: any) => void;
 }
 
 type LoginMethod = "email" | "license" | "strata";
-
-const userTypeLoginMethods: Record<UserType, LoginMethod[]> = {
-  technician: ["license", "email"],
-  property_manager: ["email"],
-  building_manager: ["strata", "email"],
-  resident: ["email"],
-  company: ["email"],
-};
 
 const loginMethodConfig: Record<LoginMethod, { label: string; icon: typeof Mail; placeholder: string }> = {
   email: {
@@ -54,13 +44,11 @@ const loginMethodConfig: Record<LoginMethod, { label: string; icon: typeof Mail;
   },
 };
 
-export function LoginForm({ userType, onSuccess }: LoginFormProps) {
+export function LoginForm({ onSuccess }: LoginFormProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const availableMethods = userTypeLoginMethods[userType];
-  const [loginMethod, setLoginMethod] = useState<LoginMethod>(availableMethods[0]);
+  const [loginMethod, setLoginMethod] = useState<LoginMethod>("email");
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -69,14 +57,6 @@ export function LoginForm({ userType, onSuccess }: LoginFormProps) {
       password: "",
     },
   });
-
-  useEffect(() => {
-    const newMethods = userTypeLoginMethods[userType];
-    if (!newMethods.includes(loginMethod)) {
-      setLoginMethod(newMethods[0]);
-    }
-    form.reset({ identifier: "", password: "" });
-  }, [userType]);
 
   const handleMethodChange = (method: string) => {
     setLoginMethod(method as LoginMethod);
@@ -87,10 +67,26 @@ export function LoginForm({ userType, onSuccess }: LoginFormProps) {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
+      const payload: Record<string, string> = {
+        password: data.password,
+      };
+      
+      switch (loginMethod) {
+        case "email":
+          payload.identifier = data.identifier;
+          break;
+        case "license":
+          payload.identifier = data.identifier;
+          break;
+        case "strata":
+          payload.identifier = data.identifier;
+          break;
+      }
+
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
         credentials: "include",
       });
 
@@ -157,22 +153,22 @@ export function LoginForm({ userType, onSuccess }: LoginFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {availableMethods.length > 1 && (
-          <Tabs value={loginMethod} onValueChange={handleMethodChange} className="w-full">
-            <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${availableMethods.length}, 1fr)` }}>
-              {availableMethods.map((method) => {
-                const config = loginMethodConfig[method];
-                const Icon = config.icon;
-                return (
-                  <TabsTrigger key={method} value={method} className="flex items-center gap-1.5" data-testid={`tab-method-${method}`}>
-                    <Icon className="h-3.5 w-3.5" />
-                    <span className="text-xs">{config.label}</span>
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-          </Tabs>
-        )}
+        <Tabs value={loginMethod} onValueChange={handleMethodChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="email" className="flex items-center gap-1.5" data-testid="tab-method-email">
+              <Mail className="h-3.5 w-3.5" />
+              <span className="text-xs">Email</span>
+            </TabsTrigger>
+            <TabsTrigger value="license" className="flex items-center gap-1.5" data-testid="tab-method-license">
+              <CreditCard className="h-3.5 w-3.5" />
+              <span className="text-xs">License #</span>
+            </TabsTrigger>
+            <TabsTrigger value="strata" className="flex items-center gap-1.5" data-testid="tab-method-strata">
+              <Building2 className="h-3.5 w-3.5" />
+              <span className="text-xs">Strata #</span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
 
         <FormField
           control={form.control}
