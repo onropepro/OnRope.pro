@@ -6902,19 +6902,22 @@ export default function Dashboard() {
                                     {t('dashboard.employees.removeSeat', 'Remove Seat')}
                                   </Button>
                                 )}
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEmployeeToDelete(employee.id);
-                                  }}
-                                  data-testid={`button-unlink-employee-${employee.id}`}
-                                  className="h-9 w-9 text-amber-600 hover:text-amber-700"
-                                  disabled={userIsReadOnly}
-                                >
-                                  <span className="material-icons text-sm">link_off</span>
-                                </Button>
+                                {/* Unlink button - only for employees, not company owner (can't unlink yourself) */}
+                                {employee.id !== user?.id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEmployeeToDelete(employee.id);
+                                    }}
+                                    data-testid={`button-unlink-employee-${employee.id}`}
+                                    className="h-9 w-9 text-amber-600 hover:text-amber-700"
+                                    disabled={userIsReadOnly}
+                                  >
+                                    <span className="material-icons text-sm">link_off</span>
+                                  </Button>
+                                )}
                               </div>
                             </div>
 
