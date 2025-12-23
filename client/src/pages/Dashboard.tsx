@@ -3637,7 +3637,7 @@ export default function Dashboard() {
             <div className="h-full flex items-center justify-between gap-4">
               {/* Left Side: Search */}
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                {activeTab !== "" && (
+                {activeTab !== "" && activeTab !== "employees" && (
                   <h1 className={`text-lg font-semibold truncate text-slate-800 dark:text-slate-100 hidden sm:block`}>
                     {getPageTitle()}
                   </h1>
@@ -3737,8 +3737,8 @@ export default function Dashboard() {
           />
         )}
 
-        {/* Back Button for all tabs */}
-        {activeTab !== "" && (
+        {/* Back Button for all tabs except employees (employees is accessed via sidebar) */}
+        {activeTab !== "" && activeTab !== "employees" && (
           <div className="mb-4">
             <Button 
               variant="ghost" 
