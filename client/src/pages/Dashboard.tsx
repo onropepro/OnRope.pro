@@ -3673,8 +3673,12 @@ export default function Dashboard() {
                 {/* Language Selector */}
                 <LanguageDropdown />
                 
-                {/* User Profile */}
-                <div className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700">
+                {/* User Profile - Clickable to go to Settings */}
+                <Link 
+                  href="/profile" 
+                  className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                  data-testid="link-user-profile"
+                >
                   <Avatar className="w-8 h-8 bg-[#0B64A3]">
                     <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
                       {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
@@ -3684,7 +3688,7 @@ export default function Dashboard() {
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
                     <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role}</p>
                   </div>
-                </div>
+                </Link>
                 
                 {/* Logout Button */}
                 <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
