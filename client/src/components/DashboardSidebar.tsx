@@ -21,7 +21,6 @@ import {
   ClipboardCheck,
   Menu,
   X,
-  Contact,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -121,13 +120,6 @@ export function DashboardSidebar({
           icon: Building2,
           onClick: () => onTabChange("projects"),
           isVisible: () => true,
-        },
-        {
-          id: "crm",
-          label: t("dashboard.sidebar.crm", "CRM"),
-          icon: Contact,
-          onClick: () => onTabChange("clients"),
-          isVisible: (user) => user?.role === "company" || canManageEmployees(user),
         },
         {
           id: "schedule",
@@ -268,8 +260,7 @@ export function DashboardSidebar({
       return activeTab === "home" || activeTab === "" || !activeTab;
     }
     return activeTab === item.id || 
-           (item.id === "feedback" && activeTab === "complaints") ||
-           (item.id === "crm" && activeTab === "clients");
+           (item.id === "feedback" && activeTab === "complaints");
   };
 
   const handleItemClick = (item: NavItem) => {

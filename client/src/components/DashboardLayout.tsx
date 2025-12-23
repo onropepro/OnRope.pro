@@ -70,8 +70,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       setLocation("/dashboard?tab=projects");
     } else if (tab === "employees") {
       setLocation("/dashboard?tab=employees");
-    } else if (tab === "clients") {
-      setLocation("/dashboard?tab=clients");
     } else if (tab === "complaints") {
       setLocation("/dashboard?tab=complaints");
     } else {
