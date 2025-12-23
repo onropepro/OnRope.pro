@@ -13,10 +13,11 @@
  */
 
 import { db } from '../db';
-import { users, projects, scheduledJobs, jobAssignments, gearItems, workSessions } from '@shared/schema';
-import { eq, and, ilike, or, sql, gte, lte, desc } from 'drizzle-orm';
+import { users, projects, scheduledJobs, jobAssignments, gearItems, workSessions, companyDocuments } from '@shared/schema';
+import { eq, and, ilike, or, sql, gte, lte, desc, count } from 'drizzle-orm';
 import { queryRAG } from './ragService';
 import { generateChatResponse } from '../gemini';
+import { storage } from '../storage';
 import { 
   addDays, 
   startOfDay, 
@@ -369,6 +370,51 @@ async function queryWorkingToday(companyId: string): Promise<DataResult[]> {
   }));
 }
 
+// Query company's actual CSR data
+async function queryCompanyCSR(companyId: string): Promise<{
+  score: number;
+  label: string;
+  missingDocs: string[];
+  suggestions: string[];
+} | null> {
+  try {
+    const docs = await storage.getCompanyDocuments(companyId);
+    
+    const hasHealthSafety = docs.some((d: any) => d.documentType === 'health_safety_manual');
+    const hasCompanyPolicy = docs.some((d: any) => d.documentType === 'company_policy');
+    const hasInsurance = docs.some((d: any) => d.documentType === 'certificate_of_insurance');
+    
+    const docsUploaded = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
+    const baseScore = 75 + Math.round((docsUploaded / 3) * 25);
+    
+    const missingDocs: string[] = [];
+    const suggestions: string[] = [];
+    
+    if (!hasHealthSafety) {
+      missingDocs.push('Health & Safety Manual');
+      suggestions.push('Upload your Health & Safety Manual');
+    }
+    if (!hasCompanyPolicy) {
+      missingDocs.push('Company Policy');
+      suggestions.push('Upload your Company Policy');
+    }
+    if (!hasInsurance) {
+      missingDocs.push('Certificate of Insurance (COI)');
+      suggestions.push('Upload your Certificate of Insurance');
+    }
+    
+    let label = 'Critical';
+    if (baseScore >= 90) label = 'Excellent';
+    else if (baseScore >= 70) label = 'Good';
+    else if (baseScore >= 50) label = 'Warning';
+    
+    return { score: baseScore, label, missingDocs, suggestions };
+  } catch (error) {
+    console.error('[Assistant] CSR query error:', error);
+    return null;
+  }
+}
+
 // Main query function - accepts individual parameters for flexibility
 export async function queryAssistant(
   query: string,
@@ -408,17 +454,42 @@ export async function queryAssistant(
     // Handle knowledge-only queries
     if (intent === 'knowledge') {
       try {
+        // Check if query is about CSR - include company-specific data
+        const isCSRQuery = lowerQuery.includes('csr') || 
+                          lowerQuery.includes('safety rating') || 
+                          lowerQuery.includes('compliance score');
+        
+        let companyContext = '';
+        let csrSuggestions: string[] = [];
+        
+        if (isCSRQuery) {
+          const csrData = await queryCompanyCSR(companyId);
+          if (csrData) {
+            companyContext = `\n\n**Your Company's Current Status:**\n`;
+            companyContext += `- **Current CSR Score:** ${csrData.score}% (${csrData.label})\n`;
+            
+            if (csrData.missingDocs.length > 0) {
+              companyContext += `- **Missing Documents:** ${csrData.missingDocs.join(', ')}\n`;
+              csrSuggestions = csrData.suggestions;
+            } else {
+              companyContext += `- All core company documents are uploaded.\n`;
+            }
+          }
+        }
+        
         const ragResult = await queryRAG(query, []);
+        const baseResponse = ragResult.message || 'Here\'s what I found in our help center.';
+        
         return {
-          response: ragResult.message || 'Here\'s what I found in our help center.',
+          response: baseResponse + companyContext,
           results: ragResult.sources.map(s => ({
             type: 'knowledge' as const,
             title: s.title,
             subtitle: 'Help Article',
             link: `/help/${s.slug}`,
           })),
-          suggestions: ['How do I improve CSR?', 'What is IRATA certification?'],
-          category: 'knowledge',
+          suggestions: csrSuggestions.length > 0 ? csrSuggestions : ['How do I improve CSR?', 'What is IRATA certification?'],
+          category: isCSRQuery ? 'hybrid' : 'knowledge',
         };
       } catch (error) {
         console.error('[Assistant] RAG query failed:', error);
