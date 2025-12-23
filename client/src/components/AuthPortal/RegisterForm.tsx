@@ -97,7 +97,9 @@ export function RegisterForm({ userType, onSuccess }: RegisterFormProps) {
 
   const handleGoToPricing = () => {
     closeAuthPortal();
-    setLocation("/pricing");
+    setTimeout(() => {
+      setLocation("/pricing");
+    }, 100);
   };
 
   if (userType === "company") {
