@@ -59,7 +59,6 @@ const propertyManagerSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   propertyManagementCompany: z.string().min(2, "Property management company name is required"),
-  companyCode: z.string().length(10, "Company code must be exactly 10 characters"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
@@ -145,7 +144,6 @@ export default function Register() {
       firstName: "",
       lastName: "",
       propertyManagementCompany: "",
-      companyCode: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -262,7 +260,6 @@ export default function Register() {
           name: `${firstName} ${lastName}`.trim(), // Combine first and last name
           role: "property_manager",
           passwordHash: data.password,
-          companyCode: data.companyCode,
         }),
         credentials: "include",
       });
@@ -620,23 +617,6 @@ export default function Register() {
                         <FormControl>
                           <Input placeholder={t('register.propertyManager.companyPlaceholder', 'ABC Property Management')} {...field} data-testid="input-property-management-company" className="h-12" />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={propertyManagerForm.control}
-                    name="companyCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('register.propertyManager.companyCode', 'Company Code')}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t('register.propertyManager.companyCodePlaceholder', 'Enter the code from your rope access provider')} {...field} data-testid="input-company-code" className="h-12" maxLength={10} />
-                        </FormControl>
-                        <FormDescription className="text-muted-foreground text-sm">
-                          {t('register.propertyManager.companyCodeDescription', 'Get this 10-character code from your rope access service provider')}
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

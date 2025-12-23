@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SignInModal } from "@/components/SignInModal";
-import { EmployerRegistration } from "@/components/EmployerRegistration";
+import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
 import { useTranslation } from "react-i18next";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
@@ -637,7 +637,7 @@ export default function CSRPropertyManagerLanding() {
       </section>
 
       {/* Registration Modal */}
-      <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
+      <PropertyManagerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
 
       {/* Footer */}
       <footer className="py-8 px-4 border-t">
