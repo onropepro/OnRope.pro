@@ -33,6 +33,7 @@ import {
   canAccessQuotes,
 } from "@/lib/permissions";
 import { useState, useEffect } from "react";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 export interface NavItem {
   id: string;
@@ -341,16 +342,12 @@ export function DashboardSidebar({
             data-testid="img-sidebar-logo"
           />
         ) : (
-          <div className="flex items-center gap-2.5" data-testid="sidebar-default-logo">
-            <div 
-              className="flex h-7 w-7 items-center justify-center rounded-md text-white font-semibold text-sm"
-              style={{ backgroundColor: getBrandColor() }}
-            >
-              OR
-            </div>
-            <span className="font-medium text-base text-slate-900 dark:text-slate-100">
-              OnRopePro
-            </span>
+          <div className="flex items-center gap-2" data-testid="sidebar-default-logo">
+            <img
+              src={onRopeProLogo}
+              alt="OnRopePro"
+              className="h-8 w-auto object-contain"
+            />
           </div>
         )}
         {/* Close button for mobile */}
