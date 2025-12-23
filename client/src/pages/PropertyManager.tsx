@@ -128,8 +128,8 @@ export default function PropertyManager() {
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
       
-      // Navigate to home page
-      setLocation("/");
+      // Navigate to login page
+      setLocation("/login");
       
       toast({
         title: t('propertyManager.toasts.loggedOut', 'Logged Out'),

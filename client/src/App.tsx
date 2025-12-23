@@ -7,11 +7,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePermissionSync } from "@/hooks/use-permission-sync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { AuthPortalProvider } from "@/hooks/use-auth-portal";
-import { AuthPortalModal } from "@/components/AuthPortal/AuthPortalModal";
 
 // Pages
 import Register from "@/pages/Register";
+import Login from "@/pages/Login";
 import GetLicense from "@/pages/GetLicense";
 import CompleteRegistration from "@/pages/CompleteRegistration";
 import ResidentDashboard from "@/pages/ResidentDashboard";
@@ -157,6 +156,7 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/register" component={Register} />
+      <Route path="/login" component={Login} />
       <Route path="/employer" component={Employer} />
       <Route path="/resident" component={ResidentLanding} />
       <Route path="/reset-password" component={ResetPassword} />
@@ -489,7 +489,7 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   });
   
   // NEVER apply branding on login/register/license pages
-  const isPublicPage = location === '/' || location === '/register' || location === '/link' || location === '/get-license' || location === '/complete-registration' || location.startsWith('/complete-registration?');
+  const isPublicPage = location === '/' || location === '/login' || location === '/register' || location === '/link' || location === '/get-license' || location === '/complete-registration' || location.startsWith('/complete-registration?');
   
   // Only apply branding if user is authenticated AND not on public pages
   const isAuthenticated = !!userData?.user && !isPublicPage;
@@ -729,13 +729,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ErrorBoundary>
-          <AuthPortalProvider>
-            <BrandingProvider>
-              <Router />
-              <Toaster />
-              <AuthPortalModal />
-            </BrandingProvider>
-          </AuthPortalProvider>
+          <BrandingProvider>
+            <Router />
+            <Toaster />
+          </BrandingProvider>
         </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>

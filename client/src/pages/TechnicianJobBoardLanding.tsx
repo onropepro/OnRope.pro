@@ -64,11 +64,6 @@ export default function TechnicianJobBoardLanding() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-hero-login">
-                <Link href="/technician?signin=true">
-                  Sign In
-                </Link>
-              </Button>
             </div>
             
             <p className="text-sm text-orange-100/80">

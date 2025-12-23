@@ -36,7 +36,6 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { PublicHeader } from "@/components/PublicHeader";
 import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
-import { useAuthPortal } from "@/hooks/use-auth-portal";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import projectProgressImg from "@assets/residents-project-progress_1766199096691.png";
 import workNoticesImg from "@assets/residents-notices_1766199096691.png";
@@ -50,10 +49,19 @@ const RESIDENT_COLOR = "#86A59C";
 export default function ResidentLanding() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
-  const { openAuthPortal } = useAuthPortal();
   const [showSignup, setShowSignup] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [signInError, setSignInError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(false);
   const { toast } = useToast();
   
+  // Check if user is already logged in as resident
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
     retry: false,
@@ -65,12 +73,84 @@ export default function ResidentLanding() {
     }
   }, [userData, setLocation]);
 
-  const handleSignIn = () => {
-    openAuthPortal({ mode: 'login' });
+  // Handle sign in
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSignInError("");
+    setIsSigningIn(true);
+    
+    try {
+      const response = await apiRequest("POST", "/api/login", {
+        email: signInEmail,
+        password: signInPassword,
+      });
+      
+      if (response.ok) {
+        toast({
+          title: t('residentLanding.toast.welcomeBack'),
+          description: t('residentLanding.toast.redirecting'),
+        });
+        window.location.href = "/resident-dashboard";
+      } else {
+        const data = await response.json();
+        setSignInError(data.message || t('residentLanding.errors.invalidCredentials'));
+      }
+    } catch (error) {
+      setSignInError(t('residentLanding.errors.somethingWentWrong'));
+    } finally {
+      setIsSigningIn(false);
+    }
   };
 
+  // Handle forgot password
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResettingPassword(true);
+    
+    try {
+      const response = await apiRequest("POST", "/api/forgot-password", {
+        email: forgotPasswordEmail,
+      });
+      
+      if (response.ok) {
+        setResetSuccess(true);
+        toast({
+          title: t('residentLanding.toast.checkEmail'),
+          description: t('residentLanding.toast.resetInstructions'),
+        });
+      } else {
+        // Still show success message for security (don't reveal if email exists)
+        setResetSuccess(true);
+        toast({
+          title: t('residentLanding.toast.checkEmail'),
+          description: t('residentLanding.toast.resetInstructions'),
+        });
+      }
+    } catch (error) {
+      // Still show success for security
+      setResetSuccess(true);
+      toast({
+        title: t('residentLanding.toast.checkEmail'),
+        description: t('residentLanding.toast.resetInstructions'),
+      });
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
+  // Toggle handlers that close the other form
   const handleToggleSignup = () => {
+    setShowSignIn(false);
+    setShowForgotPassword(false);
     setShowSignup(!showSignup);
+  };
+
+  const handleToggleSignIn = () => {
+    setShowSignup(false);
+    setShowForgotPassword(false);
+    setShowSignIn(!showSignIn);
+    setSignInError("");
+    setResetSuccess(false);
   };
 
   return (
@@ -117,16 +197,28 @@ export default function ResidentLanding() {
                   </>
                 )}
               </Button>
-              {!showSignup && (
+              {!showSignup && !showSignIn && (
                 <Button 
                   size="lg" 
                   variant="outline" 
                   className="border-white/40 text-white hover:bg-white/10"
-                  onClick={handleSignIn}
+                  onClick={handleToggleSignIn}
                   data-testid="button-sign-in-hero"
                 >
                   {t('residentLanding.buttons.signIn')}
                   <LogIn className="ml-2 w-5 h-5" />
+                </Button>
+              )}
+              {showSignIn && (
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="border-white/40 text-white hover:bg-white/10"
+                  onClick={handleToggleSignIn}
+                  data-testid="button-close-signin"
+                >
+                  <X className="mr-2 w-5 h-5" />
+                  {t('residentLanding.buttons.close')}
                 </Button>
               )}
             </div>
@@ -145,9 +237,178 @@ export default function ResidentLanding() {
                     onClose={() => setShowSignup(false)} 
                     onShowSignIn={() => {
                       setShowSignup(false);
-                      openAuthPortal({ mode: 'login' });
+                      setShowSignIn(true);
                     }}
                   />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Sliding Sign In Form */}
+            <AnimatePresence>
+              {showSignIn && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -20, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-md mx-auto pt-6"
+                >
+                  <Card className="shadow-xl">
+                    <CardContent className="p-6">
+                      {!showForgotPassword ? (
+                        <form onSubmit={handleSignIn} className="space-y-4">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <Label htmlFor="signin-email" className="text-sm font-medium text-foreground">{t('residentLanding.form.emailAddress')}</Label>
+                              <Input
+                                id="signin-email"
+                                type="email"
+                                placeholder={t('residentLanding.form.emailPlaceholder')}
+                                value={signInEmail}
+                                onChange={(e) => setSignInEmail(e.target.value)}
+                                required
+                                data-testid="input-signin-email"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="signin-password" className="text-sm font-medium text-foreground">{t('residentLanding.form.password')}</Label>
+                              <Input
+                                id="signin-password"
+                                type="password"
+                                placeholder={t('residentLanding.form.passwordPlaceholder')}
+                                value={signInPassword}
+                                onChange={(e) => setSignInPassword(e.target.value)}
+                                required
+                                data-testid="input-signin-password"
+                              />
+                            </div>
+                          </div>
+                          
+                          {signInError && (
+                            <p className="text-sm text-red-500">{signInError}</p>
+                          )}
+                          
+                          <Button
+                            type="submit"
+                            className="w-full"
+                            style={{ backgroundColor: RESIDENT_COLOR }}
+                            disabled={isSigningIn}
+                            data-testid="button-submit-signin"
+                          >
+                            {isSigningIn ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <>
+                                {t('residentLanding.buttons.signIn')}
+                                <ArrowRight className="ml-2 w-4 h-4" />
+                              </>
+                            )}
+                          </Button>
+                          
+                          <div className="text-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowForgotPassword(true);
+                                setForgotPasswordEmail(signInEmail);
+                                setResetSuccess(false);
+                              }}
+                              className="text-sm text-muted-foreground hover:underline"
+                              data-testid="link-forgot-password"
+                            >
+                              {t('residentLanding.form.forgotPassword')}
+                            </button>
+                          </div>
+                          
+                          <div className="text-center text-sm text-muted-foreground">
+                            {t('residentLanding.form.noAccount')}{" "}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowSignIn(false);
+                                setShowSignup(true);
+                              }}
+                              className="font-medium hover:underline"
+                              style={{ color: RESIDENT_COLOR }}
+                              data-testid="link-create-account"
+                            >
+                              {t('residentLanding.buttons.createAccountShort')}
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="space-y-4">
+                          {!resetSuccess ? (
+                            <form onSubmit={handleForgotPassword} className="space-y-4">
+                              <div className="text-center mb-4">
+                                <h3 className="text-lg font-semibold text-foreground">{t('residentLanding.form.resetPassword')}</h3>
+                                <p className="text-sm text-muted-foreground">{t('residentLanding.form.resetInstructions')}</p>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="forgot-email" className="text-sm font-medium text-foreground">{t('residentLanding.form.emailAddress')}</Label>
+                                <Input
+                                  id="forgot-email"
+                                  type="email"
+                                  placeholder={t('residentLanding.form.emailPlaceholder')}
+                                  value={forgotPasswordEmail}
+                                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                                  required
+                                  data-testid="input-forgot-email"
+                                />
+                              </div>
+                              
+                              <Button
+                                type="submit"
+                                className="w-full"
+                                style={{ backgroundColor: RESIDENT_COLOR }}
+                                disabled={isResettingPassword}
+                                data-testid="button-submit-reset"
+                              >
+                                {isResettingPassword ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  t('residentLanding.form.sendResetLink')
+                                )}
+                              </Button>
+                              
+                              <div className="text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowForgotPassword(false)}
+                                  className="text-sm text-muted-foreground hover:underline"
+                                  data-testid="link-back-to-signin"
+                                >
+                                  {t('residentLanding.form.backToSignIn')}
+                                </button>
+                              </div>
+                            </form>
+                          ) : (
+                            <div className="text-center space-y-4">
+                              <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center" style={{ backgroundColor: `${RESIDENT_COLOR}20` }}>
+                                <CheckCircle2 className="w-8 h-8" style={{ color: RESIDENT_COLOR }} />
+                              </div>
+                              <h3 className="text-lg font-semibold text-foreground">{t('residentLanding.form.checkYourEmail')}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {t('residentLanding.form.resetEmailSent')}
+                              </p>
+                              <Button
+                                onClick={() => {
+                                  setShowForgotPassword(false);
+                                  setResetSuccess(false);
+                                }}
+                                variant="outline"
+                                className="w-full"
+                                data-testid="button-back-signin-after-reset"
+                              >
+                                {t('residentLanding.form.backToSignIn')}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -820,24 +1081,16 @@ export default function ResidentLanding() {
             {t('residentLanding.cta.tagline')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button 
-              size="lg" 
-              className="bg-white hover:bg-gray-50" 
-              style={{color: RESIDENT_COLOR}}
-              onClick={() => openAuthPortal({ mode: 'register', initialUserType: 'resident' })}
-              data-testid="button-create-account"
-            >
-              {t('residentLanding.buttons.createAccount')}
-              <ArrowRight className="ml-2 w-5 h-5" />
+            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: RESIDENT_COLOR}} asChild>
+              <Link href="/register" data-testid="button-create-account">
+                {t('residentLanding.buttons.createAccount')}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-white/40 text-white hover:bg-white/10"
-              onClick={() => openAuthPortal({ mode: 'login', initialUserType: 'resident' })}
-              data-testid="button-login-cta"
-            >
-              {t('residentLanding.buttons.logIn')}
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
+              <Link href="/login" data-testid="button-login-cta">
+                {t('residentLanding.buttons.logIn')}
+              </Link>
             </Button>
           </div>
           <p className="text-sm text-white/80 pt-2">

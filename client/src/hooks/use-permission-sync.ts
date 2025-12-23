@@ -53,12 +53,12 @@ export function usePermissionSync(isAuthenticated: boolean) {
           } else if (data.type === 'user:terminated') {
             toast({
               title: "Session Ended",
-              description: "Your account access has been revoked. You will be redirected to sign in.",
+              description: "Your account access has been revoked. You will be redirected to the login page.",
               variant: "destructive",
             });
             setTimeout(() => {
               queryClient.clear();
-              setLocation('/');
+              setLocation('/login');
             }, 2000);
           }
         } catch (error) {

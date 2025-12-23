@@ -22,12 +22,10 @@ import {
   Timer,
   History,
   Sparkles,
-  LogIn,
 } from "lucide-react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
-import { useAuthPortal } from "@/hooks/use-auth-portal";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 const PM_COLOR = "#6E9075";
@@ -37,7 +35,6 @@ export default function PropertyManagerLanding() {
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
   const [showRegistration, setShowRegistration] = useState(false);
-  const { openAuthPortal } = useAuthPortal();
   
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -73,10 +70,6 @@ export default function PropertyManagerLanding() {
               <Button size="lg" className="bg-white text-[#6E9075] hover:bg-green-50" onClick={() => setShowRegistration(true)} data-testid="button-create-account-hero">
                 {t('propertyManagerLanding.cta.createFreeAccount')}
                 <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => openAuthPortal("login")} data-testid="button-sign-in-hero">
-                {t('common.signIn', 'Sign In')}
-                <LogIn className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
                 <Link href="#how-it-works" data-testid="button-learn-how">
