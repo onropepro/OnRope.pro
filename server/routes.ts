@@ -5760,6 +5760,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           floorCount: quote.floorCount,
           status: quote.status,
           pipelineStage: quote.pipelineStage,
+          collaborationStatus: quote.collaborationStatus,
           createdAt: quote.createdAt,
           companyName,
           services: quote.services.map(s => ({
