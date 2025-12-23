@@ -19180,6 +19180,22 @@ Do not include any other text, just the JSON object.`
             
             console.log(`[Quote] Auto-linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
             
+            // Get company name for WebSocket notification
+            const companyUser = await storage.getUserById(companyId);
+            const companyNameForWs = companyUser?.companyName || 'Rope Access Company';
+            
+            // Send real-time WebSocket notification to property manager
+            wsHub.notifyQuoteCreated(propertyManager.id, {
+              id: fullQuote!.id,
+              quoteNumber: fullQuote!.quoteNumber,
+              buildingName: fullQuote!.buildingName,
+              strataPlanNumber: fullQuote!.strataPlanNumber,
+              status: fullQuote!.status,
+              grandTotal: fullQuote!.services?.reduce((sum: number, s: any) => sum + Number(s.totalCost || 0), 0)?.toString() || null,
+              createdAt: fullQuote!.createdAt,
+              companyName: companyNameForWs
+            });
+            
             // Send SMS notification if PM has phone and opted in
             if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
               const baseUrl = process.env.REPLIT_DEV_DOMAIN 

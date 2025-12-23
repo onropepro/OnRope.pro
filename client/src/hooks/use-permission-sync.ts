@@ -60,6 +60,15 @@ export function usePermissionSync(isAuthenticated: boolean) {
               queryClient.clear();
               setLocation('/login');
             }, 2000);
+          } else if (data.type === 'quote:created') {
+            // Property manager received a new quote
+            const quote = data.quote;
+            toast({
+              title: "New Quote Received",
+              description: `You have a new quote for ${quote.buildingName || 'your building'} from ${quote.companyName || 'a vendor'}`,
+            });
+            // Invalidate quotes query to refresh the list
+            queryClient.invalidateQueries({ queryKey: ['/api/property-managers/me/quotes'] });
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
