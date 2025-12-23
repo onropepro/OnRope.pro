@@ -1026,7 +1026,7 @@
         "description": "Employee hours"
       },
       "quotes": {
-        "label": "Quotes & CRM",
+        "label": "Quote/Pipeline",
         "description": "Service quotes"
       },
       "schedule": {
@@ -2514,7 +2514,7 @@
     "gearItem": "Gear Item"
   },
   "quotes": {
-    "title": "Quotes & CRM",
+    "title": "Quote/Pipeline",
     "pageTitle": "Service Quotes",
     "pageSubtitle": "Create and manage service quotes for buildings",
     "newQuote": "New Quote",
