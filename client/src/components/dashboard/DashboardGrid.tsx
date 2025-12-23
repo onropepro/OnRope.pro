@@ -261,15 +261,37 @@ export function DashboardGrid({
               </Button>
             </>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditMode(true)}
-              data-testid="button-customize-dashboard"
-            >
-              <Settings className="w-4 h-4 mr-1" />
-              Customize
-            </Button>
+            <>
+              {currentUser?.role === 'company' && (currentUser?.residentCode || currentUser?.propertyManagerCode) && (
+                <div className="hidden lg:flex items-center gap-3 text-xs">
+                  {currentUser?.residentCode && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground font-medium">Resident:</span>
+                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-resident-code">
+                        {currentUser.residentCode}
+                      </Badge>
+                    </div>
+                  )}
+                  {currentUser?.propertyManagerCode && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground font-medium">Property Mgr:</span>
+                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-property-manager-code">
+                        {currentUser.propertyManagerCode}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditMode(true)}
+                data-testid="button-customize-dashboard"
+              >
+                <Settings className="w-4 h-4 mr-1" />
+                Customize
+              </Button>
+            </>
           )}
         </div>
       </div>
