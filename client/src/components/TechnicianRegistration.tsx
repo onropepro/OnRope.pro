@@ -290,12 +290,16 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     t('techReg.benefits.safetyRating', 'Personal Safety Rating builds your reputation'),
   ];
 
-  // Right panel welcome screen benefits  
+  // Right panel welcome screen benefits (8 items matching copy doc)
   const welcomeBenefits = [
-    t('techReg.welcome.benefit1', 'Never lose hours when companies fold'),
-    t('techReg.welcome.benefit2', 'Import your logbook history via photo'),
-    t('techReg.welcome.benefit3', 'Skip onboarding paperwork at every new job'),
-    t('techReg.welcome.benefit4', 'Automatic logging when employer uses OnRopePro'),
+    t('techReg.welcome.benefit1', 'Your hours survive company closures'),
+    t('techReg.welcome.benefit2', 'Import your logbook via photo'),
+    t('techReg.welcome.benefit3', '10-second onboarding at new jobs'),
+    t('techReg.welcome.benefit4', 'All certifications in one place'),
+    t('techReg.welcome.benefit5', 'AI-verified license credentials'),
+    t('techReg.welcome.benefit6', 'Banking & tax docs ready to share'),
+    t('techReg.welcome.benefit7', 'Personal Safety Rating'),
+    t('techReg.welcome.benefit8', 'Track progress toward L2/L3'),
   ];
 
   // PLUS benefits (unlocked by referring one tech)
@@ -355,21 +359,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   {getStepNumber() > 4 ? <Check className="w-3.5 h-3.5" /> : "4"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.employer', 'Employer Info')}</span>
-              </div>
-            </div>
-
-            {/* FREE ACCOUNT Benefits */}
-            <div className="mb-4">
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-2">{t('techReg.sidebar.freeAccount', 'FREE ACCOUNT')}</p>
-              <div className="space-y-2">
-                {freeAccountBenefits.map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm">
-                    <div className="w-4 h-4 rounded-full bg-green-500/80 flex items-center justify-center shrink-0 mt-0.5">
-                      <Check className="w-2.5 h-2.5 text-white" />
-                    </div>
-                    <span className="text-white/90">{benefit}</span>
-                  </div>
-                ))}
               </div>
             </div>
 
