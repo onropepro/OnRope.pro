@@ -5732,7 +5732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { quoteId } = req.params;
       
       // Get the quote with services
-      const quote = await storage.getQuoteWithServicesById(quoteId);
+      const quote = await storage.getQuoteById(quoteId);
       
       if (!quote) {
         return res.status(404).json({ message: "Quote not found" });
