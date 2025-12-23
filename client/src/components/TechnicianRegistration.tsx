@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -748,18 +749,46 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     />
                   </div>
 
-                  {/* PLUS benefits section - locked/grayed */}
+                  {/* PLUS benefits section - locked/grayed with animated checkmarks */}
                   <div className="mb-8">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-medium">
                       {t('techReg.plusSection.header', 'Unlock PLUS for free by referring 1 other tech:')}
                     </p>
                     <div className="space-y-1.5">
                       {plusBenefits.map((benefit, i) => (
-                        <div key={i} className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/30 border border-dashed border-muted-foreground/20">
-                          <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 flex items-center justify-center shrink-0">
-                          </div>
+                        <motion.div 
+                          key={i} 
+                          className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/30 border border-dashed border-muted-foreground/20"
+                          initial={{ opacity: 0.7 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: i * 0.1 }}
+                        >
+                          <motion.div 
+                            className="w-5 h-5 rounded-full border-2 border-green-500/50 flex items-center justify-center shrink-0 bg-green-50 dark:bg-green-900/20"
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ 
+                              delay: 0.5 + i * 0.15,
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 20
+                            }}
+                          >
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ 
+                                delay: 0.6 + i * 0.15,
+                                type: "spring",
+                                stiffness: 400,
+                                damping: 15
+                              }}
+                            >
+                              <Check className="w-3 h-3 text-green-500" />
+                            </motion.div>
+                          </motion.div>
                           <span className="text-sm text-muted-foreground">{benefit}</span>
-                        </div>
+                        </motion.div>
                       ))}
                     </div>
                     <p className="text-xs text-muted-foreground mt-2 text-center">
