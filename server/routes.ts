@@ -23,6 +23,7 @@ import OpenAI from "openai";
 import { generateQuizFromDocument } from "./gemini";
 import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
+import { queryAssistant } from "./services/assistantService";
 import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
@@ -811,6 +812,54 @@ async function generateReferralCode(): Promise<string> {
 export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== HELP CENTER ROUTES ====================
   app.use('/api/help', helpRouter);
+  
+  // ==================== DASHBOARD ASSISTANT SEARCH ====================
+  app.post("/api/assistant/query", async (req: Request, res: Response) => {
+    try {
+      if (!req.session?.userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { query } = req.body;
+      if (!query || typeof query !== 'string' || query.length < 2) {
+        return res.json({ 
+          response: "", 
+          results: [], 
+          suggestions: [] 
+        });
+      }
+      
+      // Get user for company ID and permissions
+      const user = await storage.getUser(req.session.userId);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      
+      // Extract company ID based on role
+      const companyId = user.role === 'company' ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "No company context available" });
+      }
+      
+      // Normalize permissions - handle both array and string cases
+      let permissions: string[] = [];
+      if (Array.isArray(user.permissions)) {
+        permissions = user.permissions;
+      } else if (typeof user.permissions === 'string') {
+        try {
+          permissions = JSON.parse(user.permissions);
+        } catch {
+          permissions = [];
+        }
+      }
+      
+      const result = await queryAssistant(query, companyId, user.id, user.role || 'employee', permissions);
+      return res.json(result);
+    } catch (error) {
+      console.error("Assistant query error:", error);
+      return res.status(500).json({ message: "Search failed" });
+    }
+  });
   
   // ==================== ADDRESS AUTOCOMPLETE ====================
   

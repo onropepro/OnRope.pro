@@ -72,6 +72,7 @@ import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDia
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -3641,14 +3642,8 @@ export default function Dashboard() {
                     {getPageTitle()}
                   </h1>
                 )}
-                <div className="relative flex-1 max-w-xs lg:max-w-sm hidden md:block">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input 
-                    type="text"
-                    placeholder="Search projects, employees, equipment..."
-                    className="w-full h-9 pl-9 pr-3 text-sm bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#0B64A3]/20 focus:border-[#0B64A3]"
-                    data-testid="input-dashboard-search"
-                  />
+                <div className="hidden md:block">
+                  <DashboardSearch />
                 </div>
               </div>
               

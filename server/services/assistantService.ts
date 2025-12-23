@@ -13,7 +13,7 @@
  */
 
 import { db } from '../db';
-import { users, projects, scheduledJobs, scheduledJobAssignments, gearItems, workSessions } from '@shared/schema';
+import { users, projects, scheduledJobs, jobAssignments, gearItems, workSessions } from '@shared/schema';
 import { eq, and, ilike, or, sql, gte, lte, desc } from 'drizzle-orm';
 import { queryRAG } from './ragService';
 import { generateChatResponse } from '../gemini';
@@ -46,7 +46,7 @@ export interface AssistantResult {
 }
 
 export interface DataResult {
-  type: 'employee' | 'project' | 'schedule' | 'equipment' | 'safety';
+  type: 'employee' | 'project' | 'schedule' | 'equipment' | 'safety' | 'knowledge';
   title: string;
   subtitle?: string;
   details?: Record<string, string>;
@@ -58,6 +58,13 @@ interface UserContext {
   companyId: string;
   role: string;
   permissions: string[];
+}
+
+// Check if user can view schedules of other employees
+function canViewOtherEmployeeSchedules(user: UserContext): boolean {
+  if (user.role === 'company') return true;
+  return user.permissions.includes('view_full_schedule') || 
+         user.permissions.includes('view_employees');
 }
 
 // Natural language date parsing
@@ -247,43 +254,56 @@ async function findEmployeeByName(companyId: string, name: string): Promise<{ id
 
 // Query employee schedule
 async function queryEmployeeSchedule(companyId: string, employeeId: string, dateRange: { start: Date; end: Date }): Promise<DataResult[]> {
-  const assignments = await db.select({
-    jobId: scheduledJobAssignments.scheduledJobId,
-    startDate: scheduledJobAssignments.startDate,
-    endDate: scheduledJobAssignments.endDate,
-    projectId: scheduledJobs.projectId,
-    projectName: projects.name,
-    projectAddress: projects.buildingAddress,
-  })
-  .from(scheduledJobAssignments)
-  .innerJoin(scheduledJobs, eq(scheduledJobAssignments.scheduledJobId, scheduledJobs.id))
-  .innerJoin(projects, eq(scheduledJobs.projectId, projects.id))
-  .where(
-    and(
-      eq(scheduledJobAssignments.employeeId, employeeId),
-      eq(projects.companyId, companyId),
-      gte(scheduledJobAssignments.endDate, format(dateRange.start, 'yyyy-MM-dd')),
-      lte(scheduledJobAssignments.startDate, format(dateRange.end, 'yyyy-MM-dd'))
+  try {
+    const assignments = await db.select({
+      jobId: jobAssignments.jobId,
+      startDate: jobAssignments.startDate,
+      endDate: jobAssignments.endDate,
+      projectId: scheduledJobs.projectId,
+      jobTitle: scheduledJobs.title,
+      jobLocation: scheduledJobs.location,
+      companyId: scheduledJobs.companyId,
+    })
+    .from(jobAssignments)
+    .innerJoin(scheduledJobs, eq(jobAssignments.jobId, scheduledJobs.id))
+    .where(
+      and(
+        eq(jobAssignments.employeeId, employeeId),
+        eq(scheduledJobs.companyId, companyId)
+      )
     )
-  );
-  
-  return assignments.map(a => ({
-    type: 'schedule' as const,
-    title: a.projectName || 'Unnamed Project',
-    subtitle: a.projectAddress || undefined,
-    details: {
-      'Start': a.startDate || '',
-      'End': a.endDate || '',
-    },
-    link: `/projects/${a.projectId}`,
-  }));
+    .limit(20);
+    
+    // Filter by date range in JavaScript to avoid timestamp comparison issues
+    const filteredAssignments = assignments.filter(a => {
+      if (!a.startDate || !a.endDate) return false;
+      const jobStart = new Date(a.startDate);
+      const jobEnd = new Date(a.endDate);
+      // Job overlaps with date range if: job ends after range starts AND job starts before range ends
+      return jobEnd >= dateRange.start && jobStart <= dateRange.end;
+    });
+    
+    return filteredAssignments.map(a => ({
+      type: 'schedule' as const,
+      title: a.jobTitle || 'Scheduled Work',
+      subtitle: a.jobLocation || undefined,
+      details: {
+        'Start': a.startDate ? format(new Date(a.startDate), 'MMM d') : 'TBD',
+        'End': a.endDate ? format(new Date(a.endDate), 'MMM d') : 'TBD',
+      },
+      link: a.projectId ? `/projects/${a.projectId}` : `/schedule`,
+    }));
+  } catch (error) {
+    console.error('[Assistant] Schedule query error:', error);
+    return [];
+  }
 }
 
 // Query active projects
 async function queryActiveProjects(companyId: string, searchTerm?: string): Promise<DataResult[]> {
   let query = db.select({
     id: projects.id,
-    name: projects.name,
+    buildingName: projects.buildingName,
     address: projects.buildingAddress,
     status: projects.status,
     jobType: projects.jobType,
@@ -293,7 +313,7 @@ async function queryActiveProjects(companyId: string, searchTerm?: string): Prom
     and(
       eq(projects.companyId, companyId),
       eq(projects.status, 'In Progress'),
-      searchTerm ? ilike(projects.name, `%${searchTerm}%`) : undefined
+      searchTerm ? ilike(projects.buildingName, `%${searchTerm}%`) : undefined
     )
   )
   .orderBy(desc(projects.createdAt))
@@ -303,7 +323,7 @@ async function queryActiveProjects(companyId: string, searchTerm?: string): Prom
   
   return results.map(p => ({
     type: 'project' as const,
-    title: p.name || 'Unnamed Project',
+    title: p.buildingName || 'Unnamed Project',
     subtitle: p.address || undefined,
     details: {
       'Status': p.status || 'Unknown',
@@ -321,9 +341,9 @@ async function queryWorkingToday(companyId: string): Promise<DataResult[]> {
     employeeId: workSessions.employeeId,
     firstName: users.firstName,
     lastName: users.lastName,
-    projectName: projects.name,
-    clockIn: workSessions.clockIn,
-    clockOut: workSessions.clockOut,
+    projectBuildingName: projects.buildingName,
+    startTime: workSessions.startTime,
+    endTime: workSessions.endTime,
   })
   .from(workSessions)
   .innerJoin(users, eq(workSessions.employeeId, users.id))
@@ -334,195 +354,224 @@ async function queryWorkingToday(companyId: string): Promise<DataResult[]> {
       eq(workSessions.workDate, today)
     )
   )
-  .orderBy(desc(workSessions.clockIn))
+  .orderBy(desc(workSessions.startTime))
   .limit(20);
   
   return sessions.map(s => ({
     type: 'employee' as const,
     title: `${s.firstName} ${s.lastName}`,
-    subtitle: s.projectName || 'Unknown project',
+    subtitle: s.projectBuildingName || 'Unknown project',
     details: {
-      'Clocked In': s.clockIn ? format(new Date(s.clockIn), 'h:mm a') : 'N/A',
-      'Status': s.clockOut ? 'Clocked out' : 'Working',
+      'Clocked In': s.startTime ? format(new Date(s.startTime), 'h:mm a') : 'N/A',
+      'Status': s.endTime ? 'Clocked out' : 'Working',
     },
     link: `/employees/${s.employeeId}`,
   }));
 }
 
-// Main query function
+// Main query function - accepts individual parameters for flexibility
 export async function queryAssistant(
   query: string,
-  user: UserContext
-): Promise<AssistantResult> {
-  const companyId = user.companyId;
-  if (!companyId) {
+  companyId: string,
+  userId: string,
+  role: string,
+  permissions: string[]
+): Promise<{ response: string; results: DataResult[]; suggestions: string[]; category?: string }> {
+  // Validate companyId to ensure multi-tenant isolation
+  if (!companyId || typeof companyId !== 'string') {
     return {
-      type: 'no_results',
-      answer: 'Unable to process your request. Please try again.',
-      confidence: 'low',
+      response: 'Unable to process your request.',
+      results: [],
+      suggestions: ['Try asking about your projects', 'Ask who is working today'],
     };
   }
   
-  const intent = classifyIntent(query);
-  const dateRange = parseDateReference(query);
-  const extractedName = extractNameFromQuery(query);
-  const lowerQuery = query.toLowerCase();
+  // Create user context with properly passed role, id, and permissions
+  // SECURITY: Never infer role from permissions - always use the authenticated role
+  const user: UserContext = {
+    id: userId || '',
+    companyId,
+    role: role || 'employee', // Default to employee (most restrictive) if role is missing
+    permissions: Array.isArray(permissions) ? permissions : [],
+  };
   
-  // Handle knowledge-only queries
-  if (intent === 'knowledge') {
-    try {
-      const ragResult = await queryRAG(query, []);
-      return {
-        type: 'knowledge',
-        answer: ragResult.message,
-        knowledgeSource: ragResult.sources[0] || undefined,
-        actionLink: ragResult.sources[0] ? { 
-          label: `Read ${ragResult.sources[0].title}`, 
-          path: `/help/${ragResult.sources[0].slug}` 
-        } : undefined,
-        confidence: ragResult.sources.length > 0 ? 'high' : 'medium',
-      };
-    } catch (error) {
-      console.error('[Assistant] RAG query failed:', error);
-      return {
-        type: 'no_results',
-        answer: 'I couldn\'t find information about that. Try rephrasing your question.',
-        confidence: 'low',
-      };
-    }
-  }
-  
-  // Handle data lookup queries
-  if (intent === 'data_lookup' || intent === 'hybrid') {
+  try {
+    const intent = classifyIntent(query);
+    const dateRange = parseDateReference(query);
+    const extractedName = extractNameFromQuery(query);
+    const lowerQuery = query.toLowerCase();
+    
     let dataResults: DataResult[] = [];
-    let answerText = '';
+    let responseText = '';
+    const suggestions: string[] = [];
     
-    // Employee schedule lookup
-    if (extractedName && dateRange && hasDataAccess(user, 'schedule')) {
-      const employee = await findEmployeeByName(companyId, extractedName);
-      if (employee) {
-        dataResults = await queryEmployeeSchedule(companyId, employee.id, dateRange);
-        if (dataResults.length > 0) {
-          const dateDesc = format(dateRange.start, 'EEEE, MMMM d');
-          answerText = `${employee.firstName} ${employee.lastName} is scheduled for ${dataResults.length} project${dataResults.length > 1 ? 's' : ''} on ${dateDesc}.`;
-        } else {
-          answerText = `${employee.firstName} ${employee.lastName} has no scheduled work on ${format(dateRange.start, 'EEEE, MMMM d')}.`;
-        }
-      } else {
-        answerText = `I couldn't find an employee named "${extractedName}" in your company.`;
-      }
-    }
-    
-    // Who's working today
-    else if ((lowerQuery.includes('who') && (lowerQuery.includes('working') || lowerQuery.includes('clocked'))) ||
-             lowerQuery.includes('on site') || lowerQuery.includes('active')) {
-      if (hasDataAccess(user, 'employees')) {
-        dataResults = await queryWorkingToday(companyId);
-        if (dataResults.length > 0) {
-          answerText = `${dataResults.length} employee${dataResults.length > 1 ? 's are' : ' is'} working today.`;
-        } else {
-          answerText = 'No employees have clocked in today yet.';
-        }
-      } else {
-        answerText = 'You don\'t have permission to view employee work status.';
-      }
-    }
-    
-    // Active projects lookup
-    else if (lowerQuery.includes('project') && (lowerQuery.includes('active') || lowerQuery.includes('current') || lowerQuery.includes('in progress'))) {
-      dataResults = await queryActiveProjects(companyId);
-      if (dataResults.length > 0) {
-        answerText = `You have ${dataResults.length} active project${dataResults.length > 1 ? 's' : ''}.`;
-      } else {
-        answerText = 'You have no active projects at the moment.';
-      }
-    }
-    
-    // Hybrid: Data + knowledge
-    if (intent === 'hybrid' && dataResults.length > 0) {
+    // Handle knowledge-only queries
+    if (intent === 'knowledge') {
       try {
         const ragResult = await queryRAG(query, []);
         return {
-          type: 'hybrid',
-          answer: answerText,
-          data: dataResults,
-          knowledgeSource: ragResult.sources[0] || undefined,
-          actionLink: ragResult.sources[0] ? { 
-            label: `Learn more`, 
-            path: `/help/${ragResult.sources[0].slug}` 
-          } : undefined,
-          confidence: 'high',
+          response: ragResult.message || 'Here\'s what I found in our help center.',
+          results: ragResult.sources.map(s => ({
+            type: 'knowledge' as const,
+            title: s.title,
+            subtitle: 'Help Article',
+            link: `/help/${s.slug}`,
+          })),
+          suggestions: ['How do I improve CSR?', 'What is IRATA certification?'],
+          category: 'knowledge',
         };
       } catch (error) {
-        // Continue with just data results
-      }
-    }
-    
-    if (answerText || dataResults.length > 0) {
-      return {
-        type: 'data',
-        answer: answerText || 'Here\'s what I found.',
-        data: dataResults.length > 0 ? dataResults : undefined,
-        confidence: dataResults.length > 0 ? 'high' : 'medium',
-      };
-    }
-  }
-  
-  // Navigation queries
-  if (intent === 'navigation') {
-    const navigationMap: Record<string, { path: string; label: string }> = {
-      'schedule': { path: '/schedule', label: 'Open Schedule' },
-      'calendar': { path: '/schedule', label: 'Open Calendar' },
-      'project': { path: '/projects', label: 'View Projects' },
-      'employee': { path: '/employees', label: 'View Employees' },
-      'team': { path: '/employees', label: 'View Team' },
-      'gear': { path: '/gear', label: 'View Gear Inventory' },
-      'equipment': { path: '/gear', label: 'View Equipment' },
-      'inventory': { path: '/gear', label: 'View Inventory' },
-      'safety': { path: '/safety', label: 'View Safety' },
-      'payroll': { path: '/payroll', label: 'View Payroll' },
-      'timesheet': { path: '/timesheets', label: 'View Timesheets' },
-      'quote': { path: '/quotes', label: 'View Quotes' },
-      'client': { path: '/clients', label: 'View Clients' },
-      'building': { path: '/buildings', label: 'View Buildings' },
-      'help': { path: '/help', label: 'Open Help Center' },
-      'settings': { path: '/settings', label: 'Open Settings' },
-    };
-    
-    for (const [keyword, nav] of Object.entries(navigationMap)) {
-      if (lowerQuery.includes(keyword)) {
+        console.error('[Assistant] RAG query failed:', error);
         return {
-          type: 'navigation',
-          answer: `I can take you to the ${keyword} section.`,
-          actionLink: nav,
-          confidence: 'high',
+          response: 'I couldn\'t find information about that in our help center.',
+          results: [],
+          suggestions: ['Try asking about your projects', 'Ask who is working today'],
         };
       }
     }
-  }
-  
-  // Fallback to RAG if no data results
-  try {
-    const ragResult = await queryRAG(query, []);
-    if (ragResult.sources.length > 0) {
-      return {
-        type: 'knowledge',
-        answer: ragResult.message,
-        knowledgeSource: ragResult.sources[0],
-        actionLink: { 
-          label: `Read ${ragResult.sources[0].title}`, 
-          path: `/help/${ragResult.sources[0].slug}` 
-        },
-        confidence: 'medium',
-      };
+    
+    // Handle data lookup queries - check permissions BEFORE querying
+    if (intent === 'data_lookup' || intent === 'hybrid') {
+      // Employee schedule lookup - requires appropriate schedule permission
+      if (extractedName && dateRange) {
+        const employee = await findEmployeeByName(companyId, extractedName);
+        if (employee) {
+          // SECURITY: Check if user can view this employee's schedule
+          // Allow if: 1) They're a company owner/manager, 2) They have full schedule access, OR 3) They're viewing their own schedule
+          const isViewingSelf = employee.id === user.id;
+          const canView = canViewOtherEmployeeSchedules(user) || isViewingSelf;
+          
+          if (!canView) {
+            return {
+              response: 'You don\'t have permission to view other employees\' schedules. You can only view your own schedule.',
+              results: [],
+              suggestions: ['What is my schedule this week?', 'Show active projects'],
+            };
+          }
+          
+          dataResults = await queryEmployeeSchedule(companyId, employee.id, dateRange);
+          if (dataResults.length > 0) {
+            const dateDesc = format(dateRange.start, 'EEEE, MMMM d');
+            responseText = `${employee.firstName} ${employee.lastName} is scheduled for ${dataResults.length} assignment${dataResults.length > 1 ? 's' : ''} on ${dateDesc}.`;
+          } else {
+            responseText = `${employee.firstName} ${employee.lastName} has no scheduled work on ${format(dateRange.start, 'EEEE, MMMM d')}.`;
+          }
+        } else {
+          responseText = `I couldn't find an employee named "${extractedName}" in your company.`;
+        }
+        suggestions.push('Who is working today?', 'Show active projects');
+      }
+      
+      // Who's working today - requires employees permission
+      else if ((lowerQuery.includes('who') && (lowerQuery.includes('working') || lowerQuery.includes('clocked'))) ||
+               lowerQuery.includes('on site') || lowerQuery.includes('active technician')) {
+        if (!hasDataAccess(user, 'employees')) {
+          return {
+            response: 'You don\'t have permission to view employee work status.',
+            results: [],
+            suggestions: ['Ask about active projects', 'Check the help center'],
+          };
+        }
+        
+        dataResults = await queryWorkingToday(companyId);
+        if (dataResults.length > 0) {
+          responseText = `${dataResults.length} employee${dataResults.length > 1 ? 's are' : ' is'} working today.`;
+        } else {
+          responseText = 'No employees have clocked in today yet.';
+        }
+        suggestions.push('Show active projects', 'What is the schedule for this week?');
+      }
+      
+      // Active projects lookup - all authenticated users can view projects they're assigned to
+      else if (lowerQuery.includes('project') && (lowerQuery.includes('active') || lowerQuery.includes('current') || lowerQuery.includes('in progress') || lowerQuery.includes('list'))) {
+        // Projects are visible to all company members (multi-tenant isolation is handled by companyId filter)
+        dataResults = await queryActiveProjects(companyId);
+        if (dataResults.length > 0) {
+          responseText = `You have ${dataResults.length} active project${dataResults.length > 1 ? 's' : ''}.`;
+        } else {
+          responseText = 'You have no active projects at the moment.';
+        }
+        suggestions.push('Who is working today?', 'How do I create a project?');
+      }
+      
+      if (responseText || dataResults.length > 0) {
+        return {
+          response: responseText || 'Here\'s what I found.',
+          results: dataResults,
+          suggestions,
+          category: 'data',
+        };
+      }
     }
+    
+    // Navigation queries
+    if (intent === 'navigation') {
+      const navigationMap: Record<string, { path: string; label: string }> = {
+        'schedule': { path: '/schedule', label: 'Schedule' },
+        'calendar': { path: '/schedule', label: 'Calendar' },
+        'project': { path: '/projects', label: 'Projects' },
+        'employee': { path: '/employees', label: 'Employees' },
+        'team': { path: '/employees', label: 'Team' },
+        'gear': { path: '/gear', label: 'Gear Inventory' },
+        'equipment': { path: '/gear', label: 'Equipment' },
+        'safety': { path: '/safety', label: 'Safety' },
+        'payroll': { path: '/payroll', label: 'Payroll' },
+        'timesheet': { path: '/timesheets', label: 'Timesheets' },
+        'quote': { path: '/quotes', label: 'Quotes' },
+        'client': { path: '/clients', label: 'Clients' },
+        'building': { path: '/buildings', label: 'Buildings' },
+        'help': { path: '/help', label: 'Help Center' },
+        'settings': { path: '/settings', label: 'Settings' },
+      };
+      
+      for (const [keyword, nav] of Object.entries(navigationMap)) {
+        if (lowerQuery.includes(keyword)) {
+          return {
+            response: `You can access ${nav.label} from here.`,
+            results: [{
+              type: 'knowledge' as const,
+              title: nav.label,
+              subtitle: 'Navigation',
+              link: nav.path,
+            }],
+            suggestions: ['Show active projects', 'Who is working today?'],
+            category: 'navigation',
+          };
+        }
+      }
+    }
+    
+    // Fallback to RAG if no data results
+    try {
+      const ragResult = await queryRAG(query, []);
+      if (ragResult.sources.length > 0) {
+        return {
+          response: ragResult.message,
+          results: ragResult.sources.map(s => ({
+            type: 'knowledge' as const,
+            title: s.title,
+            subtitle: 'Help Article',
+            link: `/help/${s.slug}`,
+          })),
+          suggestions: ['Who is working today?', 'Show active projects'],
+          category: 'knowledge',
+        };
+      }
+    } catch (error) {
+      console.error('[Assistant] Fallback RAG query failed:', error);
+    }
+    
+    return {
+      response: 'I couldn\'t find specific information for that. Try asking about your projects, schedule, or employees.',
+      results: [],
+      suggestions: ['Who is working today?', 'Show active projects', 'How do I improve CSR?'],
+    };
   } catch (error) {
-    console.error('[Assistant] Fallback RAG query failed:', error);
+    console.error('[Assistant] Query processing error:', error);
+    return {
+      response: 'Something went wrong while processing your question. Please try again.',
+      results: [],
+      suggestions: ['Who is working today?', 'Show active projects'],
+    };
   }
-  
-  return {
-    type: 'no_results',
-    answer: 'I couldn\'t find specific information for that query. Try asking about your projects, schedule, employees, or type "help" to see what I can help with.',
-    confidence: 'low',
-  };
 }
