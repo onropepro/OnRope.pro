@@ -465,15 +465,15 @@ export async function queryAssistant(
         if (isCSRQuery) {
           const csrData = await queryCompanyCSR(companyId);
           if (csrData) {
-            companyContext = `\n\n**Your Company's Current Status:**\n`;
-            companyContext += `- **Current CSR Score:** ${csrData.score}% (${csrData.label})\n`;
+            companyContext = `**Your Company's CSR:** ${csrData.score}% (${csrData.label})\n\n`;
             
             if (csrData.missingDocs.length > 0) {
-              companyContext += `- **Missing Documents:** ${csrData.missingDocs.join(', ')}\n`;
+              companyContext += `**Missing Documents:** ${csrData.missingDocs.join(', ')}\n\n`;
               csrSuggestions = csrData.suggestions;
             } else {
-              companyContext += `- All core company documents are uploaded.\n`;
+              companyContext += `All core company documents are uploaded.\n\n`;
             }
+            companyContext += `---\n\n`;
           }
         }
         
@@ -481,7 +481,7 @@ export async function queryAssistant(
         const baseResponse = ragResult.message || 'Here\'s what I found in our help center.';
         
         return {
-          response: baseResponse + companyContext,
+          response: companyContext + baseResponse,
           results: ragResult.sources.map(s => ({
             type: 'knowledge' as const,
             title: s.title,
