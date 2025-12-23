@@ -105,6 +105,7 @@ export default function PropertyManager() {
     defaultValues: {
       name: "",
       email: "",
+      propertyManagerPhoneNumber: "",
       currentPassword: "",
       newPassword: "",
     },
@@ -717,6 +718,7 @@ export default function PropertyManager() {
                   accountForm.reset({
                     name: userData?.user?.name || "",
                     email: userData?.user?.email || "",
+                    propertyManagerPhoneNumber: userData?.user?.propertyManagerPhoneNumber || "",
                     currentPassword: "",
                     newPassword: "",
                   });
@@ -1389,6 +1391,24 @@ export default function PropertyManager() {
                           placeholder={t('propertyManager.accountSettings.emailPlaceholder', 'your.email@example.com')}
                           {...field}
                           data-testid="input-account-email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="propertyManagerPhoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('propertyManager.accountSettings.phone', 'Phone Number')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          placeholder={t('propertyManager.accountSettings.phonePlaceholder', 'Enter your phone number')}
+                          {...field}
+                          data-testid="input-account-phone"
                         />
                       </FormControl>
                       <FormMessage />
