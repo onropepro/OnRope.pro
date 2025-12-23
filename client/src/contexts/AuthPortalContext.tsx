@@ -338,19 +338,24 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
       </Dialog>
 
       <TechnicianRegistration 
-        isOpen={showTechnicianRegistration} 
-        onClose={() => setShowTechnicianRegistration(false)} 
+        open={showTechnicianRegistration} 
+        onOpenChange={(open) => setShowTechnicianRegistration(open)} 
       />
       
       <PropertyManagerRegistration 
-        isOpen={showPropertyManagerRegistration} 
-        onClose={() => setShowPropertyManagerRegistration(false)} 
+        open={showPropertyManagerRegistration} 
+        onOpenChange={(open) => setShowPropertyManagerRegistration(open)} 
       />
       
-      <ResidentSlidingSignup 
-        isOpen={showResidentSignup} 
-        onClose={() => setShowResidentSignup(false)} 
-      />
+      {showResidentSignup && (
+        <ResidentSlidingSignup 
+          onClose={() => setShowResidentSignup(false)}
+          onShowSignIn={() => {
+            setShowResidentSignup(false);
+            openLogin();
+          }}
+        />
+      )}
     </AuthPortalContext.Provider>
   );
 }
