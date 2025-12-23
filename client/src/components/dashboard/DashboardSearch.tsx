@@ -141,7 +141,7 @@ export function DashboardSearch() {
   }, []);
 
   return (
-    <div className="relative flex-1 max-w-xs lg:max-w-sm">
+    <div className="relative flex-1 max-w-md lg:max-w-xl">
       <div className="relative">
         {isLoading ? (
           <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
