@@ -5259,6 +5259,209 @@
         }
       }
     },
+    "safety": {
+      "hero": {
+        "badge": "Module Sécurité et Conformité",
+        "titleLine1": "{{authority}} vient d'arriver",
+        "titleLine2": "sur le stationnement.",
+        "titleLine3": "Êtes-vous prêt?",
+        "descriptionLine1": "Inspections quotidiennes de harnais. Réunions de sécurité.",
+        "descriptionLine2": "Suivi d'équipement. Signatures numériques.",
+        "descriptionLine3": "Tout recherchable. Tout exportable. Tout défendable.",
+        "ctaTrial": "Commencer votre essai gratuit de 60 jours"
+      },
+      "stats": {
+        "missingForms": "Formulaires manquants",
+        "failedAudits": "Audits échoués",
+        "sleeplessNights": "Nuits blanches",
+        "searchableHistory": "Historique recherchable"
+      },
+      "problem": {
+        "title": "La panique que vous connaissez trop bien",
+        "paragraph1": "La plupart des opérateurs d'accès sur corde savent exactement ce qui se passe quand l'auditeur demande six mois d'inspections de harnais.",
+        "paragraph2": "On fouille le camion. On déterre le classeur. Quelqu'un dit « Je crois que Dave avait ce dossier. » La moitié des formulaires manquent. Ceux que vous trouvez ont des taches de café et une écriture illisible.",
+        "paragraph3": "Vous passez l'audit. De justesse. Et vous vous promettez de vous organiser.",
+        "paragraph4": "Jusqu'à la prochaine fois, où la même panique recommence.",
+        "paragraph5": "Pendant ce temps, votre assureur veut une preuve de votre culture de sécurité. Votre gestionnaire de propriété veut de la documentation avant chaque travail. Et si quelqu'un se blesse, la première question d'un avocat est:",
+        "quote": "« Pouvez-vous prouver que vous avez effectué les inspections requises? »",
+        "paragraph6": "Les formulaires papier ne peuvent pas vous protéger. Les classeurs ne peuvent pas vous protéger. Les meilleurs techniciens du monde ne peuvent pas vous protéger s'il n'y a aucun dossier de ce qu'ils ont fait."
+      },
+      "features": {
+        "title": "Ce que fait ce module",
+        "subtitle": "Documentation de sécurité complète qui se crée d'elle-même grâce à l'utilisation quotidienne."
+      },
+      "solutionCards": {
+        "harness": {
+          "title": "Chaque inspection de harnais. Chaque jour. Sans exception.",
+          "description": "Avant qu'un technicien commence une session de travail, il complète une inspection numérique sur son téléphone.",
+          "bullet1": "Sangles, boucles, coutures, anneaux D, étiquettes vérifiés",
+          "bullet2": "Réussite/échec enregistré pour chaque élément",
+          "bullet3": "Photos jointes pour l'usure ou les dommages",
+          "bullet4": "Équipement défaillant automatiquement signalé pour retrait"
+        },
+        "toolbox": {
+          "title": "Réunions de sécurité qui ont vraiment eu lieu",
+          "description": "Choisissez parmi plus de 20 sujets de sécurité pour l'accès sur corde et documentez les participants.",
+          "bullet1": "Protection contre les chutes, sauvetage, ancrages, météo",
+          "bullet2": "Signatures numériques ou confirmation par case à cocher",
+          "bullet3": "Couverture quotidienne suivie automatiquement",
+          "bullet4": "Ne vous demandez plus si vous êtes conforme"
+        },
+        "audit": {
+          "title": "PDF prêts pour l'audit en quatre clics",
+          "description": "Quand l'auditeur IRATA appelle, vous ne paniquez pas. Vous cherchez et exportez.",
+          "bullet1": "Recherche par date, technicien ou numéro de série",
+          "bullet2": "PDF professionnels avec signatures intégrées",
+          "bullet3": "Mêmes PDF pour l'assurance et les gestionnaires de propriété",
+          "bullet4": "Protection juridique si quelque chose va en cour"
+        }
+      },
+      "notForEveryone": {
+        "title": "Pas pour tout le monde",
+        "subtitle": "Ce logiciel n'est pas pour toutes les entreprises d'accès sur corde.",
+        "paragraph1": "Si vous faites travailler des équipes sans inspections appropriées, OnRopePro exposera cela. Si vos réunions de sécurité sont fictives, le système le rendra évident. Si l'équipement reste en rotation après qu'il aurait dû être retiré, il y aura un dossier.",
+        "paragraph2": "La transparence est le but.",
+        "paragraph3": "OnRopePro est conçu pour les opérateurs qui se soucient vraiment de la sécurité de leurs techniciens. Des entreprises qui veulent prouver qu'elles font les choses correctement. Des entreprises qui accueillent les audits parce qu'elles savent ce que l'auditeur trouvera.",
+        "paragraph4": "Si vous préférez ne pas avoir de visibilité sur votre propre conformité en matière de sécurité, continuez à utiliser les formulaires papier. Ils sont beaucoup plus faciles à perdre."
+      },
+      "problemsSolved": {
+        "title": "À qui s'adresse ce module",
+        "subtitle": "Des problèmes réels d'opérateurs comme vous.",
+        "organized": {
+          "title": "Pour l'opérateur qui « comptait s'organiser »",
+          "p1": "Vous le dites depuis des années. Vous allez réparer le système de classement. Vous allez acheter de meilleurs classeurs. Vous allez faire en sorte que tout le monde remplisse les formulaires correctement.",
+          "p2": "Mais la saison commence, vous manquez de personnel, les travaux s'accumulent, et la paperasse de sécurité devient « quelque chose qu'on rattrapera plus tard. »",
+          "p3": "Le problème n'est pas la discipline. Le problème est que les systèmes papier nécessitent un effort constant pour être maintenus. Les systèmes numériques nécessitent une configuration unique et fonctionnent ensuite tout seuls.",
+          "p4": "Vos techniciens complètent les inspections sur leur téléphone en attendant l'ascenseur. Les dossiers existent que vous y fassiez attention ou non."
+        },
+        "audit": {
+          "title": "Pour l'opérateur qui a passé un audit",
+          "p1": "Vous connaissez ce sentiment de malaise quand quelqu'un demande une documentation dont vous n'êtes pas sûr à 100% de l'avoir.",
+          "p2": "Vous vous êtes fait des promesses sur comment la prochaine fois sera différente.",
+          "p3": "Voici comment la prochaine fois devient vraiment différente: les dossiers se créent d'eux-mêmes. Quotidiennement. Automatiquement. Avec des horodatages et des signatures qui ne peuvent pas être contestés."
+        },
+        "liability": {
+          "title": "Pour l'opérateur inquiet de la responsabilité",
+          "p1": "Le travail d'accès sur corde est dangereux. Tout le monde le sait. C'est pourquoi IRATA et SPRAT existent. C'est pourquoi les inspections sont obligatoires.",
+          "p2": "Mais obligatoire et documenté ne sont pas la même chose.",
+          "p3": "Si un harnais cède et que quelqu'un est blessé, l'enquête commence par une question: pouvez-vous prouver que vous l'avez inspecté? Pouvez-vous prouver que vous avez formé vos employés? Pouvez-vous prouver que vous avez discuté des dangers spécifiques de ce travail spécifique?",
+          "p4": "Avec des formulaires papier, vous espérez que les bons morceaux de papier existent et peuvent être trouvés. Avec des dossiers numériques, vous savez exactement ce qui existe parce que vous pouvez le rechercher."
+        }
+      },
+      "keyFeatures": {
+        "title": "Fonctionnalités clés",
+        "subtitle": "Documentation de sécurité numérique qui garde votre équipe plus en sécurité et votre entreprise protégée. Du suivi d'équipement aux audits de conformité, tout dans un système intégré.",
+        "mobileInspections": {
+          "title": "Inspections sur mobile",
+          "description": "Les techniciens complètent les inspections de harnais et d'équipement sur leur téléphone. Listes de contrôle guidées avec photos et notes. Prend 2 minutes."
+        },
+        "toolboxTracking": {
+          "title": "Suivi des réunions de sécurité",
+          "description": "Tenez des réunions de sécurité quotidiennes ou hebdomadaires. Sujets parmi plus de 20 thèmes de sécurité. Les techniciens signent leur présence numériquement."
+        },
+        "equipmentLifecycle": {
+          "title": "Gestion du cycle de vie de l'équipement",
+          "description": "Suivez les dates d'achat, la durée de vie, les dates de retrait. L'équipement défaillant est automatiquement signalé et retiré de la disponibilité."
+        },
+        "auditPdfs": {
+          "title": "PDF prêts pour l'audit",
+          "description": "Recherchez par équipement, technicien, date ou projet. Exportez des rapports complets instantanément. Prêt pour les audits d'assurance ou IRATA."
+        },
+        "automaticFlagging": {
+          "title": "Signalement automatique",
+          "description": "L'équipement qui échoue à l'inspection est signalé immédiatement. Les flux de travail de retrait se déclenchent automatiquement."
+        },
+        "digitalSignatures": {
+          "title": "Signatures numériques",
+          "description": "Chaque inspection et réunion comprend des signatures numériques horodatées. Piste d'audit complète pour la conformité."
+        }
+      },
+      "everythingYouNeed": {
+        "title": "Tout ce dont vous avez besoin",
+        "subtitle": "Documentation de sécurité complète dans un système intégré.",
+        "equipmentInventory": {
+          "title": "Inventaire d'équipement",
+          "description": "Suivez chaque harnais, longe, descendeur, bloqueur et corde. Numéros de série, fabricants, dates d'achat, durée de vie restante."
+        },
+        "dailyChecklists": {
+          "title": "Listes de contrôle d'inspection quotidienne",
+          "description": "Les formulaires numériques guident les techniciens à travers chaque vérification requise. Réussite/échec binaire pour chaque élément avec notes et photos."
+        },
+        "automaticFlagging": {
+          "title": "Signalement automatique",
+          "description": "L'équipement qui échoue à l'inspection est signalé immédiatement. Les flux de travail de retrait se déclenchent automatiquement."
+        },
+        "safetyTopics": {
+          "title": "Plus de 20 sujets de sécurité",
+          "description": "Protection contre les chutes, évaluation météo, procédures de sauvetage, inspection d'ancrage, calculs de charge, et plus."
+        },
+        "digitalSignatures": {
+          "title": "Signatures numériques",
+          "description": "La présence aux réunions de sécurité vérifiée avec des signatures juridiquement valables. Horodatages capturés automatiquement."
+        },
+        "searchableHistory": {
+          "title": "Historique recherchable",
+          "description": "Trouvez n'importe quelle inspection par date, technicien, numéro de série d'équipement ou projet. Fini de fouiller dans les boîtes."
+        }
+      },
+      "measurableResults": {
+        "title": "Résultats mesurables",
+        "insurance": {
+          "title": "Les assureurs veulent de la documentation",
+          "description": "Quand votre assureur audite votre programme de sécurité, il cherche des preuves de gestion systématique des risques. Des dossiers complets démontrent exactement cela."
+        },
+        "auditPrep": {
+          "title": "Préparation d'audit: des jours aux minutes",
+          "description": "La panique avant un audit IRATA prenait des jours. Maintenant, ça prend des minutes. Chercher. Exporter. Terminé."
+        },
+        "liability": {
+          "title": "Protection de responsabilité",
+          "description": "Dans les enquêtes sur les accidents, une preuve documentée de diligence raisonnable change tout. Démontrez exactement ce qui s'est passé."
+        },
+        "equipmentRoi": {
+          "title": "Suivi du ROI de l'équipement",
+          "description": "Sachez exactement combien de temps chaque pièce d'équipement dure en service. Prédisez les besoins de remplacement. Budgétisez avec précision."
+        }
+      },
+      "testimonials": {
+        "title": "Ce que disent les opérateurs",
+        "subtitle": "Retours réels d'entreprises d'accès sur corde utilisant le module Sécurité et Conformité.",
+        "quote1": "La première fois qu'un auditeur d'assurance a demandé nos dossiers d'inspection et que j'ai exporté six mois de documentation en trente secondes, j'ai su qu'on ne reviendrait jamais au papier.",
+        "quote2": "Je passais mes dimanches soirs à m'inquiéter de savoir si on avait couvert nos arrières. Maintenant je vérifie juste le tableau de bord. Tout est là ou non, et il n'y a pas d'ambiguïté.",
+        "quote3": "Un gestionnaire de propriété a appelé pour demander une preuve qu'on avait fait une réunion de sécurité avant de travailler sur son immeuble. J'ai envoyé le PDF pendant qu'on était encore au téléphone. C'est ce genre de professionnalisme qui garde les contrats."
+      },
+      "commonQuestions": {
+        "title": "Questions fréquentes",
+        "q1": {
+          "question": "Mes techniciens détestent la paperasse.",
+          "answer": "Comme les techniciens de tout le monde. C'est pourquoi ça marche. Compléter une inspection sur un téléphone prend moins de deux minutes. C'est plus rapide que de remplir un formulaire papier, et ils n'ont pas besoin de se souvenir de ramener les formulaires au bureau."
+        },
+        "q2": {
+          "question": "Nous sommes trop petits pour avoir besoin d'un logiciel.",
+          "answer": "Plus vous êtes petit, plus chaque audit compte. Un audit IRATA échoué. Une lacune de couverture d'assurance. Un procès où vous ne pouvez pas prouver la diligence raisonnable. Le coût de n'importe lequel de ceux-ci est plus que des années de logiciel."
+        },
+        "q3": {
+          "question": "Le papier a bien fonctionné jusqu'ici.",
+          "answer": "Vraiment? Ou avez-vous juste eu de la chance? Chaque opérateur qui a perdu sa certification ou perdu un procès pensait que le papier fonctionnait bien jusqu'à ce que ce ne soit plus le cas."
+        },
+        "q4": {
+          "question": "Je n'ai pas le temps de configurer ça.",
+          "answer": "La configuration initiale prend un après-midi. Ajoutez votre équipement. Ajoutez vos techniciens. Après ça, le système se maintient par l'utilisation quotidienne. Le temps que vous économisez au cours du mois suivant rembourse le temps de configuration dix fois."
+        }
+      },
+      "finalCta": {
+        "title": "Arrêtez de vous demander si vous êtes conforme.",
+        "titleHighlight": "Commencez à savoir.",
+        "subtitle": "Chaque inspection de harnais. Chaque réunion de sécurité. Chaque signature.",
+        "subtitle2": "Recherchable, exportable, et prêt pour le prochain audit.",
+        "button": "Commencer votre essai gratuit de 60 jours",
+        "disclaimer": "Essai gratuit de 90 jours pour les Membres Fondateurs. Aucune carte de crédit requise."
+      },
+      "disclaimer": {
+        "title": "Important: Responsabilité de conformité en matière de sécurité",
+        "text": "OnRopePro aide à documenter les procédures de sécurité, mais vous restez entièrement responsable de la sécurité au travail et de la conformité réglementaire. Ce logiciel ne remplace pas les professionnels de la sécurité qualifiés, la formation IRATA/SPRAT, les inspections d'équipement par des inspecteurs certifiés, ou le respect de toutes les réglementations OSHA/WorkSafeBC applicables."
+      }
+    },
     "csr": {
       "hero": {
         "badge": "Module Cote de Sécurité Entreprise",
