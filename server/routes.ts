@@ -3,9 +3,9 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
-import { eq, sql, and, or, isNull, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
+import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -3925,13 +3925,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       weekEnd.setDate(weekStart.getDate() + 6);
       weekEnd.setHours(23, 59, 59, 999);
 
-      // Get all jobs for this week (inclusive bounds)
-      const jobs = await db.select()
-        .from(scheduledJobs)
+      const weekStartStr = weekStart.toISOString().split('T')[0];
+      const weekEndStr = weekEnd.toISOString().split('T')[0];
+
+      // Get active projects that overlap with this week
+      // Includes: projects with startDate <= weekEnd AND (endDate >= weekStart OR endDate is null for ongoing projects)
+      // Status "active" means project is in progress, "completed" means finished
+      const activeProjects = await db.select()
+        .from(projectsTable)
         .where(and(
-          eq(scheduledJobs.companyId, companyId),
-          gte(scheduledJobs.startDate, weekStart),
-          lte(scheduledJobs.startDate, weekEnd)
+          eq(projectsTable.companyId, companyId),
+          eq(projectsTable.status, "active"),
+          eq(projectsTable.deleted, false),
+          not(isNull(projectsTable.startDate)),
+          lte(projectsTable.startDate, weekEndStr),
+          or(
+            gte(projectsTable.endDate, weekStartStr),
+            isNull(projectsTable.endDate)
+          )
         ));
 
       const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -3942,15 +3953,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         date.setDate(weekStart.getDate() + i);
         const dateStr = date.toISOString().split('T')[0];
         
-        const jobCount = jobs.filter(job => {
-          const jobDate = job.startDate?.toISOString().split('T')[0];
-          return jobDate === dateStr;
+        // Count projects active on this day
+        // Project is active if: startDate <= day AND (endDate >= day OR endDate is null)
+        // Note: Drizzle returns date columns as strings in "YYYY-MM-DD" format
+        const projectCount = activeProjects.filter(project => {
+          const projectStart = project.startDate as string | null;
+          const projectEnd = project.endDate as string | null;
+          if (!projectStart || projectStart > dateStr) return false;
+          if (!projectEnd) return true; // Ongoing project (no end date set)
+          return projectEnd >= dateStr;
         }).length;
 
         days.push({
           date: dateStr,
           dayName: dayNames[i],
-          jobCount,
+          jobCount: projectCount,
           isToday: dateStr === today.toISOString().split('T')[0],
         });
       }
