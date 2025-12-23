@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { 
   User, ArrowRight, ArrowLeft, Award, Loader2, 
   Check, Upload, Shield, Copy, Mail, MessageSquare,
@@ -175,10 +174,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     }
     if (data.password !== data.confirmPassword) {
       setError(t('techReg.errors.passwordsMismatch', 'Passwords do not match'));
-      return false;
-    }
-    if (!data.streetAddress.trim() || !data.city.trim() || !data.provinceState.trim() || !data.country.trim() || !data.postalCode.trim()) {
-      setError(t('techReg.errors.fullAddressRequired', 'Full address is required'));
       return false;
     }
     return true;

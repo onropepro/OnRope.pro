@@ -1364,9 +1364,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!password) {
         return res.status(400).json({ message: "Password is required" });
       }
-      if (!streetAddress || !city || !provinceState || !country || !postalCode) {
-        return res.status(400).json({ message: "Full address is required" });
-      }
 
       // Validate password strength
       const passwordValidation = validatePasswordStrength(password);
