@@ -16,7 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/use-auth";
+import type { User } from "@shared/schema";
 
 interface CompanyLink {
   id: string;
@@ -28,7 +28,10 @@ interface CompanyLink {
 
 export default function PropertyManagerSettings() {
   const { t } = useTranslation();
-  const { user, refetch: refetchUser } = useAuth();
+  const { data: userData, refetch: refetchUser } = useQuery<{ user: User }>({
+    queryKey: ["/api/user"],
+  });
+  const user = userData?.user;
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newCompanyCode, setNewCompanyCode] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
