@@ -16,6 +16,7 @@ import { User, KeyRound, Loader2, HardHat, Building2, Briefcase, Home } from "lu
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
+import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
 
 const loginSchema = z.object({
@@ -55,6 +56,7 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
   
   const [showTechnicianRegistration, setShowTechnicianRegistration] = useState(false);
   const [showPropertyManagerRegistration, setShowPropertyManagerRegistration] = useState(false);
+  const [showEmployerRegistration, setShowEmployerRegistration] = useState(false);
   const [showResidentSignup, setShowResidentSignup] = useState(false);
 
   const form = useForm<LoginFormData>({
@@ -161,7 +163,7 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
 
   const handleEmployerRegister = () => {
     closePortal();
-    setLocation("/pricing");
+    setShowEmployerRegistration(true);
   };
 
   const handleResidentRegister = () => {
@@ -345,6 +347,11 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
       <PropertyManagerRegistration 
         open={showPropertyManagerRegistration} 
         onOpenChange={(open) => setShowPropertyManagerRegistration(open)} 
+      />
+      
+      <EmployerRegistration 
+        open={showEmployerRegistration} 
+        onOpenChange={(open) => setShowEmployerRegistration(open)} 
       />
       
       {showResidentSignup && (
