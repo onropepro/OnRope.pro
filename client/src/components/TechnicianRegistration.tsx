@@ -303,10 +303,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   // PLUS benefits (unlocked by referring one tech)
   const plusBenefits = [
-    t('techReg.plusBenefits.expiryAlerts', 'Certification expiry alerts (never miss a renewal)'),
+    t('techReg.plusBenefits.expiryAlerts', 'Certification expiry alerts (60 + 30 day warnings)'),
     t('techReg.plusBenefits.multiEmployers', 'Work for multiple employers simultaneously'),
     t('techReg.plusBenefits.jobBoard', 'Job Board access — see who\'s hiring'),
     t('techReg.plusBenefits.taskLogging', 'Enhanced task logging'),
+    t('techReg.plusBenefits.analytics', 'Work history analytics'),
   ];
 
   // Employer-connected benefits for Page 4
@@ -736,7 +737,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   </div>
 
                   {/* Referral Code Input */}
-                  <div className="mb-6">
+                  <div className="mb-8">
                     <Label className="text-sm mb-2 block">{t('techReg.referral.inputLabel', 'Enter referral code (optional)')}</Label>
                     <Input
                       placeholder={t('techReg.referral.inputPlaceholder', 'Enter referral code')}
@@ -748,7 +749,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   </div>
 
                   {/* PLUS benefits section - locked/grayed */}
-                  <div className="mb-6">
+                  <div className="mb-8">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-medium">
                       {t('techReg.plusSection.header', 'Unlock PLUS for free by referring 1 other tech:')}
                     </p>
