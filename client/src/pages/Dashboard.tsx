@@ -2714,7 +2714,7 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       setEmployeeToDelete(null);
-      toast({ title: t('dashboard.toast.employeeDeleted', 'Employee deleted successfully') });
+      toast({ title: t('dashboard.toast.employeeUnlinked', 'Employee unlinked successfully') });
     },
     onError: (error: Error) => {
       toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
@@ -6909,11 +6909,11 @@ export default function Dashboard() {
                                     e.stopPropagation();
                                     setEmployeeToDelete(employee.id);
                                   }}
-                                  data-testid={`button-delete-employee-${employee.id}`}
-                                  className="h-9 w-9 text-destructive hover:text-destructive"
+                                  data-testid={`button-unlink-employee-${employee.id}`}
+                                  className="h-9 w-9 text-amber-600 hover:text-amber-700"
                                   disabled={userIsReadOnly}
                                 >
-                                  <span className="material-icons text-sm">delete</span>
+                                  <span className="material-icons text-sm">link_off</span>
                                 </Button>
                               </div>
                             </div>
@@ -6961,7 +6961,7 @@ export default function Dashboard() {
 
                             {/* irata Details */}
                             {employee.irataLevel && (
-                              <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                              <div className="text-sm text-muted-foreground space-y-1 pt-2 border-t">
                                 <div className="flex items-center gap-2">
                                   <span className="material-icons text-sm">workspace_premium</span>
                                   <span>{t('dashboard.employees.irataLevel', 'irata Level')} {employee.irataLevel}</span>
@@ -6979,7 +6979,7 @@ export default function Dashboard() {
 
                             {/* Driver's License */}
                             {(employee.driversLicenseNumber || employee.driversLicenseProvince) && (
-                              <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                              <div className="text-sm text-muted-foreground space-y-1 pt-2 border-t">
                                 <div className="flex items-center gap-2">
                                   <span className="material-icons text-sm">badge</span>
                                   <span>
@@ -7220,11 +7220,11 @@ export default function Dashboard() {
                                       variant="ghost"
                                       size="icon"
                                       onClick={() => setEmployeeToDelete(employee.id)}
-                                      data-testid={`button-delete-terminated-employee-${employee.id}`}
-                                      className="h-9 w-9 text-destructive hover:text-destructive"
+                                      data-testid={`button-unlink-terminated-employee-${employee.id}`}
+                                      className="h-9 w-9 text-amber-600 hover:text-amber-700"
                                       disabled={userIsReadOnly}
                                     >
-                                      <span className="material-icons text-sm">delete</span>
+                                      <span className="material-icons text-sm">link_off</span>
                                     </Button>
                                   </div>
                                 </div>
@@ -9669,23 +9669,29 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Employee Confirmation Dialog */}
+      {/* Unlink Employee Confirmation Dialog */}
       <AlertDialog open={employeeToDelete !== null} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('dashboard.deleteEmployee.title', 'Delete Employee')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('dashboard.deleteEmployee.description', 'Are you sure you want to delete this employee? This action cannot be undone.')}
+            <AlertDialogTitle>{t('dashboard.unlinkEmployee.title', 'Unlink Employee')}</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <span className="block">
+                {t('dashboard.unlinkEmployee.description', 'This will disconnect this employee from your company. They will lose access to your company dashboard.')}
+              </span>
+              <span className="block text-muted-foreground">
+                {t('dashboard.unlinkEmployee.reassurance', 'Their personal account, certifications, and work history remain intact. They can still work for other employers.')}
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-unlink">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => employeeToDelete && deleteEmployeeMutation.mutate(employeeToDelete)}
-              data-testid="button-confirm-delete"
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-unlink"
+              className="bg-amber-600 text-white hover:bg-amber-700"
             >
-              {t('common.delete', 'Delete')}
+              <span className="material-icons text-sm mr-1">link_off</span>
+              {t('common.unlink', 'Unlink')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
