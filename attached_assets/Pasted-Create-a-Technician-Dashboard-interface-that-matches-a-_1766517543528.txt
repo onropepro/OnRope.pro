@@ -1,0 +1,51 @@
+Create a Technician Dashboard interface that matches a professional SaaS 'Operations Command Center' aesthetic. The design must be cohesive with our Employer Dashboard, using a fixed sidebar and sticky header layout.
+
+Stack: React, Tailwind CSS, Lucide React icons.
+
+1. Global Layout & Styling
+
+Theme: Clean, data-dense professional look. Background #F8FAFC, Primary Blue #0B64A3.
+Font: Inter (sans-serif).
+Structure:
+Fixed Sidebar: Width w-60 (240px), white background, right border.
+Sticky Header: Height h-14 (56px), white background, bottom border.
+Main Content: Flexible width (flex-1 ml-60), padded container (max-w-[1000px]).
+2. Sidebar Navigation
+
+Logo Area: 56px height, OnRopePro branding.
+User Switcher: Button below logo showing user initials (GB) and role 'Technician'.
+Nav Items: 'Home' (Active blue), 'Profile', 'Employer View', 'Job Board', 'More'.
+Footer: 'Settings' link at the bottom with a top border separator.
+3. Top Header
+
+Left: Large search input (w-80) with icon.
+Right Actions Group:
+Referral Badge: bg-blue-50 pill displaying code '87GXJSE...'.
+Language: Simple 'English' dropdown.
+Sign Out: Outline button with icon.
+4. Dashboard Widgets (Main Content)
+
+Constraint: All cards must be bg-white border border-slate-200 rounded-lg shadow-sm.
+
+Banner: 'Go to Work Dashboard'
+
+Full-width card.
+Content: Briefcase icon in Sky-50 square, title, and description.
+Action: 'Go to Work Dashboard' button in Primary Blue (#0B64A3).
+Card: Profile Completion
+
+Progress bar (slate track) with '18%' badge.
+List of missing items (Phone, Certs) as tags.
+Grid: Quick Links (4 Columns)
+
+Cards for: Job Board (Purple icon/hover), Profile (Slate), Feedback (Pink), Logged Hours (Sky).
+Style: Icon centered in a light-colored rounded square (e.g., bg-purple-50 text-purple-600).
+Interaction: Hover state adds shadow and changes text color to Primary Blue.
+List: Safety Quizzes
+
+List of safety procedures (e.g., 'Window Cleaning SWP').
+Badges: 'SWP' (Emerald), 'FLHA' (Amber) to indicate type.
+Action: Small 'Start' button on the right.
+Please
+
+implement this as a responsive, high-fidelity mockup.

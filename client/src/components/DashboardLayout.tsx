@@ -2,11 +2,19 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useContext, ReactNode } from "react";
 import { BrandingContext } from "@/App";
-import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { DashboardSidebar, type NavGroup, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";
 import type { User } from "@/lib/permissions";
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  variant?: DashboardVariant;
+  customNavigationGroups?: NavGroup[];
+  customBrandColor?: string;
+  showDashboardLink?: boolean;
+  dashboardLinkLabel?: string;
+  headerContent?: React.ReactNode;
+  onTabChange?: (tab: string) => void;
+  activeTab?: string;
 }
 
 interface BrandingSettings {
@@ -17,7 +25,17 @@ interface BrandingSettings {
   pwaAppIconUrl?: string | null;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export function DashboardLayout({ 
+  children,
+  variant = "employer",
+  customNavigationGroups,
+  customBrandColor,
+  showDashboardLink = true,
+  dashboardLinkLabel,
+  headerContent,
+  onTabChange: externalTabChange,
+  activeTab: externalActiveTab,
+}: DashboardLayoutProps) {
   const [location, setLocation] = useLocation();
   const brandingContext = useContext(BrandingContext);
 
@@ -100,17 +118,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   // White label is active if the API says subscriptionActive is true
   const whitelabelActive = !!brandingData?.subscriptionActive;
 
+  // Use external handlers if provided, otherwise use internal defaults
+  const resolvedActiveTab = externalActiveTab ?? getActiveTab();
+  const resolvedTabChange = externalTabChange ?? handleTabChange;
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <DashboardSidebar
         currentUser={currentUser}
-        activeTab={getActiveTab()}
-        onTabChange={handleTabChange}
+        activeTab={resolvedActiveTab}
+        onTabChange={resolvedTabChange}
         brandingLogoUrl={brandingData?.logoUrl}
         whitelabelBrandingActive={whitelabelActive}
         companyName={brandingData?.companyName || currentUser?.username}
         employeeCount={employees?.length || 0}
         alertCounts={alertCounts}
+        variant={variant}
+        customNavigationGroups={customNavigationGroups}
+        customBrandColor={customBrandColor}
+        showDashboardLink={showDashboardLink}
+        dashboardLinkLabel={dashboardLinkLabel}
+        headerContent={headerContent}
       />
       
       <main className="lg:pl-60 min-h-screen">
@@ -119,3 +147,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     </div>
   );
 }
+
+// Re-export types for convenience
+export { type NavGroup, type NavItem, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";

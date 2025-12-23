@@ -33,7 +33,7 @@ import {
 } from "@/lib/permissions";
 import { useState, useEffect } from "react";
 
-interface NavItem {
+export interface NavItem {
   id: string;
   label: string;
   icon: React.ElementType;
@@ -44,13 +44,23 @@ interface NavItem {
   isVisible: (user: User | null | undefined) => boolean;
 }
 
-interface NavGroup {
+export interface NavGroup {
   id: string;
   label: string;
   items: NavItem[];
 }
 
-interface DashboardSidebarProps {
+export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager";
+
+export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
+  employer: "#0B64A3",
+  technician: "#AB4521",
+  "property-manager": "#6E9075",
+  resident: "#86A59C",
+  "building-manager": "#B89685",
+};
+
+export interface DashboardSidebarProps {
   currentUser: User | null | undefined;
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -66,6 +76,12 @@ interface DashboardSidebarProps {
     jobApplications?: number;
     quoteNotifications?: number;
   };
+  variant?: DashboardVariant;
+  customNavigationGroups?: NavGroup[];
+  customBrandColor?: string;
+  showDashboardLink?: boolean;
+  dashboardLinkLabel?: string;
+  headerContent?: React.ReactNode;
 }
 
 export function DashboardSidebar({
@@ -77,13 +93,19 @@ export function DashboardSidebar({
   companyName,
   employeeCount = 0,
   alertCounts = {},
+  variant = "employer",
+  customNavigationGroups,
+  customBrandColor,
+  showDashboardLink = true,
+  dashboardLinkLabel,
+  headerContent,
 }: DashboardSidebarProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Deep Blue brand color - used when white label is not active
-  const BRAND_COLOR = "#0B64A3";
+  // Get brand color based on variant or custom override
+  const BRAND_COLOR = customBrandColor || STAKEHOLDER_COLORS[variant];
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -271,7 +293,10 @@ export function DashboardSidebar({
     }
   };
 
-  const filteredGroups = navigationGroups
+  // Use custom navigation groups if provided, otherwise use default employer groups
+  const activeNavigationGroups = customNavigationGroups || navigationGroups;
+  
+  const filteredGroups = activeNavigationGroups
     .map((group) => ({
       ...group,
       items: group.items.filter((item) => item.isVisible(currentUser)),
@@ -280,6 +305,7 @@ export function DashboardSidebar({
 
   const displayCompanyName = companyName || "My Company";
   const isDashboardActive = activeTab === "home" || activeTab === "" || !activeTab;
+  const resolvedDashboardLabel = dashboardLinkLabel || t("dashboard.sidebar.dashboard", "Dashboard");
 
   // Get brand color - use CSS variable when white label is active, otherwise use Deep Blue
   const getBrandColor = () => {
@@ -326,23 +352,32 @@ export function DashboardSidebar({
       </div>
 
 
+      {/* Optional Header Content (e.g., user info card) */}
+      {headerContent && (
+        <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+          {headerContent}
+        </div>
+      )}
+
       {/* Dashboard Primary Link */}
-      <div className="px-3 pb-2">
-        <button
-          onClick={() => onTabChange("home")}
-          data-testid="sidebar-nav-dashboard"
-          className={cn(
-            "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium transition-colors",
-            isDashboardActive 
-              ? "text-white shadow-sm"
-              : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          )}
-          style={isDashboardActive ? { backgroundColor: getBrandColor() } : undefined}
-        >
-          <LayoutDashboard className="h-4 w-4 shrink-0" />
-          <span>{t("dashboard.sidebar.dashboard", "Dashboard")}</span>
-        </button>
-      </div>
+      {showDashboardLink && (
+        <div className="px-3 pb-2">
+          <button
+            onClick={() => onTabChange("home")}
+            data-testid="sidebar-nav-dashboard"
+            className={cn(
+              "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium transition-colors",
+              isDashboardActive 
+                ? "text-white shadow-sm"
+                : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            )}
+            style={isDashboardActive ? { backgroundColor: getBrandColor() } : undefined}
+          >
+            <LayoutDashboard className="h-4 w-4 shrink-0" />
+            <span>{resolvedDashboardLabel}</span>
+          </button>
+        </div>
+      )}
 
       {/* Navigation Groups - Scrollable */}
       <nav className="flex-1 overflow-y-auto px-3 py-1">

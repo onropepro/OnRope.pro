@@ -1,0 +1,137 @@
+I understand perfectly. Since you already have the logic and data connections in your other project, the most efficient way to apply this design is to just copy the "App Shell" (the Sidebar and Header structure) and wrap your existing content in it.
+
+Here is the clean, reusable code for the Layout Shell. You can copy this component into your project (e.g., as components/Layout.tsx) and simply pass your existing dashboard content as children.
+
+1. The Layout Component (Layout.tsx)
+Copy this file to your project. It contains the Sidebar and Sticky Header.
+
+import { useState } from 'react'
+import { 
+  Home, Users, Eye, Briefcase, MoreHorizontal, // Nav Icons
+  Search, Bell, Globe, ChevronDown, Download, ExternalLink, Settings, ChevronRight // Header Icons
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+// Navigation Items configuration
+const NAV_ITEMS = [
+  { id: 'home', label: 'Home', icon: Home },
+  { id: 'profile', label: 'Profile', icon: Users },
+  { id: 'employer', label: 'Employer View', icon: Eye },
+  { id: 'work', label: 'Job Board', icon: Briefcase },
+  { id: 'more', label: 'More', icon: MoreHorizontal },
+]
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const [activeNav, setActiveNav] = useState('home') // You can replace this with your router logic
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] flex font-sans antialiased text-slate-900">
+      
+      {/* SIDEBAR: Fixed width 240px (w-60) */}
+      <aside className="w-60 bg-white border-r border-slate-200/80 flex flex-col fixed h-full z-20">
+        
+        {/* Logo */}
+        <div className="h-14 px-5 flex items-center border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-md bg-[#0B64A3] flex items-center justify-center">
+              <span className="text-white font-bold text-xs">OR</span>
+            </div>
+            <span className="font-semibold text-slate-800 text-[15px]">OnRopePro</span>
+          </div>
+        </div>
+        {/* Company/User Switcher */}
+        <div className="px-3 py-3 border-b border-slate-100">
+          <button className="w-full flex items-center justify-between px-2.5 py-2 rounded-md hover:bg-slate-50 transition-colors group cursor-pointer text-left">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center text-xs font-medium text-slate-600">
+                GB
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-800 leading-tight">Glenn Brubaker</p>
+                <p className="text-[11px] text-slate-400">Technician</p>
+              </div>
+            </div>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-400" />
+          </button>
+        </div>
+        {/* Navigation Links */}
+        <nav className="flex-1 px-2.5 py-3 overflow-y-auto">
+          <div className="mb-4">
+            <p className="px-2.5 py-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              Portal
+            </p>
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveNav(item.id)}
+                className={cn(
+                  "w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[13px] transition-all cursor-pointer mb-1",
+                  activeNav === item.id 
+                    ? "bg-[#0B64A3] text-white font-medium shadow-sm" 
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                )}
+              >
+                <item.icon className={cn("w-4 h-4", activeNav === item.id ? "text-white" : "text-slate-500")} />
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </nav>
+        {/* Footer Settings */}
+        <div className="p-3 border-t border-slate-100">
+          <button className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors">
+            <Settings className="w-4 h-4" />
+            Settings
+          </button>
+        </div>
+      </aside>
+      {/* MAIN CONTENT WRAPPER */}
+      <main className="flex-1 ml-60 min-w-0">
+        
+        {/* TOP HEADER: Sticky */}
+        <header className="h-14 bg-white border-b border-slate-200/80 px-6 flex items-center justify-between sticky top-0 z-10">
+          {/* Search */}
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Search..." 
+              className="w-80 h-9 pl-9 pr-3 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B64A3]/20 focus:border-[#0B64A3] placeholder:text-slate-400 text-slate-800"
+            />
+          </div>
+          
+          {/* Right Actions */}
+          <div className="flex items-center gap-3">
+            {/* Referral Badge */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-slate-600 rounded-md border border-blue-100/50">
+              <span className="text-[11px] font-medium text-slate-400">Referral:</span>
+              <span className="text-xs font-bold text-[#0B64A3] font-mono">87GXJSE</span>
+            </div>
+            {/* Language */}
+            <button className="hidden md:flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-slate-50 text-slate-700 text-sm font-medium">
+              <Globe className="w-4 h-4" />
+              English
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </button>
+            {/* Sign Out */}
+            <button className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-md hover:bg-slate-50 text-slate-600 text-sm font-medium ml-2">
+              <ExternalLink className="w-3.5 h-3.5 rotate-180" />
+              Sign Out
+            </button>
+          </div>
+        </header>
+        {/* PAGE CONTENT INJECTED HERE */}
+        <div className="p-6 max-w-[1000px] mx-auto space-y-6">
+          {children}
+        </div>
+      </main>
+    </div>
+  )
+}
+2. How to use it
+In your existing page file, just import this AppLayout and wrap your existing widgets:
+
+import AppLayout from './components/AppLayout'
+export default function TechnicianDashboard() {
+  return (
+    <AppLayout>
+       {/* YOUR EXISTING WIDGETS GO HERE */}
+       <MyGoToWorkBanner />
+<MyProfileProgress /> <MyJobBoardGrid /> </AppLayout> ) } ```

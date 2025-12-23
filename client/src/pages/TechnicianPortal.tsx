@@ -5,6 +5,7 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
 
 // Helper to detect iOS PWA standalone mode
 const isIOSPWA = (): boolean => {
@@ -1670,6 +1671,55 @@ export default function TechnicianPortal() {
   });
   
   const totalUnreadFeedback = myFeedbackData?.requests?.reduce((sum, r) => sum + r.unreadCount, 0) ?? 0;
+
+  // Technician sidebar navigation groups for desktop
+  const technicianNavGroups: NavGroup[] = [
+    {
+      id: "main",
+      label: "NAVIGATION",
+      items: [
+        {
+          id: "home",
+          label: t.tabHome || "Home",
+          icon: Home,
+          onClick: () => setActiveTab('home'),
+          isVisible: () => true,
+        },
+        {
+          id: "profile",
+          label: t.tabProfile || "Profile",
+          icon: User,
+          onClick: () => setActiveTab('profile'),
+          isVisible: () => true,
+        },
+        {
+          id: "employer",
+          label: language === 'en' ? "Employer" : "Employeur",
+          icon: Eye,
+          onClick: () => setActiveTab('employer'),
+          isVisible: () => true,
+        },
+        {
+          id: "work",
+          label: t.tabWork || "Work",
+          icon: Briefcase,
+          onClick: () => setActiveTab('work'),
+          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
+          badgeType: "alert",
+          isVisible: () => true,
+        },
+        {
+          id: "more",
+          label: t.tabMore || "More",
+          icon: MoreHorizontal,
+          onClick: () => setActiveTab('more'),
+          badge: totalUnreadFeedback > 0 ? totalUnreadFeedback : undefined,
+          badgeType: "info",
+          isVisible: () => true,
+        },
+      ],
+    },
+  ];
   
   // Mark all feedback as read when the dialog opens
   useEffect(() => {
@@ -2281,7 +2331,21 @@ export default function TechnicianPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden lg:block">
+        <DashboardSidebar
+          currentUser={user}
+          activeTab={activeTab}
+          onTabChange={(tab) => setActiveTab(tab as TabType)}
+          variant="technician"
+          customNavigationGroups={technicianNavGroups}
+          showDashboardLink={false}
+        />
+      </div>
+      
+      {/* Main content wrapper - offset for sidebar on desktop */}
+      <div className="lg:pl-60">
+        <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img 
@@ -5382,6 +5446,7 @@ export default function TechnicianPortal() {
           </>
         )}
       </main>
+      </div>{/* End of lg:pl-60 wrapper */}
 
       {/* Document Deletion Confirmation Dialog */}
       <AlertDialog open={!!deletingDocument} onOpenChange={(open) => !open && setDeletingDocument(null)}>
@@ -5419,8 +5484,8 @@ export default function TechnicianPortal() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom">
+      {/* Mobile Bottom Navigation - hidden on desktop */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom lg:hidden">
         <div className="max-w-4xl mx-auto flex items-center justify-around py-2">
           <button
             onClick={() => setActiveTab('home')}
