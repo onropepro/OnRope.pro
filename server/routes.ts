@@ -4686,6 +4686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           user: {
             id: 'superuser',
             name: 'Super User',
+            fullName: 'Super User',
             email: 'superuser@system',
             role: 'superuser',
             companyName: 'System Admin',
@@ -4819,9 +4820,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Disable caching to ensure fresh data
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
       
+      // Compute fullName for frontend display
+      // For property_manager: use firstName + lastName
+      // For other roles: use name field or companyName
+      let fullName: string | undefined;
+      if (user.role === 'property_manager' && user.firstName && user.lastName) {
+        fullName = `${user.firstName} ${user.lastName}`;
+      } else if (user.name) {
+        fullName = user.name;
+      } else if (user.companyName) {
+        fullName = user.companyName;
+      }
+      
       res.json({ 
         user: {
           ...userWithoutPassword,
+          ...(fullName && { fullName }),
           ...(companyLicenseVerified !== undefined && { companyLicenseVerified }),
           ...(companyResidentCode && { residentCode: companyResidentCode }),
           ...(employerCompanyName && { companyName: employerCompanyName }),
