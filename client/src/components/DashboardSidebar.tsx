@@ -281,7 +281,7 @@ export function DashboardSidebar({
           id: "clients",
           label: t("dashboard.cards.clients.label", "Clients"),
           icon: Building,
-          onClick: () => onTabChange("clients"),
+          href: "/dashboard?tab=clients",
           isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
         },
       ],
