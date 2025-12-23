@@ -52,6 +52,7 @@ import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
 import PropertyManagerSettings from "@/pages/PropertyManagerSettings";
 import PropertyManager from "@/pages/PropertyManager";
+import PropertyManagerQuoteDetail from "@/pages/PropertyManagerQuoteDetail";
 import MyLoggedHours from "@/pages/MyLoggedHours";
 import Changelog from "@/pages/Changelog";
 import InventoryGuide from "@/pages/InventoryGuide";
@@ -260,6 +261,11 @@ function Router() {
       <Route path="/property-manager">
         <ProtectedRoute allowedRoles={["property_manager"]}>
           <PropertyManager />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/property-manager/quotes/:quoteId">
+        <ProtectedRoute allowedRoles={["property_manager"]}>
+          <PropertyManagerQuoteDetail />
         </ProtectedRoute>
       </Route>
       <Route path="/pm-dashboard">

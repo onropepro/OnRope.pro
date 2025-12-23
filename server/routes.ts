@@ -24,6 +24,7 @@ import { generateQuizFromDocument } from "./gemini";
 import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
+import { sendQuoteNotificationSMS } from "./services/twilio";
 import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
@@ -5669,6 +5670,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Account settings updated successfully" });
     } catch (error) {
       console.error("Update property manager account error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Get a specific quote by ID (if they are the recipient)
+  app.get("/api/property-managers/quotes/:quoteId", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      
+      // Get the quote with services
+      const quote = await storage.getQuoteWithServicesById(quoteId);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      // Verify this property manager is the recipient of the quote
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Get the company info for display
+      const company = await storage.getUserById(quote.companyId);
+      const companyName = company?.companyName || "Rope Access Company";
+      
+      // Calculate grand total
+      const grandTotal = quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+      
+      res.json({
+        quote: {
+          id: quote.id,
+          quoteNumber: quote.quoteNumber,
+          buildingName: quote.buildingName,
+          strataPlanNumber: quote.strataPlanNumber,
+          buildingAddress: quote.buildingAddress,
+          floorCount: quote.floorCount,
+          status: quote.status,
+          pipelineStage: quote.pipelineStage,
+          createdAt: quote.createdAt,
+          companyName,
+          services: quote.services.map(s => ({
+            id: s.id,
+            serviceType: s.serviceType,
+            description: s.description,
+            totalCost: s.totalCost
+          })),
+          grandTotal
+        }
+      });
+    } catch (error) {
+      console.error("Get property manager quote error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -20454,9 +20507,48 @@ Do not include any other text, just the JSON object.`
       
       console.log(`Quote ${quote.strataPlanNumber} emailed to ${recipientEmail} with PDF attachment, message ID: ${data?.id}`);
       
+      // SMS notification to property manager (non-blocking, failures don't affect email delivery)
+      let smsResult: { sent: boolean; error?: string } = { sent: false };
+      try {
+        // Look up if recipient is a property manager with a phone number
+        const propertyManager = await storage.getUserByEmail(recipientEmail);
+        if (propertyManager?.role === 'property_manager') {
+          // Link the quote to this property manager so they can view it
+          await storage.updateQuote(quote.id, { recipientPropertyManagerId: propertyManager.id } as any);
+          
+          // If they have a phone number, send SMS notification
+          if (propertyManager.propertyManagerPhoneNumber) {
+            // Build the deep link URL to the specific quote
+            const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+              ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+              : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
+            const quoteViewUrl = `${baseUrl}/property-manager/quotes/${quote.id}`;
+            
+            const smsResponse = await sendQuoteNotificationSMS(
+              propertyManager.propertyManagerPhoneNumber,
+              quote.buildingName,
+              companyName,
+              grandTotal,
+              quoteViewUrl
+            );
+            if (smsResponse.success) {
+              console.log(`[SMS] Quote notification sent to ${propertyManager.propertyManagerPhoneNumber}, SID: ${smsResponse.messageId}`);
+              smsResult = { sent: true };
+            } else {
+              console.warn(`[SMS] Failed to send quote notification: ${smsResponse.error}`);
+              smsResult = { sent: false, error: smsResponse.error };
+            }
+          }
+        }
+      } catch (smsError: any) {
+        console.error("[SMS] Quote notification error (non-blocking):", smsError?.message || smsError);
+        smsResult = { sent: false, error: smsError?.message || 'SMS sending failed' };
+      }
+      
       res.json({ 
         message: "Quote sent successfully with PDF attachment",
-        emailId: data?.id 
+        emailId: data?.id,
+        sms: smsResult
       });
     } catch (error) {
       console.error("Email quote error:", error);
