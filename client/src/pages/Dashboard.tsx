@@ -34,7 +34,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, AlertTriangle } from "lucide-react";
-import { useLocation, useSearch } from "wouter";
+import { useLocation, useSearch, Link } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -50,6 +50,7 @@ import { SubscriptionRenewalBadge } from "@/components/SubscriptionRenewalBadge"
 import { formatLocalDate, formatLocalDateLong, formatTimestampDate, formatTimestampDateShort, formatTimestampDateMedium, parseLocalDate, formatLocalDateMedium, formatDurationMs } from "@/lib/dateUtils";
 import { QRCodeSVG } from 'qrcode.react';
 import { trackLogout, trackWorkSessionStart, trackWorkSessionEnd, trackProjectCreated, trackClientAdded, trackBuildingAdded, trackEmployeeAdded } from "@/lib/analytics";
+import { getDashboardUrl, parseDashboardTab, type DashboardTab } from "@/lib/navigation";
 import {
   DndContext,
   closestCenter,
@@ -1144,8 +1145,7 @@ export default function Dashboard() {
   
   // Derive activeTab from the URL search params (single source of truth)
   const activeTab = useMemo(() => {
-    const urlParams = new URLSearchParams(searchString);
-    return urlParams.get('tab') || "";
+    return parseDashboardTab(searchString);
   }, [searchString]);
   
   const [projectsSubTab, setProjectsSubTab] = useState<"active" | "past">("active");
@@ -1153,18 +1153,19 @@ export default function Dashboard() {
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
   const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "hsl(var(--primary))";
 
-  // Scroll to top when changing tabs - navigate via URL
-  const handleTabChange = (tab: string) => {
-    if (tab === "" || tab === "home") {
-      setLocation("/dashboard");
+  // Scroll to top when changing tabs - navigate via URL using typed helpers
+  const handleTabChange = (tab: DashboardTab | string) => {
+    // Handle special cases that should go to base dashboard URL
+    if (!tab || tab === '' || tab === 'home' || tab === 'overview') {
+      setLocation(getDashboardUrl());
     } else {
-      setLocation(`/dashboard?tab=${tab}`);
+      setLocation(getDashboardUrl(tab as DashboardTab));
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToNav = () => {
-    setLocation("/dashboard");
+    setLocation(getDashboardUrl());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const [showProjectDialog, setShowProjectDialog] = useState(false);
@@ -2493,7 +2494,7 @@ export default function Dashboard() {
     setProjectDataForClient(null);
     
     // Switch to Clients tab and open the client dialog
-    setLocation("/dashboard?tab=clients");
+    setLocation(getDashboardUrl('clients'));
     setTimeout(() => {
       setShowClientDialog(true);
     }, 100);
@@ -3637,11 +3638,6 @@ export default function Dashboard() {
             <div className="h-full flex items-center justify-between gap-4">
               {/* Left Side: Search */}
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                {activeTab !== "" && activeTab !== "employees" && (
-                  <h1 className={`text-lg font-semibold truncate text-slate-800 dark:text-slate-100 hidden sm:block`}>
-                    {getPageTitle()}
-                  </h1>
-                )}
                 <div className="hidden md:flex flex-1 max-w-xl">
                   <DashboardSearch />
                 </div>
@@ -3673,8 +3669,12 @@ export default function Dashboard() {
                 {/* Language Selector */}
                 <LanguageDropdown />
                 
-                {/* User Profile */}
-                <div className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700">
+                {/* User Profile - Clickable to go to Settings */}
+                <Link 
+                  href="/profile" 
+                  className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                  data-testid="link-user-profile"
+                >
                   <Avatar className="w-8 h-8 bg-[#0B64A3]">
                     <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
                       {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
@@ -3684,7 +3684,7 @@ export default function Dashboard() {
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
                     <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role}</p>
                   </div>
-                </div>
+                </Link>
                 
                 {/* Logout Button */}
                 <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
@@ -3735,21 +3735,6 @@ export default function Dashboard() {
             onRouteNavigate={setLocation}
             branding={branding}
           />
-        )}
-
-        {/* Back Button for all tabs except employees (employees is accessed via sidebar) */}
-        {activeTab !== "" && activeTab !== "employees" && (
-          <div className="mb-4">
-            <Button 
-              variant="ghost" 
-              onClick={handleBackToNav}
-              data-testid="button-back-to-nav"
-              className="gap-2 text-primary"
-            >
-              <span className="material-icons">arrow_back</span>
-              {t('dashboard.backToDashboard', 'Back to Dashboard')}
-            </Button>
-          </div>
         )}
 
         {activeTab === "projects" && (

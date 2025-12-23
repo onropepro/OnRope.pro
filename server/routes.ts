@@ -182,7 +182,8 @@ function getCsrRatingInfo(percentage: number): { label: string; color: string } 
 
 // Shared CSR calculation function - used by both company and property manager endpoints
 // This ensures consistent CSR values across all views
-async function calculateCompanyCSR(companyId: string, storage: any, skipHistoryRecording: boolean = false): Promise<any> {
+// Exported for use in assistantService
+export async function calculateCompanyCSR(companyId: string, storage: any, skipHistoryRecording: boolean = false): Promise<any> {
   // 1. Company Documentation Points
   const companyDocuments = await storage.getCompanyDocuments(companyId);
   const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
@@ -4682,6 +4683,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           user: {
             id: 'superuser',
             name: 'Super User',
+            fullName: 'Super User',
             email: 'superuser@system',
             role: 'superuser',
             companyName: 'System Admin',
@@ -4815,9 +4817,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Disable caching to ensure fresh data
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
       
+      // Compute fullName for frontend display
+      // For property_manager: use firstName + lastName
+      // For other roles: use name field or companyName
+      let fullName: string | undefined;
+      if (user.role === 'property_manager' && user.firstName && user.lastName) {
+        fullName = `${user.firstName} ${user.lastName}`;
+      } else if (user.name) {
+        fullName = user.name;
+      } else if (user.companyName) {
+        fullName = user.companyName;
+      }
+      
       res.json({ 
         user: {
           ...userWithoutPassword,
+          ...(fullName && { fullName }),
           ...(companyLicenseVerified !== undefined && { companyLicenseVerified }),
           ...(companyResidentCode && { residentCode: companyResidentCode }),
           ...(employerCompanyName && { companyName: employerCompanyName }),

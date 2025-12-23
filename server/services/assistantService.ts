@@ -13,10 +13,12 @@
  */
 
 import { db } from '../db';
-import { users, projects, scheduledJobs, jobAssignments, gearItems, workSessions } from '@shared/schema';
-import { eq, and, ilike, or, sql, gte, lte, desc } from 'drizzle-orm';
+import { users, projects, scheduledJobs, jobAssignments, gearItems, workSessions, companyDocuments } from '@shared/schema';
+import { eq, and, ilike, or, sql, gte, lte, desc, count } from 'drizzle-orm';
 import { queryRAG } from './ragService';
 import { generateChatResponse } from '../gemini';
+import { storage } from '../storage';
+import { calculateCompanyCSR } from '../routes';
 import { 
   addDays, 
   startOfDay, 
@@ -163,10 +165,18 @@ function extractNameFromQuery(query: string): string | null {
 function classifyIntent(query: string): 'data_lookup' | 'knowledge' | 'navigation' | 'hybrid' {
   const lowerQuery = query.toLowerCase();
   
+  // CSR queries should always be treated as hybrid (company data + knowledge)
+  if (lowerQuery.includes('csr') || 
+      lowerQuery.includes('safety rating') || 
+      lowerQuery.includes('company safety') ||
+      lowerQuery.includes('compliance score')) {
+    return 'hybrid';
+  }
+  
   // Knowledge/how-to queries
   const knowledgePatterns = [
     /how (?:do|can|to|should)/i,
-    /what is (?:the|a|an)?\s*(?:csr|company safety|safety rating)/i,
+    /what is (?:the|a|an|our|my)?\s*\w*/i, // "what is X" - generic knowledge questions
     /improve|increase|boost|raise/i,
     /explain|understand|learn|help/i,
     /best practice|recommendation/i,
@@ -369,6 +379,59 @@ async function queryWorkingToday(companyId: string): Promise<DataResult[]> {
   }));
 }
 
+// Query company's actual CSR data - uses the REAL CSR calculation from routes.ts
+async function queryCompanyCSR(companyId: string): Promise<{
+  score: number;
+  label: string;
+  missingDocs: string[];
+  suggestions: string[];
+} | null> {
+  try {
+    // Use the actual CSR calculation function for accuracy
+    const csrData = await calculateCompanyCSR(companyId, storage, true);
+    
+    const missingDocs: string[] = [];
+    const suggestions: string[] = [];
+    
+    // Extract missing docs from the real CSR data
+    if (!csrData.hasHealthSafety) {
+      missingDocs.push('Health & Safety Manual');
+      suggestions.push('Upload your Health & Safety Manual in Documents');
+    }
+    if (!csrData.hasCompanyPolicy) {
+      missingDocs.push('Company Policy');
+      suggestions.push('Upload your Company Policy in Documents');
+    }
+    if (!csrData.hasInsurance) {
+      missingDocs.push('Certificate of Insurance (COI)');
+      suggestions.push('Upload your Certificate of Insurance in Documents');
+    }
+    
+    // Add suggestions based on component ratings
+    if (csrData.toolboxMeetingRating < 100) {
+      suggestions.push('Complete Toolbox Meetings for active projects');
+    }
+    if (csrData.harnessInspectionRating < 100) {
+      suggestions.push('Complete Harness Inspections for work sessions');
+    }
+    if (csrData.documentReviewRating < 100) {
+      suggestions.push('Ensure employees acknowledge required documents');
+    }
+    
+    console.log(`[Assistant] CSR query for company ${companyId}: score=${csrData.csrRating}% (${csrData.csrLabel})`);
+    
+    return { 
+      score: csrData.csrRating, 
+      label: csrData.csrLabel, 
+      missingDocs, 
+      suggestions 
+    };
+  } catch (error) {
+    console.error('[Assistant] CSR query error:', error);
+    return null;
+  }
+}
+
 // Main query function - accepts individual parameters for flexibility
 export async function queryAssistant(
   query: string,
@@ -407,21 +470,62 @@ export async function queryAssistant(
     
     // Handle knowledge-only queries
     if (intent === 'knowledge') {
+      // Check if query is about CSR - include company-specific data FIRST
+      const isCSRQuery = lowerQuery.includes('csr') || 
+                        lowerQuery.includes('safety rating') || 
+                        lowerQuery.includes('compliance score') ||
+                        lowerQuery.includes('company safety');
+      
+      let companyContext = '';
+      let csrSuggestions: string[] = [];
+      
+      // Always fetch company CSR data for CSR queries - do this before RAG
+      if (isCSRQuery) {
+        try {
+          const csrData = await queryCompanyCSR(companyId);
+          if (csrData) {
+            companyContext = `**Your Company's CSR:** ${csrData.score}% (${csrData.label})\n\n`;
+            
+            if (csrData.missingDocs.length > 0) {
+              companyContext += `**Missing Documents:** ${csrData.missingDocs.join(', ')}\n\n`;
+              csrSuggestions = csrData.suggestions;
+            } else {
+              companyContext += `All core company documents are uploaded.\n\n`;
+            }
+            companyContext += `---\n\n`;
+          }
+        } catch (csrError) {
+          console.error('[Assistant] CSR query failed:', csrError);
+        }
+      }
+      
+      // Try RAG query for general help content
       try {
         const ragResult = await queryRAG(query, []);
+        const baseResponse = ragResult.message || 'Here\'s what I found in our help center.';
+        
         return {
-          response: ragResult.message || 'Here\'s what I found in our help center.',
+          response: companyContext + baseResponse,
           results: ragResult.sources.map(s => ({
             type: 'knowledge' as const,
             title: s.title,
             subtitle: 'Help Article',
             link: `/help/${s.slug}`,
           })),
-          suggestions: ['How do I improve CSR?', 'What is IRATA certification?'],
-          category: 'knowledge',
+          suggestions: csrSuggestions.length > 0 ? csrSuggestions : ['How do I improve CSR?', 'What is IRATA certification?'],
+          category: isCSRQuery ? 'hybrid' : 'knowledge',
         };
       } catch (error) {
         console.error('[Assistant] RAG query failed:', error);
+        // Even if RAG fails, return company context if we have it
+        if (companyContext) {
+          return {
+            response: companyContext + 'For more details about CSR, visit the Safety & Compliance section in Help.',
+            results: [],
+            suggestions: csrSuggestions.length > 0 ? csrSuggestions : ['How do I improve CSR?'],
+            category: 'hybrid',
+          };
+        }
         return {
           response: 'I couldn\'t find information about that in our help center.',
           results: [],
@@ -432,6 +536,63 @@ export async function queryAssistant(
     
     // Handle data lookup queries - check permissions BEFORE querying
     if (intent === 'data_lookup' || intent === 'hybrid') {
+      // CSR queries in hybrid mode - get company data AND knowledge
+      const isCSRQuery = lowerQuery.includes('csr') || 
+                        lowerQuery.includes('safety rating') || 
+                        lowerQuery.includes('compliance score') ||
+                        lowerQuery.includes('company safety');
+      
+      if (isCSRQuery) {
+        let companyContext = '';
+        let csrSuggestions: string[] = [];
+        
+        // Fetch company-specific CSR data
+        try {
+          const csrData = await queryCompanyCSR(companyId);
+          if (csrData) {
+            companyContext = `**Your Company's CSR:** ${csrData.score}% (${csrData.label})\n\n`;
+            
+            if (csrData.missingDocs.length > 0) {
+              companyContext += `**Missing Documents:** ${csrData.missingDocs.join(', ')}\n\n`;
+              csrSuggestions = csrData.suggestions;
+            } else {
+              companyContext += `All core company documents are uploaded.\n\n`;
+            }
+            companyContext += `---\n\n`;
+          }
+        } catch (csrError) {
+          console.error('[Assistant] CSR query failed:', csrError);
+        }
+        
+        // Also get RAG knowledge about CSR
+        try {
+          const ragResult = await queryRAG(query, []);
+          const baseResponse = ragResult.message || 'The Company Safety Rating (CSR) measures your safety compliance.';
+          
+          return {
+            response: companyContext + baseResponse,
+            results: ragResult.sources.map(s => ({
+              type: 'knowledge' as const,
+              title: s.title,
+              subtitle: 'Help Article',
+              link: `/help/${s.slug}`,
+            })),
+            suggestions: csrSuggestions.length > 0 ? csrSuggestions : ['How do I improve CSR?', 'Upload documents'],
+            category: 'hybrid',
+          };
+        } catch (error) {
+          console.error('[Assistant] RAG query failed for CSR:', error);
+          if (companyContext) {
+            return {
+              response: companyContext + 'For more details about CSR, visit the Safety & Compliance section in Help.',
+              results: [],
+              suggestions: csrSuggestions.length > 0 ? csrSuggestions : ['How do I improve CSR?'],
+              category: 'hybrid',
+            };
+          }
+        }
+      }
+      
       // Employee schedule lookup - requires appropriate schedule permission
       if (extractedName && dateRange) {
         const employee = await findEmployeeByName(companyId, extractedName);

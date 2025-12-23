@@ -13,9 +13,16 @@ function formatResponseText(text: string): JSX.Element[] {
   lines.forEach((line, lineIndex) => {
     let content = line.trim();
     
+    if (content === '---' || content === '***') {
+      elements.push(
+        <hr key={lineIndex} className="my-3 border-slate-200 dark:border-slate-700" />
+      );
+      return;
+    }
+    
     content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     content = content.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-    content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
+    content = content.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-xs">$1</code>');
     
     if (content.startsWith('* ') || content.startsWith('- ')) {
       const listContent = content.slice(2);

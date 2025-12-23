@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,82 +5,72 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe, ChevronDown } from "lucide-react";
+import { Globe, ChevronDown, Check } from "lucide-react";
+import { useLanguage } from "@/hooks/use-language";
+import { cn } from "@/lib/utils";
 
 interface LanguageDropdownProps {
   variant?: "default" | "ghost" | "outline" | "secondary";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
+  showLabel?: boolean;
+  iconOnly?: boolean;
+  align?: "start" | "center" | "end";
+  stakeholderColor?: string | null;
 }
 
 export function LanguageDropdown({ 
   variant = "ghost", 
   size = "sm",
-  className = ""
+  className = "",
+  showLabel = true,
+  iconOnly = false,
+  align = "end",
+  stakeholderColor = null,
 }: LanguageDropdownProps) {
-  const { t, i18n } = useTranslation();
-  const [currentLanguage, setCurrentLanguage] = useState<'en' | 'fr' | 'es'>(() => {
-    const lang = i18n.language;
-    if (lang?.startsWith('fr')) return 'fr';
-    if (lang?.startsWith('es')) return 'es';
-    return 'en';
-  });
+  const { currentLanguage, changeLanguage, supportedLanguages } = useLanguage();
 
-  useEffect(() => {
-    const lang = i18n.language;
-    if (lang?.startsWith('fr')) setCurrentLanguage('fr');
-    else if (lang?.startsWith('es')) setCurrentLanguage('es');
-    else setCurrentLanguage('en');
-  }, [i18n.language]);
-
-  const changeLanguage = (lang: 'en' | 'fr' | 'es') => {
-    setCurrentLanguage(lang);
-    localStorage.setItem('i18nextLng', lang);
-    i18n.changeLanguage(lang);
-  };
-
-  const languageNames: Record<'en' | 'fr' | 'es', string> = {
-    en: 'English',
-    fr: 'Français',
-    es: 'Español',
-  };
+  const currentLang = supportedLanguages.find(lang => lang.code === currentLanguage);
+  const displayName = currentLang?.nativeName || 'English';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
           variant={variant}
-          size={size}
-          className={className}
+          size={iconOnly ? "icon" : size}
+          className={cn(
+            stakeholderColor ? "text-white hover:bg-white/10" : "",
+            className
+          )}
           data-testid="button-language-dropdown"
         >
-          <Globe className="w-4 h-4 mr-1" />
-          {languageNames[currentLanguage]}
-          <ChevronDown className="w-3 h-3 ml-1" />
+          <Globe className="w-4 h-4" />
+          {showLabel && !iconOnly && (
+            <>
+              <span className="ml-1">{displayName}</span>
+              <ChevronDown className="w-3 h-3 ml-1" />
+            </>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="z-[200]" sideOffset={5}>
-        <DropdownMenuItem 
-          onClick={() => changeLanguage('en')}
-          className={currentLanguage === 'en' ? 'bg-accent' : ''}
-          data-testid="menu-item-language-en"
-        >
-          English
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => changeLanguage('fr')}
-          className={currentLanguage === 'fr' ? 'bg-accent' : ''}
-          data-testid="menu-item-language-fr"
-        >
-          Français
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => changeLanguage('es')}
-          className={currentLanguage === 'es' ? 'bg-accent' : ''}
-          data-testid="menu-item-language-es"
-        >
-          Español
-        </DropdownMenuItem>
+      <DropdownMenuContent align={align} className="z-[200]" sideOffset={5}>
+        {supportedLanguages.map((lang) => (
+          <DropdownMenuItem 
+            key={lang.code}
+            onClick={() => changeLanguage(lang.code)}
+            className={cn(
+              "flex items-center justify-between gap-2",
+              currentLanguage === lang.code ? 'bg-accent' : ''
+            )}
+            data-testid={`menu-item-language-${lang.code}`}
+          >
+            <span>{lang.nativeName}</span>
+            {currentLanguage === lang.code && (
+              <Check className="w-4 h-4 text-primary" />
+            )}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
