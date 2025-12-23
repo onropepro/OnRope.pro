@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, BookOpen, Settings, HeartPulse, Wallet } from "lucide-react";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe, BookOpen, Settings, HeartPulse, Wallet } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {

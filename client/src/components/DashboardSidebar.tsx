@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 import type { User } from "@/lib/permissions";
 import {
   hasFinancialAccess,
@@ -393,7 +394,7 @@ export function DashboardSidebar({
         ))}
       </nav>
 
-      {/* Footer - Settings and Help */}
+      {/* Footer - Settings, Help, and Language */}
       <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
         <div className="space-y-0.5">
           <button
@@ -412,6 +413,13 @@ export function DashboardSidebar({
             <HelpCircle className="h-4 w-4 shrink-0" />
             <span>{t("dashboard.sidebar.help", "Help Center")}</span>
           </button>
+        </div>
+        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <LanguageDropdown 
+            variant="ghost" 
+            size="sm"
+            className="w-full justify-start text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+          />
         </div>
       </div>
     </>
