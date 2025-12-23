@@ -5777,6 +5777,236 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Get quote messages (collaboration thread)
+  app.get("/api/property-managers/quotes/:quoteId/messages", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Get all messages for this quote
+      const messages = await storage.getQuoteMessages(quoteId);
+      
+      // Mark messages from company as read
+      await storage.markQuoteMessagesAsRead(quoteId, 'property_manager');
+      
+      res.json({ messages });
+    } catch (error) {
+      console.error("Get quote messages error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Send a message on a quote
+  app.post("/api/property-managers/quotes/:quoteId/messages", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      const { content } = req.body;
+      
+      if (!content || typeof content !== 'string' || content.trim().length === 0) {
+        return res.status(400).json({ message: "Message content is required" });
+      }
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Get property manager info
+      const propertyManager = await storage.getUserById(propertyManagerId);
+      const senderName = propertyManager?.name || "Property Manager";
+      
+      // Create the message
+      const message = await storage.createQuoteMessage({
+        quoteId,
+        senderUserId: propertyManagerId,
+        senderType: 'property_manager',
+        senderName,
+        messageType: 'message',
+        content: content.trim(),
+      });
+      
+      // Update quote collaboration status if not already in negotiation
+      if (quote.collaborationStatus === 'sent' || quote.collaborationStatus === 'viewed') {
+        await storage.updateQuoteCollaborationStatus(quoteId, 'negotiation');
+      }
+      
+      res.json({ message, success: true });
+    } catch (error) {
+      console.error("Send quote message error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Accept a quote
+  app.post("/api/property-managers/quotes/:quoteId/accept", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Check quote is in a valid state for acceptance
+      if (quote.collaborationStatus === 'accepted') {
+        return res.status(400).json({ message: "Quote has already been accepted" });
+      }
+      if (quote.collaborationStatus === 'declined') {
+        return res.status(400).json({ message: "Quote has been declined and cannot be accepted" });
+      }
+      
+      // Get property manager info
+      const propertyManager = await storage.getUserById(propertyManagerId);
+      const senderName = propertyManager?.name || "Property Manager";
+      
+      // Create accept message
+      await storage.createQuoteMessage({
+        quoteId,
+        senderUserId: propertyManagerId,
+        senderType: 'property_manager',
+        senderName,
+        messageType: 'accept',
+        content: 'Quote accepted',
+      });
+      
+      // Update quote collaboration status
+      await storage.updateQuoteCollaborationStatus(quoteId, 'accepted');
+      
+      // Update pipeline stage to approved
+      await db.update(quotes)
+        .set({ pipelineStage: 'approved', stageUpdatedAt: new Date() })
+        .where(eq(quotes.id, quoteId));
+      
+      res.json({ success: true, message: "Quote accepted successfully" });
+    } catch (error) {
+      console.error("Accept quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Decline a quote
+  app.post("/api/property-managers/quotes/:quoteId/decline", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      const { reason } = req.body;
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Check quote is in a valid state
+      if (quote.collaborationStatus === 'declined') {
+        return res.status(400).json({ message: "Quote has already been declined" });
+      }
+      if (quote.collaborationStatus === 'accepted') {
+        return res.status(400).json({ message: "Quote has been accepted and cannot be declined" });
+      }
+      
+      // Get property manager info
+      const propertyManager = await storage.getUserById(propertyManagerId);
+      const senderName = propertyManager?.name || "Property Manager";
+      
+      // Create decline message
+      await storage.createQuoteMessage({
+        quoteId,
+        senderUserId: propertyManagerId,
+        senderType: 'property_manager',
+        senderName,
+        messageType: 'decline',
+        content: reason || 'Quote declined',
+      });
+      
+      // Update quote collaboration status
+      await storage.updateQuoteCollaborationStatus(quoteId, 'declined');
+      
+      // Update pipeline stage to lost
+      await db.update(quotes)
+        .set({ pipelineStage: 'lost', stageUpdatedAt: new Date() })
+        .where(eq(quotes.id, quoteId));
+      
+      res.json({ success: true, message: "Quote declined" });
+    } catch (error) {
+      console.error("Decline quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Submit a counter-offer
+  app.post("/api/property-managers/quotes/:quoteId/counter-offer", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      const { counterOfferAmount, notes } = req.body;
+      
+      if (!counterOfferAmount || isNaN(Number(counterOfferAmount))) {
+        return res.status(400).json({ message: "Valid counter-offer amount is required" });
+      }
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Check quote is in a valid state
+      if (quote.collaborationStatus === 'accepted' || quote.collaborationStatus === 'declined') {
+        return res.status(400).json({ message: "Cannot submit counter-offer on a closed quote" });
+      }
+      
+      // Get property manager info
+      const propertyManager = await storage.getUserById(propertyManagerId);
+      const senderName = propertyManager?.name || "Property Manager";
+      
+      // Create counter-offer message
+      const message = await storage.createQuoteMessage({
+        quoteId,
+        senderUserId: propertyManagerId,
+        senderType: 'property_manager',
+        senderName,
+        messageType: 'counter_offer',
+        content: notes || `Counter-offer submitted: $${Number(counterOfferAmount).toLocaleString()}`,
+        counterOfferAmount: String(counterOfferAmount),
+        counterOfferNotes: notes,
+      });
+      
+      // Update quote collaboration status to negotiation
+      await storage.updateQuoteCollaborationStatus(quoteId, 'negotiation');
+      
+      res.json({ message, success: true });
+    } catch (error) {
+      console.error("Counter-offer error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // SuperUser: Get all companies
   app.get("/api/superuser/companies", requireAuth, async (req: Request, res: Response) => {
     try {
