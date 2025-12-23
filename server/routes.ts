@@ -11913,27 +11913,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
       
-      // Calculate project usage using new subscription system (company users only)
+      // Calculate project usage for dashboard display (company users only)
+      // Note: Projects are unlimited for all tiers, so no limit enforcement needed
       let projectInfo = null;
       if (currentUser.role === "company") {
-        const limitsCheck = await checkSubscriptionLimits(currentUser.id);
         const tier = currentUser.subscriptionTier || 'none';
-        const additionalProjects = currentUser.additionalProjectsCount || 0;
-        const projectLimit = limitsCheck.limits.maxProjects;
-        const baseProjectLimit = projectLimit - additionalProjects;
-        // Only count non-completed projects toward the limit
+        // Count active (non-completed) projects for display purposes
         const projectsUsed = projectsWithProgress.filter(p => p.status !== "completed").length;
-        const projectsAvailable = projectLimit === -1 ? -1 : Math.max(0, projectLimit - projectsUsed);
-        const atProjectLimit = projectLimit > 0 && projectsUsed >= projectLimit;
         
         projectInfo = {
           tier,
-          projectLimit,
-          baseProjectLimit,
-          additionalProjects,
           projectsUsed,
-          projectsAvailable,
-          atProjectLimit
         };
       }
       
