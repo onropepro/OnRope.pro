@@ -290,16 +290,15 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     t('techReg.benefits.safetyRating', 'Personal Safety Rating builds your reputation'),
   ];
 
-  // Right panel welcome screen benefits (8 items matching copy doc)
+  // Right panel welcome screen benefits (7 items matching copy doc)
   const welcomeBenefits = [
     t('techReg.welcome.benefit1', 'Your hours survive company closures'),
     t('techReg.welcome.benefit2', 'Import your logbook via photo'),
     t('techReg.welcome.benefit3', '10-second onboarding at new jobs'),
     t('techReg.welcome.benefit4', 'All certifications in one place'),
-    t('techReg.welcome.benefit5', 'AI-verified license credentials'),
-    t('techReg.welcome.benefit6', 'Banking & tax docs ready to share'),
-    t('techReg.welcome.benefit7', 'Personal Safety Rating'),
-    t('techReg.welcome.benefit8', 'Track progress toward L2/L3'),
+    t('techReg.welcome.benefit5', 'Import your logbook history via photo'),
+    t('techReg.welcome.benefit6', 'Your hours follow you - every job, every city'),
+    t('techReg.welcome.benefit7', 'Track progress toward L2/L3'),
   ];
 
   // PLUS benefits (unlocked by referring one tech)
@@ -307,7 +306,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     t('techReg.plusBenefits.expiryAlerts', 'Certification expiry alerts (never miss a renewal)'),
     t('techReg.plusBenefits.multiEmployers', 'Work for multiple employers simultaneously'),
     t('techReg.plusBenefits.jobBoard', 'Job Board access — see who\'s hiring'),
-    t('techReg.plusBenefits.exportHistory', 'Export your complete work history'),
+    t('techReg.plusBenefits.taskLogging', 'Enhanced task logging'),
   ];
 
   // Employer-connected benefits for Page 4
@@ -364,7 +363,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
             {/* PLUS ACCOUNT Benefits (muted) */}
             <div className="mt-auto">
-              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">{t('techReg.sidebar.plusAccount', 'PLUS — Refer 1 tech to unlock')}</p>
+              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">{t('techReg.sidebar.plusAccount', 'PLUS Account - Refer 1 tech to unlock')}</p>
               <div className="space-y-2">
                 {plusBenefits.map((benefit, i) => (
                   <div key={i} className="flex items-start gap-2 text-sm opacity-60">
