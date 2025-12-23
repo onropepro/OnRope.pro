@@ -21,6 +21,7 @@ import {
   ClipboardCheck,
   Menu,
   X,
+  Building,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -268,6 +269,19 @@ export function DashboardSidebar({
           href: "/quotes",
           badge: alertCounts.quoteNotifications,
           badgeType: alertCounts.quoteNotifications ? "alert" : undefined,
+          isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
+        },
+      ],
+    },
+    {
+      id: "clients",
+      label: t("dashboard.categories.clients", "CLIENTS"),
+      items: [
+        {
+          id: "clients",
+          label: t("dashboard.cards.clients.label", "Clients"),
+          icon: Building,
+          href: "/dashboard?tab=clients",
           isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
         },
       ],

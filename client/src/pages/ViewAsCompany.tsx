@@ -241,7 +241,7 @@ export default function ViewAsCompany() {
             icon={Building}
           />
           <StatCard
-            title="Quotes & CRM"
+            title="Quote/Pipeline"
             value={stats.totalQuotes}
             icon={FileText}
             description={`${stats.pendingQuotes} pending`}

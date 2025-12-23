@@ -2598,7 +2598,7 @@
     "gearItem": "Gear Item"
   },
   "quotes": {
-    "title": "Quotes & CRM",
+    "title": "Quote/Pipeline",
     "pageTitle": "Service Quotes",
     "pageSubtitle": "Create and manage service quotes for buildings",
     "newQuote": "New Quote",
