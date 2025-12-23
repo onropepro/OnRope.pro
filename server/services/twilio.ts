@@ -74,7 +74,8 @@ export async function sendQuoteNotificationSMS(
   phoneNumber: string,
   buildingName: string,
   companyName: string,
-  totalAmount: number
+  totalAmount: number,
+  quoteViewUrl: string
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const formattedAmount = totalAmount.toLocaleString('en-US', {
     style: 'currency',
@@ -82,7 +83,7 @@ export async function sendQuoteNotificationSMS(
     minimumFractionDigits: 2
   });
   
-  const message = `You've received a service quote for ${buildingName} from ${companyName}. Amount: ${formattedAmount}. Check your email for details.`;
+  const message = `You've received a service quote for ${buildingName} from ${companyName}. Amount: ${formattedAmount}. View details: ${quoteViewUrl}`;
   
   return sendSMS(phoneNumber, message);
 }
