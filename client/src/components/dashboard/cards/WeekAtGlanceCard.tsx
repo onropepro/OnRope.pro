@@ -98,7 +98,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
               data-testid={`week-day-${day.date}`}
             >
               <p className="text-xs font-medium">{day.dayName}</p>
-              <p className="text-lg font-bold">{day.jobCount}</p>
+              <p className={`text-lg font-bold ${day.isToday ? "" : "text-muted-foreground"}`}>{day.jobCount}</p>
             </div>
           ))}
         </div>
