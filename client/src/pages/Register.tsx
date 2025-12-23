@@ -21,6 +21,7 @@ import {
 import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 
 const residentSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -76,6 +77,7 @@ export default function Register() {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<"resident" | "employer" | "property_manager">("resident");
   const [, setLocation] = useLocation();
+  const { openLogin } = useAuthPortal();
   // Unit conflict dialog state
   const [showUnitConflictDialog, setShowUnitConflictDialog] = useState(false);
   const [pendingRegistrationData, setPendingRegistrationData] = useState<ResidentFormData | null>(null);
@@ -288,11 +290,9 @@ export default function Register() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
           <div className="flex items-center justify-between mb-2">
-            <Link href="/login">
-              <Button variant="ghost" size="icon" data-testid="button-back">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
+            <Button variant="ghost" size="icon" onClick={openLogin} data-testid="button-back">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <LanguageDropdown />
           </div>
           <CardTitle className="text-2xl font-bold text-center">{t('register.title', 'Create Account')}</CardTitle>
@@ -696,9 +696,9 @@ export default function Register() {
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             {t('register.haveAccount', 'Already have an account?')}{" "}
-            <a href="/login" className="text-primary font-medium hover:underline" data-testid="link-login">
+            <button onClick={openLogin} className="text-primary font-medium hover:underline" data-testid="link-login">
               {t('register.signIn', 'Sign in')}
-            </a>
+            </button>
           </div>
         </CardContent>
       </Card>
