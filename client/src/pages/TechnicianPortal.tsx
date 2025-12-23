@@ -3584,7 +3584,7 @@ export default function TechnicianPortal() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <h3 className="font-semibold text-sm">
+                        <h3 className="font-semibold text-base">
                           {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
                         </h3>
                         <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
@@ -3595,7 +3595,7 @@ export default function TechnicianPortal() {
                           style={{ width: `${profileCompletion.percentage}%` }}
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground mb-2">
+                      <p className="text-sm text-muted-foreground mb-2">
                         {language === 'en' 
                           ? 'Complete your profile to connect with employers instantly' 
                           : language === 'es'
@@ -3638,7 +3638,7 @@ export default function TechnicianPortal() {
                       >
                         {t.yourReferralCode}
                       </button>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{language === 'en' ? 'Share with friends to earn rewards' : language === 'es' ? 'Comparte con amigos para ganar recompensas' : 'Partagez avec vos amis pour gagner des récompenses'}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{language === 'en' ? 'Share with friends to earn rewards' : language === 'es' ? 'Comparte con amigos para ganar recompensas' : 'Partagez avec vos amis pour gagner des récompenses'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -4126,7 +4126,7 @@ export default function TechnicianPortal() {
                     <MapPin className="w-4 h-4" />
                     {t.address}
                   </h3>
-                  <p className="text-sm">
+                  <p className="text-base">
                     {user.employeeStreetAddress && (
                       <>
                         {user.employeeStreetAddress}<br />
@@ -6266,19 +6266,19 @@ function InfoItem({
   if (!value) {
     return (
       <div className="space-y-1">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm text-muted-foreground/50 italic">Not provided</p>
+        <p className="text-sm text-muted-foreground flex items-center gap-1">{icon}{label}</p>
+        <p className="text-base text-muted-foreground/50 italic">Not provided</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-1">
-      <p className="text-xs text-muted-foreground flex items-center gap-1">
+      <p className="text-sm text-muted-foreground flex items-center gap-1">
         {icon}
         {label}
       </p>
-      <p className="text-sm">{value}</p>
+      <p className="text-base">{value}</p>
     </div>
   );
 }
