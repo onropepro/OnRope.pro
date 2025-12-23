@@ -36,6 +36,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { PublicHeader } from "@/components/PublicHeader";
 import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import projectProgressImg from "@assets/residents-project-progress_1766199096691.png";
 import workNoticesImg from "@assets/residents-notices_1766199096691.png";
@@ -49,6 +50,7 @@ const RESIDENT_COLOR = "#86A59C";
 export default function ResidentLanding() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
+  const { openAuthPortal } = useAuthPortal();
   const [showSignup, setShowSignup] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -1081,16 +1083,24 @@ export default function ResidentLanding() {
             {t('residentLanding.cta.tagline')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: RESIDENT_COLOR}} asChild>
-              <Link href="/register" data-testid="button-create-account">
-                {t('residentLanding.buttons.createAccount')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            <Button 
+              size="lg" 
+              className="bg-white hover:bg-gray-50" 
+              style={{color: RESIDENT_COLOR}}
+              onClick={() => openAuthPortal({ mode: 'register', initialUserType: 'resident' })}
+              data-testid="button-create-account"
+            >
+              {t('residentLanding.buttons.createAccount')}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild>
-              <Link href="/login" data-testid="button-login-cta">
-                {t('residentLanding.buttons.logIn')}
-              </Link>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-white/40 text-white hover:bg-white/10"
+              onClick={() => openAuthPortal({ mode: 'login', initialUserType: 'resident' })}
+              data-testid="button-login-cta"
+            >
+              {t('residentLanding.buttons.logIn')}
             </Button>
           </div>
           <p className="text-sm text-white/80 pt-2">
