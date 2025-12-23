@@ -192,7 +192,6 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     { icon: Clock, text: "Track complaint resolution times across your entire portfolio" },
     { icon: MessageSquare, text: "Two-way messaging — negotiate quotes without email chains" },
     { icon: ThumbsUp, text: "Approve, deny, or request changes with one click" },
-    { icon: Users, text: "Zero cost. Zero catch. Zero excuses." },
   ];
 
   const welcomeBenefits = [
