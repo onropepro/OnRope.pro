@@ -409,8 +409,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {step === "accountDetails" && (
                 <div className="max-w-lg mx-auto">
                   <div className="mb-6">
-                    <p className="text-sm text-muted-foreground mb-1">{t('techReg.accountDetails.step', 'Step 1 of 4')}</p>
-                    <h2 className="text-2xl font-bold">{t('techReg.accountDetails.title', 'Account Details')}</h2>
+                                        <h2 className="text-2xl font-bold">{t('techReg.accountDetails.title', 'Account Details')}</h2>
                   </div>
 
                   <div className="space-y-4">
@@ -532,8 +531,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {step === "certification" && (
                 <div className="max-w-lg mx-auto">
                   <div className="mb-6">
-                    <p className="text-sm text-muted-foreground mb-1">{t('techReg.certification.step', 'Step 2 of 4')}</p>
-                    <h2 className="text-2xl font-bold">{t('techReg.certification.title', 'Verify Your Certification')}</h2>
+                                        <h2 className="text-2xl font-bold">{t('techReg.certification.title', 'Verify Your Certification')}</h2>
                     <p className="text-muted-foreground mt-1">{t('techReg.certification.subtitle', 'Select your certification type')}</p>
                   </div>
 
@@ -711,8 +709,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {step === "referral" && (
                 <div className="max-w-lg mx-auto">
                   <div className="mb-6">
-                    <p className="text-sm text-muted-foreground mb-1">{t('techReg.referral.step', 'Step 3 of 4 (Optional)')}</p>
-                    <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Referral Code')}</h2>
+                                        <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Referral Code')}</h2>
                     <p className="text-muted-foreground mt-1">{t('techReg.referral.subtitle', 'Got a referral code from a friend?')}</p>
                   </div>
 
