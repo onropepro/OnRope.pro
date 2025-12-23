@@ -1,10 +1,44 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Search, ArrowRight, Building2, Users, Calendar, HelpCircle, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { apiRequest } from '@/lib/queryClient';
 import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+
+function formatResponseText(text: string): JSX.Element[] {
+  const elements: JSX.Element[] = [];
+  const lines = text.split(/\n+/).filter(line => line.trim());
+  
+  lines.forEach((line, lineIndex) => {
+    let content = line.trim();
+    
+    content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    content = content.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    if (content.startsWith('* ') || content.startsWith('- ')) {
+      const listContent = content.slice(2);
+      elements.push(
+        <li 
+          key={lineIndex} 
+          className="ml-4 text-sm text-slate-600 dark:text-slate-400 py-0.5"
+          dangerouslySetInnerHTML={{ __html: listContent }}
+        />
+      );
+    } else {
+      elements.push(
+        <p 
+          key={lineIndex} 
+          className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-2 last:mb-0"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
+    }
+  });
+  
+  return elements;
+}
 
 interface DataResult {
   type: 'employee' | 'project' | 'schedule' | 'knowledge';
@@ -141,7 +175,7 @@ export function DashboardSearch() {
   }, []);
 
   return (
-    <div className="relative flex-1 max-w-xs lg:max-w-sm">
+    <div className="relative flex-1 max-w-md lg:max-w-xl">
       <div className="relative">
         {isLoading ? (
           <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 animate-spin" />
@@ -168,10 +202,10 @@ export function DashboardSearch() {
           data-testid="dropdown-search-results"
         >
           {response.response && (
-            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                {response.response}
-              </p>
+            <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 max-h-48 overflow-y-auto">
+              <div className="prose prose-sm dark:prose-invert prose-slate max-w-none">
+                {formatResponseText(response.response)}
+              </div>
             </div>
           )}
 

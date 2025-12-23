@@ -3642,7 +3642,7 @@ export default function Dashboard() {
                     {getPageTitle()}
                   </h1>
                 )}
-                <div className="hidden md:block">
+                <div className="hidden md:flex flex-1 max-w-xl">
                   <DashboardSearch />
                 </div>
               </div>
