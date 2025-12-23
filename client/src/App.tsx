@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePermissionSync } from "@/hooks/use-permission-sync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { AuthPortalProvider } from "@/hooks/use-auth-portal";
 
 // Pages
 import Register from "@/pages/Register";
@@ -729,10 +730,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ErrorBoundary>
-          <BrandingProvider>
-            <Router />
-            <Toaster />
-          </BrandingProvider>
+          <AuthPortalProvider>
+            <BrandingProvider>
+              <Router />
+              <Toaster />
+            </BrandingProvider>
+          </AuthPortalProvider>
         </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>
