@@ -18,6 +18,7 @@ import { eq, and, ilike, or, sql, gte, lte, desc, count } from 'drizzle-orm';
 import { queryRAG } from './ragService';
 import { generateChatResponse } from '../gemini';
 import { storage } from '../storage';
+import { calculateCompanyCSR } from '../routes';
 import { 
   addDays, 
   startOfDay, 
@@ -378,7 +379,7 @@ async function queryWorkingToday(companyId: string): Promise<DataResult[]> {
   }));
 }
 
-// Query company's actual CSR data - uses same logic as the CSR API endpoint
+// Query company's actual CSR data - uses the REAL CSR calculation from routes.ts
 async function queryCompanyCSR(companyId: string): Promise<{
   score: number;
   label: string;
@@ -386,50 +387,45 @@ async function queryCompanyCSR(companyId: string): Promise<{
   suggestions: string[];
 } | null> {
   try {
-    const docs = await storage.getCompanyDocuments(companyId);
-    
-    const hasHealthSafety = docs.some((d: any) => d.documentType === 'health_safety_manual');
-    const hasCompanyPolicy = docs.some((d: any) => d.documentType === 'company_policy');
-    const hasInsurance = docs.some((d: any) => d.documentType === 'certificate_of_insurance');
-    
-    const docsUploaded = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
-    
-    // Simplified CSR calculation matching the actual API logic
-    // New companies start at 75% and can reach 100% by uploading 3 core documents
-    const documentationPoints = Math.round((docsUploaded / 3) * 100) / 100;
-    const documentationPenalty = Math.round((1 - documentationPoints) * 25);
-    const baseScore = Math.max(0, Math.min(100, 100 - documentationPenalty));
+    // Use the actual CSR calculation function for accuracy
+    const csrData = await calculateCompanyCSR(companyId, storage, true);
     
     const missingDocs: string[] = [];
     const suggestions: string[] = [];
     
-    if (!hasHealthSafety) {
+    // Extract missing docs from the real CSR data
+    if (!csrData.hasHealthSafety) {
       missingDocs.push('Health & Safety Manual');
       suggestions.push('Upload your Health & Safety Manual in Documents');
     }
-    if (!hasCompanyPolicy) {
+    if (!csrData.hasCompanyPolicy) {
       missingDocs.push('Company Policy');
       suggestions.push('Upload your Company Policy in Documents');
     }
-    if (!hasInsurance) {
+    if (!csrData.hasInsurance) {
       missingDocs.push('Certificate of Insurance (COI)');
       suggestions.push('Upload your Certificate of Insurance in Documents');
     }
     
-    // Add project-specific suggestions
-    if (missingDocs.length === 0) {
-      suggestions.push('Complete Toolbox Meetings for all active projects');
-      suggestions.push('Upload FLHA forms for each work session');
+    // Add suggestions based on component ratings
+    if (csrData.toolboxMeetingRating < 100) {
+      suggestions.push('Complete Toolbox Meetings for active projects');
+    }
+    if (csrData.harnessInspectionRating < 100) {
+      suggestions.push('Complete Harness Inspections for work sessions');
+    }
+    if (csrData.documentReviewRating < 100) {
+      suggestions.push('Ensure employees acknowledge required documents');
     }
     
-    let label = 'Critical';
-    if (baseScore >= 90) label = 'Excellent';
-    else if (baseScore >= 70) label = 'Good';
-    else if (baseScore >= 50) label = 'Warning';
+    console.log(`[Assistant] CSR query for company ${companyId}: score=${csrData.csrRating}% (${csrData.csrLabel})`);
     
-    console.log(`[Assistant] CSR query for company ${companyId}: score=${baseScore}, docs=${docsUploaded}/3`);
-    
-    return { score: baseScore, label, missingDocs, suggestions };
+    return { 
+      score: csrData.csrRating, 
+      label: csrData.csrLabel, 
+      missingDocs, 
+      suggestions 
+    };
   } catch (error) {
     console.error('[Assistant] CSR query error:', error);
     return null;
