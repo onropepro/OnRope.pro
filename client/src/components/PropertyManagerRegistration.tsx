@@ -11,16 +11,15 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { 
   ArrowRight, ArrowLeft, Loader2, 
   Check, Shield, Clock, MessageSquare, Building2,
-  FileText, Eye, EyeOff, ThumbsUp, Users, Inbox
+  Eye, EyeOff, ThumbsUp, Inbox
 } from "lucide-react";
 
-type RegistrationStep = "welcome" | "buildingDetails" | "verification" | "success";
+type RegistrationStep = "welcome" | "accountDetails" | "success";
 
 interface PropertyManagerData {
   firstName: string;
   lastName: string;
   propertyManagementCompany: string;
-  companyCode: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -44,7 +43,6 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     firstName: "",
     lastName: "",
     propertyManagementCompany: "",
-    companyCode: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -57,7 +55,6 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
       firstName: "",
       lastName: "",
       propertyManagementCompany: "",
-      companyCode: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -81,7 +78,6 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
           lastName: formData.lastName,
           email: formData.email,
           propertyManagementCompany: formData.propertyManagementCompany,
-          companyCode: formData.companyCode,
           passwordHash: formData.password,
           role: "property_manager",
         }),
@@ -110,7 +106,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     },
   });
 
-  const validateBuildingDetails = (): boolean => {
+  const validateAccountDetails = (): boolean => {
     if (!data.firstName.trim()) {
       setError("First name is required");
       return false;
@@ -125,18 +121,6 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     }
     if (!data.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
       setError("Valid email is required");
-      return false;
-    }
-    return true;
-  };
-
-  const validateVerification = (): boolean => {
-    if (!data.companyCode.trim()) {
-      setError("Company code is required to link with your vendor");
-      return false;
-    }
-    if (data.companyCode.length !== 10) {
-      setError("Company code must be exactly 10 characters");
       return false;
     }
     if (!data.password || data.password.length < 6) {
@@ -154,13 +138,9 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     setError("");
     
     if (step === "welcome") {
-      setStep("buildingDetails");
-    } else if (step === "buildingDetails") {
-      if (validateBuildingDetails()) {
-        setStep("verification");
-      }
-    } else if (step === "verification") {
-      if (validateVerification()) {
+      setStep("accountDetails");
+    } else if (step === "accountDetails") {
+      if (validateAccountDetails()) {
         handleSubmit();
       }
     }
@@ -168,10 +148,8 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
 
   const handleBack = () => {
     setError("");
-    if (step === "buildingDetails") {
+    if (step === "accountDetails") {
       setStep("welcome");
-    } else if (step === "verification") {
-      setStep("buildingDetails");
     }
   };
 
@@ -180,9 +158,8 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
   };
 
   const getStepNumber = () => {
-    if (step === "buildingDetails") return 1;
-    if (step === "verification") return 2;
-    if (step === "success") return 3;
+    if (step === "accountDetails") return 1;
+    if (step === "success") return 2;
     return 0;
   };
 
@@ -224,23 +201,17 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
               <p className="text-white/80 text-sm">Stop chasing. Start deciding.</p>
             </div>
             
-            {/* Progress Steps */}
+            {/* Progress Steps - Simplified to 2 steps */}
             <div className="space-y-4 mb-8">
               <div className={`flex items-center gap-3 ${getStepNumber() >= 1 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 1 ? 'bg-white' : 'bg-white/20'}`} style={{color: getStepNumber() >= 1 ? SAGE_GREEN : 'white'}}>
                   {getStepNumber() > 1 ? <Check className="w-4 h-4" /> : "1"}
                 </div>
-                <span className="text-sm font-medium">Building Details</span>
+                <span className="text-sm font-medium">Create Account</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 2 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 2 ? 'bg-white' : 'bg-white/20'}`} style={{color: getStepNumber() >= 2 ? SAGE_GREEN : 'white'}}>
-                  {getStepNumber() > 2 ? <Check className="w-4 h-4" /> : "2"}
-                </div>
-                <span className="text-sm font-medium">Verification</span>
-              </div>
-              <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 3 ? 'bg-white' : 'bg-white/20'}`} style={{color: getStepNumber() >= 3 ? SAGE_GREEN : 'white'}}>
-                  {getStepNumber() >= 3 ? <Check className="w-4 h-4" /> : "3"}
+                  {getStepNumber() >= 2 ? <Check className="w-4 h-4" /> : "2"}
                 </div>
                 <span className="text-sm font-medium">Complete</span>
               </div>
@@ -338,8 +309,8 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                 </div>
               )}
 
-              {/* Building Details Step */}
-              {step === "buildingDetails" && (
+              {/* Account Details Step - Combined personal info + password */}
+              {step === "accountDetails" && (
                 <div className="max-w-md mx-auto">
                   <button
                     onClick={handleBack}
@@ -350,9 +321,9 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                     Back
                   </button>
                   
-                  <h2 className="text-xl font-bold mb-1">Your Details</h2>
+                  <h2 className="text-xl font-bold mb-1">Create Your Account</h2>
                   <p className="text-sm text-muted-foreground mb-6">
-                    Tell us about yourself and your property management company.
+                    Enter your details to get started. You can add vendors from your dashboard after signing up.
                   </p>
 
                   <div className="space-y-4">
@@ -400,60 +371,6 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                         placeholder="you@company.com"
                         data-testid="input-email"
                       />
-                    </div>
-
-                    {error && (
-                      <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
-                        <p className="text-sm text-destructive">{error}</p>
-                      </div>
-                    )}
-
-                    <Button 
-                      size="lg" 
-                      className="w-full gap-2 rounded-full text-white"
-                      style={{backgroundColor: SAGE_GREEN}}
-                      onClick={handleContinue}
-                      data-testid="button-continue"
-                    >
-                      Continue
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Verification Step */}
-              {step === "verification" && (
-                <div className="max-w-md mx-auto">
-                  <button
-                    onClick={handleBack}
-                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
-                    data-testid="button-back"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                  </button>
-                  
-                  <h2 className="text-xl font-bold mb-1">Link to Your Vendor</h2>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Enter the company code provided by your rope access vendor to connect your accounts.
-                  </p>
-
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="companyCode" className="text-sm font-medium">Vendor Company Code</Label>
-                      <Input
-                        id="companyCode"
-                        value={data.companyCode}
-                        onChange={(e) => setData({ ...data, companyCode: e.target.value.toUpperCase() })}
-                        placeholder="ABC1234567"
-                        maxLength={10}
-                        className="font-mono tracking-wider"
-                        data-testid="input-company-code"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Ask your rope access vendor for their 10-character company code
-                      </p>
                     </div>
 
                     <div className="space-y-1.5">
@@ -523,7 +440,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                         </>
                       ) : (
                         <>
-                          Complete Registration
+                          Create Account
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
@@ -540,13 +457,34 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-2">You're All Set!</h2>
-                  <p className="text-muted-foreground mb-8">
-                    Your property manager account has been created. You can now access vendor safety ratings, receive quotes, and track compliance across your portfolio.
+                  <p className="text-muted-foreground mb-6">
+                    Your account has been created. Head to your dashboard to add vendors and start managing your portfolio.
                   </p>
+
+                  <div className="w-full space-y-3 mb-6">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{backgroundColor: `${SAGE_GREEN}20`}}>
+                        <Building2 className="w-4 h-4" style={{color: SAGE_GREEN}} />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium text-sm">Add Your Vendors</p>
+                        <p className="text-xs text-muted-foreground">Request company codes from your rope access vendors</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{backgroundColor: `${SAGE_GREEN}20`}}>
+                        <Shield className="w-4 h-4" style={{color: SAGE_GREEN}} />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-medium text-sm">View Safety Ratings</p>
+                        <p className="text-xs text-muted-foreground">Compare vendor compliance scores</p>
+                      </div>
+                    </div>
+                  </div>
 
                   <Button 
                     size="lg" 
-                    className="gap-2 rounded-full text-white"
+                    className="w-full gap-2 rounded-full text-white"
                     style={{backgroundColor: SAGE_GREEN}}
                     onClick={() => {
                       handleClose();
@@ -554,7 +492,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                     }}
                     data-testid="button-go-to-dashboard"
                   >
-                    Go to Dashboard
+                    Go to My Dashboard
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
