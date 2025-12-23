@@ -22,6 +22,7 @@ interface PropertyManagerData {
   lastName: string;
   propertyManagementCompany: string;
   email: string;
+  phoneNumber: string;
   password: string;
   confirmPassword: string;
 }
@@ -45,6 +46,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     lastName: "",
     propertyManagementCompany: "",
     email: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -57,6 +59,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
       lastName: "",
       propertyManagementCompany: "",
       email: "",
+      phoneNumber: "",
       password: "",
       confirmPassword: "",
     });
@@ -79,6 +82,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
           lastName: formData.lastName,
           email: formData.email,
           propertyManagementCompany: formData.propertyManagementCompany,
+          propertyManagerPhoneNumber: formData.phoneNumber || undefined,
           passwordHash: formData.password,
           role: "property_manager",
         }),
@@ -372,6 +376,19 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                         placeholder="you@company.com"
                         data-testid="input-email"
                       />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="phoneNumber" className="text-sm font-medium">Phone Number (Optional)</Label>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        value={data.phoneNumber}
+                        onChange={(e) => setData({ ...data, phoneNumber: e.target.value })}
+                        placeholder="604-123-4567"
+                        data-testid="input-phone-number"
+                      />
+                      <p className="text-xs text-muted-foreground">Used for SMS notifications when you receive quotes</p>
                     </div>
 
                     <div className="space-y-1.5">
