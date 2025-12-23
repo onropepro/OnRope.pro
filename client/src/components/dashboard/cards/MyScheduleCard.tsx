@@ -23,20 +23,20 @@ export function MyScheduleCard({ currentUser, onRouteNavigate, branding }: CardP
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <CalendarDays className="w-5 h-5" style={{ color: accentColor }} />
             My Schedule
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse space-y-3">
             <div className="h-16 bg-muted rounded" />
             <div className="h-16 bg-muted rounded" />
           </div>
         </CardContent>
-      </>
+      </div>
     );
   }
 
@@ -44,8 +44,8 @@ export function MyScheduleCard({ currentUser, onRouteNavigate, branding }: CardP
   const upcomingJobs = jobs.slice(0, 3);
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <CalendarDays className="w-5 h-5" style={{ color: accentColor }} />
@@ -56,11 +56,13 @@ export function MyScheduleCard({ currentUser, onRouteNavigate, branding }: CardP
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {upcomingJobs.length === 0 ? (
-          <p className="text-base text-muted-foreground text-center py-4">
-            No upcoming jobs scheduled
-          </p>
+          <div className="h-full flex items-center justify-center">
+            <p className="text-base text-muted-foreground text-center">
+              No upcoming jobs scheduled
+            </p>
+          </div>
         ) : (
           <div className="space-y-3">
             {upcomingJobs.map((job) => (
@@ -100,6 +102,6 @@ export function MyScheduleCard({ currentUser, onRouteNavigate, branding }: CardP
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }

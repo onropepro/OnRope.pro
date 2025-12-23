@@ -24,31 +24,31 @@ export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" style={{ color: accentColor }} />
             Overdue Projects
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse h-20 bg-muted rounded" />
         </CardContent>
-      </>
+      </div>
     );
   }
 
   const hasData = data && data.count > 0;
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <AlertTriangle className="w-5 h-5" style={{ color: accentColor }} />
           Overdue Projects
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {hasData ? (
           <div className="space-y-3">
             <div className="text-center mb-2">
@@ -57,7 +57,7 @@ export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
               </p>
               <p className="text-sm text-muted-foreground">Past due date</p>
             </div>
-            <div className="space-y-2 max-h-32 overflow-y-auto">
+            <div className="space-y-2">
               {data!.projects.slice(0, 3).map((project) => (
                 <div
                   key={project.id}
@@ -88,13 +88,13 @@ export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-4 text-center">
+          <div className="h-full flex flex-col items-center justify-center text-center">
             <FolderCheck className="w-10 h-10 text-muted-foreground/50 mb-2" />
             <p className="text-base text-muted-foreground">No overdue projects</p>
             <p className="text-sm text-muted-foreground/70">All projects on track</p>
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }

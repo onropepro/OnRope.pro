@@ -28,36 +28,36 @@ export function ActiveWorkersCard({ currentUser, branding }: CardProps) {
 
   if (!hasAccess) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Users className="w-5 h-5" style={{ color: accentColor }} />
             Active Workers
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
-      </>
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Users className="w-5 h-5" style={{ color: accentColor }} />
             Active Workers
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse space-y-2">
             <div className="h-10 bg-muted rounded" />
             <div className="h-10 bg-muted rounded" />
           </div>
         </CardContent>
-      </>
+      </div>
     );
   }
 
@@ -71,8 +71,8 @@ export function ActiveWorkersCard({ currentUser, branding }: CardProps) {
   };
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Users className="w-5 h-5" style={{ color: accentColor }} />
@@ -88,9 +88,11 @@ export function ActiveWorkersCard({ currentUser, branding }: CardProps) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {activeSessions.length === 0 ? (
-          <p className="text-base text-muted-foreground">No workers currently clocked in</p>
+          <div className="h-full flex items-center justify-center">
+            <p className="text-base text-muted-foreground">No workers currently clocked in</p>
+          </div>
         ) : (
           <div className="space-y-2">
             {activeSessions.slice(0, 5).map((session, idx) => (
@@ -120,6 +122,6 @@ export function ActiveWorkersCard({ currentUser, branding }: CardProps) {
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }

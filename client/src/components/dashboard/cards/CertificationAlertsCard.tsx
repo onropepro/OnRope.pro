@@ -28,25 +28,25 @@ export function CertificationAlertsCard({ currentUser, employees, onNavigate, br
 
   if (!hasAccess) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Award className="w-5 h-5" style={{ color: accentColor }} />
             Certification Alerts
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
-      </>
+      </div>
     );
   }
 
   const totalAlerts = expiringCerts.length + expiredCerts.length;
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Award className="w-5 h-5" style={{ color: accentColor }} />
@@ -59,9 +59,11 @@ export function CertificationAlertsCard({ currentUser, employees, onNavigate, br
           )}
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {totalAlerts === 0 ? (
-          <p className="text-base text-muted-foreground">All certifications up to date</p>
+          <div className="h-full flex items-center justify-center">
+            <p className="text-base text-muted-foreground">All certifications up to date</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {expiredCerts.length > 0 && (
@@ -97,6 +99,6 @@ export function CertificationAlertsCard({ currentUser, employees, onNavigate, br
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }
