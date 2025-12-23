@@ -5686,6 +5686,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Get all quotes sent to them
+  app.get("/api/property-managers/me/quotes", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      
+      // Get all quotes where this property manager is the recipient
+      const allQuotes = await db.select()
+        .from(quotes)
+        .where(eq(quotes.recipientPropertyManagerId, propertyManagerId))
+        .orderBy(sql`${quotes.createdAt} DESC`);
+      
+      // Enrich quotes with company names and services
+      const enrichedQuotes = await Promise.all(allQuotes.map(async (quote) => {
+        const company = await storage.getUserById(quote.companyId);
+        const services = await db.select().from(quoteServices).where(eq(quoteServices.quoteId, quote.id));
+        const grandTotal = services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+        
+        return {
+          id: quote.id,
+          quoteNumber: quote.quoteNumber,
+          buildingName: quote.buildingName,
+          strataPlanNumber: quote.strataPlanNumber,
+          buildingAddress: quote.buildingAddress,
+          status: quote.status,
+          pipelineStage: quote.pipelineStage,
+          createdAt: quote.createdAt,
+          companyName: company?.companyName || "Rope Access Company",
+          grandTotal,
+          serviceCount: services.length
+        };
+      }));
+      
+      res.json({ quotes: enrichedQuotes });
+    } catch (error) {
+      console.error("Get property manager quotes error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Get a specific quote by ID (if they are the recipient)
   app.get("/api/property-managers/quotes/:quoteId", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
@@ -19114,7 +19153,70 @@ Do not include any other text, just the JSON object.`
       // Get the complete quote with services (after transaction)
       const fullQuote = await storage.getQuoteById(quoteWithServices.id);
       
-      res.json({ quote: fullQuote });
+      // Auto-link property manager based on strata number (non-blocking)
+      let smsResult: { sent: boolean; error?: string } = { sent: false };
+      try {
+        // Find property manager linked to this company with matching strata number
+        const pmLinks = await db.select()
+          .from(propertyManagerCompanyLinks)
+          .where(
+            and(
+              eq(propertyManagerCompanyLinks.companyId, companyId),
+              eq(propertyManagerCompanyLinks.strataNumber, fullQuote!.strataPlanNumber)
+            )
+          );
+        
+        if (pmLinks.length > 0) {
+          const pmLink = pmLinks[0];
+          const propertyManager = await storage.getUserById(pmLink.propertyManagerId);
+          
+          if (propertyManager && propertyManager.role === 'property_manager') {
+            // Link the quote to this property manager
+            await storage.updateQuote(fullQuote!.id, { 
+              recipientPropertyManagerId: propertyManager.id,
+              collaborationStatus: 'sent',
+              sentAt: new Date()
+            } as any);
+            
+            console.log(`[Quote] Auto-linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
+            
+            // Send SMS notification if PM has phone and opted in
+            if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
+              const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+                ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+                : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
+              const quoteViewUrl = `${baseUrl}/property-manager/quotes/${fullQuote!.id}`;
+              
+              // Get company name for SMS
+              const company = await storage.getUserById(companyId);
+              const companyName = company?.companyName || 'Rope Access Company';
+              const grandTotal = fullQuote!.services?.reduce((sum: number, s: any) => sum + Number(s.totalCost || 0), 0) || 0;
+              
+              const smsResponse = await sendQuoteNotificationSMS(
+                propertyManager.propertyManagerPhoneNumber,
+                fullQuote!.buildingName,
+                companyName,
+                grandTotal,
+                quoteViewUrl
+              );
+              
+              if (smsResponse.success) {
+                console.log(`[SMS] Quote notification sent to ${propertyManager.propertyManagerPhoneNumber}, SID: ${smsResponse.messageId}`);
+                smsResult = { sent: true };
+              } else {
+                console.warn(`[SMS] Failed to send quote notification: ${smsResponse.error}`);
+                smsResult = { sent: false, error: smsResponse.error };
+              }
+            } else if (propertyManager.propertyManagerPhoneNumber && !propertyManager.propertyManagerSmsOptIn) {
+              console.log(`[SMS] Skipped - property manager ${propertyManager.email} has not opted-in to SMS notifications`);
+            }
+          }
+        }
+      } catch (pmError: any) {
+        console.error("[Quote] Auto-link property manager error (non-blocking):", pmError?.message || pmError);
+      }
+      
+      res.json({ quote: fullQuote, sms: smsResult });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
