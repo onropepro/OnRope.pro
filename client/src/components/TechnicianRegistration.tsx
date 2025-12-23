@@ -314,7 +314,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   // Employer-connected benefits for Page 4
   const employerBenefits = [
     { title: t('techReg.employer.autoHours', 'Hours log automatically'), desc: t('techReg.employer.autoHoursDesc', 'No manual entry — clock in/out and everything logs itself. Drops. Payroll. Safety Meetings.') },
-    { title: t('techReg.employer.gpsVerified', 'GPS-verified clock in/out'), desc: t('techReg.employer.gpsVerifiedDesc', 'Location-stamped records protect you and your employer') },
+    { title: t('techReg.employer.gpsVerified', 'GPS-verified clock in/out'), desc: t('techReg.employer.gpsVerifiedDesc', 'Location-stamped records protect you and your employer. No more short paycheques.') },
     { title: t('techReg.employer.dashboard', 'Work Dashboard with projects & shifts'), desc: t('techReg.employer.dashboardDesc', 'See your schedule, projects, and tasks in one place') },
     { title: t('techReg.employer.digitalForms', 'Digital toolbox talks & safety forms'), desc: t('techReg.employer.digitalFormsDesc', 'Safety meetings delivered to your phone, sign once, recorded forever') },
     { title: t('techReg.employer.docRequests', 'Instant document requests'), desc: t('techReg.employer.docRequestsDesc', 'Employer needs something? One tap to upload from your phone') },
@@ -862,7 +862,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="mb-8 text-center">
                     <p className="text-muted-foreground mb-2">{t('techReg.employer.question', 'Does Your Employer Use OnRopePro?')}</p>
                     <h2 className="text-2xl font-bold">{t('techReg.employer.title', 'Good alone. Unstoppable together.')}</h2>
-                    <p className="text-muted-foreground mt-1">{t('techReg.employer.subtitle', 'Everything you do manually? Not anymore.')}</p>
+                    <p className="text-muted-foreground mt-1">{t('techReg.employer.subtitle', 'Everything you do manually? It\'s Done For You.')}</p>
                   </div>
 
                   <div className="space-y-1 mb-8">
