@@ -95,20 +95,15 @@ client/src/lib/navigation.ts
 ### Type Definitions
 ```typescript
 // Valid dashboard tab names - single source of truth
+// IMPORTANT: Empty string '' represents the main dashboard overview (DashboardGrid)
 export const DASHBOARD_TABS = [
-  'overview',
-  'clients', 
-  'buildings',
+  '',           // Main dashboard overview - renders DashboardGrid
+  'overview',   // Alias for main dashboard (URL normalized to /dashboard)
   'projects',
   'employees',
-  'schedule',
-  'gear',
-  'timesheets',
-  'invoices',
-  'reports',
-  'settings',
+  'clients',
+  'performance',
   'complaints',
-  'safety'
 ] as const;
 
 export type DashboardTab = typeof DASHBOARD_TABS[number];
@@ -136,16 +131,15 @@ export function getDashboardUrl(tab?: DashboardTab): string {
 /**
  * Parses dashboard tab from URL search string
  * @param search - URL search string (e.g., '?tab=clients')
- * @returns Valid DashboardTab, defaults to 'overview'
+ * @returns Valid DashboardTab, defaults to '' (main dashboard)
  */
-export function parseDashboardTab(search: string): DashboardTab {
-  const params = new URLSearchParams(search);
+export function parseDashboardTab(searchParams: string): DashboardTab {
+  const params = new URLSearchParams(searchParams);
   const tab = params.get('tab');
-  
-  if (tab && DASHBOARD_TABS.includes(tab as DashboardTab)) {
-    return tab as DashboardTab;
+  if (isValidDashboardTab(tab)) {
+    return tab;
   }
-  return 'overview';
+  return '';  // Default to main dashboard overview
 }
 ```
 
