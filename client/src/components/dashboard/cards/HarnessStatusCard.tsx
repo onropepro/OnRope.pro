@@ -11,17 +11,17 @@ export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavi
 
   if (!hasAccess) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldAlert className="w-5 h-5" style={{ color: accentColor }} />
             Harness Status
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
-      </>
+      </div>
     );
   }
 
@@ -47,8 +47,8 @@ export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavi
   const totalAlerts = overdue.length + dueToday.length;
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldAlert className="w-5 h-5" style={{ color: accentColor }} />
@@ -61,9 +61,9 @@ export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavi
           )}
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {totalAlerts === 0 && dueSoon.length === 0 ? (
-          <div className="text-center py-4">
+          <div className="h-full flex flex-col items-center justify-center">
             <CheckCircle className="w-8 h-8 mx-auto text-green-500 mb-2" />
             <p className="text-base text-muted-foreground">All harnesses inspected</p>
           </div>
@@ -106,6 +106,6 @@ export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavi
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }

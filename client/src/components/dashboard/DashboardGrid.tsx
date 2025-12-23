@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import type { CardDefinition } from "@shared/dashboardCards";
+import { getCardById, type CardDefinition } from "@shared/dashboardCards";
 import { DashboardCard } from "./DashboardCard";
 import { CardSkeleton } from "./CardSkeleton";
 import { getCardComponent } from "./cardRegistry";
@@ -339,40 +339,44 @@ export function DashboardGrid({
                 ref={provided.innerRef}
                 className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
               >
-                {cardOrder.map((cardId, index) => (
-                  <Draggable
-                    key={cardId}
-                    draggableId={cardId}
-                    index={index}
-                    isDragDisabled={!isEditMode}
-                  >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className={`${snapshot.isDragging ? "z-50" : ""}`}
-                      >
-                        <DashboardCard
-                          cardId={cardId}
-                          isEditMode={isEditMode}
-                          onRemove={() => handleRemoveCard(cardId)}
-                          dragHandleProps={provided.dragHandleProps}
-                          isDragging={snapshot.isDragging}
+                {cardOrder.map((cardId, index) => {
+                  const cardDef = getCardById(cardId);
+                  return (
+                    <Draggable
+                      key={cardId}
+                      draggableId={cardId}
+                      index={index}
+                      isDragDisabled={!isEditMode}
+                    >
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className={`${snapshot.isDragging ? "z-50" : ""}`}
                         >
-                          {getCardComponent(cardId, {
-                            currentUser,
-                            projects,
-                            employees,
-                            harnessInspections,
-                            onNavigate,
-                            onRouteNavigate,
-                            branding,
-                          })}
-                        </DashboardCard>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
+                          <DashboardCard
+                            cardId={cardId}
+                            isEditMode={isEditMode}
+                            onRemove={() => handleRemoveCard(cardId)}
+                            dragHandleProps={provided.dragHandleProps}
+                            isDragging={snapshot.isDragging}
+                            size={cardDef?.size || 'single'}
+                          >
+                            {getCardComponent(cardId, {
+                              currentUser,
+                              projects,
+                              employees,
+                              harnessInspections,
+                              onNavigate,
+                              onRouteNavigate,
+                              branding,
+                            })}
+                          </DashboardCard>
+                        </div>
+                      )}
+                    </Draggable>
+                  );
+                })}
                 {provided.placeholder}
               </div>
             )}

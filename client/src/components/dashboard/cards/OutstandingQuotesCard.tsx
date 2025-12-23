@@ -23,36 +23,36 @@ export function OutstandingQuotesCard({ currentUser, onRouteNavigate, branding }
 
   if (!hasAccess) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <FileText className="w-5 h-5" style={{ color: accentColor }} />
             Outstanding Quotes
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
-      </>
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <FileText className="w-5 h-5" style={{ color: accentColor }} />
             Outstanding Quotes
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse space-y-3">
             <div className="h-12 bg-muted rounded" />
             <div className="h-8 bg-muted rounded" />
           </div>
         </CardContent>
-      </>
+      </div>
     );
   }
 
@@ -66,8 +66,8 @@ export function OutstandingQuotesCard({ currentUser, onRouteNavigate, branding }
   };
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <FileText className="w-5 h-5" style={{ color: accentColor }} />
@@ -80,7 +80,7 @@ export function OutstandingQuotesCard({ currentUser, onRouteNavigate, branding }
           )}
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-muted/50 p-3 rounded-lg">
@@ -111,6 +111,6 @@ export function OutstandingQuotesCard({ currentUser, onRouteNavigate, branding }
           </Button>
         </div>
       </CardContent>
-    </>
+    </div>
   );
 }

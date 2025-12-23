@@ -19,31 +19,31 @@ export function TodaysHoursCard({ onRouteNavigate, branding }: CardProps) {
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Clock className="w-5 h-5" style={{ color: accentColor }} />
             Today's Hours
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse h-20 bg-muted rounded" />
         </CardContent>
-      </>
+      </div>
     );
   }
 
   const hasData = data && (data.totalHours > 0 || data.activeCount > 0 || data.completedSessions > 0);
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <Clock className="w-5 h-5" style={{ color: accentColor }} />
           Today's Hours
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {hasData ? (
           <div className="space-y-3">
             <div className="text-center">
@@ -74,13 +74,13 @@ export function TodaysHoursCard({ onRouteNavigate, branding }: CardProps) {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-4 text-center">
+          <div className="h-full flex flex-col items-center justify-center text-center">
             <Timer className="w-10 h-10 text-muted-foreground/50 mb-2" />
             <p className="text-base text-muted-foreground">No hours logged today</p>
             <p className="text-sm text-muted-foreground/70">Work sessions will appear here</p>
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }

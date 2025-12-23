@@ -23,36 +23,36 @@ export function OvertimeAlertCard({ currentUser, onRouteNavigate, branding }: Ca
 
   if (!hasAccess) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" style={{ color: accentColor }} />
             Overtime Alert
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
-      </>
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" style={{ color: accentColor }} />
             Overtime Alert
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse space-y-3">
             <div className="h-12 bg-muted rounded" />
             <div className="h-12 bg-muted rounded" />
           </div>
         </CardContent>
-      </>
+      </div>
     );
   }
 
@@ -61,8 +61,8 @@ export function OvertimeAlertCard({ currentUser, onRouteNavigate, branding }: Ca
   const totalAlerts = approachingCount + exceedingCount;
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" style={{ color: accentColor }} />
@@ -75,9 +75,9 @@ export function OvertimeAlertCard({ currentUser, onRouteNavigate, branding }: Ca
           )}
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {totalAlerts === 0 ? (
-          <div className="text-center py-4">
+          <div className="h-full flex flex-col items-center justify-center">
             <Clock className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
             <p className="text-base text-muted-foreground">No overtime alerts this period</p>
           </div>
@@ -117,6 +117,6 @@ export function OvertimeAlertCard({ currentUser, onRouteNavigate, branding }: Ca
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }

@@ -33,46 +33,46 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
 
   if (!hasAccess) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
             Safety Rating
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
-      </>
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
             Safety Rating
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse h-16 bg-muted rounded" />
         </CardContent>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
           Safety Rating (CSR)
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
-        <div className={`rounded-lg p-4 ${colors.bg}`}>
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center">
+        <div className={`rounded-lg p-4 w-full ${colors.bg}`}>
           <div className="flex items-center justify-between">
             <div>
               <p className={`text-3xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
@@ -93,6 +93,6 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
           </div>
         </div>
       </CardContent>
-    </>
+    </div>
   );
 }

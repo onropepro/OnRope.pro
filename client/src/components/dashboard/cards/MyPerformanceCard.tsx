@@ -19,31 +19,31 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
 
   if (isLoading) {
     return (
-      <>
-        <CardHeader className="px-4 py-3">
+      <div className="flex flex-col h-full">
+        <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <TrendingUp className="w-5 h-5" style={{ color: accentColor }} />
             My Performance
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse h-20 bg-muted rounded" />
         </CardContent>
-      </>
+      </div>
     );
   }
 
   const hasData = perfData && (perfData.completedJobs > 0 || perfData.hoursThisMonth > 0);
 
   return (
-    <>
-      <CardHeader className="px-4 py-3">
+    <div className="flex flex-col h-full">
+      <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <TrendingUp className="w-5 h-5" style={{ color: accentColor }} />
           My Performance
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {hasData ? (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
@@ -77,7 +77,7 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-4 text-center">
+          <div className="h-full flex flex-col items-center justify-center text-center">
             <BarChart3 className="w-10 h-10 text-muted-foreground/50 mb-2" />
             <p className="text-base text-muted-foreground">No activity this month</p>
             <p className="text-sm text-muted-foreground/70">
@@ -86,6 +86,6 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
           </div>
         )}
       </CardContent>
-    </>
+    </div>
   );
 }
