@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile, ResidentFeedbackPhotoQueue, InsertResidentFeedbackPhotoQueue } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, quoteMessages, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, QuoteMessage, InsertQuoteMessage, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile, ResidentFeedbackPhotoQueue, InsertResidentFeedbackPhotoQueue } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -2695,6 +2695,53 @@ export class Storage {
     return db.select().from(quoteHistory)
       .where(eq(quoteHistory.quoteId, quoteId))
       .orderBy(desc(quoteHistory.createdAt));
+  }
+
+  // Quote messages operations - 2-way collaboration
+  async createQuoteMessage(message: InsertQuoteMessage): Promise<QuoteMessage> {
+    const result = await db.insert(quoteMessages).values(message).returning();
+    return result[0];
+  }
+
+  async getQuoteMessages(quoteId: string): Promise<QuoteMessage[]> {
+    return db.select().from(quoteMessages)
+      .where(eq(quoteMessages.quoteId, quoteId))
+      .orderBy(quoteMessages.createdAt);
+  }
+
+  async markQuoteMessagesAsRead(quoteId: string, readerType: 'company' | 'property_manager'): Promise<void> {
+    const oppositeType = readerType === 'company' ? 'property_manager' : 'company';
+    await db.update(quoteMessages)
+      .set({ isRead: true, readAt: new Date() })
+      .where(
+        and(
+          eq(quoteMessages.quoteId, quoteId),
+          eq(quoteMessages.senderType, oppositeType),
+          eq(quoteMessages.isRead, false)
+        )
+      );
+  }
+
+  async updateQuoteCollaborationStatus(quoteId: string, status: string): Promise<Quote> {
+    const result = await db.update(quotes)
+      .set({ collaborationStatus: status })
+      .where(eq(quotes.id, quoteId))
+      .returning();
+    return result[0];
+  }
+
+  async getUnreadQuoteMessageCount(quoteId: string, forType: 'company' | 'property_manager'): Promise<number> {
+    const oppositeType = forType === 'company' ? 'property_manager' : 'company';
+    const result = await db.select({ count: sql<number>`count(*)` })
+      .from(quoteMessages)
+      .where(
+        and(
+          eq(quoteMessages.quoteId, quoteId),
+          eq(quoteMessages.senderType, oppositeType),
+          eq(quoteMessages.isRead, false)
+        )
+      );
+    return result[0]?.count || 0;
   }
 
   // Scheduled Jobs operations

@@ -174,6 +174,32 @@ class WebSocketHub {
       });
     }
   }
+
+  // Notify property manager when a new quote is linked to them
+  notifyQuoteCreated(propertyManagerId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    status: string;
+    grandTotal: string | null;
+    createdAt: Date | string;
+    companyName: string | null;
+  }) {
+    const userConnections = this.connections.get(propertyManagerId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:created',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified property manager ${propertyManagerId} of new quote ${quote.quoteNumber}`);
+    }
+  }
 }
 
 export const wsHub = new WebSocketHub();

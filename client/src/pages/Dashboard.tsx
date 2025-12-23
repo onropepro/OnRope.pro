@@ -3749,62 +3749,18 @@ export default function Dashboard() {
                       <div>
                         <div className="font-medium">{t('dashboard.projects.title', 'Projects')}</div>
                         <div className="text-sm text-muted-foreground">
-                          {projectsData.projectInfo.tier && projectsData.projectInfo.tier !== 'none'
-                            ? (() => {
-                                const projectsRemaining = projectsData.projectInfo.projectLimit === -1 
-                                  ? '∞' 
-                                  : Math.max(0, projectsData.projectInfo.projectLimit - projectsData.projectInfo.projectsUsed);
-                                const additionalInfo = projectsData.projectInfo.additionalProjects > 0 
-                                  ? ` (${projectsData.projectInfo.baseProjectLimit} ${t('dashboard.projects.base', 'base')} + ${projectsData.projectInfo.additionalProjects} ${t('dashboard.projects.additional', 'additional')})` 
-                                  : '';
-                                
-                                return projectsData.projectInfo.projectLimit === -1
-                                  ? t('dashboard.projects.usageUnlimited', '{{used}} projects used • Unlimited available', { used: projectsData.projectInfo.projectsUsed })
-                                  : t('dashboard.projects.usage', '{{used}} of {{total}} used • {{remaining}} {{projectLabel}} remaining{{additionalInfo}}', { 
-                                      used: projectsData.projectInfo.projectsUsed, 
-                                      total: projectsData.projectInfo.projectLimit, 
-                                      remaining: projectsRemaining, 
-                                      projectLabel: projectsRemaining === 1 ? t('dashboard.projects.project', 'project') : t('dashboard.projects.projectsLabel', 'projects'),
-                                      additionalInfo
-                                    });
-                              })()
-                            : t('dashboard.projects.manageCapacity', 'Manage your project capacity')
-                          }
+                          {t('dashboard.projects.usageUnlimited', '{{used}} active projects', { used: projectsData.projectInfo.projectsUsed })}
                         </div>
                       </div>
                     </div>
                     {projectsData.projectInfo.tier && projectsData.projectInfo.tier !== 'none' && (
                       <div className="text-right">
-                        <Badge variant={projectsData.projectInfo.atProjectLimit ? "destructive" : "secondary"} data-testid="badge-project-tier-status">
+                        <Badge variant="secondary" data-testid="badge-project-tier-status">
                           {projectsData.projectInfo.tier.charAt(0).toUpperCase() + projectsData.projectInfo.tier.slice(1)}
                         </Badge>
                       </div>
                     )}
                   </div>
-                  
-                  {projectsData.projectInfo.atProjectLimit && (
-                    <div className="mt-3 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-                      <div className="flex items-start gap-2">
-                        <span className="material-icons text-destructive text-sm mt-0.5">warning</span>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-destructive">{t('dashboard.projects.limitReached', 'Project Limit Reached')}</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {t('dashboard.projects.limitReachedDesc', "You've reached your {{limit}}-project limit. Visit Profile → Subscription to upgrade your tier or add more projects.", { limit: projectsData.projectInfo.projectLimit })}
-                          </div>
-                        </div>
-                      </div>
-                      <Button 
-                        size="sm" 
-                        variant="default" 
-                        className="mt-2 w-full"
-                        data-testid="button-manage-subscription"
-                        onClick={() => window.location.href = "/profile"}
-                      >
-                        <span className="material-icons text-sm mr-1">settings</span>
-                        {t('dashboard.projects.manageSubscription', 'Manage Subscription')}
-                      </Button>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             )}
@@ -3828,10 +3784,10 @@ export default function Dashboard() {
                     <Button 
                       className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
                       data-testid="button-create-project"
-                      disabled={userIsReadOnly || (projectsData?.projectInfo?.atProjectLimit ?? false)}
+                      disabled={userIsReadOnly}
                     >
                       <span className="material-icons text-xl text-primary-foreground">add_circle</span>
-                      <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? t('dashboard.projects.limitReached', 'Project Limit Reached') : t('dashboard.projects.newProject', 'New Project')}</span>
+                      <span className="hidden sm:inline">{t('dashboard.projects.newProject', 'New Project')}</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl p-0 max-h-[95vh] flex flex-col gap-0">

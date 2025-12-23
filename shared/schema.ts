@@ -78,6 +78,7 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"), // for property_manager role
   propertyManagementCompany: varchar("property_management_company"), // for property_manager role
   propertyManagerPhoneNumber: varchar("property_manager_phone_number"), // for property_manager role - SMS notifications
+  propertyManagerSmsOptIn: boolean("property_manager_sms_opt_in").default(false), // for property_manager role - opt-in to receive SMS notifications for new quotes
   
   // Resident-specific fields
   strataPlanNumber: varchar("strata_plan_number"), // for resident role
@@ -1560,6 +1561,53 @@ export const quoteHistory = pgTable("quote_history", {
   index("IDX_quote_history_created").on(table.quoteId, table.createdAt),
 ]);
 
+// Quote messages table - 2-way collaboration between property managers and companies
+export const quoteMessages = pgTable("quote_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  quoteId: varchar("quote_id").notNull().references(() => quotes.id, { onDelete: "cascade" }),
+  
+  // Sender information
+  senderUserId: varchar("sender_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  senderType: varchar("sender_type").notNull(), // company | property_manager
+  senderName: varchar("sender_name").notNull(), // Denormalized for display
+  
+  // Message content
+  messageType: varchar("message_type").notNull(), // message | counter_offer | accept | decline | revoke
+  content: text("content"), // Text message content
+  
+  // Counter-offer details (when messageType is 'counter_offer')
+  counterOfferAmount: numeric("counter_offer_amount", { precision: 12, scale: 2 }),
+  counterOfferNotes: text("counter_offer_notes"),
+  
+  // Response to counter-offer (when company responds)
+  responseStatus: varchar("response_status"), // pending | accepted | declined
+  respondedAt: timestamp("responded_at"),
+  respondedBy: varchar("responded_by").references(() => users.id, { onDelete: "set null" }),
+  
+  // Read status
+  isRead: boolean("is_read").default(false),
+  readAt: timestamp("read_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_quote_messages_quote").on(table.quoteId),
+  index("IDX_quote_messages_sender").on(table.senderUserId),
+  index("IDX_quote_messages_created").on(table.quoteId, table.createdAt),
+]);
+
+export const insertQuoteMessageSchema = createInsertSchema(quoteMessages).omit({
+  id: true,
+  createdAt: true,
+  isRead: true,
+  readAt: true,
+  responseStatus: true,
+  respondedAt: true,
+  respondedBy: true,
+});
+
+export type InsertQuoteMessage = z.infer<typeof insertQuoteMessageSchema>;
+export type QuoteMessage = typeof quoteMessages.$inferSelect;
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
@@ -1716,14 +1764,24 @@ export type PropertyManagerCompanyLink = typeof propertyManagerCompanyLinks.$inf
 
 // Schema for property manager account updates
 export const updatePropertyManagerAccountSchema = z.object({
-  name: z.string().min(1, "Name is required").optional(),
-  email: z.string().email("Invalid email address").optional(),
+  name: z.string().optional(),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
   propertyManagerPhoneNumber: z.string().optional(),
+  propertyManagerSmsOptIn: z.boolean().optional(),
   currentPassword: z.string().optional(),
-  newPassword: z.string().min(6, "Password must be at least 6 characters").optional(),
+  newPassword: z.string().optional(),
+}).refine((data) => {
+  // If newPassword is provided, it must be at least 6 characters
+  if (data.newPassword && data.newPassword.length > 0 && data.newPassword.length < 6) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Password must be at least 6 characters",
+  path: ["newPassword"],
 }).refine((data) => {
   // If newPassword is provided, currentPassword must also be provided
-  if (data.newPassword && !data.currentPassword) {
+  if (data.newPassword && data.newPassword.length > 0 && !data.currentPassword) {
     return false;
   }
   return true;

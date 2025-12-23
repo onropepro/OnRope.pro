@@ -8,7 +8,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { useSafetyAuthority } from "@/hooks/useSafetyAuthority";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SignInModal } from "@/components/SignInModal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
@@ -48,7 +48,7 @@ import {
 export default function SafetyComplianceLanding() {
   const { t } = useTranslation();
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
   const [, setLocation] = useLocation();
   const [count1, setCount1] = useState(0);
@@ -114,12 +114,10 @@ export default function SafetyComplianceLanding() {
                 {t('modules.safety.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-hero-signin">
                 {t('login.header.signIn', 'Sign In')}
               </Button>
             </div>
-            
-            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
             
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["safety-compliance"]} 
