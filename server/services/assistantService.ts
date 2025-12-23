@@ -370,7 +370,7 @@ async function queryWorkingToday(companyId: string): Promise<DataResult[]> {
   }));
 }
 
-// Query company's actual CSR data
+// Query company's actual CSR data - uses same logic as the CSR API endpoint
 async function queryCompanyCSR(companyId: string): Promise<{
   score: number;
   label: string;
@@ -385,28 +385,41 @@ async function queryCompanyCSR(companyId: string): Promise<{
     const hasInsurance = docs.some((d: any) => d.documentType === 'certificate_of_insurance');
     
     const docsUploaded = (hasHealthSafety ? 1 : 0) + (hasCompanyPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
-    const baseScore = 75 + Math.round((docsUploaded / 3) * 25);
+    
+    // Simplified CSR calculation matching the actual API logic
+    // New companies start at 75% and can reach 100% by uploading 3 core documents
+    const documentationPoints = Math.round((docsUploaded / 3) * 100) / 100;
+    const documentationPenalty = Math.round((1 - documentationPoints) * 25);
+    const baseScore = Math.max(0, Math.min(100, 100 - documentationPenalty));
     
     const missingDocs: string[] = [];
     const suggestions: string[] = [];
     
     if (!hasHealthSafety) {
       missingDocs.push('Health & Safety Manual');
-      suggestions.push('Upload your Health & Safety Manual');
+      suggestions.push('Upload your Health & Safety Manual in Documents');
     }
     if (!hasCompanyPolicy) {
       missingDocs.push('Company Policy');
-      suggestions.push('Upload your Company Policy');
+      suggestions.push('Upload your Company Policy in Documents');
     }
     if (!hasInsurance) {
       missingDocs.push('Certificate of Insurance (COI)');
-      suggestions.push('Upload your Certificate of Insurance');
+      suggestions.push('Upload your Certificate of Insurance in Documents');
+    }
+    
+    // Add project-specific suggestions
+    if (missingDocs.length === 0) {
+      suggestions.push('Complete Toolbox Meetings for all active projects');
+      suggestions.push('Upload FLHA forms for each work session');
     }
     
     let label = 'Critical';
     if (baseScore >= 90) label = 'Excellent';
     else if (baseScore >= 70) label = 'Good';
     else if (baseScore >= 50) label = 'Warning';
+    
+    console.log(`[Assistant] CSR query for company ${companyId}: score=${baseScore}, docs=${docsUploaded}/3`);
     
     return { score: baseScore, label, missingDocs, suggestions };
   } catch (error) {
@@ -453,16 +466,18 @@ export async function queryAssistant(
     
     // Handle knowledge-only queries
     if (intent === 'knowledge') {
-      try {
-        // Check if query is about CSR - include company-specific data
-        const isCSRQuery = lowerQuery.includes('csr') || 
-                          lowerQuery.includes('safety rating') || 
-                          lowerQuery.includes('compliance score');
-        
-        let companyContext = '';
-        let csrSuggestions: string[] = [];
-        
-        if (isCSRQuery) {
+      // Check if query is about CSR - include company-specific data FIRST
+      const isCSRQuery = lowerQuery.includes('csr') || 
+                        lowerQuery.includes('safety rating') || 
+                        lowerQuery.includes('compliance score') ||
+                        lowerQuery.includes('company safety');
+      
+      let companyContext = '';
+      let csrSuggestions: string[] = [];
+      
+      // Always fetch company CSR data for CSR queries - do this before RAG
+      if (isCSRQuery) {
+        try {
           const csrData = await queryCompanyCSR(companyId);
           if (csrData) {
             companyContext = `**Your Company's CSR:** ${csrData.score}% (${csrData.label})\n\n`;
@@ -475,8 +490,13 @@ export async function queryAssistant(
             }
             companyContext += `---\n\n`;
           }
+        } catch (csrError) {
+          console.error('[Assistant] CSR query failed:', csrError);
         }
-        
+      }
+      
+      // Try RAG query for general help content
+      try {
         const ragResult = await queryRAG(query, []);
         const baseResponse = ragResult.message || 'Here\'s what I found in our help center.';
         
@@ -493,6 +513,15 @@ export async function queryAssistant(
         };
       } catch (error) {
         console.error('[Assistant] RAG query failed:', error);
+        // Even if RAG fails, return company context if we have it
+        if (companyContext) {
+          return {
+            response: companyContext + 'For more details about CSR, visit the Safety & Compliance section in Help.',
+            results: [],
+            suggestions: csrSuggestions.length > 0 ? csrSuggestions : ['How do I improve CSR?'],
+            category: 'hybrid',
+          };
+        }
         return {
           response: 'I couldn\'t find information about that in our help center.',
           results: [],
