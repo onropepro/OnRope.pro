@@ -276,28 +276,29 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     return 0;
   };
 
-  // Left sidebar benefits
-  const sidebarBenefits = [
-    { icon: Briefcase, text: t('techReg.benefits.hoursTravel', 'Your hours travel with you - every employer, every city') },
-    { icon: Clock, text: t('techReg.benefits.importLogbook', 'Import your existing logbook via photo') },
-    { icon: FileText, text: t('techReg.benefits.fastOnboarding', '10-second new employer onboarding vs 60 minutes of paperwork') },
-    { icon: Bell, text: t('techReg.benefits.autoLogging', 'Automatic logging if your employer uses OnRopePro') },
-    { icon: Award, text: t('techReg.benefits.freeUpgrade', 'Free PLUS upgrade when you refer a tech') },
+  // Left sidebar FREE account benefits (5 items)
+  const freeAccountBenefits = [
+    t('techReg.free.hoursSurvive', 'Your hours survive company closures'),
+    t('techReg.free.importLogbook', 'Import your existing logbook via photo'),
+    t('techReg.free.certifications', 'All certifications stored in one place'),
+    t('techReg.free.fastOnboarding', '10-second onboarding at every new job'),
+    t('techReg.free.safetyRating', 'Personal Safety Rating builds your reputation'),
   ];
 
-  // Right panel welcome screen benefits  
+  // Left sidebar PLUS account benefits (4 items - muted/locked)
+  const plusBenefits = [
+    t('techReg.plus.expiryAlerts', 'Certification expiry alerts (never miss a renewal)'),
+    t('techReg.plus.multiEmployers', 'Work for multiple employers simultaneously'),
+    t('techReg.plus.jobBoard', 'Job Board access — see who\'s hiring'),
+    t('techReg.plus.exportHistory', 'Export your complete work history'),
+  ];
+
+  // Right panel welcome screen benefits (4 items)
   const welcomeBenefits = [
     t('techReg.welcome.benefit1', 'Never lose hours when companies fold'),
     t('techReg.welcome.benefit2', 'Import your logbook history via photo'),
     t('techReg.welcome.benefit3', 'Skip onboarding paperwork at every new job'),
     t('techReg.welcome.benefit4', 'Automatic logging if your employer uses OnRopePro'),
-  ];
-
-  const plusBenefits = [
-    t('techReg.plusBenefits.expiryAlerts', 'Certification expiry alerts (60 & 30 day warnings)'),
-    t('techReg.plusBenefits.multiEmployers', 'Connect with multiple employers at once'),
-    t('techReg.plusBenefits.jobBoard', 'Rope Access Job Board'),
-    t('techReg.plusBenefits.priorityVisibility', 'Priority profile visibility to employers'),
   ];
 
   return (
@@ -340,17 +341,38 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               </div>
             </div>
 
-            {/* Benefits */}
-            <div className="mt-auto">
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-3">{t('techReg.sidebar.whatYouGet', 'Included Free:')}</p>
-              <div className="space-y-3">
-                {sidebarBenefits.map((benefit, i) => (
+            {/* Join thousands text */}
+            <p className="text-white/80 text-sm mb-4">{t('techReg.sidebar.joinThousands', 'Join thousands of rope access technicians')}</p>
+
+            {/* FREE Account Benefits */}
+            <div className="mb-4">
+              <p className="text-white/60 text-xs uppercase tracking-wider mb-2">{t('techReg.sidebar.freeAccount', 'FREE ACCOUNT')}</p>
+              <div className="space-y-1.5">
+                {freeAccountBenefits.map((benefit, i) => (
                   <div key={i} className="flex items-start gap-2 text-sm">
-                    <benefit.icon className="w-4 h-4 text-white/80 mt-0.5 shrink-0" />
-                    <span className="text-white/90">{benefit.text}</span>
+                    <Check className="w-4 h-4 text-green-300 mt-0.5 shrink-0" />
+                    <span className="text-white/90">{benefit}</span>
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* PLUS Account Benefits (muted/locked) */}
+            <div className="mb-4">
+              <p className="text-white/60 text-xs uppercase tracking-wider mb-2">{t('techReg.sidebar.plusAccount', 'PLUS ACCOUNT — Refer 1 tech to unlock')}</p>
+              <div className="space-y-1.5">
+                {plusBenefits.map((benefit, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <div className="w-4 h-4 rounded-full border border-white/40 mt-0.5 shrink-0" />
+                    <span className="text-white/50">{benefit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-auto pt-4 border-t border-white/20">
+              <p className="text-white/70 text-xs text-center">{t('techReg.sidebar.referFooter', 'Refer one tech after signup → instant PLUS upgrade')}</p>
             </div>
           </div>
 
