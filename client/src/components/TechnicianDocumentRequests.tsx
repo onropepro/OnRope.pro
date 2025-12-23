@@ -278,56 +278,58 @@ export function TechnicianDocumentRequests({ language = 'en' }: TechnicianDocume
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
-          <p className="text-sm text-muted-foreground mt-2">{t.loading}</p>
-        </CardContent>
-      </Card>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+        <div className="p-8 text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-slate-400" />
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{t.loading}</p>
+        </div>
+      </div>
     );
   }
 
   if (requests.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-primary" />
-            {t.title}
-          </CardTitle>
-          <CardDescription>{t.subtitle}</CardDescription>
-        </CardHeader>
-        <CardContent className="text-center py-8">
-          <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-          <h3 className="font-medium">{t.noRequests}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{t.noRequestsDesc}</p>
-        </CardContent>
-      </Card>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t.title}</h3>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t.subtitle}</p>
+        </div>
+        <div className="p-4 sm:p-5 text-center py-8">
+          <div className="inline-flex p-4 bg-slate-100 dark:bg-slate-800 rounded-full mb-4">
+            <FileText className="w-8 h-8 text-slate-400" />
+          </div>
+          <h4 className="font-medium text-slate-700 dark:text-slate-300">{t.noRequests}</h4>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t.noRequestsDesc}</p>
+        </div>
+      </div>
     );
   }
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-primary" />
-            {t.title}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t.title}</h3>
             {pendingRequests.length > 0 && (
-              <Badge variant="destructive" className="ml-2">{pendingRequests.length}</Badge>
+              <Badge variant="destructive" className="ml-1">{pendingRequests.length}</Badge>
             )}
-          </CardTitle>
-          <CardDescription>{t.subtitle}</CardDescription>
-        </CardHeader>
-        <CardContent>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t.subtitle}</p>
+        </div>
+        <div className="p-4 sm:p-5">
           <Accordion type="single" collapsible className="w-full">
             {pendingRequests.length > 0 && (
-              <AccordionItem value="pending">
+              <AccordionItem value="pending" className="border-slate-200 dark:border-slate-700">
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-amber-500" />
-                    <span>{t.pending}</span>
-                    <Badge variant="secondary">{pendingRequests.length}</Badge>
+                    <span className="text-slate-900 dark:text-slate-100">{t.pending}</span>
+                    <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">{pendingRequests.length}</Badge>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -335,22 +337,22 @@ export function TechnicianDocumentRequests({ language = 'en' }: TechnicianDocume
                     {pendingRequests.map((request) => (
                       <div
                         key={request.id}
-                        className="p-4 border rounded-lg hover-elevate cursor-pointer"
+                        className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:shadow-md transition-shadow cursor-pointer"
                         onClick={() => setSelectedRequest(request)}
                         data-testid={`doc-request-pending-${request.id}`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">{request.title}</h4>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                            <h4 className="font-medium text-slate-900 dark:text-slate-100 truncate">{request.title}</h4>
+                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1">
                               <Building2 className="w-3 h-3" />
                               <span>{request.company?.companyName || request.company?.name || 'Unknown Company'}</span>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                               {t.requestedOn} {format(new Date(request.requestedAt), 'MMM d, yyyy')}
                             </p>
                           </div>
-                          <Button size="sm" variant="outline" className="gap-1.5">
+                          <Button size="sm" variant="outline" className="gap-1.5 border-slate-300 dark:border-slate-600">
                             <Upload className="w-3 h-3" />
                             {t.uploadFiles}
                           </Button>
@@ -363,12 +365,12 @@ export function TechnicianDocumentRequests({ language = 'en' }: TechnicianDocume
             )}
 
             {fulfilledRequests.length > 0 && (
-              <AccordionItem value="fulfilled">
+              <AccordionItem value="fulfilled" className="border-slate-200 dark:border-slate-700">
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
-                    <span>{t.fulfilled}</span>
-                    <Badge variant="outline">{fulfilledRequests.length}</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    <span className="text-slate-900 dark:text-slate-100">{t.fulfilled}</span>
+                    <Badge variant="outline" className="border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300">{fulfilledRequests.length}</Badge>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -376,22 +378,22 @@ export function TechnicianDocumentRequests({ language = 'en' }: TechnicianDocume
                     {fulfilledRequests.map((request) => (
                       <div
                         key={request.id}
-                        className="p-4 border rounded-lg hover-elevate cursor-pointer"
+                        className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:shadow-md transition-shadow cursor-pointer"
                         onClick={() => setSelectedRequest(request)}
                         data-testid={`doc-request-fulfilled-${request.id}`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium truncate">{request.title}</h4>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                            <h4 className="font-medium text-slate-900 dark:text-slate-100 truncate">{request.title}</h4>
+                            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mt-1">
                               <Building2 className="w-3 h-3" />
                               <span>{request.company?.companyName || request.company?.name || 'Unknown Company'}</span>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                               {t.respondedOn} {request.respondedAt ? format(new Date(request.respondedAt), 'MMM d, yyyy') : '-'}
                             </p>
                           </div>
-                          <Badge variant="default" className="gap-1">
+                          <Badge variant="default" className="gap-1 bg-emerald-600 text-white">
                             <FileText className="w-3 h-3" />
                             {request.files?.length || 0} {t.filesUploaded}
                           </Badge>
@@ -403,8 +405,8 @@ export function TechnicianDocumentRequests({ language = 'en' }: TechnicianDocume
               </AccordionItem>
             )}
           </Accordion>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <Dialog open={!!selectedRequest} onOpenChange={(open) => {
         if (!open) {
