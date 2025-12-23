@@ -1182,6 +1182,8 @@ export default function Dashboard() {
   const [showBusinessCardScanner, setShowBusinessCardScanner] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
+  const [showClientDetailDialog, setShowClientDetailDialog] = useState(false);
+  const [clientToView, setClientToView] = useState<Client | null>(null);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
   const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; buildingName?: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>([{ number: "", address: "" }]);
@@ -7836,7 +7838,15 @@ export default function Dashboard() {
                           );
                         })
                         .map((client) => (
-                        <Card key={client.id} className="hover-elevate" data-testid={`client-card-${client.id}`}>
+                        <Card 
+                          key={client.id} 
+                          className="hover-elevate cursor-pointer" 
+                          data-testid={`client-card-${client.id}`}
+                          onClick={() => {
+                            setClientToView(client);
+                            setShowClientDetailDialog(true);
+                          }}
+                        >
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
@@ -7881,7 +7891,7 @@ export default function Dashboard() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() => handleEditClient(client)}
+                                    onClick={(e) => { e.stopPropagation(); handleEditClient(client); }}
                                     data-testid={`button-edit-client-${client.id}`}
                                   >
                                     <span className="material-icons">edit</span>
@@ -7889,7 +7899,7 @@ export default function Dashboard() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() => handleDeleteClient(client)}
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteClient(client); }}
                                     data-testid={`button-delete-client-${client.id}`}
                                   >
                                     <span className="material-icons text-destructive">delete</span>
@@ -8288,6 +8298,113 @@ export default function Dashboard() {
               </Button>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Client Detail Dialog */}
+      <Dialog open={showClientDetailDialog} onOpenChange={setShowClientDetailDialog}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" data-testid="dialog-client-detail">
+          <DialogHeader className="pb-4">
+            <DialogTitle>{clientToView?.firstName} {clientToView?.lastName}</DialogTitle>
+            <DialogDescription>{clientToView?.company || t('dashboard.clientDetail.noCompany', 'No company specified')}</DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Contact Information */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-muted-foreground">{t('dashboard.clientDetail.contactInfo', 'Contact Information')}</h4>
+              {clientToView?.email && (
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-muted-foreground text-sm">email</span>
+                  <a href={`mailto:${clientToView.email}`} className="text-sm text-primary hover:underline">{clientToView.email}</a>
+                </div>
+              )}
+              {clientToView?.phoneNumber && (
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-muted-foreground text-sm">phone</span>
+                  <a href={`tel:${clientToView.phoneNumber}`} className="text-sm text-primary hover:underline">{clientToView.phoneNumber}</a>
+                </div>
+              )}
+              {clientToView?.address && (
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-muted-foreground text-sm">location_on</span>
+                  <span className="text-sm">{clientToView.address}</span>
+                </div>
+              )}
+              {clientToView?.billingAddress && clientToView.billingAddress !== clientToView.address && (
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-muted-foreground text-sm">receipt</span>
+                  <div>
+                    <span className="text-xs text-muted-foreground">{t('dashboard.clientDetail.billingAddress', 'Billing:')}</span>
+                    <span className="text-sm ml-1">{clientToView.billingAddress}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Buildings / Strata Numbers */}
+            {clientToView?.lmsNumbers && clientToView.lmsNumbers.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-muted-foreground">{t('dashboard.clientDetail.buildings', 'Buildings')}</h4>
+                <div className="space-y-3">
+                  {clientToView.lmsNumbers.map((lms, idx) => (
+                    <Card key={idx} className="p-3">
+                      <div className="space-y-1">
+                        {lms.buildingName && (
+                          <div className="font-medium text-sm">{lms.buildingName}</div>
+                        )}
+                        <Badge variant="secondary" className="text-xs">{lms.number}</Badge>
+                        {lms.address && (
+                          <div className="text-xs text-muted-foreground">{lms.address}</div>
+                        )}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {lms.stories && (
+                            <span className="text-xs text-muted-foreground">{lms.stories} {t('dashboard.clientDetail.floors', 'floors')}</span>
+                          )}
+                          {lms.units && (
+                            <span className="text-xs text-muted-foreground">{lms.units} {t('dashboard.clientDetail.units', 'units')}</span>
+                          )}
+                          {lms.parkingStalls && (
+                            <span className="text-xs text-muted-foreground">{lms.parkingStalls} {t('dashboard.clientDetail.parkingStalls', 'parking stalls')}</span>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setShowClientDetailDialog(false);
+                    if (clientToView) handleEditClient(clientToView);
+                  }}
+                  data-testid="button-detail-edit-client"
+                >
+                  <span className="material-icons text-sm mr-1">edit</span>
+                  {t('common.edit', 'Edit')}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="text-destructive"
+                  onClick={() => {
+                    setShowClientDetailDialog(false);
+                    if (clientToView) handleDeleteClient(clientToView);
+                  }}
+                  data-testid="button-detail-delete-client"
+                >
+                  <span className="material-icons text-sm mr-1">delete</span>
+                  {t('common.delete', 'Delete')}
+                </Button>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
