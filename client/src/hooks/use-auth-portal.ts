@@ -1,11 +1,7 @@
-import { useLocation } from "wouter";
+import { useAuthPortalContext } from "@/contexts/AuthPortalContext";
 
 export function useAuthPortal() {
-  const [, setLocation] = useLocation();
+  const { openLogin, closePortal, isOpen } = useAuthPortalContext();
   
-  const openLogin = () => {
-    setLocation("/login");
-  };
-  
-  return { openLogin };
+  return { openLogin, closePortal, isOpen };
 }
