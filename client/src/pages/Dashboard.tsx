@@ -50,6 +50,7 @@ import { SubscriptionRenewalBadge } from "@/components/SubscriptionRenewalBadge"
 import { formatLocalDate, formatLocalDateLong, formatTimestampDate, formatTimestampDateShort, formatTimestampDateMedium, parseLocalDate, formatLocalDateMedium, formatDurationMs } from "@/lib/dateUtils";
 import { QRCodeSVG } from 'qrcode.react';
 import { trackLogout, trackWorkSessionStart, trackWorkSessionEnd, trackProjectCreated, trackClientAdded, trackBuildingAdded, trackEmployeeAdded } from "@/lib/analytics";
+import { getDashboardUrl, parseDashboardTab, type DashboardTab } from "@/lib/navigation";
 import {
   DndContext,
   closestCenter,
@@ -1144,8 +1145,7 @@ export default function Dashboard() {
   
   // Derive activeTab from the URL search params (single source of truth)
   const activeTab = useMemo(() => {
-    const urlParams = new URLSearchParams(searchString);
-    return urlParams.get('tab') || "";
+    return parseDashboardTab(searchString);
   }, [searchString]);
   
   const [projectsSubTab, setProjectsSubTab] = useState<"active" | "past">("active");
@@ -1153,18 +1153,19 @@ export default function Dashboard() {
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
   const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "hsl(var(--primary))";
 
-  // Scroll to top when changing tabs - navigate via URL
-  const handleTabChange = (tab: string) => {
-    if (tab === "" || tab === "home") {
-      setLocation("/dashboard");
+  // Scroll to top when changing tabs - navigate via URL using typed helpers
+  const handleTabChange = (tab: DashboardTab | string) => {
+    // Handle special cases that should go to base dashboard URL
+    if (!tab || tab === '' || tab === 'home' || tab === 'overview') {
+      setLocation(getDashboardUrl());
     } else {
-      setLocation(`/dashboard?tab=${tab}`);
+      setLocation(getDashboardUrl(tab as DashboardTab));
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToNav = () => {
-    setLocation("/dashboard");
+    setLocation(getDashboardUrl());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const [showProjectDialog, setShowProjectDialog] = useState(false);
@@ -2493,7 +2494,7 @@ export default function Dashboard() {
     setProjectDataForClient(null);
     
     // Switch to Clients tab and open the client dialog
-    setLocation("/dashboard?tab=clients");
+    setLocation(getDashboardUrl('clients'));
     setTimeout(() => {
       setShowClientDialog(true);
     }, 100);
