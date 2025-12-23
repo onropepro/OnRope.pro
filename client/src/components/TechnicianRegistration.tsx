@@ -12,7 +12,7 @@ import {
   User, ArrowRight, ArrowLeft, Award, Loader2, 
   Check, Upload, Shield, Copy, Mail, MessageSquare,
   Briefcase, FileText, Clock, Bell, ChevronRight,
-  HardHat, X, CheckCircle, Eye, EyeOff, Building
+  HardHat, X, CheckCircle, Eye, EyeOff
 } from "lucide-react";
 
 type RegistrationStep = "welcome" | "accountDetails" | "certification" | "success";
@@ -37,8 +37,6 @@ interface TechnicianData {
   spratLevel: string;
   spratLicenseNumber: string;
   certificationCardFile: File | null;
-  employerCompanyName: string;
-  employerEmail: string;
 }
 
 interface TechnicianRegistrationProps {
@@ -73,8 +71,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     spratLevel: "",
     spratLicenseNumber: "",
     certificationCardFile: null,
-    employerCompanyName: "",
-    employerEmail: "",
   });
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -100,8 +96,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       spratLevel: "",
       spratLicenseNumber: "",
       certificationCardFile: null,
-      employerCompanyName: "",
-      employerEmail: "",
     });
     setError("");
     setGeneratedReferralCode("");
@@ -286,8 +280,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   const sidebarBenefits = [
     { icon: Briefcase, text: t('techReg.benefits.hoursTravel', 'Your hours travel with you - every employer, every city') },
     { icon: Clock, text: t('techReg.benefits.importLogbook', 'Import your existing logbook via photo') },
-    { icon: FileText, text: t('techReg.benefits.fastOnboarding', '10-second onboarding vs 60 minutes of paperwork') },
-    { icon: Bell, text: t('techReg.benefits.autoLogging', 'Automatic logging when your employer joins') },
+    { icon: FileText, text: t('techReg.benefits.fastOnboarding', '10-second new employer onboarding vs 60 minutes of paperwork') },
+    { icon: Bell, text: t('techReg.benefits.autoLogging', 'Automatic logging if your employer uses OnRopePro') },
     { icon: Award, text: t('techReg.benefits.freeUpgrade', 'Free PLUS upgrade when you refer a tech') },
   ];
 
@@ -296,7 +290,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     t('techReg.welcome.benefit1', 'Never lose hours when companies fold'),
     t('techReg.welcome.benefit2', 'Import your logbook history via photo'),
     t('techReg.welcome.benefit3', 'Skip onboarding paperwork at every new job'),
-    t('techReg.welcome.benefit4', 'Automatic logging when your employer joins'),
+    t('techReg.welcome.benefit4', 'Automatic logging if your employer uses OnRopePro'),
   ];
 
   const plusBenefits = [
@@ -785,42 +779,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       <p className="text-xs text-muted-foreground mt-1">{t('techReg.certification.supportedFormats', 'Supported: JPG, PNG, PDF')}</p>
                     </div>
                   )}
-
-                  {/* Employer Connection (Optional) */}
-                  <div className="space-y-3 mb-4 p-4 rounded-lg bg-muted/50">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <Building className="w-4 h-4 text-[#AB4521]" />
-                      {t('techReg.certification.employerConnection', 'Employer Connection (Optional)')}
-                    </h4>
-                    <p className="text-xs text-muted-foreground">
-                      {t('techReg.certification.employerConnectionDesc', 'We will search to see if your employer already has an OnRopePro account and will initiate a connection if they do.')}
-                    </p>
-                    <div className="space-y-3">
-                      <div>
-                        <Label htmlFor="employerCompanyName">{t('techReg.certification.employerCompanyName', 'Employer Company Name')}</Label>
-                        <Input
-                          id="employerCompanyName"
-                          placeholder={t('techReg.certification.employerCompanyNamePlaceholder', 'Acme Rope Access Inc.')}
-                          value={data.employerCompanyName || ""}
-                          onChange={(e) => setData({ ...data, employerCompanyName: e.target.value })}
-                          className="mt-1"
-                          data-testid="input-employer-company-name"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="employerEmail">{t('techReg.certification.employerEmail', 'Employer Email Address')}</Label>
-                        <Input
-                          id="employerEmail"
-                          type="email"
-                          placeholder={t('techReg.certification.employerEmailPlaceholder', 'office@acmerope.com')}
-                          value={data.employerEmail || ""}
-                          onChange={(e) => setData({ ...data, employerEmail: e.target.value })}
-                          className="mt-1"
-                          data-testid="input-employer-email"
-                        />
-                      </div>
-                    </div>
-                  </div>
 
                   {error && (
                     <div className="mt-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
