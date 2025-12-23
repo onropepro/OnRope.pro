@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { AuthPortalModal } from "@/components/AuthPortal/AuthPortalModal";
 
 export type UserType = "technician" | "property_manager" | "building_manager" | "resident" | "company";
 export type AuthMode = "login" | "register";
@@ -55,7 +54,6 @@ export function AuthPortalProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-      <AuthPortalModal />
     </AuthPortalContext.Provider>
   );
 }

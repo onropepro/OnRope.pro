@@ -109,17 +109,21 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             <FormItem>
               <FormLabel className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                {t("auth.emailOrId", "Email, License #, or Strata #")}
+                {t("auth.yourCredentials", "Your Credentials")}
               </FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="text"
-                  placeholder={t("auth.enterCredentials", "Enter email, license number, or strata number")}
+                  placeholder={t("auth.enterCredentials", "Email, license number, or strata number")}
                   autoComplete="username"
                   data-testid="input-identifier"
                 />
               </FormControl>
+              <p className="text-xs text-muted-foreground mt-1.5 space-y-0.5">
+                <span className="block">{t("auth.loginHintTechnician", "Technicians: use your email or IRATA/SPRAT license number")}</span>
+                <span className="block">{t("auth.loginHintBuildingManager", "Building Managers: use your strata plan number")}</span>
+              </p>
               <FormMessage />
             </FormItem>
           )}

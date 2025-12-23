@@ -8,6 +8,7 @@ import { usePermissionSync } from "@/hooks/use-permission-sync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AuthPortalProvider } from "@/hooks/use-auth-portal";
+import { AuthPortalModal } from "@/components/AuthPortal/AuthPortalModal";
 
 // Pages
 import Register from "@/pages/Register";
@@ -734,6 +735,7 @@ function App() {
             <BrandingProvider>
               <Router />
               <Toaster />
+              <AuthPortalModal />
             </BrandingProvider>
           </AuthPortalProvider>
         </ErrorBoundary>
