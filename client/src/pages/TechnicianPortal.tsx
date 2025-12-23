@@ -2347,7 +2347,7 @@ export default function TechnicianPortal() {
       {/* Main content wrapper - offset for sidebar on desktop */}
       <div className="lg:pl-60">
         <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div className="w-full px-4 md:px-6 xl:px-8 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img 
               src={onRopeProLogo} 
@@ -2474,7 +2474,7 @@ export default function TechnicianPortal() {
         if (!user.hasPlusAccess) {
           return (
             <div className="bg-amber-500/20 border-b border-amber-500/30" data-testid="banner-certification-expiry-locked">
-              <div className="max-w-4xl mx-auto px-4 py-3">
+              <div className="w-full px-4 md:px-6 xl:px-8 py-3">
                 <div className="flex items-center gap-3 flex-wrap">
                   <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
@@ -2495,7 +2495,7 @@ export default function TechnicianPortal() {
         
         return (
           <div className="bg-red-600 dark:bg-red-700 text-white" data-testid="banner-certification-expiry">
-            <div className="max-w-4xl mx-auto px-4 py-3">
+            <div className="w-full px-4 md:px-6 xl:px-8 py-3">
               <div className="flex items-center gap-3 flex-wrap">
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
@@ -2516,7 +2516,7 @@ export default function TechnicianPortal() {
         );
       })()}
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6 pb-24">
+      <main className="w-full px-4 md:px-6 xl:px-8 py-6 space-y-6 pb-24">
         {/* HOME TAB - Quick actions and overview */}
         {activeTab === 'home' && (
           <>
@@ -5506,7 +5506,7 @@ export default function TechnicianPortal() {
 
       {/* Mobile Bottom Navigation - hidden on desktop */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom lg:hidden">
-        <div className="max-w-4xl mx-auto flex items-center justify-around py-2">
+        <div className="w-full px-4 md:px-6 flex items-center justify-around py-2">
           <button
             onClick={() => setActiveTab('home')}
             className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
