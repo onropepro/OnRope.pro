@@ -3,13 +3,8 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe, BookOpen, Settings, HeartPulse, Wallet } from "lucide-react";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, BookOpen, Settings, HeartPulse, Wallet } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
@@ -27,7 +22,7 @@ const STAKEHOLDER_COLORS = {
 } as const;
 
 export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
   const [showTechnicianMenu, setShowTechnicianMenu] = useState(false);
@@ -36,12 +31,6 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const [mobileModulesExpanded, setMobileModulesExpanded] = useState(false);
   const [mobileTechnicianExpanded, setMobileTechnicianExpanded] = useState(false);
   const [mobilePropertyManagerExpanded, setMobilePropertyManagerExpanded] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'en' | 'fr' | 'es'>(() => {
-    const lang = i18n.language;
-    if (lang?.startsWith('fr')) return 'fr';
-    if (lang?.startsWith('es')) return 'es';
-    return 'en';
-  });
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const technicianMenuRef = useRef<HTMLDivElement>(null);
   const propertyManagerMenuRef = useRef<HTMLDivElement>(null);
@@ -94,18 +83,6 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   };
   
   const stakeholderColor = getStakeholderColor();
-
-  const changeLanguage = (lang: 'en' | 'fr' | 'es') => {
-    setCurrentLanguage(lang);
-    localStorage.setItem('i18nextLng', lang);
-    i18n.changeLanguage(lang);
-  };
-
-  const languageLabels = {
-    en: 'English',
-    fr: 'Francais',
-    es: 'Espanol'
-  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -171,43 +148,11 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <HelpCircle className="w-4 h-4 mr-1" />
             {t('navigation.help', 'Help')}
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost"
-                size="sm"
-                className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-                data-testid="button-language-dropdown"
-              >
-                <Globe className="w-4 h-4 mr-1" />
-                {t('navigation.language', 'Language')}
-                <ChevronDown className="w-3 h-3 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem 
-                onClick={() => changeLanguage('en')}
-                className={currentLanguage === 'en' ? 'bg-accent' : ''}
-                data-testid="menu-item-language-en"
-              >
-                English
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => changeLanguage('fr')}
-                className={currentLanguage === 'fr' ? 'bg-accent' : ''}
-                data-testid="menu-item-language-fr"
-              >
-                Francais
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => changeLanguage('es')}
-                className={currentLanguage === 'es' ? 'bg-accent' : ''}
-                data-testid="menu-item-language-es"
-              >
-                Espanol
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <LanguageDropdown 
+            variant="ghost" 
+            size="sm" 
+            stakeholderColor={stakeholderColor}
+          />
         </div>
       </div>
 
