@@ -60,6 +60,7 @@ const propertyManagerSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   propertyManagementCompany: z.string().min(2, "Property management company name is required"),
   email: z.string().email("Invalid email address"),
+  phoneNumber: z.string().optional(),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -145,6 +146,7 @@ export default function Register() {
       lastName: "",
       propertyManagementCompany: "",
       email: "",
+      phoneNumber: "",
       password: "",
       confirmPassword: "",
     },
@@ -250,7 +252,7 @@ export default function Register() {
 
   const onPropertyManagerSubmit = async (data: PropertyManagerFormData) => {
     try {
-      const { confirmPassword, firstName, lastName, ...registrationData } = data;
+      const { confirmPassword, firstName, lastName, phoneNumber, ...registrationData } = data;
       
       const response = await fetch("/api/register", {
         method: "POST",
@@ -258,6 +260,9 @@ export default function Register() {
         body: JSON.stringify({
           ...registrationData,
           name: `${firstName} ${lastName}`.trim(), // Combine first and last name
+          firstName,
+          lastName,
+          propertyManagerPhoneNumber: phoneNumber || undefined,
           role: "property_manager",
           passwordHash: data.password,
         }),
@@ -631,6 +636,23 @@ export default function Register() {
                         <FormControl>
                           <Input type="email" placeholder={t('register.propertyManager.emailPlaceholder', 'you@example.com')} {...field} data-testid="input-property-manager-email" className="h-12" />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={propertyManagerForm.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('register.propertyManager.phoneNumber', 'Phone Number (Optional)')}</FormLabel>
+                        <FormControl>
+                          <Input type="tel" placeholder={t('register.propertyManager.phoneNumberPlaceholder', '604-123-4567')} {...field} data-testid="input-property-manager-phone" className="h-12" />
+                        </FormControl>
+                        <FormDescription className="text-xs">
+                          {t('register.propertyManager.phoneDescription', 'Used for SMS notifications when you receive quotes')}
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

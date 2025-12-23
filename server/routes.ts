@@ -5622,7 +5622,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const { name, email, currentPassword, newPassword } = validationResult.data;
+      const { name, email, propertyManagerPhoneNumber, currentPassword, newPassword } = validationResult.data;
       
       // Get current property manager data
       const currentUser = await storage.getUserById(propertyManagerId);
@@ -5657,6 +5657,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update name if changed
       if (name && name !== currentUser.name) {
         await storage.updateUserName(propertyManagerId, name);
+      }
+      
+      // Update phone number if provided (can be empty to clear it)
+      if (propertyManagerPhoneNumber !== undefined) {
+        await db.update(users)
+          .set({ propertyManagerPhoneNumber: propertyManagerPhoneNumber || null })
+          .where(eq(users.id, propertyManagerId));
       }
       
       res.json({ message: "Account settings updated successfully" });

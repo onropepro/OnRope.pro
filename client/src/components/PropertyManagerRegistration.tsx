@@ -11,8 +11,9 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { 
   ArrowRight, ArrowLeft, Loader2, 
   Check, Shield, Clock, MessageSquare, Building2,
-  Eye, EyeOff, ThumbsUp, Inbox
+  Eye, EyeOff, ThumbsUp, Inbox, FileText
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 type RegistrationStep = "welcome" | "accountDetails" | "success";
 
@@ -21,6 +22,7 @@ interface PropertyManagerData {
   lastName: string;
   propertyManagementCompany: string;
   email: string;
+  phoneNumber: string;
   password: string;
   confirmPassword: string;
 }
@@ -44,6 +46,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     lastName: "",
     propertyManagementCompany: "",
     email: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -56,6 +59,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
       lastName: "",
       propertyManagementCompany: "",
       email: "",
+      phoneNumber: "",
       password: "",
       confirmPassword: "",
     });
@@ -78,6 +82,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
           lastName: formData.lastName,
           email: formData.email,
           propertyManagementCompany: formData.propertyManagementCompany,
+          propertyManagerPhoneNumber: formData.phoneNumber || undefined,
           passwordHash: formData.password,
           role: "property_manager",
         }),
@@ -374,6 +379,19 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                     </div>
 
                     <div className="space-y-1.5">
+                      <Label htmlFor="phoneNumber" className="text-sm font-medium">Phone Number (Optional)</Label>
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        value={data.phoneNumber}
+                        onChange={(e) => setData({ ...data, phoneNumber: e.target.value })}
+                        placeholder="604-123-4567"
+                        data-testid="input-phone-number"
+                      />
+                      <p className="text-xs text-muted-foreground">Used for SMS notifications when you receive quotes</p>
+                    </div>
+
+                    <div className="space-y-1.5">
                       <Label htmlFor="password" className="text-sm font-medium">Create Password</Label>
                       <div className="relative">
                         <Input
@@ -478,6 +496,18 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                       <div className="text-left">
                         <p className="font-medium text-sm">View Safety Ratings</p>
                         <p className="text-xs text-muted-foreground">Compare vendor compliance scores</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{backgroundColor: `${SAGE_GREEN}20`}}>
+                        <FileText className="w-4 h-4" style={{color: SAGE_GREEN}} />
+                      </div>
+                      <div className="text-left flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-sm">Receive Project Quotes</p>
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Coming Soon</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Post RFPs to selected vendors</p>
                       </div>
                     </div>
                   </div>

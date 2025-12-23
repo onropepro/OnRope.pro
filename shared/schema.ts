@@ -77,6 +77,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"), // for property_manager role
   lastName: varchar("last_name"), // for property_manager role
   propertyManagementCompany: varchar("property_management_company"), // for property_manager role
+  propertyManagerPhoneNumber: varchar("property_manager_phone_number"), // for property_manager role - SMS notifications
   
   // Resident-specific fields
   strataPlanNumber: varchar("strata_plan_number"), // for resident role
@@ -1717,6 +1718,7 @@ export type PropertyManagerCompanyLink = typeof propertyManagerCompanyLinks.$inf
 export const updatePropertyManagerAccountSchema = z.object({
   name: z.string().min(1, "Name is required").optional(),
   email: z.string().email("Invalid email address").optional(),
+  propertyManagerPhoneNumber: z.string().optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().min(6, "Password must be at least 6 characters").optional(),
 }).refine((data) => {
