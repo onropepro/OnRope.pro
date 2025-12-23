@@ -22,6 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import {
   DropdownMenu,
@@ -106,6 +107,7 @@ export default function PropertyManager() {
       name: "",
       email: "",
       propertyManagerPhoneNumber: "",
+      propertyManagerSmsOptIn: false,
       currentPassword: "",
       newPassword: "",
     },
@@ -719,6 +721,7 @@ export default function PropertyManager() {
                     name: userData?.user?.name || "",
                     email: userData?.user?.email || "",
                     propertyManagerPhoneNumber: userData?.user?.propertyManagerPhoneNumber || "",
+                    propertyManagerSmsOptIn: userData?.user?.propertyManagerSmsOptIn || false,
                     currentPassword: "",
                     newPassword: "",
                   });
@@ -1412,6 +1415,29 @@ export default function PropertyManager() {
                         />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="propertyManagerSmsOptIn"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          {t('propertyManager.accountSettings.smsOptIn', 'Receive SMS Notifications')}
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          {t('propertyManager.accountSettings.smsOptInDescription', 'Get text message alerts when companies send you new quotes')}
+                        </p>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="switch-sms-opt-in"
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />
