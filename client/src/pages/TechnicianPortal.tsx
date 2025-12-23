@@ -2467,7 +2467,7 @@ export default function TechnicianPortal() {
                         PLUS
                       </Badge>
                     </p>
-                    <p className="text-sm text-amber-600/80 dark:text-amber-400/80 mt-0.5">{t.plusLockedDesc}</p>
+                    <p className="text-base text-amber-600/80 dark:text-amber-400/80 mt-0.5">{t.plusLockedDesc}</p>
                   </div>
                 </div>
               </div>
@@ -2482,7 +2482,7 @@ export default function TechnicianPortal() {
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-base">{t.certificationExpiryBannerTitle}</p>
-                  <div className="text-sm mt-0.5 space-y-0.5">
+                  <div className="text-base mt-0.5 space-y-0.5">
                     {urgentCerts.map((cert) => (
                       <p key={cert.type}>
                         {t.certificationExpiryBannerMessage
@@ -3183,7 +3183,7 @@ export default function TechnicianPortal() {
                 <div className="text-center py-6 text-muted-foreground">
                   <Building className="w-10 h-10 mx-auto mb-3 opacity-50" />
                   <p className="font-medium">{t.noInvitations}</p>
-                  <p className="text-sm mt-1">{t.noInvitationsDesc}</p>
+                  <p className="text-base mt-1">{t.noInvitationsDesc}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -5290,7 +5290,7 @@ export default function TechnicianPortal() {
                           );
                         })}
                         {(form.watch("ropeAccessSpecialties") || []).length === 0 && (
-                          <p className="text-sm text-muted-foreground italic">{t.noSpecialties}</p>
+                          <p className="text-base text-muted-foreground italic">{t.noSpecialties}</p>
                         )}
                       </div>
                       
@@ -5365,7 +5365,7 @@ export default function TechnicianPortal() {
                           );
                         })
                       ) : (
-                        <p className="text-sm text-muted-foreground italic">{t.noSpecialties}</p>
+                        <p className="text-base text-muted-foreground italic">{t.noSpecialties}</p>
                       )}
                     </div>
                   )}
@@ -5468,7 +5468,7 @@ export default function TechnicianPortal() {
                   ) : (
                     <div className="p-4 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 text-center">
                       <Lock className="w-6 h-6 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">{t.plusLockedFeature}</p>
+                      <p className="text-base text-muted-foreground">{t.plusLockedFeature}</p>
                       <p className="text-xs text-muted-foreground mt-1">{t.plusLockedDesc}</p>
                     </div>
                   )}
