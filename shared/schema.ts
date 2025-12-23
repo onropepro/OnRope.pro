@@ -1717,15 +1717,24 @@ export type PropertyManagerCompanyLink = typeof propertyManagerCompanyLinks.$inf
 
 // Schema for property manager account updates
 export const updatePropertyManagerAccountSchema = z.object({
-  name: z.string().min(1, "Name is required").optional(),
-  email: z.string().email("Invalid email address").optional(),
+  name: z.string().optional(),
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
   propertyManagerPhoneNumber: z.string().optional(),
   propertyManagerSmsOptIn: z.boolean().optional(),
   currentPassword: z.string().optional(),
-  newPassword: z.string().min(6, "Password must be at least 6 characters").optional(),
+  newPassword: z.string().optional(),
+}).refine((data) => {
+  // If newPassword is provided, it must be at least 6 characters
+  if (data.newPassword && data.newPassword.length > 0 && data.newPassword.length < 6) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Password must be at least 6 characters",
+  path: ["newPassword"],
 }).refine((data) => {
   // If newPassword is provided, currentPassword must also be provided
-  if (data.newPassword && !data.currentPassword) {
+  if (data.newPassword && data.newPassword.length > 0 && !data.currentPassword) {
     return false;
   }
   return true;
