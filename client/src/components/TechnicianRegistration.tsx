@@ -838,9 +838,9 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <p className="text-muted-foreground mt-1">{t('techReg.employer.subtitle', 'Everything you do manually? Now it\'s automatic.')}</p>
                   </div>
 
-                  <div className="space-y-3 mb-8">
+                  <div className="space-y-2 mb-8">
                     {employerBenefits.slice(0, 6).map((benefit, i) => (
-                      <div key={i} className="flex items-start gap-3 p-4 rounded-md bg-muted/50">
+                      <div key={i} className="flex items-start gap-3 p-3 rounded-md bg-muted/50">
                         <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0 mt-0.5">
                           <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
                         </div>
