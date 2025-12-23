@@ -1561,6 +1561,53 @@ export const quoteHistory = pgTable("quote_history", {
   index("IDX_quote_history_created").on(table.quoteId, table.createdAt),
 ]);
 
+// Quote messages table - 2-way collaboration between property managers and companies
+export const quoteMessages = pgTable("quote_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  quoteId: varchar("quote_id").notNull().references(() => quotes.id, { onDelete: "cascade" }),
+  
+  // Sender information
+  senderUserId: varchar("sender_user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  senderType: varchar("sender_type").notNull(), // company | property_manager
+  senderName: varchar("sender_name").notNull(), // Denormalized for display
+  
+  // Message content
+  messageType: varchar("message_type").notNull(), // message | counter_offer | accept | decline | revoke
+  content: text("content"), // Text message content
+  
+  // Counter-offer details (when messageType is 'counter_offer')
+  counterOfferAmount: numeric("counter_offer_amount", { precision: 12, scale: 2 }),
+  counterOfferNotes: text("counter_offer_notes"),
+  
+  // Response to counter-offer (when company responds)
+  responseStatus: varchar("response_status"), // pending | accepted | declined
+  respondedAt: timestamp("responded_at"),
+  respondedBy: varchar("responded_by").references(() => users.id, { onDelete: "set null" }),
+  
+  // Read status
+  isRead: boolean("is_read").default(false),
+  readAt: timestamp("read_at"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_quote_messages_quote").on(table.quoteId),
+  index("IDX_quote_messages_sender").on(table.senderUserId),
+  index("IDX_quote_messages_created").on(table.quoteId, table.createdAt),
+]);
+
+export const insertQuoteMessageSchema = createInsertSchema(quoteMessages).omit({
+  id: true,
+  createdAt: true,
+  isRead: true,
+  readAt: true,
+  responseStatus: true,
+  respondedAt: true,
+  respondedBy: true,
+});
+
+export type InsertQuoteMessage = z.infer<typeof insertQuoteMessageSchema>;
+export type QuoteMessage = typeof quoteMessages.$inferSelect;
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
