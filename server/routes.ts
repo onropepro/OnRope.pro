@@ -182,7 +182,8 @@ function getCsrRatingInfo(percentage: number): { label: string; color: string } 
 
 // Shared CSR calculation function - used by both company and property manager endpoints
 // This ensures consistent CSR values across all views
-async function calculateCompanyCSR(companyId: string, storage: any, skipHistoryRecording: boolean = false): Promise<any> {
+// Exported for use in assistantService
+export async function calculateCompanyCSR(companyId: string, storage: any, skipHistoryRecording: boolean = false): Promise<any> {
   // 1. Company Documentation Points
   const companyDocuments = await storage.getCompanyDocuments(companyId);
   const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
