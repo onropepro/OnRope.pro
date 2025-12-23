@@ -830,7 +830,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get user for company ID and permissions
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUserById(req.session.userId);
       if (!user) {
         return res.status(401).json({ message: "User not found" });
       }
