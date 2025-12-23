@@ -129,6 +129,62 @@ export default function CSRPropertyManagerLanding() {
 
       <Separator className="my-8" />
 
+      {/* CSR Rating Tiers Visual */}
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            {t('modules.pmCSR.tiers.title', 'Vendor Safety at a Glance')}
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
+            {t('modules.pmCSR.tiers.subtitle', 'Every rope access vendor on OnRopePro has a Company Safety Rating (CSR) visible in your vendor dashboard. Use it to compare vendors, verify compliance, and document your due diligence in vendor selection.')}
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {/* Green - Excellent */}
+            <div className="rounded-xl p-6 text-center bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800">
+              <div className="mx-auto w-16 h-16 rounded-full bg-green-500 flex items-center justify-center mb-4 ring-4 ring-green-200 dark:ring-green-800">
+                <span className="text-white font-bold text-lg">90+</span>
+              </div>
+              <p className="font-semibold text-green-700 dark:text-green-300">{t('modules.csr.tiers.green.name', 'Green')}</p>
+              <p className="text-sm font-medium text-green-600 dark:text-green-400">{t('modules.csr.tiers.green.label', 'Excellent')}</p>
+              <p className="text-xs text-green-600/80 dark:text-green-400/80 mt-2">{t('modules.pmCSR.tiers.green.description', 'Vendor maintains strong safety culture with consistent compliance. Low-risk choice for your properties.')}</p>
+            </div>
+
+            {/* Yellow - Good */}
+            <div className="rounded-xl p-6 text-center bg-yellow-50 dark:bg-yellow-950/50 border border-yellow-200 dark:border-yellow-800">
+              <div className="mx-auto w-16 h-16 rounded-full bg-yellow-500 flex items-center justify-center mb-4 ring-4 ring-yellow-200 dark:ring-yellow-800">
+                <span className="text-white font-bold text-lg">70+</span>
+              </div>
+              <p className="font-semibold text-yellow-700 dark:text-yellow-300">{t('modules.csr.tiers.yellow.name', 'Yellow')}</p>
+              <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">{t('modules.csr.tiers.yellow.label', 'Good')}</p>
+              <p className="text-xs text-yellow-600/80 dark:text-yellow-400/80 mt-2">{t('modules.pmCSR.tiers.yellow.description', 'Vendor has solid foundation with minor gaps. Review specifics before contracting.')}</p>
+            </div>
+
+            {/* Orange - Warning */}
+            <div className="rounded-xl p-6 text-center bg-orange-50 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800">
+              <div className="mx-auto w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center mb-4 ring-4 ring-orange-200 dark:ring-orange-800">
+                <span className="text-white font-bold text-lg">50+</span>
+              </div>
+              <p className="font-semibold text-orange-700 dark:text-orange-300">{t('modules.csr.tiers.orange.name', 'Orange')}</p>
+              <p className="text-sm font-medium text-orange-600 dark:text-orange-400">{t('modules.csr.tiers.orange.label', 'Warning')}</p>
+              <p className="text-xs text-orange-600/80 dark:text-orange-400/80 mt-2">{t('modules.pmCSR.tiers.orange.description', 'Vendor has significant compliance gaps. Request remediation plan before engagement.')}</p>
+            </div>
+
+            {/* Red - Critical */}
+            <div className="rounded-xl p-6 text-center bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800">
+              <div className="mx-auto w-16 h-16 rounded-full bg-red-500 flex items-center justify-center mb-4 ring-4 ring-red-200 dark:ring-red-800">
+                <span className="text-white font-bold text-lg">&lt;50</span>
+              </div>
+              <p className="font-semibold text-red-700 dark:text-red-300">{t('modules.csr.tiers.red.name', 'Red')}</p>
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">{t('modules.csr.tiers.red.label', 'Critical')}</p>
+              <p className="text-xs text-red-600/80 dark:text-red-400/80 mt-2">{t('modules.pmCSR.tiers.red.description', 'Vendor has serious compliance issues. Consider alternative vendors for liability protection.')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Separator className="my-8" />
+
       {/* Problem Statement Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -559,23 +615,21 @@ export default function CSRPropertyManagerLanding() {
         </div>
       </section>
 
-      <Separator className="my-8" />
-
       {/* CTA Section */}
-      <section className="py-16 md:py-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="py-16 md:py-20 px-4 text-white" style={{backgroundImage: `linear-gradient(135deg, ${SAGE_GREEN} 0%, #5A7A60 100%)`}}>
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl md:text-4xl font-bold">
             {t('modules.pmCSR.cta.title', 'From Liability Exposure to Documented Risk Management')}
           </h2>
-          <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-white/90">
             {t('modules.pmCSR.cta.description', 'With CSR, you check one dashboard and know exactly which vendors pose risk across your entire portfolio. Compliance gaps get flagged before insurance audits discover them.')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial" style={{backgroundColor: SAGE_GREEN}}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: SAGE_GREEN}} onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
               {t('modules.pmCSR.cta.trial', 'Start Your 60-Day Trial')}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-cta-faqs">
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-cta-faqs">
               {t('modules.pmCSR.cta.faqs', 'Read FAQs')}
             </Button>
           </div>
@@ -586,23 +640,19 @@ export default function CSRPropertyManagerLanding() {
       <EmployerRegistration open={showRegistration} onOpenChange={setShowRegistration} />
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain brightness-0 invert" />
-            </div>
-            <div className="text-sm text-slate-400">
-              {t('modules.pmCSR.footer.tagline', 'Management Software for Rope Access')}
-            </div>
-            <div className="flex gap-6 text-sm">
-              <Link href="/privacy" className="hover:text-white transition-colors text-slate-400" data-testid="link-privacy">
-                {t('modules.pmCSR.footer.privacy', 'Privacy Policy')}
-              </Link>
-              <Link href="/terms" className="hover:text-white transition-colors text-slate-400" data-testid="link-terms">
-                {t('modules.pmCSR.footer.terms', 'Terms of Service')}
-              </Link>
-            </div>
+      <footer className="py-8 px-4 border-t">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
+            <span className="text-sm text-muted-foreground">{t('modules.pmCSR.footer.tagline', 'Management Software for Rope Access')}</span>
+          </div>
+          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+            <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-privacy">
+              {t('modules.pmCSR.footer.privacy', 'Privacy Policy')}
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors" data-testid="link-terms">
+              {t('modules.pmCSR.footer.terms', 'Terms of Service')}
+            </Link>
           </div>
         </div>
       </footer>
