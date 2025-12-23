@@ -26,7 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, Star, Calculator, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, Star, Calculator, ChevronLeft, ChevronRight, Plus, Search, FlaskConical, Download, Bell, Globe, ChevronDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -3631,70 +3631,73 @@ export default function Dashboard() {
     <div className="min-h-screen w-full">
       {/* Main Content - sidebar is now provided by DashboardLayout wrapper */}
       <div className="flex-1 flex flex-col page-gradient min-h-screen">
-          {/* Header - Premium Glass Effect */}
-          <header 
-            className={`sticky top-0 z-[100] glass backdrop-blur-xl border-b shadow-premium ${hasCustomBranding ? 'custom-brand-border' : 'border-border/50'}`}
-          >
-            <div className="px-3 sm:px-6 h-14 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-                  <div className="min-w-0">
-                    {activeTab !== "" && (
-                      <h1 className={`text-lg sm:text-xl font-bold truncate ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
-                        {getPageTitle()}
-                      </h1>
-                    )}
-                  </div>
-                  
-                  {currentUser?.role === 'company' && (currentUser?.residentCode || currentUser?.propertyManagerCode) && (
-                    <div className="hidden lg:flex flex-col gap-0.5 text-xs">
-                      {currentUser?.residentCode && (
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-muted-foreground font-medium">{t('dashboard.header.resident', 'Resident:')}</span>
-                          <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-resident-code">
-                            {currentUser.residentCode}
-                          </Badge>
-                        </div>
-                      )}
-                      {currentUser?.propertyManagerCode && (
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-muted-foreground font-medium">{t('dashboard.header.propertyMgr', 'Property Mgr:')}</span>
-                          <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-property-manager-code">
-                            {currentUser.propertyManagerCode}
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-                  )}
+          {/* Header - Modern SaaS Design */}
+          <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+            <div className="h-full flex items-center justify-between gap-4">
+              {/* Left Side: Search */}
+              <div className="flex items-center gap-4 flex-1 min-w-0">
+                {activeTab !== "" && (
+                  <h1 className={`text-lg font-semibold truncate text-slate-800 dark:text-slate-100 hidden sm:block`}>
+                    {getPageTitle()}
+                  </h1>
+                )}
+                <div className="relative flex-1 max-w-xs lg:max-w-sm hidden md:block">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input 
+                    type="text"
+                    placeholder="Search projects, employees, equipment..."
+                    className="w-full h-9 pl-9 pr-3 text-sm bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-[#0B64A3]/20 focus:border-[#0B64A3]"
+                    data-testid="input-dashboard-search"
+                  />
                 </div>
               </div>
-              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              
+              {/* Right Side: Actions Group */}
+              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 {/* License Expiry Warning - Inline in header */}
                 {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
                   <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
                 )}
-                {/* Subscription Renewal Countdown - Company owners only */}
+                
+                {/* Trial Badge - Company owners only */}
                 {currentUser?.role === 'company' && (
                   <SubscriptionRenewalBadge 
                     subscriptionEndDate={currentUser.subscriptionEndDate} 
                     subscriptionStatus={currentUser.subscriptionStatus}
                   />
                 )}
-                {/* Install PWA Button */}
+                
+                {/* Install App Button */}
                 <InstallPWAButton />
+                
                 {/* Notification Bell - Company owners only */}
                 {currentUser?.role === 'company' && (
                   <NotificationBell />
                 )}
-                {/* Language Toggle Button */}
+                
+                {/* Language Selector */}
                 <LanguageDropdown />
-            <RefreshButton />
-            <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
-              <span className="material-icons text-xl sm:text-2xl">logout</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+                
+                {/* User Profile */}
+                <div className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700">
+                  <Avatar className="w-8 h-8 bg-[#0B64A3]">
+                    <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
+                      {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="hidden lg:block">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
+                    <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role}</p>
+                  </div>
+                </div>
+                
+                {/* Logout Button */}
+                <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <span className="material-icons text-xl">logout</span>
+                </Button>
+              </div>
+            </div>
+          </header>
 
       {/* Read-Only Mode Banner - Shows on all tabs */}
       {currentUser && isReadOnly(currentUser) && (
