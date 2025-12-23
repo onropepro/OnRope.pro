@@ -12,8 +12,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { User, KeyRound, Loader2 } from "lucide-react";
+import { User, KeyRound, Loader2, HardHat, Building2, Briefcase, Home } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { TechnicianRegistration } from "@/components/TechnicianRegistration";
+import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
+import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email, license number, or strata number is required"),
@@ -49,6 +52,10 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"signin" | "register">("signin");
+  
+  const [showTechnicianRegistration, setShowTechnicianRegistration] = useState(false);
+  const [showPropertyManagerRegistration, setShowPropertyManagerRegistration] = useState(false);
+  const [showResidentSignup, setShowResidentSignup] = useState(false);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -142,9 +149,24 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
     }
   };
 
-  const handleRegisterClick = () => {
+  const handleTechnicianRegister = () => {
     closePortal();
-    setLocation("/register");
+    setShowTechnicianRegistration(true);
+  };
+
+  const handlePropertyManagerRegister = () => {
+    closePortal();
+    setShowPropertyManagerRegistration(true);
+  };
+
+  const handleEmployerRegister = () => {
+    closePortal();
+    setLocation("/pricing");
+  };
+
+  const handleResidentRegister = () => {
+    closePortal();
+    setShowResidentSignup(true);
   };
 
   return (
@@ -252,17 +274,61 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
               </TabsContent>
 
               <TabsContent value="register" className="mt-0">
-                <div className="text-center py-6 space-y-4">
-                  <p className="text-muted-foreground">
-                    {t('login.registerDescription', 'Create a new account to access OnRopePro.')}
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground text-center mb-4">
+                    {t('login.selectAccountType', 'Select your account type to get started')}
                   </p>
+                  
                   <Button 
-                    onClick={handleRegisterClick}
-                    className="w-full"
-                    size="lg"
-                    data-testid="button-modal-go-to-register"
+                    variant="outline"
+                    onClick={handleTechnicianRegister}
+                    className="w-full justify-start gap-3 h-12"
+                    data-testid="button-register-technician"
                   >
-                    {t('login.createAccount', 'Create an account')}
+                    <HardHat className="w-5 h-5 text-amber-600" />
+                    <div className="text-left">
+                      <div className="font-medium">{t('login.technicianAccount', 'Technician')}</div>
+                      <div className="text-xs text-muted-foreground">{t('login.technicianDesc', 'Rope access professional')}</div>
+                    </div>
+                  </Button>
+
+                  <Button 
+                    variant="outline"
+                    onClick={handleEmployerRegister}
+                    className="w-full justify-start gap-3 h-12"
+                    data-testid="button-register-employer"
+                  >
+                    <Briefcase className="w-5 h-5 text-blue-600" />
+                    <div className="text-left">
+                      <div className="font-medium">{t('login.employerAccount', 'Employer')}</div>
+                      <div className="text-xs text-muted-foreground">{t('login.employerDesc', 'Rope access company')}</div>
+                    </div>
+                  </Button>
+
+                  <Button 
+                    variant="outline"
+                    onClick={handlePropertyManagerRegister}
+                    className="w-full justify-start gap-3 h-12"
+                    data-testid="button-register-property-manager"
+                  >
+                    <Building2 className="w-5 h-5 text-purple-600" />
+                    <div className="text-left">
+                      <div className="font-medium">{t('login.propertyManagerAccount', 'Property Manager')}</div>
+                      <div className="text-xs text-muted-foreground">{t('login.propertyManagerDesc', 'Building management')}</div>
+                    </div>
+                  </Button>
+
+                  <Button 
+                    variant="outline"
+                    onClick={handleResidentRegister}
+                    className="w-full justify-start gap-3 h-12"
+                    data-testid="button-register-resident"
+                  >
+                    <Home className="w-5 h-5 text-green-600" />
+                    <div className="text-left">
+                      <div className="font-medium">{t('login.residentAccount', 'Resident')}</div>
+                      <div className="text-xs text-muted-foreground">{t('login.residentDesc', 'Building resident')}</div>
+                    </div>
                   </Button>
                 </div>
               </TabsContent>
@@ -270,6 +336,21 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
           </div>
         </DialogContent>
       </Dialog>
+
+      <TechnicianRegistration 
+        isOpen={showTechnicianRegistration} 
+        onClose={() => setShowTechnicianRegistration(false)} 
+      />
+      
+      <PropertyManagerRegistration 
+        isOpen={showPropertyManagerRegistration} 
+        onClose={() => setShowPropertyManagerRegistration(false)} 
+      />
+      
+      <ResidentSlidingSignup 
+        isOpen={showResidentSignup} 
+        onClose={() => setShowResidentSignup(false)} 
+      />
     </AuthPortalContext.Provider>
   );
 }
