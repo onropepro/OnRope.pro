@@ -204,7 +204,6 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
   ];
 
   const includedBenefits = [
-    "Free forever — buildings never pay",
     "Full quote inbox with two-way messaging",
     "Vendor safety ratings and compliance data",
     "Complete complaint and resolution tracking",
