@@ -1,4 +1,5 @@
 export const DASHBOARD_TABS = [
+  '',
   'overview',
   'projects',
   'employees',
@@ -68,5 +69,5 @@ export function parseDashboardTab(searchParams: string): DashboardTab {
   if (isValidDashboardTab(tab)) {
     return tab;
   }
-  return 'overview';
+  return '';
 }
