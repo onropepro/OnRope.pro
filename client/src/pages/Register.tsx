@@ -288,7 +288,7 @@ export default function Register() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
           <div className="flex items-center justify-between mb-2">
-            <Link href="/login">
+            <Link href="/">
               <Button variant="ghost" size="icon" data-testid="button-back">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
@@ -696,7 +696,7 @@ export default function Register() {
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             {t('register.haveAccount', 'Already have an account?')}{" "}
-            <a href="/login" className="text-primary font-medium hover:underline" data-testid="link-login">
+            <a href="/" className="text-primary font-medium hover:underline" data-testid="link-login">
               {t('register.signIn', 'Sign in')}
             </a>
           </div>
