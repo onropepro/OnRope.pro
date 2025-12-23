@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SignInModal } from "@/components/SignInModal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -44,7 +44,7 @@ export default function ResidentPortalLanding() {
   const [phoneSaved, setPhoneSaved] = useState(0);
   const [resolution, setResolution] = useState(0);
   const [controlPercentage, setControlPercentage] = useState(0);
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
 
   useEffect(() => {
@@ -96,13 +96,11 @@ export default function ResidentPortalLanding() {
                 {t('modules.residentPortal.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-hero-signin">
                 Sign In
               </Button>
             </div>
             
-            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
-
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["resident-portal"]} 
               className="mt-8 bg-white/5 rounded-lg mx-auto max-w-2xl [&_span]:text-blue-100 [&_svg]:text-blue-200"

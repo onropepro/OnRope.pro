@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SignInModal } from "@/components/SignInModal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
 import { useTranslation } from "react-i18next";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -49,7 +49,7 @@ const SAGE_GREEN_DARK = "#5A7A60";
 export default function CSRPropertyManagerLanding() {
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
 
   return (
@@ -82,12 +82,11 @@ export default function CSRPropertyManagerLanding() {
                 {t('modules.pmCSR.hero.ctaTrial', 'Start 60-Day Free Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-hero-signin">
                 {t('modules.pmCSR.hero.signIn', 'Sign In')}
               </Button>
             </div>
             
-            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor={SAGE_GREEN} />
           </div>
         </div>
         

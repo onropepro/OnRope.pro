@@ -5,6 +5,7 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
 
 // Helper to detect iOS PWA standalone mode
 const isIOSPWA = (): boolean => {
@@ -118,6 +119,7 @@ import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { QuizSection } from "@/components/QuizSection";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 
 type Language = 'en' | 'fr' | 'es';
 
@@ -1670,6 +1672,55 @@ export default function TechnicianPortal() {
   });
   
   const totalUnreadFeedback = myFeedbackData?.requests?.reduce((sum, r) => sum + r.unreadCount, 0) ?? 0;
+
+  // Technician sidebar navigation groups for desktop
+  const technicianNavGroups: NavGroup[] = [
+    {
+      id: "main",
+      label: "NAVIGATION",
+      items: [
+        {
+          id: "home",
+          label: t.tabHome || "Home",
+          icon: Home,
+          onClick: () => setActiveTab('home'),
+          isVisible: () => true,
+        },
+        {
+          id: "profile",
+          label: t.tabProfile || "Profile",
+          icon: User,
+          onClick: () => setActiveTab('profile'),
+          isVisible: () => true,
+        },
+        {
+          id: "employer",
+          label: language === 'en' ? "Employer" : "Employeur",
+          icon: Eye,
+          onClick: () => setActiveTab('employer'),
+          isVisible: () => true,
+        },
+        {
+          id: "work",
+          label: t.tabWork || "Work",
+          icon: Briefcase,
+          onClick: () => setActiveTab('work'),
+          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
+          badgeType: "alert",
+          isVisible: () => true,
+        },
+        {
+          id: "more",
+          label: t.tabMore || "More",
+          icon: MoreHorizontal,
+          onClick: () => setActiveTab('more'),
+          badge: totalUnreadFeedback > 0 ? totalUnreadFeedback : undefined,
+          badgeType: "info",
+          isVisible: () => true,
+        },
+      ],
+    },
+  ];
   
   // Mark all feedback as read when the dialog opens
   useEffect(() => {
@@ -2281,8 +2332,22 @@ export default function TechnicianPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden lg:block">
+        <DashboardSidebar
+          currentUser={user}
+          activeTab={activeTab}
+          onTabChange={(tab) => setActiveTab(tab as TabType)}
+          variant="technician"
+          customNavigationGroups={technicianNavGroups}
+          showDashboardLink={false}
+        />
+      </div>
+      
+      {/* Main content wrapper - offset for sidebar on desktop */}
+      <div className="lg:pl-60">
+        <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="w-full px-4 md:px-6 xl:px-8 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img 
               src={onRopeProLogo} 
@@ -2314,6 +2379,12 @@ export default function TechnicianPortal() {
               </div>
             </div>
           </div>
+          
+          {/* Search - hidden on mobile */}
+          <div className="hidden md:flex flex-1 max-w-md">
+            <DashboardSearch />
+          </div>
+          
           <div className="flex items-center gap-2">
             {/* Referral Code in Top Bar */}
             {user?.referralCode && (
@@ -2403,7 +2474,7 @@ export default function TechnicianPortal() {
         if (!user.hasPlusAccess) {
           return (
             <div className="bg-amber-500/20 border-b border-amber-500/30" data-testid="banner-certification-expiry-locked">
-              <div className="max-w-4xl mx-auto px-4 py-3">
+              <div className="w-full px-4 md:px-6 xl:px-8 py-3">
                 <div className="flex items-center gap-3 flex-wrap">
                   <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
@@ -2424,7 +2495,7 @@ export default function TechnicianPortal() {
         
         return (
           <div className="bg-red-600 dark:bg-red-700 text-white" data-testid="banner-certification-expiry">
-            <div className="max-w-4xl mx-auto px-4 py-3">
+            <div className="w-full px-4 md:px-6 xl:px-8 py-3">
               <div className="flex items-center gap-3 flex-wrap">
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
@@ -2445,22 +2516,22 @@ export default function TechnicianPortal() {
         );
       })()}
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6 pb-24">
+      <main className="w-full px-4 md:px-6 xl:px-8 py-6 space-y-6 pb-24">
         {/* HOME TAB - Quick actions and overview */}
         {activeTab === 'home' && (
           <>
             {/* Work Dashboard Quick Access */}
             {user && user.role === 'rope_access_tech' && (
-              <Card className={user.companyId && !user.terminatedDate ? "border-primary bg-primary/5" : "border-muted bg-muted/30"}>
-                <CardContent className="p-4">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+                <div className="p-4 sm:p-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-3 rounded-full ${user.companyId && !user.terminatedDate ? "bg-primary/10" : "bg-muted"}`}>
-                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate ? "text-primary" : "text-muted-foreground"}`} />
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-lg ${user.companyId && !user.terminatedDate ? "bg-sky-50 dark:bg-sky-900/30" : "bg-slate-100 dark:bg-slate-800"}`}>
+                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate ? "text-sky-600 dark:text-sky-400" : "text-slate-400"}`} />
                       </div>
                       <div>
-                        <p className={`font-medium ${!user.companyId || user.terminatedDate ? "text-muted-foreground" : ""}`}>{t.goToWorkDashboard}</p>
-                        <p className="text-sm text-muted-foreground">{t.accessProjects}</p>
+                        <p className={`font-semibold ${!user.companyId || user.terminatedDate ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.accessProjects}</p>
                       </div>
                     </div>
                     <Button
@@ -2471,49 +2542,49 @@ export default function TechnicianPortal() {
                           setLocation("/dashboard");
                         }
                       }}
-                      className="gap-2 h-12 text-base"
+                      className="gap-2 bg-[#0B64A3] hover:bg-[#0B64A3]/90 text-white"
                       disabled={!user.companyId || !!user.terminatedDate}
                       data-testid="button-go-to-dashboard"
                     >
                       {t.goToWorkDashboard}
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
                   {(!user.companyId || user.terminatedDate) && (
-                    <p className="text-sm text-muted-foreground mt-3 pt-3 border-t">
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                       {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
                     </p>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
 
             {/* Profile Completion Widget on Home Tab - Show until complete */}
             {user && user.role === 'rope_access_tech' && !profileCompletion.isComplete && (
-              <Card 
-                className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 cursor-pointer hover-elevate" 
+              <div 
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow" 
                 onClick={() => setActiveTab('profile')}
                 data-testid="card-profile-completion-home"
               >
-                <CardContent className="pt-4 pb-4">
+                <div className="p-4 sm:p-5">
                   <div className="flex items-start gap-4">
-                    <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                    <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/30">
                       <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <h3 className="font-semibold text-sm">
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100">
                           {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
                         </h3>
-                        <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
+                        <span className="text-sm font-semibold text-[#0B64A3]">{profileCompletion.percentage}%</span>
                       </div>
-                      <div className="w-full bg-amber-200 dark:bg-amber-800 rounded-full h-2 mb-3">
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mb-3">
                         <div 
-                          className="bg-amber-500 h-2 rounded-full transition-all" 
+                          className="bg-[#0B64A3] h-2 rounded-full transition-all" 
                           style={{ width: `${profileCompletion.percentage}%` }}
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground mb-2">
+                      <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
                         {language === 'en' 
                           ? 'Complete your profile to connect with employers instantly' 
                           : language === 'es'
@@ -2521,48 +2592,55 @@ export default function TechnicianPortal() {
                           : 'Complétez votre profil pour vous connecter instantanément avec les employeurs'}
                       </p>
                       {profileCompletion.incompleteFields.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap gap-2">
                           {profileCompletion.incompleteFields.slice(0, 3).map((field, i) => (
-                            <Badge key={i} variant="outline" className="text-xs bg-background">
+                            <span key={i} className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
                               {field.label}
-                            </Badge>
+                            </span>
                           ))}
                           {profileCompletion.incompleteFields.length > 3 && (
-                            <Badge variant="outline" className="text-xs bg-background">
+                            <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600">
                               +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : language === 'es' ? 'más' : 'de plus'}
-                            </Badge>
+                            </span>
                           )}
                         </div>
                       )}
                     </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                    <ArrowRight className="w-5 h-5 text-[#0B64A3] flex-shrink-0" />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
 
-            {/* Quick Actions Grid */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* Quick Actions Grid - 4 columns on desktop, 2 on mobile */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {/* Job Board - Purple theme */}
               <button
                 onClick={() => setLocation("/technician-job-board")}
-                className="p-4 rounded-lg border bg-gradient-to-br from-blue-500/10 to-purple-500/10 hover-elevate text-left"
+                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
                 data-testid="quick-action-jobs"
               >
-                <Briefcase className="w-8 h-8 text-blue-500 mb-2" />
-                <p className="font-medium text-sm">{t.jobBoard}</p>
-                <p className="text-xs text-muted-foreground">{t.browseJobs}</p>
+                <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-3">
+                  <Briefcase className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.jobBoard}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t.browseJobs}</p>
               </button>
               
+              {/* Profile - Slate theme */}
               <button
                 onClick={() => setActiveTab('profile')}
-                className="p-4 rounded-lg border bg-card hover-elevate text-left"
+                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
                 data-testid="quick-action-profile"
               >
-                <User className="w-8 h-8 text-primary mb-2" />
-                <p className="font-medium text-sm">{t.tabProfile}</p>
-                <p className="text-xs text-muted-foreground">{t.editProfile}</p>
+                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+                  <User className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                </div>
+                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.tabProfile}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t.editProfile}</p>
               </button>
               
+              {/* Feedback - Pink theme */}
               <button
                 onClick={() => {
                   if (totalUnreadFeedback > 0) {
@@ -2571,12 +2649,14 @@ export default function TechnicianPortal() {
                     setShowFeedbackDialog(true);
                   }
                 }}
-                className="p-4 rounded-lg border bg-gradient-to-br from-purple-500/5 to-pink-500/5 hover-elevate text-left relative"
+                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all relative"
                 data-testid="quick-action-feedback"
               >
-                <MessageSquare className="w-8 h-8 text-purple-500 mb-2" />
-                <p className="font-medium text-sm">{t.feedback}</p>
-                <p className="text-xs text-muted-foreground">
+                <div className="w-10 h-10 rounded-lg bg-pink-50 dark:bg-pink-900/30 flex items-center justify-center mb-3">
+                  <MessageSquare className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                </div>
+                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.feedback}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   {totalUnreadFeedback > 0 ? t.viewMyFeedback : t.sendFeedback}
                 </p>
                 {totalUnreadFeedback > 0 && (
@@ -2586,31 +2666,35 @@ export default function TechnicianPortal() {
                 )}
               </button>
               
-              {/* My Logged Hours - Same style as other quick actions */}
+              {/* My Logged Hours - Sky theme */}
               <button
                 onClick={() => setLocation("/technician-logged-hours")}
-                className="p-4 rounded-lg border bg-gradient-to-br from-primary/5 to-primary/10 hover-elevate text-left"
+                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
                 data-testid="quick-action-logged-hours"
               >
-                <Clock className="w-8 h-8 text-primary mb-2" />
-                <p className="font-medium text-sm">{t.myLoggedHours}</p>
-                <p className="text-xs text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                <div className="w-10 h-10 rounded-lg bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center mb-3">
+                  <Clock className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                </div>
+                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.myLoggedHours}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t.viewLoggedHoursDesc}</p>
                 {(combinedTotalHours > 0 || workSessionHours > 0) && (
-                  <p className="text-sm font-bold text-primary mt-1" data-testid="text-home-total-logged-hours">
+                  <p className="text-sm font-bold text-[#0B64A3] mt-1" data-testid="text-home-total-logged-hours">
                     {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
                   </p>
                 )}
               </button>
               
-              {/* Personal Safety Documents */}
+              {/* Personal Safety Documents - Emerald theme */}
               <button
                 onClick={() => setLocation("/personal-safety-documents")}
-                className="p-4 rounded-lg border bg-gradient-to-br from-green-500/5 to-green-500/10 hover-elevate text-left"
+                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
                 data-testid="quick-action-personal-safety"
               >
-                <Shield className="w-8 h-8 text-green-600 mb-2" />
-                <p className="font-medium text-sm">{t.personalSafetyDocs}</p>
-                <p className="text-xs text-muted-foreground">{t.personalSafetyDocsDesc}</p>
+                <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center mb-3">
+                  <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.personalSafetyDocs}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t.personalSafetyDocsDesc}</p>
               </button>
             </div>
 
@@ -5382,6 +5466,7 @@ export default function TechnicianPortal() {
           </>
         )}
       </main>
+      </div>{/* End of lg:pl-60 wrapper */}
 
       {/* Document Deletion Confirmation Dialog */}
       <AlertDialog open={!!deletingDocument} onOpenChange={(open) => !open && setDeletingDocument(null)}>
@@ -5419,9 +5504,9 @@ export default function TechnicianPortal() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom">
-        <div className="max-w-4xl mx-auto flex items-center justify-around py-2">
+      {/* Mobile Bottom Navigation - hidden on desktop */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom lg:hidden">
+        <div className="w-full px-4 md:px-6 flex items-center justify-around py-2">
           <button
             onClick={() => setActiveTab('home')}
             className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${

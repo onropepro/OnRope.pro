@@ -148,48 +148,6 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
 }
 
 /**
- * Middleware: Block creation of new projects if limit exceeded
- * Use on: POST /api/projects
- */
-export async function requireProjectsWithinLimit(req: Request, res: Response, next: NextFunction) {
-  try {
-    if (!req.session.userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    const user = await storage.getUserById(req.session.userId);
-    if (!user || user.role !== 'company') {
-      return next(); // Not a company, no limits apply
-    }
-
-    const check = await checkSubscriptionLimits(user.id);
-
-    // If within grace period, always allow
-    if (check.withinGracePeriod) {
-      console.log(`[Subscription] Allowing project creation during grace period`);
-      return next();
-    }
-
-    // Check if project limit would be exceeded
-    if (check.limits.maxProjects !== -1 && check.usage.currentProjects >= check.limits.maxProjects) {
-      console.warn(`[Subscription] Project limit exceeded for company ${user.id}: ${check.usage.currentProjects}/${check.limits.maxProjects}`);
-      return res.status(403).json({
-        message: `Project limit reached (${check.limits.maxProjects}). Please upgrade your subscription to create more projects.`,
-        exceeded: true,
-        limits: check.limits,
-        usage: check.usage,
-      });
-    }
-
-    next();
-  } catch (error) {
-    console.error('[Subscription] Error in requireProjectsWithinLimit:', error);
-    // FAIL-SAFE: Allow on error (don't block emergency operations)
-    next();
-  }
-}
-
-/**
  * Middleware: Block creation of new employees if limit exceeded
  * Use on: POST /api/employees, POST /api/register (for employee creation)
  */

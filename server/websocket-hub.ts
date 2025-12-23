@@ -174,6 +174,79 @@ class WebSocketHub {
       });
     }
   }
+
+  // Notify property manager when a new quote is linked to them
+  notifyQuoteCreated(propertyManagerId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    status: string;
+    grandTotal: string | null;
+    createdAt: Date | string;
+    companyName: string | null;
+  }) {
+    const userConnections = this.connections.get(propertyManagerId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:created',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified property manager ${propertyManagerId} of new quote ${quote.quoteNumber}`);
+    }
+  }
+
+  // Notify company when a quote is accepted by property manager
+  notifyQuoteAccepted(companyId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    propertyManagerName: string | null;
+  }) {
+    const userConnections = this.connections.get(companyId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:accepted',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified company ${companyId} that quote ${quote.quoteNumber} was accepted`);
+    }
+  }
+
+  // Notify company when a quote is declined by property manager
+  notifyQuoteDeclined(companyId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    propertyManagerName: string | null;
+    reason: string | null;
+  }) {
+    const userConnections = this.connections.get(companyId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:declined',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified company ${companyId} that quote ${quote.quoteNumber} was declined`);
+    }
+  }
 }
 
 export const wsHub = new WebSocketHub();

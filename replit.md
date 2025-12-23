@@ -24,8 +24,9 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 *   **Security Architecture:** Session-based authentication, multi-tenant data isolation, permission-based API filtering, and AES-256-GCM encryption for sensitive data at rest.
 *   **UI/UX Standards:** Emphasizes mobile-first design, accessibility, clear visual feedback, and consistent component usage (e.g., `max-w-4xl` for dialogs).
 *   **Mandatory Timezone Support:** All date/time operations use timezone-safe utilities (`date-fns-tz`) with a hierarchy: Project timezone → Company timezone → Default (America/Vancouver).
-*   **Knowledge Base & Help Center (/help):** RAG-powered, AI chat assistant with semantic search using Gemini embeddings, 16 module guides, and stakeholder-specific navigation.
+*   **Knowledge Base & Help Center (/help):** RAG-powered, AI chat assistant with semantic search using Gemini embeddings, 19 module guides (including Technician Portal), and stakeholder-specific navigation.
 *   **Stakeholder Landing Pages:** Public-facing, branded landing pages for Technicians, Residents, Property Managers, and Building Managers.
+*   **Unified Dashboard Layout System:** Variant-based DashboardSidebar and DashboardLayout components supporting 5 stakeholder types (employer, technician, property-manager, resident, building-manager) with role-specific brand colors (Employer: #0B64A3, Technician: #AB4521, Property Manager: #6E9075, Resident: #86A59C, Building Manager: #B89685).
 
 ## External Dependencies
 *   **Database:** PostgreSQL

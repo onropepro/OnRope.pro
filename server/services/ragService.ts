@@ -95,6 +95,13 @@ export const guideRegistry = [
     stakeholders: ['owner', 'technician'],
   },
   {
+    slug: 'technician-portal',
+    title: 'Technician Portal',
+    category: 'hr',
+    sourceFile: 'client/src/pages/TechnicianPortal.tsx',
+    stakeholders: ['technician'],
+  },
+  {
     slug: 'quoting-sales',
     title: 'Quoting & Sales',
     category: 'financial',
