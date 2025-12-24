@@ -150,8 +150,9 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
               <ShieldCheck className="w-4 h-4 text-muted-foreground" />
               <div>
                 <p className={`text-xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
-                  {Math.round(rating)}% <span className="text-xs font-normal text-muted-foreground">CSR</span>
+                  {Math.round(rating)}%
                 </p>
+                <p className="text-xs text-muted-foreground">Company Safety</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -180,8 +181,9 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                 <Users className="w-4 h-4 text-muted-foreground" />
                 <div>
                   <p className={`text-lg font-semibold ${wssColors.text}`} data-testid="text-wss-value">
-                    {wssScore}% <span className="text-xs font-normal text-muted-foreground">WSS</span>
+                    {wssScore}%
                   </p>
+                  <p className="text-xs text-muted-foreground">Workforce Safety</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
