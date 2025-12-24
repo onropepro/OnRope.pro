@@ -12,7 +12,11 @@ import {
   TrendingUp,
   Info,
   Award,
-  GraduationCap
+  GraduationCap,
+  BookOpen,
+  Target,
+  Calculator,
+  Star
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { User } from "@shared/schema";
@@ -119,6 +123,24 @@ export default function TechnicianPSR() {
       quizzesPassed: "quizzes passed",
       sessions: "work sessions",
       incidents: "incidents",
+      // Documentation section
+      aboutPSR: "Understanding Your PSR",
+      whatIsPSR: "What is PSR?",
+      whatIsPSRDesc: "Your Personal Safety Rating (PSR) is a comprehensive score that reflects your commitment to safety in rope access work. It combines your certifications, equipment inspections, safety knowledge, and work history into a single, easy-to-understand percentage.",
+      whyPSRMatters: "Why Your PSR Matters",
+      whyPSRMattersDesc: "A strong PSR demonstrates your professionalism to employers. Companies reviewing technician profiles can see your safety rating, making a high PSR a competitive advantage when seeking work opportunities.",
+      howCalculated: "How It's Calculated",
+      calcIntro: "Your PSR is calculated from the following components:",
+      calcCert: "Certifications: Valid, verified IRATA/SPRAT certification scores highest (100%). Unverified scores 75%, expired scores 25%.",
+      calcDocs: "Safety Documents: Based on your personal harness inspections in the last 30 days. More passed inspections = higher score.",
+      calcQuiz: "Safety Quizzes: Complete the 6 available safety quizzes to maximize this score.",
+      calcWork: "Work History: Only applies when linked to an employer. Clean incident record maintains high score.",
+      calcWeights: "When not linked to an employer, each component is weighted equally at 33%. When linked, all four components are weighted at 25% each.",
+      scoreRanges: "Score Ranges",
+      range90: "90-100%: Excellent - Top-tier safety compliance",
+      range70: "70-89%: Good - Solid safety record",
+      range50: "50-69%: Needs Work - Room for improvement",
+      range0: "0-49%: Critical - Immediate attention required",
     },
     fr: {
       pageTitle: "Cote de Sécurité Personnelle",
@@ -154,6 +176,24 @@ export default function TechnicianPSR() {
       quizzesPassed: "quiz réussis",
       sessions: "sessions de travail",
       incidents: "incidents",
+      // Documentation section
+      aboutPSR: "Comprendre votre PSR",
+      whatIsPSR: "Qu'est-ce que le PSR?",
+      whatIsPSRDesc: "Votre Cote de Sécurité Personnelle (PSR) est un score complet qui reflète votre engagement envers la sécurité dans les travaux sur corde. Il combine vos certifications, inspections d'équipement, connaissances en sécurité et historique de travail en un pourcentage facile à comprendre.",
+      whyPSRMatters: "Pourquoi votre PSR est important",
+      whyPSRMattersDesc: "Un PSR élevé démontre votre professionnalisme aux employeurs. Les entreprises qui examinent les profils de techniciens peuvent voir votre cote de sécurité, faisant d'un PSR élevé un avantage compétitif lors de la recherche d'opportunités de travail.",
+      howCalculated: "Comment c'est calculé",
+      calcIntro: "Votre PSR est calculé à partir des composants suivants:",
+      calcCert: "Certifications: Une certification IRATA/SPRAT valide et vérifiée obtient le score le plus élevé (100%). Non vérifié = 75%, expiré = 25%.",
+      calcDocs: "Documents de sécurité: Basé sur vos inspections de harnais personnelles des 30 derniers jours. Plus d'inspections réussies = score plus élevé.",
+      calcQuiz: "Quiz de sécurité: Complétez les 6 quiz de sécurité disponibles pour maximiser ce score.",
+      calcWork: "Historique de travail: S'applique uniquement lorsque vous êtes lié à un employeur. Un dossier propre maintient un score élevé.",
+      calcWeights: "Lorsque vous n'êtes pas lié à un employeur, chaque composant est pondéré également à 33%. Lorsque lié, les quatre composants sont pondérés à 25% chacun.",
+      scoreRanges: "Plages de scores",
+      range90: "90-100%: Excellent - Conformité de sécurité de premier ordre",
+      range70: "70-89%: Bon - Dossier de sécurité solide",
+      range50: "50-69%: À améliorer - Marge d'amélioration",
+      range0: "0-49%: Critique - Attention immédiate requise",
     },
     es: {
       pageTitle: "Calificación de Seguridad Personal",
@@ -189,6 +229,24 @@ export default function TechnicianPSR() {
       quizzesPassed: "cuestionarios aprobados",
       sessions: "sesiones de trabajo",
       incidents: "incidentes",
+      // Documentation section
+      aboutPSR: "Entendiendo tu PSR",
+      whatIsPSR: "Que es el PSR?",
+      whatIsPSRDesc: "Tu Calificacion de Seguridad Personal (PSR) es una puntuacion integral que refleja tu compromiso con la seguridad en el trabajo de acceso con cuerdas. Combina tus certificaciones, inspecciones de equipo, conocimientos de seguridad e historial de trabajo en un porcentaje facil de entender.",
+      whyPSRMatters: "Por que importa tu PSR",
+      whyPSRMattersDesc: "Un PSR alto demuestra tu profesionalismo a los empleadores. Las empresas que revisan perfiles de tecnicos pueden ver tu calificacion de seguridad, haciendo de un PSR alto una ventaja competitiva al buscar oportunidades de trabajo.",
+      howCalculated: "Como se calcula",
+      calcIntro: "Tu PSR se calcula a partir de los siguientes componentes:",
+      calcCert: "Certificaciones: Una certificacion IRATA/SPRAT valida y verificada obtiene la puntuacion mas alta (100%). No verificada = 75%, vencida = 25%.",
+      calcDocs: "Documentos de seguridad: Basado en tus inspecciones de arnes personales de los ultimos 30 dias. Mas inspecciones aprobadas = puntuacion mas alta.",
+      calcQuiz: "Cuestionarios de seguridad: Completa los 6 cuestionarios de seguridad disponibles para maximizar esta puntuacion.",
+      calcWork: "Historial de trabajo: Solo aplica cuando estas vinculado a un empleador. Un registro limpio mantiene una puntuacion alta.",
+      calcWeights: "Cuando no estas vinculado a un empleador, cada componente tiene un peso igual del 33%. Cuando estas vinculado, los cuatro componentes tienen un peso del 25% cada uno.",
+      scoreRanges: "Rangos de puntuacion",
+      range90: "90-100%: Excelente - Cumplimiento de seguridad de primer nivel",
+      range70: "70-89%: Bueno - Registro de seguridad solido",
+      range50: "50-69%: Necesita mejora - Margen de mejora",
+      range0: "0-49%: Critico - Atencion inmediata requerida",
     }
   };
 
@@ -400,6 +458,97 @@ export default function TechnicianPSR() {
                   </li>
                 ))}
               </ul>
+            </CardContent>
+          </Card>
+
+          {/* Understanding Your PSR Documentation */}
+          <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-[#0B64A3]" />
+                {trans.aboutPSR}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* What is PSR */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Info className="w-4 h-4 text-slate-500" />
+                  <h3 className="font-medium text-base text-slate-900 dark:text-slate-100">{trans.whatIsPSR}</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 pl-6">
+                  {trans.whatIsPSRDesc}
+                </p>
+              </div>
+
+              {/* Why PSR Matters */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Target className="w-4 h-4 text-slate-500" />
+                  <h3 className="font-medium text-base text-slate-900 dark:text-slate-100">{trans.whyPSRMatters}</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 pl-6">
+                  {trans.whyPSRMattersDesc}
+                </p>
+              </div>
+
+              {/* How It's Calculated */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Calculator className="w-4 h-4 text-slate-500" />
+                  <h3 className="font-medium text-base text-slate-900 dark:text-slate-100">{trans.howCalculated}</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 pl-6">
+                  {trans.calcIntro}
+                </p>
+                <ul className="space-y-2 pl-6">
+                  <li className="flex items-start gap-2">
+                    <Award className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{trans.calcCert}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <FileCheck className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{trans.calcDocs}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <GraduationCap className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{trans.calcQuiz}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Clock className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{trans.calcWork}</span>
+                  </li>
+                </ul>
+                <p className="text-sm text-slate-500 dark:text-slate-500 pl-6 italic">
+                  {trans.calcWeights}
+                </p>
+              </div>
+
+              {/* Score Ranges */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-slate-500" />
+                  <h3 className="font-medium text-base text-slate-900 dark:text-slate-100">{trans.scoreRanges}</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-6">
+                  <div className="flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-950/30">
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <span className="text-sm text-green-700 dark:text-green-400">{trans.range90}</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 dark:bg-emerald-950/30">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                    <span className="text-sm text-emerald-700 dark:text-emerald-400">{trans.range70}</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-md bg-amber-50 dark:bg-amber-950/30">
+                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                    <span className="text-sm text-amber-700 dark:text-amber-400">{trans.range50}</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-md bg-red-50 dark:bg-red-950/30">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <span className="text-sm text-red-700 dark:text-red-400">{trans.range0}</span>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </main>
