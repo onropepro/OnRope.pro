@@ -19871,22 +19871,19 @@ Do not include any other text, just the JSON object.`
             
             // Send SMS notification if PM has phone and opted in
             if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
-              const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-                ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-                : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
-              const quoteViewUrl = `${baseUrl}/property-manager/quotes/${fullQuote!.id}`;
-              
               // Get company name for SMS
               const company = await storage.getUserById(companyId);
               const companyName = company?.companyName || 'Rope Access Company';
-              const grandTotal = fullQuote!.services?.reduce((sum: number, s: any) => sum + Number(s.totalCost || 0), 0) || 0;
+              
+              // Extract service types from quote services
+              const serviceTypes = fullQuote!.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
               
               const smsResponse = await sendQuoteNotificationSMS(
                 propertyManager.propertyManagerPhoneNumber,
                 fullQuote!.buildingName,
                 companyName,
-                grandTotal,
-                quoteViewUrl
+                serviceTypes,
+                fullQuote!.strataPlanNumber
               );
               
               if (smsResponse.success) {
@@ -21310,18 +21307,15 @@ Do not include any other text, just the JSON object.`
           
           // If they have a phone number AND opted-in to SMS, send SMS notification
           if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
-            // Build the deep link URL to the specific quote
-            const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-              ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-              : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
-            const quoteViewUrl = `${baseUrl}/property-manager/quotes/${quote.id}`;
+            // Extract service types from quote services
+            const serviceTypes = quote.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
             
             const smsResponse = await sendQuoteNotificationSMS(
               propertyManager.propertyManagerPhoneNumber,
               quote.buildingName,
               companyName,
-              grandTotal,
-              quoteViewUrl
+              serviceTypes,
+              quote.strataPlanNumber
             );
             if (smsResponse.success) {
               console.log(`[SMS] Quote notification sent to ${propertyManager.propertyManagerPhoneNumber}, SID: ${smsResponse.messageId}`);
