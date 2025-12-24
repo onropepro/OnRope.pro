@@ -9326,11 +9326,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ found: false, message: "This technician is already connected to your company" });
       }
       
-      // If technician is linked to another company and doesn't have PLUS access
-      if (technician.companyId && !technician.hasPlusAccess) {
+      // Technicians are visible to employers if they have visibility toggle on
+      // OR if they have PLUS access (which allows multi-employer connections)
+      const isVisible = technician.isVisibleToEmployers || technician.hasPlusAccess;
+      
+      // If technician is linked to another company, doesn't have PLUS, AND hasn't enabled visibility
+      if (technician.companyId && !technician.hasPlusAccess && !technician.isVisibleToEmployers) {
         return res.json({ 
           found: false, 
-          message: "This technician is already linked to another company. They need Technician PLUS to connect with multiple employers." 
+          message: "This technician is not currently visible to employers. They need to enable their visibility toggle or have Technician PLUS." 
         });
       }
       
