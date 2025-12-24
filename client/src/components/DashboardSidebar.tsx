@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
 import type { User } from "@/lib/permissions";
 import {
   hasFinancialAccess,
