@@ -299,7 +299,14 @@ export default function VisibleTechniciansBrowser() {
   const filteredTechnicians = technicians.filter(tech => {
     const name = getDisplayName(tech).toLowerCase();
     const location = getLocation(tech)?.toLowerCase() || "";
-    const matchesSearch = name.includes(searchQuery.toLowerCase()) || location.includes(searchQuery.toLowerCase());
+    const irataLicense = (tech.irataLicenseNumber || "").toLowerCase();
+    const spratLicense = (tech.spratLicenseNumber || "").toLowerCase();
+    const searchLower = searchQuery.toLowerCase();
+    
+    const matchesSearch = name.includes(searchLower) || 
+                          location.includes(searchLower) ||
+                          irataLicense.includes(searchLower) ||
+                          spratLicense.includes(searchLower);
 
     let matchesCert = true;
     if (certFilter === "irata") {
