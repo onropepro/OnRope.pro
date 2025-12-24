@@ -124,6 +124,7 @@ import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import PersonalSafetyDocuments from "@/pages/PersonalSafetyDocuments";
 import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
 import TechnicianPracticeQuizzes from "@/pages/TechnicianPracticeQuizzes";
+import TechnicianPSR from "@/pages/TechnicianPSR";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
 import VisibleTechniciansBrowser from "@/pages/VisibleTechniciansBrowser";
 import NotFound from "@/pages/not-found";
@@ -258,6 +259,11 @@ function Router() {
       <Route path="/technician-practice-quizzes">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianPracticeQuizzes />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/technician-psr">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+          <TechnicianPSR />
         </ProtectedRoute>
       </Route>
       <Route path="/resident-dashboard">
