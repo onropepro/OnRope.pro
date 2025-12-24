@@ -353,7 +353,7 @@ export function DashboardSidebar({
             <img
               src={onRopeProLogo}
               alt="OnRopePro"
-              className="h-9 w-auto object-contain"
+              className="h-10 w-auto object-contain"
             />
           </div>
         )}
