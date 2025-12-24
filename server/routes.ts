@@ -11300,6 +11300,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const pmId = req.params.pmId;
       
+      // Get the company to access propertyManagerCode
+      const company = currentUser.role === "company" ? currentUser : await storage.getUserById(companyId);
+      if (!company || !company.propertyManagerCode) {
+        return res.status(400).json({ message: "Company does not have a property manager code configured" });
+      }
+      
       // Verify the PM exists and is a property_manager
       const pm = await storage.getUserById(pmId);
       if (!pm || pm.role !== 'property_manager') {
@@ -11318,14 +11324,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Property manager is already linked to your company" });
       }
       
-      // Create the link
+      // Check if a client already exists for this PM email
+      const existingClients = await storage.getClientsByCompany(companyId);
+      const existingClient = existingClients.find((c: any) => 
+        c.email && pm.email && c.email.toLowerCase() === pm.email.toLowerCase()
+      );
+      
+      // Create the link with company code
       await db.insert(propertyManagerCompanyLinks).values({
         id: crypto.randomUUID(),
         propertyManagerId: pmId,
         companyId: companyId,
+        companyCode: company.propertyManagerCode,
       });
       
-      res.json({ success: true, message: "Property manager linked successfully" });
+      // Create a client record for this PM if one doesn't exist
+      if (!existingClient) {
+        const pmName = `${pm.firstName || ''} ${pm.lastName || ''}`.trim();
+        await storage.createClient({
+          companyId: companyId,
+          firstName: pm.firstName || '',
+          lastName: pm.lastName || '',
+          company: pm.propertyManagementCompany || '',
+          email: pm.email || '',
+          phoneNumber: pm.propertyManagerPhoneNumber || '',
+          address: '',
+          billingAddress: '',
+        });
+      }
+      
+      res.json({ success: true, message: "Property manager linked and added to client database" });
     } catch (error) {
       console.error("Error linking property manager:", error);
       res.status(500).json({ message: "Failed to link property manager" });

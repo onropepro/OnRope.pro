@@ -7929,8 +7929,10 @@ export default function Dashboard() {
                                       if (response.ok) {
                                         toast({
                                           title: t('dashboard.pmSearch.linkSuccess', 'Property Manager Linked'),
-                                          description: t('dashboard.pmSearch.linkSuccessDesc', '{{name}} has been linked to your company', { name: pm.name || pm.email }),
+                                          description: t('dashboard.pmSearch.linkSuccessDesc', '{{name}} has been linked and added to your client database', { name: pm.name || pm.email }),
                                         });
+                                        // Invalidate clients query to refresh the list
+                                        queryClient.invalidateQueries({ queryKey: ['/api/clients'] });
                                         // Update local state to show as linked
                                         setPMSearchResults(prev => 
                                           prev.map(p => p.id === pm.id ? { ...p, isLinked: true } : p)
