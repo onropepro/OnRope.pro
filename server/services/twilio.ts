@@ -83,7 +83,11 @@ export async function sendQuoteNotificationSMS(
     minimumFractionDigits: 2
   });
   
-  const message = `You've received a service quote for ${buildingName} from ${companyName}. Amount: ${formattedAmount}. Log in to your OnRopePro account to review the quote.`;
+  // Build PM login URL from environment
+  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || 'onropepro.com';
+  const pmLoginUrl = `https://${domain}/pm-dashboard`;
+  
+  const message = `You've received a service quote for ${buildingName} from ${companyName}. Amount: ${formattedAmount}. Log in to review: ${pmLoginUrl}`;
   
   return sendSMS(phoneNumber, message);
 }
