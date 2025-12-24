@@ -197,8 +197,9 @@ If no markdown file exists, the system attempts to extract content from the TSX 
 | `property-manager-interface` | Property Manager Interface | communication | YES | Complete |
 | `white-label-branding` | White-Label Branding | customization | YES | Complete |
 | `analytics-reporting` | Analytics & Reporting | operations | YES | Complete |
+| `personal-safety-rating` | Personal Safety Rating (PSR) | safety | YES | Complete |
 
-**Summary:** 16 of 16 modules have dedicated markdown content in `server/help-content/modules/`.
+**Summary:** 17 of 17 modules have dedicated markdown content in `server/help-content/modules/`.
 
 **Note:** There should be exactly ONE entry per module in guideRegistry. The previous duplicate `resident-portal-user-guide` entry was removed in December 2025.
 

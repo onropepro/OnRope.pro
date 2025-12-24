@@ -406,6 +406,7 @@ Manually trigger full reindex.
 | property-manager-interface | Property Manager Interface | communication | Yes |
 | white-label-branding | White-Label Branding | customization | Yes |
 | analytics-reporting | Analytics & Reporting | operations | Yes |
+| personal-safety-rating | Personal Safety Rating (PSR) | safety | Yes |
 
 ---
 

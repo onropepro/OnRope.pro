@@ -130,6 +130,7 @@ const moduleIcons: Record<string, React.ReactNode> = {
   'property-manager-interface': <Building2 className="h-5 w-5" />,
   'white-label-branding': <Palette className="h-5 w-5" />,
   'analytics-reporting': <BarChart3 className="h-5 w-5" />,
+  'personal-safety-rating': <HardHat className="h-5 w-5" />,
 };
 
 export default function HelpCenter() {
