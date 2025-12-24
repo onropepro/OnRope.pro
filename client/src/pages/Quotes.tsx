@@ -1914,17 +1914,25 @@ export default function Quotes() {
                 <div className="flex flex-col gap-2 items-end">
                   <Badge
                     className={`rounded-full px-4 py-2 text-base ${
-                      selectedQuote.status === "draft"
+                      (selectedQuote as any).pipelineStage === "draft"
                         ? "bg-muted-foreground text-white"
-                        : selectedQuote.status === "submitted"
+                        : (selectedQuote as any).pipelineStage === "submitted"
                         ? "bg-primary text-white"
-                        : selectedQuote.status === "open"
+                        : (selectedQuote as any).pipelineStage === "review"
                         ? "bg-chart-2 text-white"
-                        : "bg-success text-white"
+                        : (selectedQuote as any).pipelineStage === "negotiation"
+                        ? "bg-amber-500 text-white"
+                        : (selectedQuote as any).pipelineStage === "approved"
+                        ? "bg-emerald-500 text-white"
+                        : (selectedQuote as any).pipelineStage === "won"
+                        ? "bg-success text-white"
+                        : (selectedQuote as any).pipelineStage === "lost"
+                        ? "bg-destructive text-white"
+                        : "bg-chart-2 text-white"
                     }`}
                     data-testid="badge-quote-status"
                   >
-                    {selectedQuote.status}
+                    {((selectedQuote as any).pipelineStage || 'draft').replace(/_/g, ' ')}
                   </Badge>
                   <div className="flex gap-2 flex-wrap">
                     <Button
