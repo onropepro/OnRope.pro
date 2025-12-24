@@ -35,11 +35,18 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
   const savedCoords = typeof window !== 'undefined' 
     ? localStorage.getItem('weather_coordinates') 
     : null;
-  const coords = savedCoords ? JSON.parse(savedCoords) : { lat: 49.2827, lng: -123.1207 };
+  const coords = savedCoords ? JSON.parse(savedCoords) : { lat: 49.2827, lon: -123.1207 };
+  const lat = coords.lat;
+  const lon = coords.lon ?? coords.lng;
   
   const { data: weatherData, isLoading, error } = useQuery<WeatherData>({
-    queryKey: [`/api/weather/${coords.lat}/${coords.lng}`],
+    queryKey: ['/api/weather', lat, lon],
     refetchInterval: 300000,
+    queryFn: async () => {
+      const response = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+      if (!response.ok) throw new Error("Failed to fetch weather");
+      return response.json();
+    },
   });
 
   const accentColor = branding?.primaryColor || "#0B64A3";
