@@ -21206,6 +21206,68 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+  // ==================== WEATHER ROUTES ====================
+
+  // Get weather data from Open-Meteo (free, no API key required)
+  app.get("/api/weather", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const lat = parseFloat(req.query.lat as string);
+      const lon = parseFloat(req.query.lon as string);
+      
+      if (isNaN(lat) || isNaN(lon)) {
+        return res.status(400).json({ message: "Invalid coordinates. Please provide lat and lon query parameters." });
+      }
+      
+      // Fetch from Open-Meteo API - free, no key required
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto&forecast_days=1`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Open-Meteo API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Transform the data for easier frontend consumption
+      const current = {
+        temperature: data.current?.temperature_2m,
+        temperatureUnit: data.current_units?.temperature_2m || "°C",
+        humidity: data.current?.relative_humidity_2m,
+        weatherCode: data.current?.weather_code,
+        windSpeed: data.current?.wind_speed_10m,
+        windSpeedUnit: data.current_units?.wind_speed_10m || "km/h",
+        windDirection: data.current?.wind_direction_10m,
+        windGusts: data.current?.wind_gusts_10m,
+        time: data.current?.time,
+      };
+      
+      // Build hourly forecast
+      const hourly = [];
+      if (data.hourly?.time) {
+        for (let i = 0; i < data.hourly.time.length; i++) {
+          hourly.push({
+            time: data.hourly.time[i],
+            temperature: data.hourly.temperature_2m?.[i],
+            weatherCode: data.hourly.weather_code?.[i],
+            windSpeed: data.hourly.wind_speed_10m?.[i],
+            windDirection: data.hourly.wind_direction_10m?.[i],
+            windGusts: data.hourly.wind_gusts_10m?.[i],
+          });
+        }
+      }
+      
+      res.json({
+        current,
+        hourly,
+        timezone: data.timezone,
+        location: { lat, lon },
+      });
+    } catch (error) {
+      console.error("Weather API error:", error);
+      res.status(500).json({ message: "Failed to fetch weather data" });
+    }
+  });
+
   // ==================== SCHEDULING ROUTES ====================
 
   // Get all scheduled jobs for the company
