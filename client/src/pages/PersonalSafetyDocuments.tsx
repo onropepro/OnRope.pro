@@ -391,6 +391,17 @@ export default function PersonalSafetyDocuments() {
 
         <main className="p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <Shield className="h-7 w-7 text-primary" />
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                  {language === 'en' ? 'Personal Safety Documents' : language === 'es' ? 'Documentos de Seguridad Personal' : 'Documents de Securite Personnel'}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {language === 'en' ? 'Track and manage your personal safety inspections' : language === 'es' ? 'Rastrea y gestiona tus inspecciones de seguridad personal' : 'Suivez et gerez vos inspections de securite personnelles'}
+                </p>
+              </div>
+            </div>
 
         <Card className="mb-4 border-primary/20 bg-primary/5">
           <CardContent className="p-4">
