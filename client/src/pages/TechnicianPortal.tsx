@@ -1767,6 +1767,19 @@ export default function TechnicianPortal() {
       ],
     },
     {
+      id: "logging",
+      label: language === 'en' ? "LOGGING" : language === 'es' ? "REGISTRO" : "JOURNALISATION",
+      items: [
+        {
+          id: "logged-hours",
+          label: language === 'en' ? "Logged Hours" : language === 'es' ? "Horas Registradas" : "Heures enregistrées",
+          icon: Clock,
+          href: "/technician-logged-hours",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
       id: "safety",
       label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
       items: [
