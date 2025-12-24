@@ -17881,8 +17881,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // 4. Work History Score (25%)
         let workScore = 50; // Default for new employees
-        const workSessions = await storage.getWorkSessionsByEmployeeId(employee.id);
-        const completedSessions = workSessions.filter((ws: any) => ws.clockOutTime);
+        const workSessionsList = await db.select()
+          .from(workSessions)
+          .where(eq(workSessions.employeeId, employee.id));
+        const completedSessions = workSessionsList.filter((ws: any) => ws.clockOutTime);
         
         const incidentReportsList = await db.select()
           .from(incidentReports)
@@ -18006,8 +18008,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // 4. Work History Score (25%)
         let workScore = 50;
-        const workSessions = await storage.getWorkSessionsByEmployeeId(employee.id);
-        const completedSessions = workSessions.filter((ws: any) => ws.clockOutTime);
+        const workSessionsList = await db.select()
+          .from(workSessions)
+          .where(eq(workSessions.employeeId, employee.id));
+        const completedSessions = workSessionsList.filter((ws: any) => ws.clockOutTime);
         
         const incidentReportsList = await db.select()
           .from(incidentReports)
