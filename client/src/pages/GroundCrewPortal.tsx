@@ -144,6 +144,19 @@ const translations = {
     changesSaved: "Your changes have been saved successfully.",
     updateFailed: "Update Failed",
     invalidFile: "Invalid file",
+    uploadImageFile: "Please upload an image or PDF file.",
+    uploading: "Uploading...",
+    uploadFailed: "Upload Failed",
+    documentUploaded: "Document Uploaded",
+    documentUploadedDesc: "Your document has been saved successfully.",
+    documentDeleted: "Document Deleted",
+    documentDeletedDesc: "Your document has been removed.",
+    deleteError: "Delete Error",
+    deleteErrorDesc: "Failed to delete the document. Please try again.",
+    firstAidCertificate: "First Aid Certificate",
+    confirmDelete: "Confirm Delete",
+    confirmDeleteDesc: "Are you sure you want to delete this document? This action cannot be undone.",
+    deleteDocument: "Delete",
     privacyNotice: "Privacy Notice",
     privacyText: "Your personal information is securely stored and used only by your employer for HR and payroll purposes. We never share your data externally.",
     errorNameRequired: "Name is required",
@@ -580,6 +593,12 @@ export default function GroundCrewPortal() {
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadType, setUploadType] = useState<string | null>(null);
+  
+  // Document upload state
+  const documentInputRef = useRef<HTMLInputElement>(null);
+  const uploadingDocTypeRef = useRef<string | null>(null);
+  const [uploadingDocType, setUploadingDocType] = useState<string | null>(null);
+  const [deletingDocument, setDeletingDocument] = useState<{ type: string; url: string } | null>(null);
 
   const { data: user, isLoading } = useQuery<any>({
     queryKey: ["/api/user"],
@@ -734,6 +753,127 @@ export default function GroundCrewPortal() {
       });
     },
   });
+
+  // Document delete mutation
+  const deleteDocumentMutation = useMutation({
+    mutationFn: async ({ documentType, documentUrl }: { documentType: string; documentUrl: string }) => {
+      return apiRequest("DELETE", "/api/ground-crew/document", { documentType, documentUrl });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setDeletingDocument(null);
+      toast({
+        title: t.documentDeleted || "Document Deleted",
+        description: t.documentDeletedDesc || "Your document has been removed.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.deleteError || "Delete Error",
+        description: t.deleteErrorDesc || "Failed to delete the document. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handler for uploading documents
+  const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    const docType = uploadingDocTypeRef.current;
+    
+    if (!file) return;
+    
+    if (!docType) {
+      toast({
+        title: "Upload Error",
+        description: "Document type not set. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const isValidType = file.type.startsWith('image/') || file.type === 'application/pdf';
+    if (!isValidType) {
+      toast({
+        title: t.invalidFile || "Invalid File",
+        description: t.uploadImageFile || "Please upload an image or PDF file.",
+        variant: "destructive",
+      });
+      setUploadingDocType(null);
+      uploadingDocTypeRef.current = null;
+      return;
+    }
+
+    toast({
+      title: t.uploading || "Uploading...",
+      description: `${file.name} (${(file.size / 1024).toFixed(1)} KB)`,
+    });
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', docType);
+
+      const response = await fetch('/api/ground-crew/upload-document', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || t.uploadFailed || "Upload failed");
+      }
+
+      toast({
+        title: t.documentUploaded || "Document Uploaded",
+        description: t.documentUploadedDesc || "Your document has been saved successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    } catch (error: any) {
+      toast({
+        title: t.uploadFailed || "Upload Failed",
+        description: error.message || "Failed to upload document",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingDocType(null);
+      uploadingDocTypeRef.current = null;
+      if (documentInputRef.current) {
+        documentInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Trigger document upload for a specific type
+  const triggerDocumentUpload = (docType: string) => {
+    uploadingDocTypeRef.current = docType;
+    setUploadingDocType(docType);
+    
+    if (!documentInputRef.current) {
+      toast({
+        title: "Upload Error",
+        description: "File input not found. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    documentInputRef.current.value = '';
+    
+    const handleDialogClose = () => {
+      setTimeout(() => {
+        if (documentInputRef.current && !documentInputRef.current.files?.length) {
+          setUploadingDocType(null);
+        }
+      }, 1000);
+      window.removeEventListener('focus', handleDialogClose);
+    };
+    
+    window.addEventListener('focus', handleDialogClose);
+    documentInputRef.current.click();
+  };
 
   const handleLogout = async () => {
     try {
@@ -1317,6 +1457,45 @@ export default function GroundCrewPortal() {
                           )}
                         />
                       </div>
+                      <div className="mt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('voidCheque')}
+                          disabled={uploadingDocType === 'voidCheque'}
+                          data-testid="button-upload-void-cheque"
+                        >
+                          {uploadingDocType === 'voidCheque' ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 mr-2" />
+                          )}
+                          {t.uploadVoidCheque || "Upload Void Cheque"}
+                        </Button>
+                        {user?.bankDocuments && user.bankDocuments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {user.bankDocuments.map((url: string, index: number) => (
+                              <div key={index} className="flex items-center gap-2 text-sm">
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                  {t.voidCheque || "Void Cheque"} #{index + 1}
+                                </a>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeletingDocument({ type: 'bankDocuments', url })}
+                                  className="h-6 w-6 p-0"
+                                  data-testid={`button-delete-bank-doc-${index}`}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <Separator />
@@ -1361,6 +1540,45 @@ export default function GroundCrewPortal() {
                           )}
                         />
                       </div>
+                      <div className="mt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('driversLicense')}
+                          disabled={uploadingDocType === 'driversLicense'}
+                          data-testid="button-upload-drivers-license"
+                        >
+                          {uploadingDocType === 'driversLicense' ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 mr-2" />
+                          )}
+                          {t.uploadDriversLicense || "Upload Driver's License"}
+                        </Button>
+                        {user?.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {user.driversLicenseDocuments.map((url: string, index: number) => (
+                              <div key={index} className="flex items-center gap-2 text-sm">
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                  {t.driversLicense || "Driver's License"} #{index + 1}
+                                </a>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeletingDocument({ type: 'driversLicenseDocuments', url })}
+                                  className="h-6 w-6 p-0"
+                                  data-testid={`button-delete-license-doc-${index}`}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <Separator />
@@ -1392,6 +1610,45 @@ export default function GroundCrewPortal() {
                             </FormItem>
                           )}
                         />
+                      </div>
+                      <div className="mt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('firstAidCertificate')}
+                          disabled={uploadingDocType === 'firstAidCertificate'}
+                          data-testid="button-upload-first-aid"
+                        >
+                          {uploadingDocType === 'firstAidCertificate' ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 mr-2" />
+                          )}
+                          {t.uploadFirstAidCert || "Upload First Aid Certificate"}
+                        </Button>
+                        {user?.firstAidDocuments && user.firstAidDocuments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {user.firstAidDocuments.map((url: string, index: number) => (
+                              <div key={index} className="flex items-center gap-2 text-sm">
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                  {t.firstAidCertificate || "First Aid Certificate"} #{index + 1}
+                                </a>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeletingDocument({ type: 'firstAidDocuments', url })}
+                                  className="h-6 w-6 p-0"
+                                  data-testid={`button-delete-first-aid-doc-${index}`}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -1609,6 +1866,35 @@ export default function GroundCrewPortal() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={!!deletingDocument} onOpenChange={(open) => !open && setDeletingDocument(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.confirmDelete}</AlertDialogTitle>
+            <AlertDialogDescription>{t.confirmDeleteDesc}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deletingDocument && deleteDocumentMutation.mutate(deletingDocument)}
+              className="bg-destructive text-destructive-foreground"
+              disabled={deleteDocumentMutation.isPending}
+              data-testid="button-confirm-delete"
+            >
+              {deleteDocumentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t.deleteDocument}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <input
+        ref={documentInputRef}
+        type="file"
+        accept="image/*,application/pdf"
+        className="hidden"
+        onChange={handleDocumentUpload}
+        data-testid="input-document-file"
+      />
     </div>
   );
 }

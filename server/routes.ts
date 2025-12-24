@@ -5740,6 +5740,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Ground Crew: Upload documents (void cheque, driver's license, first aid)
+  app.post("/api/ground-crew/upload-document", requireAuth, technicianDocumentUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'ground_crew' && user.role !== 'ground_crew_supervisor') {
+        return res.status(403).json({ message: "Only ground crew members can upload documents through this endpoint" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { documentType } = req.body;
+      if (!documentType) {
+        return res.status(400).json({ message: "Document type is required" });
+      }
+
+      const validTypes = ['voidCheque', 'driversLicense', 'firstAidCertificate'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Upload file to object storage
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
+      const filename = `ground-crew-${userId}-${documentType}-${timestamp}.${extension}`;
+      
+      const url = await objectStorageService.uploadPublicFile(filename, req.file.buffer, req.file.mimetype);
+      
+      console.log(`[GroundCrew] Uploaded ${documentType} for user ${userId}:`, url);
+
+      // Update the user's document arrays based on document type
+      let updateData: any = {};
+      
+      if (documentType === 'voidCheque') {
+        const existingDocs = user.bankDocuments || [];
+        updateData.bankDocuments = [...existingDocs, url];
+      } else if (documentType === 'driversLicense') {
+        const existingDocs = user.driversLicenseDocuments || [];
+        updateData.driversLicenseDocuments = [...existingDocs, url];
+      } else if (documentType === 'firstAidCertificate') {
+        const existingDocs = user.firstAidDocuments || [];
+        updateData.firstAidDocuments = [...existingDocs, url];
+      }
+
+      await storage.updateUser(userId, updateData);
+
+      res.json({ 
+        message: "Document uploaded successfully",
+        url,
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[GroundCrew] Error uploading document:", error);
+      res.status(500).json({ message: error.message || "Failed to upload document" });
+    }
+  });
+
+  // Ground Crew: Delete uploaded document
+  app.delete("/api/ground-crew/document", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'ground_crew' && user.role !== 'ground_crew_supervisor') {
+        return res.status(403).json({ message: "Only ground crew members can delete documents through this endpoint" });
+      }
+
+      const { documentType, documentUrl } = req.body;
+      if (!documentType || !documentUrl) {
+        return res.status(400).json({ message: "Document type and URL are required" });
+      }
+
+      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Get the current document array and remove the URL
+      let currentDocs: string[] = [];
+      
+      if (documentType === 'bankDocuments') {
+        currentDocs = user.bankDocuments || [];
+      } else if (documentType === 'driversLicenseDocuments') {
+        currentDocs = user.driversLicenseDocuments || [];
+      } else if (documentType === 'firstAidDocuments') {
+        currentDocs = user.firstAidDocuments || [];
+      }
+
+      // Check if the document exists
+      if (!currentDocs.includes(documentUrl)) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      // Remove the document URL from the array
+      const updatedDocs = currentDocs.filter(url => url !== documentUrl);
+      const updateData: any = {};
+      updateData[documentType] = updatedDocs;
+
+      await storage.updateUser(userId, updateData);
+
+      console.log(`[GroundCrew] Deleted ${documentType} document for user ${userId}`);
+
+      res.json({ 
+        message: "Document deleted successfully",
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[GroundCrew] Error deleting document:", error);
+      res.status(500).json({ message: error.message || "Failed to delete document" });
+    }
+  });
+
   // Property Manager: Get all company links
   app.get("/api/property-manager/company-links", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
