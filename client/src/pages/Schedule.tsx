@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { ScheduledJobWithAssignments, User, EmployeeTimeOff } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
@@ -1007,10 +1007,10 @@ export default function Schedule() {
                 }}
                 eventContent={(eventInfo) => {
                   return (
-                    <div className="p-1 text-xs overflow-hidden">
+                    <div className="p-1 text-sm overflow-hidden">
                       <div className="font-medium truncate">{eventInfo.event.title}</div>
                       {eventInfo.event.extendedProps.address && (
-                        <div className="text-[10px] opacity-80 truncate">{eventInfo.event.extendedProps.address}</div>
+                        <div className="text-sm opacity-80 truncate">{eventInfo.event.extendedProps.address}</div>
                       )}
                     </div>
                   );
@@ -1361,7 +1361,7 @@ export default function Schedule() {
                 font-weight: 600;
                 padding: 12px 8px;
                 text-transform: uppercase;
-                font-size: 0.75rem;
+                font-size: 0.875rem;
                 letter-spacing: 0.05em;
               }
               
@@ -1447,11 +1447,11 @@ export default function Schedule() {
                         <div className="fc-event-title" style={{ fontWeight: 700, fontSize: '0.875rem', color: 'white' }}>
                           {timeOffLabel}
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.95)', marginTop: '2px', fontWeight: 600 }}>
+                        <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.95)', marginTop: '2px', fontWeight: 600 }}>
                           {employeeName}
                         </div>
                         {timeOffEntry.notes && (
-                          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)', marginTop: '2px', fontStyle: 'italic' }}>
+                          <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.85)', marginTop: '2px', fontStyle: 'italic' }}>
                             {timeOffEntry.notes}
                           </div>
                         )}
@@ -1488,28 +1488,31 @@ export default function Schedule() {
                           {job.project.buildingName}
                         </div>
                       )}
-                      <div style={{ fontSize: '0.75rem', opacity: 0.9, marginTop: '1px' }}>
+                      <div style={{ fontSize: '0.875rem', opacity: 0.9, marginTop: '1px' }}>
                         {job.project?.strataPlanNumber || job.title}
                       </div>
                       {employeesForThisDay && employeesForThisDay.length > 0 && (
-                        <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3, marginTop: '3px' }}>
+                        <div style={{ fontSize: '0.75rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.4, marginTop: '3px' }}>
                           {employeesForThisDay.map((assignment: any, idx: number) => (
                             <div key={idx} style={{ 
-                              fontWeight: 700, 
+                              fontWeight: 600, 
                               backgroundColor: 'rgba(255,255,255,0.25)',
-                              padding: '1px 4px',
-                              borderRadius: '3px',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
                               marginTop: '2px',
-                              display: 'inline-block'
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
                             }}>
-                              👤 {assignment.employee.name} {assignment.employee.role && `(${assignment.employee.role.replace(/_/g, ' ')})`}
+                              <UserIcon style={{ width: '12px', height: '12px', flexShrink: 0 }} />
+                              <span>{assignment.employee.name}</span>
                             </div>
                           ))}
                         </div>
                       )}
                       {isHighlighted && (
                         <div style={{ 
-                          fontSize: '0.65rem', 
+                          fontSize: '0.75rem', 
                           marginTop: '3px', 
                           fontWeight: 600,
                           color: currentlyAssigned ? '#ef4444' : '#22c55e'
@@ -1644,7 +1647,7 @@ export default function Schedule() {
                     gridTemplateColumns: `minmax(80px, 120px) repeat(${getViewDates.length}, 1fr)` 
                   }}
                 >
-                  <div className="font-medium text-xs md:text-sm text-muted-foreground px-2 flex items-center">{t('schedule.team', 'Team')}</div>
+                  <div className="font-medium text-sm text-muted-foreground px-2 flex items-center">{t('schedule.team', 'Team')}</div>
                   {getViewDates.map((date, idx) => (
                     <div 
                       key={idx}
@@ -1690,8 +1693,8 @@ export default function Schedule() {
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium text-xs md:text-sm truncate">{employee.name}</div>
-                            <div className="text-[10px] md:text-xs text-muted-foreground truncate hidden md:block">
+                            <div className="font-medium text-sm truncate">{employee.name}</div>
+                            <div className="text-xs text-muted-foreground truncate hidden md:block">
                               {employee.role?.replace(/_/g, ' ')}
                             </div>
                           </div>
