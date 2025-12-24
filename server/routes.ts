@@ -22942,11 +22942,19 @@ Do not include any other text, just the JSON object.`
         .where(eq(jobApplications.technicianId, currentUser.id))
         .orderBy(desc(jobApplications.appliedAt));
 
-      // Fetch job posting details for each application
+      // Fetch job posting details and company info for each application
       const applicationsWithJobs = await Promise.all(
         applications.map(async (app) => {
           const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, app.jobPostingId));
-          return { ...app, jobPosting: job };
+          let companyName = null;
+          if (job?.companyId) {
+            const [company] = await db.select({ 
+              companyName: users.companyName, 
+              name: users.name 
+            }).from(users).where(eq(users.id, job.companyId));
+            companyName = company?.companyName || company?.name || null;
+          }
+          return { ...app, jobPosting: job ? { ...job, companyName } : null };
         })
       );
 

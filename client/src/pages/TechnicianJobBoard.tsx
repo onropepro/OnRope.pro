@@ -45,7 +45,8 @@ import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
-type ApplicationWithJob = JobApplication & { jobPosting: JobPosting };
+type JobPostingWithCompany = JobPosting & { companyName?: string | null };
+type ApplicationWithJob = JobApplication & { jobPosting: JobPostingWithCompany | null };
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 
@@ -146,6 +147,7 @@ const translations = {
     statusRefused: "Offer Declined",
     jobOfferReceived: "You received a job offer!",
     receivedOn: "Received",
+    fromCompany: "from",
     refuseOffer: "Decline Offer",
     deleteApplication: "Delete",
     offerRefused: "Offer Declined",
@@ -294,6 +296,7 @@ const translations = {
     statusRefused: "Offre refusee",
     jobOfferReceived: "Vous avez recu une offre d'emploi!",
     receivedOn: "Recu le",
+    fromCompany: "de",
     refuseOffer: "Refuser l'offre",
     deleteApplication: "Supprimer",
     offerRefused: "Offre refusee",
@@ -779,6 +782,11 @@ export default function TechnicianJobBoard() {
                               )}
                               <h3 className="font-semibold">
                                 {app.jobPosting?.title || "Unknown Job"}
+                                {app.jobPosting?.companyName && (
+                                  <span className="font-normal text-muted-foreground ml-1">
+                                    {t.fromCompany} {app.jobPosting.companyName}
+                                  </span>
+                                )}
                               </h3>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
