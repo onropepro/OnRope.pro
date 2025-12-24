@@ -309,10 +309,13 @@ export function DashboardSidebar({
   };
 
   const handleItemClick = (item: NavItem) => {
+    // Call onClick first if provided (e.g., tab changes)
+    if (item.onClick) {
+      item.onClick();
+    }
+    // Then navigate if href is provided
     if (item.href) {
       setLocation(item.href);
-    } else if (item.onClick) {
-      item.onClick();
     }
   };
 
