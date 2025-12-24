@@ -83,7 +83,7 @@ export async function sendQuoteNotificationSMS(
     minimumFractionDigits: 2
   });
   
-  const message = `You've received a service quote for ${buildingName} from ${companyName}. Amount: ${formattedAmount}. View details: ${quoteViewUrl}`;
+  const message = `You've received a service quote for ${buildingName} from ${companyName}. Amount: ${formattedAmount}. Log in to your OnRopePro account to review the quote.`;
   
   return sendSMS(phoneNumber, message);
 }
