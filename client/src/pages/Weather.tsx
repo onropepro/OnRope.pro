@@ -179,10 +179,10 @@ export default function Weather() {
     ? getWindSafetyLevel(weatherData.current.windSpeed)
     : { level: "Unknown", color: "text-muted-foreground", bgColor: "bg-muted" };
 
-  const currentHour = new Date().getHours();
+  const now = new Date();
   const relevantHours = weatherData?.hourly?.filter((h) => {
-    const hourTime = new Date(h.time).getHours();
-    return hourTime >= currentHour || hourTime < currentHour;
+    const hourDate = new Date(h.time);
+    return hourDate >= now;
   }).slice(0, 12) || [];
 
   return (
