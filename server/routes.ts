@@ -5872,6 +5872,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "You do not have access to this quote" });
       }
       
+      // Track first view: update viewedAt, collaborationStatus, and pipelineStage
+      if (!quote.viewedAt) {
+        await storage.updateQuote(quoteId, {
+          viewedAt: new Date(),
+          collaborationStatus: 'viewed',
+          pipelineStage: 'review',
+          stageUpdatedAt: new Date()
+        } as any);
+        
+        console.log(`[Quote] Property manager ${propertyManagerId} viewed quote ${quote.quoteNumber} - moved to 'In Review'`);
+        
+        // Log the view event in quote history
+        await db.insert(quoteHistory).values({
+          quoteId: quote.id,
+          companyId: quote.companyId,
+          eventType: 'viewed',
+          actorUserId: propertyManagerId,
+          actorName: 'Property Manager',
+          notes: `Quote first viewed by property manager`,
+        });
+      }
+      
       // Get the company info for display
       const company = await storage.getUserById(quote.companyId);
       const companyName = company?.companyName || "Rope Access Company";
@@ -19699,11 +19721,13 @@ Do not include any other text, just the JSON object.`
           const propertyManager = await storage.getUserById(pmLink.propertyManagerId);
           
           if (propertyManager && propertyManager.role === 'property_manager') {
-            // Link the quote to this property manager
+            // Link the quote to this property manager and move to submitted stage
             await storage.updateQuote(fullQuote!.id, { 
               recipientPropertyManagerId: propertyManager.id,
               collaborationStatus: 'sent',
-              sentAt: new Date()
+              sentAt: new Date(),
+              pipelineStage: 'submitted',
+              stageUpdatedAt: new Date()
             } as any);
             
             console.log(`[Quote] Auto-linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
@@ -21219,7 +21243,7 @@ Do not include any other text, just the JSON object.`
       }
       
       // Fetch from Open-Meteo API - free, no key required
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto&forecast_days=1`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto&forecast_days=2`;
       
       const response = await fetch(url);
       if (!response.ok) {

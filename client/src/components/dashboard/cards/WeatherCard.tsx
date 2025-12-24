@@ -90,7 +90,7 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
   const now = new Date();
   const upcomingHours = weatherData.hourly
     ?.filter((h) => new Date(h.time) >= now)
-    .slice(0, 5) || [];
+    .slice(0, 6) || [];
 
   return (
     <div 
@@ -141,8 +141,8 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
                   <div className="text-[10px] text-muted-foreground">
                     {index === 0 ? t('weather.now', 'Now') : time.toLocaleTimeString([], { hour: 'numeric' })}
                   </div>
-                  <div className={`text-sm font-semibold ${hourSafety.color}`}>
-                    {Math.round(hour.windSpeed)}
+                  <div className={`text-xs font-semibold ${hourSafety.color}`}>
+                    {Math.round(hour.windSpeed)} <span className="text-[9px] font-normal">km/h</span>
                   </div>
                 </div>
               );
