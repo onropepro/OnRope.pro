@@ -166,6 +166,18 @@ function canViewCSR(user: any): boolean {
   return permissions.includes('view_csr');
 }
 
+// Helper function to check if user can manage clients
+function canManageClients(user: any): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // All other roles need explicit permission
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('manage_clients');
+}
+
 // Helper function to get CSR rating label and color based on percentage
 // Per SCR.RATING.md: 90-100% Green (Excellent), 70-89% Yellow (Good), 50-69% Orange (Needs Improvement), <50% Red (Poor)
 function getCsrRatingInfo(percentage: number): { label: string; color: string } {
@@ -11207,6 +11219,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check manage_clients permission
+      if (!canManageClients(currentUser)) {
+        return res.status(403).json({ message: "Access denied - insufficient permissions" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       if (!companyId) {
         return res.status(403).json({ message: "Access denied" });
@@ -11269,6 +11286,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage_clients permission
+      if (!canManageClients(currentUser)) {
+        return res.status(403).json({ message: "Access denied - insufficient permissions" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
