@@ -76,6 +76,10 @@ export default function Login() {
       case "rope_access_tech":
         setLocation("/technician-portal");
         break;
+      case "ground_crew":
+      case "ground_crew_supervisor":
+        setLocation("/ground-crew-portal");
+        break;
       default:
         setLocation("/dashboard");
     }

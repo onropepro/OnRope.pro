@@ -52,7 +52,7 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager";
+export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew";
 
 export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
   employer: "#0B64A3",
@@ -60,6 +60,7 @@ export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
   "property-manager": "#6E9075",
   resident: "#86A59C",
   "building-manager": "#B89685",
+  "ground-crew": "#5D7B6F",
 };
 
 export interface DashboardSidebarProps {
@@ -187,6 +188,7 @@ export function DashboardSidebar({
           id: "certifications",
           label: t("dashboard.sidebar.certifications", "Certifications"),
           icon: Award,
+          href: "/dashboard",
           onClick: () => onTabChange("employees"),
           isVisible: (user) => canManageEmployees(user),
         },
@@ -308,10 +310,13 @@ export function DashboardSidebar({
   };
 
   const handleItemClick = (item: NavItem) => {
+    // Call onClick first if provided (e.g., tab changes)
+    if (item.onClick) {
+      item.onClick();
+    }
+    // Then navigate if href is provided
     if (item.href) {
       setLocation(item.href);
-    } else if (item.onClick) {
-      item.onClick();
     }
   };
 

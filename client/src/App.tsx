@@ -106,6 +106,7 @@ import PropertyManagerLanding from "@/pages/PropertyManagerLanding";
 import PropertyManagerInterfaceLanding from "@/pages/PropertyManagerInterfaceLanding";
 import CSRPropertyManagerLanding from "@/pages/CSRPropertyManagerLanding";
 import TechnicianLanding from "@/pages/TechnicianLanding";
+import GroundCrewLanding from "@/pages/GroundCrewLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -121,6 +122,7 @@ import ForBuildingManagers from "@/pages/help/stakeholders/ForBuildingManagers";
 import ForPropertyManagers from "@/pages/help/stakeholders/ForPropertyManagers";
 import ForResidents from "@/pages/help/stakeholders/ForResidents";
 import TechnicianPortal from "@/pages/TechnicianPortal";
+import GroundCrewPortal from "@/pages/GroundCrewPortal";
 import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import PersonalSafetyDocuments from "@/pages/PersonalSafetyDocuments";
@@ -168,6 +170,7 @@ function Router() {
       <Route path="/property-manager" component={PropertyManagerLanding} />
       <Route path="/property-manager/company-safety-rating" component={CSRPropertyManagerLanding} />
       <Route path="/technician" component={TechnicianLanding} />
+      <Route path="/ground-crew" component={GroundCrewLanding} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/get-license" component={GetLicense} />
       <Route path="/complete-registration" component={CompleteRegistration} />
@@ -241,6 +244,11 @@ function Router() {
       <Route path="/technician-portal">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianPortal />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/ground-crew-portal">
+        <ProtectedRoute allowedRoles={["ground_crew", "ground_crew_supervisor"]}>
+          <GroundCrewPortal />
         </ProtectedRoute>
       </Route>
       <Route path="/technician-logged-hours">

@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable, incidentReports, clients } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable, incidentReports, clients, quizAttempts } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -1635,6 +1635,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('[Technician-Register] Error:', error);
+      res.status(500).json({ message: error.message || "Registration failed" });
+    }
+  });
+
+  // Ground crew self-registration endpoint - SECURITY: Rate limited to prevent abuse
+  app.post("/api/ground-crew-register", registrationRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        streetAddress,
+        city,
+        provinceState,
+        country,
+        postalCode,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        employerCode,
+      } = req.body;
+
+      // Validate required fields
+      if (!firstName || !lastName || !email || !password || !phone || !emergencyContactName || !emergencyContactPhone) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      console.log(`[Ground-Crew-Register] Starting registration for ${email}`);
+
+      // Case-insensitive email check for existing user
+      const normalizedEmail = email.toLowerCase();
+      const existingUser = await storage.getUserByEmail(email);
+      
+      if (existingUser) {
+        console.log(`[Ground-Crew-Register] Email already exists: ${email}`);
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      // If employer code is provided, validate it
+      let invitingEmployer = null;
+      if (employerCode) {
+        // Look up the employer by their company's property manager code (used for invitations)
+        const companyResults = await db.select().from(users).where(
+          and(
+            eq(users.role, 'company'),
+            sql`LOWER(${users.propertyManagerCode}) = ${employerCode.toLowerCase()}`
+          )
+        ).limit(1);
+        
+        if (companyResults.length === 0) {
+          console.log(`[Ground-Crew-Register] Invalid employer code: ${employerCode}`);
+          return res.status(400).json({ message: "Invalid employer code" });
+        }
+        invitingEmployer = companyResults[0];
+        console.log(`[Ground-Crew-Register] Valid employer code found for company: ${invitingEmployer.companyName}`);
+      }
+
+      // Create the ground crew user (pending company approval)
+      const user = await storage.createUser({
+        name: `${firstName} ${lastName}`,
+        email,
+        role: 'ground_crew',
+        passwordHash: password, // storage.createUser will hash this
+        companyId: invitingEmployer ? invitingEmployer.id : null,
+        
+        // Address fields
+        employeeStreetAddress: streetAddress || null,
+        employeeCity: city || null,
+        employeeProvinceState: provinceState || null,
+        employeeCountry: country || null,
+        employeePostalCode: postalCode || null,
+        
+        // Contact info
+        employeePhoneNumber: phone,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship: emergencyContactRelationship || null,
+        
+        // Start date - use timezone-safe utility
+        startDate: getTodayString(),
+      });
+
+      console.log('[Ground-Crew-Register] User created:', user.id);
+
+      // Create session and auto-login the ground crew member
+      req.session.userId = user.id;
+      req.session.role = user.role;
+      
+      console.log(`[Ground-Crew-Register] Session created for ground crew: ${user.id}, email: ${user.email}`);
+      
+      // Save session before responding
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            console.error(`[Ground-Crew-Register] Session save error:`, err);
+            reject(err);
+          } else {
+            console.log(`[Ground-Crew-Register] Session saved successfully for ${user.email}`);
+            resolve();
+          }
+        });
+      });
+
+      // Return success with user data
+      const { passwordHash, ...userWithoutPassword } = user;
+      res.json({ 
+        success: true,
+        message: "Registration completed successfully.",
+        user: userWithoutPassword,
+      });
+    } catch (error: any) {
+      console.error('[Ground-Crew-Register] Error:', error);
       res.status(500).json({ message: error.message || "Registration failed" });
     }
   });
@@ -6237,6 +6351,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update quote collaboration status to negotiation
       await storage.updateQuoteCollaborationStatus(quoteId, 'negotiation');
       
+      // Update quote pipeline stage to negotiation so it appears in the pipeline
+      await storage.updateQuote(quoteId, { pipelineStage: 'negotiation' } as any);
+      
+      // Send real-time WebSocket notification to company
+      wsHub.notifyQuoteCounterOffer(quote.companyId, {
+        id: quote.id,
+        quoteNumber: quote.quoteNumber,
+        buildingName: quote.buildingName,
+        strataPlanNumber: quote.strataPlanNumber,
+        propertyManagerName: senderName,
+        counterOfferAmount: String(counterOfferAmount),
+      });
+      
+      console.log(`[Counter-Offer] PM ${senderName} submitted counter-offer of $${counterOfferAmount} for quote ${quote.quoteNumber}`);
+      
       res.json({ message, success: true });
     } catch (error) {
       console.error("Counter-offer error:", error);
@@ -9311,17 +9440,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ found: false, message: "This technician is already connected to your company" });
       }
       
-      // If technician is linked to another company and doesn't have PLUS access
-      if (technician.companyId && !technician.hasPlusAccess) {
+      // Technicians are visible to employers if they have visibility toggle on
+      // OR if they have PLUS access (which allows multi-employer connections)
+      const isVisible = technician.isVisibleToEmployers || technician.hasPlusAccess;
+      
+      // If technician is linked to another company, doesn't have PLUS, AND hasn't enabled visibility
+      if (technician.companyId && !technician.hasPlusAccess && !technician.isVisibleToEmployers) {
         return res.json({ 
           found: false, 
-          message: "This technician is already linked to another company. They need Technician PLUS to connect with multiple employers." 
+          message: "This technician is not currently visible to employers. They need to enable their visibility toggle or have Technician PLUS." 
         });
       }
       
       // Return limited info for privacy (don't expose sensitive fields)
       const { passwordHash, socialInsuranceNumber, bankTransitNumber, bankInstitutionNumber, 
               bankAccountNumber, driversLicenseNumber, specialMedicalConditions, ...safeInfo } = technician;
+      
+      // Check if technician is linked to another employer AND has visibility on
+      // This means their current employer can see they're advertising to other companies
+      const hasEmployerVisibilityWarning = !!technician.companyId && technician.isVisibleToEmployers;
       
       res.json({ 
         found: true, 
@@ -9338,8 +9475,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           hasFirstAid: safeInfo.hasFirstAid,
           firstAidType: safeInfo.firstAidType,
           hasPlusAccess: safeInfo.hasPlusAccess,
-          isAlreadyLinked: !!technician.companyId, // Tell frontend if this is a PLUS multi-employer link
-        }
+          isAlreadyLinked: !!technician.companyId,
+          isVisibleToEmployers: technician.isVisibleToEmployers,
+        },
+        warning: hasEmployerVisibilityWarning 
+          ? "This technician is currently employed and has their employer visibility turned on. Their current employer may be aware they are visible to other companies."
+          : null
       });
     } catch (error) {
       console.error("Search technicians error:", error);
@@ -17768,6 +17909,269 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workforce Safety Score (WSS) - Average of all employee PSRs
+  // Educational metric only - does not affect CSR
+  app.get("/api/workforce-safety-score", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only employers can view WSS
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Only employers can view WSS" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get all active employees for this company
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
+      
+      if (activeEmployees.length === 0) {
+        return res.json({
+          wssScore: 0,
+          wssLabel: "No Employees",
+          employeeCount: 0,
+          description: "Add employees to calculate Workforce Safety Score",
+        });
+      }
+      
+      // Calculate PSR for each employee
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const totalSafetyQuizTypes = 6;
+      
+      let totalPSR = 0;
+      let employeesWithPSR = 0;
+      
+      for (const employee of activeEmployees) {
+        // 1. Certification Score (25%)
+        let certScore = 0;
+        if (employee.irataLevel || employee.spratLevel) {
+          const expirationDate = employee.irataLevel 
+            ? (employee.irataExpirationDate ? new Date(employee.irataExpirationDate) : null)
+            : (employee.spratExpirationDate ? new Date(employee.spratExpirationDate) : null);
+          const verified = employee.irataLevel 
+            ? !!employee.irataVerifiedAt 
+            : !!employee.spratVerifiedAt;
+          
+          if (expirationDate && expirationDate > today) {
+            certScore = verified ? 100 : 75;
+          } else if (expirationDate && expirationDate <= today) {
+            certScore = 25;
+          } else {
+            certScore = 50;
+          }
+        }
+        
+        // 2. Safety Documents Score (25%) - Personal harness inspections
+        let docsScore = 0;
+        const personalInspections = await storage.getPersonalHarnessInspections(employee.id);
+        const recentInspections = personalInspections.filter((insp: any) => 
+          new Date(insp.inspectionDate) >= thirtyDaysAgo
+        );
+        const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+        if (recentInspections.length > 0) {
+          docsScore = Math.round((passedInspections.length / recentInspections.length) * 100);
+        }
+        
+        // 3. Safety Quizzes Score (25%)
+        let quizScore = 0;
+        const allAttempts = await storage.getAllQuizAttemptsByEmployee(employee.id);
+        const safetyQuizAttempts = allAttempts.filter((a: any) => 
+          a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+        );
+        const passedQuizzes = new Set(
+          safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+        );
+        quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+        
+        // 4. Work History Score (25%)
+        let workScore = 50; // Default for new employees
+        const workSessionsList = await db.select()
+          .from(workSessions)
+          .where(eq(workSessions.employeeId, employee.id));
+        const completedSessions = workSessionsList.filter((ws: any) => ws.clockOutTime);
+        
+        const incidentReportsList = await db.select()
+          .from(incidentReports)
+          .where(eq(incidentReports.companyId, companyId));
+        const technicianIncidents = incidentReportsList.filter((ir: any) => 
+          ir.reportedById === employee.id || 
+          (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(employee.id))
+        );
+        
+        if (completedSessions.length > 0) {
+          const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+          workScore = Math.max(100 - incidentPenalty, 50);
+        }
+        
+        // Calculate employee PSR (25% each component)
+        const employeePSR = Math.round(
+          (certScore * 0.25) + 
+          (docsScore * 0.25) + 
+          (quizScore * 0.25) + 
+          (workScore * 0.25)
+        );
+        
+        totalPSR += employeePSR;
+        employeesWithPSR++;
+      }
+      
+      // Calculate average WSS
+      const wssScore = employeesWithPSR > 0 ? Math.round(totalPSR / employeesWithPSR) : 0;
+      
+      // Determine label
+      let wssLabel = "Critical";
+      if (wssScore >= 90) wssLabel = "Excellent";
+      else if (wssScore >= 70) wssLabel = "Good";
+      else if (wssScore >= 50) wssLabel = "Fair";
+      
+      res.json({
+        wssScore,
+        wssLabel,
+        employeeCount: employeesWithPSR,
+        description: "Average of all employee Personal Safety Ratings (PSR). Educational metric only - does not affect CSR.",
+      });
+    } catch (error) {
+      console.error("Get WSS error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Workforce Safety Score Details - Individual employee PSR breakdown
+  app.get("/api/workforce-safety-score/details", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Only employers can view WSS details" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
+      
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const totalSafetyQuizTypes = 6;
+      
+      const employeePSRDetails = [];
+      
+      for (const employee of activeEmployees) {
+        // 1. Certification Score (25%)
+        let certScore = 0;
+        let certStatus = "none";
+        if (employee.irataLevel || employee.spratLevel) {
+          const expirationDate = employee.irataLevel 
+            ? (employee.irataExpirationDate ? new Date(employee.irataExpirationDate) : null)
+            : (employee.spratExpirationDate ? new Date(employee.spratExpirationDate) : null);
+          const verified = employee.irataLevel 
+            ? !!employee.irataVerifiedAt 
+            : !!employee.spratVerifiedAt;
+          
+          if (expirationDate && expirationDate > today) {
+            certScore = verified ? 100 : 75;
+            certStatus = verified ? "verified" : "unverified";
+          } else if (expirationDate && expirationDate <= today) {
+            certScore = 25;
+            certStatus = "expired";
+          } else {
+            certScore = 50;
+            certStatus = "no_expiry";
+          }
+        }
+        
+        // 2. Safety Documents Score (25%)
+        let docsScore = 0;
+        const personalInspections = await storage.getPersonalHarnessInspections(employee.id);
+        const recentInspections = personalInspections.filter((insp: any) => 
+          new Date(insp.inspectionDate) >= thirtyDaysAgo
+        );
+        const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+        if (recentInspections.length > 0) {
+          docsScore = Math.round((passedInspections.length / recentInspections.length) * 100);
+        }
+        
+        // 3. Safety Quizzes Score (25%)
+        let quizScore = 0;
+        const allAttempts = await storage.getAllQuizAttemptsByEmployee(employee.id);
+        const safetyQuizAttempts = allAttempts.filter((a: any) => 
+          a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+        );
+        const passedQuizzes = new Set(
+          safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+        );
+        quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+        
+        // 4. Work History Score (25%)
+        let workScore = 50;
+        const workSessionsList = await db.select()
+          .from(workSessions)
+          .where(eq(workSessions.employeeId, employee.id));
+        const completedSessions = workSessionsList.filter((ws: any) => ws.clockOutTime);
+        
+        const incidentReportsList = await db.select()
+          .from(incidentReports)
+          .where(eq(incidentReports.companyId, companyId));
+        const technicianIncidents = incidentReportsList.filter((ir: any) => 
+          ir.reportedById === employee.id || 
+          (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(employee.id))
+        );
+        
+        if (completedSessions.length > 0) {
+          const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+          workScore = Math.max(100 - incidentPenalty, 50);
+        }
+        
+        // Calculate employee PSR
+        const overallPSR = Math.round(
+          (certScore * 0.25) + 
+          (docsScore * 0.25) + 
+          (quizScore * 0.25) + 
+          (workScore * 0.25)
+        );
+        
+        employeePSRDetails.push({
+          id: employee.id,
+          name: employee.name,
+          role: employee.employeeRole || employee.role,
+          overallPSR,
+          components: {
+            certifications: { score: certScore, status: certStatus },
+            safetyDocs: { score: docsScore, recentInspections: recentInspections.length },
+            quizzes: { score: quizScore, passed: passedQuizzes.size, total: totalSafetyQuizTypes },
+            workHistory: { score: workScore, sessions: completedSessions.length, incidents: technicianIncidents.length },
+          },
+        });
+      }
+      
+      // Sort by PSR score descending
+      employeePSRDetails.sort((a, b) => b.overallPSR - a.overallPSR);
+      
+      res.json({ employees: employeePSRDetails });
+    } catch (error) {
+      console.error("Get WSS details error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Get CSR for a linked vendor company
   // SIMPLIFIED: Uses the same calculation as company CSR endpoint to ensure consistency
   app.get("/api/property-managers/vendors/:linkId/csr", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
@@ -22652,11 +23056,19 @@ Do not include any other text, just the JSON object.`
         .where(eq(jobApplications.technicianId, currentUser.id))
         .orderBy(desc(jobApplications.appliedAt));
 
-      // Fetch job posting details for each application
+      // Fetch job posting details and company info for each application
       const applicationsWithJobs = await Promise.all(
         applications.map(async (app) => {
           const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, app.jobPostingId));
-          return { ...app, jobPosting: job };
+          let companyName = null;
+          if (job?.companyId) {
+            const [company] = await db.select({ 
+              companyName: users.companyName, 
+              name: users.name 
+            }).from(users).where(eq(users.id, job.companyId));
+            companyName = company?.companyName || company?.name || null;
+          }
+          return { ...app, jobPosting: job ? { ...job, companyName } : null };
         })
       );
 
@@ -23659,7 +24071,7 @@ Do not include any other text, just the JSON object.`
       // Fetch all quiz attempts for visible technicians (for PSR calculation)
       const techIds = visibleTechs.map(t => t.id);
       const allQuizAttempts = techIds.length > 0 
-        ? await db.select().from(quizAttempts).where(sql`${quizAttempts.employeeId} = ANY(${techIds})`)
+        ? await db.select().from(quizAttempts).where(inArray(quizAttempts.employeeId, techIds))
         : [];
       
       // Group quiz attempts by employee ID

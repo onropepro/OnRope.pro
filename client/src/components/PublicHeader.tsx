@@ -9,7 +9,7 @@ import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users,
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
-  activeNav?: "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "modules";
+  activeNav?: "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew" | "modules";
   onSignInClick?: () => void;
 }
 
@@ -19,6 +19,7 @@ const STAKEHOLDER_COLORS = {
   "property-manager": "#6E9075", 
   resident: "#86A59C",
   "building-manager": "#4A6C8C",
+  "ground-crew": "#5D7B6F",
   employer: "#0B64A3", // Ocean Blue for employer - matches hero gradients
 } as const;
 

@@ -1,0 +1,1419 @@
+import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { formatLocalDate, parseLocalDate } from "@/lib/dateUtils";
+import { 
+  User, 
+  LogOut, 
+  Edit2, 
+  Save, 
+  X,
+  Check, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Building,
+  Building2,
+  Calendar,
+  AlertCircle,
+  HardHat,
+  FileText,
+  Shield,
+  CheckCircle2,
+  Upload,
+  Loader2,
+  ArrowRight,
+  Briefcase,
+  Copy,
+  Share2,
+  Users,
+  Gift,
+  Home,
+  MoreHorizontal,
+  Plus,
+  FolderOpen,
+  Download,
+  FileImage,
+  FileArchive,
+  File,
+} from "lucide-react";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+
+type Language = 'en' | 'fr' | 'es';
+
+const translations = {
+  en: {
+    groundCrewPortal: "Ground Crew Portal",
+    signOut: "Sign Out",
+    editProfile: "Edit Profile",
+    cancel: "Cancel",
+    saveChanges: "Save Changes",
+    saving: "Saving...",
+    personalInfo: "Personal Information",
+    fullName: "Full Name",
+    email: "Email",
+    phoneNumber: "Phone Number",
+    birthday: "Birthday",
+    address: "Address",
+    streetAddress: "Street Address",
+    city: "City",
+    provinceState: "Province/State",
+    country: "Country",
+    postalCode: "Postal Code",
+    emergencyContact: "Emergency Contact",
+    contactName: "Contact Name",
+    contactPhone: "Contact Phone",
+    relationship: "Relationship",
+    payrollInfo: "Payroll Information",
+    sin: "Social Insurance Number",
+    bankAccount: "Bank Account",
+    transit: "Transit",
+    institution: "Institution",
+    account: "Account",
+    driversLicense: "Driver's License",
+    licenseNumber: "License #",
+    issuedDate: "Issued Date",
+    expiry: "Expiry",
+    medicalConditions: "Medical Conditions",
+    specialMedicalConditions: "Special Medical Conditions",
+    medicalPlaceholder: "Optional - Any conditions your employer should be aware of",
+    firstAid: "First Aid",
+    firstAidType: "Type",
+    expiresOn: "Expires on",
+    expired: "Expired",
+    expiringSoon: "Expiring Soon",
+    uploadedDocuments: "Uploaded Documents",
+    licensePhoto: "License Photo",
+    driverAbstract: "Driver Abstract",
+    voidCheque: "Void Cheque / Bank Info",
+    uploadDocument: "Upload Document",
+    uploadVoidCheque: "Upload Void Cheque",
+    replaceVoidCheque: "Replace Void Cheque",
+    addVoidCheque: "Add Another Void Cheque",
+    uploadDriversLicense: "Upload Driver's License",
+    replaceDriversLicense: "Replace License",
+    addDriversLicense: "Add License Photo",
+    uploadDriversAbstract: "Upload Driver's Abstract",
+    replaceDriversAbstract: "Replace Abstract",
+    addDriversAbstract: "Add Abstract",
+    uploadFirstAidCert: "Upload First Aid Certificate",
+    replaceFirstAidCert: "Replace Certificate",
+    addFirstAidCert: "Add Certificate",
+    notProvided: "Not provided",
+    loadingProfile: "Loading your profile...",
+    pleaseLogin: "Please log in to view your profile.",
+    goToLogin: "Go to Login",
+    profileUpdated: "Profile Updated",
+    changesSaved: "Your changes have been saved successfully.",
+    updateFailed: "Update Failed",
+    invalidFile: "Invalid file",
+    privacyNotice: "Privacy Notice",
+    privacyText: "Your personal information is securely stored and used only by your employer for HR and payroll purposes. We never share your data externally.",
+    errorNameRequired: "Name is required",
+    errorInvalidEmail: "Invalid email",
+    errorPhoneRequired: "Phone is required",
+    errorEmergencyNameRequired: "Emergency contact name is required",
+    errorEmergencyPhoneRequired: "Emergency contact phone is required",
+    teamInvitations: "Team Invitations",
+    pendingInvitations: "Pending Invitations",
+    noInvitations: "No pending invitations",
+    noInvitationsDesc: "When a company invites you to join their team, it will appear here.",
+    invitedBy: "Invitation from",
+    acceptInvitation: "Accept",
+    declineInvitation: "Decline",
+    acceptingInvitation: "Accepting...",
+    decliningInvitation: "Declining...",
+    invitationAccepted: "Invitation Accepted",
+    welcomeToTeam: "Welcome to the team!",
+    invitationDeclined: "Invitation Declined",
+    declinedMessage: "You have declined this invitation.",
+    invitationError: "Error",
+    invitationMessage: "Message",
+    invitedOn: "Invited on",
+    currentEmployer: "Current Employer",
+    currentlyEmployedBy: "You are currently employed by",
+    leaveCompany: "Leave Company",
+    leavingCompany: "Leaving...",
+    leaveCompanyConfirm: "Are you sure you want to leave this company?",
+    leaveCompanyWarning: "This will remove you from their active roster. You can still be invited by other companies.",
+    confirmLeave: "Yes, Leave Company",
+    cancelLeave: "Cancel",
+    leftCompany: "Left Company",
+    leftCompanyDesc: "You have successfully left the company. You can now accept invitations from other companies.",
+    leaveError: "Error",
+    yourCompensation: "Your Compensation",
+    year: "year",
+    hour: "hr",
+    goToWorkDashboard: "Go to Work Dashboard",
+    accessProjects: "Access projects, clock in/out, safety forms, and work dashboard.",
+    dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
+    dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
+    selectEmployer: "Select Employer",
+    selectEmployerDesc: "Choose which employer's dashboard to access",
+    connectedEmployers: "Connected Employers",
+    primaryEmployer: "Primary",
+    suspended: "Suspended",
+    active: "Active",
+    setPrimary: "Set as Primary",
+    continueToEmployer: "Continue",
+    noEmployersConnected: "No employers connected",
+    tabHome: "Home",
+    tabProfile: "Profile",
+    tabInvitations: "Invites",
+    tabMore: "More",
+    welcome: "Welcome",
+    groundCrewMember: "Ground Crew Member",
+    quickActions: "Quick Actions",
+    yourStatus: "Your Status",
+    employmentStatus: "Employment Status",
+    employed: "Employed",
+    notEmployed: "Not Employed",
+    referralProgram: "Referral Program",
+    referralDesc: "Share your referral code with other ground crew workers",
+    yourReferralCode: "Your Referral Code",
+    copyCode: "Copy Code",
+    shareCode: "Share Code",
+    codeCopied: "Referral code copied!",
+    referralBonus: "Earn bonuses when referred workers join",
+    helpCenter: "Help Center",
+    helpCenterDesc: "Get help with using the platform",
+    openHelpCenter: "Open Help Center",
+  },
+  fr: {
+    groundCrewPortal: "Portail Équipe au Sol",
+    signOut: "Déconnexion",
+    editProfile: "Modifier le Profil",
+    cancel: "Annuler",
+    saveChanges: "Enregistrer",
+    saving: "Enregistrement...",
+    personalInfo: "Informations Personnelles",
+    fullName: "Nom Complet",
+    email: "Email",
+    phoneNumber: "Numéro de Téléphone",
+    birthday: "Date de Naissance",
+    address: "Adresse",
+    streetAddress: "Adresse",
+    city: "Ville",
+    provinceState: "Province/État",
+    country: "Pays",
+    postalCode: "Code Postal",
+    emergencyContact: "Contact d'Urgence",
+    contactName: "Nom du Contact",
+    contactPhone: "Téléphone du Contact",
+    relationship: "Relation",
+    payrollInfo: "Informations de Paie",
+    sin: "Numéro d'Assurance Sociale",
+    bankAccount: "Compte Bancaire",
+    transit: "Transit",
+    institution: "Institution",
+    account: "Compte",
+    driversLicense: "Permis de Conduire",
+    licenseNumber: "N° de Permis",
+    issuedDate: "Date d'Émission",
+    expiry: "Expiration",
+    medicalConditions: "Conditions Médicales",
+    specialMedicalConditions: "Conditions Médicales Spéciales",
+    medicalPlaceholder: "Optionnel - Toute condition dont votre employeur devrait être informé",
+    firstAid: "Premiers Soins",
+    firstAidType: "Type",
+    expiresOn: "Expire le",
+    expired: "Expiré",
+    expiringSoon: "Expire Bientôt",
+    uploadedDocuments: "Documents Téléchargés",
+    licensePhoto: "Photo du Permis",
+    driverAbstract: "Relevé de Conduite",
+    voidCheque: "Chèque Annulé / Info Bancaire",
+    uploadDocument: "Télécharger Document",
+    uploadVoidCheque: "Télécharger Chèque Annulé",
+    replaceVoidCheque: "Remplacer Chèque",
+    addVoidCheque: "Ajouter Chèque",
+    uploadDriversLicense: "Télécharger Permis",
+    replaceDriversLicense: "Remplacer Permis",
+    addDriversLicense: "Ajouter Photo du Permis",
+    uploadDriversAbstract: "Télécharger Relevé",
+    replaceDriversAbstract: "Remplacer Relevé",
+    addDriversAbstract: "Ajouter Relevé",
+    uploadFirstAidCert: "Télécharger Certificat",
+    replaceFirstAidCert: "Remplacer Certificat",
+    addFirstAidCert: "Ajouter Certificat",
+    notProvided: "Non fourni",
+    loadingProfile: "Chargement de votre profil...",
+    pleaseLogin: "Veuillez vous connecter pour voir votre profil.",
+    goToLogin: "Aller à la Connexion",
+    profileUpdated: "Profil Mis à Jour",
+    changesSaved: "Vos modifications ont été enregistrées avec succès.",
+    updateFailed: "Échec de la Mise à Jour",
+    invalidFile: "Fichier invalide",
+    privacyNotice: "Avis de Confidentialité",
+    privacyText: "Vos informations personnelles sont stockées de manière sécurisée et utilisées uniquement par votre employeur pour les RH et la paie. Nous ne partageons jamais vos données à l'extérieur.",
+    errorNameRequired: "Le nom est requis",
+    errorInvalidEmail: "Email invalide",
+    errorPhoneRequired: "Le téléphone est requis",
+    errorEmergencyNameRequired: "Le nom du contact d'urgence est requis",
+    errorEmergencyPhoneRequired: "Le téléphone du contact d'urgence est requis",
+    teamInvitations: "Invitations d'Équipe",
+    pendingInvitations: "Invitations en Attente",
+    noInvitations: "Aucune invitation en attente",
+    noInvitationsDesc: "Quand une entreprise vous invite à rejoindre son équipe, cela apparaîtra ici.",
+    invitedBy: "Invitation de",
+    acceptInvitation: "Accepter",
+    declineInvitation: "Refuser",
+    acceptingInvitation: "Acceptation...",
+    decliningInvitation: "Refus...",
+    invitationAccepted: "Invitation Acceptée",
+    welcomeToTeam: "Bienvenue dans l'équipe!",
+    invitationDeclined: "Invitation Refusée",
+    declinedMessage: "Vous avez refusé cette invitation.",
+    invitationError: "Erreur",
+    invitationMessage: "Message",
+    invitedOn: "Invité le",
+    currentEmployer: "Employeur Actuel",
+    currentlyEmployedBy: "Vous êtes actuellement employé par",
+    leaveCompany: "Quitter l'Entreprise",
+    leavingCompany: "Départ...",
+    leaveCompanyConfirm: "Êtes-vous sûr de vouloir quitter cette entreprise?",
+    leaveCompanyWarning: "Cela vous retirera de leur effectif. Vous pourrez toujours être invité par d'autres entreprises.",
+    confirmLeave: "Oui, Quitter",
+    cancelLeave: "Annuler",
+    leftCompany: "Entreprise Quittée",
+    leftCompanyDesc: "Vous avez quitté l'entreprise avec succès. Vous pouvez maintenant accepter des invitations d'autres entreprises.",
+    leaveError: "Erreur",
+    yourCompensation: "Votre Rémunération",
+    year: "an",
+    hour: "h",
+    goToWorkDashboard: "Aller au Tableau de Bord",
+    accessProjects: "Accédez aux projets, pointage, formulaires de sécurité et tableau de bord.",
+    dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Une invitation est envoyée par votre employeur et apparaîtra ici.",
+    dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
+    selectEmployer: "Sélectionner Employeur",
+    selectEmployerDesc: "Choisissez le tableau de bord de l'employeur",
+    connectedEmployers: "Employeurs Connectés",
+    primaryEmployer: "Principal",
+    suspended: "Suspendu",
+    active: "Actif",
+    setPrimary: "Définir comme Principal",
+    continueToEmployer: "Continuer",
+    noEmployersConnected: "Aucun employeur connecté",
+    tabHome: "Accueil",
+    tabProfile: "Profil",
+    tabInvitations: "Invites",
+    tabMore: "Plus",
+    welcome: "Bienvenue",
+    groundCrewMember: "Membre de l'Équipe au Sol",
+    quickActions: "Actions Rapides",
+    yourStatus: "Votre Statut",
+    employmentStatus: "Statut d'Emploi",
+    employed: "Employé",
+    notEmployed: "Non Employé",
+    referralProgram: "Programme de Parrainage",
+    referralDesc: "Partagez votre code de parrainage avec d'autres travailleurs",
+    yourReferralCode: "Votre Code de Parrainage",
+    copyCode: "Copier",
+    shareCode: "Partager",
+    codeCopied: "Code copié!",
+    referralBonus: "Gagnez des bonus quand les parrainés rejoignent",
+    helpCenter: "Centre d'Aide",
+    helpCenterDesc: "Obtenez de l'aide pour utiliser la plateforme",
+    openHelpCenter: "Ouvrir le Centre d'Aide",
+  },
+  es: {
+    groundCrewPortal: "Portal Equipo de Tierra",
+    signOut: "Cerrar Sesión",
+    editProfile: "Editar Perfil",
+    cancel: "Cancelar",
+    saveChanges: "Guardar",
+    saving: "Guardando...",
+    personalInfo: "Información Personal",
+    fullName: "Nombre Completo",
+    email: "Email",
+    phoneNumber: "Número de Teléfono",
+    birthday: "Fecha de Nacimiento",
+    address: "Dirección",
+    streetAddress: "Dirección",
+    city: "Ciudad",
+    provinceState: "Provincia/Estado",
+    country: "País",
+    postalCode: "Código Postal",
+    emergencyContact: "Contacto de Emergencia",
+    contactName: "Nombre del Contacto",
+    contactPhone: "Teléfono del Contacto",
+    relationship: "Relación",
+    payrollInfo: "Información de Nómina",
+    sin: "Número de Seguro Social",
+    bankAccount: "Cuenta Bancaria",
+    transit: "Tránsito",
+    institution: "Institución",
+    account: "Cuenta",
+    driversLicense: "Licencia de Conducir",
+    licenseNumber: "N° de Licencia",
+    issuedDate: "Fecha de Emisión",
+    expiry: "Vencimiento",
+    medicalConditions: "Condiciones Médicas",
+    specialMedicalConditions: "Condiciones Médicas Especiales",
+    medicalPlaceholder: "Opcional - Cualquier condición que su empleador deba conocer",
+    firstAid: "Primeros Auxilios",
+    firstAidType: "Tipo",
+    expiresOn: "Expira el",
+    expired: "Expirado",
+    expiringSoon: "Expira Pronto",
+    uploadedDocuments: "Documentos Subidos",
+    licensePhoto: "Foto de Licencia",
+    driverAbstract: "Historial de Conducción",
+    voidCheque: "Cheque Anulado / Info Bancaria",
+    uploadDocument: "Subir Documento",
+    uploadVoidCheque: "Subir Cheque Anulado",
+    replaceVoidCheque: "Reemplazar Cheque",
+    addVoidCheque: "Agregar Cheque",
+    uploadDriversLicense: "Subir Licencia",
+    replaceDriversLicense: "Reemplazar Licencia",
+    addDriversLicense: "Agregar Foto de Licencia",
+    uploadDriversAbstract: "Subir Historial",
+    replaceDriversAbstract: "Reemplazar Historial",
+    addDriversAbstract: "Agregar Historial",
+    uploadFirstAidCert: "Subir Certificado",
+    replaceFirstAidCert: "Reemplazar Certificado",
+    addFirstAidCert: "Agregar Certificado",
+    notProvided: "No proporcionado",
+    loadingProfile: "Cargando su perfil...",
+    pleaseLogin: "Por favor inicie sesión para ver su perfil.",
+    goToLogin: "Ir a Iniciar Sesión",
+    profileUpdated: "Perfil Actualizado",
+    changesSaved: "Sus cambios se han guardado correctamente.",
+    updateFailed: "Error al Actualizar",
+    invalidFile: "Archivo inválido",
+    privacyNotice: "Aviso de Privacidad",
+    privacyText: "Su información personal se almacena de forma segura y solo la utiliza su empleador para RH y nómina. Nunca compartimos sus datos externamente.",
+    errorNameRequired: "El nombre es requerido",
+    errorInvalidEmail: "Email inválido",
+    errorPhoneRequired: "El teléfono es requerido",
+    errorEmergencyNameRequired: "El nombre del contacto de emergencia es requerido",
+    errorEmergencyPhoneRequired: "El teléfono del contacto de emergencia es requerido",
+    teamInvitations: "Invitaciones de Equipo",
+    pendingInvitations: "Invitaciones Pendientes",
+    noInvitations: "Sin invitaciones pendientes",
+    noInvitationsDesc: "Cuando una empresa le invite a unirse a su equipo, aparecerá aquí.",
+    invitedBy: "Invitación de",
+    acceptInvitation: "Aceptar",
+    declineInvitation: "Rechazar",
+    acceptingInvitation: "Aceptando...",
+    decliningInvitation: "Rechazando...",
+    invitationAccepted: "Invitación Aceptada",
+    welcomeToTeam: "Bienvenido al equipo!",
+    invitationDeclined: "Invitación Rechazada",
+    declinedMessage: "Ha rechazado esta invitación.",
+    invitationError: "Error",
+    invitationMessage: "Mensaje",
+    invitedOn: "Invitado el",
+    currentEmployer: "Empleador Actual",
+    currentlyEmployedBy: "Actualmente empleado por",
+    leaveCompany: "Dejar Empresa",
+    leavingCompany: "Saliendo...",
+    leaveCompanyConfirm: "¿Está seguro de que desea dejar esta empresa?",
+    leaveCompanyWarning: "Esto lo eliminará de su plantilla activa. Aún puede ser invitado por otras empresas.",
+    confirmLeave: "Sí, Dejar Empresa",
+    cancelLeave: "Cancelar",
+    leftCompany: "Empresa Dejada",
+    leftCompanyDesc: "Ha dejado la empresa con éxito. Ahora puede aceptar invitaciones de otras empresas.",
+    leaveError: "Error",
+    yourCompensation: "Su Compensación",
+    year: "año",
+    hour: "hr",
+    goToWorkDashboard: "Ir al Panel de Trabajo",
+    accessProjects: "Acceda a proyectos, marcaje, formularios de seguridad y panel de trabajo.",
+    dashboardDisabledNoCompany: "Necesita estar vinculado con una empresa para acceder al Panel de Trabajo. Una invitación es enviada por su empleador y aparecerá aquí.",
+    dashboardDisabledTerminated: "Su empleo ha sido terminado. Acepte una nueva invitación para acceder al Panel de Trabajo.",
+    selectEmployer: "Seleccionar Empleador",
+    selectEmployerDesc: "Elija el panel de qué empleador acceder",
+    connectedEmployers: "Empleadores Conectados",
+    primaryEmployer: "Principal",
+    suspended: "Suspendido",
+    active: "Activo",
+    setPrimary: "Establecer como Principal",
+    continueToEmployer: "Continuar",
+    noEmployersConnected: "Sin empleadores conectados",
+    tabHome: "Inicio",
+    tabProfile: "Perfil",
+    tabInvitations: "Invites",
+    tabMore: "Más",
+    welcome: "Bienvenido",
+    groundCrewMember: "Miembro del Equipo de Tierra",
+    quickActions: "Acciones Rápidas",
+    yourStatus: "Su Estado",
+    employmentStatus: "Estado de Empleo",
+    employed: "Empleado",
+    notEmployed: "No Empleado",
+    referralProgram: "Programa de Referidos",
+    referralDesc: "Comparta su código de referido con otros trabajadores",
+    yourReferralCode: "Su Código de Referido",
+    copyCode: "Copiar",
+    shareCode: "Compartir",
+    codeCopied: "Código copiado!",
+    referralBonus: "Gane bonos cuando los referidos se unan",
+    helpCenter: "Centro de Ayuda",
+    helpCenterDesc: "Obtenga ayuda para usar la plataforma",
+    openHelpCenter: "Abrir Centro de Ayuda",
+  }
+};
+
+type TabType = 'home' | 'profile' | 'invitations' | 'more';
+
+const profileSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  phone: z.string().min(1, "Phone is required"),
+  birthday: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  provinceState: z.string().optional(),
+  country: z.string().optional(),
+  postalCode: z.string().optional(),
+  emergencyContactName: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
+  emergencyContactRelationship: z.string().optional(),
+  sin: z.string().optional(),
+  bankTransit: z.string().optional(),
+  bankInstitution: z.string().optional(),
+  bankAccount: z.string().optional(),
+  driversLicenseNumber: z.string().optional(),
+  driversLicenseIssuedDate: z.string().optional(),
+  driversLicenseExpiry: z.string().optional(),
+  specialMedicalConditions: z.string().optional(),
+  firstAidType: z.string().optional(),
+  firstAidExpiry: z.string().optional(),
+});
+
+type ProfileFormData = z.infer<typeof profileSchema>;
+
+export default function GroundCrewPortal() {
+  const { i18n } = useTranslation();
+  const [location, setLocation] = useLocation();
+  const { toast } = useToast();
+  
+  const [language, setLanguage] = useState<Language>(() => {
+    const stored = localStorage.getItem('i18nextLng');
+    if (stored === 'fr' || stored === 'es' || stored === 'en') {
+      return stored;
+    }
+    return 'en';
+  });
+  
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      const currentLang = i18n.language;
+      if (currentLang === 'fr' || currentLang === 'es' || currentLang === 'en') {
+        setLanguage(currentLang);
+      }
+    };
+    
+    i18n.on('languageChanged', handleLanguageChange);
+    handleLanguageChange();
+    
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
+
+  const t = translations[language];
+
+  const [activeTab, setActiveTab] = useState<TabType>('home');
+  const [isEditing, setIsEditing] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadType, setUploadType] = useState<string | null>(null);
+
+  const { data: user, isLoading } = useQuery<any>({
+    queryKey: ["/api/user"],
+    select: (data: any) => data?.user,
+  });
+
+  const { data: invitationsData } = useQuery<any>({
+    queryKey: ["/api/technician/invitations"],
+    enabled: !!user && (user.role === 'ground_crew' || user.role === 'ground_crew_supervisor'),
+  });
+
+  const pendingInvitations = invitationsData?.invitations?.filter((inv: any) => inv.status === 'pending') || [];
+
+  const { data: companyData } = useQuery<any>({
+    queryKey: ["/api/companies", user?.companyId],
+    enabled: !!user?.companyId,
+  });
+
+  const form = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      birthday: "",
+      address: "",
+      city: "",
+      provinceState: "",
+      country: "",
+      postalCode: "",
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      emergencyContactRelationship: "",
+      sin: "",
+      bankTransit: "",
+      bankInstitution: "",
+      bankAccount: "",
+      driversLicenseNumber: "",
+      driversLicenseIssuedDate: "",
+      driversLicenseExpiry: "",
+      specialMedicalConditions: "",
+      firstAidType: "",
+      firstAidExpiry: "",
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: ProfileFormData) => {
+      return apiRequest("PATCH", "/api/user/profile", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setIsEditing(false);
+      toast({
+        title: t.profileUpdated,
+        description: t.changesSaved,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.updateFailed,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const acceptInvitationMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      return apiRequest("POST", `/api/technician/invitations/${invitationId}/accept`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/technician/invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: t.invitationAccepted,
+        description: t.welcomeToTeam,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.invitationError,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const declineInvitationMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      return apiRequest("POST", `/api/technician/invitations/${invitationId}/decline`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/technician/invitations"] });
+      toast({
+        title: t.invitationDeclined,
+        description: t.declinedMessage,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.invitationError,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const leaveCompanyMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/technician/leave-company");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setShowLeaveConfirm(false);
+      toast({
+        title: t.leftCompany,
+        description: t.leftCompanyDesc,
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.leaveError,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLogout = async () => {
+    try {
+      await apiRequest("POST", "/api/logout");
+      queryClient.clear();
+      setLocation("/technician");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  const groundCrewNavGroups: NavGroup[] = [
+    {
+      id: "main",
+      label: "NAVIGATION",
+      items: [
+        {
+          id: "home",
+          label: t.tabHome || "Home",
+          icon: Home,
+          onClick: () => setActiveTab('home'),
+          isVisible: () => true,
+        },
+        {
+          id: "profile",
+          label: t.tabProfile || "Profile",
+          icon: User,
+          onClick: () => setActiveTab('profile'),
+          isVisible: () => true,
+        },
+        {
+          id: "more",
+          label: t.tabMore || "More",
+          icon: MoreHorizontal,
+          onClick: () => setActiveTab('more'),
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "employment",
+      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
+      items: [
+        {
+          id: "invitations",
+          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
+          icon: Mail,
+          onClick: () => setActiveTab('invitations'),
+          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
+          badgeType: "alert",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "resources",
+      label: language === 'en' ? "RESOURCES" : language === 'es' ? "RECURSOS" : "RESSOURCES",
+      items: [
+        {
+          id: "help",
+          label: language === 'en' ? "Help Center" : language === 'es' ? "Centro de Ayuda" : "Centre d'Aide",
+          icon: Shield,
+          href: "/help",
+          isVisible: () => true,
+        },
+      ],
+    },
+  ];
+
+  const startEditing = () => {
+    if (user) {
+      form.reset({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        birthday: user.birthday || "",
+        address: user.address || "",
+        city: user.employeeCity || "",
+        provinceState: user.employeeProvinceState || "",
+        country: user.employeeCountry || "",
+        postalCode: user.employeePostalCode || "",
+        emergencyContactName: user.emergencyContactName || "",
+        emergencyContactPhone: user.emergencyContactPhone || "",
+        emergencyContactRelationship: user.emergencyContactRelationship || "",
+        sin: user.sin || "",
+        bankTransit: user.bankTransit || "",
+        bankInstitution: user.bankInstitution || "",
+        bankAccount: user.bankAccount || "",
+        driversLicenseNumber: user.driversLicenseNumber || "",
+        driversLicenseIssuedDate: user.driversLicenseIssuedDate || "",
+        driversLicenseExpiry: user.driversLicenseExpiry || "",
+        specialMedicalConditions: user.specialMedicalConditions || "",
+        firstAidType: user.firstAidType || "",
+        firstAidExpiry: user.firstAidExpiry || "",
+      });
+    }
+    setIsEditing(true);
+  };
+
+  const onSubmit = (data: ProfileFormData) => {
+    updateMutation.mutate(data);
+  };
+
+  const copyReferralCode = () => {
+    if (user?.technicianReferralCode) {
+      navigator.clipboard.writeText(user.technicianReferralCode);
+      toast({
+        title: t.codeCopied,
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse">{t.loadingProfile}</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 text-center">
+            <p className="text-muted-foreground mb-4">{t.pleaseLogin}</p>
+            <Button onClick={() => setLocation("/technician")}>
+              {t.goToLogin}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      <div className="hidden lg:block">
+        <DashboardSidebar
+          currentUser={user}
+          activeTab={activeTab}
+          onTabChange={(tab) => setActiveTab(tab as TabType)}
+          variant="ground-crew"
+          customNavigationGroups={groundCrewNavGroups}
+          showDashboardLink={false}
+        />
+      </div>
+      
+      <div className="lg:pl-60">
+        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <div className="hidden md:flex flex-1 max-w-xl">
+                <DashboardSearch />
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              {user.role === 'company' && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => setLocation('/dashboard')}
+                  className="gap-1.5"
+                  data-testid="button-return-dashboard"
+                >
+                  <span className="material-icons text-base">dashboard</span>
+                  <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : language === 'es' ? 'Panel' : 'Tableau de bord'}</span>
+                </Button>
+              )}
+              
+              <LanguageDropdown />
+              
+              <button 
+                onClick={() => setActiveTab('profile')}
+                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                data-testid="link-user-profile"
+              >
+                <Avatar className="w-8 h-8 bg-[#5D7B6F]">
+                  <AvatarFallback className="bg-[#5D7B6F] text-white text-xs font-medium">
+                    {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
+                  <p className="text-xs text-slate-400 leading-tight">{t.groundCrewMember}</p>
+                </div>
+              </button>
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                data-testid="button-logout" 
+                onClick={handleLogout} 
+                className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="px-4 sm:px-6 py-6 pb-24 lg:pb-6">
+          {activeTab === 'home' && (
+            <div className="space-y-6 max-w-4xl mx-auto">
+              <div className="flex items-center gap-4">
+                <Avatar className="w-16 h-16 bg-[#5D7B6F]">
+                  {user.photoUrl ? (
+                    <AvatarImage src={user.photoUrl} alt={user.name} />
+                  ) : (
+                    <AvatarFallback className="bg-[#5D7B6F] text-white text-xl font-medium">
+                      {user.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div>
+                  <h1 className="text-2xl font-bold">{t.welcome}, {user.name?.split(' ')[0] || 'User'}!</h1>
+                  <p className="text-muted-foreground">{t.groundCrewMember}</p>
+                </div>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Briefcase className="w-5 h-5" />
+                    {t.yourStatus}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">{t.employmentStatus}</span>
+                    {user.companyId && !user.terminatedDate ? (
+                      <Badge variant="default" className="bg-green-600">
+                        <CheckCircle2 className="w-3 h-3 mr-1" />
+                        {t.employed}
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">
+                        {t.notEmployed}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {user.companyId && !user.terminatedDate && companyData?.company && (
+                    <div className="pt-2 border-t">
+                      <div className="flex items-center gap-3">
+                        <Building2 className="w-5 h-5 text-muted-foreground" />
+                        <div>
+                          <p className="font-medium">{companyData.company.name}</p>
+                          <p className="text-sm text-muted-foreground">{t.currentEmployer}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {user.companyId && !user.terminatedDate && (
+                    <Button
+                      className="w-full mt-4"
+                      onClick={() => setLocation('/dashboard')}
+                      data-testid="button-go-to-dashboard"
+                    >
+                      {t.goToWorkDashboard}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  )}
+
+                  {!user.companyId && (
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-sm text-muted-foreground">{t.dashboardDisabledNoCompany}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {pendingInvitations.length > 0 && (
+                <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                      <Mail className="w-5 h-5" />
+                      {t.pendingInvitations} ({pendingInvitations.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Button onClick={() => setActiveTab('invitations')} variant="outline">
+                      {language === 'en' ? 'View Invitations' : language === 'es' ? 'Ver Invitaciones' : 'Voir les Invitations'}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'profile' && (
+            <Card className="max-w-4xl mx-auto">
+              <CardHeader className="flex flex-row items-center justify-between gap-2 flex-wrap">
+                <div>
+                  <CardTitle>{t.personalInfo}</CardTitle>
+                  <CardDescription>{t.privacyText}</CardDescription>
+                </div>
+                {!isEditing ? (
+                  <Button onClick={startEditing} variant="outline" data-testid="button-edit-profile">
+                    <Edit2 className="w-4 h-4 mr-2" />
+                    {t.editProfile}
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setIsEditing(false)} data-testid="button-cancel-edit">
+                      <X className="w-4 h-4 mr-2" />
+                      {t.cancel}
+                    </Button>
+                    <Button onClick={form.handleSubmit(onSubmit)} disabled={updateMutation.isPending} data-testid="button-save-profile">
+                      {updateMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.saving}
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          {t.saveChanges}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t.fullName}</FormLabel>
+                            <FormControl>
+                              <Input {...field} disabled={!isEditing} data-testid="input-name" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t.email}</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="email" disabled={!isEditing} data-testid="input-email" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t.phoneNumber}</FormLabel>
+                            <FormControl>
+                              <Input {...field} disabled={!isEditing} data-testid="input-phone" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="birthday"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t.birthday}</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="date" disabled={!isEditing} data-testid="input-birthday" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.address}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem className="md:col-span-2">
+                              <FormLabel>{t.streetAddress}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-address" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.city}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-city" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="provinceState"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.provinceState}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-province" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.country}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-country" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="postalCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.postalCode}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-postal" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.emergencyContact}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="emergencyContactName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.contactName}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-emergency-name" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="emergencyContactPhone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.contactPhone}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-emergency-phone" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="emergencyContactRelationship"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.relationship}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-emergency-relationship" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.medicalConditions}</h3>
+                      <FormField
+                        control={form.control}
+                        name="specialMedicalConditions"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t.specialMedicalConditions}</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                {...field} 
+                                disabled={!isEditing} 
+                                placeholder={t.medicalPlaceholder}
+                                data-testid="input-medical-conditions" 
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeTab === 'invitations' && (
+            <div className="max-w-4xl mx-auto space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-5 h-5" />
+                    {t.teamInvitations}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {pendingInvitations.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p className="font-medium">{t.noInvitations}</p>
+                      <p className="text-sm">{t.noInvitationsDesc}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {pendingInvitations.map((invitation: any) => (
+                        <div key={invitation.id} className="border rounded-lg p-4">
+                          <div className="flex items-start justify-between gap-4 flex-wrap">
+                            <div className="flex-1">
+                              <p className="font-medium text-lg">{invitation.companyName || 'Company'}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {t.invitedOn}: {formatLocalDate(invitation.createdAt)}
+                              </p>
+                              {invitation.message && (
+                                <p className="mt-2 text-sm bg-muted/50 p-2 rounded">{invitation.message}</p>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => declineInvitationMutation.mutate(invitation.id)}
+                                disabled={declineInvitationMutation.isPending}
+                                data-testid={`button-decline-invitation-${invitation.id}`}
+                              >
+                                {declineInvitationMutation.isPending ? t.decliningInvitation : t.declineInvitation}
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => acceptInvitationMutation.mutate(invitation.id)}
+                                disabled={acceptInvitationMutation.isPending}
+                                data-testid={`button-accept-invitation-${invitation.id}`}
+                              >
+                                {acceptInvitationMutation.isPending ? t.acceptingInvitation : t.acceptInvitation}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {user.companyId && !user.terminatedDate && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Building2 className="w-5 h-5" />
+                      {t.currentEmployer}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                      <div>
+                        <p className="font-medium">{companyData?.company?.name || 'Your Company'}</p>
+                        <p className="text-sm text-muted-foreground">{t.currentlyEmployedBy}</p>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setShowLeaveConfirm(true)}
+                        data-testid="button-leave-company"
+                      >
+                        {t.leaveCompany}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'more' && (
+            <div className="max-w-4xl mx-auto space-y-6">
+              {user.technicianReferralCode && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Gift className="w-5 h-5 text-purple-600" />
+                      {t.referralProgram}
+                    </CardTitle>
+                    <CardDescription>{t.referralDesc}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-sm text-muted-foreground mb-2">{t.yourReferralCode}</p>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xl font-mono font-bold">{user.technicianReferralCode}</code>
+                        <Button variant="outline" size="sm" onClick={copyReferralCode} data-testid="button-copy-referral">
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">{t.referralBonus}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    {t.helpCenter}
+                  </CardTitle>
+                  <CardDescription>{t.helpCenterDesc}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" onClick={() => setLocation('/help')} data-testid="button-help-center">
+                    {t.openHelpCenter}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </main>
+      </div>
+
+      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom lg:hidden">
+        <div className="w-full px-4 md:px-6 flex items-center justify-around py-2">
+          <button
+            onClick={() => setActiveTab('home')}
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
+              activeTab === 'home' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-home"
+          >
+            <Home className="w-5 h-5" />
+            <span className="text-[10px] font-medium">{t.tabHome}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
+              activeTab === 'profile' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-profile"
+          >
+            <User className="w-5 h-5" />
+            <span className="text-[10px] font-medium">{t.tabProfile}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('invitations')}
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
+              activeTab === 'invitations' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-invitations"
+          >
+            <Mail className="w-5 h-5" />
+            <span className="text-[10px] font-medium">{t.tabInvitations}</span>
+            {pendingInvitations.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                {pendingInvitations.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('more')}
+            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
+              activeTab === 'more' 
+                ? 'text-primary bg-primary/10' 
+                : 'text-muted-foreground'
+            }`}
+            data-testid="tab-more"
+          >
+            <MoreHorizontal className="w-5 h-5" />
+            <span className="text-[10px] font-medium">{t.tabMore}</span>
+          </button>
+        </div>
+      </nav>
+
+      <AlertDialog open={showLeaveConfirm} onOpenChange={setShowLeaveConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.leaveCompanyConfirm}</AlertDialogTitle>
+            <AlertDialogDescription>{t.leaveCompanyWarning}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-leave">{t.cancelLeave}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => leaveCompanyMutation.mutate()}
+              className="bg-destructive text-destructive-foreground"
+              disabled={leaveCompanyMutation.isPending}
+              data-testid="button-confirm-leave"
+            >
+              {leaveCompanyMutation.isPending ? t.leavingCompany : t.confirmLeave}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
