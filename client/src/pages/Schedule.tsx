@@ -1492,19 +1492,19 @@ export default function Schedule() {
                         {job.project?.strataPlanNumber || job.title}
                       </div>
                       {employeesForThisDay && employeesForThisDay.length > 0 && (
-                        <div style={{ fontSize: '0.75rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.4, marginTop: '3px' }}>
+                        <div style={{ fontSize: '0.875rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.4, marginTop: '4px' }}>
                           {employeesForThisDay.map((assignment: any, idx: number) => (
                             <div key={idx} style={{ 
                               fontWeight: 600, 
-                              backgroundColor: 'rgba(255,255,255,0.25)',
-                              padding: '2px 6px',
+                              backgroundColor: 'rgba(255,255,255,0.3)',
+                              padding: '3px 8px',
                               borderRadius: '4px',
-                              marginTop: '2px',
+                              marginTop: '3px',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '4px'
+                              gap: '5px'
                             }}>
-                              <UserIcon style={{ width: '12px', height: '12px', flexShrink: 0 }} />
+                              <UserIcon style={{ width: '14px', height: '14px', flexShrink: 0 }} />
                               <span>{assignment.employee.name}</span>
                             </div>
                           ))}
