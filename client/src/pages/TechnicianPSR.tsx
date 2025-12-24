@@ -1,12 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { TechnicianHeader } from "@/components/TechnicianHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
-  Search,
   FileCheck,
   CheckCircle2,
   AlertCircle,
@@ -17,7 +15,6 @@ import {
   GraduationCap
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Input } from "@/components/ui/input";
 import type { User } from "@shared/schema";
 import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 
@@ -305,27 +302,7 @@ export default function TechnicianPSR() {
       />
 
       <div className="lg:pl-60">
-        <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-14 flex items-center justify-between px-4 gap-4">
-          <div className="flex-1 max-w-md hidden md:block">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input 
-                placeholder={trans.searchPlaceholder}
-                className="pl-10 bg-slate-100 dark:bg-slate-800 border-0"
-                data-testid="input-psr-search"
-              />
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <LanguageDropdown />
-            <Avatar className="h-8 w-8 border-2" style={{ borderColor: "#AB4521" }}>
-              <AvatarImage src={user?.photoUrl || undefined} />
-              <AvatarFallback className="text-white text-sm" style={{ backgroundColor: "#AB4521" }}>
-                {user?.firstName?.[0] || user?.name?.[0] || "T"}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        </header>
+        <TechnicianHeader language={language as "en" | "es" | "fr"} />
 
         <main className="p-4 md:p-6 space-y-6">
           <div>
