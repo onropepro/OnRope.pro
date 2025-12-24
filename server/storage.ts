@@ -15,7 +15,9 @@ export class Storage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    // Case-insensitive email lookup
+    const normalizedEmail = email.toLowerCase().trim();
+    const result = await db.select().from(users).where(sql`LOWER(${users.email}) = ${normalizedEmail}`).limit(1);
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
