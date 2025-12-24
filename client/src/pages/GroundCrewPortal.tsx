@@ -507,18 +507,18 @@ const translations = {
 
 type TabType = 'home' | 'profile' | 'invitations' | 'more';
 
-const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email"),
-  employeePhoneNumber: z.string().min(1, "Phone is required"),
+const createProfileSchema = (t: typeof translations['en']) => z.object({
+  name: z.string().min(1, t.errorNameRequired),
+  email: z.string().email(t.errorInvalidEmail),
+  employeePhoneNumber: z.string().min(1, t.errorPhoneRequired),
   birthday: z.string().optional(),
   employeeStreetAddress: z.string().optional(),
   employeeCity: z.string().optional(),
   employeeProvinceState: z.string().optional(),
   employeeCountry: z.string().optional(),
   employeePostalCode: z.string().optional(),
-  emergencyContactName: z.string().optional(),
-  emergencyContactPhone: z.string().optional(),
+  emergencyContactName: z.string().min(1, t.errorEmergencyNameRequired),
+  emergencyContactPhone: z.string().min(1, t.errorEmergencyPhoneRequired),
   emergencyContactRelationship: z.string().optional(),
   socialInsuranceNumber: z.string().optional(),
   bankTransitNumber: z.string().optional(),
@@ -532,7 +532,7 @@ const profileSchema = z.object({
   firstAidExpiry: z.string().optional(),
 });
 
-type ProfileFormData = z.infer<typeof profileSchema>;
+type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
 
 export default function GroundCrewPortal() {
   const { i18n } = useTranslation();
@@ -617,6 +617,8 @@ export default function GroundCrewPortal() {
     enabled: !!user?.companyId,
   });
 
+  const profileSchema = createProfileSchema(t);
+  
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
