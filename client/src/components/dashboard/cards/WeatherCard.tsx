@@ -87,6 +87,11 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
   const windGusts = weatherData.current.windGusts;
   const safety = getWindSafetyLevel(windSpeed);
 
+  const now = new Date();
+  const upcomingHours = weatherData.hourly
+    ?.filter((h) => new Date(h.time) >= now)
+    .slice(0, 5) || [];
+
   return (
     <div 
       className="flex flex-col h-full cursor-pointer hover-elevate" 
@@ -99,17 +104,17 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
           {t('weather.title', 'Weather')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center">
-        <div className={`rounded-lg p-4 w-full ${safety.bg}`}>
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 space-y-3">
+        <div className={`rounded-lg p-3 w-full ${safety.bg}`}>
           <div className="flex items-center justify-between gap-2">
             <div>
               <div className="flex items-center gap-2">
                 <Wind className={`w-5 h-5 ${safety.color}`} />
-                <p className={`text-2xl font-bold ${safety.color}`} data-testid="text-weather-wind">
+                <p className={`text-xl font-bold ${safety.color}`} data-testid="text-weather-wind">
                   {Math.round(windSpeed)} km/h
                 </p>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {t('weather.gusts', 'Gusts')}: {Math.round(windGusts)} km/h
               </p>
             </div>
@@ -121,6 +126,29 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
             </Badge>
           </div>
         </div>
+        
+        {upcomingHours.length > 0 && (
+          <div className="flex gap-1 justify-between">
+            {upcomingHours.map((hour, index) => {
+              const hourSafety = getWindSafetyLevel(hour.windSpeed);
+              const time = new Date(hour.time);
+              return (
+                <div 
+                  key={hour.time}
+                  className={`flex-1 text-center p-1.5 rounded ${hourSafety.bg}`}
+                  data-testid={`forecast-${index}`}
+                >
+                  <div className="text-[10px] text-muted-foreground">
+                    {index === 0 ? t('weather.now', 'Now') : time.toLocaleTimeString([], { hour: 'numeric' })}
+                  </div>
+                  <div className={`text-sm font-semibold ${hourSafety.color}`}>
+                    {Math.round(hour.windSpeed)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </div>
   );
