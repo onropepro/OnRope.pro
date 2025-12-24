@@ -38,7 +38,7 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
   const coords = savedCoords ? JSON.parse(savedCoords) : { lat: 49.2827, lng: -123.1207 };
   
   const { data: weatherData, isLoading, error } = useQuery<WeatherData>({
-    queryKey: ["/api/weather", coords.lat, coords.lng],
+    queryKey: [`/api/weather/${coords.lat}/${coords.lng}`],
     refetchInterval: 300000,
   });
 
