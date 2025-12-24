@@ -476,7 +476,7 @@ export default function TechnicianPSR() {
                   <Info className="w-4 h-4 text-slate-500" />
                   <h3 className="font-medium text-base text-slate-900 dark:text-slate-100">{trans.whatIsPSR}</h3>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400 pl-6">
+                <p className="text-base text-slate-600 dark:text-slate-400 pl-6">
                   {trans.whatIsPSRDesc}
                 </p>
               </div>
@@ -487,7 +487,7 @@ export default function TechnicianPSR() {
                   <Target className="w-4 h-4 text-slate-500" />
                   <h3 className="font-medium text-base text-slate-900 dark:text-slate-100">{trans.whyPSRMatters}</h3>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400 pl-6">
+                <p className="text-base text-slate-600 dark:text-slate-400 pl-6">
                   {trans.whyPSRMattersDesc}
                 </p>
               </div>
@@ -498,28 +498,28 @@ export default function TechnicianPSR() {
                   <Calculator className="w-4 h-4 text-slate-500" />
                   <h3 className="font-medium text-base text-slate-900 dark:text-slate-100">{trans.howCalculated}</h3>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400 pl-6">
+                <p className="text-base text-slate-600 dark:text-slate-400 pl-6">
                   {trans.calcIntro}
                 </p>
                 <ul className="space-y-2 pl-6">
                   <li className="flex items-start gap-2">
-                    <Award className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">{trans.calcCert}</span>
+                    <Award className="w-4 h-4 text-amber-500 mt-1 flex-shrink-0" />
+                    <span className="text-base text-slate-600 dark:text-slate-400">{trans.calcCert}</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <FileCheck className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">{trans.calcDocs}</span>
+                    <FileCheck className="w-4 h-4 text-emerald-500 mt-1 flex-shrink-0" />
+                    <span className="text-base text-slate-600 dark:text-slate-400">{trans.calcDocs}</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <GraduationCap className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">{trans.calcQuiz}</span>
+                    <GraduationCap className="w-4 h-4 text-purple-500 mt-1 flex-shrink-0" />
+                    <span className="text-base text-slate-600 dark:text-slate-400">{trans.calcQuiz}</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Clock className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">{trans.calcWork}</span>
+                    <Clock className="w-4 h-4 text-blue-500 mt-1 flex-shrink-0" />
+                    <span className="text-base text-slate-600 dark:text-slate-400">{trans.calcWork}</span>
                   </li>
                 </ul>
-                <p className="text-sm text-slate-500 dark:text-slate-500 pl-6 italic">
+                <p className="text-base text-slate-500 dark:text-slate-500 pl-6 italic">
                   {trans.calcWeights}
                 </p>
               </div>
@@ -533,19 +533,19 @@ export default function TechnicianPSR() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-6">
                   <div className="flex items-center gap-2 p-2 rounded-md bg-green-50 dark:bg-green-950/30">
                     <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="text-sm text-green-700 dark:text-green-400">{trans.range90}</span>
+                    <span className="text-base text-green-700 dark:text-green-400">{trans.range90}</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-50 dark:bg-emerald-950/30">
                     <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                    <span className="text-sm text-emerald-700 dark:text-emerald-400">{trans.range70}</span>
+                    <span className="text-base text-emerald-700 dark:text-emerald-400">{trans.range70}</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded-md bg-amber-50 dark:bg-amber-950/30">
                     <div className="w-3 h-3 rounded-full bg-amber-500" />
-                    <span className="text-sm text-amber-700 dark:text-amber-400">{trans.range50}</span>
+                    <span className="text-base text-amber-700 dark:text-amber-400">{trans.range50}</span>
                   </div>
                   <div className="flex items-center gap-2 p-2 rounded-md bg-red-50 dark:bg-red-950/30">
                     <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span className="text-sm text-red-700 dark:text-red-400">{trans.range0}</span>
+                    <span className="text-base text-red-700 dark:text-red-400">{trans.range0}</span>
                   </div>
                 </div>
               </div>
