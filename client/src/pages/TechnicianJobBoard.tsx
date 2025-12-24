@@ -42,7 +42,8 @@ import {
   Home,
   User as UserIcon,
   MoreHorizontal,
-  Mail
+  Mail,
+  GraduationCap
 } from "lucide-react";
 import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
 import { format } from "date-fns";
@@ -676,6 +677,33 @@ export default function TechnicianJobBoard() {
           label: language === 'en' ? "Team Invitations" : "Invitations",
           icon: Mail,
           onClick: () => setLocation('/technician-portal?tab=invitations'),
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "safety",
+      label: language === 'en' ? "SAFETY" : "SÉCURITÉ",
+      items: [
+        {
+          id: "personal-safety-docs",
+          label: language === 'en' ? "Personal Safety Docs" : "Docs de sécurité",
+          icon: Shield,
+          href: "/personal-safety-documents",
+          isVisible: () => true,
+        },
+        {
+          id: "psr",
+          label: language === 'en' ? "Safety Rating (PSR)" : "Cote de sécurité (PSR)",
+          icon: Award,
+          href: "/technician-psr",
+          isVisible: () => true,
+        },
+        {
+          id: "practice-quizzes",
+          label: language === 'en' ? "Practice Quizzes" : "Quiz de pratique",
+          icon: GraduationCap,
+          href: "/technician-practice-quizzes",
           isVisible: () => true,
         },
       ],

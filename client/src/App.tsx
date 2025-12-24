@@ -123,6 +123,7 @@ import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import PersonalSafetyDocuments from "@/pages/PersonalSafetyDocuments";
 import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
+import TechnicianPracticeQuizzes from "@/pages/TechnicianPracticeQuizzes";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
 import VisibleTechniciansBrowser from "@/pages/VisibleTechniciansBrowser";
 import NotFound from "@/pages/not-found";
@@ -252,6 +253,11 @@ function Router() {
       <Route path="/personal-safety-documents">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <PersonalSafetyDocuments />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/technician-practice-quizzes">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+          <TechnicianPracticeQuizzes />
         </ProtectedRoute>
       </Route>
       <Route path="/resident-dashboard">

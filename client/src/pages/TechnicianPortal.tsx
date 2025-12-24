@@ -113,7 +113,8 @@ import {
   Download,
   FileImage,
   FileArchive,
-  File
+  File,
+  GraduationCap
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { QuizSection } from "@/components/QuizSection";
@@ -449,14 +450,16 @@ const translations = {
     tabEmployer: "Employer View",
     tabWork: "Work",
     tabMore: "More",
-    employerProfileTitle: "What Employers See",
-    employerProfileDesc: "This is how your profile appears to potential employers browsing the talent pool.",
+    employerProfileTitle: "Get Discovered by Employers",
+    employerProfileDesc: "When visible, employers searching for certified technicians can find and connect with you.",
     editEmployerProfile: "Edit",
     saveEmployerProfile: "Save",
     cancelEdit: "Cancel",
-    visibilityStatus: "Visibility Status",
-    visibleToEmployers: "Visible to Employers",
-    hiddenFromEmployers: "Hidden from Employers",
+    visibilityStatus: "Talent Pool Visibility",
+    visibleToEmployers: "You're Discoverable",
+    hiddenFromEmployers: "Profile Hidden",
+    visibilityOnDesc: "Employers can find you in talent searches. Turn off anytime.",
+    visibilityOffDesc: "Toggle on to appear in employer searches and get job opportunities.",
     makeVisible: "Make Visible",
     makeHidden: "Hide Profile",
     yourSpecialties: "Your Specialties",
@@ -800,14 +803,16 @@ const translations = {
     tabEmployer: "Vue Employeur",
     tabWork: "Travail",
     tabMore: "Plus",
-    employerProfileTitle: "Ce que voient les employeurs",
-    employerProfileDesc: "Voici comment votre profil apparaît aux employeurs potentiels.",
+    employerProfileTitle: "Soyez découvert par les employeurs",
+    employerProfileDesc: "Lorsque visible, les employeurs recherchant des techniciens certifiés peuvent vous trouver et vous contacter.",
     editEmployerProfile: "Modifier",
     saveEmployerProfile: "Sauvegarder",
     cancelEdit: "Annuler",
-    visibilityStatus: "Statut de visibilité",
-    visibleToEmployers: "Visible aux employeurs",
-    hiddenFromEmployers: "Caché des employeurs",
+    visibilityStatus: "Visibilité dans le bassin de talents",
+    visibleToEmployers: "Vous êtes découvrable",
+    hiddenFromEmployers: "Profil caché",
+    visibilityOnDesc: "Les employeurs peuvent vous trouver. Désactivez à tout moment.",
+    visibilityOffDesc: "Activez pour apparaître dans les recherches et recevoir des opportunités.",
     makeVisible: "Rendre visible",
     makeHidden: "Cacher le profil",
     yourSpecialties: "Vos spécialités",
@@ -1192,14 +1197,16 @@ const translations = {
     tabEmployer: "Vista Empleador",
     tabWork: "Trabajo",
     tabMore: "Mas",
-    employerProfileTitle: "Lo que ven los empleadores",
-    employerProfileDesc: "Asi es como su perfil aparece a los empleadores potenciales.",
+    employerProfileTitle: "Sea descubierto por empleadores",
+    employerProfileDesc: "Cuando es visible, los empleadores que buscan tecnicos certificados pueden encontrarlo y contactarlo.",
     editEmployerProfile: "Editar",
     saveEmployerProfile: "Guardar",
     cancelEdit: "Cancelar",
-    visibilityStatus: "Estado de Visibilidad",
-    visibleToEmployers: "Visible para Empleadores",
-    hiddenFromEmployers: "Oculto de Empleadores",
+    visibilityStatus: "Visibilidad en el banco de talentos",
+    visibleToEmployers: "Eres descubrible",
+    hiddenFromEmployers: "Perfil oculto",
+    visibilityOnDesc: "Los empleadores pueden encontrarte. Desactiva en cualquier momento.",
+    visibilityOffDesc: "Activa para aparecer en busquedas y recibir oportunidades de trabajo.",
     makeVisible: "Hacer Visible",
     makeHidden: "Ocultar Perfil",
     yourSpecialties: "Sus Especialidades",
@@ -1729,6 +1736,33 @@ export default function TechnicianPortal() {
           onClick: () => setActiveTab('invitations'),
           badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
           badgeType: "alert",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "safety",
+      label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
+      items: [
+        {
+          id: "personal-safety-docs",
+          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de sécurité",
+          icon: Shield,
+          href: "/personal-safety-documents",
+          isVisible: () => true,
+        },
+        {
+          id: "psr",
+          label: language === 'en' ? "Safety Rating (PSR)" : language === 'es' ? "Calificacion (PSR)" : "Cote de sécurité (PSR)",
+          icon: Award,
+          href: "/technician-psr",
+          isVisible: () => true,
+        },
+        {
+          id: "practice-quizzes",
+          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz de pratique",
+          icon: GraduationCap,
+          href: "/technician-practice-quizzes",
           isVisible: () => true,
         },
       ],
@@ -2708,17 +2742,6 @@ export default function TechnicianPortal() {
         {/* MY VISIBILITY TAB - What employers see and visibility settings */}
         {activeTab === 'visibility' && user && (
           <>
-            {/* Back to Home button */}
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab('home')}
-              className="gap-2 -mt-2 mb-2"
-              data-testid="button-back-to-home-employer"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t.backToHome}
-            </Button>
-
             {/* Employer Profile - Glass-morphism container matching Resident Profile style */}
             {(user.role === 'rope_access_tech' || user.role === 'company') && (
               <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
@@ -2754,9 +2777,9 @@ export default function TechnicianPortal() {
                 </div>
 
                 {/* Visibility Status - Compact inline */}
-                <div className={`flex items-center justify-between p-4 rounded-lg mb-6 ${user.isVisibleToEmployers ? "bg-green-500/10 border border-green-500/20" : "bg-amber-500/10 border border-amber-500/20"}`}>
+                <div className={`flex items-center justify-between p-4 rounded-lg mb-6 gap-4 ${user.isVisibleToEmployers ? "bg-green-500/10 border border-green-500/20" : "bg-amber-500/10 border border-amber-500/20"}`}>
                   <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${user.isVisibleToEmployers ? "bg-green-500/20" : "bg-amber-500/20"}`}>
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${user.isVisibleToEmployers ? "bg-green-500/20" : "bg-amber-500/20"}`}>
                       {user.isVisibleToEmployers ? (
                         <Eye className="w-5 h-5 text-green-600 dark:text-green-400" />
                       ) : (
@@ -2764,9 +2787,9 @@ export default function TechnicianPortal() {
                       )}
                     </div>
                     <div>
-                      <p className="font-medium">{t.visibilityStatus}</p>
-                      <p className="text-base text-muted-foreground">
-                        {user.isVisibleToEmployers ? t.visibleToEmployers : t.hiddenFromEmployers}
+                      <p className="font-medium">{user.isVisibleToEmployers ? t.visibleToEmployers : t.hiddenFromEmployers}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {user.isVisibleToEmployers ? t.visibilityOnDesc : t.visibilityOffDesc}
                       </p>
                     </div>
                   </div>
