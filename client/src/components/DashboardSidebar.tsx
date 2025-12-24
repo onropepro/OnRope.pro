@@ -340,20 +340,20 @@ export function DashboardSidebar({
   const sidebarContent = (
     <>
       {/* Logo Header - h-14 (56px) */}
-      <div className="h-14 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="h-14 flex items-center justify-center px-4 border-b border-slate-100 dark:border-slate-800 relative">
         {whitelabelBrandingActive && brandingLogoUrl ? (
           <img
             src={brandingLogoUrl}
             alt="Company Logo"
-            className="h-7 w-auto max-w-[160px] object-contain"
+            className="h-8 w-auto max-w-[180px] object-contain"
             data-testid="img-sidebar-logo"
           />
         ) : (
-          <div className="flex items-center gap-2" data-testid="sidebar-default-logo">
+          <div className="flex items-center justify-center" data-testid="sidebar-default-logo">
             <img
               src={onRopeProLogo}
               alt="OnRopePro"
-              className="h-8 w-auto object-contain"
+              className="h-9 w-auto object-contain"
             />
           </div>
         )}
@@ -361,7 +361,7 @@ export function DashboardSidebar({
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="lg:hidden absolute right-2"
           onClick={() => setIsOpen(false)}
           data-testid="button-sidebar-close"
         >
