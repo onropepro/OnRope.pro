@@ -11302,6 +11302,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get all linked property managers for this company (for quote recipient dropdown)
+  app.get("/api/property-managers/linked", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get all PM links for this company
+      const pmLinks = await db.select()
+        .from(propertyManagerCompanyLinks)
+        .where(eq(propertyManagerCompanyLinks.companyId, companyId));
+      
+      // Fetch full PM details for each link
+      const linkedPMs = await Promise.all(
+        pmLinks.map(async (link) => {
+          const pm = await storage.getUserById(link.propertyManagerId);
+          if (!pm || pm.role !== 'property_manager') return null;
+          return {
+            id: pm.id,
+            name: `${pm.firstName || ''} ${pm.lastName || ''}`.trim() || pm.email,
+            email: pm.email,
+            phone: pm.propertyManagerPhoneNumber,
+            company: pm.propertyManagementCompany,
+            smsOptIn: pm.propertyManagerSmsOptIn,
+            strataNumber: link.strataNumber,
+          };
+        })
+      );
+      
+      res.json(linkedPMs.filter(Boolean));
+    } catch (error) {
+      console.error("Error fetching linked property managers:", error);
+      res.status(500).json({ message: "Failed to fetch linked property managers" });
+    }
+  });
+  
   // Link a property manager to this company
   app.post("/api/property-managers/:pmId/link", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
     try {
@@ -19703,24 +19745,36 @@ Do not include any other text, just the JSON object.`
       // Get the complete quote with services (after transaction)
       const fullQuote = await storage.getQuoteById(quoteWithServices.id);
       
-      // Auto-link property manager based on strata number (non-blocking)
+      // Link property manager and send notifications
       let smsResult: { sent: boolean; error?: string } = { sent: false };
       try {
-        // Find property manager linked to this company with matching strata number
-        const pmLinks = await db.select()
-          .from(propertyManagerCompanyLinks)
-          .where(
-            and(
-              eq(propertyManagerCompanyLinks.companyId, companyId),
-              eq(propertyManagerCompanyLinks.strataNumber, fullQuote!.strataPlanNumber)
-            )
-          );
+        let propertyManager: any = null;
         
-        if (pmLinks.length > 0) {
-          const pmLink = pmLinks[0];
-          const propertyManager = await storage.getUserById(pmLink.propertyManagerId);
+        // Check if PM was manually selected in the request
+        if (req.body.recipientPropertyManagerId) {
+          propertyManager = await storage.getUserById(req.body.recipientPropertyManagerId);
+          if (propertyManager && propertyManager.role !== 'property_manager') {
+            propertyManager = null; // Invalid - not a PM
+          }
+        }
+        
+        // If no manual selection, try auto-linking based on strata number
+        if (!propertyManager && fullQuote!.strataPlanNumber) {
+          const pmLinks = await db.select()
+            .from(propertyManagerCompanyLinks)
+            .where(
+              and(
+                eq(propertyManagerCompanyLinks.companyId, companyId),
+                eq(propertyManagerCompanyLinks.strataNumber, fullQuote!.strataPlanNumber)
+              )
+            );
           
-          if (propertyManager && propertyManager.role === 'property_manager') {
+          if (pmLinks.length > 0) {
+            propertyManager = await storage.getUserById(pmLinks[0].propertyManagerId);
+          }
+        }
+        
+        if (propertyManager && propertyManager.role === 'property_manager') {
             // Link the quote to this property manager and move to submitted stage
             await storage.updateQuote(fullQuote!.id, { 
               recipientPropertyManagerId: propertyManager.id,
@@ -19778,7 +19832,6 @@ Do not include any other text, just the JSON object.`
             } else if (propertyManager.propertyManagerPhoneNumber && !propertyManager.propertyManagerSmsOptIn) {
               console.log(`[SMS] Skipped - property manager ${propertyManager.email} has not opted-in to SMS notifications`);
             }
-          }
         }
       } catch (pmError: any) {
         console.error("[Quote] Auto-link property manager error (non-blocking):", pmError?.message || pmError);
