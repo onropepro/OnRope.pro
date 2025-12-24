@@ -1694,28 +1694,41 @@ export default function TechnicianPortal() {
           isVisible: () => true,
         },
         {
-          id: "employer",
-          label: language === 'en' ? "Employer" : "Employeur",
-          icon: Eye,
-          onClick: () => setActiveTab('employer'),
-          isVisible: () => true,
-        },
-        {
-          id: "work",
-          label: t.tabWork || "Work",
-          icon: Briefcase,
-          onClick: () => setActiveTab('work'),
-          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
-          badgeType: "alert",
-          isVisible: () => true,
-        },
-        {
           id: "more",
           label: t.tabMore || "More",
           icon: MoreHorizontal,
           onClick: () => setActiveTab('more'),
           badge: totalUnreadFeedback > 0 ? totalUnreadFeedback : undefined,
           badgeType: "info",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "employment",
+      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
+      items: [
+        {
+          id: "job-board",
+          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
+          icon: Briefcase,
+          href: "/technician-job-board",
+          isVisible: () => true,
+        },
+        {
+          id: "visibility",
+          label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
+          icon: Eye,
+          onClick: () => setActiveTab('visibility'),
+          isVisible: () => true,
+        },
+        {
+          id: "invitations",
+          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
+          icon: Mail,
+          onClick: () => setActiveTab('invitations'),
+          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
+          badgeType: "alert",
           isVisible: () => true,
         },
       ],
@@ -2692,8 +2705,8 @@ export default function TechnicianPortal() {
           </>
         )}
 
-        {/* EMPLOYER VIEW TAB - What employers see */}
-        {activeTab === 'employer' && user && (
+        {/* MY VISIBILITY TAB - What employers see and visibility settings */}
+        {activeTab === 'visibility' && user && (
           <>
             {/* Back to Home button */}
             <Button
@@ -3061,49 +3074,6 @@ export default function TechnicianPortal() {
           </>
         )}
         
-        {/* WORK TAB - Job board, invitations, employer */}
-        {activeTab === 'work' && (
-          <>
-            {/* Back to Home button */}
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab('home')}
-              className="gap-2 -mt-2 mb-2"
-              data-testid="button-back-to-home-work"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t.backToHome}
-            </Button>
-            
-            {/* Job Board Card */}
-            {user && (
-              <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-full bg-blue-500/20">
-                        <Briefcase className="w-6 h-6 text-blue-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{t.jobBoard}</p>
-                        <p className="text-base text-muted-foreground">{t.jobBoardDesc}</p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => setLocation("/technician-job-board")}
-                      className="gap-2 bg-blue-600 hover:bg-blue-700 h-12"
-                      data-testid="button-browse-jobs"
-                    >
-                      {t.browseJobs}
-                      <ArrowRight className="w-5 h-5" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
-        
         {/* MORE TAB - Feedback, referral, settings */}
         {activeTab === 'more' && (
           <>
@@ -3164,100 +3134,113 @@ export default function TechnicianPortal() {
           </>
         )}
 
-        {/* Team Invitations Section - Show for unlinked technicians, self-resigned technicians, OR PLUS technicians (WORK TAB) */}
-        {activeTab === 'work' && user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate || user.hasPlusAccess) && (
-          <Card className="border-primary/30 bg-primary/5">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Mail className="w-5 h-5 text-primary" />
+        {/* TEAM INVITATIONS TAB - Employer invitations to link accounts */}
+        {activeTab === 'invitations' && user && user.role === 'rope_access_tech' && (
+          <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home-invitations"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+            
+            <Card className="border-primary/30 bg-primary/5">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Mail className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{t.teamInvitations}</CardTitle>
+                    <CardDescription>{t.pendingInvitations}</CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle className="text-lg">{t.teamInvitations}</CardTitle>
-                  <CardDescription>{t.pendingInvitations}</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {pendingInvitations.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground">
-                  <Building className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                  <p className="font-medium">{t.noInvitations}</p>
-                  <p className="text-base mt-1">{t.noInvitationsDesc}</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {pendingInvitations.map((invitation) => (
-                    <div
-                      key={invitation.id}
-                      className="p-4 rounded-lg border bg-card shadow-sm"
-                      data-testid={`invitation-card-${invitation.id}`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-1">
-                          <p className="font-medium text-lg flex items-center gap-2">
-                            <Building className="w-4 h-4 text-muted-foreground" />
-                            {invitation.company.name}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {t.invitedOn} {formatLocalDate(invitation.createdAt)}
-                          </p>
-                          {invitation.message && (
-                            <div className="mt-2 p-3 bg-muted rounded-md">
-                              <p className="text-sm">
-                                <span className="font-medium">{t.invitationMessage}:</span> {invitation.message}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2 sm:flex-shrink-0">
-                          <Button
-                            variant="outline"
-                            size="default"
-                            onClick={() => declineInvitationMutation.mutate(invitation.id)}
-                            disabled={processingInvitationId === invitation.id}
-                            className="flex-1 sm:flex-none gap-2"
-                            data-testid={`button-decline-invitation-${invitation.id}`}
-                          >
-                            {processingInvitationId === invitation.id && declineInvitationMutation.isPending ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {t.decliningInvitation}
-                              </>
-                            ) : (
-                              <>
-                                <X className="w-4 h-4" />
-                                {t.declineInvitation}
-                              </>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {pendingInvitations.length === 0 ? (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <Building className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                    <p className="font-medium">{t.noInvitations}</p>
+                    <p className="text-base mt-1">{t.noInvitationsDesc}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {pendingInvitations.map((invitation) => (
+                      <div
+                        key={invitation.id}
+                        className="p-4 rounded-lg border bg-card shadow-sm"
+                        data-testid={`invitation-card-${invitation.id}`}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <p className="font-medium text-lg flex items-center gap-2">
+                              <Building className="w-4 h-4 text-muted-foreground" />
+                              {invitation.company.name}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {t.invitedOn} {formatLocalDate(invitation.createdAt)}
+                            </p>
+                            {invitation.message && (
+                              <div className="mt-2 p-3 bg-muted rounded-md">
+                                <p className="text-sm">
+                                  <span className="font-medium">{t.invitationMessage}:</span> {invitation.message}
+                                </p>
+                              </div>
                             )}
-                          </Button>
-                          <Button
-                            size="default"
-                            onClick={() => acceptInvitationMutation.mutate(invitation.id)}
-                            disabled={processingInvitationId === invitation.id}
-                            className="flex-1 sm:flex-none gap-2"
-                            data-testid={`button-accept-invitation-${invitation.id}`}
-                          >
-                            {processingInvitationId === invitation.id && acceptInvitationMutation.isPending ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {t.acceptingInvitation}
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle2 className="w-4 h-4" />
-                                {t.acceptInvitation}
-                              </>
-                            )}
-                          </Button>
+                          </div>
+                          <div className="flex gap-2 sm:flex-shrink-0">
+                            <Button
+                              variant="outline"
+                              size="default"
+                              onClick={() => declineInvitationMutation.mutate(invitation.id)}
+                              disabled={processingInvitationId === invitation.id}
+                              className="flex-1 sm:flex-none gap-2"
+                              data-testid={`button-decline-invitation-${invitation.id}`}
+                            >
+                              {processingInvitationId === invitation.id && declineInvitationMutation.isPending ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  {t.decliningInvitation}
+                                </>
+                              ) : (
+                                <>
+                                  <X className="w-4 h-4" />
+                                  {t.declineInvitation}
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              size="default"
+                              onClick={() => acceptInvitationMutation.mutate(invitation.id)}
+                              disabled={processingInvitationId === invitation.id}
+                              className="flex-1 sm:flex-none gap-2"
+                              data-testid={`button-accept-invitation-${invitation.id}`}
+                            >
+                              {processingInvitationId === invitation.id && acceptInvitationMutation.isPending ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  {t.acceptingInvitation}
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  {t.acceptInvitation}
+                                </>
+                              )}
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </>
         )}
 
         {/* Your Referral Code Section - Show for technicians and company owners (MORE TAB) */}
@@ -3477,88 +3460,6 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Current Employer Section - Show for linked technicians (not terminated) (WORK TAB) */}
-        {activeTab === 'work' && user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
-          <Card className="border-muted">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-muted">
-                    <Building className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">{t.currentEmployer}</CardTitle>
-                    <CardDescription>
-                      {t.currentlyEmployedBy} <span className="font-medium text-foreground">{user.companyName || "your company"}</span>
-                    </CardDescription>
-                  </div>
-                </div>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className="gap-2 text-destructive border-destructive/30"
-                      data-testid="button-leave-company"
-                    >
-                      <UserMinus className="w-4 h-4" />
-                      {t.leaveCompany}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{t.leaveCompanyConfirm}</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {t.leaveCompanyWarning}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel data-testid="button-cancel-leave">{t.cancelLeave}</AlertDialogCancel>
-                      <AlertDialogAction 
-                        onClick={() => leaveCompanyMutation.mutate()}
-                        disabled={leaveCompanyMutation.isPending}
-                        className="bg-destructive text-destructive-foreground gap-2"
-                        data-testid="button-confirm-leave"
-                      >
-                        {leaveCompanyMutation.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            {t.leavingCompany}
-                          </>
-                        ) : (
-                          t.confirmLeave
-                        )}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </CardHeader>
-            {/* Compensation Display */}
-            {(user.hourlyRate || user.salary) && (
-              <CardContent className="pt-0">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <div className="p-2 rounded-full bg-green-500/10">
-                    <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{t.yourCompensation}</p>
-                    <p className="text-lg font-semibold">
-                      {user.isSalary && user.salary ? (
-                        <>
-                          ${Number(user.salary).toLocaleString()}<span className="text-sm font-normal text-muted-foreground">/{t.year}</span>
-                        </>
-                      ) : user.hourlyRate ? (
-                        <>
-                          ${Number(user.hourlyRate).toFixed(2)}<span className="text-sm font-normal text-muted-foreground">/{t.hour}</span>
-                        </>
-                      ) : null}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            )}
-          </Card>
-        )}
 
         {/* PROFILE TAB - Personal information and certifications */}
         {activeTab === 'profile' && (
@@ -5561,28 +5462,28 @@ export default function TechnicianPortal() {
             <span className="text-[10px] font-medium">{t.tabProfile}</span>
           </button>
           <button
-            onClick={() => setActiveTab('employer')}
+            onClick={() => setActiveTab('visibility')}
             className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'employer' 
+              activeTab === 'visibility' 
                 ? 'text-primary bg-primary/10' 
                 : 'text-muted-foreground'
             }`}
-            data-testid="tab-employer"
+            data-testid="tab-visibility"
           >
             <Eye className="w-5 h-5" />
-            <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Employer' : 'Employeur'}</span>
+            <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Visibility' : language === 'es' ? 'Visibilidad' : 'Visibilité'}</span>
           </button>
           <button
-            onClick={() => setActiveTab('work')}
+            onClick={() => setActiveTab('invitations')}
             className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'work' 
+              activeTab === 'invitations' 
                 ? 'text-primary bg-primary/10' 
                 : 'text-muted-foreground'
             }`}
-            data-testid="tab-work"
+            data-testid="tab-invitations"
           >
-            <Briefcase className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{t.tabWork}</span>
+            <Mail className="w-5 h-5" />
+            <span className="text-[10px] font-medium">{language === 'en' ? 'Invites' : language === 'es' ? 'Invitaciones' : 'Invitations'}</span>
             {pendingInvitations.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                 {pendingInvitations.length}
