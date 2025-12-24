@@ -52,7 +52,7 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager";
+export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew";
 
 export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
   employer: "#0B64A3",
@@ -60,6 +60,7 @@ export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
   "property-manager": "#6E9075",
   resident: "#86A59C",
   "building-manager": "#B89685",
+  "ground-crew": "#5D7B6F",
 };
 
 export interface DashboardSidebarProps {
