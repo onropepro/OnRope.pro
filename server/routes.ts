@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable, incidentReports, clients, quizAttempts } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -3935,6 +3935,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // =====================================================================
   // END DASHBOARD PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // =====================================================================
+  // SIDEBAR PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // Get user's sidebar preferences for a specific dashboard variant
+  app.get("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant } = req.query;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant query parameter is required" });
+      }
+
+      const validVariants = ['employer', 'technician', 'property-manager', 'resident', 'building-manager', 'ground-crew'];
+      if (!validVariants.includes(variant)) {
+        return res.status(400).json({ message: `Invalid variant. Must be one of: ${validVariants.join(', ')}` });
+      }
+
+      const prefs = await db.select()
+        .from(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ))
+        .orderBy(asc(sidebarPreferences.groupId), asc(sidebarPreferences.position));
+
+      // Group by groupId for easier frontend consumption
+      const grouped: Record<string, { itemId: string; position: number }[]> = {};
+      for (const pref of prefs) {
+        if (!grouped[pref.groupId]) {
+          grouped[pref.groupId] = [];
+        }
+        grouped[pref.groupId].push({
+          itemId: pref.itemId,
+          position: pref.position,
+        });
+      }
+
+      res.json({ 
+        preferences: grouped,
+        variant,
+        isDefault: prefs.length === 0,
+      });
+    } catch (error: any) {
+      console.error('[Sidebar] Get preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to get sidebar preferences" });
+    }
+  });
+
+  // Save user's sidebar preferences for a specific dashboard variant
+  app.put("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant, groups } = req.body;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant is required" });
+      }
+
+      const validVariants = ['employer', 'technician', 'property-manager', 'resident', 'building-manager', 'ground-crew'];
+      if (!validVariants.includes(variant)) {
+        return res.status(400).json({ message: `Invalid variant. Must be one of: ${validVariants.join(', ')}` });
+      }
+
+      if (!groups || typeof groups !== 'object') {
+        return res.status(400).json({ message: "groups must be an object with groupId keys" });
+      }
+
+      // Validate structure: groups is Record<string, { itemId: string; position: number }[]>
+      const inserts: { userId: string; dashboardVariant: string; groupId: string; itemId: string; position: number }[] = [];
+      for (const [groupId, items] of Object.entries(groups)) {
+        if (!Array.isArray(items)) {
+          return res.status(400).json({ message: `Group ${groupId} must contain an array of items` });
+        }
+        for (const item of items as any[]) {
+          if (!item.itemId || typeof item.position !== 'number') {
+            return res.status(400).json({ message: `Each item must have itemId and position` });
+          }
+          inserts.push({
+            userId,
+            dashboardVariant: variant,
+            groupId,
+            itemId: item.itemId,
+            position: item.position,
+          });
+        }
+      }
+
+      // Delete existing preferences for this variant
+      await db.delete(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ));
+
+      // Insert new preferences
+      if (inserts.length > 0) {
+        await db.insert(sidebarPreferences).values(inserts);
+      }
+
+      res.json({ success: true, variant, groupCount: Object.keys(groups).length });
+    } catch (error: any) {
+      console.error('[Sidebar] Save preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to save sidebar preferences" });
+    }
+  });
+
+  // Reset sidebar preferences to default for a specific variant
+  app.delete("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant } = req.query;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant query parameter is required" });
+      }
+
+      await db.delete(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ));
+
+      res.json({ success: true, message: "Sidebar preferences reset to default" });
+    } catch (error: any) {
+      console.error('[Sidebar] Reset preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to reset sidebar preferences" });
+    }
+  });
+
+  // =====================================================================
+  // END SIDEBAR PREFERENCES ENDPOINTS
   // =====================================================================
 
   // =====================================================================
