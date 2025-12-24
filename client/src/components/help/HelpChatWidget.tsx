@@ -4,6 +4,47 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
+function formatResponseText(text: string): JSX.Element[] {
+  const elements: JSX.Element[] = [];
+  const lines = text.split(/\n+/).filter(line => line.trim());
+  
+  lines.forEach((line, lineIndex) => {
+    let content = line.trim();
+    
+    if (content === '---' || content === '***') {
+      elements.push(
+        <hr key={lineIndex} className="my-3 border-border/30" />
+      );
+      return;
+    }
+    
+    content = content.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    content = content.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    content = content.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 bg-black/10 dark:bg-white/10 rounded text-xs">$1</code>');
+    
+    if (content.startsWith('* ') || content.startsWith('- ')) {
+      const listContent = content.slice(2);
+      elements.push(
+        <li 
+          key={lineIndex} 
+          className="ml-4 text-sm py-0.5"
+          dangerouslySetInnerHTML={{ __html: listContent }}
+        />
+      );
+    } else {
+      elements.push(
+        <p 
+          key={lineIndex} 
+          className="text-sm leading-relaxed mb-2 last:mb-0"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      );
+    }
+  });
+  
+  return elements;
+}
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -192,7 +233,11 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
                   )}
                   data-testid={`message-${message.role}-${message.id}`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  {message.role === 'user' ? (
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  ) : (
+                    <div className="text-sm">{formatResponseText(message.content)}</div>
+                  )}
                   
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/30">
