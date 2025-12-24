@@ -343,6 +343,9 @@ export default function Quotes() {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [selectedPropertyIndex, setSelectedPropertyIndex] = useState<number | null>(null);
   
+  // Property Manager selection for quote recipient
+  const [selectedPmId, setSelectedPmId] = useState<string | null>(null);
+  
   // Form data
   const [buildingInfo, setBuildingInfo] = useState<BuildingInfoFormData | null>(null);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -508,6 +511,21 @@ export default function Quotes() {
   });
 
   const clients = clientsData?.clients || [];
+  
+  // Fetch linked property managers for quote recipient dropdown
+  const { data: linkedPMsData } = useQuery<Array<{
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    company: string | null;
+    smsOptIn: boolean;
+    strataNumber: string | null;
+  }>>({
+    queryKey: ["/api/property-managers/linked"],
+  });
+  
+  const linkedPMs = linkedPMsData || [];
 
   // Create quote mutation
   const createQuoteMutation = useMutation({
@@ -565,6 +583,7 @@ export default function Quotes() {
         strataManagerName: buildingInfo.strataManagerName,
         strataManagerAddress: buildingInfo.strataManagerAddress,
         clientId: selectedClientId, // Save client reference for project conversion
+        recipientPropertyManagerId: selectedPmId, // Manually selected PM to send quote to
         status: "open",
         services, // Include services array
         totalAmount: String(subtotal),
@@ -941,6 +960,7 @@ export default function Quotes() {
     setSelectedPhotoFile(null);
     setSelectedClientId(null);
     setSelectedPropertyIndex(null);
+    setSelectedPmId(null); // Reset PM selection
     setCreateStep("services");
     setCurrentTaxInfo(null); // Reset tax info when starting a new quote
     setRemovedTaxTypes(new Set()); // Reset removed tax types
@@ -3565,6 +3585,47 @@ export default function Quotes() {
                   </div>
 
                   <Separator />
+                  
+                  {/* Property Manager Selection for Quote Recipient */}
+                  {linkedPMs.length > 0 && (
+                    <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Send className="w-5 h-5 text-primary" />
+                        <Label className="text-base font-semibold">{t('quotes.sendToPropertyManager', 'Send to Property Manager')}</Label>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {t('quotes.pmSelectDescription', 'Select a property manager to send this quote to. They will receive an SMS notification and see the quote on their portal.')}
+                      </p>
+                      
+                      <div className="space-y-2">
+                        <Label>{t('quotes.selectPM', 'Select Property Manager')}</Label>
+                        <Select
+                          value={selectedPmId || ""}
+                          onValueChange={(value) => setSelectedPmId(value || null)}
+                        >
+                          <SelectTrigger className="h-12" data-testid="select-property-manager">
+                            <SelectValue placeholder={t('quotes.selectPMPlaceholder', 'Select a property manager...')} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">
+                              <span className="text-muted-foreground">{t('quotes.noPMSelected', 'No property manager (auto-match by strata)')}</span>
+                            </SelectItem>
+                            {linkedPMs.map((pm) => (
+                              <SelectItem key={pm.id} value={pm.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{pm.name}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {pm.company}{pm.strataNumber ? ` - ${pm.strataNumber}` : ''}
+                                    {pm.smsOptIn && pm.phone ? ' (SMS enabled)' : ''}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  )}
 
                   <FormField
                     control={buildingForm.control}
