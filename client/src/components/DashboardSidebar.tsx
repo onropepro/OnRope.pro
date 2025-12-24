@@ -24,6 +24,8 @@ import {
   Building,
   Cloud,
   SlidersHorizontal,
+  User as UserIcon,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -159,6 +161,30 @@ export function DashboardSidebar({
   };
 
   const navigationGroups: NavGroup[] = [
+    {
+      id: "my-account",
+      label: t("dashboard.sidebar.myAccount", "MY ACCOUNT"),
+      items: [
+        {
+          id: "my-portal",
+          label: t("dashboard.sidebar.myPortal", "My Portal"),
+          icon: UserIcon,
+          href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
+            ? "/ground-crew?tab=home" 
+            : "/technician-portal?tab=home",
+          isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
+        },
+        {
+          id: "invitations",
+          label: t("dashboard.sidebar.invitations", "Invitations"),
+          icon: Mail,
+          href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
+            ? "/ground-crew?tab=invitations" 
+            : "/technician-portal?tab=invitations",
+          isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
+        },
+      ],
+    },
     {
       id: "operations",
       label: t("dashboard.categories.operations", "OPERATIONS"),

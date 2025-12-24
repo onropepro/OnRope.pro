@@ -496,20 +496,20 @@ type TabType = 'home' | 'profile' | 'invitations' | 'more';
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
-  phone: z.string().min(1, "Phone is required"),
+  employeePhoneNumber: z.string().min(1, "Phone is required"),
   birthday: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  provinceState: z.string().optional(),
-  country: z.string().optional(),
-  postalCode: z.string().optional(),
+  employeeStreetAddress: z.string().optional(),
+  employeeCity: z.string().optional(),
+  employeeProvinceState: z.string().optional(),
+  employeeCountry: z.string().optional(),
+  employeePostalCode: z.string().optional(),
   emergencyContactName: z.string().optional(),
   emergencyContactPhone: z.string().optional(),
   emergencyContactRelationship: z.string().optional(),
-  sin: z.string().optional(),
-  bankTransit: z.string().optional(),
-  bankInstitution: z.string().optional(),
-  bankAccount: z.string().optional(),
+  socialInsuranceNumber: z.string().optional(),
+  bankTransitNumber: z.string().optional(),
+  bankInstitutionNumber: z.string().optional(),
+  bankAccountNumber: z.string().optional(),
   driversLicenseNumber: z.string().optional(),
   driversLicenseIssuedDate: z.string().optional(),
   driversLicenseExpiry: z.string().optional(),
@@ -551,8 +551,31 @@ export default function GroundCrewPortal() {
 
   const t = translations[language];
 
-  const [activeTab, setActiveTab] = useState<TabType>('home');
+  const getTabFromUrl = (): TabType => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab === 'home' || tab === 'profile' || tab === 'invitations' || tab === 'more') {
+      return tab;
+    }
+    return 'home';
+  };
+  
+  const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const tab = getTabFromUrl();
+      setActiveTab(tab);
+    };
+    
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, [location]);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadType, setUploadType] = useState<string | null>(null);
@@ -579,20 +602,20 @@ export default function GroundCrewPortal() {
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
+      employeePhoneNumber: "",
       birthday: "",
-      address: "",
-      city: "",
-      provinceState: "",
-      country: "",
-      postalCode: "",
+      employeeStreetAddress: "",
+      employeeCity: "",
+      employeeProvinceState: "",
+      employeeCountry: "",
+      employeePostalCode: "",
       emergencyContactName: "",
       emergencyContactPhone: "",
       emergencyContactRelationship: "",
-      sin: "",
-      bankTransit: "",
-      bankInstitution: "",
-      bankAccount: "",
+      socialInsuranceNumber: "",
+      bankTransitNumber: "",
+      bankInstitutionNumber: "",
+      bankAccountNumber: "",
       driversLicenseNumber: "",
       driversLicenseIssuedDate: "",
       driversLicenseExpiry: "",
@@ -608,20 +631,20 @@ export default function GroundCrewPortal() {
       form.reset({
         name: user.name || "",
         email: user.email || "",
-        phone: user.employeePhoneNumber || "",
+        employeePhoneNumber: user.employeePhoneNumber || "",
         birthday: user.birthday || "",
-        address: user.employeeStreetAddress || "",
-        city: user.employeeCity || "",
-        provinceState: user.employeeProvinceState || "",
-        country: user.employeeCountry || "",
-        postalCode: user.employeePostalCode || "",
+        employeeStreetAddress: user.employeeStreetAddress || "",
+        employeeCity: user.employeeCity || "",
+        employeeProvinceState: user.employeeProvinceState || "",
+        employeeCountry: user.employeeCountry || "",
+        employeePostalCode: user.employeePostalCode || "",
         emergencyContactName: user.emergencyContactName || "",
         emergencyContactPhone: user.emergencyContactPhone || "",
         emergencyContactRelationship: user.emergencyContactRelationship || "",
-        sin: user.sin || "",
-        bankTransit: user.bankTransit || "",
-        bankInstitution: user.bankInstitution || "",
-        bankAccount: user.bankAccount || "",
+        socialInsuranceNumber: user.socialInsuranceNumber || "",
+        bankTransitNumber: user.bankTransitNumber || "",
+        bankInstitutionNumber: user.bankInstitutionNumber || "",
+        bankAccountNumber: user.bankAccountNumber || "",
         driversLicenseNumber: user.driversLicenseNumber || "",
         driversLicenseIssuedDate: user.driversLicenseIssuedDate || "",
         driversLicenseExpiry: user.driversLicenseExpiry || "",
@@ -1069,7 +1092,7 @@ export default function GroundCrewPortal() {
                       />
                       <FormField
                         control={form.control}
-                        name="phone"
+                        name="employeePhoneNumber"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>{t.phoneNumber}</FormLabel>
@@ -1102,7 +1125,7 @@ export default function GroundCrewPortal() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
-                          name="address"
+                          name="employeeStreetAddress"
                           render={({ field }) => (
                             <FormItem className="md:col-span-2">
                               <FormLabel>{t.streetAddress}</FormLabel>
@@ -1114,7 +1137,7 @@ export default function GroundCrewPortal() {
                         />
                         <FormField
                           control={form.control}
-                          name="city"
+                          name="employeeCity"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t.city}</FormLabel>
@@ -1126,7 +1149,7 @@ export default function GroundCrewPortal() {
                         />
                         <FormField
                           control={form.control}
-                          name="provinceState"
+                          name="employeeProvinceState"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t.provinceState}</FormLabel>
@@ -1138,7 +1161,7 @@ export default function GroundCrewPortal() {
                         />
                         <FormField
                           control={form.control}
-                          name="country"
+                          name="employeeCountry"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t.country}</FormLabel>
@@ -1150,7 +1173,7 @@ export default function GroundCrewPortal() {
                         />
                         <FormField
                           control={form.control}
-                          name="postalCode"
+                          name="employeePostalCode"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t.postalCode}</FormLabel>
@@ -1228,6 +1251,140 @@ export default function GroundCrewPortal() {
                           </FormItem>
                         )}
                       />
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.payrollInfo}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="socialInsuranceNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.sin}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="XXX-XXX-XXX" data-testid="input-sin" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <FormField
+                          control={form.control}
+                          name="bankTransitNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.transit}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="XXXXX" data-testid="input-bank-transit" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="bankInstitutionNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.institution}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="XXX" data-testid="input-bank-institution" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="bankAccountNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.account}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="XXXXXXX" data-testid="input-bank-account" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.driversLicense}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="driversLicenseNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.licenseNumber}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-license-number" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="driversLicenseIssuedDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.issuedDate}</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-license-issued" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="driversLicenseExpiry"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.expiry}</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-license-expiry" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.firstAid}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="firstAidType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.firstAidType}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="OFA Level 1, Standard First Aid, etc." data-testid="input-first-aid-type" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="firstAidExpiry"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.expiry}</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-first-aid-expiry" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
                   </form>
                 </Form>

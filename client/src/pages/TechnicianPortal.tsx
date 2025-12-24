@@ -1404,7 +1404,7 @@ function MySubmittedDocuments({ language }: { language: Language }) {
 
 export default function TechnicianPortal() {
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [specialtyCategory, setSpecialtyCategory] = useState<JobCategory | "">("");
@@ -1661,8 +1661,31 @@ export default function TechnicianPortal() {
   const [showPlusBenefits, setShowPlusBenefits] = useState(false);
   
   // Mobile-friendly tab navigation
-  type TabType = 'home' | 'profile' | 'employer' | 'work' | 'more';
-  const [activeTab, setActiveTab] = useState<TabType>('home');
+  type TabType = 'home' | 'profile' | 'employer' | 'work' | 'more' | 'invitations' | 'visibility';
+  const getTabFromUrl = (): TabType => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab === 'home' || tab === 'profile' || tab === 'employer' || tab === 'work' || tab === 'more' || tab === 'invitations' || tab === 'visibility') {
+      return tab;
+    }
+    return 'home';
+  };
+  
+  const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl);
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const tab = getTabFromUrl();
+      setActiveTab(tab);
+    };
+    
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, [location]);
   
   // State for editing employer profile specialties
   const [isEditingEmployerProfile, setIsEditingEmployerProfile] = useState(false);
