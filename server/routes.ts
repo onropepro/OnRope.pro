@@ -11199,6 +11199,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ==================== CLIENT ROUTES ====================
   
+  // Search property managers by pmCode, name, or email (for company owners)
+  app.get("/api/property-managers/search", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const query = (req.query.q as string || "").trim().toLowerCase();
+      if (!query || query.length < 2) {
+        return res.json({ results: [] });
+      }
+      
+      // Search users with role 'property_manager' by pmCode, name (firstName + lastName), or email
+      const allPMs = await db.select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        pmCode: users.pmCode,
+        propertyManagementCompany: users.propertyManagementCompany,
+        propertyManagerPhoneNumber: users.propertyManagerPhoneNumber,
+      }).from(users).where(eq(users.role, 'property_manager'));
+      
+      // Filter by search query
+      const results = allPMs.filter(pm => {
+        const fullName = `${pm.firstName || ''} ${pm.lastName || ''}`.toLowerCase().trim();
+        const email = (pm.email || '').toLowerCase();
+        const pmCode = (pm.pmCode || '').toLowerCase();
+        
+        return pmCode.includes(query) || 
+               fullName.includes(query) || 
+               email.includes(query);
+      }).slice(0, 20); // Limit to 20 results
+      
+      // Check if any of these PMs are already linked to this company
+      const linkedPMs = await db.select({ propertyManagerId: propertyManagerCompanyLinks.propertyManagerId })
+        .from(propertyManagerCompanyLinks)
+        .where(eq(propertyManagerCompanyLinks.companyId, companyId));
+      const linkedPMIds = new Set(linkedPMs.map(l => l.propertyManagerId));
+      
+      // Return results with linked status
+      const resultsWithStatus = results.map(pm => ({
+        id: pm.id,
+        email: pm.email,
+        name: `${pm.firstName || ''} ${pm.lastName || ''}`.trim() || pm.email,
+        pmCode: pm.pmCode,
+        company: pm.propertyManagementCompany,
+        phone: pm.propertyManagerPhoneNumber,
+        isLinked: linkedPMIds.has(pm.id),
+      }));
+      
+      res.json({ results: resultsWithStatus });
+    } catch (error) {
+      console.error("Error searching property managers:", error);
+      res.status(500).json({ message: "Failed to search property managers" });
+    }
+  });
+  
+  // Link a property manager to this company
+  app.post("/api/property-managers/:pmId/link", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const pmId = req.params.pmId;
+      
+      // Verify the PM exists and is a property_manager
+      const pm = await storage.getUserById(pmId);
+      if (!pm || pm.role !== 'property_manager') {
+        return res.status(404).json({ message: "Property manager not found" });
+      }
+      
+      // Check if already linked
+      const existingLinks = await db.select()
+        .from(propertyManagerCompanyLinks)
+        .where(and(
+          eq(propertyManagerCompanyLinks.propertyManagerId, pmId),
+          eq(propertyManagerCompanyLinks.companyId, companyId)
+        ));
+      
+      if (existingLinks.length > 0) {
+        return res.status(400).json({ message: "Property manager is already linked to your company" });
+      }
+      
+      // Create the link
+      await db.insert(propertyManagerCompanyLinks).values({
+        id: crypto.randomUUID(),
+        propertyManagerId: pmId,
+        companyId: companyId,
+      });
+      
+      res.json({ success: true, message: "Property manager linked successfully" });
+    } catch (error) {
+      console.error("Error linking property manager:", error);
+      res.status(500).json({ message: "Failed to link property manager" });
+    }
+  });
+  
   // Get all clients for the company
   app.get("/api/clients", requireAuth, async (req: Request, res: Response) => {
     try {
