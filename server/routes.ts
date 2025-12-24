@@ -17817,7 +17817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get all active employees for this company
-      const employees = await storage.getEmployeesByCompany(companyId);
+      const employees = await storage.getAllEmployees(companyId);
       const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
       
       if (activeEmployees.length === 0) {
@@ -17949,7 +17949,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      const employees = await storage.getEmployeesByCompany(companyId);
+      const employees = await storage.getAllEmployees(companyId);
       const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
       
       const today = new Date();
