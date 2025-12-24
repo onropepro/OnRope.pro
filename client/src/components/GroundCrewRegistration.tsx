@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { 
   User, ArrowRight, ArrowLeft, Loader2, 
   Check, Shield, Briefcase, Clock, Bell, ChevronRight,
@@ -459,10 +460,23 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                     <div className="pt-4 border-t">
                       <h3 className="text-sm font-medium mb-3">{t('groundCrewReg.address.title', 'Address (Optional)')}</h3>
                       <div className="space-y-3">
-                        <Input
-                          placeholder={t('groundCrewReg.fields.streetAddress', 'Street Address')}
+                        <AddressAutocomplete
+                          placeholder={t('groundCrewReg.fields.streetAddress', 'Start typing your address...')}
                           value={data.streetAddress}
-                          onChange={(e) => setData({ ...data, streetAddress: e.target.value })}
+                          onChange={(value) => setData({ ...data, streetAddress: value })}
+                          onSelect={(address) => {
+                            const streetAddr = address.houseNumber 
+                              ? `${address.houseNumber} ${address.street}` 
+                              : address.street;
+                            setData({
+                              ...data,
+                              streetAddress: streetAddr || address.formatted,
+                              city: address.city || "",
+                              provinceState: address.state || "",
+                              country: address.country || "",
+                              postalCode: address.postcode || "",
+                            });
+                          }}
                           data-testid="input-street-address"
                         />
                         <div className="grid grid-cols-2 gap-3">
