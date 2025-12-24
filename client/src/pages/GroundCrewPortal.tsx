@@ -563,11 +563,11 @@ export default function GroundCrewPortal() {
   });
 
   const { data: invitationsData } = useQuery<any>({
-    queryKey: ["/api/technician/invitations"],
+    queryKey: ["/api/my-invitations"],
     enabled: !!user && (user.role === 'ground_crew' || user.role === 'ground_crew_supervisor'),
   });
 
-  const pendingInvitations = invitationsData?.invitations?.filter((inv: any) => inv.status === 'pending') || [];
+  const pendingInvitations = invitationsData?.invitations || [];
 
   const { data: companyData } = useQuery<any>({
     queryKey: ["/api/companies", user?.companyId],
@@ -654,10 +654,10 @@ export default function GroundCrewPortal() {
 
   const acceptInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
-      return apiRequest("POST", `/api/technician/invitations/${invitationId}/accept`);
+      return apiRequest("POST", `/api/invitations/${invitationId}/accept`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/technician/invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-invitations"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: t.invitationAccepted,
@@ -674,10 +674,10 @@ export default function GroundCrewPortal() {
 
   const declineInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
-      return apiRequest("POST", `/api/technician/invitations/${invitationId}/decline`);
+      return apiRequest("POST", `/api/invitations/${invitationId}/decline`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/technician/invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-invitations"] });
       toast({
         title: t.invitationDeclined,
         description: t.declinedMessage,
@@ -1257,7 +1257,7 @@ export default function GroundCrewPortal() {
                         <div key={invitation.id} className="border rounded-lg p-4">
                           <div className="flex items-start justify-between gap-4 flex-wrap">
                             <div className="flex-1">
-                              <p className="font-medium text-lg">{invitation.companyName || 'Company'}</p>
+                              <p className="font-medium text-lg">{invitation.company?.name || invitation.companyName || 'Company'}</p>
                               <p className="text-sm text-muted-foreground">
                                 {t.invitedOn}: {formatLocalDate(invitation.createdAt)}
                               </p>
