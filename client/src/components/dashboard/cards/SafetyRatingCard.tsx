@@ -1,7 +1,7 @@
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { ShieldCheck, TrendingUp, TrendingDown } from "lucide-react";
+import { ShieldCheck, TrendingUp, TrendingDown, Users } from "lucide-react";
 import { canViewCSR } from "@/lib/permissions";
 import type { CardProps } from "../cardRegistry";
 
@@ -11,11 +11,23 @@ interface CSRData {
   csrColor: string;
 }
 
+interface WSSData {
+  wssScore: number;
+  wssLabel: string;
+  employeeCount: number;
+  description: string;
+}
+
 export function SafetyRatingCard({ currentUser, branding }: CardProps) {
   const hasAccess = canViewCSR(currentUser);
   
   const { data: csrData, isLoading } = useQuery<CSRData>({
     queryKey: ["/api/company-safety-rating"],
+    enabled: hasAccess,
+  });
+  
+  const { data: wssData, isLoading: wssLoading } = useQuery<WSSData>({
+    queryKey: ["/api/workforce-safety-score"],
     enabled: hasAccess,
   });
 
@@ -63,15 +75,19 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
     );
   }
 
+  const wssScore = wssData?.wssScore ?? 0;
+  const wssColors = getColorScheme(wssScore);
+
   return (
     <div className="flex flex-col h-full">
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
-          Safety Rating (CSR)
+          Safety Ratings
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col gap-3">
+        {/* CSR Section */}
         <div className={`rounded-lg p-4 w-full ${colors.bg}`}>
           <div className="flex items-center justify-between">
             <div>
@@ -79,7 +95,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                 {Math.round(rating)}%
               </p>
               <p className="text-sm text-muted-foreground mt-1">
-                {csrData?.csrLabel || "Company Safety Rating"}
+                {csrData?.csrLabel || "Company Safety Rating (CSR)"}
               </p>
             </div>
             <Badge className={colors.badge}>
@@ -92,6 +108,33 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
             </Badge>
           </div>
         </div>
+        
+        {/* WSS Section - Educational metric */}
+        {!wssLoading && wssData && (
+          <div className={`rounded-lg p-3 w-full ${wssColors.bg} border border-dashed border-muted-foreground/30`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-muted-foreground" />
+                <div>
+                  <p className={`text-xl font-semibold ${wssColors.text}`} data-testid="text-wss-value">
+                    {wssScore}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Workforce Safety Score (WSS)
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <Badge variant="outline" className="text-xs">
+                  {wssData.employeeCount} employees
+                </Badge>
+                <p className="text-xs text-muted-foreground mt-1 italic">
+                  Educational only
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </div>
   );
