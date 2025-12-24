@@ -64,6 +64,7 @@ import {
   Users,
   Gift,
   Home,
+  LayoutDashboard,
   MoreHorizontal,
   Plus,
   FolderOpen,
@@ -749,6 +750,13 @@ export default function GroundCrewPortal() {
       id: "main",
       label: "NAVIGATION",
       items: [
+        {
+          id: "dashboard",
+          label: language === 'en' ? "Dashboard" : language === 'es' ? "Panel" : "Tableau de Bord",
+          icon: LayoutDashboard,
+          href: "/",
+          isVisible: () => true,
+        },
         {
           id: "home",
           label: t.tabHome || "Home",
