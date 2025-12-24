@@ -8,6 +8,25 @@ The Rope Access Management Platform is an enterprise-grade, mobile-first web app
 - Code Management: No code deletion without explicit permission
 - Documentation Accuracy: Systematic audit of all safety & compliance guide documentation to match codebase implementation (source of truth)
 
+## MANDATORY: API Development Process
+**Every API-related change MUST follow these steps - no exceptions:**
+
+1. **Check database schema first** - Query actual tables/fields before writing any code
+2. **Search for similar existing endpoints** - Match patterns already in use in routes.ts
+3. **Test the endpoint after implementing** - Actually call it and verify the response
+4. **Check the logs** - Confirm no errors occurred
+5. **Only then report completion**
+
+**Common Field Name Gotchas (database uses these names):**
+- `employeePhoneNumber` (NOT `phone`)
+- `employeeStreetAddress` (NOT `address`)
+- `companyName` (NOT `name` for companies)
+
+**Role Groups (use these for access control):**
+- EMPLOYEE_ROLES: `['rope_access_tech', 'ground_crew']`
+- ADMIN_ROLES: `['superuser', 'staff']`
+- LINKABLE_ROLES: `['rope_access_tech', 'ground_crew']` (can receive team invitations)
+
 ## System Architecture
 The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Express.js backend, and a PostgreSQL database with Drizzle ORM. Styling is managed with Tailwind CSS and Shadcn UI, adhering to a premium SaaS aesthetic with a mobile-first responsive design. Authentication is custom session-based.
 
