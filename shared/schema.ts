@@ -3184,3 +3184,31 @@ export const insertDashboardPreferencesSchema = createInsertSchema(dashboardPref
 
 export type DashboardPreferences = typeof dashboardPreferences.$inferSelect;
 export type InsertDashboardPreferences = z.infer<typeof insertDashboardPreferencesSchema>;
+
+// ============================================
+// SIDEBAR PREFERENCES
+// ============================================
+
+// Sidebar Preferences - Stores user's customized sidebar menu item ordering
+export const sidebarPreferences = pgTable("sidebar_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  dashboardVariant: varchar("dashboard_variant", { length: 30 }).notNull(), // employer, technician, etc.
+  groupId: varchar("group_id", { length: 50 }).notNull(), // Group identifier (e.g., "operations", "team")
+  itemId: varchar("item_id", { length: 50 }).notNull(), // Item identifier (e.g., "projects", "schedule")
+  position: integer("position").notNull(), // Order position within the group (0-indexed)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_sidebar_prefs_user").on(table.userId),
+  index("IDX_sidebar_prefs_user_variant").on(table.userId, table.dashboardVariant),
+]);
+
+export const insertSidebarPreferencesSchema = createInsertSchema(sidebarPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SidebarPreferences = typeof sidebarPreferences.$inferSelect;
+export type InsertSidebarPreferences = z.infer<typeof insertSidebarPreferencesSchema>;
