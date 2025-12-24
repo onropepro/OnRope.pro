@@ -77,6 +77,7 @@ import LanguageGuide from "@/pages/LanguageGuide";
 import GPSGuide from "@/pages/GPSGuide";
 import PropertyManagerGuide from "@/pages/PropertyManagerGuide";
 import CSRGuide from "@/pages/CSRGuide";
+import PSRGuide from "@/pages/PSRGuide";
 import TechnicianRegistrationGuide from "@/pages/TechnicianRegistrationGuide";
 import HomePage from "@/pages/HomePage";
 import PayrollGuide from "@/pages/PayrollGuide";
@@ -458,6 +459,7 @@ function Router() {
       <Route path="/changelog/gps" component={GPSGuide} />
       <Route path="/changelog/property-manager" component={PropertyManagerGuide} />
       <Route path="/changelog/csr" component={CSRGuide} />
+      <Route path="/changelog/psr" component={PSRGuide} />
       <Route path="/changelog/technician-registration" component={TechnicianRegistrationGuide} />
       <Route path="/changelog/payroll" component={PayrollGuide} />
       <Route path="/changelog/mobile-design" component={MobileDesignGuide} />

@@ -41,6 +41,7 @@ const guideLinks: GuideLink[] = [
   { name: "IRATA / SPRAT Task Logging", path: "/changelog/irata-logging", icon: ClipboardCheck },
   { name: "Safety & Compliance", path: "/changelog/safety", icon: Shield },
   { name: "Company Safety Rating (CSR)", path: "/changelog/csr", icon: Star },
+  { name: "Personal Safety Rating (PSR)", path: "/changelog/psr", icon: HardHat },
   { name: "Document Management", path: "/changelog/documents", icon: FileText },
   { name: "Employee Management", path: "/changelog/employees", icon: Users },
   { name: "Technician Passport", path: "/changelog/technician-registration", icon: HardHat },
