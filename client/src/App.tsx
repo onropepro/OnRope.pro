@@ -177,67 +177,67 @@ function Router() {
       <Route path="/complete-registration" component={CompleteRegistration} />
       <Route path="/link" component={ResidentLink} />
       <Route path="/superuser">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUser />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/companies/:id">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <CompanyDetail />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/view-as/:companyId">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <ViewAsCompany />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/feature-requests">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUserFeatureRequests />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/metrics">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUserMetrics />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/goals">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUserGoalsOverview />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/companies">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <AllCompanies />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/founder-resources">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <FounderResources />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/technicians">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUserTechnicians />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/buildings">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUserBuildings />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/tasks">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUserTasks />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/job-board">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUserJobBoard />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/future-ideas">
-        <ProtectedRoute allowedRoles={["superuser"]}>
+        <ProtectedRoute allowedRoles={["superuser", "staff"]}>
           <SuperUserFutureIdeas />
         </ProtectedRoute>
       </Route>
