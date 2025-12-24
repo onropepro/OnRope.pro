@@ -1768,6 +1768,7 @@ export const updatePropertyManagerAccountSchema = z.object({
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   propertyManagerPhoneNumber: z.string().optional(),
   propertyManagerSmsOptIn: z.boolean().optional(),
+  propertyManagementCompany: z.string().optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),
 }).refine((data) => {

@@ -238,6 +238,7 @@ export default function PropertyManager() {
       email: "",
       propertyManagerPhoneNumber: "",
       propertyManagerSmsOptIn: false,
+      propertyManagementCompany: "",
       currentPassword: "",
       newPassword: "",
     },
@@ -863,6 +864,7 @@ export default function PropertyManager() {
                     email: userData?.user?.email || "",
                     propertyManagerPhoneNumber: userData?.user?.propertyManagerPhoneNumber || "",
                     propertyManagerSmsOptIn: userData?.user?.propertyManagerSmsOptIn || false,
+                    propertyManagementCompany: userData?.user?.propertyManagementCompany || "",
                     currentPassword: "",
                     newPassword: "",
                   });
@@ -1538,6 +1540,23 @@ export default function PropertyManager() {
                           placeholder={t('propertyManager.accountSettings.emailPlaceholder', 'your.email@example.com')}
                           {...field}
                           data-testid="input-account-email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="propertyManagementCompany"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('propertyManager.accountSettings.company', 'Property Management Company')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('propertyManager.accountSettings.companyPlaceholder', 'e.g., ABC Property Management')}
+                          {...field}
+                          data-testid="input-account-company"
                         />
                       </FormControl>
                       <FormMessage />

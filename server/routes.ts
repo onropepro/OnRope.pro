@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable, clients } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -5635,7 +5635,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const { name, email, propertyManagerPhoneNumber, propertyManagerSmsOptIn, currentPassword, newPassword } = validationResult.data;
+      const { name, email, propertyManagerPhoneNumber, propertyManagerSmsOptIn, propertyManagementCompany, currentPassword, newPassword } = validationResult.data;
       
       // Get current property manager data
       const currentUser = await storage.getUserById(propertyManagerId);
@@ -5679,11 +5679,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .where(eq(users.id, propertyManagerId));
       }
       
+      // Update property management company if provided
+      if (propertyManagementCompany !== undefined) {
+        await db.update(users)
+          .set({ propertyManagementCompany: propertyManagementCompany || null })
+          .where(eq(users.id, propertyManagerId));
+      }
+      
       // Update SMS opt-in if provided
       if (propertyManagerSmsOptIn !== undefined) {
         await db.update(users)
           .set({ propertyManagerSmsOptIn })
           .where(eq(users.id, propertyManagerId));
+      }
+      
+      // Sync property manager profile changes to linked client records
+      // This ensures companies see up-to-date PM information
+      try {
+        const pmLinks = await db.select()
+          .from(propertyManagerCompanyLinks)
+          .where(eq(propertyManagerCompanyLinks.propertyManagerId, propertyManagerId));
+        
+        if (pmLinks.length > 0) {
+          // Get updated PM data
+          const updatedPM = await storage.getUserById(propertyManagerId);
+          if (updatedPM) {
+            // Parse name into firstName and lastName
+            const nameParts = (updatedPM.name || '').trim().split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            
+            // Update client records in each linked company that match this PM's email
+            for (const link of pmLinks) {
+              await db.update(clients)
+                .set({
+                  firstName: firstName || undefined,
+                  lastName: lastName || undefined,
+                  company: updatedPM.propertyManagementCompany || undefined,
+                  phoneNumber: updatedPM.propertyManagerPhoneNumber || undefined,
+                  updatedAt: new Date()
+                })
+                .where(
+                  and(
+                    eq(clients.companyId, link.companyId),
+                    eq(clients.email, updatedPM.email!)
+                  )
+                );
+            }
+            console.log(`[PM Sync] Updated client records for PM ${updatedPM.email} in ${pmLinks.length} linked companies`);
+          }
+        }
+      } catch (syncError) {
+        // Non-blocking - log but don't fail the request
+        console.error("[PM Sync] Error syncing PM profile to client records:", syncError);
       }
       
       res.json({ message: "Account settings updated successfully" });
