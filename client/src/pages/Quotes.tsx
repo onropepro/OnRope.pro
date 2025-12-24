@@ -3500,6 +3500,12 @@ export default function Quotes() {
                             buildingForm.setValue('strataPlanNumber', '');
                             buildingForm.setValue('buildingAddress', '');
                             buildingForm.setValue('floorCount', undefined);
+                            
+                            // Auto-select PM recipient if client email matches a linked PM
+                            const matchingPM = linkedPMs.find((pm) => pm.email === client.email);
+                            if (matchingPM) {
+                              setSelectedPmId(matchingPM.id);
+                            }
                           }
                         }}
                       >
@@ -3600,14 +3606,14 @@ export default function Quotes() {
                       <div className="space-y-2">
                         <Label>{t('quotes.selectPM', 'Select Property Manager')}</Label>
                         <Select
-                          value={selectedPmId || ""}
-                          onValueChange={(value) => setSelectedPmId(value || null)}
+                          value={selectedPmId || "none"}
+                          onValueChange={(value) => setSelectedPmId(value === "none" ? null : value)}
                         >
                           <SelectTrigger className="h-12" data-testid="select-property-manager">
                             <SelectValue placeholder={t('quotes.selectPMPlaceholder', 'Select a property manager...')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">
+                            <SelectItem value="none">
                               <span className="text-muted-foreground">{t('quotes.noPMSelected', 'No property manager (auto-match by strata)')}</span>
                             </SelectItem>
                             {linkedPMs.map((pm) => (

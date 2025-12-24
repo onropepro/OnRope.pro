@@ -19875,6 +19875,50 @@ Do not include any other text, just the JSON object.`
             
             console.log(`[Quote] Linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
             
+            // Save building info to PM's client record if one exists
+            try {
+              const pmClient = await db.select()
+                .from(clients)
+                .where(
+                  and(
+                    eq(clients.companyId, companyId),
+                    eq(clients.email, propertyManager.email)
+                  )
+                )
+                .limit(1);
+              
+              if (pmClient.length > 0 && fullQuote!.strataPlanNumber) {
+                const existingBuildings = (pmClient[0].lmsNumbers as any[]) || [];
+                
+                // Check if this strata/building already exists
+                const existingBuildingIndex = existingBuildings.findIndex(
+                  (b: any) => b.number === fullQuote!.strataPlanNumber
+                );
+                
+                if (existingBuildingIndex === -1) {
+                  // Add the new building from the quote
+                  const newBuilding = {
+                    number: fullQuote!.strataPlanNumber,
+                    buildingName: fullQuote!.buildingName || '',
+                    address: fullQuote!.buildingAddress || '',
+                    stories: fullQuote!.floorCount || null,
+                    units: fullQuote!.unitCount || null,
+                    parkingStalls: fullQuote!.parkingStalls || null
+                  };
+                  
+                  await db.update(clients)
+                    .set({ lmsNumbers: [...existingBuildings, newBuilding] })
+                    .where(eq(clients.id, pmClient[0].id));
+                  
+                  console.log(`[Quote] Added building ${fullQuote!.buildingName} (${fullQuote!.strataPlanNumber}) to PM client record`);
+                } else {
+                  console.log(`[Quote] Building ${fullQuote!.strataPlanNumber} already exists in PM client record`);
+                }
+              }
+            } catch (clientError: any) {
+              console.warn(`[Quote] Could not update PM client record: ${clientError?.message}`);
+            }
+            
             // Get company name for WebSocket notification
             const companyUser = await storage.getUserById(companyId);
             const companyNameForWs = companyUser?.companyName || 'Rope Access Company';
@@ -19893,22 +19937,19 @@ Do not include any other text, just the JSON object.`
             
             // Send SMS notification if PM has phone and opted in
             if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
-              const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-                ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-                : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
-              const quoteViewUrl = `${baseUrl}/property-manager/quotes/${fullQuote!.id}`;
-              
               // Get company name for SMS
               const company = await storage.getUserById(companyId);
               const companyName = company?.companyName || 'Rope Access Company';
-              const grandTotal = fullQuote!.services?.reduce((sum: number, s: any) => sum + Number(s.totalCost || 0), 0) || 0;
+              
+              // Extract service types from quote services
+              const serviceTypes = fullQuote!.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
               
               const smsResponse = await sendQuoteNotificationSMS(
                 propertyManager.propertyManagerPhoneNumber,
                 fullQuote!.buildingName,
                 companyName,
-                grandTotal,
-                quoteViewUrl
+                serviceTypes,
+                fullQuote!.strataPlanNumber
               );
               
               if (smsResponse.success) {
@@ -21332,18 +21373,15 @@ Do not include any other text, just the JSON object.`
           
           // If they have a phone number AND opted-in to SMS, send SMS notification
           if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
-            // Build the deep link URL to the specific quote
-            const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-              ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-              : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
-            const quoteViewUrl = `${baseUrl}/property-manager/quotes/${quote.id}`;
+            // Extract service types from quote services
+            const serviceTypes = quote.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
             
             const smsResponse = await sendQuoteNotificationSMS(
               propertyManager.propertyManagerPhoneNumber,
               quote.buildingName,
               companyName,
-              grandTotal,
-              quoteViewUrl
+              serviceTypes,
+              quote.strataPlanNumber
             );
             if (smsResponse.success) {
               console.log(`[SMS] Quote notification sent to ${propertyManager.propertyManagerPhoneNumber}, SID: ${smsResponse.messageId}`);
