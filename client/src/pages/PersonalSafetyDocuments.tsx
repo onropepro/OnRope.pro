@@ -15,7 +15,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,7 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { TechnicianHeader } from "@/components/TechnicianHeader";
 import {
   ArrowLeft,
   ClipboardCheck,
@@ -43,7 +42,6 @@ import {
   Trash2,
   Loader2,
   Plus,
-  LogOut,
 } from "lucide-react";
 import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory, type EquipmentFindings, type InspectionResult } from "@shared/schema";
@@ -373,16 +371,6 @@ export default function PersonalSafetyDocuments() {
   const { i18n } = useTranslation();
   const language = i18n.language as 'en' | 'fr' | 'es';
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-      queryClient.clear();
-      setLocation('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   const technicianNavGroups = getTechnicianNavGroups(language);
 
   return (
@@ -399,44 +387,7 @@ export default function PersonalSafetyDocuments() {
       </div>
       
       <div className="lg:pl-60">
-        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
-          <div className="h-full flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Shield className="h-6 w-6 text-primary" />
-              <h1 className="text-lg font-semibold">Personal Safety Documents</h1>
-            </div>
-            
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              <LanguageDropdown />
-              
-              <button 
-                onClick={() => setLocation('/technician-portal')}
-                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
-                data-testid="link-user-profile"
-              >
-                <Avatar className="w-8 h-8 bg-[#AB4521]">
-                  <AvatarFallback className="bg-[#AB4521] text-white text-xs font-medium">
-                    {currentUser?.name ? currentUser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="hidden lg:block">
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.name || 'User'}</p>
-                  <p className="text-xs text-slate-400 leading-tight">{language === 'en' ? 'Technician' : language === 'es' ? 'Tecnico' : 'Technicien'}</p>
-                </div>
-              </button>
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                data-testid="button-logout" 
-                onClick={handleLogout} 
-                className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-              >
-                <LogOut className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </header>
+        <TechnicianHeader language={language} />
 
         <main className="p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">
