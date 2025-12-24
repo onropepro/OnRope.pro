@@ -120,6 +120,7 @@ import ForBuildingManagers from "@/pages/help/stakeholders/ForBuildingManagers";
 import ForPropertyManagers from "@/pages/help/stakeholders/ForPropertyManagers";
 import ForResidents from "@/pages/help/stakeholders/ForResidents";
 import TechnicianPortal from "@/pages/TechnicianPortal";
+import GroundCrewPortal from "@/pages/GroundCrewPortal";
 import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import PersonalSafetyDocuments from "@/pages/PersonalSafetyDocuments";
@@ -240,6 +241,11 @@ function Router() {
       <Route path="/technician-portal">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianPortal />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/ground-crew-portal">
+        <ProtectedRoute allowedRoles={["ground_crew", "ground_crew_supervisor"]}>
+          <GroundCrewPortal />
         </ProtectedRoute>
       </Route>
       <Route path="/technician-logged-hours">
