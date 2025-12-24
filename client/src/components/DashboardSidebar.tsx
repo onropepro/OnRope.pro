@@ -23,6 +23,7 @@ import {
   X,
   Building,
   Cloud,
+  SlidersHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -32,8 +33,16 @@ import {
   canManageEmployees,
   canAccessQuotes,
 } from "@/lib/permissions";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { SidebarCustomizeDialog } from "./SidebarCustomizeDialog";
+
+interface SidebarPreferencesResponse {
+  preferences: Record<string, { itemId: string; position: number }[]>;
+  variant: string;
+  isDefault: boolean;
+}
 
 export interface NavItem {
   id: string;
@@ -106,9 +115,17 @@ export function DashboardSidebar({
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [customizeDialogOpen, setCustomizeDialogOpen] = useState(false);
 
   // Get brand color based on variant or custom override
   const BRAND_COLOR = customBrandColor || STAKEHOLDER_COLORS[variant];
+
+  // Fetch sidebar preferences for ordering
+  const { data: sidebarPreferences } = useQuery<SidebarPreferencesResponse>({
+    queryKey: ["/api/sidebar/preferences", variant],
+    queryFn: () => fetch(`/api/sidebar/preferences?variant=${variant}`).then(r => r.json()),
+    enabled: !!currentUser,
+  });
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -323,12 +340,45 @@ export function DashboardSidebar({
   // Use custom navigation groups if provided, otherwise use default employer groups
   const activeNavigationGroups = customNavigationGroups || navigationGroups;
   
-  const filteredGroups = activeNavigationGroups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => item.isVisible(currentUser)),
-    }))
-    .filter((group) => group.items.length > 0);
+  // Apply custom ordering from preferences
+  const filteredGroups = useMemo(() => {
+    const groups = activeNavigationGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => item.isVisible(currentUser)),
+      }))
+      .filter((group) => group.items.length > 0);
+
+    // If we have saved preferences, apply the custom ordering
+    if (sidebarPreferences && !sidebarPreferences.isDefault) {
+      return groups.map((group) => {
+        const savedOrder = sidebarPreferences.preferences[group.id];
+        if (!savedOrder || savedOrder.length === 0) return group;
+
+        // Create a map of items for quick lookup
+        const itemMap = new Map(group.items.map((item) => [item.id, item]));
+        const orderedItems: NavItem[] = [];
+
+        // First add items in saved order
+        savedOrder
+          .sort((a, b) => a.position - b.position)
+          .forEach(({ itemId }) => {
+            const item = itemMap.get(itemId);
+            if (item) {
+              orderedItems.push(item);
+              itemMap.delete(itemId);
+            }
+          });
+
+        // Add any remaining items that weren't in saved preferences
+        itemMap.forEach((item) => orderedItems.push(item));
+
+        return { ...group, items: orderedItems };
+      });
+    }
+
+    return groups;
+  }, [activeNavigationGroups, currentUser, sidebarPreferences]);
 
   const displayCompanyName = companyName || "My Company";
   const isDashboardActive = activeTab === "home" || activeTab === "" || !activeTab;
@@ -474,6 +524,15 @@ export function DashboardSidebar({
             <HelpCircle className="h-4 w-4 shrink-0" />
             <span>{t("dashboard.sidebar.help", "Help Center")}</span>
           </button>
+          {/* Customize Sidebar button */}
+          <button
+            onClick={() => setCustomizeDialogOpen(true)}
+            data-testid="sidebar-nav-customize"
+            className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
+            <SlidersHorizontal className="h-4 w-4 shrink-0" />
+            <span>{t("dashboard.sidebar.customize", "Customize")}</span>
+          </button>
         </div>
       </div>
     </>
@@ -512,6 +571,15 @@ export function DashboardSidebar({
       >
         {sidebarContent}
       </aside>
+
+      {/* Sidebar Customization Dialog */}
+      <SidebarCustomizeDialog
+        open={customizeDialogOpen}
+        onOpenChange={setCustomizeDialogOpen}
+        variant={variant}
+        navigationGroups={activeNavigationGroups}
+        currentUser={currentUser}
+      />
     </>
   );
 }
