@@ -23957,7 +23957,7 @@ Do not include any other text, just the JSON object.`
       // Fetch all quiz attempts for visible technicians (for PSR calculation)
       const techIds = visibleTechs.map(t => t.id);
       const allQuizAttempts = techIds.length > 0 
-        ? await db.select().from(quizAttempts).where(sql`${quizAttempts.employeeId} = ANY(${techIds})`)
+        ? await db.select().from(quizAttempts).where(inArray(quizAttempts.employeeId, techIds))
         : [];
       
       // Group quiz attempts by employee ID
