@@ -150,6 +150,13 @@ export const guideRegistry = [
     sourceFile: 'client/src/pages/CRMGuide.tsx',
     stakeholders: ['owner', 'operations_manager'],
   },
+  {
+    slug: 'dashboard-customization',
+    title: 'Dashboard Customization',
+    category: 'customization',
+    sourceFile: 'client/src/pages/DashboardCustomizationGuide.tsx',
+    stakeholders: ['owner', 'operations_manager', 'supervisor'],
+  },
 ];
 
 /**
