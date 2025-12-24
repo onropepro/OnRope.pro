@@ -22,6 +22,7 @@ import {
   Menu,
   X,
   Building,
+  Cloud,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -149,6 +150,13 @@ export function DashboardSidebar({
           label: t("dashboard.cards.schedule.label", "Schedule"),
           icon: Calendar,
           href: "/schedule",
+          isVisible: () => true,
+        },
+        {
+          id: "weather",
+          label: t("dashboard.sidebar.weather", "Weather"),
+          icon: Cloud,
+          href: "/weather",
           isVisible: () => true,
         },
         {
