@@ -50,6 +50,8 @@ import {
   GraduationCap,
   Award,
   LogOut,
+  Eye,
+  Mail,
 } from "lucide-react";
 import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory, type EquipmentFindings, type InspectionResult } from "@shared/schema";
 
@@ -404,21 +406,21 @@ export default function PersonalSafetyDocuments() {
           id: "profile",
           label: language === 'en' ? "Profile" : language === 'es' ? "Perfil" : "Profil",
           icon: User,
-          href: "/technician-portal",
+          href: "/technician-portal?tab=profile",
           isVisible: () => true,
         },
         {
           id: "more",
           label: language === 'en' ? "More" : language === 'es' ? "Mas" : "Plus",
           icon: MoreHorizontal,
-          href: "/technician-portal",
+          href: "/technician-portal?tab=more",
           isVisible: () => true,
         },
       ],
     },
     {
       id: "employment",
-      label: "EMPLOYMENT",
+      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
       items: [
         {
           id: "job-board",
@@ -427,31 +429,45 @@ export default function PersonalSafetyDocuments() {
           href: "/technician-job-board",
           isVisible: () => true,
         },
+        {
+          id: "visibility",
+          label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
+          icon: Eye,
+          href: "/technician-portal?tab=visibility",
+          isVisible: () => true,
+        },
+        {
+          id: "invitations",
+          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
+          icon: Mail,
+          href: "/technician-portal?tab=invitations",
+          isVisible: () => true,
+        },
       ],
     },
     {
       id: "safety",
-      label: "SAFETY",
+      label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
       items: [
         {
-          id: "practice-quizzes",
-          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz",
-          icon: GraduationCap,
-          href: "/technician-practice-quizzes",
-          isVisible: () => true,
-        },
-        {
           id: "personal-safety-docs",
-          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de securite",
+          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de sécurité",
           icon: Shield,
           href: "/personal-safety-documents",
           isVisible: () => true,
         },
         {
           id: "psr",
-          label: language === 'en' ? "Personal Safety Rating" : language === 'es' ? "Calificacion de Seguridad" : "Cote de securite",
+          label: language === 'en' ? "Safety Rating (PSR)" : language === 'es' ? "Calificacion (PSR)" : "Cote de sécurité (PSR)",
           icon: Award,
           href: "/technician-psr",
+          isVisible: () => true,
+        },
+        {
+          id: "practice-quizzes",
+          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz pratiques",
+          icon: GraduationCap,
+          href: "/technician-practice-quizzes",
           isVisible: () => true,
         },
       ],
