@@ -19822,27 +19822,26 @@ Do not include any other text, just the JSON object.`
                 .limit(1);
               
               if (pmClient.length > 0 && fullQuote!.strataPlanNumber) {
-                const existingProperties = (pmClient[0].properties as any[]) || [];
+                const existingBuildings = (pmClient[0].lmsNumbers as any[]) || [];
                 
                 // Check if this strata/building already exists
-                const existingPropertyIndex = existingProperties.findIndex(
-                  (p: any) => p.number === fullQuote!.strataPlanNumber
+                const existingBuildingIndex = existingBuildings.findIndex(
+                  (b: any) => b.number === fullQuote!.strataPlanNumber
                 );
                 
-                if (existingPropertyIndex === -1) {
+                if (existingBuildingIndex === -1) {
                   // Add the new building from the quote
-                  const newProperty = {
+                  const newBuilding = {
                     number: fullQuote!.strataPlanNumber,
                     buildingName: fullQuote!.buildingName || '',
                     address: fullQuote!.buildingAddress || '',
                     stories: fullQuote!.floorCount || null,
-                    unitCount: fullQuote!.unitCount || null,
-                    parkingStalls: fullQuote!.parkingStalls || null,
-                    elevations: fullQuote!.elevations || null
+                    units: fullQuote!.unitCount || null,
+                    parkingStalls: fullQuote!.parkingStalls || null
                   };
                   
                   await db.update(clients)
-                    .set({ properties: [...existingProperties, newProperty] })
+                    .set({ lmsNumbers: [...existingBuildings, newBuilding] })
                     .where(eq(clients.id, pmClient[0].id));
                   
                   console.log(`[Quote] Added building ${fullQuote!.buildingName} (${fullQuote!.strataPlanNumber}) to PM client record`);
