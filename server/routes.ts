@@ -5227,6 +5227,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Redeem a referral code after registration
+  // Allows technicians who missed entering a code during signup to help their referrer earn PLUS
+  app.post("/api/user/redeem-referral-code", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians can redeem referral codes
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can redeem referral codes" });
+      }
+
+      // Check if user has already used a referral code
+      if (user.referredByUserId || user.referredByCode) {
+        return res.status(400).json({ message: "You have already redeemed a referral code" });
+      }
+
+      const { referralCode } = req.body;
+      if (!referralCode || !referralCode.trim()) {
+        return res.status(400).json({ message: "Referral code is required" });
+      }
+
+      const normalizedCode = referralCode.trim().toUpperCase();
+
+      // Validate the referral code exists and belongs to a technician
+      const referrer = await storage.getUserByReferralCode(normalizedCode);
+      if (!referrer) {
+        return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+      }
+
+      // Verify the referrer is an active technician
+      if (referrer.role !== 'rope_access_tech') {
+        return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+      }
+
+      // Can't use your own referral code
+      if (referrer.id === userId) {
+        return res.status(400).json({ message: "You cannot use your own referral code" });
+      }
+
+      // Update the user with the referral information
+      await storage.updateUser(userId, {
+        referredByUserId: referrer.id,
+        referredByCode: normalizedCode,
+      });
+
+      console.log(`[Referral] User ${userId} redeemed referral code ${normalizedCode} from ${referrer.id}`);
+
+      res.json({ 
+        success: true,
+        message: `Referral code redeemed successfully! ${referrer.name || 'The referrer'} will now have PLUS access.`,
+        referrerName: referrer.name
+      });
+    } catch (error: any) {
+      console.error("[Referral] Error redeeming referral code:", error);
+      res.status(500).json({ message: error.message || "Failed to redeem referral code" });
+    }
+  });
+
   // Multer config for technician document uploads (images or PDFs)
   const technicianDocumentUpload = multer({
     storage: multer.memoryStorage(),
