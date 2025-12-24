@@ -19809,6 +19809,51 @@ Do not include any other text, just the JSON object.`
             
             console.log(`[Quote] Linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
             
+            // Save building info to PM's client record if one exists
+            try {
+              const pmClient = await db.select()
+                .from(clients)
+                .where(
+                  and(
+                    eq(clients.companyId, companyId),
+                    eq(clients.email, propertyManager.email)
+                  )
+                )
+                .limit(1);
+              
+              if (pmClient.length > 0 && fullQuote!.strataPlanNumber) {
+                const existingProperties = (pmClient[0].properties as any[]) || [];
+                
+                // Check if this strata/building already exists
+                const existingPropertyIndex = existingProperties.findIndex(
+                  (p: any) => p.number === fullQuote!.strataPlanNumber
+                );
+                
+                if (existingPropertyIndex === -1) {
+                  // Add the new building from the quote
+                  const newProperty = {
+                    number: fullQuote!.strataPlanNumber,
+                    buildingName: fullQuote!.buildingName || '',
+                    address: fullQuote!.buildingAddress || '',
+                    stories: fullQuote!.floorCount || null,
+                    unitCount: fullQuote!.unitCount || null,
+                    parkingStalls: fullQuote!.parkingStalls || null,
+                    elevations: fullQuote!.elevations || null
+                  };
+                  
+                  await db.update(clients)
+                    .set({ properties: [...existingProperties, newProperty] })
+                    .where(eq(clients.id, pmClient[0].id));
+                  
+                  console.log(`[Quote] Added building ${fullQuote!.buildingName} (${fullQuote!.strataPlanNumber}) to PM client record`);
+                } else {
+                  console.log(`[Quote] Building ${fullQuote!.strataPlanNumber} already exists in PM client record`);
+                }
+              }
+            } catch (clientError: any) {
+              console.warn(`[Quote] Could not update PM client record: ${clientError?.message}`);
+            }
+            
             // Get company name for WebSocket notification
             const companyUser = await storage.getUserById(companyId);
             const companyNameForWs = companyUser?.companyName || 'Rope Access Company';
