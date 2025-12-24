@@ -247,6 +247,30 @@ class WebSocketHub {
       console.log(`WebSocket: Notified company ${companyId} that quote ${quote.quoteNumber} was declined`);
     }
   }
+
+  // Notify company when a property manager submits a counter-offer
+  notifyQuoteCounterOffer(companyId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    propertyManagerName: string | null;
+    counterOfferAmount: string;
+  }) {
+    const userConnections = this.connections.get(companyId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:counter_offer',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified company ${companyId} that quote ${quote.quoteNumber} received a counter-offer`);
+    }
+  }
 }
 
 export const wsHub = new WebSocketHub();

@@ -6237,6 +6237,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update quote collaboration status to negotiation
       await storage.updateQuoteCollaborationStatus(quoteId, 'negotiation');
       
+      // Update quote pipeline stage to negotiation so it appears in the pipeline
+      await storage.updateQuote(quoteId, { pipelineStage: 'negotiation' } as any);
+      
+      // Send real-time WebSocket notification to company
+      wsHub.notifyQuoteCounterOffer(quote.companyId, {
+        id: quote.id,
+        quoteNumber: quote.quoteNumber,
+        buildingName: quote.buildingName,
+        strataPlanNumber: quote.strataPlanNumber,
+        propertyManagerName: senderName,
+        counterOfferAmount: String(counterOfferAmount),
+      });
+      
+      console.log(`[Counter-Offer] PM ${senderName} submitted counter-offer of $${counterOfferAmount} for quote ${quote.quoteNumber}`);
+      
       res.json({ message, success: true });
     } catch (error) {
       console.error("Counter-offer error:", error);
