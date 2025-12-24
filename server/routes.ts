@@ -811,6 +811,32 @@ async function generateReferralCode(): Promise<string> {
   throw new Error('Failed to generate unique referral code after maximum attempts');
 }
 
+// Generate unique 10-character PM code for property managers using cryptographically secure randomness
+async function generatePmCode(): Promise<string> {
+  const crypto = await import('crypto');
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
+  const codeLength = 10;
+  const maxAttempts = 10;
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const randomBytes = crypto.randomBytes(codeLength);
+    let code = '';
+    
+    for (let i = 0; i < codeLength; i++) {
+      const randomIndex = randomBytes[i] % characters.length;
+      code += characters.charAt(randomIndex);
+    }
+    
+    // Check if code already exists
+    const [existing] = await db.select().from(users).where(eq(users.pmCode, code)).limit(1);
+    if (!existing) {
+      return code;
+    }
+  }
+  
+  throw new Error('Failed to generate unique PM code after maximum attempts');
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== HELP CENTER ROUTES ====================
   app.use('/api/help', helpRouter);
@@ -4767,6 +4793,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateUser(user.id, updates);
           // Refetch user to get the updated codes
           user = await storage.getUserById(user.id) || user;
+        }
+      }
+      
+      // Auto-generate PM code if property manager doesn't have one
+      if (user.role === 'property_manager' && !user.pmCode) {
+        try {
+          console.log('[/api/user] Property manager missing PM code, generating...');
+          const pmCode = await generatePmCode();
+          await storage.updateUser(user.id, { pmCode });
+          user = await storage.getUserById(user.id) || user;
+          console.log(`[/api/user] PM code generated: ${pmCode}`);
+        } catch (error) {
+          console.error('[/api/user] Failed to generate PM code:', error);
         }
       }
       

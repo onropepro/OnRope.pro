@@ -79,6 +79,7 @@ export const users = pgTable("users", {
   propertyManagementCompany: varchar("property_management_company"), // for property_manager role
   propertyManagerPhoneNumber: varchar("property_manager_phone_number"), // for property_manager role - SMS notifications
   propertyManagerSmsOptIn: boolean("property_manager_sms_opt_in").default(true), // for property_manager role - opt-in to receive SMS notifications for new quotes (defaults to true for better UX)
+  pmCode: varchar("pm_code", { length: 10 }).unique(), // Unique 10-character code for property managers (similar to company's propertyManagerCode)
   
   // Resident-specific fields
   strataPlanNumber: varchar("strata_plan_number"), // for resident role
