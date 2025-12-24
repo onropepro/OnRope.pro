@@ -305,15 +305,6 @@ export default function TechnicianPSR() {
         <TechnicianHeader language={language as "en" | "es" | "fr"} />
 
         <main className="p-4 md:p-6 space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100" data-testid="text-psr-title">
-              {trans.pageTitle}
-            </h1>
-            <p className="text-base text-slate-500 dark:text-slate-400 mt-1">
-              {trans.pageDescription}
-            </p>
-          </div>
-
           <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
