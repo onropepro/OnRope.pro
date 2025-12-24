@@ -2724,6 +2724,19 @@ export default function TechnicianPortal() {
                 <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.personalSafetyDocs}</p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">{t.personalSafetyDocsDesc}</p>
               </button>
+              
+              {/* PSR - Amber theme */}
+              <button
+                onClick={() => setLocation("/technician-psr")}
+                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
+                data-testid="quick-action-psr"
+              >
+                <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center mb-3">
+                  <Award className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">PSR</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.performanceSafetyRating}</p>
+              </button>
             </div>
 
             {/* Document Requests from Employers */}

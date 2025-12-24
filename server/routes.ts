@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable, incidentReports } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -22629,6 +22629,210 @@ Do not include any other text, just the JSON object.`
   // =====================================================================
   // END JOB APPLICATIONS ENDPOINTS
   // =====================================================================
+
+  // Get technician's Personal Safety Rating (PSR)
+  app.get("/api/technician/psr", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const ALLOWED_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "company"];
+      if (!ALLOWED_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians can view PSR" });
+      }
+
+      // 1. Certification Score (25% of total)
+      let certScore = 0;
+      let certStatus = "none";
+      let certDetails: any = { level: null, expirationDate: null, daysUntilExpiry: null, verified: false };
+      
+      const today = new Date();
+      if (currentUser.irataLevel || currentUser.spratLevel) {
+        const certType = currentUser.irataLevel ? "IRATA" : "SPRAT";
+        const level = currentUser.irataLevel || currentUser.spratLevel;
+        const expirationDate = currentUser.irataLevel 
+          ? (currentUser.irataExpirationDate ? new Date(currentUser.irataExpirationDate) : null)
+          : (currentUser.spratExpirationDate ? new Date(currentUser.spratExpirationDate) : null);
+        const verified = currentUser.irataLevel 
+          ? !!currentUser.irataVerifiedAt 
+          : !!currentUser.spratVerifiedAt;
+
+        certDetails = {
+          type: certType,
+          level,
+          expirationDate: expirationDate?.toISOString() || null,
+          daysUntilExpiry: expirationDate ? Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : null,
+          verified,
+        };
+
+        if (expirationDate && expirationDate > today) {
+          certScore = verified ? 100 : 75;
+          certStatus = verified ? "verified" : "unverified";
+        } else if (expirationDate && expirationDate <= today) {
+          certScore = 25;
+          certStatus = "expired";
+        } else {
+          certScore = 50;
+          certStatus = "no_expiry_date";
+        }
+      }
+
+      // 2. Safety Documents Score (25% of total) - Personal harness inspections
+      let docsScore = 0;
+      let docsStatus = "none";
+      const personalInspections = await storage.getPersonalHarnessInspections(currentUser.id);
+      
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const recentInspections = personalInspections.filter((insp: any) => 
+        new Date(insp.inspectionDate) >= thirtyDaysAgo
+      );
+      
+      const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+      const inspectionCount = recentInspections.length;
+      
+      if (inspectionCount === 0) {
+        docsScore = 0;
+        docsStatus = "none";
+      } else {
+        docsScore = Math.round((passedInspections.length / Math.max(inspectionCount, 1)) * 100);
+        docsStatus = docsScore >= 80 ? "good" : docsScore >= 50 ? "fair" : "poor";
+      }
+
+      const docsDetails = {
+        totalInspections: personalInspections.length,
+        recentInspections: inspectionCount,
+        passedRecent: passedInspections.length,
+        last30Days: inspectionCount,
+      };
+
+      // 3. Safety Quizzes Score (25% of total)
+      let quizScore = 0;
+      let quizStatus = "none";
+      const allAttempts = await storage.getAllQuizAttemptsByEmployee(currentUser.id);
+      
+      const safetyQuizAttempts = allAttempts.filter((a: any) => 
+        a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+      );
+      
+      const passedQuizzes = new Set(
+        safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+      );
+      
+      const totalSafetyQuizTypes = 6;
+      quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+      quizStatus = quizScore >= 80 ? "good" : quizScore >= 50 ? "fair" : quizScore > 0 ? "started" : "none";
+
+      const quizDetails = {
+        totalAttempts: safetyQuizAttempts.length,
+        passedQuizTypes: passedQuizzes.size,
+        totalQuizTypes: totalSafetyQuizTypes,
+        quizzesPassed: Array.from(passedQuizzes),
+      };
+
+      // 4. Work History Score (25% of total) - Only for employer-linked technicians
+      let workScore = 0;
+      let workStatus = "not_applicable";
+      let workDetails: any = { isLinked: false };
+
+      const connections = await db.select()
+        .from(technicianEmployerConnections)
+        .where(
+          and(
+            eq(technicianEmployerConnections.technicianId, currentUser.id),
+            eq(technicianEmployerConnections.status, "active")
+          )
+        );
+
+      if (connections.length > 0 || currentUser.companyId) {
+        workDetails.isLinked = true;
+        const companyId = currentUser.companyId || connections[0]?.companyId;
+        
+        if (companyId) {
+          const workSessions = await storage.getWorkSessionsByEmployeeId(currentUser.id);
+          const completedSessions = workSessions.filter((ws: any) => ws.clockOutTime);
+          
+          const incidentReportsList = await db.select()
+            .from(incidentReports)
+            .where(eq(incidentReports.companyId, companyId));
+          
+          const technicianIncidents = incidentReportsList.filter((ir: any) => 
+            ir.reportedById === currentUser.id || 
+            (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(currentUser.id))
+          );
+
+          workDetails = {
+            isLinked: true,
+            totalSessions: completedSessions.length,
+            incidentCount: technicianIncidents.length,
+          };
+
+          if (completedSessions.length === 0) {
+            workScore = 50;
+            workStatus = "new";
+          } else {
+            const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+            workScore = Math.max(100 - incidentPenalty, 50);
+            workStatus = workScore >= 90 ? "excellent" : workScore >= 70 ? "good" : "fair";
+          }
+        }
+      }
+
+      // Calculate overall PSR
+      const weights = { cert: 0.25, docs: 0.25, quiz: 0.25, work: 0.25 };
+      
+      let overallScore: number;
+      if (!workDetails.isLinked) {
+        overallScore = Math.round(
+          (certScore * 0.33) + 
+          (docsScore * 0.33) + 
+          (quizScore * 0.34)
+        );
+      } else {
+        overallScore = Math.round(
+          (certScore * weights.cert) + 
+          (docsScore * weights.docs) + 
+          (quizScore * weights.quiz) + 
+          (workScore * weights.work)
+        );
+      }
+
+      res.json({
+        overallScore,
+        isLinkedToEmployer: workDetails.isLinked,
+        components: {
+          certifications: {
+            score: certScore,
+            status: certStatus,
+            details: certDetails,
+            weight: workDetails.isLinked ? 25 : 33,
+          },
+          safetyDocs: {
+            score: docsScore,
+            status: docsStatus,
+            details: docsDetails,
+            weight: workDetails.isLinked ? 25 : 33,
+          },
+          quizzes: {
+            score: quizScore,
+            status: quizStatus,
+            details: quizDetails,
+            weight: workDetails.isLinked ? 25 : 34,
+          },
+          workHistory: {
+            score: workScore,
+            status: workStatus,
+            details: workDetails,
+            weight: workDetails.isLinked ? 25 : 0,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Get technician PSR error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
   // Toggle technician visibility to employers
   app.patch("/api/technician/visibility", requireAuth, async (req: Request, res: Response) => {
