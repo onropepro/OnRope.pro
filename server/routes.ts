@@ -9342,6 +9342,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { passwordHash, socialInsuranceNumber, bankTransitNumber, bankInstitutionNumber, 
               bankAccountNumber, driversLicenseNumber, specialMedicalConditions, ...safeInfo } = technician;
       
+      // Check if technician is linked to another employer AND has visibility on
+      // This means their current employer can see they're advertising to other companies
+      const hasEmployerVisibilityWarning = !!technician.companyId && technician.isVisibleToEmployers;
+      
       res.json({ 
         found: true, 
         technician: {
@@ -9357,8 +9361,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           hasFirstAid: safeInfo.hasFirstAid,
           firstAidType: safeInfo.firstAidType,
           hasPlusAccess: safeInfo.hasPlusAccess,
-          isAlreadyLinked: !!technician.companyId, // Tell frontend if this is a PLUS multi-employer link
-        }
+          isAlreadyLinked: !!technician.companyId,
+          isVisibleToEmployers: technician.isVisibleToEmployers,
+        },
+        warning: hasEmployerVisibilityWarning 
+          ? "This technician is currently employed and has their employer visibility turned on. Their current employer may be aware they are visible to other companies."
+          : null
       });
     } catch (error) {
       console.error("Search technicians error:", error);

@@ -1232,6 +1232,7 @@ export default function Dashboard() {
   const [onRopeProSearchType, setOnRopeProSearchType] = useState<'irata' | 'sprat' | 'email'>('irata'); // Search type for OnRopePro
   const [onRopeProSearchValue, setOnRopeProSearchValue] = useState(''); // Search value for OnRopePro
   const [foundTechnician, setFoundTechnician] = useState<any>(null); // Found technician from search
+  const [technicianSearchWarning, setTechnicianSearchWarning] = useState<string | null>(null); // Warning from search
   const [technicianSearching, setTechnicianSearching] = useState(false); // Loading state for search
   const [technicianLinking, setTechnicianLinking] = useState(false); // Loading state for linking
   const [editEmployeeFormStep, setEditEmployeeFormStep] = useState<1 | 2>(1); // Track edit form step
@@ -2278,6 +2279,7 @@ export default function Dashboard() {
     
     setTechnicianSearching(true);
     setFoundTechnician(null);
+    setTechnicianSearchWarning(null);
     
     try {
       const response = await fetch(`/api/technicians/search?searchType=${onRopeProSearchType}&searchValue=${encodeURIComponent(onRopeProSearchValue)}`, {
@@ -2292,6 +2294,7 @@ export default function Dashboard() {
       
       if (data.found) {
         setFoundTechnician(data.technician);
+        setTechnicianSearchWarning(data.warning || null);
       } else {
         toast({ 
           title: "No technician found", 
@@ -5937,6 +5940,16 @@ export default function Dashboard() {
                                 </div>
                               )}
                             </div>
+                            
+                            {/* Warning if technician is employed and has visibility on */}
+                            {technicianSearchWarning && (
+                              <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                                <span className="material-icons text-amber-500 text-lg mt-0.5">warning</span>
+                                <p className="text-sm text-amber-700 dark:text-amber-400">
+                                  {technicianSearchWarning}
+                                </p>
+                              </div>
+                            )}
                             
                             <Button 
                               type="button"
