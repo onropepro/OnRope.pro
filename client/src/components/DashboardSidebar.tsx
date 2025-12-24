@@ -170,7 +170,7 @@ export function DashboardSidebar({
           label: t("dashboard.sidebar.myPortal", "My Portal"),
           icon: UserIcon,
           href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
-            ? "/ground-crew?tab=home" 
+            ? "/ground-crew-portal?tab=home" 
             : "/technician-portal?tab=home",
           isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
         },
@@ -179,7 +179,7 @@ export function DashboardSidebar({
           label: t("dashboard.sidebar.invitations", "Invitations"),
           icon: Mail,
           href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
-            ? "/ground-crew?tab=invitations" 
+            ? "/ground-crew-portal?tab=invitations" 
             : "/technician-portal?tab=invitations",
           isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
         },
