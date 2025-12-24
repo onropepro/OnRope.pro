@@ -123,8 +123,15 @@ export function DashboardSidebar({
   // Fetch sidebar preferences for ordering
   const { data: sidebarPreferences } = useQuery<SidebarPreferencesResponse>({
     queryKey: ["/api/sidebar/preferences", variant],
-    queryFn: () => fetch(`/api/sidebar/preferences?variant=${variant}`).then(r => r.json()),
+    queryFn: async () => {
+      const response = await fetch(`/api/sidebar/preferences?variant=${variant}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch sidebar preferences");
+      }
+      return response.json();
+    },
     enabled: !!currentUser,
+    retry: false,
   });
 
   // Close sidebar on route change (mobile)
@@ -349,11 +356,11 @@ export function DashboardSidebar({
       }))
       .filter((group) => group.items.length > 0);
 
-    // If we have saved preferences, apply the custom ordering
-    if (sidebarPreferences && !sidebarPreferences.isDefault) {
+    // If we have saved preferences, apply the custom ordering (with defensive guards)
+    if (sidebarPreferences && !sidebarPreferences.isDefault && sidebarPreferences.preferences) {
       return groups.map((group) => {
         const savedOrder = sidebarPreferences.preferences[group.id];
-        if (!savedOrder || savedOrder.length === 0) return group;
+        if (!savedOrder || !Array.isArray(savedOrder) || savedOrder.length === 0) return group;
 
         // Create a map of items for quick lookup
         const itemMap = new Map(group.items.map((item) => [item.id, item]));

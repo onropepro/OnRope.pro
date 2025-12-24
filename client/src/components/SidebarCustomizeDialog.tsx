@@ -46,10 +46,17 @@ export function SidebarCustomizeDialog({
   const [editableGroups, setEditableGroups] = useState<NavGroup[]>([]);
 
   // Fetch current preferences
-  const { data: preferences, isLoading } = useQuery<SidebarPreferencesResponse>({
+  const { data: preferences, isLoading, isError } = useQuery<SidebarPreferencesResponse>({
     queryKey: ["/api/sidebar/preferences", variant],
-    queryFn: () => fetch(`/api/sidebar/preferences?variant=${variant}`).then(r => r.json()),
+    queryFn: async () => {
+      const response = await fetch(`/api/sidebar/preferences?variant=${variant}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch sidebar preferences");
+      }
+      return response.json();
+    },
     enabled: open,
+    retry: false,
   });
 
   // Initialize editable groups when dialog opens
@@ -64,11 +71,11 @@ export function SidebarCustomizeDialog({
       }))
       .filter((group) => group.items.length > 0);
 
-    // Apply saved preferences if any
-    if (preferences && !preferences.isDefault) {
+    // Apply saved preferences if any (with defensive guards)
+    if (preferences && !preferences.isDefault && preferences.preferences) {
       const orderedGroups = filteredGroups.map((group) => {
         const savedOrder = preferences.preferences[group.id];
-        if (!savedOrder) return group;
+        if (!savedOrder || !Array.isArray(savedOrder)) return group;
 
         // Sort items based on saved positions
         const itemMap = new Map(group.items.map((item) => [item.id, item]));
