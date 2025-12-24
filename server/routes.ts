@@ -9174,6 +9174,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Ground crew and rope access tech profile fields
+      if (user.role === "ground_crew" || user.role === "ground_crew_supervisor" || user.role === "rope_access_tech") {
+        // Map form fields to database columns
+        if (req.body.phone !== undefined) {
+          updates.employeePhoneNumber = req.body.phone || null;
+        }
+        if (req.body.birthday !== undefined) {
+          updates.birthday = req.body.birthday || null;
+        }
+        if (req.body.address !== undefined) {
+          updates.employeeStreetAddress = req.body.address || null;
+        }
+        if (req.body.city !== undefined) {
+          updates.employeeCity = req.body.city || null;
+        }
+        if (req.body.provinceState !== undefined) {
+          updates.employeeProvinceState = req.body.provinceState || null;
+        }
+        if (req.body.country !== undefined) {
+          updates.employeeCountry = req.body.country || null;
+        }
+        if (req.body.postalCode !== undefined) {
+          updates.employeePostalCode = req.body.postalCode || null;
+        }
+        // Emergency contact fields
+        if (req.body.emergencyContactName !== undefined) {
+          updates.emergencyContactName = req.body.emergencyContactName || null;
+        }
+        if (req.body.emergencyContactPhone !== undefined) {
+          updates.emergencyContactPhone = req.body.emergencyContactPhone || null;
+        }
+        if (req.body.emergencyContactRelationship !== undefined) {
+          updates.emergencyContactRelationship = req.body.emergencyContactRelationship || null;
+        }
+        // Payroll and license fields
+        if (req.body.sin !== undefined) {
+          updates.sin = req.body.sin || null;
+        }
+        if (req.body.bankTransit !== undefined) {
+          updates.bankTransit = req.body.bankTransit || null;
+        }
+        if (req.body.bankInstitution !== undefined) {
+          updates.bankInstitution = req.body.bankInstitution || null;
+        }
+        if (req.body.bankAccount !== undefined) {
+          updates.bankAccount = req.body.bankAccount || null;
+        }
+        if (req.body.driversLicenseNumber !== undefined) {
+          updates.driversLicenseNumber = req.body.driversLicenseNumber || null;
+        }
+        if (req.body.driversLicenseIssuedDate !== undefined) {
+          updates.driversLicenseIssuedDate = req.body.driversLicenseIssuedDate || null;
+        }
+        if (req.body.driversLicenseExpiry !== undefined) {
+          updates.driversLicenseExpiry = req.body.driversLicenseExpiry || null;
+        }
+        // Medical and first aid fields
+        if (req.body.specialMedicalConditions !== undefined) {
+          updates.specialMedicalConditions = req.body.specialMedicalConditions || null;
+        }
+        if (req.body.firstAidType !== undefined) {
+          updates.firstAidType = req.body.firstAidType || null;
+        }
+        if (req.body.firstAidExpiry !== undefined) {
+          updates.firstAidExpiry = req.body.firstAidExpiry || null;
+        }
+      }
+      
       await storage.updateUser(user.id, updates);
       const updatedUser = await storage.getUserById(user.id);
       

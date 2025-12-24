@@ -602,6 +602,36 @@ export default function GroundCrewPortal() {
     },
   });
 
+  // Populate form with user data when loaded
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.employeePhoneNumber || "",
+        birthday: user.birthday || "",
+        address: user.employeeStreetAddress || "",
+        city: user.employeeCity || "",
+        provinceState: user.employeeProvinceState || "",
+        country: user.employeeCountry || "",
+        postalCode: user.employeePostalCode || "",
+        emergencyContactName: user.emergencyContactName || "",
+        emergencyContactPhone: user.emergencyContactPhone || "",
+        emergencyContactRelationship: user.emergencyContactRelationship || "",
+        sin: user.sin || "",
+        bankTransit: user.bankTransit || "",
+        bankInstitution: user.bankInstitution || "",
+        bankAccount: user.bankAccount || "",
+        driversLicenseNumber: user.driversLicenseNumber || "",
+        driversLicenseIssuedDate: user.driversLicenseIssuedDate || "",
+        driversLicenseExpiry: user.driversLicenseExpiry || "",
+        specialMedicalConditions: user.specialMedicalConditions || "",
+        firstAidType: user.firstAidType || "",
+        firstAidExpiry: user.firstAidExpiry || "",
+      });
+    }
+  }, [user, form]);
+
   const updateMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
       return apiRequest("PATCH", "/api/user/profile", data);
@@ -754,9 +784,9 @@ export default function GroundCrewPortal() {
       form.reset({
         name: user.name || "",
         email: user.email || "",
-        phone: user.phone || "",
+        phone: user.employeePhoneNumber || "",
         birthday: user.birthday || "",
-        address: user.address || "",
+        address: user.employeeStreetAddress || "",
         city: user.employeeCity || "",
         provinceState: user.employeeProvinceState || "",
         country: user.employeeCountry || "",
