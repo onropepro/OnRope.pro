@@ -27,6 +27,7 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 *   **Knowledge Base & Help Center (/help):** RAG-powered, AI chat assistant with semantic search using Gemini embeddings, 19 module guides (including Technician Portal), and stakeholder-specific navigation.
 *   **Stakeholder Landing Pages:** Public-facing, branded landing pages for Technicians, Residents, Property Managers, and Building Managers.
 *   **Unified Dashboard Layout System:** Variant-based DashboardSidebar and DashboardLayout components supporting 5 stakeholder types (employer, technician, property-manager, resident, building-manager) with role-specific brand colors (Employer: #0B64A3, Technician: #AB4521, Property Manager: #6E9075, Resident: #86A59C, Building Manager: #B89685).
+*   **Customizable Sidebar Menu Ordering:** Users can personalize sidebar navigation by reordering menu items within groups using drag-and-drop. Preferences are stored per-user per-dashboard-variant in the sidebar_preferences table.
 
 ## External Dependencies
 *   **Database:** PostgreSQL
