@@ -65,7 +65,8 @@ import {
   LogOut, 
   Edit2, 
   Save, 
-  X, 
+  X,
+  Check, 
   MapPin, 
   Phone, 
   Mail, 
@@ -2578,9 +2579,56 @@ export default function TechnicianPortal() {
                     </Button>
                   </div>
                   {(!user.companyId || user.terminatedDate) && (
-                    <p className="text-base text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                      {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
-                    </p>
+                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <p className="text-base text-slate-500 dark:text-slate-400 flex-1">
+                          {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                        </p>
+                        {pendingInvitations.length > 0 && (
+                          <div className="flex flex-col gap-2 sm:items-end" data-testid="pending-invitations-section">
+                            {pendingInvitations.map((invitation) => (
+                              <div 
+                                key={invitation.id} 
+                                className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
+                                data-testid={`invitation-card-${invitation.id}`}
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-green-800 dark:text-green-300 truncate">
+                                    {t.invitedBy} {invitation.company.name}
+                                  </p>
+                                </div>
+                                <div className="flex gap-1.5 flex-shrink-0">
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
+                                    onClick={() => acceptInvitationMutation.mutate(invitation.id)}
+                                    disabled={processingInvitationId === invitation.id}
+                                    data-testid={`button-accept-invitation-${invitation.id}`}
+                                  >
+                                    {processingInvitationId === invitation.id ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                      <Check className="w-3 h-3" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 px-2 border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                                    onClick={() => declineInvitationMutation.mutate(invitation.id)}
+                                    disabled={processingInvitationId === invitation.id}
+                                    data-testid={`button-decline-invitation-${invitation.id}`}
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
