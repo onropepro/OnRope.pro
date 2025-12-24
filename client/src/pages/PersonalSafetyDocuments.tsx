@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
+import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 import {
   ArrowLeft,
   ClipboardCheck,
@@ -40,6 +43,13 @@ import {
   Trash2,
   Loader2,
   Plus,
+  Home,
+  User,
+  MoreHorizontal,
+  Briefcase,
+  GraduationCap,
+  Award,
+  LogOut,
 } from "lucide-react";
 import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory, type EquipmentFindings, type InspectionResult } from "@shared/schema";
 
@@ -365,26 +375,144 @@ export default function PersonalSafetyDocuments() {
     doc.save(`Personal_Inspection_${inspection.inspectionDate}.pdf`);
   };
 
+  const { i18n } = useTranslation();
+  const language = i18n.language as 'en' | 'fr' | 'es';
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      queryClient.clear();
+      setLocation('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const technicianNavGroups: NavGroup[] = [
+    {
+      id: "main",
+      label: "NAVIGATION",
+      items: [
+        {
+          id: "home",
+          label: language === 'en' ? "Home" : language === 'es' ? "Inicio" : "Accueil",
+          icon: Home,
+          href: "/technician-portal",
+          isVisible: () => true,
+        },
+        {
+          id: "profile",
+          label: language === 'en' ? "Profile" : language === 'es' ? "Perfil" : "Profil",
+          icon: User,
+          href: "/technician-portal",
+          isVisible: () => true,
+        },
+        {
+          id: "more",
+          label: language === 'en' ? "More" : language === 'es' ? "Mas" : "Plus",
+          icon: MoreHorizontal,
+          href: "/technician-portal",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "employment",
+      label: "EMPLOYMENT",
+      items: [
+        {
+          id: "job-board",
+          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
+          icon: Briefcase,
+          href: "/technician-job-board",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "safety",
+      label: "SAFETY",
+      items: [
+        {
+          id: "practice-quizzes",
+          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz",
+          icon: GraduationCap,
+          href: "/technician-practice-quizzes",
+          isVisible: () => true,
+        },
+        {
+          id: "personal-safety-docs",
+          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de securite",
+          icon: Shield,
+          href: "/personal-safety-documents",
+          isVisible: () => true,
+        },
+        {
+          id: "psr",
+          label: language === 'en' ? "Personal Safety Rating" : language === 'es' ? "Calificacion de Seguridad" : "Cote de securite",
+          icon: Award,
+          href: "/technician-psr",
+          isVisible: () => true,
+        },
+      ],
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-6 px-4 max-w-4xl">
-        <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/technician-portal")}
-            data-testid="button-back-to-portal"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-3">
-            <Shield className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-2xl font-semibold">Personal Safety Documents</h1>
-              <p className="text-sm text-muted-foreground">Track your personal equipment inspections</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      <div className="hidden lg:block">
+        <DashboardSidebar
+          currentUser={currentUser}
+          activeTab="personal-safety-docs"
+          onTabChange={() => {}}
+          variant="technician"
+          customNavigationGroups={technicianNavGroups}
+          showDashboardLink={false}
+        />
+      </div>
+      
+      <div className="lg:pl-60">
+        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Shield className="h-6 w-6 text-primary" />
+              <h1 className="text-lg font-semibold">Personal Safety Documents</h1>
+            </div>
+            
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <LanguageDropdown />
+              
+              <button 
+                onClick={() => setLocation('/technician-portal')}
+                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                data-testid="link-user-profile"
+              >
+                <Avatar className="w-8 h-8 bg-[#AB4521]">
+                  <AvatarFallback className="bg-[#AB4521] text-white text-xs font-medium">
+                    {currentUser?.name ? currentUser.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.name || 'User'}</p>
+                  <p className="text-xs text-slate-400 leading-tight">{language === 'en' ? 'Technician' : language === 'es' ? 'Tecnico' : 'Technicien'}</p>
+                </div>
+              </button>
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                data-testid="button-logout" 
+                onClick={handleLogout} 
+                className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
             </div>
           </div>
-        </div>
+        </header>
+
+        <main className="p-4 sm:p-6 lg:p-8">
+          <div className="max-w-4xl mx-auto">
 
         <Card className="mb-4 border-primary/20 bg-primary/5">
           <CardContent className="p-4">
@@ -771,6 +899,8 @@ export default function PersonalSafetyDocuments() {
             </Form>
           </>
         )}
+          </div>
+        </main>
       </div>
     </div>
   );
