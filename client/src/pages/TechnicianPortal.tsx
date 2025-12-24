@@ -116,7 +116,6 @@ import {
   File,
   GraduationCap
 } from "lucide-react";
-import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
