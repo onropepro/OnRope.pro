@@ -38,6 +38,7 @@ import { useLocation, useSearch, Link } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Project, Client, InsertClient } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts";
@@ -1199,6 +1200,9 @@ export default function Dashboard() {
   const [clientDropdownStep, setClientDropdownStep] = useState<"clients" | "buildings">("clients");
   const [selectedClientInDropdown, setSelectedClientInDropdown] = useState<string | null>(null);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
+  const [clientViewMode, setClientViewMode] = useState<"cards" | "table">("cards");
+  const [clientSortField, setClientSortField] = useState<"name" | "company" | "email" | "phone">("name");
+  const [clientSortDirection, setClientSortDirection] = useState<"asc" | "desc">("asc");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [employeeToSuspendSeat, setEmployeeToSuspendSeat] = useState<any | null>(null); // For seat removal/suspend
   const [showDropDialog, setShowDropDialog] = useState(false);
@@ -7798,22 +7802,67 @@ export default function Dashboard() {
               {/* Clients List */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="material-icons text-primary">business</span>
-                    {t('dashboard.clientDatabase.title', 'Client Database')}
-                  </CardTitle>
-                  <CardDescription>{t('dashboard.clientDatabase.description', 'Property managers and building contacts')}</CardDescription>
-                  <div className="mt-4 relative">
-                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                      search
-                    </span>
-                    <Input
-                      placeholder={t('dashboard.clientDatabase.searchPlaceholder', 'Search by name, company, strata number, or address...')}
-                      value={clientSearchQuery}
-                      onChange={(e) => setClientSearchQuery(e.target.value)}
-                      className="h-10 pl-10"
-                      data-testid="input-search-clients"
-                    />
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <span className="material-icons text-primary">business</span>
+                        {t('dashboard.clientDatabase.title', 'Client Database')}
+                      </CardTitle>
+                      <CardDescription>{t('dashboard.clientDatabase.description', 'Property managers and building contacts')}</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={clientViewMode === "cards" ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setClientViewMode("cards")}
+                        data-testid="button-view-cards"
+                      >
+                        <span className="material-icons text-sm">grid_view</span>
+                      </Button>
+                      <Button
+                        variant={clientViewMode === "table" ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setClientViewMode("table")}
+                        data-testid="button-view-table"
+                      >
+                        <span className="material-icons text-sm">view_list</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
+                      <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                        search
+                      </span>
+                      <Input
+                        placeholder={t('dashboard.clientDatabase.searchPlaceholder', 'Search by name, company, strata number, or address...')}
+                        value={clientSearchQuery}
+                        onChange={(e) => setClientSearchQuery(e.target.value)}
+                        className="h-10 pl-10"
+                        data-testid="input-search-clients"
+                      />
+                    </div>
+                    <Select value={clientSortField} onValueChange={(v) => setClientSortField(v as any)}>
+                      <SelectTrigger className="w-full sm:w-40" data-testid="select-sort-field">
+                        <SelectValue placeholder="Sort by" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="name">{t('dashboard.clientDatabase.sortName', 'Name')}</SelectItem>
+                        <SelectItem value="company">{t('dashboard.clientDatabase.sortCompany', 'Company')}</SelectItem>
+                        <SelectItem value="email">{t('dashboard.clientDatabase.sortEmail', 'Email')}</SelectItem>
+                        <SelectItem value="phone">{t('dashboard.clientDatabase.sortPhone', 'Phone')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setClientSortDirection(d => d === "asc" ? "desc" : "asc")}
+                      data-testid="button-toggle-sort-direction"
+                    >
+                      <span className="material-icons text-sm">
+                        {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                      </span>
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -7822,95 +7871,331 @@ export default function Dashboard() {
                   ) : !clientsData || clientsData.length === 0 ? (
                     <p className="text-sm text-muted-foreground">{t('dashboard.clientDatabase.noClients', 'No clients yet. Add your first client to get started.')}</p>
                   ) : (
-                    <div className="space-y-3">
-                      {clientsData
-                        .filter(client => {
-                          if (!clientSearchQuery) return true;
-                          const query = clientSearchQuery.toLowerCase();
-                          return (
-                            client.firstName.toLowerCase().includes(query) ||
-                            client.lastName.toLowerCase().includes(query) ||
-                            client.company?.toLowerCase().includes(query) ||
-                            client.lmsNumbers?.some(lms => 
-                              lms.number.toLowerCase().includes(query) ||
-                              lms.address?.toLowerCase().includes(query)
-                            )
-                          );
-                        })
-                        .map((client) => (
-                        <Card 
-                          key={client.id} 
-                          className="hover-elevate cursor-pointer" 
-                          data-testid={`client-card-${client.id}`}
-                          onClick={() => {
-                            setClientToView(client);
-                            setShowClientDetailDialog(true);
-                          }}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="font-medium text-base mb-1">
-                                  {client.firstName} {client.lastName}
+                    <>
+                      {/* Table View */}
+                      {clientViewMode === "table" && (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead 
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() => {
+                                  if (clientSortField === "name") {
+                                    setClientSortDirection(d => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setClientSortField("name");
+                                    setClientSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  {t('dashboard.clientDatabase.columnName', 'Name')}
+                                  {clientSortField === "name" && (
+                                    <span className="material-icons text-xs">
+                                      {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  )}
                                 </div>
-                                {client.company && (
-                                  <div className="text-sm text-muted-foreground mb-1">
-                                    {client.company}
-                                  </div>
-                                )}
-                                {client.phoneNumber && (
-                                  <div className="text-sm text-muted-foreground mb-1">
-                                    {client.phoneNumber}
-                                  </div>
-                                )}
-                                {client.email && (
-                                  <div className="text-sm text-muted-foreground mb-1">
-                                    {client.email}
-                                  </div>
-                                )}
-                                {client.lmsNumbers && client.lmsNumbers.length > 0 && (
-                                  <div className="space-y-2 mt-2">
-                                    {client.lmsNumbers.map((lms, idx) => (
-                                      <div key={idx} className="text-sm">
-                                        {lms.buildingName && (
-                                          <div className="text-sm font-medium mb-1">{lms.buildingName}</div>
-                                        )}
-                                        <Badge variant="secondary" className="text-xs mr-2">
+                              </TableHead>
+                              <TableHead 
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() => {
+                                  if (clientSortField === "company") {
+                                    setClientSortDirection(d => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setClientSortField("company");
+                                    setClientSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  {t('dashboard.clientDatabase.columnCompany', 'Company')}
+                                  {clientSortField === "company" && (
+                                    <span className="material-icons text-xs">
+                                      {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead 
+                                className="cursor-pointer hover:bg-muted/50 hidden md:table-cell"
+                                onClick={() => {
+                                  if (clientSortField === "email") {
+                                    setClientSortDirection(d => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setClientSortField("email");
+                                    setClientSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  {t('dashboard.clientDatabase.columnEmail', 'Email')}
+                                  {clientSortField === "email" && (
+                                    <span className="material-icons text-xs">
+                                      {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead 
+                                className="cursor-pointer hover:bg-muted/50 hidden lg:table-cell"
+                                onClick={() => {
+                                  if (clientSortField === "phone") {
+                                    setClientSortDirection(d => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setClientSortField("phone");
+                                    setClientSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  {t('dashboard.clientDatabase.columnPhone', 'Phone')}
+                                  {clientSortField === "phone" && (
+                                    <span className="material-icons text-xs">
+                                      {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead className="hidden xl:table-cell">{t('dashboard.clientDatabase.columnBuildings', 'Buildings')}</TableHead>
+                              <TableHead className="text-right">{t('dashboard.clientDatabase.columnActions', 'Actions')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {clientsData
+                              .filter(client => {
+                                if (!clientSearchQuery) return true;
+                                const query = clientSearchQuery.toLowerCase();
+                                return (
+                                  client.firstName.toLowerCase().includes(query) ||
+                                  client.lastName.toLowerCase().includes(query) ||
+                                  client.company?.toLowerCase().includes(query) ||
+                                  client.lmsNumbers?.some(lms => 
+                                    lms.number.toLowerCase().includes(query) ||
+                                    lms.address?.toLowerCase().includes(query)
+                                  )
+                                );
+                              })
+                              .sort((a, b) => {
+                                let aVal = "";
+                                let bVal = "";
+                                switch (clientSortField) {
+                                  case "name":
+                                    aVal = `${a.firstName} ${a.lastName}`.toLowerCase();
+                                    bVal = `${b.firstName} ${b.lastName}`.toLowerCase();
+                                    break;
+                                  case "company":
+                                    aVal = (a.company || "").toLowerCase();
+                                    bVal = (b.company || "").toLowerCase();
+                                    break;
+                                  case "email":
+                                    aVal = (a.email || "").toLowerCase();
+                                    bVal = (b.email || "").toLowerCase();
+                                    break;
+                                  case "phone":
+                                    aVal = (a.phoneNumber || "").toLowerCase();
+                                    bVal = (b.phoneNumber || "").toLowerCase();
+                                    break;
+                                }
+                                if (clientSortDirection === "asc") {
+                                  return aVal.localeCompare(bVal);
+                                } else {
+                                  return bVal.localeCompare(aVal);
+                                }
+                              })
+                              .map((client) => (
+                              <TableRow 
+                                key={client.id} 
+                                className="cursor-pointer"
+                                onClick={() => {
+                                  setClientToView(client);
+                                  setShowClientDetailDialog(true);
+                                }}
+                                data-testid={`table-row-client-${client.id}`}
+                              >
+                                <TableCell className="font-medium">
+                                  {client.firstName} {client.lastName}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground">
+                                  {client.company || "-"}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground hidden md:table-cell">
+                                  {client.email || "-"}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground hidden lg:table-cell">
+                                  {client.phoneNumber || "-"}
+                                </TableCell>
+                                <TableCell className="hidden xl:table-cell">
+                                  {client.lmsNumbers && client.lmsNumbers.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1">
+                                      {client.lmsNumbers.slice(0, 2).map((lms, idx) => (
+                                        <Badge key={idx} variant="secondary" className="text-xs">
                                           {lms.number}
                                         </Badge>
-                                        {lms.address && (
-                                          <span className="text-muted-foreground text-sm">{lms.address}</span>
+                                      ))}
+                                      {client.lmsNumbers.length > 2 && (
+                                        <Badge variant="outline" className="text-xs">
+                                          +{client.lmsNumbers.length - 2}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
+                                    <div className="flex justify-end gap-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); handleEditClient(client); }}
+                                        data-testid={`button-edit-client-${client.id}`}
+                                      >
+                                        <span className="material-icons text-sm">edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); handleDeleteClient(client); }}
+                                        data-testid={`button-delete-client-${client.id}`}
+                                      >
+                                        <span className="material-icons text-destructive text-sm">delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      )}
+
+                      {/* Cards View */}
+                      {clientViewMode === "cards" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {clientsData
+                            .filter(client => {
+                              if (!clientSearchQuery) return true;
+                              const query = clientSearchQuery.toLowerCase();
+                              return (
+                                client.firstName.toLowerCase().includes(query) ||
+                                client.lastName.toLowerCase().includes(query) ||
+                                client.company?.toLowerCase().includes(query) ||
+                                client.lmsNumbers?.some(lms => 
+                                  lms.number.toLowerCase().includes(query) ||
+                                  lms.address?.toLowerCase().includes(query)
+                                )
+                              );
+                            })
+                            .sort((a, b) => {
+                              let aVal = "";
+                              let bVal = "";
+                              switch (clientSortField) {
+                                case "name":
+                                  aVal = `${a.firstName} ${a.lastName}`.toLowerCase();
+                                  bVal = `${b.firstName} ${b.lastName}`.toLowerCase();
+                                  break;
+                                case "company":
+                                  aVal = (a.company || "").toLowerCase();
+                                  bVal = (b.company || "").toLowerCase();
+                                  break;
+                                case "email":
+                                  aVal = (a.email || "").toLowerCase();
+                                  bVal = (b.email || "").toLowerCase();
+                                  break;
+                                case "phone":
+                                  aVal = (a.phoneNumber || "").toLowerCase();
+                                  bVal = (b.phoneNumber || "").toLowerCase();
+                                  break;
+                              }
+                              if (clientSortDirection === "asc") {
+                                return aVal.localeCompare(bVal);
+                              } else {
+                                return bVal.localeCompare(aVal);
+                              }
+                            })
+                            .map((client) => (
+                            <Card 
+                              key={client.id} 
+                              className="hover-elevate cursor-pointer" 
+                              data-testid={`client-card-${client.id}`}
+                              onClick={() => {
+                                setClientToView(client);
+                                setShowClientDetailDialog(true);
+                              }}
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium text-base mb-1 truncate">
+                                      {client.firstName} {client.lastName}
+                                    </div>
+                                    {client.company && (
+                                      <div className="text-sm text-muted-foreground mb-1 truncate">
+                                        {client.company}
+                                      </div>
+                                    )}
+                                    {client.phoneNumber && (
+                                      <div className="text-sm text-muted-foreground mb-1">
+                                        {client.phoneNumber}
+                                      </div>
+                                    )}
+                                    {client.email && (
+                                      <div className="text-sm text-muted-foreground mb-1 truncate">
+                                        {client.email}
+                                      </div>
+                                    )}
+                                    {client.lmsNumbers && client.lmsNumbers.length > 0 && (
+                                      <div className="space-y-2 mt-2">
+                                        {client.lmsNumbers.slice(0, 2).map((lms, idx) => (
+                                          <div key={idx} className="text-sm">
+                                            {lms.buildingName && (
+                                              <div className="text-sm font-medium mb-1 truncate">{lms.buildingName}</div>
+                                            )}
+                                            <Badge variant="secondary" className="text-xs mr-2">
+                                              {lms.number}
+                                            </Badge>
+                                            {lms.address && (
+                                              <span className="text-muted-foreground text-sm">{lms.address}</span>
+                                            )}
+                                          </div>
+                                        ))}
+                                        {client.lmsNumbers.length > 2 && (
+                                          <Badge variant="outline" className="text-xs">
+                                            +{client.lmsNumbers.length - 2} more
+                                          </Badge>
                                         )}
                                       </div>
-                                    ))}
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                              {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
-                                <div className="flex gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => { e.stopPropagation(); handleEditClient(client); }}
-                                    data-testid={`button-edit-client-${client.id}`}
-                                  >
-                                    <span className="material-icons">edit</span>
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => { e.stopPropagation(); handleDeleteClient(client); }}
-                                    data-testid={`button-delete-client-${client.id}`}
-                                  >
-                                    <span className="material-icons text-destructive">delete</span>
-                                  </Button>
+                                  {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
+                                    <div className="flex gap-1 ml-2 flex-shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); handleEditClient(client); }}
+                                        data-testid={`button-edit-client-card-${client.id}`}
+                                      >
+                                        <span className="material-icons">edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); handleDeleteClient(client); }}
+                                        data-testid={`button-delete-client-card-${client.id}`}
+                                      >
+                                        <span className="material-icons text-destructive">delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>
