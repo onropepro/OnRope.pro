@@ -38,8 +38,13 @@ import {
   Gift,
   Save,
   X,
-  Trash2
+  Trash2,
+  Home,
+  User as UserIcon,
+  MoreHorizontal,
+  Mail
 } from "lucide-react";
+import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
@@ -619,38 +624,106 @@ export default function TechnicianJobBoard() {
     return `$${min || max} ${periodLabel}`;
   };
 
+  // Technician sidebar navigation groups - matches TechnicianPortal structure
+  const technicianNavGroups: NavGroup[] = [
+    {
+      id: "main",
+      label: "NAVIGATION",
+      items: [
+        {
+          id: "home",
+          label: language === 'en' ? "Home" : "Accueil",
+          icon: Home,
+          onClick: () => setLocation('/technician-portal'),
+          isVisible: () => true,
+        },
+        {
+          id: "profile",
+          label: language === 'en' ? "Profile" : "Profil",
+          icon: UserIcon,
+          onClick: () => setLocation('/technician-portal?tab=profile'),
+          isVisible: () => true,
+        },
+        {
+          id: "more",
+          label: language === 'en' ? "More" : "Plus",
+          icon: MoreHorizontal,
+          onClick: () => setLocation('/technician-portal?tab=more'),
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "employment",
+      label: language === 'en' ? "EMPLOYMENT" : "EMPLOI",
+      items: [
+        {
+          id: "job-board",
+          label: language === 'en' ? "Job Board" : "Offres d'emploi",
+          icon: Briefcase,
+          href: "/technician-job-board",
+          isVisible: () => true,
+        },
+        {
+          id: "visibility",
+          label: language === 'en' ? "My Visibility" : "Ma Visibilité",
+          icon: Eye,
+          onClick: () => setLocation('/technician-portal?tab=visibility'),
+          isVisible: () => true,
+        },
+        {
+          id: "invitations",
+          label: language === 'en' ? "Team Invitations" : "Invitations",
+          icon: Mail,
+          onClick: () => setLocation('/technician-portal?tab=invitations'),
+          isVisible: () => true,
+        },
+      ],
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img 
-              src={onRopeProLogo} 
-              alt="OnRopePro" 
-              className="h-8 w-auto"
-            />
-            <div>
-              <h1 className="text-lg font-bold">{t.title}</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">{t.subtitle}</p>
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden lg:block">
+        <DashboardSidebar
+          currentUser={user as any}
+          activeTab="job-board"
+          onTabChange={() => {}}
+          variant="technician"
+          customNavigationGroups={technicianNavGroups}
+          showDashboardLink={false}
+        />
+      </div>
+      
+      {/* Main content wrapper - offset for sidebar on desktop */}
+      <div className="lg:pl-60">
+        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            {/* Left Side: Page Title */}
+            <div className="flex items-center gap-3">
+              <h1 className="text-lg font-semibold">{t.title}</h1>
+            </div>
+            
+            {/* Right Side: Actions Group */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <LanguageDropdown />
+              {/* Mobile back button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLocation("/technician-portal")}
+                className="lg:hidden gap-1.5"
+                data-testid="button-back-to-portal"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">{t.backToPortal}</span>
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <LanguageDropdown />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLocation("/technician-portal")}
-              className="gap-1.5"
-              data-testid="button-back-to-portal"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.backToPortal}</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        <main className="px-4 sm:px-6 py-6 space-y-6">
         {/* PLUS Required Gate */}
         {user && !(user as any).hasPlusAccess && (
           <Card className="border-amber-500/50 bg-gradient-to-r from-amber-500/10 to-transparent">
@@ -1021,6 +1094,7 @@ export default function TechnicianJobBoard() {
           </>
         )}
       </main>
+      </div>
 
       {/* Job Details Dialog */}
       <Dialog open={!!selectedJob} onOpenChange={(open) => !open && setSelectedJob(null)}>
