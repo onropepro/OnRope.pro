@@ -5709,24 +5709,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const firstName = nameParts[0] || '';
             const lastName = nameParts.slice(1).join(' ') || '';
             
-            // Update client records in each linked company that match this PM's email
+            // Update client records in each linked company
+            // Match by strata number (building) since email may be empty
             for (const link of pmLinks) {
-              await db.update(clients)
-                .set({
-                  firstName: firstName || undefined,
-                  lastName: lastName || undefined,
-                  company: updatedPM.propertyManagementCompany || undefined,
-                  phoneNumber: updatedPM.propertyManagerPhoneNumber || undefined,
-                  updatedAt: new Date()
-                })
-                .where(
-                  and(
-                    eq(clients.companyId, link.companyId),
-                    eq(clients.email, updatedPM.email!)
-                  )
+              if (!link.companyId) continue;
+              
+              // Find clients in this company that have this strata number in their lmsNumbers
+              // or match by email if available
+              const strataNumber = link.strataNumber;
+              
+              // Get all clients in this company
+              const companyClients = await db.select()
+                .from(clients)
+                .where(eq(clients.companyId, link.companyId));
+              
+              // Find clients that match by email OR by strata number in lmsNumbers
+              for (const client of companyClients) {
+                const matchesByEmail = client.email && client.email.toLowerCase() === updatedPM.email?.toLowerCase();
+                const lmsNumbers = client.lmsNumbers as Array<{ number: string }> | null;
+                const matchesByStrata = strataNumber && lmsNumbers?.some(
+                  (lms) => lms.number?.toUpperCase() === strataNumber.toUpperCase()
                 );
+                
+                if (matchesByEmail || matchesByStrata) {
+                  // Build update object with only non-empty values
+                  const updateData: Record<string, any> = { updatedAt: new Date() };
+                  if (firstName) updateData.firstName = firstName;
+                  if (lastName) updateData.lastName = lastName;
+                  if (updatedPM.propertyManagementCompany) updateData.company = updatedPM.propertyManagementCompany;
+                  if (updatedPM.propertyManagerPhoneNumber) updateData.phoneNumber = updatedPM.propertyManagerPhoneNumber;
+                  // Also sync email to ensure future syncs work by email
+                  if (updatedPM.email && !client.email) updateData.email = updatedPM.email;
+                  
+                  await db.update(clients)
+                    .set(updateData)
+                    .where(eq(clients.id, client.id));
+                  
+                  console.log(`[PM Sync] Updated client ${client.id} (${client.firstName} ${client.lastName}) with PM data`);
+                }
+              }
             }
-            console.log(`[PM Sync] Updated client records for PM ${updatedPM.email} in ${pmLinks.length} linked companies`);
+            console.log(`[PM Sync] Completed sync for PM ${updatedPM.email} across ${pmLinks.length} linked companies`);
           }
         }
       } catch (syncError) {
