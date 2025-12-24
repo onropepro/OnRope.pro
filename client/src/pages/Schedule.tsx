@@ -1532,22 +1532,8 @@ export default function Schedule() {
 
         <TabsContent value="employee-schedule" className="mt-4">
           <div 
-            className="rounded-lg shadow-premium p-4 md:p-6 relative overflow-hidden"
-            style={{
-              background: `linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--brand-secondary-hsl, var(--chart-2)) / 0.06) 50%, hsl(var(--card)) 100%)`
-            }}
+            className="rounded-lg border bg-card p-4 md:p-6 relative"
           >
-            {/* Multi-color decorative gradient overlays */}
-            <div 
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: `
-                  radial-gradient(ellipse at top right, hsl(var(--primary) / 0.15), transparent 50%),
-                  radial-gradient(ellipse at bottom left, hsl(var(--brand-secondary-hsl, var(--chart-2)) / 0.10), transparent 40%),
-                  radial-gradient(ellipse at top left, hsl(var(--brand-tertiary-hsl, var(--chart-3)) / 0.08), transparent 35%)
-                `
-              }}
-            />
             {/* Timeline Navigation Header - Mobile optimized */}
             <div className="flex flex-col gap-3 mb-4 md:mb-6 relative z-10">
               {/* View mode toggle */}
@@ -1750,7 +1736,10 @@ export default function Schedule() {
                                     <TooltipTrigger asChild>
                                       <div 
                                         className={`rounded font-medium text-white truncate cursor-pointer hover-elevate ${timeOff ? 'opacity-60' : ''} ${isMonthView ? 'px-0.5 py-0.5 text-[8px]' : 'px-2 py-1.5 text-xs'}`}
-                                        style={{ backgroundColor: job.color || defaultJobColor }}
+                                        style={{ 
+                                          backgroundColor: job.color || defaultJobColor,
+                                          filter: 'saturate(0.85) brightness(1.05)'
+                                        }}
                                         onClick={() => {
                                           setSelectedJob(job);
                                           setDetailDialogOpen(true);
