@@ -117,7 +117,6 @@ import {
   GraduationCap
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
-import { QuizSection } from "@/components/QuizSection";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
@@ -2730,11 +2729,6 @@ export default function TechnicianPortal() {
             {/* Document Requests from Employers */}
             {user && user.role === 'rope_access_tech' && (
               <TechnicianDocumentRequests language={language} />
-            )}
-
-            {/* Safety Quizzes Section - Show for all technicians (certification/safety quizzes always available) */}
-            {user && user.role === 'rope_access_tech' && !user.terminatedDate && (
-              <QuizSection />
             )}
           </>
         )}
