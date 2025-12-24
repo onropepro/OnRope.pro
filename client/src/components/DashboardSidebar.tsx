@@ -443,14 +443,17 @@ export function DashboardSidebar({
       {/* Footer - Settings and Help */}
       <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
         <div className="space-y-0.5">
-          <button
-            onClick={() => setLocation("/profile")}
-            data-testid="sidebar-nav-settings"
-            className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-          >
-            <Settings className="h-4 w-4 shrink-0" />
-            <span>{t("dashboard.sidebar.settings", "Settings")}</span>
-          </button>
+          {/* Settings button - hidden for technician variant (they have Profile in main nav) */}
+          {variant !== "technician" && (
+            <button
+              onClick={() => setLocation("/profile")}
+              data-testid="sidebar-nav-settings"
+              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <Settings className="h-4 w-4 shrink-0" />
+              <span>{t("dashboard.sidebar.settings", "Settings")}</span>
+            </button>
+          )}
           <button
             onClick={() => setLocation("/help")}
             data-testid="sidebar-nav-help"
