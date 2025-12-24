@@ -1639,6 +1639,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Ground crew self-registration endpoint - SECURITY: Rate limited to prevent abuse
+  app.post("/api/ground-crew-register", registrationRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        streetAddress,
+        city,
+        provinceState,
+        country,
+        postalCode,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        employerCode,
+      } = req.body;
+
+      // Validate required fields
+      if (!firstName || !lastName || !email || !password || !phone || !emergencyContactName || !emergencyContactPhone) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      console.log(`[Ground-Crew-Register] Starting registration for ${email}`);
+
+      // Case-insensitive email check for existing user
+      const normalizedEmail = email.toLowerCase();
+      const existingUser = await storage.getUserByEmail(email);
+      
+      if (existingUser) {
+        console.log(`[Ground-Crew-Register] Email already exists: ${email}`);
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      // If employer code is provided, validate it
+      let invitingEmployer = null;
+      if (employerCode) {
+        // Look up the employer by their company's property manager code (used for invitations)
+        const companyResults = await db.select().from(users).where(
+          and(
+            eq(users.role, 'company'),
+            sql`LOWER(${users.propertyManagerCode}) = ${employerCode.toLowerCase()}`
+          )
+        ).limit(1);
+        
+        if (companyResults.length === 0) {
+          console.log(`[Ground-Crew-Register] Invalid employer code: ${employerCode}`);
+          return res.status(400).json({ message: "Invalid employer code" });
+        }
+        invitingEmployer = companyResults[0];
+        console.log(`[Ground-Crew-Register] Valid employer code found for company: ${invitingEmployer.companyName}`);
+      }
+
+      // Create the ground crew user (pending company approval)
+      const user = await storage.createUser({
+        name: `${firstName} ${lastName}`,
+        email,
+        role: 'ground_crew',
+        passwordHash: password, // storage.createUser will hash this
+        companyId: invitingEmployer ? invitingEmployer.id : null,
+        
+        // Address fields
+        employeeStreetAddress: streetAddress || null,
+        employeeCity: city || null,
+        employeeProvinceState: provinceState || null,
+        employeeCountry: country || null,
+        employeePostalCode: postalCode || null,
+        
+        // Contact info
+        employeePhoneNumber: phone,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship: emergencyContactRelationship || null,
+        
+        // Start date - use timezone-safe utility
+        startDate: getTodayString(),
+      });
+
+      console.log('[Ground-Crew-Register] User created:', user.id);
+
+      // Create session and auto-login the ground crew member
+      req.session.userId = user.id;
+      req.session.role = user.role;
+      
+      console.log(`[Ground-Crew-Register] Session created for ground crew: ${user.id}, email: ${user.email}`);
+      
+      // Save session before responding
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            console.error(`[Ground-Crew-Register] Session save error:`, err);
+            reject(err);
+          } else {
+            console.log(`[Ground-Crew-Register] Session saved successfully for ${user.email}`);
+            resolve();
+          }
+        });
+      });
+
+      // Return success with user data
+      const { passwordHash, ...userWithoutPassword } = user;
+      res.json({ 
+        success: true,
+        message: "Registration completed successfully.",
+        user: userWithoutPassword,
+      });
+    } catch (error: any) {
+      console.error('[Ground-Crew-Register] Error:', error);
+      res.status(500).json({ message: error.message || "Registration failed" });
+    }
+  });
+
   // Login endpoint - SECURITY: Rate limited to prevent brute force attacks
   app.post("/api/login", loginRateLimiter, async (req: Request, res: Response) => {
     try {
