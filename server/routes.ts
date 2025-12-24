@@ -10488,7 +10488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view invitations" });
       }
       
