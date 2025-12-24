@@ -19,7 +19,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import type { User } from "@shared/schema";
-import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 
 interface PSRData {
@@ -307,9 +306,6 @@ export default function TechnicianPSR() {
 
       <div className="lg:pl-60">
         <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-14 flex items-center justify-between px-4 gap-4">
-          <div className="flex items-center gap-3">
-            <img src={onRopeProLogo} alt="OnRopePro" className="h-8 w-auto" />
-          </div>
           <div className="flex-1 max-w-md hidden md:block">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />

@@ -19,6 +19,7 @@ import { PendingApprovalsCard } from "./cards/PendingApprovalsCard";
 import { ExpiringCertsCard } from "./cards/ExpiringCertsCard";
 import { NewFeedbackCard } from "./cards/NewFeedbackCard";
 import { PlaceholderCard } from "./cards/PlaceholderCard";
+import { WeatherCard } from "./cards/WeatherCard";
 
 export interface CardProps {
   currentUser: any;
@@ -72,6 +73,8 @@ export function getCardComponent(cardId: string, props: CardProps): React.ReactN
       return <ExpiringCertsCard {...props} />;
     case "feed-new":
       return <NewFeedbackCard {...props} />;
+    case "ops-weather":
+      return <WeatherCard {...props} />;
     default:
       return <PlaceholderCard cardId={cardId} />;
   }

@@ -34,6 +34,7 @@ import NonBillableHours from "@/pages/NonBillableHours";
 import Inventory from "@/pages/Inventory";
 import HoursAnalytics from "@/pages/HoursAnalytics";
 import ScheduleRouter from "@/pages/ScheduleRouter";
+import Weather from "@/pages/Weather";
 import SuperUser from "@/pages/SuperUser";
 import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
@@ -394,6 +395,11 @@ function Router() {
       <Route path="/schedule">
         <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
           <ScheduleRouter />
+        </WithDashboardLayout>
+      </Route>
+      <Route path="/weather">
+        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+          <Weather />
         </WithDashboardLayout>
       </Route>
       <Route path="/residents">

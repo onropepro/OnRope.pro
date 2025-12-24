@@ -3390,106 +3390,6 @@ export default function TechnicianPortal() {
           </Card>
         )}
 
-        {/* Performance & Safety Rating Card - Show for technicians and company owners (HOME TAB) */}
-        {activeTab === 'home' && user && (user.role === 'rope_access_tech' || user.role === 'company') && (
-          <Card className="border-muted overflow-visible">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-gradient-to-br from-amber-500/20 to-yellow-400/20">
-                  <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                </div>
-                <div className="flex-1">
-                  <CardTitle className="text-lg">PSR</CardTitle>
-                  <p className="text-sm text-muted-foreground">{t.performanceSafetyRating}</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {performanceData?.summary?.totalSessions && performanceData.summary.totalSessions > 0 ? (
-                <div className="space-y-4">
-                  {/* Main Score Display */}
-                  <div className="p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-400/10 border border-amber-200/30 dark:border-amber-800/30">
-                    <div className="flex items-center gap-4">
-                      <div className="text-4xl font-bold text-amber-600 dark:text-amber-400" data-testid="text-performance-score">
-                        {performanceData.summary.averageScore}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{t.overallScore}</p>
-                        <Badge 
-                          variant={performanceData.summary.overallRating === 'excellent' ? 'default' : 
-                                   performanceData.summary.overallRating === 'good' ? 'secondary' : 'destructive'}
-                          className={performanceData.summary.overallRating === 'excellent' ? 
-                            'bg-green-500 text-white' : 
-                            performanceData.summary.overallRating === 'good' ? 
-                            'bg-blue-500 text-white' : ''}
-                          data-testid="badge-performance-rating"
-                        >
-                          {performanceData.summary.overallRating === 'excellent' ? t.ratingExcellent :
-                           performanceData.summary.overallRating === 'good' ? t.ratingGood :
-                           performanceData.summary.overallRating === 'needs_improvement' ? t.ratingNeedsImprovement :
-                           t.ratingPoor}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    {/* Improvement hints - show when not excellent */}
-                    {(performanceData.summary.overallRating === 'needs_improvement' || 
-                      performanceData.summary.overallRating === 'poor') && 
-                      (performanceData.summary.harnessCompliance < 80 || performanceData.summary.documentCompliance < 100) && (
-                      <div className="mt-3 pt-3 border-t border-amber-200/30 dark:border-amber-800/30">
-                        <p className="text-xs font-medium text-muted-foreground mb-1">{t.improvementNeeded}</p>
-                        <ul className="text-xs text-muted-foreground space-y-1">
-                          {performanceData.summary.harnessCompliance < 80 && (
-                            <li className="flex items-center gap-1.5" data-testid="hint-harness">
-                              <AlertTriangle className="w-3 h-3 text-amber-500" />
-                              {t.improveHarness}
-                            </li>
-                          )}
-                          {performanceData.summary.documentCompliance < 100 && (
-                            <li className="flex items-center gap-1.5" data-testid="hint-docs">
-                              <AlertTriangle className="w-3 h-3 text-amber-500" />
-                              {t.improveDocs}
-                            </li>
-                          )}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Stats Row */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="p-3 rounded-lg bg-muted/50 text-center">
-                      <p className="text-xl font-semibold" data-testid="text-harness-compliance">
-                        {performanceData.summary.harnessCompliance}%
-                      </p>
-                      <p className="text-sm text-muted-foreground">{t.harnessCompliance}</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/50 text-center">
-                      <p className="text-xl font-semibold" data-testid="text-document-compliance">
-                        {performanceData.summary.documentCompliance}%
-                      </p>
-                      <p className="text-sm text-muted-foreground">{t.documentCompliance}</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/50 text-center">
-                      <p className="text-xl font-semibold" data-testid="text-sessions-count">
-                        {performanceData.summary.totalSessions}
-                      </p>
-                      <p className="text-sm text-muted-foreground">{t.sessionsAnalyzed}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <Shield className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
-                  <p className="font-medium text-muted-foreground">{t.noPerformanceData}</p>
-                  <p className="text-base text-muted-foreground">{t.noPerformanceDataDesc}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-
         {/* PROFILE TAB - Personal information and certifications */}
         {activeTab === 'profile' && (
           <>
@@ -3568,7 +3468,7 @@ export default function TechnicianPortal() {
                       >
                         {t.yourReferralCode}
                       </button>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">{language === 'en' ? 'Share with friends to earn rewards' : language === 'es' ? 'Comparte con amigos para ganar recompensas' : 'Partagez avec vos amis pour gagner des récompenses'}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{language === 'en' ? 'Share with another tech and instantly get upgraded to PLUS' : language === 'es' ? 'Comparte con otro técnico y actualízate a PLUS al instante' : 'Partagez avec un autre technicien et obtenez un accès PLUS instantané'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

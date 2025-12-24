@@ -1181,6 +1181,10 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState("");
   const [showClientDialog, setShowClientDialog] = useState(false);
   const [showBusinessCardScanner, setShowBusinessCardScanner] = useState(false);
+  const [showPMSearchDialog, setShowPMSearchDialog] = useState(false);
+  const [pmSearchQuery, setPMSearchQuery] = useState("");
+  const [pmSearchResults, setPMSearchResults] = useState<Array<{ id: string; email: string; name: string; pmCode: string | null; company: string | null; phone: string | null; isLinked: boolean }>>([]);
+  const [pmSearchLoading, setPMSearchLoading] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
   const [showClientDetailDialog, setShowClientDetailDialog] = useState(false);
@@ -7777,6 +7781,24 @@ export default function Dashboard() {
                     {t('dashboard.clientDatabase.scanCard', 'Scan Business Card')}
                   </Button>
                 )}
+                
+                {/* Search Property Manager Button */}
+                {(currentUser?.role === "company" || currentUser?.role === "employee") && (
+                  <Button 
+                    variant="outline"
+                    className="h-12 gap-2" 
+                    onClick={() => {
+                      setPMSearchQuery("");
+                      setPMSearchResults([]);
+                      setShowPMSearchDialog(true);
+                    }}
+                    data-testid="button-search-pm"
+                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                  >
+                    <span className="material-icons">person_search</span>
+                    {t('dashboard.clientDatabase.searchPM', 'Find Property Manager')}
+                  </Button>
+                )}
               </div>
 
               {/* Business Card Scanner Dialog */}
@@ -7798,6 +7820,154 @@ export default function Dashboard() {
                   setShowClientDialog(true);
                 }}
               />
+
+              {/* Property Manager Search Dialog */}
+              <Dialog open={showPMSearchDialog} onOpenChange={setShowPMSearchDialog}>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <span className="material-icons text-primary">person_search</span>
+                      {t('dashboard.pmSearch.title', 'Find Property Manager')}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {t('dashboard.pmSearch.description', 'Search by PM code, name, or email to link them to your company')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                        search
+                      </span>
+                      <Input
+                        placeholder={t('dashboard.pmSearch.placeholder', 'Enter PM code, name, or email...')}
+                        value={pmSearchQuery}
+                        onChange={async (e) => {
+                          const query = e.target.value;
+                          setPMSearchQuery(query);
+                          
+                          if (query.trim().length < 2) {
+                            setPMSearchResults([]);
+                            return;
+                          }
+                          
+                          setPMSearchLoading(true);
+                          try {
+                            const response = await fetch(`/api/property-managers/search?q=${encodeURIComponent(query)}`);
+                            if (response.ok) {
+                              const data = await response.json();
+                              setPMSearchResults(data.results || []);
+                            }
+                          } catch (error) {
+                            console.error("PM search error:", error);
+                          } finally {
+                            setPMSearchLoading(false);
+                          }
+                        }}
+                        className="h-10 pl-10"
+                        data-testid="input-search-pm"
+                      />
+                    </div>
+                    
+                    {pmSearchLoading && (
+                      <div className="text-center py-4 text-muted-foreground text-sm">
+                        {t('dashboard.pmSearch.searching', 'Searching...')}
+                      </div>
+                    )}
+                    
+                    {!pmSearchLoading && pmSearchQuery.length >= 2 && pmSearchResults.length === 0 && (
+                      <div className="text-center py-6 text-muted-foreground">
+                        <span className="material-icons text-3xl mb-2 block">search_off</span>
+                        <p className="text-sm">{t('dashboard.pmSearch.noResults', 'No property managers found')}</p>
+                      </div>
+                    )}
+                    
+                    {pmSearchResults.length > 0 && (
+                      <div className="space-y-2 max-h-80 overflow-y-auto">
+                        {pmSearchResults.map((pm) => (
+                          <div 
+                            key={pm.id} 
+                            className="p-3 border rounded-md hover-elevate"
+                            data-testid={`pm-result-${pm.id}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate">{pm.name || pm.email}</p>
+                                {pm.company && (
+                                  <p className="text-sm text-muted-foreground truncate">{pm.company}</p>
+                                )}
+                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                  {pm.pmCode && (
+                                    <Badge variant="outline" className="font-mono text-xs">
+                                      {pm.pmCode}
+                                    </Badge>
+                                  )}
+                                  {pm.email && (
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <span className="material-icons text-xs">mail</span>
+                                      {pm.email}
+                                    </span>
+                                  )}
+                                  {pm.phone && (
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <span className="material-icons text-xs">phone</span>
+                                      {pm.phone}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              {pm.isLinked ? (
+                                <Badge variant="secondary" className="shrink-0">
+                                  <span className="material-icons text-xs mr-1">check_circle</span>
+                                  {t('dashboard.pmSearch.linked', 'Linked')}
+                                </Badge>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  onClick={async () => {
+                                    try {
+                                      const response = await apiRequest("POST", `/api/property-managers/${pm.id}/link`);
+                                      if (response.ok) {
+                                        toast({
+                                          title: t('dashboard.pmSearch.linkSuccess', 'Property Manager Linked'),
+                                          description: t('dashboard.pmSearch.linkSuccessDesc', '{{name}} has been linked and added to your client database', { name: pm.name || pm.email }),
+                                        });
+                                        // Invalidate clients query to refresh the list
+                                        queryClient.invalidateQueries({ queryKey: ['/api/clients'] });
+                                        // Update local state to show as linked
+                                        setPMSearchResults(prev => 
+                                          prev.map(p => p.id === pm.id ? { ...p, isLinked: true } : p)
+                                        );
+                                      } else {
+                                        const error = await response.json();
+                                        toast({
+                                          title: t('dashboard.pmSearch.linkError', 'Link Failed'),
+                                          description: error.message || t('dashboard.pmSearch.linkErrorDesc', 'Could not link property manager'),
+                                          variant: "destructive",
+                                        });
+                                      }
+                                    } catch (error) {
+                                      console.error("Link PM error:", error);
+                                      toast({
+                                        title: t('dashboard.pmSearch.linkError', 'Link Failed'),
+                                        description: t('dashboard.pmSearch.linkErrorDesc', 'Could not link property manager'),
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }}
+                                  data-testid={`button-link-pm-${pm.id}`}
+                                >
+                                  <span className="material-icons text-sm mr-1">link</span>
+                                  {t('dashboard.pmSearch.link', 'Link')}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               {/* Clients List */}
               <Card>

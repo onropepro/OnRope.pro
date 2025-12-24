@@ -56,6 +56,7 @@ SUPERUSER_PASSWORD_HASH = "$2b$10$znLuQpyvTqoiYjPt39vMROJILL/Cq0b2L5TQSfTliowZU9
 ENCRYPTION_KEY = "04118da23aaf7972a3ac7bf12a0b338b732ddc7dc69379adfa4f7122003efc05"
 RESIDENT_PHOTOS_BUCKET = "/replit-objstore-7384c998-585d-4bde-b18e-d8c9ecb92482/resident-photos"
 APP_URL = "https://app.onrope.pro"
+VITE_GEOAPIFY_API_KEY = "${GEOAPIFY_API_KEY}"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-7384c998-585d-4bde-b18e-d8c9ecb92482"

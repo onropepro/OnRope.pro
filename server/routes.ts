@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable, incidentReports } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable, incidentReports, clients } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -164,6 +164,18 @@ function canViewCSR(user: any): boolean {
   // All other roles need explicit permission
   const permissions = normalizePermissions(user.permissions);
   return permissions.includes('view_csr');
+}
+
+// Helper function to check if user can manage clients
+function canManageClients(user: any): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // All other roles need explicit permission
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('manage_clients');
 }
 
 // Helper function to get CSR rating label and color based on percentage
@@ -809,6 +821,32 @@ async function generateReferralCode(): Promise<string> {
   }
   
   throw new Error('Failed to generate unique referral code after maximum attempts');
+}
+
+// Generate unique 10-character PM code for property managers using cryptographically secure randomness
+async function generatePmCode(): Promise<string> {
+  const crypto = await import('crypto');
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
+  const codeLength = 10;
+  const maxAttempts = 10;
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const randomBytes = crypto.randomBytes(codeLength);
+    let code = '';
+    
+    for (let i = 0; i < codeLength; i++) {
+      const randomIndex = randomBytes[i] % characters.length;
+      code += characters.charAt(randomIndex);
+    }
+    
+    // Check if code already exists
+    const [existing] = await db.select().from(users).where(eq(users.pmCode, code)).limit(1);
+    if (!existing) {
+      return code;
+    }
+  }
+  
+  throw new Error('Failed to generate unique PM code after maximum attempts');
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -4770,6 +4808,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Auto-generate PM code if property manager doesn't have one
+      if (user.role === 'property_manager' && !user.pmCode) {
+        try {
+          console.log('[/api/user] Property manager missing PM code, generating...');
+          const pmCode = await generatePmCode();
+          await storage.updateUser(user.id, { pmCode });
+          user = await storage.getUserById(user.id) || user;
+          console.log(`[/api/user] PM code generated: ${pmCode}`);
+        } catch (error) {
+          console.error('[/api/user] Failed to generate PM code:', error);
+        }
+      }
+      
       // Check if user has been terminated - destroy session if so
       // Exception: Self-resigned technicians can still log in to accept new invitations
       if (user.terminatedDate && user.terminationReason !== "Self-resigned") {
@@ -5635,7 +5686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const { name, email, propertyManagerPhoneNumber, propertyManagerSmsOptIn, currentPassword, newPassword } = validationResult.data;
+      const { name, email, propertyManagerPhoneNumber, propertyManagerSmsOptIn, propertyManagementCompany, currentPassword, newPassword } = validationResult.data;
       
       // Get current property manager data
       const currentUser = await storage.getUserById(propertyManagerId);
@@ -5679,11 +5730,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .where(eq(users.id, propertyManagerId));
       }
       
+      // Update property management company if provided
+      if (propertyManagementCompany !== undefined) {
+        await db.update(users)
+          .set({ propertyManagementCompany: propertyManagementCompany || null })
+          .where(eq(users.id, propertyManagerId));
+      }
+      
       // Update SMS opt-in if provided
       if (propertyManagerSmsOptIn !== undefined) {
         await db.update(users)
           .set({ propertyManagerSmsOptIn })
           .where(eq(users.id, propertyManagerId));
+      }
+      
+      // Sync property manager profile changes to linked client records
+      // This ensures companies see up-to-date PM information
+      try {
+        const pmLinks = await db.select()
+          .from(propertyManagerCompanyLinks)
+          .where(eq(propertyManagerCompanyLinks.propertyManagerId, propertyManagerId));
+        
+        if (pmLinks.length > 0) {
+          // Get updated PM data
+          const updatedPM = await storage.getUserById(propertyManagerId);
+          if (updatedPM) {
+            // Parse name into firstName and lastName
+            const nameParts = (updatedPM.name || '').trim().split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            
+            // Update client records in each linked company
+            // Match by strata number (building) since email may be empty
+            for (const link of pmLinks) {
+              if (!link.companyId) continue;
+              
+              // Find clients in this company that have this strata number in their lmsNumbers
+              // or match by email if available
+              const strataNumber = link.strataNumber;
+              
+              // Get all clients in this company
+              const companyClients = await db.select()
+                .from(clients)
+                .where(eq(clients.companyId, link.companyId));
+              
+              // Find clients that match by email OR by strata number in lmsNumbers
+              for (const client of companyClients) {
+                const matchesByEmail = client.email && client.email.toLowerCase() === updatedPM.email?.toLowerCase();
+                const lmsNumbers = client.lmsNumbers as Array<{ number: string }> | null;
+                const matchesByStrata = strataNumber && lmsNumbers?.some(
+                  (lms) => lms.number?.toUpperCase() === strataNumber.toUpperCase()
+                );
+                
+                if (matchesByEmail || matchesByStrata) {
+                  // Build update object with only non-empty values
+                  const updateData: Record<string, any> = { updatedAt: new Date() };
+                  if (firstName) updateData.firstName = firstName;
+                  if (lastName) updateData.lastName = lastName;
+                  if (updatedPM.propertyManagementCompany) updateData.company = updatedPM.propertyManagementCompany;
+                  if (updatedPM.propertyManagerPhoneNumber) updateData.phoneNumber = updatedPM.propertyManagerPhoneNumber;
+                  // Also sync email to ensure future syncs work by email
+                  if (updatedPM.email && !client.email) updateData.email = updatedPM.email;
+                  
+                  await db.update(clients)
+                    .set(updateData)
+                    .where(eq(clients.id, client.id));
+                  
+                  console.log(`[PM Sync] Updated client ${client.id} (${client.firstName} ${client.lastName}) with PM data`);
+                }
+              }
+            }
+            console.log(`[PM Sync] Completed sync for PM ${updatedPM.email} across ${pmLinks.length} linked companies`);
+          }
+        }
+      } catch (syncError) {
+        // Non-blocking - log but don't fail the request
+        console.error("[PM Sync] Error syncing PM profile to client records:", syncError);
       }
       
       res.json({ message: "Account settings updated successfully" });
@@ -11088,6 +11210,155 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // ==================== CLIENT ROUTES ====================
+  
+  // Search property managers by pmCode, name, or email (for company owners)
+  app.get("/api/property-managers/search", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage_clients permission
+      if (!canManageClients(currentUser)) {
+        return res.status(403).json({ message: "Access denied - insufficient permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const query = (req.query.q as string || "").trim().toLowerCase();
+      if (!query || query.length < 2) {
+        return res.json({ results: [] });
+      }
+      
+      // Search users with role 'property_manager' by pmCode, name (firstName + lastName), or email
+      const allPMs = await db.select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        pmCode: users.pmCode,
+        propertyManagementCompany: users.propertyManagementCompany,
+        propertyManagerPhoneNumber: users.propertyManagerPhoneNumber,
+      }).from(users).where(eq(users.role, 'property_manager'));
+      
+      // Filter by search query
+      const results = allPMs.filter(pm => {
+        const fullName = `${pm.firstName || ''} ${pm.lastName || ''}`.toLowerCase().trim();
+        const email = (pm.email || '').toLowerCase();
+        const pmCode = (pm.pmCode || '').toLowerCase();
+        
+        return pmCode.includes(query) || 
+               fullName.includes(query) || 
+               email.includes(query);
+      }).slice(0, 20); // Limit to 20 results
+      
+      // Check if any of these PMs are already linked to this company
+      const linkedPMs = await db.select({ propertyManagerId: propertyManagerCompanyLinks.propertyManagerId })
+        .from(propertyManagerCompanyLinks)
+        .where(eq(propertyManagerCompanyLinks.companyId, companyId));
+      const linkedPMIds = new Set(linkedPMs.map(l => l.propertyManagerId));
+      
+      // Return results with linked status
+      const resultsWithStatus = results.map(pm => ({
+        id: pm.id,
+        email: pm.email,
+        name: `${pm.firstName || ''} ${pm.lastName || ''}`.trim() || pm.email,
+        pmCode: pm.pmCode,
+        company: pm.propertyManagementCompany,
+        phone: pm.propertyManagerPhoneNumber,
+        isLinked: linkedPMIds.has(pm.id),
+      }));
+      
+      res.json({ results: resultsWithStatus });
+    } catch (error) {
+      console.error("Error searching property managers:", error);
+      res.status(500).json({ message: "Failed to search property managers" });
+    }
+  });
+  
+  // Link a property manager to this company
+  app.post("/api/property-managers/:pmId/link", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage_clients permission
+      if (!canManageClients(currentUser)) {
+        return res.status(403).json({ message: "Access denied - insufficient permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const pmId = req.params.pmId;
+      
+      // Get the company to access propertyManagerCode
+      const company = currentUser.role === "company" ? currentUser : await storage.getUserById(companyId);
+      if (!company || !company.propertyManagerCode) {
+        return res.status(400).json({ message: "Company does not have a property manager code configured" });
+      }
+      
+      // Verify the PM exists and is a property_manager
+      const pm = await storage.getUserById(pmId);
+      if (!pm || pm.role !== 'property_manager') {
+        return res.status(404).json({ message: "Property manager not found" });
+      }
+      
+      // Check if already linked
+      const existingLinks = await db.select()
+        .from(propertyManagerCompanyLinks)
+        .where(and(
+          eq(propertyManagerCompanyLinks.propertyManagerId, pmId),
+          eq(propertyManagerCompanyLinks.companyId, companyId)
+        ));
+      
+      if (existingLinks.length > 0) {
+        return res.status(400).json({ message: "Property manager is already linked to your company" });
+      }
+      
+      // Check if a client already exists for this PM email
+      const existingClients = await storage.getClientsByCompany(companyId);
+      const existingClient = existingClients.find((c: any) => 
+        c.email && pm.email && c.email.toLowerCase() === pm.email.toLowerCase()
+      );
+      
+      // Create the link with company code
+      await db.insert(propertyManagerCompanyLinks).values({
+        id: crypto.randomUUID(),
+        propertyManagerId: pmId,
+        companyId: companyId,
+        companyCode: company.propertyManagerCode,
+      });
+      
+      // Create a client record for this PM if one doesn't exist
+      if (!existingClient) {
+        const pmName = `${pm.firstName || ''} ${pm.lastName || ''}`.trim();
+        await storage.createClient({
+          companyId: companyId,
+          firstName: pm.firstName || '',
+          lastName: pm.lastName || '',
+          company: pm.propertyManagementCompany || '',
+          email: pm.email || '',
+          phoneNumber: pm.propertyManagerPhoneNumber || '',
+          address: '',
+          billingAddress: '',
+        });
+      }
+      
+      res.json({ success: true, message: "Property manager linked and added to client database" });
+    } catch (error) {
+      console.error("Error linking property manager:", error);
+      res.status(500).json({ message: "Failed to link property manager" });
+    }
+  });
   
   // Get all clients for the company
   app.get("/api/clients", requireAuth, async (req: Request, res: Response) => {
@@ -20932,6 +21203,68 @@ Do not include any other text, just the JSON object.`
     } catch (error) {
       console.error("Email quote error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== WEATHER ROUTES ====================
+
+  // Get weather data from Open-Meteo (free, no API key required)
+  app.get("/api/weather", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const lat = parseFloat(req.query.lat as string);
+      const lon = parseFloat(req.query.lon as string);
+      
+      if (isNaN(lat) || isNaN(lon)) {
+        return res.status(400).json({ message: "Invalid coordinates. Please provide lat and lon query parameters." });
+      }
+      
+      // Fetch from Open-Meteo API - free, no key required
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto&forecast_days=1`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Open-Meteo API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Transform the data for easier frontend consumption
+      const current = {
+        temperature: data.current?.temperature_2m,
+        temperatureUnit: data.current_units?.temperature_2m || "°C",
+        humidity: data.current?.relative_humidity_2m,
+        weatherCode: data.current?.weather_code,
+        windSpeed: data.current?.wind_speed_10m,
+        windSpeedUnit: data.current_units?.wind_speed_10m || "km/h",
+        windDirection: data.current?.wind_direction_10m,
+        windGusts: data.current?.wind_gusts_10m,
+        time: data.current?.time,
+      };
+      
+      // Build hourly forecast
+      const hourly = [];
+      if (data.hourly?.time) {
+        for (let i = 0; i < data.hourly.time.length; i++) {
+          hourly.push({
+            time: data.hourly.time[i],
+            temperature: data.hourly.temperature_2m?.[i],
+            weatherCode: data.hourly.weather_code?.[i],
+            windSpeed: data.hourly.wind_speed_10m?.[i],
+            windDirection: data.hourly.wind_direction_10m?.[i],
+            windGusts: data.hourly.wind_gusts_10m?.[i],
+          });
+        }
+      }
+      
+      res.json({
+        current,
+        hourly,
+        timezone: data.timezone,
+        location: { lat, lon },
+      });
+    } catch (error) {
+      console.error("Weather API error:", error);
+      res.status(500).json({ message: "Failed to fetch weather data" });
     }
   });
 
