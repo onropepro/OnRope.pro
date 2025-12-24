@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { ShieldCheck, TrendingUp, TrendingDown, Users, ChevronRight, Award, FileCheck, BookOpen, Briefcase } from "lucide-react";
+import { ShieldCheck, TrendingUp, TrendingDown, Users, ChevronRight, Award, FileCheck, BookOpen, Briefcase, Building2, Calendar, ClipboardCheck, AlertTriangle, History } from "lucide-react";
 import { canViewCSR } from "@/lib/permissions";
 import type { CardProps } from "../cardRegistry";
 import {
@@ -13,11 +13,25 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import { format } from "date-fns";
 
 interface CSRData {
   csrRating: number;
   csrLabel: string;
   csrColor: string;
+}
+
+interface CSRHistoryEntry {
+  id: string;
+  previousScore: number;
+  newScore: number;
+  changeReason: string;
+  changedAt: string;
+  csrLabel: string;
+}
+
+interface CSRHistoryData {
+  history: CSRHistoryEntry[];
 }
 
 interface WSSData {
@@ -45,6 +59,7 @@ interface WSSDetailsData {
 }
 
 export function SafetyRatingCard({ currentUser, branding }: CardProps) {
+  const [showCSRDialog, setShowCSRDialog] = useState(false);
   const [showWSSDialog, setShowWSSDialog] = useState(false);
   const hasAccess = canViewCSR(currentUser);
   
@@ -61,6 +76,11 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
   const { data: wssDetails, isLoading: wssDetailsLoading } = useQuery<WSSDetailsData>({
     queryKey: ["/api/workforce-safety-score/details"],
     enabled: hasAccess && showWSSDialog,
+  });
+  
+  const { data: csrHistory, isLoading: csrHistoryLoading } = useQuery<CSRHistoryData>({
+    queryKey: ["/api/company-safety-rating/history"],
+    enabled: hasAccess && showCSRDialog,
   });
 
   const rating = csrData?.csrRating ?? 0;
@@ -119,25 +139,32 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col gap-2">
-        {/* CSR Section */}
-        <div className={`rounded-lg p-3 w-full ${colors.bg}`}>
+        {/* CSR Section (clickable) */}
+        <div 
+          className={`rounded-lg p-3 w-full ${colors.bg} cursor-pointer hover-elevate`}
+          onClick={() => setShowCSRDialog(true)}
+          data-testid="button-csr-details"
+        >
           <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-2xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
-                {Math.round(rating)}%
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Company Safety Rating (CSR)
-              </p>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <p className={`text-xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
+                  {Math.round(rating)}% <span className="text-xs font-normal text-muted-foreground">CSR</span>
+                </p>
+              </div>
             </div>
-            <Badge className={colors.badge}>
-              {rating >= 70 ? (
-                <TrendingUp className="w-3 h-3 mr-1" />
-              ) : (
-                <TrendingDown className="w-3 h-3 mr-1" />
-              )}
-              {rating >= 90 ? "Excellent" : rating >= 70 ? "Good" : rating >= 50 ? "Warning" : "Critical"}
-            </Badge>
+            <div className="flex items-center gap-1">
+              <Badge className={colors.badge}>
+                {rating >= 70 ? (
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                ) : (
+                  <TrendingDown className="w-3 h-3 mr-1" />
+                )}
+                {rating >= 90 ? "Excellent" : rating >= 70 ? "Good" : rating >= 50 ? "Warning" : "Critical"}
+              </Badge>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </div>
           </div>
         </div>
         
@@ -168,6 +195,103 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
         )}
       </CardContent>
       
+      {/* CSR Details Dialog */}
+      <Dialog open={showCSRDialog} onOpenChange={setShowCSRDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5" />
+              Company Safety Rating (CSR)
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className={`rounded-lg p-4 ${colors.bg}`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-3xl font-bold ${colors.text}`}>
+                    {Math.round(rating)}%
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Current Rating: {csrData?.csrLabel || "Unknown"}
+                  </p>
+                </div>
+                <Badge className={colors.badge}>
+                  {rating >= 90 ? "Excellent" : rating >= 70 ? "Good" : rating >= 50 ? "Warning" : "Critical"}
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="text-sm bg-muted/50 rounded-md p-3 space-y-2">
+              <p className="font-medium">What is CSR?</p>
+              <p className="text-muted-foreground text-xs">
+                The Company Safety Rating measures your company's overall safety compliance based on:
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+                <div className="flex items-center gap-1"><ClipboardCheck className="w-3 h-3" /> Harness inspections</div>
+                <div className="flex items-center gap-1"><FileCheck className="w-3 h-3" /> Toolbox meetings</div>
+                <div className="flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> FLHA compliance</div>
+                <div className="flex items-center gap-1"><Building2 className="w-3 h-3" /> Incident reports</div>
+              </div>
+              <p className="text-muted-foreground text-xs pt-2">
+                This rating affects your company's reputation with property managers and clients.
+              </p>
+            </div>
+            
+            <div>
+              <p className="font-medium text-sm flex items-center gap-1 mb-2">
+                <History className="w-4 h-4" /> Rating History
+              </p>
+              <ScrollArea className="h-[200px] pr-2">
+                {csrHistoryLoading ? (
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="animate-pulse bg-muted rounded-md h-12" />
+                    ))}
+                  </div>
+                ) : csrHistory?.history && csrHistory.history.length > 0 ? (
+                  <div className="space-y-2">
+                    {csrHistory.history.map((entry) => {
+                      const change = entry.newScore - entry.previousScore;
+                      const isPositive = change >= 0;
+                      return (
+                        <div 
+                          key={entry.id} 
+                          className="border rounded-md p-2 text-sm"
+                          data-testid={`card-csr-history-${entry.id}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-3 h-3 text-muted-foreground" />
+                              <span className="text-xs text-muted-foreground">
+                                {format(new Date(entry.changedAt), "MMM d, yyyy")}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-muted-foreground">{Math.round(entry.previousScore)}%</span>
+                              <span>{isPositive ? "+" : ""}{Math.round(change)}%</span>
+                              <Badge variant={isPositive ? "default" : "destructive"} className="text-xs">
+                                {Math.round(entry.newScore)}%
+                              </Badge>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">{entry.changeReason}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <History className="w-6 h-6 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No rating changes recorded yet</p>
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       {/* WSS Details Dialog */}
       <Dialog open={showWSSDialog} onOpenChange={setShowWSSDialog}>
         <DialogContent className="max-w-2xl max-h-[80vh]">
@@ -186,22 +310,31 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                     {wssScore}% WSS
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Average of all employee Personal Safety Ratings
+                    Workforce Safety Score
                   </p>
                 </div>
                 <Badge variant="outline">{wssData?.employeeCount || 0} employees</Badge>
               </div>
             </div>
             
-            <div className="text-sm text-muted-foreground bg-muted/50 rounded-md p-3">
-              <p className="font-medium mb-1">PSR Components (25% each):</p>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="flex items-center gap-1"><Award className="w-3 h-3" /> Certifications</div>
-                <div className="flex items-center gap-1"><FileCheck className="w-3 h-3" /> Safety Documents</div>
-                <div className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> Safety Quizzes</div>
-                <div className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> Work History</div>
+            <div className="text-sm bg-muted/50 rounded-md p-3 space-y-2">
+              <p className="font-medium">What is WSS?</p>
+              <p className="text-muted-foreground text-xs">
+                The Workforce Safety Score is the average of all employee Personal Safety Ratings (PSR). 
+                Each employee's PSR is calculated from 4 components (25% each):
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+                <div className="flex items-center gap-1"><Award className="w-3 h-3" /> Certifications status</div>
+                <div className="flex items-center gap-1"><FileCheck className="w-3 h-3" /> Safety documents</div>
+                <div className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> Safety quizzes passed</div>
+                <div className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> Work history</div>
               </div>
+              <p className="text-muted-foreground text-xs pt-2 italic">
+                This is an educational metric only and does not affect your CSR.
+              </p>
             </div>
+            
+            <p className="font-medium text-sm">Employee PSR Breakdown</p>
             
             <ScrollArea className="h-[300px] pr-2">
               {wssDetailsLoading ? (
