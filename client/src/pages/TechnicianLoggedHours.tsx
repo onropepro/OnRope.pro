@@ -400,10 +400,10 @@ const getTaskIcon = (taskId: string): string => {
 export default function TechnicianLoggedHours() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [language] = useState<Language>(() => {
-    const stored = localStorage.getItem('technicianLanguage');
-    return (stored === 'fr' ? 'fr' : 'en') as Language;
-  });
+  const { i18n } = useTranslation();
+  
+  // Use global i18n language, not local storage
+  const language: Language = i18n.language === 'fr' ? 'fr' : 'en';
   const t = translations[language];
   const dateLocale = language === 'fr' ? fr : enUS;
   

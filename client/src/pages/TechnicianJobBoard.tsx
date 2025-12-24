@@ -353,11 +353,11 @@ const translations = {
 export default function TechnicianJobBoard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [language, setLanguage] = useState<Language>(() => {
-    // Use same localStorage key as TechnicianPortal for consistency
-    const saved = localStorage.getItem("techPortalLanguage");
-    return (saved === "fr" ? "fr" : "en") as Language;
-  });
+  const { i18n } = useTranslation();
+  
+  // Use global i18n language, not local storage
+  const language: Language = (i18n.language === 'fr' || i18n.language === 'es') ? 
+    (i18n.language === 'fr' ? 'fr' : 'en') : 'en';
   const t = translations[language];
 
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
