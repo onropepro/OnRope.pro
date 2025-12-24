@@ -19775,6 +19775,29 @@ Do not include any other text, just the JSON object.`
         }
         
         if (propertyManager && propertyManager.role === 'property_manager') {
+            // If PM was manually selected and quote has a strata number, update/add PM's strata link
+            if (req.body.recipientPropertyManagerId && fullQuote!.strataPlanNumber) {
+              const existingLink = await db.select()
+                .from(propertyManagerCompanyLinks)
+                .where(
+                  and(
+                    eq(propertyManagerCompanyLinks.propertyManagerId, propertyManager.id),
+                    eq(propertyManagerCompanyLinks.companyId, companyId)
+                  )
+                )
+                .limit(1);
+              
+              if (existingLink.length > 0) {
+                // Update existing link with the strata number if not already set or different
+                if (!existingLink[0].strataNumber || existingLink[0].strataNumber !== fullQuote!.strataPlanNumber) {
+                  await db.update(propertyManagerCompanyLinks)
+                    .set({ strataNumber: fullQuote!.strataPlanNumber })
+                    .where(eq(propertyManagerCompanyLinks.id, existingLink[0].id));
+                  console.log(`[Quote] Updated PM link with strata number ${fullQuote!.strataPlanNumber} for ${propertyManager.email}`);
+                }
+              }
+            }
+            
             // Link the quote to this property manager and move to submitted stage
             await storage.updateQuote(fullQuote!.id, { 
               recipientPropertyManagerId: propertyManager.id,
@@ -19784,7 +19807,7 @@ Do not include any other text, just the JSON object.`
               stageUpdatedAt: new Date()
             } as any);
             
-            console.log(`[Quote] Auto-linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
+            console.log(`[Quote] Linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
             
             // Get company name for WebSocket notification
             const companyUser = await storage.getUserById(companyId);
