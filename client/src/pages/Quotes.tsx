@@ -3500,6 +3500,12 @@ export default function Quotes() {
                             buildingForm.setValue('strataPlanNumber', '');
                             buildingForm.setValue('buildingAddress', '');
                             buildingForm.setValue('floorCount', undefined);
+                            
+                            // Auto-select PM recipient if client email matches a linked PM
+                            const matchingPM = linkedPMs.find((pm) => pm.email === client.email);
+                            if (matchingPM) {
+                              setSelectedPmId(matchingPM.id);
+                            }
                           }
                         }}
                       >
