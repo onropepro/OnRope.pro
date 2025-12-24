@@ -38,14 +38,10 @@ import {
   Gift,
   Save,
   X,
-  Trash2,
-  Home,
-  User as UserIcon,
-  MoreHorizontal,
-  Mail,
-  GraduationCap
+  Trash2
 } from "lucide-react";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
@@ -625,90 +621,7 @@ export default function TechnicianJobBoard() {
     return `$${min || max} ${periodLabel}`;
   };
 
-  // Technician sidebar navigation groups - matches TechnicianPortal structure
-  const technicianNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: "NAVIGATION",
-      items: [
-        {
-          id: "home",
-          label: language === 'en' ? "Home" : "Accueil",
-          icon: Home,
-          onClick: () => setLocation('/technician-portal'),
-          isVisible: () => true,
-        },
-        {
-          id: "profile",
-          label: language === 'en' ? "Profile" : "Profil",
-          icon: UserIcon,
-          onClick: () => setLocation('/technician-portal?tab=profile'),
-          isVisible: () => true,
-        },
-        {
-          id: "more",
-          label: language === 'en' ? "More" : "Plus",
-          icon: MoreHorizontal,
-          onClick: () => setLocation('/technician-portal?tab=more'),
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "employment",
-      label: language === 'en' ? "EMPLOYMENT" : "EMPLOI",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'en' ? "Job Board" : "Offres d'emploi",
-          icon: Briefcase,
-          href: "/technician-job-board",
-          isVisible: () => true,
-        },
-        {
-          id: "visibility",
-          label: language === 'en' ? "My Visibility" : "Ma Visibilité",
-          icon: Eye,
-          onClick: () => setLocation('/technician-portal?tab=visibility'),
-          isVisible: () => true,
-        },
-        {
-          id: "invitations",
-          label: language === 'en' ? "Team Invitations" : "Invitations",
-          icon: Mail,
-          onClick: () => setLocation('/technician-portal?tab=invitations'),
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "safety",
-      label: language === 'en' ? "SAFETY" : "SÉCURITÉ",
-      items: [
-        {
-          id: "personal-safety-docs",
-          label: language === 'en' ? "Personal Safety Docs" : "Docs de sécurité",
-          icon: Shield,
-          href: "/personal-safety-documents",
-          isVisible: () => true,
-        },
-        {
-          id: "psr",
-          label: language === 'en' ? "Safety Rating (PSR)" : "Cote de sécurité (PSR)",
-          icon: Award,
-          href: "/technician-psr",
-          isVisible: () => true,
-        },
-        {
-          id: "practice-quizzes",
-          label: language === 'en' ? "Practice Quizzes" : "Quiz de pratique",
-          icon: GraduationCap,
-          href: "/technician-practice-quizzes",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">

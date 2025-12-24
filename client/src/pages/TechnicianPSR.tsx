@@ -1,32 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
-  Home, 
-  User as UserIcon, 
-  MoreHorizontal, 
-  Briefcase, 
-  Eye, 
-  Mail,
-  Shield,
-  Award,
-  GraduationCap,
   Search,
   FileCheck,
   CheckCircle2,
   AlertCircle,
   Clock,
   TrendingUp,
-  Info
+  Info,
+  Award,
+  GraduationCap
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import type { User } from "@shared/schema";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 
 interface PSRData {
   overallScore: number;
@@ -204,89 +198,7 @@ export default function TechnicianPSR() {
 
   const trans = translations[language as keyof typeof translations] || translations.en;
 
-  const technicianNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: "NAVIGATION",
-      items: [
-        {
-          id: "home",
-          label: language === 'en' ? "Home" : language === 'es' ? "Inicio" : "Accueil",
-          icon: Home,
-          href: "/technician-portal",
-          isVisible: () => true,
-        },
-        {
-          id: "profile",
-          label: language === 'en' ? "Profile" : language === 'es' ? "Perfil" : "Profil",
-          icon: UserIcon,
-          href: "/technician-portal?tab=profile",
-          isVisible: () => true,
-        },
-        {
-          id: "more",
-          label: language === 'en' ? "More" : language === 'es' ? "Mas" : "Plus",
-          icon: MoreHorizontal,
-          href: "/technician-portal?tab=more",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "employment",
-      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
-          icon: Briefcase,
-          href: "/technician-job-board",
-          isVisible: () => true,
-        },
-        {
-          id: "visibility",
-          label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
-          icon: Eye,
-          href: "/technician-portal?tab=visibility",
-          isVisible: () => true,
-        },
-        {
-          id: "invitations",
-          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
-          icon: Mail,
-          href: "/technician-portal?tab=invitations",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "safety",
-      label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
-      items: [
-        {
-          id: "personal-safety-docs",
-          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de sécurité",
-          icon: Shield,
-          href: "/personal-safety-documents",
-          isVisible: () => true,
-        },
-        {
-          id: "psr",
-          label: language === 'en' ? "Safety Rating (PSR)" : language === 'es' ? "Calificacion (PSR)" : "Cote de sécurité (PSR)",
-          icon: Award,
-          href: "/technician-psr",
-          isVisible: () => true,
-        },
-        {
-          id: "practice-quizzes",
-          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz pratiques",
-          icon: GraduationCap,
-          href: "/technician-practice-quizzes",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es');
 
   const getScoreColor = (score: number) => {
     if (score >= 90) return { bg: "bg-green-50 dark:bg-green-950/30", text: "text-green-700 dark:text-green-400", badge: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" };
@@ -386,10 +298,10 @@ export default function TechnicianPSR() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <DashboardSidebar
         variant="technician"
-        userName={user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.username || "Technician"}
-        userAvatar={user?.profileImage || undefined}
+        currentUser={user}
         currentPage="psr"
         customNavigationGroups={technicianNavGroups}
+        showDashboardLink={false}
         hideSettingsButton={true}
       />
 
@@ -411,9 +323,9 @@ export default function TechnicianPSR() {
           <div className="flex items-center gap-3">
             <LanguageDropdown />
             <Avatar className="h-8 w-8 border-2" style={{ borderColor: "#AB4521" }}>
-              <AvatarImage src={user?.profileImage || undefined} />
+              <AvatarImage src={user?.photoUrl || undefined} />
               <AvatarFallback className="text-white text-sm" style={{ backgroundColor: "#AB4521" }}>
-                {user?.firstName?.[0] || user?.username?.[0] || "T"}
+                {user?.firstName?.[0] || user?.name?.[0] || "T"}
               </AvatarFallback>
             </Avatar>
           </div>

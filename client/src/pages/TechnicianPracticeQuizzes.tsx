@@ -1,24 +1,14 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { QuizSection } from "@/components/QuizSection";
-import { 
-  Home, 
-  User as UserIcon, 
-  MoreHorizontal, 
-  Briefcase, 
-  Eye, 
-  Mail,
-  Shield,
-  Award,
-  GraduationCap,
-  Search
-} from "lucide-react";
+import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import type { User } from "@shared/schema";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 
 export default function TechnicianPracticeQuizzes() {
   const [, setLocation] = useLocation();
@@ -51,89 +41,7 @@ export default function TechnicianPracticeQuizzes() {
 
   const trans = translations[language as keyof typeof translations] || translations.en;
 
-  const technicianNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: "NAVIGATION",
-      items: [
-        {
-          id: "home",
-          label: language === 'en' ? "Home" : language === 'es' ? "Inicio" : "Accueil",
-          icon: Home,
-          href: "/technician-portal",
-          isVisible: () => true,
-        },
-        {
-          id: "profile",
-          label: language === 'en' ? "Profile" : language === 'es' ? "Perfil" : "Profil",
-          icon: UserIcon,
-          href: "/technician-portal?tab=profile",
-          isVisible: () => true,
-        },
-        {
-          id: "more",
-          label: language === 'en' ? "More" : language === 'es' ? "Mas" : "Plus",
-          icon: MoreHorizontal,
-          href: "/technician-portal?tab=more",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "employment",
-      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
-          icon: Briefcase,
-          href: "/technician-job-board",
-          isVisible: () => true,
-        },
-        {
-          id: "visibility",
-          label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
-          icon: Eye,
-          href: "/technician-portal?tab=visibility",
-          isVisible: () => true,
-        },
-        {
-          id: "invitations",
-          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
-          icon: Mail,
-          href: "/technician-portal?tab=invitations",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "safety",
-      label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
-      items: [
-        {
-          id: "personal-safety-docs",
-          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de sécurité",
-          icon: Shield,
-          href: "/personal-safety-documents",
-          isVisible: () => true,
-        },
-        {
-          id: "psr",
-          label: language === 'en' ? "Safety Rating (PSR)" : language === 'es' ? "Calificacion (PSR)" : "Cote de sécurité (PSR)",
-          icon: Award,
-          href: "/technician-psr",
-          isVisible: () => true,
-        },
-        {
-          id: "practice-quizzes",
-          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz de pratique",
-          icon: GraduationCap,
-          href: "/technician-practice-quizzes",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es');
 
   if (!user) {
     return (
@@ -179,8 +87,8 @@ export default function TechnicianPracticeQuizzes() {
               onClick={() => setLocation("/technician-portal?tab=profile")}
               data-testid="avatar-header-profile"
             >
-              {user.profilePhotoUrl ? (
-                <AvatarImage src={user.profilePhotoUrl} alt={user.name || ""} />
+              {user.photoUrl ? (
+                <AvatarImage src={user.photoUrl} alt={user.name || ""} />
               ) : (
                 <AvatarFallback 
                   className="text-white text-xs font-medium"

@@ -30,7 +30,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import {
   ArrowLeft,
@@ -43,16 +43,9 @@ import {
   Trash2,
   Loader2,
   Plus,
-  Home,
-  User,
-  MoreHorizontal,
-  Briefcase,
-  GraduationCap,
-  Award,
   LogOut,
-  Eye,
-  Mail,
 } from "lucide-react";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory, type EquipmentFindings, type InspectionResult } from "@shared/schema";
 
 const inspectionFormSchema = z.object({
@@ -390,89 +383,7 @@ export default function PersonalSafetyDocuments() {
     }
   };
 
-  const technicianNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: "NAVIGATION",
-      items: [
-        {
-          id: "home",
-          label: language === 'en' ? "Home" : language === 'es' ? "Inicio" : "Accueil",
-          icon: Home,
-          href: "/technician-portal",
-          isVisible: () => true,
-        },
-        {
-          id: "profile",
-          label: language === 'en' ? "Profile" : language === 'es' ? "Perfil" : "Profil",
-          icon: User,
-          href: "/technician-portal?tab=profile",
-          isVisible: () => true,
-        },
-        {
-          id: "more",
-          label: language === 'en' ? "More" : language === 'es' ? "Mas" : "Plus",
-          icon: MoreHorizontal,
-          href: "/technician-portal?tab=more",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "employment",
-      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
-          icon: Briefcase,
-          href: "/technician-job-board",
-          isVisible: () => true,
-        },
-        {
-          id: "visibility",
-          label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
-          icon: Eye,
-          href: "/technician-portal?tab=visibility",
-          isVisible: () => true,
-        },
-        {
-          id: "invitations",
-          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
-          icon: Mail,
-          href: "/technician-portal?tab=invitations",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "safety",
-      label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
-      items: [
-        {
-          id: "personal-safety-docs",
-          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de sécurité",
-          icon: Shield,
-          href: "/personal-safety-documents",
-          isVisible: () => true,
-        },
-        {
-          id: "psr",
-          label: language === 'en' ? "Safety Rating (PSR)" : language === 'es' ? "Calificacion (PSR)" : "Cote de sécurité (PSR)",
-          icon: Award,
-          href: "/technician-psr",
-          isVisible: () => true,
-        },
-        {
-          id: "practice-quizzes",
-          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz pratiques",
-          icon: GraduationCap,
-          href: "/technician-practice-quizzes",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  const technicianNavGroups = getTechnicianNavGroups(language);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
