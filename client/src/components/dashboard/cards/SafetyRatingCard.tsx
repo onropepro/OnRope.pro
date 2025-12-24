@@ -1,9 +1,18 @@
+import { useState } from "react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { ShieldCheck, TrendingUp, TrendingDown, Users } from "lucide-react";
+import { ShieldCheck, TrendingUp, TrendingDown, Users, ChevronRight, Award, FileCheck, BookOpen, Briefcase } from "lucide-react";
 import { canViewCSR } from "@/lib/permissions";
 import type { CardProps } from "../cardRegistry";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
 
 interface CSRData {
   csrRating: number;
@@ -18,7 +27,25 @@ interface WSSData {
   description: string;
 }
 
+interface EmployeePSRDetail {
+  id: string;
+  name: string;
+  role: string;
+  overallPSR: number;
+  components: {
+    certifications: { score: number; status: string };
+    safetyDocs: { score: number; recentInspections: number };
+    quizzes: { score: number; passed: number; total: number };
+    workHistory: { score: number; sessions: number; incidents: number };
+  };
+}
+
+interface WSSDetailsData {
+  employees: EmployeePSRDetail[];
+}
+
 export function SafetyRatingCard({ currentUser, branding }: CardProps) {
+  const [showWSSDialog, setShowWSSDialog] = useState(false);
   const hasAccess = canViewCSR(currentUser);
   
   const { data: csrData, isLoading } = useQuery<CSRData>({
@@ -29,6 +56,11 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
   const { data: wssData, isLoading: wssLoading } = useQuery<WSSData>({
     queryKey: ["/api/workforce-safety-score"],
     enabled: hasAccess,
+  });
+  
+  const { data: wssDetails, isLoading: wssDetailsLoading } = useQuery<WSSDetailsData>({
+    queryKey: ["/api/workforce-safety-score/details"],
+    enabled: hasAccess && showWSSDialog,
   });
 
   const rating = csrData?.csrRating ?? 0;
@@ -109,9 +141,13 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
           </div>
         </div>
         
-        {/* WSS Section - Educational metric */}
+        {/* WSS Section - Educational metric (clickable) */}
         {!wssLoading && wssData && (
-          <div className={`rounded-lg p-3 w-full ${wssColors.bg} border border-dashed border-muted-foreground/30`}>
+          <div 
+            className={`rounded-lg p-3 w-full ${wssColors.bg} border border-dashed border-muted-foreground/30 cursor-pointer hover-elevate`}
+            onClick={() => setShowWSSDialog(true)}
+            data-testid="button-wss-details"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-muted-foreground" />
@@ -124,18 +160,148 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <Badge variant="outline" className="text-xs">
-                  {wssData.employeeCount} employees
-                </Badge>
-                <p className="text-xs text-muted-foreground mt-1 italic">
-                  Educational only
-                </p>
+              <div className="flex items-center gap-2">
+                <div className="text-right">
+                  <Badge variant="outline" className="text-xs">
+                    {wssData.employeeCount} employees
+                  </Badge>
+                  <p className="text-xs text-muted-foreground mt-1 italic">
+                    Educational only
+                  </p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
             </div>
           </div>
         )}
       </CardContent>
+      
+      {/* WSS Details Dialog */}
+      <Dialog open={showWSSDialog} onOpenChange={setShowWSSDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Workforce Safety Score Details
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className={`rounded-lg p-3 ${wssColors.bg}`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-2xl font-bold ${wssColors.text}`}>
+                    {wssScore}% WSS
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Average of all employee Personal Safety Ratings
+                  </p>
+                </div>
+                <Badge variant="outline">{wssData?.employeeCount || 0} employees</Badge>
+              </div>
+            </div>
+            
+            <div className="text-sm text-muted-foreground bg-muted/50 rounded-md p-3">
+              <p className="font-medium mb-1">PSR Components (25% each):</p>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center gap-1"><Award className="w-3 h-3" /> Certifications</div>
+                <div className="flex items-center gap-1"><FileCheck className="w-3 h-3" /> Safety Documents</div>
+                <div className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> Safety Quizzes</div>
+                <div className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> Work History</div>
+              </div>
+            </div>
+            
+            <ScrollArea className="h-[300px] pr-2">
+              {wssDetailsLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="animate-pulse bg-muted rounded-md h-24" />
+                  ))}
+                </div>
+              ) : wssDetails?.employees && wssDetails.employees.length > 0 ? (
+                <div className="space-y-3">
+                  {wssDetails.employees.map((emp) => {
+                    const empColors = getColorScheme(emp.overallPSR);
+                    return (
+                      <div 
+                        key={emp.id} 
+                        className="border rounded-lg p-3 space-y-2"
+                        data-testid={`card-employee-psr-${emp.id}`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">{emp.name}</p>
+                            <p className="text-xs text-muted-foreground capitalize">{emp.role}</p>
+                          </div>
+                          <Badge className={empColors.badge}>
+                            {emp.overallPSR}% PSR
+                          </Badge>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="flex items-center gap-1">
+                                <Award className="w-3 h-3" /> Certs
+                              </span>
+                              <span className="font-medium">{emp.components.certifications.score}%</span>
+                            </div>
+                            <Progress value={emp.components.certifications.score} className="h-1" />
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="flex items-center gap-1">
+                                <FileCheck className="w-3 h-3" /> Docs
+                              </span>
+                              <span className="font-medium">{emp.components.safetyDocs.score}%</span>
+                            </div>
+                            <Progress value={emp.components.safetyDocs.score} className="h-1" />
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="flex items-center gap-1">
+                                <BookOpen className="w-3 h-3" /> Quizzes
+                              </span>
+                              <span className="font-medium">{emp.components.quizzes.score}%</span>
+                            </div>
+                            <Progress value={emp.components.quizzes.score} className="h-1" />
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="flex items-center gap-1">
+                                <Briefcase className="w-3 h-3" /> Work
+                              </span>
+                              <span className="font-medium">{emp.components.workHistory.score}%</span>
+                            </div>
+                            <Progress value={emp.components.workHistory.score} className="h-1" />
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground pt-1">
+                          <span>{emp.components.quizzes.passed}/{emp.components.quizzes.total} quizzes</span>
+                          <span>{emp.components.safetyDocs.recentInspections} recent inspections</span>
+                          <span>{emp.components.workHistory.sessions} work sessions</span>
+                          {emp.components.workHistory.incidents > 0 && (
+                            <span className="text-destructive">{emp.components.workHistory.incidents} incidents</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p>No employee PSR data available</p>
+                </div>
+              )}
+            </ScrollArea>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

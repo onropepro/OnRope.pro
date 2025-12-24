@@ -17930,6 +17930,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workforce Safety Score Details - Individual employee PSR breakdown
+  app.get("/api/workforce-safety-score/details", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Only employers can view WSS details" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const employees = await storage.getEmployeesByCompany(companyId);
+      const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
+      
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const totalSafetyQuizTypes = 6;
+      
+      const employeePSRDetails = [];
+      
+      for (const employee of activeEmployees) {
+        // 1. Certification Score (25%)
+        let certScore = 0;
+        let certStatus = "none";
+        if (employee.irataLevel || employee.spratLevel) {
+          const expirationDate = employee.irataLevel 
+            ? (employee.irataExpirationDate ? new Date(employee.irataExpirationDate) : null)
+            : (employee.spratExpirationDate ? new Date(employee.spratExpirationDate) : null);
+          const verified = employee.irataLevel 
+            ? !!employee.irataVerifiedAt 
+            : !!employee.spratVerifiedAt;
+          
+          if (expirationDate && expirationDate > today) {
+            certScore = verified ? 100 : 75;
+            certStatus = verified ? "verified" : "unverified";
+          } else if (expirationDate && expirationDate <= today) {
+            certScore = 25;
+            certStatus = "expired";
+          } else {
+            certScore = 50;
+            certStatus = "no_expiry";
+          }
+        }
+        
+        // 2. Safety Documents Score (25%)
+        let docsScore = 0;
+        const personalInspections = await storage.getPersonalHarnessInspections(employee.id);
+        const recentInspections = personalInspections.filter((insp: any) => 
+          new Date(insp.inspectionDate) >= thirtyDaysAgo
+        );
+        const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+        if (recentInspections.length > 0) {
+          docsScore = Math.round((passedInspections.length / recentInspections.length) * 100);
+        }
+        
+        // 3. Safety Quizzes Score (25%)
+        let quizScore = 0;
+        const allAttempts = await storage.getAllQuizAttemptsByEmployee(employee.id);
+        const safetyQuizAttempts = allAttempts.filter((a: any) => 
+          a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+        );
+        const passedQuizzes = new Set(
+          safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+        );
+        quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+        
+        // 4. Work History Score (25%)
+        let workScore = 50;
+        const workSessions = await storage.getWorkSessionsByEmployeeId(employee.id);
+        const completedSessions = workSessions.filter((ws: any) => ws.clockOutTime);
+        
+        const incidentReportsList = await db.select()
+          .from(incidentReports)
+          .where(eq(incidentReports.companyId, companyId));
+        const technicianIncidents = incidentReportsList.filter((ir: any) => 
+          ir.reportedById === employee.id || 
+          (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(employee.id))
+        );
+        
+        if (completedSessions.length > 0) {
+          const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+          workScore = Math.max(100 - incidentPenalty, 50);
+        }
+        
+        // Calculate employee PSR
+        const overallPSR = Math.round(
+          (certScore * 0.25) + 
+          (docsScore * 0.25) + 
+          (quizScore * 0.25) + 
+          (workScore * 0.25)
+        );
+        
+        employeePSRDetails.push({
+          id: employee.id,
+          name: employee.name,
+          role: employee.employeeRole || employee.role,
+          overallPSR,
+          components: {
+            certifications: { score: certScore, status: certStatus },
+            safetyDocs: { score: docsScore, recentInspections: recentInspections.length },
+            quizzes: { score: quizScore, passed: passedQuizzes.size, total: totalSafetyQuizTypes },
+            workHistory: { score: workScore, sessions: completedSessions.length, incidents: technicianIncidents.length },
+          },
+        });
+      }
+      
+      // Sort by PSR score descending
+      employeePSRDetails.sort((a, b) => b.overallPSR - a.overallPSR);
+      
+      res.json({ employees: employeePSRDetails });
+    } catch (error) {
+      console.error("Get WSS details error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Get CSR for a linked vendor company
   // SIMPLIFIED: Uses the same calculation as company CSR endpoint to ensure consistency
   app.get("/api/property-managers/vendors/:linkId/csr", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
