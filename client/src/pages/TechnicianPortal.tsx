@@ -381,6 +381,14 @@ const translations = {
     noReferralsYet: "No referrals yet. Share your code to get started!",
     joinedOn: "Joined",
     noReferralCodeYet: "No referral code yet",
+    enterReferralCode: "Enter a Referral Code",
+    enterReferralCodeDesc: "Have a friend's referral code? Enter it here to help them earn PLUS access.",
+    referralCodePlaceholder: "Enter code (e.g., ABCD1234EFGH)",
+    redeemCode: "Redeem Code",
+    redeemingCode: "Redeeming...",
+    referralCodeRedeemed: "Referral code redeemed!",
+    referralCodeRedeemedDesc: "Thank you! Your referrer will now have PLUS access.",
+    alreadyRedeemedCode: "You've already redeemed a referral code",
     editExpirationDate: "Edit Expiration Date",
     setExpirationDate: "Set Expiration Date",
     expirationDateUpdated: "Expiration date updated",
@@ -734,6 +742,14 @@ const translations = {
     noReferralsYet: "Pas encore de parrainages. Partagez votre code pour commencer!",
     joinedOn: "Inscrit le",
     noReferralCodeYet: "Pas encore de code de parrainage",
+    enterReferralCode: "Entrer un code de parrainage",
+    enterReferralCodeDesc: "Vous avez un code de parrainage d'un ami? Entrez-le ici pour l'aider a obtenir l'acces PLUS.",
+    referralCodePlaceholder: "Entrer le code (ex: ABCD1234EFGH)",
+    redeemCode: "Echanger le code",
+    redeemingCode: "Echange en cours...",
+    referralCodeRedeemed: "Code de parrainage echange!",
+    referralCodeRedeemedDesc: "Merci! Votre parrain aura maintenant l'acces PLUS.",
+    alreadyRedeemedCode: "Vous avez deja echange un code de parrainage",
     editExpirationDate: "Modifier la date d'expiration",
     setExpirationDate: "Définir la date d'expiration",
     expirationDateUpdated: "Date d'expiration mise à jour",
@@ -1006,6 +1022,14 @@ const translations = {
     noReferralsYet: "Aun no hay referencias. Comparta su codigo para comenzar!",
     joinedOn: "Unido el",
     noReferralCodeYet: "Aun no hay codigo de referencia",
+    enterReferralCode: "Ingresar un codigo de referencia",
+    enterReferralCodeDesc: "Tienes el codigo de referencia de un amigo? Ingresalo aqui para ayudarle a obtener acceso PLUS.",
+    referralCodePlaceholder: "Ingresar codigo (ej: ABCD1234EFGH)",
+    redeemCode: "Canjear codigo",
+    redeemingCode: "Canjeando...",
+    referralCodeRedeemed: "Codigo de referencia canjeado!",
+    referralCodeRedeemedDesc: "Gracias! Tu referidor ahora tendra acceso PLUS.",
+    alreadyRedeemedCode: "Ya has canjeado un codigo de referencia",
     editExpirationDate: "Editar fecha de vencimiento",
     setExpirationDate: "Establecer fecha de vencimiento",
     expirationDateUpdated: "Fecha de vencimiento actualizada",
@@ -1630,6 +1654,9 @@ export default function TechnicianPortal() {
   // State for copy button
   const [codeCopied, setCodeCopied] = useState(false);
   
+  // State for entering a referral code
+  const [referralCodeInput, setReferralCodeInput] = useState("");
+  
   // State for PLUS benefits dialog
   const [showPlusBenefits, setShowPlusBenefits] = useState(false);
   
@@ -1980,6 +2007,29 @@ export default function TechnicianPortal() {
     },
     onError: (error: any) => {
       console.error("Failed to generate referral code:", error);
+    },
+  });
+
+  // Mutation to redeem a referral code after registration
+  const redeemReferralCodeMutation = useMutation({
+    mutationFn: async (referralCode: string) => {
+      return apiRequest("POST", "/api/user/redeem-referral-code", { referralCode });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setReferralCodeInput("");
+      toast({
+        title: t.referralCodeRedeemed,
+        description: t.referralCodeRedeemedDesc,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Failed to redeem referral code:", error);
+      toast({
+        title: language === 'en' ? 'Error' : language === 'es' ? 'Error' : 'Erreur',
+        description: error.message || (language === 'en' ? 'Failed to redeem referral code' : language === 'es' ? 'Error al canjear codigo' : 'Echec de l\'echange du code'),
+        variant: "destructive",
+      });
     },
   });
 
@@ -3318,6 +3368,55 @@ export default function TechnicianPortal() {
               </CardContent>
             </Card>
           </>
+        )}
+
+        {/* Enter a Referral Code Section - Only show for technicians who haven't used one (MORE TAB) */}
+        {activeTab === 'more' && user && user.role === 'rope_access_tech' && !user.referredByCode && (
+          <Card className="border border-slate-200 dark:border-slate-700">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                  <Gift className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">{t.enterReferralCode}</CardTitle>
+                  <CardDescription>
+                    {t.enterReferralCodeDesc}
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  placeholder={t.referralCodePlaceholder}
+                  value={referralCodeInput}
+                  onChange={(e) => setReferralCodeInput(e.target.value.toUpperCase())}
+                  className="flex-1 font-mono tracking-wider"
+                  maxLength={20}
+                  data-testid="input-redeem-referral-code"
+                />
+                <Button
+                  onClick={() => redeemReferralCodeMutation.mutate(referralCodeInput)}
+                  disabled={!referralCodeInput.trim() || redeemReferralCodeMutation.isPending}
+                  className="gap-2"
+                  data-testid="button-redeem-referral-code"
+                >
+                  {redeemReferralCodeMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t.redeemingCode}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      {t.redeemCode}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Your Referral Code Section - Show for technicians and company owners (MORE TAB) */}
