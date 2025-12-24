@@ -483,10 +483,13 @@ export class Storage {
   }
 
   async getTechnicianByEmail(email: string): Promise<User | undefined> {
-    // Search for ANY technician by email (including already linked ones for PLUS access)
+    // Search for ANY technician or ground crew by email (including already linked ones for PLUS access)
     const results = await db.select().from(users).where(
       and(
-        eq(users.role, "rope_access_tech"),
+        or(
+          eq(users.role, "rope_access_tech"),
+          eq(users.role, "ground_crew")
+        ),
         eq(users.email, email.toLowerCase())
       )
     ).limit(1);
