@@ -118,16 +118,16 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
           Safety Ratings
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col gap-3">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col gap-2">
         {/* CSR Section */}
-        <div className={`rounded-lg p-4 w-full ${colors.bg}`}>
+        <div className={`rounded-lg p-3 w-full ${colors.bg}`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className={`text-3xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
+              <p className={`text-2xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
                 {Math.round(rating)}%
               </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                {csrData?.csrLabel || "Company Safety Rating (CSR)"}
+              <p className="text-xs text-muted-foreground">
+                Company Safety Rating (CSR)
               </p>
             </div>
             <Badge className={colors.badge}>
@@ -144,7 +144,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
         {/* WSS Section - Educational metric (clickable) */}
         {!wssLoading && wssData && (
           <div 
-            className={`rounded-lg p-3 w-full ${wssColors.bg} border border-dashed border-muted-foreground/30 cursor-pointer hover-elevate`}
+            className={`rounded-lg p-2 w-full ${wssColors.bg} border border-dashed border-muted-foreground/30 cursor-pointer hover-elevate`}
             onClick={() => setShowWSSDialog(true)}
             data-testid="button-wss-details"
           >
@@ -152,23 +152,15 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-muted-foreground" />
                 <div>
-                  <p className={`text-xl font-semibold ${wssColors.text}`} data-testid="text-wss-value">
-                    {wssScore}%
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Workforce Safety Score (WSS)
+                  <p className={`text-lg font-semibold ${wssColors.text}`} data-testid="text-wss-value">
+                    {wssScore}% <span className="text-xs font-normal text-muted-foreground">WSS</span>
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="text-right">
-                  <Badge variant="outline" className="text-xs">
-                    {wssData.employeeCount} employees
-                  </Badge>
-                  <p className="text-xs text-muted-foreground mt-1 italic">
-                    Educational only
-                  </p>
-                </div>
+              <div className="flex items-center gap-1">
+                <Badge variant="outline" className="text-xs">
+                  {wssData.employeeCount} emp
+                </Badge>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
             </div>
