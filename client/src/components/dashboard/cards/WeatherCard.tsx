@@ -90,7 +90,7 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
   const now = new Date();
   const upcomingHours = weatherData.hourly
     ?.filter((h) => new Date(h.time) >= now)
-    .slice(0, 5) || [];
+    .slice(0, 6) || [];
 
   return (
     <div 
