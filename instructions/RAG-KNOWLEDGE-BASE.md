@@ -408,6 +408,14 @@ Manually trigger full reindex.
 | analytics-reporting | Analytics & Reporting | operations | Yes |
 | personal-safety-rating | Personal Safety Rating (PSR) | safety | Yes |
 
+### Popular Topics (Not in Modules Grid)
+
+These help articles appear in "Popular Topics" section, not the modules grid. They ARE in `guideRegistry` for RAG indexing, but have `hideFromModulesGrid: true` flag.
+
+| Slug | Title | Has Markdown | hideFromModulesGrid |
+|------|-------|--------------|---------------------|
+| dashboard-customization | Dashboard Customization | Yes | true |
+
 ---
 
 ## Future Improvements

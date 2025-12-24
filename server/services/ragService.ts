@@ -156,6 +156,7 @@ export const guideRegistry = [
     category: 'customization',
     sourceFile: 'client/src/pages/DashboardCustomizationGuide.tsx',
     stakeholders: ['owner', 'operations_manager', 'supervisor'],
+    hideFromModulesGrid: true, // This is a "Popular Topic", shown in Popular Topics section not modules grid
   },
 ];
 

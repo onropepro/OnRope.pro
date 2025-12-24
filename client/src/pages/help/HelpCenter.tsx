@@ -274,6 +274,11 @@ export default function HelpCenter() {
               description="Calculate your potential savings with OnRopePro"
               href="/help/tools/roi-calculator"
             />
+            <TopicCard 
+              title="Dashboard Customization" 
+              description="Personalize your dashboard with widgets and layouts"
+              href="/help/modules/dashboard-customization"
+            />
           </div>
         </section>
         
