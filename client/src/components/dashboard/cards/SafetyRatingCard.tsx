@@ -256,6 +256,15 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                     {csrHistory.history.map((entry) => {
                       const change = entry.newScore - entry.previousScore;
                       const isPositive = change >= 0;
+                      let formattedDate = "Unknown date";
+                      try {
+                        const date = new Date(entry.changedAt);
+                        if (!isNaN(date.getTime())) {
+                          formattedDate = format(date, "MMM d, yyyy");
+                        }
+                      } catch {
+                        formattedDate = "Unknown date";
+                      }
                       return (
                         <div 
                           key={entry.id} 
@@ -266,7 +275,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                             <div className="flex items-center gap-2">
                               <Calendar className="w-3 h-3 text-muted-foreground" />
                               <span className="text-xs text-muted-foreground">
-                                {format(new Date(entry.changedAt), "MMM d, yyyy")}
+                                {formattedDate}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
