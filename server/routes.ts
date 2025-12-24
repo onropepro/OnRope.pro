@@ -1794,6 +1794,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // STAFF ACCOUNT CHECK - Check if this is a staff account login
+      const staffAccount = await storage.verifyStaffAccountPassword(identifier, password);
+      if (staffAccount) {
+        // Create staff session
+        req.session.userId = staffAccount.id;
+        req.session.role = 'staff';
+        req.session.staffPermissions = staffAccount.permissions as string[];
+        
+        await new Promise<void>((resolve, reject) => {
+          req.session.save((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+        
+        // Return staff account payload
+        return res.json({
+          user: {
+            id: staffAccount.id,
+            name: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            email: staffAccount.email,
+            role: 'staff',
+            permissions: staffAccount.permissions,
+          }
+        });
+      }
+      
       // Try to find user by email, company name, or rope access license number
       let user = await storage.getUserByEmail(identifier);
       
@@ -4978,6 +5005,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Handle Staff account session
+      if (req.session.role === 'staff') {
+        const staffAccount = await storage.getStaffAccountById(req.session.userId!);
+        if (!staffAccount || !staffAccount.isActive) {
+          return res.status(401).json({ message: "Staff account not found or disabled" });
+        }
+        
+        return res.json({
+          user: {
+            id: staffAccount.id,
+            name: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            fullName: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            email: staffAccount.email,
+            role: 'staff',
+            permissions: staffAccount.permissions,
+          }
+        });
+      }
+      
       let user = await storage.getUserById(req.session.userId!);
       
       if (!user) {
@@ -6849,6 +6895,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('[Gift-Company] Error:', error);
       const message = error.message || "Failed to create gifted company account";
       res.status(400).json({ message });
+    }
+  });
+
+  // ==================== STAFF ACCOUNTS (Internal Platform Management) ====================
+  
+  // Helper to check if user is superuser or has specific staff permission
+  const requireSuperuserOrStaffPermission = (permission: string) => {
+    return async (req: Request, res: Response, next: Function) => {
+      if (req.session.userId === 'superuser') {
+        return next();
+      }
+      
+      if (req.session.role === 'staff') {
+        const permissions = req.session.staffPermissions || [];
+        if (permissions.includes(permission)) {
+          return next();
+        }
+      }
+      
+      return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+    };
+  };
+  
+  // Get all staff accounts (superuser or staff with manage_staff_accounts permission)
+  app.get("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser or staff with manage_staff_accounts permission
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const accounts = await storage.getAllStaffAccounts();
+      
+      // Remove password hashes from response
+      const safeAccounts = accounts.map(({ passwordHash, ...rest }) => rest);
+      
+      res.json({ staffAccounts: safeAccounts });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Get all error:', error);
+      res.status(500).json({ message: error.message || "Failed to get staff accounts" });
+    }
+  });
+  
+  // Get single staff account
+  app.get("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const account = await storage.getStaffAccountById(req.params.id);
+      if (!account) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Get by ID error:', error);
+      res.status(500).json({ message: error.message || "Failed to get staff account" });
+    }
+  });
+  
+  // Create staff account
+  app.post("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const { firstName, lastName, email, password, permissions, isActive } = req.body;
+      
+      if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: "Missing required fields: firstName, lastName, email, password" });
+      }
+      
+      // Check if email already exists
+      const existing = await storage.getStaffAccountByEmail(email);
+      if (existing) {
+        return res.status(400).json({ message: "A staff account with this email already exists" });
+      }
+      
+      // Validate permissions
+      const validPermissions = [
+        'view_dashboard', 'view_companies', 'view_technicians', 'view_buildings',
+        'view_job_board', 'view_tasks', 'view_feature_requests', 'view_future_ideas',
+        'view_metrics', 'view_goals', 'view_changelog', 'view_founder_resources',
+        'manage_staff_accounts'
+      ];
+      
+      const requestedPermissions = permissions || [];
+      const invalidPermissions = requestedPermissions.filter((p: string) => !validPermissions.includes(p));
+      if (invalidPermissions.length > 0) {
+        return res.status(400).json({ message: `Invalid permissions: ${invalidPermissions.join(', ')}` });
+      }
+      
+      const account = await storage.createStaffAccount({
+        firstName,
+        lastName,
+        email,
+        passwordHash: password, // Will be hashed in storage
+        permissions: requestedPermissions,
+        isActive: isActive !== false,
+        createdBy: req.session.userId === 'superuser' ? 'superuser' : req.session.userId,
+      });
+      
+      console.log(`[Staff-Accounts] Created account for ${email} by ${req.session.userId}`);
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ success: true, message: "Staff account created", staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Create error:', error);
+      res.status(500).json({ message: error.message || "Failed to create staff account" });
+    }
+  });
+  
+  // Update staff account
+  app.patch("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const { firstName, lastName, email, password, permissions, isActive } = req.body;
+      const updates: any = {};
+      
+      if (firstName !== undefined) updates.firstName = firstName;
+      if (lastName !== undefined) updates.lastName = lastName;
+      if (email !== undefined) updates.email = email;
+      if (password !== undefined) updates.passwordHash = password; // Will be hashed in storage
+      if (permissions !== undefined) updates.permissions = permissions;
+      if (isActive !== undefined) updates.isActive = isActive;
+      
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: "No updates provided" });
+      }
+      
+      const account = await storage.updateStaffAccount(req.params.id, updates);
+      if (!account) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      console.log(`[Staff-Accounts] Updated account ${req.params.id} by ${req.session.userId}`);
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ success: true, message: "Staff account updated", staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Update error:', error);
+      res.status(500).json({ message: error.message || "Failed to update staff account" });
+    }
+  });
+  
+  // Delete staff account
+  app.delete("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      // Prevent deleting yourself
+      if (req.session.role === 'staff' && req.session.userId === req.params.id) {
+        return res.status(400).json({ message: "You cannot delete your own account" });
+      }
+      
+      const deleted = await storage.deleteStaffAccount(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      console.log(`[Staff-Accounts] Deleted account ${req.params.id} by ${req.session.userId}`);
+      
+      res.json({ success: true, message: "Staff account deleted" });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Delete error:', error);
+      res.status(500).json({ message: error.message || "Failed to delete staff account" });
     }
   });
 
@@ -9648,26 +9879,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician
+      // Find the technician or ground crew member
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
+        return res.status(404).json({ message: "Team member not found" });
       }
       
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "This user is not a technician" });
+      const LINKABLE_ROLES = ['rope_access_tech', 'ground_crew'];
+      if (!LINKABLE_ROLES.includes(technician.role)) {
+        return res.status(400).json({ message: "This user cannot be linked to a company" });
       }
       
       // Check if already linked to THIS company
       if (technician.companyId === companyId) {
-        return res.status(400).json({ message: "This technician is already linked to your company" });
+        return res.status(400).json({ message: "This team member is already linked to your company" });
       }
       
       // Check existing employer connections
       const existingConnections = (technician.employerConnections || []) as any[];
       const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
       if (alreadyConnected) {
-        return res.status(400).json({ message: "This technician is already connected to your company" });
+        return res.status(400).json({ message: "This team member is already connected to your company" });
       }
       
       // Get company name for the connection
@@ -9753,26 +9985,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician
+      // Find the technician or ground crew member
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
+        return res.status(404).json({ message: "Team member not found" });
       }
       
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "This user is not a technician" });
+      const INVITABLE_ROLES = ['rope_access_tech', 'ground_crew'];
+      if (!INVITABLE_ROLES.includes(technician.role)) {
+        return res.status(400).json({ message: "This user cannot be invited to a company" });
       }
       
       // Check if already linked to THIS company
       if (technician.companyId === companyId) {
-        return res.status(400).json({ message: "This technician is already linked to your company" });
+        return res.status(400).json({ message: "This team member is already linked to your company" });
       }
       
       // Check existing employer connections
       const existingConnections = (technician.employerConnections || []) as any[];
       const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
       if (alreadyConnected) {
-        return res.status(400).json({ message: "This technician is already connected to your company" });
+        return res.status(400).json({ message: "This team member is already connected to your company" });
       }
       
       // If linked to another company, require PLUS access

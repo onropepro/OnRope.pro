@@ -3212,3 +3212,53 @@ export const insertSidebarPreferencesSchema = createInsertSchema(sidebarPreferen
 
 export type SidebarPreferences = typeof sidebarPreferences.$inferSelect;
 export type InsertSidebarPreferences = z.infer<typeof insertSidebarPreferencesSchema>;
+
+// ============================================
+// STAFF ACCOUNTS (Internal App Management)
+// ============================================
+
+// Available permissions for staff accounts (maps to sidebar items)
+export const STAFF_PERMISSIONS = [
+  'view_dashboard',           // Dashboard
+  'view_companies',           // View All Companies
+  'view_technicians',         // Technician Database
+  'view_buildings',           // Global Buildings
+  'view_job_board',           // Job Board
+  'view_tasks',               // Task List
+  'view_feature_requests',    // Feature Requests
+  'view_future_ideas',        // Future Ideas
+  'view_metrics',             // Platform Metrics
+  'view_goals',               // Goals & KPIs
+  'view_changelog',           // Changelog
+  'view_founder_resources',   // Founder Resources
+  'manage_staff_accounts',    // Staff Accounts (create, edit, delete)
+] as const;
+
+export type StaffPermission = typeof STAFF_PERMISSIONS[number];
+
+// Staff Accounts - Internal accounts for platform management (not visible anywhere on site)
+export const staffAccounts = pgTable("staff_accounts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  firstName: varchar("first_name", { length: 100 }).notNull(),
+  lastName: varchar("last_name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  permissions: text("permissions").array().notNull().default([]), // Array of StaffPermission values
+  isActive: boolean("is_active").default(true).notNull(),
+  lastLoginAt: timestamp("last_login_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  createdBy: varchar("created_by"), // Staff account who created this account
+}, (table) => [
+  index("IDX_staff_email").on(table.email),
+]);
+
+export const insertStaffAccountSchema = createInsertSchema(staffAccounts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastLoginAt: true,
+});
+
+export type StaffAccount = typeof staffAccounts.$inferSelect;
+export type InsertStaffAccount = z.infer<typeof insertStaffAccountSchema>;

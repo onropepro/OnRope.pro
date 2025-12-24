@@ -28,6 +28,8 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 *   **Stakeholder Landing Pages:** Public-facing, branded landing pages for Technicians, Residents, Property Managers, and Building Managers.
 *   **Unified Dashboard Layout System:** Variant-based DashboardSidebar and DashboardLayout components supporting 5 stakeholder types (employer, technician, property-manager, resident, building-manager) with role-specific brand colors (Employer: #0B64A3, Technician: #AB4521, Property Manager: #6E9075, Resident: #86A59C, Building Manager: #B89685).
 *   **Customizable Sidebar Menu Ordering:** Users can personalize sidebar navigation by reordering menu items within groups using drag-and-drop. Preferences are stored per-user per-dashboard-variant in the sidebar_preferences table.
+*   **Staff Accounts (Internal Platform Management):** Internal-only accounts for app management staff with 13 granular permissions (view_dashboard, view_companies, view_technicians, view_buildings, view_job_board, view_tasks, view_feature_requests, view_future_ideas, view_metrics, view_goals, view_changelog, view_founder_resources, manage_staff_accounts). Staff accounts can log in at /login using their email and access permitted sections of the SuperUser dashboard. No mention of "superuser" is visible to staff users.
+*   **Linkable Team Member Roles:** Both rope_access_tech and ground_crew roles can be searched by email, linked to companies, and sent team invitations using the unified employee workflow.
 
 ## External Dependencies
 *   **Database:** PostgreSQL
