@@ -187,6 +187,7 @@ export function DashboardSidebar({
           id: "certifications",
           label: t("dashboard.sidebar.certifications", "Certifications"),
           icon: Award,
+          href: "/dashboard",
           onClick: () => onTabChange("employees"),
           isVisible: (user) => canManageEmployees(user),
         },
