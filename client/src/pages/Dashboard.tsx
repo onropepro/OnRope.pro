@@ -7873,13 +7873,13 @@ export default function Dashboard() {
                                     {client.lmsNumbers.map((lms, idx) => (
                                       <div key={idx} className="text-sm">
                                         {lms.buildingName && (
-                                          <div className="text-xs font-medium mb-1">{lms.buildingName}</div>
+                                          <div className="text-sm font-medium mb-1">{lms.buildingName}</div>
                                         )}
                                         <Badge variant="secondary" className="text-xs mr-2">
                                           {lms.number}
                                         </Badge>
                                         {lms.address && (
-                                          <span className="text-muted-foreground text-xs">{lms.address}</span>
+                                          <span className="text-muted-foreground text-sm">{lms.address}</span>
                                         )}
                                       </div>
                                     ))}
@@ -8355,17 +8355,17 @@ export default function Dashboard() {
                         )}
                         <Badge variant="secondary" className="text-xs">{lms.number}</Badge>
                         {lms.address && (
-                          <div className="text-xs text-muted-foreground">{lms.address}</div>
+                          <div className="text-sm text-muted-foreground">{lms.address}</div>
                         )}
                         <div className="flex flex-wrap gap-2 mt-2">
                           {lms.stories && (
-                            <span className="text-xs text-muted-foreground">{lms.stories} {t('dashboard.clientDetail.floors', 'floors')}</span>
+                            <span className="text-sm text-muted-foreground">{lms.stories} {t('dashboard.clientDetail.floors', 'floors')}</span>
                           )}
                           {lms.units && (
-                            <span className="text-xs text-muted-foreground">{lms.units} {t('dashboard.clientDetail.units', 'units')}</span>
+                            <span className="text-sm text-muted-foreground">{lms.units} {t('dashboard.clientDetail.units', 'units')}</span>
                           )}
                           {lms.parkingStalls && (
-                            <span className="text-xs text-muted-foreground">{lms.parkingStalls} {t('dashboard.clientDetail.parkingStalls', 'parking stalls')}</span>
+                            <span className="text-sm text-muted-foreground">{lms.parkingStalls} {t('dashboard.clientDetail.parkingStalls', 'parking stalls')}</span>
                           )}
                         </div>
                       </div>
