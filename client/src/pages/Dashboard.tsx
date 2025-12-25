@@ -1573,6 +1573,56 @@ export default function Dashboard() {
 
   const pendingOnboardingInvitations = pendingOnboardingData?.invitations || [];
 
+  // Query for sent invitations (pending, not yet responded)
+  const { data: sentInvitationsData } = useQuery<{
+    invitations: Array<{
+      id: string;
+      createdAt: string;
+      message?: string;
+      technician: {
+        id: string;
+        name: string;
+        email: string;
+        employeePhoneNumber?: string;
+        role: string;
+      };
+    }>;
+  }>({
+    queryKey: ["/api/sent-invitations"],
+    enabled: userData?.user?.role === 'owner' || userData?.user?.role === 'company' || userData?.user?.role === 'admin' || userData?.user?.role === 'operations_manager',
+  });
+
+  const sentInvitations = sentInvitationsData?.invitations || [];
+
+  // Mutation to cancel a sent invitation
+  const cancelInvitationMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      const response = await fetch(`/api/sent-invitations/${invitationId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to cancel invitation');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sent-invitations"] });
+      toast({
+        title: t('dashboard.invitations.cancelled', 'Invitation Cancelled'),
+        description: t('dashboard.invitations.cancelledDesc', 'The invitation has been cancelled.'),
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Mutation to acknowledge accepted invitation
   const acknowledgeInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
@@ -6662,6 +6712,62 @@ export default function Dashboard() {
                               >
                                 <span className="material-icons mr-2 text-sm">person_add</span>
                                 {t('dashboard.employees.completeOnboarding', 'Complete Onboarding')}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pending Sent Invitations */}
+                {sentInvitations.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-medium flex items-center gap-2">
+                      <span className="material-icons text-amber-500">mail_outline</span>
+                      {t('dashboard.employees.pendingSentInvitations', 'Pending Invitations')}
+                      <Badge variant="secondary" className="ml-2">{sentInvitations.length}</Badge>
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t('dashboard.employees.pendingSentInvitationsDesc', 'Invitations sent that are awaiting response')}
+                    </p>
+                    <div className="grid gap-3">
+                      {sentInvitations.map((inv) => (
+                        <Card key={inv.id} className="border-amber-200 dark:border-amber-800" data-testid={`sent-invitation-${inv.id}`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-medium">{inv.technician.name}</span>
+                                  <Badge variant="outline" className="text-xs">
+                                    {inv.technician.role === 'ground_crew' ? t('dashboard.employees.groundCrew', 'Ground Crew') : t('dashboard.employees.ropeAccessTech', 'Rope Access Tech')}
+                                  </Badge>
+                                </div>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  <span className="material-icons text-xs mr-1 align-middle">email</span>
+                                  {inv.technician.email}
+                                </div>
+                                {inv.technician.employeePhoneNumber && (
+                                  <div className="text-sm text-muted-foreground">
+                                    <span className="material-icons text-xs mr-1 align-middle">phone</span>
+                                    {inv.technician.employeePhoneNumber}
+                                  </div>
+                                )}
+                                <div className="text-xs text-muted-foreground mt-2">
+                                  {t('dashboard.employees.sentOn', 'Sent')} {new Date(inv.createdAt).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => cancelInvitationMutation.mutate(inv.id)}
+                                disabled={cancelInvitationMutation.isPending}
+                                className="text-destructive hover:text-destructive"
+                                data-testid={`button-cancel-invitation-${inv.id}`}
+                              >
+                                <span className="material-icons text-sm mr-1">close</span>
+                                {t('dashboard.employees.cancelInvitation', 'Cancel')}
                               </Button>
                             </div>
                           </CardContent>

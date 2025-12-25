@@ -4469,6 +4469,32 @@ export class Storage {
     return result[0];
   }
 
+  async cancelTeamInvitation(invitationId: string): Promise<void> {
+    await db.delete(teamInvitations)
+      .where(eq(teamInvitations.id, invitationId));
+  }
+
+  async getPendingSentInvitationsForCompany(companyId: string): Promise<(TeamInvitation & { technician: User })[]> {
+    const results = await db.select({
+      invitation: teamInvitations,
+      technician: users,
+    })
+      .from(teamInvitations)
+      .innerJoin(users, eq(teamInvitations.technicianId, users.id))
+      .where(
+        and(
+          eq(teamInvitations.companyId, companyId),
+          eq(teamInvitations.status, "pending")
+        )
+      )
+      .orderBy(desc(teamInvitations.createdAt));
+    
+    return results.map(r => ({
+      ...r.invitation,
+      technician: r.technician
+    }));
+  }
+
   async getInvitationsForCompany(companyId: string): Promise<TeamInvitation[]> {
     return db.select()
       .from(teamInvitations)

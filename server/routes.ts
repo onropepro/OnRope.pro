@@ -11026,6 +11026,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get pending onboarding invitations (acknowledged but not converted - technician has no hourlyRate)
+  // Get pending invitations SENT by this company (not yet responded)
+  app.get("/api/sent-invitations", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only company owners and authorized roles can view sent invitations
+      const authorizedRoles = ['owner', 'company', 'admin', 'operations_manager'];
+      if (!authorizedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only authorized users can view sent invitations" });
+      }
+      
+      const invitations = await storage.getPendingSentInvitationsForCompany(companyId);
+      
+      const safeInvitations = invitations.map(inv => ({
+        id: inv.id,
+        createdAt: inv.createdAt,
+        message: inv.message,
+        technician: {
+          id: inv.technician.id,
+          name: inv.technician.name,
+          email: inv.technician.email,
+          employeePhoneNumber: inv.technician.employeePhoneNumber,
+          role: inv.technician.role,
+        }
+      }));
+      
+      res.json({ invitations: safeInvitations });
+    } catch (error) {
+      console.error("Get sent invitations error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Cancel a pending invitation
+  app.delete("/api/sent-invitations/:invitationId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { invitationId } = req.params;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only company owners and authorized roles can cancel invitations
+      const authorizedRoles = ['owner', 'company', 'admin', 'operations_manager'];
+      if (!authorizedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only authorized users can cancel invitations" });
+      }
+      
+      // Verify the invitation exists and belongs to this company
+      const invitation = await storage.getTeamInvitationById(invitationId);
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      if (invitation.companyId !== companyId) {
+        return res.status(403).json({ message: "You can only cancel your own company's invitations" });
+      }
+      
+      if (invitation.status !== 'pending') {
+        return res.status(400).json({ message: "Only pending invitations can be cancelled" });
+      }
+      
+      await storage.cancelTeamInvitation(invitationId);
+      
+      console.log(\`[Team-Invite] Company \${companyId} cancelled invitation \${invitationId}\`);
+      
+      res.json({ success: true, message: "Invitation cancelled successfully" });
+    } catch (error) {
+      console.error("Cancel invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/pending-onboarding-invitations", requireAuth, async (req: Request, res: Response) => {
     try {
       const user = await storage.getUserById(req.session.userId!);
