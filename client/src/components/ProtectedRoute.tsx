@@ -49,6 +49,8 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
         setLocation("/building-portal");
       } else if (user.role === "rope_access_tech") {
         setLocation("/technician-portal");
+      } else if (user.role === "ground_crew") {
+        setLocation("/ground-crew-portal");
       } else {
         setLocation("/dashboard");
       }
