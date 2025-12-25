@@ -3250,6 +3250,7 @@ export const staffAccounts = pgTable("staff_accounts", {
   lastName: varchar("last_name", { length: 100 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  role: varchar("role", { length: 100 }),
   permissions: text("permissions").array().notNull().default([]), // Array of StaffPermission values
   isActive: boolean("is_active").default(true).notNull(),
   lastLoginAt: timestamp("last_login_at"),

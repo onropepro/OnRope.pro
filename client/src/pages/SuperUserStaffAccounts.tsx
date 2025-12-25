@@ -35,6 +35,7 @@ interface StaffAccount {
   firstName: string;
   lastName: string;
   email: string;
+  role: string | null;
   permissions: string[];
   isActive: boolean;
   lastLoginAt: string | null;
@@ -64,6 +65,7 @@ interface StaffFormData {
   lastName: string;
   email: string;
   password: string;
+  role: string;
   permissions: string[];
   isActive: boolean;
 }
@@ -73,6 +75,7 @@ const defaultFormData: StaffFormData = {
   lastName: '',
   email: '',
   password: '',
+  role: '',
   permissions: [],
   isActive: true,
 };
@@ -147,6 +150,14 @@ export default function SuperUserStaffAccounts() {
     }));
   };
 
+  const toggleAllPermissions = () => {
+    const allPermissionIds = PERMISSION_OPTIONS.map(p => p.id);
+    setFormData(prev => ({
+      ...prev,
+      permissions: prev.permissions.length === allPermissionIds.length ? [] : allPermissionIds,
+    }));
+  };
+
   const openEditDialog = (account: StaffAccount) => {
     setSelectedAccount(account);
     setFormData({
@@ -154,6 +165,7 @@ export default function SuperUserStaffAccounts() {
       lastName: account.lastName,
       email: account.email,
       password: '',
+      role: account.role || '',
       permissions: account.permissions || [],
       isActive: account.isActive,
     });
@@ -180,6 +192,7 @@ export default function SuperUserStaffAccounts() {
       firstName: formData.firstName,
       lastName: formData.lastName,
       email: formData.email,
+      role: formData.role,
       permissions: formData.permissions,
       isActive: formData.isActive,
     };
@@ -355,8 +368,31 @@ export default function SuperUserStaffAccounts() {
                 data-testid="input-password"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Input
+                id="role"
+                value={formData.role}
+                onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                placeholder="e.g., Admin, Developer, Support"
+                data-testid="input-role"
+              />
+            </div>
             <div className="space-y-3">
-              <Label>Permissions</Label>
+              <div className="flex items-center justify-between">
+                <Label>Permissions</Label>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="select-all-create"
+                    checked={formData.permissions.length === PERMISSION_OPTIONS.length}
+                    onCheckedChange={toggleAllPermissions}
+                    data-testid="checkbox-select-all"
+                  />
+                  <Label htmlFor="select-all-create" className="text-sm cursor-pointer">
+                    Select All
+                  </Label>
+                </div>
+              </div>
               <div className="grid gap-3 border rounded-lg p-4 max-h-64 overflow-y-auto">
                 {PERMISSION_OPTIONS.map((perm) => (
                   <div key={perm.id} className="flex items-start gap-3">
@@ -444,6 +480,16 @@ export default function SuperUserStaffAccounts() {
                 data-testid="input-edit-password"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-role">Role</Label>
+              <Input
+                id="edit-role"
+                value={formData.role}
+                onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                placeholder="e.g., Admin, Developer, Support"
+                data-testid="input-edit-role"
+              />
+            </div>
             <div className="flex items-center gap-3 py-2">
               <Switch
                 id="edit-isActive"
@@ -454,7 +500,20 @@ export default function SuperUserStaffAccounts() {
               <Label htmlFor="edit-isActive">Account Active</Label>
             </div>
             <div className="space-y-3">
-              <Label>Permissions</Label>
+              <div className="flex items-center justify-between">
+                <Label>Permissions</Label>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="select-all-edit"
+                    checked={formData.permissions.length === PERMISSION_OPTIONS.length}
+                    onCheckedChange={toggleAllPermissions}
+                    data-testid="checkbox-edit-select-all"
+                  />
+                  <Label htmlFor="select-all-edit" className="text-sm cursor-pointer">
+                    Select All
+                  </Label>
+                </div>
+              </div>
               <div className="grid gap-3 border rounded-lg p-4 max-h-64 overflow-y-auto">
                 {PERMISSION_OPTIONS.map((perm) => (
                   <div key={perm.id} className="flex items-start gap-3">
