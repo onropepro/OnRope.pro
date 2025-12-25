@@ -10237,37 +10237,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[Team-Invite] Company ${companyId} sent invitation ${invitation.id} to technician ${technicianId} (${technician.name})`);
       
-      // Send SMS notification if technician has SMS enabled and valid phone number
-      console.log(`[Team-Invite] Checking SMS for ${technician.name}: phone=${technician.employeePhoneNumber || 'none'}, smsEnabled=${technician.smsNotificationsEnabled}`);
+      // Handle both camelCase and snake_case field names from Drizzle ORM
+      const techAny = technician as any;
+      const technicianPhone = techAny.employeePhoneNumber || techAny.employee_phone_number;
+      const smsEnabled = techAny.smsNotificationsEnabled ?? techAny.sms_notifications_enabled;
       
-      if (technician.smsNotificationsEnabled && technician.employeePhoneNumber) {
+      // Debug info for response
+      const debugInfo = {
+        technicianId,
+        technicianName: technician.name,
+        rawPhoneField: technicianPhone,
+        rawSmsEnabled: smsEnabled,
+        invitationId: invitation.id,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log(`[Team-Invite] DEBUG: raw fields - phone=${technicianPhone}, smsEnabled=${smsEnabled}`);
+      
+      let smsStatus = 'not_attempted';
+      let smsError: string | null = null;
+      
+      if (smsEnabled && technicianPhone) {
         try {
           const company = await storage.getUserById(companyId);
           const companyName = company?.companyName || 'An employer';
-          console.log(`[Team-Invite] Sending SMS to ${technician.employeePhoneNumber} from company ${companyName}`);
+          console.log(`[Team-Invite] Sending SMS to ${technicianPhone} from company ${companyName}`);
           const smsResult = await sendTeamInvitationSMS(
-            technician.employeePhoneNumber,
+            technicianPhone,
             companyName
           );
           if (smsResult.success) {
             console.log(`[Team-Invite] SMS notification sent to ${technician.name}`);
+            smsStatus = 'sent';
           } else {
             console.log(`[Team-Invite] SMS notification failed for ${technician.name}: ${smsResult.error}`);
+            smsStatus = 'failed';
+            smsError = smsResult.error || null;
           }
-        } catch (smsError) {
-          console.error(`[Team-Invite] SMS notification error for ${technician.name}:`, smsError);
-          // Don't fail the invitation if SMS fails
+        } catch (smsErr: any) {
+          console.error(`[Team-Invite] SMS notification error for ${technician.name}:`, smsErr);
+          smsStatus = 'error';
+          smsError = smsErr.message;
         }
-      } else if (!technician.smsNotificationsEnabled) {
+      } else if (!smsEnabled) {
         console.log(`[Team-Invite] SMS disabled for ${technician.name}, skipping SMS`);
+        smsStatus = 'skipped_disabled';
       } else {
         console.log(`[Team-Invite] No phone number for ${technician.name}, skipping SMS`);
+        smsStatus = 'skipped_no_phone';
       }
       
       res.json({
         success: true, 
         message: `Invitation sent to ${technician.name}!`,
-        invitationId: invitation.id
+        invitationId: invitation.id,
+        debug: {
+          ...debugInfo,
+          smsStatus,
+          smsError
+        }
       });
     } catch (error) {
       console.error("Send team invitation error:", error);

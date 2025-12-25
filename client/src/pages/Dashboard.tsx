@@ -1232,6 +1232,7 @@ export default function Dashboard() {
   const [onRopeProSearchType, setOnRopeProSearchType] = useState<'irata' | 'sprat' | 'email'>('irata'); // Search type for OnRopePro
   const [onRopeProSearchValue, setOnRopeProSearchValue] = useState(''); // Search value for OnRopePro
   const [foundTechnician, setFoundTechnician] = useState<any>(null); // Found technician from search
+  const [inviteDebugResponse, setInviteDebugResponse] = useState<any>(null); // Debug info from last invite
   const [technicianSearchWarning, setTechnicianSearchWarning] = useState<string | null>(null); // Warning from search
   const [technicianSearching, setTechnicianSearching] = useState(false); // Loading state for search
   const [technicianLinking, setTechnicianLinking] = useState(false); // Loading state for linking
@@ -2379,6 +2380,14 @@ export default function Dashboard() {
       
       const data = await response.json();
       
+      // Store debug response for visibility
+      setInviteDebugResponse({
+        timestamp: new Date().toISOString(),
+        status: response.status,
+        statusOk: response.ok,
+        data
+      });
+      
       if (!response.ok) {
         throw new Error(data.message || "Invitation failed");
       }
@@ -2390,6 +2399,10 @@ export default function Dashboard() {
         description: data.message || t('dashboard.toast.invitationSentDesc', `An invitation has been sent to ${foundTechnician.name}. They can accept or decline in their portal.`),
       });
     } catch (error: any) {
+      setInviteDebugResponse({
+        timestamp: new Date().toISOString(),
+        error: error.message
+      });
       toast({ 
         title: t('dashboard.toast.invitationFailed', 'Failed to send invitation'), 
         description: error.message, 
@@ -5622,6 +5635,30 @@ export default function Dashboard() {
         {activeTab === "employees" && (
           <div>
             <div className="space-y-4">
+              {/* Debug Panel for Invite Response */}
+              {inviteDebugResponse && (
+                <Card className="border-amber-500 bg-amber-50 dark:bg-amber-950/20" data-testid="card-invite-debug">
+                  <CardHeader className="flex flex-row items-center justify-between gap-2 py-2 px-4">
+                    <div className="flex items-center gap-2">
+                      <span className="material-icons text-amber-600">bug_report</span>
+                      <span className="font-medium text-amber-800 dark:text-amber-200">Invite Debug Response</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setInviteDebugResponse(null)}
+                      data-testid="button-clear-debug"
+                    >
+                      <span className="material-icons">close</span>
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4">
+                    <pre className="text-xs bg-background p-3 rounded overflow-auto max-h-64 border">
+                      {JSON.stringify(inviteDebugResponse, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
               {/* Seat Usage Information */}
               {employeesData?.seatInfo && (
                 <Card data-testid="card-seat-info">
