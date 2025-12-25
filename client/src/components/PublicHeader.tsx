@@ -118,15 +118,14 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     <header className="sticky top-0 z-50">
       {/* Top Utility Bar */}
       <div 
-        className={stakeholderColor ? "border-b border-white/20" : "bg-muted border-b border-border/50"}
-        style={stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
+        className="bg-[#0B64A3] border-b border-white/10"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-start sm:justify-end overflow-x-auto">
           <div className="flex items-center gap-1 sm:gap-2 w-max">
             <Button 
               variant="ghost"
               size="sm"
-              className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
+              className="text-white hover:bg-white/10"
               onClick={() => setLocation("/safety")}
               data-testid="button-safety-manifesto-header"
             >
@@ -135,18 +134,18 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <Button 
               variant="ghost"
               size="sm"
-              className={`hidden sm:inline-flex ${stakeholderColor ? "text-white hover:bg-white/10" : ""}`}
+              className="hidden sm:inline-flex text-white hover:bg-white/10"
               onClick={() => setLocation("/pricing")}
               data-testid="link-pricing-header"
             >
               {t('login.header.pricing', 'Pricing')}
             </Button>
-            <InstallPWAButton stakeholderColor={stakeholderColor} />
+            <InstallPWAButton stakeholderColor="#0B64A3" />
             <Button 
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/help")}
-              className={`hidden sm:inline-flex ${stakeholderColor ? "text-white hover:bg-white/10" : ""}`}
+              className="hidden sm:inline-flex text-white hover:bg-white/10"
               data-testid="button-help-header"
             >
               <HelpCircle className="w-4 h-4 mr-1" />
@@ -155,7 +154,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <LanguageDropdown 
               variant="ghost" 
               size="sm" 
-              stakeholderColor={stakeholderColor}
+              stakeholderColor="#0B64A3"
             />
           </div>
         </div>
