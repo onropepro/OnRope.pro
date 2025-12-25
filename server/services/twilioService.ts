@@ -125,3 +125,20 @@ export async function sendTeamInvitationSMS(
   
   return result;
 }
+
+export async function sendInvitationAcceptedSMS(
+  phoneNumber: string,
+  employeeName: string,
+  employeeRole: string
+): Promise<{ success: boolean; error?: string; messageId?: string }> {
+  const roleDisplay = employeeRole === 'ground_crew' ? 'ground crew member' : 'technician';
+  const message = `${employeeName} has accepted your team invite and has been added as a ${roleDisplay} to your company.`;
+  
+  const result = await sendSMS(phoneNumber, message);
+  
+  if (result.success) {
+    console.log(`[Twilio] Invitation accepted SMS sent to ${phoneNumber} for employee ${employeeName}`);
+  }
+  
+  return result;
+}

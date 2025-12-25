@@ -25,7 +25,7 @@ import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
 import { sendQuoteNotificationSMS } from "./services/twilio";
-import { sendTeamInvitationSMS } from "./services/twilioService";
+import { sendTeamInvitationSMS, sendInvitationAcceptedSMS } from "./services/twilioService";
 import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
@@ -10772,6 +10772,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         console.log(`[Team-Invite] PLUS member ${user.id} (${user.name}) added secondary employer ${invitation.companyId} via invitation ${invitationId}`);
+        
+        // Send SMS to company owner about acceptance
+        if (company) {
+          const companyAny = company as any;
+          const ownerPhone = companyAny.employeePhoneNumber || companyAny.employee_phone_number;
+          const ownerSmsEnabled = companyAny.smsNotificationsEnabled ?? companyAny.sms_notifications_enabled;
+          if (ownerSmsEnabled && ownerPhone) {
+            try {
+              const smsResult = await sendInvitationAcceptedSMS(ownerPhone, user.name || 'A technician', user.role || 'rope_access_tech');
+              if (smsResult.success) {
+                console.log(`[Team-Invite] SMS sent to company owner about ${user.name} acceptance`);
+              }
+            } catch (smsErr) {
+              console.error('[Team-Invite] Failed to send acceptance SMS:', smsErr);
+            }
+          }
+        }
       } else {
         // Link the technician to the company and clear any previous termination status
         await storage.updateUser(user.id, {
@@ -10783,6 +10800,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         console.log(`[Team-Invite] Technician ${user.id} (${user.name}) accepted invitation ${invitationId} from company ${invitation.companyId}`);
+        
+        // Send SMS to company owner about acceptance
+        if (company) {
+          const companyAny = company as any;
+          const ownerPhone = companyAny.employeePhoneNumber || companyAny.employee_phone_number;
+          const ownerSmsEnabled = companyAny.smsNotificationsEnabled ?? companyAny.sms_notifications_enabled;
+          if (ownerSmsEnabled && ownerPhone) {
+            try {
+              const smsResult = await sendInvitationAcceptedSMS(ownerPhone, user.name || 'A technician', user.role || 'rope_access_tech');
+              if (smsResult.success) {
+                console.log(`[Team-Invite] SMS sent to company owner about ${user.name} acceptance`);
+              }
+            } catch (smsErr) {
+              console.error('[Team-Invite] Failed to send acceptance SMS:', smsErr);
+            }
+          }
+        }
       }
       
       res.json({ 
