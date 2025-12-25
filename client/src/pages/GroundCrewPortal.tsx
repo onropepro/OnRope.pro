@@ -915,6 +915,19 @@ export default function GroundCrewPortal() {
 
   const groundCrewNavGroups: NavGroup[] = [
     {
+      id: "dashboard",
+      label: "",
+      items: [
+        {
+          id: "dashboard",
+          label: language === 'en' ? "Dashboard" : language === 'es' ? "Panel" : "Tableau de bord",
+          icon: LayoutDashboard,
+          href: "/dashboard",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
       id: "main",
       label: "NAVIGATION",
       items: [
