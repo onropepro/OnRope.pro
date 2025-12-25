@@ -8593,7 +8593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Personal Info
         birthday: technician.birthday,
         employeePhoneNumber: technician.employeePhoneNumber,
-        smsNotificationsEnabled,
+        smsNotificationsEnabled: technician.smsNotificationsEnabled,
         employeeStreetAddress: technician.employeeStreetAddress,
         employeeCity: technician.employeeCity,
         employeeProvinceState: technician.employeeProvinceState,
