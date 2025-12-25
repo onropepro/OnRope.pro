@@ -294,6 +294,19 @@ const translations = {
     changesSaved: "Vos modifications ont été enregistrées avec succès.",
     updateFailed: "Échec de la Mise à Jour",
     invalidFile: "Fichier invalide",
+    uploadImageFile: "Veuillez télécharger un fichier image ou PDF.",
+    uploading: "Téléchargement...",
+    uploadFailed: "Échec du Téléchargement",
+    documentUploaded: "Document Téléchargé",
+    documentUploadedDesc: "Votre document a été enregistré avec succès.",
+    documentDeleted: "Document Supprimé",
+    documentDeletedDesc: "Votre document a été supprimé.",
+    deleteError: "Erreur de Suppression",
+    deleteErrorDesc: "Échec de la suppression du document. Veuillez réessayer.",
+    firstAidCertificate: "Certificat de Premiers Soins",
+    confirmDelete: "Confirmer la Suppression",
+    confirmDeleteDesc: "Êtes-vous sûr de vouloir supprimer ce document? Cette action est irréversible.",
+    deleteDocument: "Supprimer",
     privacyNotice: "Avis de Confidentialité",
     privacyText: "Vos informations personnelles sont stockées de manière sécurisée et utilisées uniquement par votre employeur pour les RH et la paie. Nous ne partageons jamais vos données à l'extérieur.",
     errorNameRequired: "Le nom est requis",
@@ -431,6 +444,19 @@ const translations = {
     changesSaved: "Sus cambios se han guardado correctamente.",
     updateFailed: "Error al Actualizar",
     invalidFile: "Archivo inválido",
+    uploadImageFile: "Por favor suba un archivo de imagen o PDF.",
+    uploading: "Subiendo...",
+    uploadFailed: "Error al Subir",
+    documentUploaded: "Documento Subido",
+    documentUploadedDesc: "Su documento se ha guardado correctamente.",
+    documentDeleted: "Documento Eliminado",
+    documentDeletedDesc: "Su documento ha sido eliminado.",
+    deleteError: "Error al Eliminar",
+    deleteErrorDesc: "No se pudo eliminar el documento. Por favor intente de nuevo.",
+    firstAidCertificate: "Certificado de Primeros Auxilios",
+    confirmDelete: "Confirmar Eliminación",
+    confirmDeleteDesc: "¿Está seguro de que desea eliminar este documento? Esta acción no se puede deshacer.",
+    deleteDocument: "Eliminar",
     privacyNotice: "Aviso de Privacidad",
     privacyText: "Su información personal se almacena de forma segura y solo la utiliza su empleador para RH y nómina. Nunca compartimos sus datos externamente.",
     errorNameRequired: "El nombre es requerido",
@@ -598,7 +624,7 @@ export default function GroundCrewPortal() {
   const documentInputRef = useRef<HTMLInputElement>(null);
   const uploadingDocTypeRef = useRef<string | null>(null);
   const [uploadingDocType, setUploadingDocType] = useState<string | null>(null);
-  const [deletingDocument, setDeletingDocument] = useState<{ type: string; url: string } | null>(null);
+  const [deletingDocument, setDeletingDocument] = useState<{ documentType: string; documentUrl: string } | null>(null);
 
   const { data: user, isLoading } = useQuery<any>({
     queryKey: ["/api/user"],
@@ -881,7 +907,7 @@ export default function GroundCrewPortal() {
     try {
       await apiRequest("POST", "/api/logout");
       queryClient.clear();
-      setLocation("/technician");
+      setLocation("/ground-crew");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -892,13 +918,6 @@ export default function GroundCrewPortal() {
       id: "main",
       label: "NAVIGATION",
       items: [
-        {
-          id: "dashboard",
-          label: language === 'en' ? "Dashboard" : language === 'es' ? "Panel" : "Tableau de Bord",
-          icon: LayoutDashboard,
-          href: "/",
-          isVisible: () => true,
-        },
         {
           id: "home",
           label: t.tabHome || "Home",
@@ -957,9 +976,9 @@ export default function GroundCrewPortal() {
       form.reset({
         name: user.name || "",
         email: user.email || "",
-        phone: user.employeePhoneNumber || "",
+        employeePhoneNumber: user.employeePhoneNumber || "",
         birthday: user.birthday || "",
-        address: user.employeeStreetAddress || "",
+        employeeStreetAddress: user.employeeStreetAddress || "",
         city: user.employeeCity || "",
         provinceState: user.employeeProvinceState || "",
         country: user.employeeCountry || "",
@@ -1487,7 +1506,7 @@ export default function GroundCrewPortal() {
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => setDeletingDocument({ type: 'bankDocuments', url })}
+                                  onClick={() => setDeletingDocument({ documentType: 'bankDocuments', documentUrl: url })}
                                   className="h-6 w-6 p-0"
                                   data-testid={`button-delete-bank-doc-${index}`}
                                 >
@@ -1570,7 +1589,7 @@ export default function GroundCrewPortal() {
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => setDeletingDocument({ type: 'driversLicenseDocuments', url })}
+                                  onClick={() => setDeletingDocument({ documentType: 'driversLicenseDocuments', documentUrl: url })}
                                   className="h-6 w-6 p-0"
                                   data-testid={`button-delete-license-doc-${index}`}
                                 >
@@ -1641,7 +1660,7 @@ export default function GroundCrewPortal() {
                                   type="button"
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => setDeletingDocument({ type: 'firstAidDocuments', url })}
+                                  onClick={() => setDeletingDocument({ documentType: 'firstAidDocuments', documentUrl: url })}
                                   className="h-6 w-6 p-0"
                                   data-testid={`button-delete-first-aid-doc-${index}`}
                                 >
