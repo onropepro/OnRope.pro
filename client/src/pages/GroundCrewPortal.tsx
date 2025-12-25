@@ -1129,19 +1129,6 @@ export default function GroundCrewPortal() {
         },
       ],
     },
-    {
-      id: "resources",
-      label: language === 'en' ? "RESOURCES" : language === 'es' ? "RECURSOS" : "RESSOURCES",
-      items: [
-        {
-          id: "help",
-          label: language === 'en' ? "Help Center" : language === 'es' ? "Centro de Ayuda" : "Centre d'Aide",
-          icon: Shield,
-          href: "/help",
-          isVisible: () => true,
-        },
-      ],
-    },
   ];
 
   const startEditing = () => {
