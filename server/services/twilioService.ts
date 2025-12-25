@@ -113,7 +113,9 @@ export async function sendTeamInvitationSMS(
   phoneNumber: string,
   companyName: string
 ): Promise<{ success: boolean; error?: string }> {
-  const message = `${companyName} has sent you a team invite. Login to your OnRopePro account to respond: https://onrope.pro/technician`;
+  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || 'onrope.pro';
+  const loginUrl = `https://${domain}/technician`;
+  const message = `${companyName} has sent you a team invite. Log in to your OnRopePro account to respond: ${loginUrl}`;
   
   const result = await sendSMS(phoneNumber, message);
   
