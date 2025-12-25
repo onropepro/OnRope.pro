@@ -330,7 +330,10 @@ export default function SafetyLanding() {
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Market Pressure Forces Industry Improvement</h3>
                     <p className="text-base text-muted-foreground">
-                      Companies losing bids to high-CSR competitors have a choice: improve or keep losing. The cowboys who undercut on price while cutting corners find themselves locked out of quality contracts. <strong className="text-foreground">The industry standard rises. Not because of regulation. Because the incentives aligned.</strong>
+                      Companies losing bids to high-CSR competitors have a choice: improve or keep losing. The cowboys who undercut on price while cutting corners find themselves locked out of quality contracts. 
+                    </p>
+                    <p className="text-base text-muted-foreground">
+                      <strong className="text-foreground">The industry standard rises. Not because of regulation. Because the incentives aligned.</strong>
                     </p>
                   </div>
                 </div>
