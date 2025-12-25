@@ -136,6 +136,19 @@ export function DashboardSidebar({
     retry: false,
   });
 
+  // Fetch pending invitations for technicians and ground crew
+  const { data: invitationsData } = useQuery<{ invitations: any[] }>({
+    queryKey: ["/api/my-invitations"],
+    enabled: !!currentUser && (
+      currentUser.role === 'rope_access_tech' || 
+      currentUser.role === 'ground_crew' || 
+      currentUser.role === 'ground_crew_supervisor'
+    ),
+    refetchInterval: 60000, // Refresh every minute
+  });
+  
+  const pendingInvitationsCount = invitationsData?.invitations?.length || 0;
+
   // Close sidebar on route change (mobile)
   useEffect(() => {
     setIsOpen(false);
@@ -181,6 +194,8 @@ export function DashboardSidebar({
           href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
             ? "/ground-crew-portal?tab=invitations" 
             : "/technician-portal?tab=invitations",
+          badge: pendingInvitationsCount > 0 ? pendingInvitationsCount : undefined,
+          badgeType: pendingInvitationsCount > 0 ? "alert" : undefined,
           isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
         },
       ],
