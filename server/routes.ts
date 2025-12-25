@@ -25,6 +25,7 @@ import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
 import { sendQuoteNotificationSMS } from "./services/twilio";
+import { sendTeamInvitationSMS } from "./services/twilioService";
 import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
@@ -5214,6 +5215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         email,
         employeePhoneNumber,
+        smsNotificationsEnabled,
         employeeStreetAddress,
         employeeCity,
         employeeProvinceState,
@@ -5264,11 +5266,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         email,
         employeePhoneNumber,
+        smsNotificationsEnabled,
         emergencyContactName,
         emergencyContactPhone,
       };
 
       // Add optional address fields only if provided
+      if (smsNotificationsEnabled !== undefined) updateData.smsNotificationsEnabled = smsNotificationsEnabled ?? false;
       if (employeeStreetAddress !== undefined) updateData.employeeStreetAddress = employeeStreetAddress || null;
       if (employeeCity !== undefined) updateData.employeeCity = employeeCity || null;
       if (employeeProvinceState !== undefined) updateData.employeeProvinceState = employeeProvinceState || null;
@@ -8409,6 +8413,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Personal Info
         birthday: technician.birthday,
         employeePhoneNumber: technician.employeePhoneNumber,
+        smsNotificationsEnabled,
         employeeStreetAddress: technician.employeeStreetAddress,
         employeeCity: technician.employeeCity,
         employeeProvinceState: technician.employeeProvinceState,
@@ -10224,7 +10229,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[Team-Invite] Company ${companyId} sent invitation ${invitation.id} to technician ${technicianId} (${technician.name})`);
       
-      res.json({ 
+      // Send SMS notification if technician has SMS enabled and valid phone number
+      if (technician.smsNotificationsEnabled && technician.employeePhoneNumber) {
+        try {
+          const company = await storage.getUserById(companyId);
+          const companyName = company?.companyName || 'An employer';
+          const smsResult = await sendTeamInvitationSMS(
+            technician.employeePhoneNumber,
+            companyName
+          );
+          if (smsResult.success) {
+            console.log(`[Team-Invite] SMS notification sent to ${technician.name}`);
+          } else {
+            console.log(`[Team-Invite] SMS notification failed for ${technician.name}: ${smsResult.error}`);
+          }
+        } catch (smsError) {
+          console.error(`[Team-Invite] SMS notification error for ${technician.name}:`, smsError);
+          // Don't fail the invitation if SMS fails
+        }
+      }
+      
+      res.json({
+      
         success: true, 
         message: `Invitation sent to ${technician.name}!`,
         invitationId: invitation.id
@@ -10933,6 +10959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: inv.technician.email,
           // Phone and address
           employeePhoneNumber: inv.technician.employeePhoneNumber,
+        smsNotificationsEnabled,
           employeeStreetAddress: inv.technician.employeeStreetAddress,
           employeeCity: inv.technician.employeeCity,
           employeeProvinceState: inv.technician.employeeProvinceState,
@@ -11022,6 +11049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: inv.technician.name,
           email: inv.technician.email,
           employeePhoneNumber: inv.technician.employeePhoneNumber,
+        smsNotificationsEnabled,
           employeeStreetAddress: inv.technician.employeeStreetAddress,
           employeeCity: inv.technician.employeeCity,
           employeeProvinceState: inv.technician.employeeProvinceState,
