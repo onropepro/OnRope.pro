@@ -80,13 +80,38 @@ This document defines the shared components used across all stakeholder dashboar
 
 ```typescript
 interface DashboardSidebarProps {
-  currentUser: User;
+  // Core required props
+  currentUser: User | null | undefined;
   activeTab: string;
   onTabChange: (tab: string) => void;
-  variant: 'employer' | 'technician' | 'property-manager' | 'resident' | 'building-manager' | 'ground-crew';
-  customNavigationGroups?: NavGroup[];
-  showDashboardLink?: boolean;
+  
+  // Variant-based theming (defaults to "employer" if not specified)
+  variant?: DashboardVariant;  // 'employer' | 'technician' | 'property-manager' | 'resident' | 'building-manager' | 'ground-crew'
+  customNavigationGroups?: NavGroup[];  // Override default navigation
+  showDashboardLink?: boolean;  // Whether to show link back to main dashboard
+  
+  // Optional branding and display props
+  brandingLogoUrl?: string | null;
+  whitelabelBrandingActive?: boolean;
+  companyName?: string;
+  employeeCount?: number;
+  alertCounts?: {
+    expiringCerts?: number;
+    overdueInspections?: number;
+    pendingTimesheets?: number;
+    unsignedDocs?: number;
+    jobApplications?: number;
+    quoteNotifications?: number;
+  };
+  customBrandColor?: string;
+  dashboardLinkLabel?: string;
+  headerContent?: React.ReactNode;
 }
+```
+
+**Note**: The `variant` prop is optional and defaults to `"employer"` in the function implementation:
+```typescript
+variant = "employer"  // Default in function destructuring
 ```
 
 ### Usage Examples
@@ -116,42 +141,33 @@ interface DashboardSidebarProps {
 
 ### Variant-Based Styling
 
-Each variant applies stakeholder-specific brand colors:
+Each variant applies stakeholder-specific brand colors via the exported `STAKEHOLDER_COLORS` constant:
 
 ```typescript
-const variantStyles = {
-  employer: {
-    brandColor: '#0B64A3',     // Blue
-    sidebarBg: 'bg-slate-900',
-    accentColor: 'text-blue-400',
-  },
-  technician: {
-    brandColor: '#AB4521',     // Rust
-    sidebarBg: 'bg-slate-900',
-    accentColor: 'text-amber-400',
-  },
-  'property-manager': {
-    brandColor: '#6E9075',     // Sage
-    sidebarBg: 'bg-slate-900',
-    accentColor: 'text-green-400',
-  },
-  resident: {
-    brandColor: '#86A59C',     // Teal
-    sidebarBg: 'bg-slate-900',
-    accentColor: 'text-teal-400',
-  },
-  'building-manager': {
-    brandColor: '#B89685',     // Taupe
-    sidebarBg: 'bg-slate-900',
-    accentColor: 'text-orange-300',
-  },
-  'ground-crew': {
-    brandColor: '#AB4521',     // Matches technician
-    sidebarBg: 'bg-slate-900',
-    accentColor: 'text-amber-400',
-  },
+// From DashboardSidebar.tsx - This is the actual implementation
+export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew";
+
+export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
+  employer: "#0B64A3",          // Blue
+  technician: "#AB4521",        // Rust
+  "property-manager": "#6E9075", // Sage
+  resident: "#86A59C",          // Teal
+  "building-manager": "#B89685", // Taupe
+  "ground-crew": "#5D7B6F",     // Forest green
 };
 ```
+
+The sidebar determines brand color at runtime:
+
+```typescript
+// Inside DashboardSidebar component
+const BRAND_COLOR = customBrandColor || STAKEHOLDER_COLORS[variant];
+```
+
+This allows:
+1. **Variant-based defaults**: Each stakeholder type gets its predefined color
+2. **Custom overrides**: Pass `customBrandColor` prop to override the variant default
+3. **White-label support**: Companies can customize with their own brand colors
 
 ---
 
@@ -168,7 +184,7 @@ interface NavItem {
   href?: string;
   badge?: number;
   badgeType?: 'info' | 'alert' | 'success';
-  isVisible: () => boolean;
+  isVisible: (user: User | null | undefined) => boolean;  // Receives user context
 }
 
 interface NavGroup {
