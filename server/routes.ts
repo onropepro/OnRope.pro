@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable, incidentReports, clients, quizAttempts } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -1792,6 +1792,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           });
         }
+      }
+      
+      // STAFF ACCOUNT CHECK - Check if this is a staff account login
+      const staffAccount = await storage.verifyStaffAccountPassword(identifier, password);
+      if (staffAccount) {
+        // Create staff session
+        req.session.userId = staffAccount.id;
+        req.session.role = 'staff';
+        req.session.staffPermissions = staffAccount.permissions as string[];
+        
+        await new Promise<void>((resolve, reject) => {
+          req.session.save((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+        
+        // Return staff account payload
+        return res.json({
+          user: {
+            id: staffAccount.id,
+            name: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            email: staffAccount.email,
+            role: 'staff',
+            permissions: staffAccount.permissions,
+          }
+        });
       }
       
       // Try to find user by email, company name, or rope access license number
@@ -3938,6 +3965,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================================================================
 
   // =====================================================================
+  // SIDEBAR PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // Get user's sidebar preferences for a specific dashboard variant
+  app.get("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant } = req.query;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant query parameter is required" });
+      }
+
+      const validVariants = ['employer', 'technician', 'property-manager', 'resident', 'building-manager', 'ground-crew'];
+      if (!validVariants.includes(variant)) {
+        return res.status(400).json({ message: `Invalid variant. Must be one of: ${validVariants.join(', ')}` });
+      }
+
+      const prefs = await db.select()
+        .from(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ))
+        .orderBy(asc(sidebarPreferences.groupId), asc(sidebarPreferences.position));
+
+      // Group by groupId for easier frontend consumption
+      const grouped: Record<string, { itemId: string; position: number }[]> = {};
+      for (const pref of prefs) {
+        if (!grouped[pref.groupId]) {
+          grouped[pref.groupId] = [];
+        }
+        grouped[pref.groupId].push({
+          itemId: pref.itemId,
+          position: pref.position,
+        });
+      }
+
+      res.json({ 
+        preferences: grouped,
+        variant,
+        isDefault: prefs.length === 0,
+      });
+    } catch (error: any) {
+      console.error('[Sidebar] Get preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to get sidebar preferences" });
+    }
+  });
+
+  // Save user's sidebar preferences for a specific dashboard variant
+  app.put("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant, groups } = req.body;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant is required" });
+      }
+
+      const validVariants = ['employer', 'technician', 'property-manager', 'resident', 'building-manager', 'ground-crew'];
+      if (!validVariants.includes(variant)) {
+        return res.status(400).json({ message: `Invalid variant. Must be one of: ${validVariants.join(', ')}` });
+      }
+
+      if (!groups || typeof groups !== 'object') {
+        return res.status(400).json({ message: "groups must be an object with groupId keys" });
+      }
+
+      // Validate structure: groups is Record<string, { itemId: string; position: number }[]>
+      const inserts: { userId: string; dashboardVariant: string; groupId: string; itemId: string; position: number }[] = [];
+      for (const [groupId, items] of Object.entries(groups)) {
+        if (!Array.isArray(items)) {
+          return res.status(400).json({ message: `Group ${groupId} must contain an array of items` });
+        }
+        for (const item of items as any[]) {
+          if (!item.itemId || typeof item.position !== 'number') {
+            return res.status(400).json({ message: `Each item must have itemId and position` });
+          }
+          inserts.push({
+            userId,
+            dashboardVariant: variant,
+            groupId,
+            itemId: item.itemId,
+            position: item.position,
+          });
+        }
+      }
+
+      // Delete existing preferences for this variant
+      await db.delete(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ));
+
+      // Insert new preferences
+      if (inserts.length > 0) {
+        await db.insert(sidebarPreferences).values(inserts);
+      }
+
+      res.json({ success: true, variant, groupCount: Object.keys(groups).length });
+    } catch (error: any) {
+      console.error('[Sidebar] Save preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to save sidebar preferences" });
+    }
+  });
+
+  // Reset sidebar preferences to default for a specific variant
+  app.delete("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant } = req.query;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant query parameter is required" });
+      }
+
+      await db.delete(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ));
+
+      res.json({ success: true, message: "Sidebar preferences reset to default" });
+    } catch (error: any) {
+      console.error('[Sidebar] Reset preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to reset sidebar preferences" });
+    }
+  });
+
+  // =====================================================================
+  // END SIDEBAR PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // =====================================================================
   // DASHBOARD CARD DATA ENDPOINTS
   // =====================================================================
 
@@ -4843,6 +5005,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Handle Staff account session
+      if (req.session.role === 'staff') {
+        const staffAccount = await storage.getStaffAccountById(req.session.userId!);
+        if (!staffAccount || !staffAccount.isActive) {
+          return res.status(401).json({ message: "Staff account not found or disabled" });
+        }
+        
+        return res.json({
+          user: {
+            id: staffAccount.id,
+            name: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            fullName: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            email: staffAccount.email,
+            role: 'staff',
+            permissions: staffAccount.permissions,
+          }
+        });
+      }
+      
       let user = await storage.getUserById(req.session.userId!);
       
       if (!user) {
@@ -5555,6 +5736,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[Technician] Error deleting document:", error);
+      res.status(500).json({ message: error.message || "Failed to delete document" });
+    }
+  });
+
+  // Ground Crew: Upload documents (void cheque, driver's license, first aid)
+  app.post("/api/ground-crew/upload-document", requireAuth, technicianDocumentUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'ground_crew' && user.role !== 'ground_crew_supervisor') {
+        return res.status(403).json({ message: "Only ground crew members can upload documents through this endpoint" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { documentType } = req.body;
+      if (!documentType) {
+        return res.status(400).json({ message: "Document type is required" });
+      }
+
+      const validTypes = ['voidCheque', 'driversLicense', 'firstAidCertificate'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Upload file to object storage
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
+      const filename = `ground-crew-${userId}-${documentType}-${timestamp}.${extension}`;
+      
+      const url = await objectStorageService.uploadPublicFile(filename, req.file.buffer, req.file.mimetype);
+      
+      console.log(`[GroundCrew] Uploaded ${documentType} for user ${userId}:`, url);
+
+      // Update the user's document arrays based on document type
+      let updateData: any = {};
+      
+      if (documentType === 'voidCheque') {
+        const existingDocs = user.bankDocuments || [];
+        updateData.bankDocuments = [...existingDocs, url];
+      } else if (documentType === 'driversLicense') {
+        const existingDocs = user.driversLicenseDocuments || [];
+        updateData.driversLicenseDocuments = [...existingDocs, url];
+      } else if (documentType === 'firstAidCertificate') {
+        const existingDocs = user.firstAidDocuments || [];
+        updateData.firstAidDocuments = [...existingDocs, url];
+      }
+
+      await storage.updateUser(userId, updateData);
+
+      res.json({ 
+        message: "Document uploaded successfully",
+        url,
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[GroundCrew] Error uploading document:", error);
+      res.status(500).json({ message: error.message || "Failed to upload document" });
+    }
+  });
+
+  // Ground Crew: Delete uploaded document
+  app.delete("/api/ground-crew/document", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'ground_crew' && user.role !== 'ground_crew_supervisor') {
+        return res.status(403).json({ message: "Only ground crew members can delete documents through this endpoint" });
+      }
+
+      const { documentType, documentUrl } = req.body;
+      if (!documentType || !documentUrl) {
+        return res.status(400).json({ message: "Document type and URL are required" });
+      }
+
+      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Get the current document array and remove the URL
+      let currentDocs: string[] = [];
+      
+      if (documentType === 'bankDocuments') {
+        currentDocs = user.bankDocuments || [];
+      } else if (documentType === 'driversLicenseDocuments') {
+        currentDocs = user.driversLicenseDocuments || [];
+      } else if (documentType === 'firstAidDocuments') {
+        currentDocs = user.firstAidDocuments || [];
+      }
+
+      // Check if the document exists
+      if (!currentDocs.includes(documentUrl)) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      // Remove the document URL from the array
+      const updatedDocs = currentDocs.filter(url => url !== documentUrl);
+      const updateData: any = {};
+      updateData[documentType] = updatedDocs;
+
+      await storage.updateUser(userId, updateData);
+
+      console.log(`[GroundCrew] Deleted ${documentType} document for user ${userId}`);
+
+      res.json({ 
+        message: "Document deleted successfully",
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[GroundCrew] Error deleting document:", error);
       res.status(500).json({ message: error.message || "Failed to delete document" });
     }
   });
@@ -6714,6 +7019,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('[Gift-Company] Error:', error);
       const message = error.message || "Failed to create gifted company account";
       res.status(400).json({ message });
+    }
+  });
+
+  // ==================== STAFF ACCOUNTS (Internal Platform Management) ====================
+  
+  // Helper to check if user is superuser or has specific staff permission
+  const requireSuperuserOrStaffPermission = (permission: string) => {
+    return async (req: Request, res: Response, next: Function) => {
+      if (req.session.userId === 'superuser') {
+        return next();
+      }
+      
+      if (req.session.role === 'staff') {
+        const permissions = req.session.staffPermissions || [];
+        if (permissions.includes(permission)) {
+          return next();
+        }
+      }
+      
+      return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+    };
+  };
+  
+  // Get all staff accounts (superuser or staff with manage_staff_accounts permission)
+  app.get("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser or staff with manage_staff_accounts permission
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const accounts = await storage.getAllStaffAccounts();
+      
+      // Remove password hashes from response
+      const safeAccounts = accounts.map(({ passwordHash, ...rest }) => rest);
+      
+      res.json({ staffAccounts: safeAccounts });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Get all error:', error);
+      res.status(500).json({ message: error.message || "Failed to get staff accounts" });
+    }
+  });
+  
+  // Get single staff account
+  app.get("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const account = await storage.getStaffAccountById(req.params.id);
+      if (!account) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Get by ID error:', error);
+      res.status(500).json({ message: error.message || "Failed to get staff account" });
+    }
+  });
+  
+  // Create staff account
+  app.post("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const { firstName, lastName, email, password, permissions, isActive } = req.body;
+      
+      if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: "Missing required fields: firstName, lastName, email, password" });
+      }
+      
+      // Check if email already exists
+      const existing = await storage.getStaffAccountByEmail(email);
+      if (existing) {
+        return res.status(400).json({ message: "A staff account with this email already exists" });
+      }
+      
+      // Validate permissions
+      const validPermissions = [
+        'view_dashboard', 'view_companies', 'view_technicians', 'view_buildings',
+        'view_job_board', 'view_tasks', 'view_feature_requests', 'view_future_ideas',
+        'view_metrics', 'view_goals', 'view_changelog', 'view_founder_resources',
+        'manage_staff_accounts'
+      ];
+      
+      const requestedPermissions = permissions || [];
+      const invalidPermissions = requestedPermissions.filter((p: string) => !validPermissions.includes(p));
+      if (invalidPermissions.length > 0) {
+        return res.status(400).json({ message: `Invalid permissions: ${invalidPermissions.join(', ')}` });
+      }
+      
+      const account = await storage.createStaffAccount({
+        firstName,
+        lastName,
+        email,
+        passwordHash: password, // Will be hashed in storage
+        permissions: requestedPermissions,
+        isActive: isActive !== false,
+        createdBy: req.session.userId === 'superuser' ? 'superuser' : req.session.userId,
+      });
+      
+      console.log(`[Staff-Accounts] Created account for ${email} by ${req.session.userId}`);
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ success: true, message: "Staff account created", staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Create error:', error);
+      res.status(500).json({ message: error.message || "Failed to create staff account" });
+    }
+  });
+  
+  // Update staff account
+  app.patch("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const { firstName, lastName, email, password, permissions, isActive } = req.body;
+      const updates: any = {};
+      
+      if (firstName !== undefined) updates.firstName = firstName;
+      if (lastName !== undefined) updates.lastName = lastName;
+      if (email !== undefined) updates.email = email;
+      if (password !== undefined) updates.passwordHash = password; // Will be hashed in storage
+      if (permissions !== undefined) updates.permissions = permissions;
+      if (isActive !== undefined) updates.isActive = isActive;
+      
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: "No updates provided" });
+      }
+      
+      const account = await storage.updateStaffAccount(req.params.id, updates);
+      if (!account) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      console.log(`[Staff-Accounts] Updated account ${req.params.id} by ${req.session.userId}`);
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ success: true, message: "Staff account updated", staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Update error:', error);
+      res.status(500).json({ message: error.message || "Failed to update staff account" });
+    }
+  });
+  
+  // Delete staff account
+  app.delete("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      // Prevent deleting yourself
+      if (req.session.role === 'staff' && req.session.userId === req.params.id) {
+        return res.status(400).json({ message: "You cannot delete your own account" });
+      }
+      
+      const deleted = await storage.deleteStaffAccount(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      console.log(`[Staff-Accounts] Deleted account ${req.params.id} by ${req.session.userId}`);
+      
+      res.json({ success: true, message: "Staff account deleted" });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Delete error:', error);
+      res.status(500).json({ message: error.message || "Failed to delete staff account" });
     }
   });
 
@@ -8808,6 +9298,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Ground crew and rope access tech profile fields
+      if (user.role === "ground_crew" || user.role === "ground_crew_supervisor" || user.role === "rope_access_tech") {
+        // Map form fields to database columns
+        if (req.body.phone !== undefined) {
+          updates.employeePhoneNumber = req.body.phone || null;
+        }
+        if (req.body.birthday !== undefined) {
+          updates.birthday = req.body.birthday || null;
+        }
+        if (req.body.address !== undefined) {
+          updates.employeeStreetAddress = req.body.address || null;
+        }
+        if (req.body.city !== undefined) {
+          updates.employeeCity = req.body.city || null;
+        }
+        if (req.body.provinceState !== undefined) {
+          updates.employeeProvinceState = req.body.provinceState || null;
+        }
+        if (req.body.country !== undefined) {
+          updates.employeeCountry = req.body.country || null;
+        }
+        if (req.body.postalCode !== undefined) {
+          updates.employeePostalCode = req.body.postalCode || null;
+        }
+        // Emergency contact fields
+        if (req.body.emergencyContactName !== undefined) {
+          updates.emergencyContactName = req.body.emergencyContactName || null;
+        }
+        if (req.body.emergencyContactPhone !== undefined) {
+          updates.emergencyContactPhone = req.body.emergencyContactPhone || null;
+        }
+        if (req.body.emergencyContactRelationship !== undefined) {
+          updates.emergencyContactRelationship = req.body.emergencyContactRelationship || null;
+        }
+        // Payroll and license fields
+        if (req.body.sin !== undefined) {
+          updates.sin = req.body.sin || null;
+        }
+        if (req.body.bankTransit !== undefined) {
+          updates.bankTransit = req.body.bankTransit || null;
+        }
+        if (req.body.bankInstitution !== undefined) {
+          updates.bankInstitution = req.body.bankInstitution || null;
+        }
+        if (req.body.bankAccount !== undefined) {
+          updates.bankAccount = req.body.bankAccount || null;
+        }
+        if (req.body.driversLicenseNumber !== undefined) {
+          updates.driversLicenseNumber = req.body.driversLicenseNumber || null;
+        }
+        if (req.body.driversLicenseIssuedDate !== undefined) {
+          updates.driversLicenseIssuedDate = req.body.driversLicenseIssuedDate || null;
+        }
+        if (req.body.driversLicenseExpiry !== undefined) {
+          updates.driversLicenseExpiry = req.body.driversLicenseExpiry || null;
+        }
+        // Medical and first aid fields
+        if (req.body.specialMedicalConditions !== undefined) {
+          updates.specialMedicalConditions = req.body.specialMedicalConditions || null;
+        }
+        if (req.body.firstAidType !== undefined) {
+          updates.firstAidType = req.body.firstAidType || null;
+        }
+        if (req.body.firstAidExpiry !== undefined) {
+          updates.firstAidExpiry = req.body.firstAidExpiry || null;
+        }
+      }
+      
       await storage.updateUser(user.id, updates);
       const updatedUser = await storage.getUserById(user.id);
       
@@ -9513,26 +10071,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician
+      // Find the technician or ground crew member
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
+        return res.status(404).json({ message: "Team member not found" });
       }
       
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "This user is not a technician" });
+      const LINKABLE_ROLES = ['rope_access_tech', 'ground_crew'];
+      if (!LINKABLE_ROLES.includes(technician.role)) {
+        return res.status(400).json({ message: "This user cannot be linked to a company" });
       }
       
       // Check if already linked to THIS company
       if (technician.companyId === companyId) {
-        return res.status(400).json({ message: "This technician is already linked to your company" });
+        return res.status(400).json({ message: "This team member is already linked to your company" });
       }
       
       // Check existing employer connections
       const existingConnections = (technician.employerConnections || []) as any[];
       const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
       if (alreadyConnected) {
-        return res.status(400).json({ message: "This technician is already connected to your company" });
+        return res.status(400).json({ message: "This team member is already connected to your company" });
       }
       
       // Get company name for the connection
@@ -9618,26 +10177,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician
+      // Find the technician or ground crew member
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
+        return res.status(404).json({ message: "Team member not found" });
       }
       
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "This user is not a technician" });
+      const INVITABLE_ROLES = ['rope_access_tech', 'ground_crew'];
+      if (!INVITABLE_ROLES.includes(technician.role)) {
+        return res.status(400).json({ message: "This user cannot be invited to a company" });
       }
       
       // Check if already linked to THIS company
       if (technician.companyId === companyId) {
-        return res.status(400).json({ message: "This technician is already linked to your company" });
+        return res.status(400).json({ message: "This team member is already linked to your company" });
       }
       
       // Check existing employer connections
       const existingConnections = (technician.employerConnections || []) as any[];
       const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
       if (alreadyConnected) {
-        return res.status(400).json({ message: "This technician is already connected to your company" });
+        return res.status(400).json({ message: "This team member is already connected to your company" });
       }
       
       // If linked to another company, require PLUS access
@@ -10052,7 +10612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view invitations" });
       }
       
@@ -22855,21 +23415,28 @@ Do not include any other text, just the JSON object.`
     try {
       // Get only active, non-expired job postings
       const now = new Date();
+      const positionType = req.query.positionType as string | undefined;
+      
+      // Build conditions array
+      const conditions: any[] = [
+        eq(jobPostings.status, "active"),
+        or(
+          isNull(jobPostings.expiresAt),
+          gt(jobPostings.expiresAt, now)
+        )
+      ];
+      
+      // Add position type filter if specified
+      if (positionType && (positionType === "rope_access" || positionType === "ground_crew")) {
+        conditions.push(eq(jobPostings.positionType, positionType));
+      }
       
       const activeJobs = await db.select({
         job: jobPostings,
         companyName: users.companyName,
       }).from(jobPostings)
         .leftJoin(users, eq(jobPostings.companyId, users.id))
-        .where(
-          and(
-            eq(jobPostings.status, "active"),
-            or(
-              isNull(jobPostings.expiresAt),
-              gt(jobPostings.expiresAt, now)
-            )
-          )
-        )
+        .where(and(...conditions))
         .orderBy(desc(jobPostings.createdAt));
 
       const jobsWithCompany = activeJobs.map(item => ({

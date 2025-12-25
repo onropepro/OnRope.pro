@@ -64,6 +64,7 @@ import {
   Users,
   Gift,
   Home,
+  LayoutDashboard,
   MoreHorizontal,
   Plus,
   FolderOpen,
@@ -143,6 +144,19 @@ const translations = {
     changesSaved: "Your changes have been saved successfully.",
     updateFailed: "Update Failed",
     invalidFile: "Invalid file",
+    uploadImageFile: "Please upload an image or PDF file.",
+    uploading: "Uploading...",
+    uploadFailed: "Upload Failed",
+    documentUploaded: "Document Uploaded",
+    documentUploadedDesc: "Your document has been saved successfully.",
+    documentDeleted: "Document Deleted",
+    documentDeletedDesc: "Your document has been removed.",
+    deleteError: "Delete Error",
+    deleteErrorDesc: "Failed to delete the document. Please try again.",
+    firstAidCertificate: "First Aid Certificate",
+    confirmDelete: "Confirm Delete",
+    confirmDeleteDesc: "Are you sure you want to delete this document? This action cannot be undone.",
+    deleteDocument: "Delete",
     privacyNotice: "Privacy Notice",
     privacyText: "Your personal information is securely stored and used only by your employer for HR and payroll purposes. We never share your data externally.",
     errorNameRequired: "Name is required",
@@ -280,6 +294,19 @@ const translations = {
     changesSaved: "Vos modifications ont été enregistrées avec succès.",
     updateFailed: "Échec de la Mise à Jour",
     invalidFile: "Fichier invalide",
+    uploadImageFile: "Veuillez télécharger un fichier image ou PDF.",
+    uploading: "Téléchargement...",
+    uploadFailed: "Échec du Téléchargement",
+    documentUploaded: "Document Téléchargé",
+    documentUploadedDesc: "Votre document a été enregistré avec succès.",
+    documentDeleted: "Document Supprimé",
+    documentDeletedDesc: "Votre document a été supprimé.",
+    deleteError: "Erreur de Suppression",
+    deleteErrorDesc: "Échec de la suppression du document. Veuillez réessayer.",
+    firstAidCertificate: "Certificat de Premiers Soins",
+    confirmDelete: "Confirmer la Suppression",
+    confirmDeleteDesc: "Êtes-vous sûr de vouloir supprimer ce document? Cette action est irréversible.",
+    deleteDocument: "Supprimer",
     privacyNotice: "Avis de Confidentialité",
     privacyText: "Vos informations personnelles sont stockées de manière sécurisée et utilisées uniquement par votre employeur pour les RH et la paie. Nous ne partageons jamais vos données à l'extérieur.",
     errorNameRequired: "Le nom est requis",
@@ -417,6 +444,19 @@ const translations = {
     changesSaved: "Sus cambios se han guardado correctamente.",
     updateFailed: "Error al Actualizar",
     invalidFile: "Archivo inválido",
+    uploadImageFile: "Por favor suba un archivo de imagen o PDF.",
+    uploading: "Subiendo...",
+    uploadFailed: "Error al Subir",
+    documentUploaded: "Documento Subido",
+    documentUploadedDesc: "Su documento se ha guardado correctamente.",
+    documentDeleted: "Documento Eliminado",
+    documentDeletedDesc: "Su documento ha sido eliminado.",
+    deleteError: "Error al Eliminar",
+    deleteErrorDesc: "No se pudo eliminar el documento. Por favor intente de nuevo.",
+    firstAidCertificate: "Certificado de Primeros Auxilios",
+    confirmDelete: "Confirmar Eliminación",
+    confirmDeleteDesc: "¿Está seguro de que desea eliminar este documento? Esta acción no se puede deshacer.",
+    deleteDocument: "Eliminar",
     privacyNotice: "Aviso de Privacidad",
     privacyText: "Su información personal se almacena de forma segura y solo la utiliza su empleador para RH y nómina. Nunca compartimos sus datos externamente.",
     errorNameRequired: "El nombre es requerido",
@@ -493,23 +533,23 @@ const translations = {
 
 type TabType = 'home' | 'profile' | 'invitations' | 'more';
 
-const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email"),
-  phone: z.string().min(1, "Phone is required"),
+const createProfileSchema = (t: typeof translations['en']) => z.object({
+  name: z.string().min(1, t.errorNameRequired),
+  email: z.string().email(t.errorInvalidEmail),
+  employeePhoneNumber: z.string().min(1, t.errorPhoneRequired),
   birthday: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  provinceState: z.string().optional(),
-  country: z.string().optional(),
-  postalCode: z.string().optional(),
-  emergencyContactName: z.string().optional(),
-  emergencyContactPhone: z.string().optional(),
+  employeeStreetAddress: z.string().optional(),
+  employeeCity: z.string().optional(),
+  employeeProvinceState: z.string().optional(),
+  employeeCountry: z.string().optional(),
+  employeePostalCode: z.string().optional(),
+  emergencyContactName: z.string().min(1, t.errorEmergencyNameRequired),
+  emergencyContactPhone: z.string().min(1, t.errorEmergencyPhoneRequired),
   emergencyContactRelationship: z.string().optional(),
-  sin: z.string().optional(),
-  bankTransit: z.string().optional(),
-  bankInstitution: z.string().optional(),
-  bankAccount: z.string().optional(),
+  socialInsuranceNumber: z.string().optional(),
+  bankTransitNumber: z.string().optional(),
+  bankInstitutionNumber: z.string().optional(),
+  bankAccountNumber: z.string().optional(),
   driversLicenseNumber: z.string().optional(),
   driversLicenseIssuedDate: z.string().optional(),
   driversLicenseExpiry: z.string().optional(),
@@ -518,7 +558,7 @@ const profileSchema = z.object({
   firstAidExpiry: z.string().optional(),
 });
 
-type ProfileFormData = z.infer<typeof profileSchema>;
+type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
 
 export default function GroundCrewPortal() {
   const { i18n } = useTranslation();
@@ -551,11 +591,40 @@ export default function GroundCrewPortal() {
 
   const t = translations[language];
 
-  const [activeTab, setActiveTab] = useState<TabType>('home');
+  const getTabFromUrl = (): TabType => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab === 'home' || tab === 'profile' || tab === 'invitations' || tab === 'more') {
+      return tab;
+    }
+    return 'home';
+  };
+  
+  const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const tab = getTabFromUrl();
+      setActiveTab(tab);
+    };
+    
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, [location]);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadType, setUploadType] = useState<string | null>(null);
+  
+  // Document upload state
+  const documentInputRef = useRef<HTMLInputElement>(null);
+  const uploadingDocTypeRef = useRef<string | null>(null);
+  const [uploadingDocType, setUploadingDocType] = useState<string | null>(null);
+  const [deletingDocument, setDeletingDocument] = useState<{ documentType: string; documentUrl: string } | null>(null);
 
   const { data: user, isLoading } = useQuery<any>({
     queryKey: ["/api/user"],
@@ -563,36 +632,38 @@ export default function GroundCrewPortal() {
   });
 
   const { data: invitationsData } = useQuery<any>({
-    queryKey: ["/api/technician/invitations"],
+    queryKey: ["/api/my-invitations"],
     enabled: !!user && (user.role === 'ground_crew' || user.role === 'ground_crew_supervisor'),
   });
 
-  const pendingInvitations = invitationsData?.invitations?.filter((inv: any) => inv.status === 'pending') || [];
+  const pendingInvitations = invitationsData?.invitations || [];
 
   const { data: companyData } = useQuery<any>({
     queryKey: ["/api/companies", user?.companyId],
     enabled: !!user?.companyId,
   });
 
+  const profileSchema = createProfileSchema(t);
+  
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
+      employeePhoneNumber: "",
       birthday: "",
-      address: "",
-      city: "",
-      provinceState: "",
-      country: "",
-      postalCode: "",
+      employeeStreetAddress: "",
+      employeeCity: "",
+      employeeProvinceState: "",
+      employeeCountry: "",
+      employeePostalCode: "",
       emergencyContactName: "",
       emergencyContactPhone: "",
       emergencyContactRelationship: "",
-      sin: "",
-      bankTransit: "",
-      bankInstitution: "",
-      bankAccount: "",
+      socialInsuranceNumber: "",
+      bankTransitNumber: "",
+      bankInstitutionNumber: "",
+      bankAccountNumber: "",
       driversLicenseNumber: "",
       driversLicenseIssuedDate: "",
       driversLicenseExpiry: "",
@@ -601,6 +672,36 @@ export default function GroundCrewPortal() {
       firstAidExpiry: "",
     },
   });
+
+  // Populate form with user data when loaded
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user.name || "",
+        email: user.email || "",
+        employeePhoneNumber: user.employeePhoneNumber || "",
+        birthday: user.birthday || "",
+        employeeStreetAddress: user.employeeStreetAddress || "",
+        employeeCity: user.employeeCity || "",
+        employeeProvinceState: user.employeeProvinceState || "",
+        employeeCountry: user.employeeCountry || "",
+        employeePostalCode: user.employeePostalCode || "",
+        emergencyContactName: user.emergencyContactName || "",
+        emergencyContactPhone: user.emergencyContactPhone || "",
+        emergencyContactRelationship: user.emergencyContactRelationship || "",
+        socialInsuranceNumber: user.socialInsuranceNumber || "",
+        bankTransitNumber: user.bankTransitNumber || "",
+        bankInstitutionNumber: user.bankInstitutionNumber || "",
+        bankAccountNumber: user.bankAccountNumber || "",
+        driversLicenseNumber: user.driversLicenseNumber || "",
+        driversLicenseIssuedDate: user.driversLicenseIssuedDate || "",
+        driversLicenseExpiry: user.driversLicenseExpiry || "",
+        specialMedicalConditions: user.specialMedicalConditions || "",
+        firstAidType: user.firstAidType || "",
+        firstAidExpiry: user.firstAidExpiry || "",
+      });
+    }
+  }, [user, form]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
@@ -624,10 +725,10 @@ export default function GroundCrewPortal() {
 
   const acceptInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
-      return apiRequest("POST", `/api/technician/invitations/${invitationId}/accept`);
+      return apiRequest("POST", `/api/invitations/${invitationId}/accept`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/technician/invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-invitations"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: t.invitationAccepted,
@@ -644,10 +745,10 @@ export default function GroundCrewPortal() {
 
   const declineInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
-      return apiRequest("POST", `/api/technician/invitations/${invitationId}/decline`);
+      return apiRequest("POST", `/api/invitations/${invitationId}/decline`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/technician/invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-invitations"] });
       toast({
         title: t.invitationDeclined,
         description: t.declinedMessage,
@@ -681,17 +782,151 @@ export default function GroundCrewPortal() {
     },
   });
 
+  // Document delete mutation
+  const deleteDocumentMutation = useMutation({
+    mutationFn: async ({ documentType, documentUrl }: { documentType: string; documentUrl: string }) => {
+      return apiRequest("DELETE", "/api/ground-crew/document", { documentType, documentUrl });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setDeletingDocument(null);
+      toast({
+        title: t.documentDeleted || "Document Deleted",
+        description: t.documentDeletedDesc || "Your document has been removed.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: t.deleteError || "Delete Error",
+        description: t.deleteErrorDesc || "Failed to delete the document. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handler for uploading documents
+  const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    const docType = uploadingDocTypeRef.current;
+    
+    if (!file) return;
+    
+    if (!docType) {
+      toast({
+        title: "Upload Error",
+        description: "Document type not set. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const isValidType = file.type.startsWith('image/') || file.type === 'application/pdf';
+    if (!isValidType) {
+      toast({
+        title: t.invalidFile || "Invalid File",
+        description: t.uploadImageFile || "Please upload an image or PDF file.",
+        variant: "destructive",
+      });
+      setUploadingDocType(null);
+      uploadingDocTypeRef.current = null;
+      return;
+    }
+
+    toast({
+      title: t.uploading || "Uploading...",
+      description: `${file.name} (${(file.size / 1024).toFixed(1)} KB)`,
+    });
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', docType);
+
+      const response = await fetch('/api/ground-crew/upload-document', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || t.uploadFailed || "Upload failed");
+      }
+
+      toast({
+        title: t.documentUploaded || "Document Uploaded",
+        description: t.documentUploadedDesc || "Your document has been saved successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    } catch (error: any) {
+      toast({
+        title: t.uploadFailed || "Upload Failed",
+        description: error.message || "Failed to upload document",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingDocType(null);
+      uploadingDocTypeRef.current = null;
+      if (documentInputRef.current) {
+        documentInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Trigger document upload for a specific type
+  const triggerDocumentUpload = (docType: string) => {
+    uploadingDocTypeRef.current = docType;
+    setUploadingDocType(docType);
+    
+    if (!documentInputRef.current) {
+      toast({
+        title: "Upload Error",
+        description: "File input not found. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    documentInputRef.current.value = '';
+    
+    const handleDialogClose = () => {
+      setTimeout(() => {
+        if (documentInputRef.current && !documentInputRef.current.files?.length) {
+          setUploadingDocType(null);
+        }
+      }, 1000);
+      window.removeEventListener('focus', handleDialogClose);
+    };
+    
+    window.addEventListener('focus', handleDialogClose);
+    documentInputRef.current.click();
+  };
+
   const handleLogout = async () => {
     try {
       await apiRequest("POST", "/api/logout");
       queryClient.clear();
-      setLocation("/technician");
+      setLocation("/ground-crew");
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
   const groundCrewNavGroups: NavGroup[] = [
+    {
+      id: "dashboard",
+      label: "",
+      items: [
+        {
+          id: "dashboard",
+          label: language === 'en' ? "Dashboard" : language === 'es' ? "Panel" : "Tableau de bord",
+          icon: LayoutDashboard,
+          href: "/dashboard",
+          isVisible: () => true,
+        },
+      ],
+    },
     {
       id: "main",
       label: "NAVIGATION",
@@ -724,6 +959,13 @@ export default function GroundCrewPortal() {
       label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
       items: [
         {
+          id: "job-board",
+          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
+          icon: Briefcase,
+          href: "/ground-crew-job-board",
+          isVisible: () => true,
+        },
+        {
           id: "invitations",
           label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
           icon: Mail,
@@ -754,9 +996,9 @@ export default function GroundCrewPortal() {
       form.reset({
         name: user.name || "",
         email: user.email || "",
-        phone: user.phone || "",
+        employeePhoneNumber: user.employeePhoneNumber || "",
         birthday: user.birthday || "",
-        address: user.address || "",
+        employeeStreetAddress: user.employeeStreetAddress || "",
         city: user.employeeCity || "",
         provinceState: user.employeeProvinceState || "",
         country: user.employeeCountry || "",
@@ -1039,7 +1281,7 @@ export default function GroundCrewPortal() {
                       />
                       <FormField
                         control={form.control}
-                        name="phone"
+                        name="employeePhoneNumber"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>{t.phoneNumber}</FormLabel>
@@ -1072,7 +1314,7 @@ export default function GroundCrewPortal() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
-                          name="address"
+                          name="employeeStreetAddress"
                           render={({ field }) => (
                             <FormItem className="md:col-span-2">
                               <FormLabel>{t.streetAddress}</FormLabel>
@@ -1084,7 +1326,7 @@ export default function GroundCrewPortal() {
                         />
                         <FormField
                           control={form.control}
-                          name="city"
+                          name="employeeCity"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t.city}</FormLabel>
@@ -1096,7 +1338,7 @@ export default function GroundCrewPortal() {
                         />
                         <FormField
                           control={form.control}
-                          name="provinceState"
+                          name="employeeProvinceState"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t.provinceState}</FormLabel>
@@ -1108,7 +1350,7 @@ export default function GroundCrewPortal() {
                         />
                         <FormField
                           control={form.control}
-                          name="country"
+                          name="employeeCountry"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t.country}</FormLabel>
@@ -1120,7 +1362,7 @@ export default function GroundCrewPortal() {
                         />
                         <FormField
                           control={form.control}
-                          name="postalCode"
+                          name="employeePostalCode"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t.postalCode}</FormLabel>
@@ -1199,6 +1441,257 @@ export default function GroundCrewPortal() {
                         )}
                       />
                     </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.payrollInfo}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="socialInsuranceNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.sin}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="XXX-XXX-XXX" data-testid="input-sin" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <FormField
+                          control={form.control}
+                          name="bankTransitNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.transit}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="XXXXX" data-testid="input-bank-transit" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="bankInstitutionNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.institution}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="XXX" data-testid="input-bank-institution" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="bankAccountNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.account}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="XXXXXXX" data-testid="input-bank-account" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="mt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('voidCheque')}
+                          disabled={uploadingDocType === 'voidCheque'}
+                          data-testid="button-upload-void-cheque"
+                        >
+                          {uploadingDocType === 'voidCheque' ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 mr-2" />
+                          )}
+                          {t.uploadVoidCheque || "Upload Void Cheque"}
+                        </Button>
+                        {user?.bankDocuments && user.bankDocuments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {user.bankDocuments.map((url: string, index: number) => (
+                              <div key={index} className="flex items-center gap-2 text-sm">
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                  {t.voidCheque || "Void Cheque"} #{index + 1}
+                                </a>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeletingDocument({ documentType: 'bankDocuments', documentUrl: url })}
+                                  className="h-6 w-6 p-0"
+                                  data-testid={`button-delete-bank-doc-${index}`}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.driversLicense}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="driversLicenseNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.licenseNumber}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} data-testid="input-license-number" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="driversLicenseIssuedDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.issuedDate}</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-license-issued" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="driversLicenseExpiry"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.expiry}</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-license-expiry" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="mt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('driversLicense')}
+                          disabled={uploadingDocType === 'driversLicense'}
+                          data-testid="button-upload-drivers-license"
+                        >
+                          {uploadingDocType === 'driversLicense' ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 mr-2" />
+                          )}
+                          {t.uploadDriversLicense || "Upload Driver's License"}
+                        </Button>
+                        {user?.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {user.driversLicenseDocuments.map((url: string, index: number) => (
+                              <div key={index} className="flex items-center gap-2 text-sm">
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                  {t.driversLicense || "Driver's License"} #{index + 1}
+                                </a>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeletingDocument({ documentType: 'driversLicenseDocuments', documentUrl: url })}
+                                  className="h-6 w-6 p-0"
+                                  data-testid={`button-delete-license-doc-${index}`}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">{t.firstAid}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="firstAidType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.firstAidType}</FormLabel>
+                              <FormControl>
+                                <Input {...field} disabled={!isEditing} placeholder="OFA Level 1, Standard First Aid, etc." data-testid="input-first-aid-type" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="firstAidExpiry"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t.expiry}</FormLabel>
+                              <FormControl>
+                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-first-aid-expiry" />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="mt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('firstAidCertificate')}
+                          disabled={uploadingDocType === 'firstAidCertificate'}
+                          data-testid="button-upload-first-aid"
+                        >
+                          {uploadingDocType === 'firstAidCertificate' ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 mr-2" />
+                          )}
+                          {t.uploadFirstAidCert || "Upload First Aid Certificate"}
+                        </Button>
+                        {user?.firstAidDocuments && user.firstAidDocuments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {user.firstAidDocuments.map((url: string, index: number) => (
+                              <div key={index} className="flex items-center gap-2 text-sm">
+                                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                  {t.firstAidCertificate || "First Aid Certificate"} #{index + 1}
+                                </a>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setDeletingDocument({ documentType: 'firstAidDocuments', documentUrl: url })}
+                                  className="h-6 w-6 p-0"
+                                  data-testid={`button-delete-first-aid-doc-${index}`}
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </form>
                 </Form>
               </CardContent>
@@ -1227,7 +1720,7 @@ export default function GroundCrewPortal() {
                         <div key={invitation.id} className="border rounded-lg p-4">
                           <div className="flex items-start justify-between gap-4 flex-wrap">
                             <div className="flex-1">
-                              <p className="font-medium text-lg">{invitation.companyName || 'Company'}</p>
+                              <p className="font-medium text-lg">{invitation.company?.name || invitation.companyName || 'Company'}</p>
                               <p className="text-sm text-muted-foreground">
                                 {t.invitedOn}: {formatLocalDate(invitation.createdAt)}
                               </p>
@@ -1414,6 +1907,35 @@ export default function GroundCrewPortal() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={!!deletingDocument} onOpenChange={(open) => !open && setDeletingDocument(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.confirmDelete}</AlertDialogTitle>
+            <AlertDialogDescription>{t.confirmDeleteDesc}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deletingDocument && deleteDocumentMutation.mutate(deletingDocument)}
+              className="bg-destructive text-destructive-foreground"
+              disabled={deleteDocumentMutation.isPending}
+              data-testid="button-confirm-delete"
+            >
+              {deleteDocumentMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t.deleteDocument}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <input
+        ref={documentInputRef}
+        type="file"
+        accept="image/*,application/pdf"
+        className="hidden"
+        onChange={handleDocumentUpload}
+        data-testid="input-document-file"
+      />
     </div>
   );
 }

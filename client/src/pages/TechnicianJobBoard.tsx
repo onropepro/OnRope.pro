@@ -381,7 +381,12 @@ export default function TechnicianJobBoard() {
   });
 
   const { data: jobsData, isLoading: jobsLoading } = useQuery<{ jobPostings: JobPosting[] }>({
-    queryKey: ["/api/job-postings/public"],
+    queryKey: ["/api/job-postings/public", "rope_access"],
+    queryFn: async () => {
+      const res = await fetch("/api/job-postings/public?positionType=rope_access", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch jobs");
+      return res.json();
+    },
   });
 
   const { data: applicationsData } = useQuery<{ applications: ApplicationWithJob[] }>({

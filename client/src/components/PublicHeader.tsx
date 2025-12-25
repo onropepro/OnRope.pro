@@ -108,7 +108,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
 
   const navItems = [
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
-    { id: "technician", label: t('navigation.technician', 'Technician'), href: "/technician" },
+    { id: "technician", label: t('navigation.technician', 'Rope Access Technician / Ground Crew'), href: "/technician" },
     { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
     { id: "resident", label: t('navigation.resident', 'Resident'), href: "/resident" },
     { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-portal" },
@@ -565,7 +565,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
-                {t('navigation.technician', 'Technician')}
+                {t('navigation.technician', 'Rope Access Technician / Ground Crew')}
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showTechnicianMenu && (
@@ -604,6 +604,26 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.technicianJobBoard.description', 'Browse jobs, apply instantly, control profile visibility')}</div>
                       </div>
                     </button>
+                    
+                    <div className="border-t pt-3 mt-2">
+                      <div className="text-xs font-medium text-muted-foreground mb-2 px-1">{t('navigation.supportRoles', 'Support Roles')}</div>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
+                        onClick={() => {
+                          setLocation("/ground-crew");
+                          setShowTechnicianMenu(false);
+                        }}
+                        data-testid="nav-ground-crew"
+                      >
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform" style={{ backgroundColor: "#5D7B6F20" }}>
+                          <HardHat className="w-5 h-5" style={{ color: "#5D7B6F" }} />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.groundCrew.title', 'Ground Crew')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.groundCrew.description', 'Support techs from the ground, no heights required')}</div>
+                        </div>
+                      </button>
+                    </div>
                     </div>
                   </div>
                 </div>
@@ -850,7 +870,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
               >
-                <span>{t('navigation.technician', 'Technician')}</span>
+                <span>{t('navigation.technician', 'Rope Access Technician / Ground Crew')}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileTechnicianExpanded ? "rotate-180" : ""}`} />
               </button>
               
