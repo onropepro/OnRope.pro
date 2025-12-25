@@ -6909,7 +6909,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/superuser/gift-company", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7110,7 +7110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create staff account
   app.post("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
           return res.status(403).json({ message: "Access denied. Insufficient permissions." });
         }
@@ -7165,7 +7165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update staff account
   app.patch("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
           return res.status(403).json({ message: "Access denied. Insufficient permissions." });
         }
@@ -7203,7 +7203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete staff account
   app.delete("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
           return res.status(403).json({ message: "Access denied. Insufficient permissions." });
         }
@@ -7254,7 +7254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only superuser can add resources
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7289,7 +7289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/founder-resources/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only superuser can delete resources
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
 
   // Database Cost Tracking Endpoints
@@ -7342,7 +7342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add a database cost entry
   app.post("/api/superuser/database-costs", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7366,7 +7366,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a database cost entry
   app.delete("/api/superuser/database-costs/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7395,7 +7395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/superuser/companies/:id/gift-addons", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7489,7 +7489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/superuser/companies/:id/remove-legacy-seats", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7712,7 +7712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update feature request status
   app.patch("/api/superuser/feature-requests/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7740,7 +7740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Send message on feature request
   app.post("/api/superuser/feature-requests/:id/messages", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7792,7 +7792,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Create a future idea
   app.post("/api/superuser/future-ideas", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7812,7 +7812,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update a future idea
   app.patch("/api/superuser/future-ideas/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7845,7 +7845,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Delete a future idea
   app.delete("/api/superuser/future-ideas/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8028,7 +8028,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update building details
   app.patch("/api/superuser/buildings/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8058,7 +8058,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Reset building password
   app.post("/api/superuser/buildings/:id/reset-password", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8081,7 +8081,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Geocode a building's address to get lat/lng
   app.post("/api/superuser/buildings/:id/geocode", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8147,7 +8147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Batch geocode all buildings without coordinates
   app.post("/api/superuser/buildings/geocode-all", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8657,7 +8657,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle PLUS access for a technician (SuperUser only)
   app.put("/api/superuser/technicians/:technicianId/plus-access", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8694,7 +8694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Disable/Enable account (SuperUser only) - for fraud or misuse
   app.put("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8839,7 +8839,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new SuperUser task
   app.post("/api/superuser/tasks", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8869,7 +8869,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update a SuperUser task (status, details)
   app.patch("/api/superuser/tasks/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8940,7 +8940,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a SuperUser task
   app.delete("/api/superuser/tasks/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8958,7 +8958,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add a comment to a SuperUser task
   app.post("/api/superuser/tasks/:id/comments", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8985,7 +8985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a comment
   app.delete("/api/superuser/tasks/:taskId/comments/:commentId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -9058,7 +9058,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload attachment to a task
   app.post("/api/superuser/tasks/:id/attachments", requireAuth, taskAttachmentUpload.single('file'), async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -9155,7 +9155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete attachment
   app.delete("/api/superuser/tasks/:taskId/attachments/:attachmentId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
