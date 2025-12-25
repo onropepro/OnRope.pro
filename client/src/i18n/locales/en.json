@@ -12600,7 +12600,7 @@
       }
     },
     "modules": {
-      "title": "18 Modules. One Platform. All Connected. All Included.",
+      "title": "19 Modules. One Platform. All Connected. All Included.",
       "subtitle": "Everything you need to run a profitable rope access company, from first quote to final payment and every drop inbetween.",
       "categories": {
         "all": "All Modules",
@@ -12636,8 +12636,12 @@
           "desc": "Digital forms, PDF plans, and audit-ready documentation"
         },
         "companySafetyRating": {
-          "name": "Safety Rating",
+          "name": "Company Safety Rating",
           "desc": "Real-time company safety score based on inspections and compliance"
+        },
+        "personalSafetyRating": {
+          "name": "Personal Safety Rating",
+          "desc": "Portable technician safety score that follows you across employers"
         },
         "irataSpratLogging": {
           "name": "IRATA/SPRAT Logging",
