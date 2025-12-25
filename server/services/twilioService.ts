@@ -115,8 +115,8 @@ export async function sendTeamInvitationSMS(
 ): Promise<{ success: boolean; error?: string }> {
   const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || 'onropepro.com';
   const loginUrl = `https://${domain}/technician`;
-  // Match quote message style which delivers successfully
-  const message = `You've received a team invitation from ${companyName}. Log in to respond: ${loginUrl}`;
+  // Twilio compliant: Sender ID + clear message + opt-out
+  const message = `OnRopePro: ${companyName} has invited you to join their team. Log in to respond: ${loginUrl} Reply STOP to opt out.`;
   
   const result = await sendSMS(phoneNumber, message);
   
@@ -133,7 +133,8 @@ export async function sendInvitationAcceptedSMS(
   employeeRole: string
 ): Promise<{ success: boolean; error?: string; messageId?: string }> {
   const roleDisplay = employeeRole === 'ground_crew' ? 'ground crew member' : 'technician';
-  const message = `OnRopePro: ${employeeName} has accepted your team invitation and joined as a ${roleDisplay}.`;
+  // Twilio compliant: Sender ID + clear message + opt-out
+  const message = `OnRopePro: ${employeeName} has accepted your invitation and joined as a ${roleDisplay}. Reply STOP to opt out.`;
   
   const result = await sendSMS(phoneNumber, message);
   

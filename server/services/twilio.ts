@@ -91,7 +91,8 @@ export async function sendQuoteNotificationSMS(
     ? `${buildingName} (${strataPlanNumber})`
     : buildingName;
   
-  const message = `You've received a quote for ${servicesText} at ${buildingInfo} from ${companyName}. Log in to review: ${pmLoginUrl}`;
+  // Twilio compliant: Sender ID + clear message + opt-out
+  const message = `OnRopePro: ${companyName} has sent you a quote for ${servicesText} at ${buildingInfo}. Log in to review: ${pmLoginUrl} Reply STOP to opt out.`;
   
   return sendSMS(phoneNumber, message);
 }
