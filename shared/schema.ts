@@ -1795,6 +1795,9 @@ export const updatePropertyManagerAccountSchema = z.object({
 
 export type UpdatePropertyManagerAccount = z.infer<typeof updatePropertyManagerAccountSchema>;
 
+// Helper to handle null values for optional numbers (forms often send null instead of undefined)
+const optionalNumber = z.union([z.number(), z.null()]).transform(v => v === null ? undefined : v).optional();
+
 export const insertClientSchema = createInsertSchema(clients).omit({
   id: true,
   createdAt: true,
@@ -1803,14 +1806,14 @@ export const insertClientSchema = createInsertSchema(clients).omit({
   lmsNumbers: z.array(z.object({
     number: z.string(),
     address: z.string(),
-    stories: z.number().optional(),
-    units: z.number().optional(),
-    parkingStalls: z.number().optional(),
-    dailyDropTarget: z.number().optional(),
-    totalDropsNorth: z.number().optional(),
-    totalDropsEast: z.number().optional(),
-    totalDropsSouth: z.number().optional(),
-    totalDropsWest: z.number().optional(),
+    stories: optionalNumber,
+    units: optionalNumber,
+    parkingStalls: optionalNumber,
+    dailyDropTarget: optionalNumber,
+    totalDropsNorth: optionalNumber,
+    totalDropsEast: optionalNumber,
+    totalDropsSouth: optionalNumber,
+    totalDropsWest: optionalNumber,
   })).optional(),
 });
 
