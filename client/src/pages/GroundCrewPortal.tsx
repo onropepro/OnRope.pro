@@ -231,6 +231,17 @@ const translations = {
     helpCenter: "Help Center",
     helpCenterDesc: "Get help with using the platform",
     openHelpCenter: "Open Help Center",
+    completeYourProfile: "Complete Your Profile",
+    completeProfileDesc: "Complete your profile to connect with employers instantly",
+    jobBoard: "Job Board",
+    browseJobs: "Browse Jobs",
+    profile: "Profile",
+    editProfileAction: "Edit Profile",
+    feedback: "Feedback",
+    sendFeedback: "Send Feedback",
+    documents: "Documents",
+    manageDocuments: "Manage Documents",
+    more: "more",
   },
   fr: {
     groundCrewPortal: "Portail Équipe au Sol",
@@ -383,6 +394,17 @@ const translations = {
     helpCenter: "Centre d'Aide",
     helpCenterDesc: "Obtenez de l'aide pour utiliser la plateforme",
     openHelpCenter: "Ouvrir le Centre d'Aide",
+    completeYourProfile: "Complétez Votre Profil",
+    completeProfileDesc: "Complétez votre profil pour vous connecter instantanément avec les employeurs",
+    jobBoard: "Offres d'emploi",
+    browseJobs: "Parcourir",
+    profile: "Profil",
+    editProfileAction: "Modifier le Profil",
+    feedback: "Commentaires",
+    sendFeedback: "Envoyer",
+    documents: "Documents",
+    manageDocuments: "Gérer Documents",
+    more: "de plus",
   },
   es: {
     groundCrewPortal: "Portal Equipo de Tierra",
@@ -535,6 +557,17 @@ const translations = {
     helpCenter: "Centro de Ayuda",
     helpCenterDesc: "Obtenga ayuda para usar la plataforma",
     openHelpCenter: "Abrir Centro de Ayuda",
+    completeYourProfile: "Complete Su Perfil",
+    completeProfileDesc: "Complete su perfil para conectarse con empleadores al instante",
+    jobBoard: "Bolsa de Trabajo",
+    browseJobs: "Buscar Trabajos",
+    profile: "Perfil",
+    editProfileAction: "Editar Perfil",
+    feedback: "Comentarios",
+    sendFeedback: "Enviar",
+    documents: "Documentos",
+    manageDocuments: "Gestionar Documentos",
+    more: "más",
   }
 };
 
@@ -645,6 +678,35 @@ export default function GroundCrewPortal() {
   });
 
   const pendingInvitations = invitationsData?.invitations || [];
+
+  // Profile completion calculation for Ground Crew
+  const profileCompletion = (() => {
+    if (!user) return { percentage: 0, isComplete: true, incompleteFields: [] };
+    
+    const requiredFields = [
+      { key: 'employeePhoneNumber', label: t.phoneNumber },
+      { key: 'emergencyContactName', label: t.emergencyContact },
+      { key: 'emergencyContactPhone', label: t.contactPhone },
+      { key: 'employeeStreetAddress', label: t.address },
+    ];
+    
+    const optionalFields = [
+      { key: 'birthday', label: t.birthday },
+      { key: 'driversLicenseNumber', label: t.driversLicense },
+      { key: 'bankAccountNumber', label: t.bankAccount },
+    ];
+    
+    const allFields = [...requiredFields, ...optionalFields];
+    const completedFields = allFields.filter(field => !!user[field.key]);
+    const percentage = Math.round((completedFields.length / allFields.length) * 100);
+    const incompleteFields = allFields.filter(field => !user[field.key]);
+    
+    return {
+      percentage,
+      isComplete: percentage === 100,
+      incompleteFields,
+    };
+  })();
 
   const { data: companyData } = useQuery<any>({
     queryKey: ["/api/companies", user?.companyId],
@@ -1019,19 +1081,6 @@ export default function GroundCrewPortal() {
 
   const groundCrewNavGroups: NavGroup[] = [
     {
-      id: "dashboard",
-      label: "",
-      items: [
-        {
-          id: "dashboard",
-          label: language === 'en' ? "Dashboard" : language === 'es' ? "Panel" : "Tableau de bord",
-          icon: LayoutDashboard,
-          href: "/dashboard",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
       id: "main",
       label: "NAVIGATION",
       items: [
@@ -1232,90 +1281,214 @@ export default function GroundCrewPortal() {
         <main className="px-4 sm:px-6 py-6 pb-24 lg:pb-6">
           {activeTab === 'home' && (
             <div className="space-y-6 max-w-4xl mx-auto">
-              <div className="flex items-center gap-4">
-                <Avatar className="w-16 h-16 bg-[#5D7B6F]">
-                  {user.photoUrl ? (
-                    <AvatarImage src={user.photoUrl} alt={user.name} />
-                  ) : (
-                    <AvatarFallback className="bg-[#5D7B6F] text-white text-xl font-medium">
-                      {user.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <div>
-                  <h1 className="text-2xl font-bold">{t.welcome}, {user.name?.split(' ')[0] || 'User'}!</h1>
-                  <p className="text-muted-foreground">{t.groundCrewMember}</p>
-                </div>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Briefcase className="w-5 h-5" />
-                    {t.yourStatus}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">{t.employmentStatus}</span>
-                    {user.companyId && !user.terminatedDate ? (
-                      <Badge variant="default" className="bg-green-600">
-                        <CheckCircle2 className="w-3 h-3 mr-1" />
-                        {t.employed}
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">
-                        {t.notEmployed}
-                      </Badge>
-                    )}
-                  </div>
-
-                  {user.companyId && !user.terminatedDate && companyData?.company && (
-                    <div className="pt-2 border-t">
-                      <div className="flex items-center gap-3">
-                        <Building2 className="w-5 h-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium">{companyData.company.name}</p>
-                          <p className="text-sm text-muted-foreground">{t.currentEmployer}</p>
-                        </div>
+              {/* Go to Work Dashboard Card */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+                <div className="p-4 sm:p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-lg ${user.companyId && !user.terminatedDate ? "bg-[#5D7B6F]/10 dark:bg-[#5D7B6F]/20" : "bg-slate-100 dark:bg-slate-800"}`}>
+                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate ? "text-[#5D7B6F]" : "text-slate-400"}`} />
+                      </div>
+                      <div>
+                        <p className={`font-semibold ${!user.companyId || user.terminatedDate ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
+                        <p className="text-base text-slate-500 dark:text-slate-400">{t.accessProjects}</p>
                       </div>
                     </div>
-                  )}
-
-                  {user.companyId && !user.terminatedDate && (
                     <Button
-                      className="w-full mt-4"
-                      onClick={() => setLocation('/dashboard')}
+                      onClick={() => setLocation("/dashboard")}
+                      className="gap-2 bg-[#0B64A3] hover:bg-[#0B64A3]/90 text-white"
+                      disabled={!user.companyId || !!user.terminatedDate}
                       data-testid="button-go-to-dashboard"
                     >
                       {t.goToWorkDashboard}
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      <ArrowRight className="w-4 h-4" />
                     </Button>
-                  )}
-
-                  {!user.companyId && (
-                    <div className="bg-muted/50 rounded-lg p-4">
-                      <p className="text-sm text-muted-foreground">{t.dashboardDisabledNoCompany}</p>
+                  </div>
+                  {(!user.companyId || user.terminatedDate) && (
+                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <p className="text-base text-slate-500 dark:text-slate-400 flex-1">
+                          {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                        </p>
+                        {pendingInvitations.length > 0 && (
+                          <div className="flex flex-col gap-2 sm:items-end" data-testid="pending-invitations-section">
+                            {pendingInvitations.map((invitation: any) => (
+                              <div 
+                                key={invitation.id} 
+                                className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
+                                data-testid={`invitation-card-${invitation.id}`}
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-green-800 dark:text-green-300 truncate">
+                                    {t.invitedBy} {invitation.company?.name}
+                                  </p>
+                                </div>
+                                <div className="flex gap-1.5 flex-shrink-0">
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
+                                    onClick={() => acceptInvitationMutation.mutate(invitation.id)}
+                                    disabled={acceptInvitationMutation.isPending}
+                                    data-testid={`button-accept-invitation-${invitation.id}`}
+                                  >
+                                    {acceptInvitationMutation.isPending ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                      <Check className="w-3 h-3" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 px-2 border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                                    onClick={() => declineInvitationMutation.mutate(invitation.id)}
+                                    disabled={declineInvitationMutation.isPending}
+                                    data-testid={`button-decline-invitation-${invitation.id}`}
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              {pendingInvitations.length > 0 && (
-                <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                      <Mail className="w-5 h-5" />
-                      {t.pendingInvitations} ({pendingInvitations.length})
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Button onClick={() => setActiveTab('invitations')} variant="outline">
-                      {language === 'en' ? 'View Invitations' : language === 'es' ? 'Ver Invitaciones' : 'Voir les Invitations'}
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </CardContent>
-                </Card>
+              {/* Profile Completion Card - Show until complete */}
+              {!profileCompletion.isComplete && (
+                <div 
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow" 
+                  onClick={() => setActiveTab('profile')}
+                  data-testid="card-profile-completion-home"
+                >
+                  <div className="p-4 sm:p-5">
+                    <div className="flex items-start gap-4">
+                      <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/30">
+                        <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+                            {t.completeYourProfile}
+                          </h3>
+                          <span className="text-base font-semibold text-[#5D7B6F]">{profileCompletion.percentage}%</span>
+                        </div>
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mb-3">
+                          <div 
+                            className="bg-[#5D7B6F] h-2 rounded-full transition-all" 
+                            style={{ width: `${profileCompletion.percentage}%` }}
+                          />
+                        </div>
+                        <p className="text-base text-slate-500 dark:text-slate-400 mb-3">
+                          {t.completeProfileDesc}
+                        </p>
+                        {profileCompletion.incompleteFields.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {profileCompletion.incompleteFields.slice(0, 3).map((field, i) => (
+                              <span key={i} className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+                                {field.label}
+                              </span>
+                            ))}
+                            {profileCompletion.incompleteFields.length > 3 && (
+                              <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600">
+                                +{profileCompletion.incompleteFields.length - 3} {t.more}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <ArrowRight className="w-5 h-5 text-[#5D7B6F] flex-shrink-0" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Actions Grid - 4 columns on desktop, 2 on mobile */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {/* Job Board */}
+                <button
+                  onClick={() => setLocation("/ground-crew-job-board")}
+                  className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
+                  data-testid="quick-action-jobs"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-3">
+                    <Briefcase className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#5D7B6F] transition-colors">{t.jobBoard}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{t.browseJobs}</p>
+                </button>
+                
+                {/* Profile */}
+                <button
+                  onClick={() => setActiveTab('profile')}
+                  className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
+                  data-testid="quick-action-profile"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+                    <User className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  </div>
+                  <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#5D7B6F] transition-colors">{t.profile}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{t.editProfileAction}</p>
+                </button>
+                
+                {/* Team Invitations */}
+                <button
+                  onClick={() => setActiveTab('invitations')}
+                  className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all relative"
+                  data-testid="quick-action-invitations"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-3">
+                    <Mail className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#5D7B6F] transition-colors">{t.teamInvitations}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{t.pendingInvitations}</p>
+                  {pendingInvitations.length > 0 && (
+                    <span className="absolute top-3 right-3 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                      {pendingInvitations.length}
+                    </span>
+                  )}
+                </button>
+                
+                {/* Help Center */}
+                <button
+                  onClick={() => setLocation("/help")}
+                  className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
+                  data-testid="quick-action-help"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center mb-3">
+                    <Shield className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                  </div>
+                  <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#5D7B6F] transition-colors">{t.helpCenter}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{t.helpCenterDesc}</p>
+                </button>
+              </div>
+
+              {/* Current Employment Status Card - Only show when employed */}
+              {user.companyId && !user.terminatedDate && companyData?.company && (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+                  <div className="p-4 sm:p-5">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2.5 rounded-lg bg-green-50 dark:bg-green-900/30">
+                        <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.name}</p>
+                          <Badge variant="default" className="bg-green-600 text-xs">
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                            {t.employed}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.currentEmployer}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           )}
