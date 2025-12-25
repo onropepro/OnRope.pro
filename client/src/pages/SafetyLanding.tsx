@@ -43,7 +43,7 @@ export default function SafetyLanding() {
       <PublicHeader activeNav="modules" />
       
       {/* Hero Section */}
-      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #064E7B 100%)'}}>
+      <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #193a63 0%, #112a4d 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtOS45NDEgMC0xOCA4LjA1OS0xOCAxOHM4LjA1OSAxOCAxOCAxOGM5Ljk0MSAwIDE4LTguMDU5IDE4LTE4cy04LjA1OS0xOC0xOC0xOHptMCAzMmMtNy43MzIgMC0xNC02LjI2OC0xNC0xNHM2LjI2OC0xNCAxNC0xNHMxNCA2LjI2OCAxNCAxNC02LjI2OCAxNC0xNCAxNHoiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L2c+PC9zdmc+')] opacity-30"></div>
         
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
@@ -64,7 +64,7 @@ export default function SafetyLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+              <Button size="lg" className="bg-white text-[#193a63] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
                 Start Building Your Safety Record
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
@@ -561,7 +561,7 @@ export default function SafetyLanding() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-20 px-4 text-center" style={{backgroundImage: 'linear-gradient(135deg, #0B64A3 0%, #064E7B 100%)'}}>
+      <section className="py-16 md:py-20 px-4 text-center" style={{backgroundColor: '#193a63'}}>
         <div className="max-w-3xl mx-auto text-white">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Start Building Your Safety Record Today
@@ -570,7 +570,7 @@ export default function SafetyLanding() {
             Your safety practices are either measured or they're made up. Start measuring.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-start">
+            <Button size="lg" className="bg-white text-[#193a63] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-start">
               Get Started Free
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
