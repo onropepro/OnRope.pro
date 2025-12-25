@@ -11,6 +11,7 @@ import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 interface PublicHeaderProps {
   activeNav?: "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew" | "modules";
   onSignInClick?: () => void;
+  stakeholderColor?: string;
 }
 
 // Stakeholder color constants
@@ -23,7 +24,7 @@ const STAKEHOLDER_COLORS = {
   employer: "#0B64A3", // Ocean Blue for employer - matches hero gradients
 } as const;
 
-export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
+export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propStakeholderColor }: PublicHeaderProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const { openLogin } = useAuthPortal();
@@ -40,6 +41,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   
   // Determine stakeholder color based on current path
   const getStakeholderColor = (): string | null => {
+    if (propStakeholderColor) return propStakeholderColor;
     const path = location.toLowerCase();
     // Homepage uses employer Ocean Blue
     if (path === '/') {
@@ -119,7 +121,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
       {/* Top Utility Bar */}
       <div 
         className="border-b border-white/10"
-        style={{ backgroundColor: stakeholderColor || '#0B64A3' }}
+        style={{ backgroundColor: getStakeholderColor() || '#0B64A3' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-start sm:justify-end overflow-x-auto">
           <div className="flex items-center gap-1 sm:gap-2 w-max">
@@ -141,7 +143,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             >
               {t('login.header.pricing', 'Pricing')}
             </Button>
-            <InstallPWAButton stakeholderColor={stakeholderColor || '#0B64A3'} />
+            <InstallPWAButton stakeholderColor={getStakeholderColor() || '#0B64A3'} />
             <Button 
               variant="ghost"
               size="sm"
@@ -155,7 +157,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <LanguageDropdown 
               variant="ghost" 
               size="sm" 
-              stakeholderColor={stakeholderColor || '#0B64A3'}
+              stakeholderColor={getStakeholderColor() || '#0B64A3'}
             />
           </div>
         </div>
