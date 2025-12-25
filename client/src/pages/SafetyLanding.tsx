@@ -40,7 +40,7 @@ export default function SafetyLanding() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
-      <PublicHeader activeNav="modules" />
+      <PublicHeader activeNav="modules" stakeholderColor="#193a63" />
       
       {/* Hero Section */}
       <section className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #193a63 0%, #112a4d 100%)'}}>

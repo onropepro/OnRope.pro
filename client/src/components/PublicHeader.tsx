@@ -118,7 +118,8 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     <header className="sticky top-0 z-50">
       {/* Top Utility Bar */}
       <div 
-        className="bg-[#193a63] border-b border-white/10"
+        className="border-b border-white/10"
+        style={{ backgroundColor: stakeholderColor || '#0B64A3' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-start sm:justify-end overflow-x-auto">
           <div className="flex items-center gap-1 sm:gap-2 w-max">
@@ -140,7 +141,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             >
               {t('login.header.pricing', 'Pricing')}
             </Button>
-            <InstallPWAButton stakeholderColor="#0B64A3" />
+            <InstallPWAButton stakeholderColor={stakeholderColor || '#0B64A3'} />
             <Button 
               variant="ghost"
               size="sm"
@@ -154,7 +155,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             <LanguageDropdown 
               variant="ghost" 
               size="sm" 
-              stakeholderColor="#0B64A3"
+              stakeholderColor={stakeholderColor || '#0B64A3'}
             />
           </div>
         </div>
