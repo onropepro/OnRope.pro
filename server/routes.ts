@@ -9306,6 +9306,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Ground crew and rope access tech profile fields
       if (user.role === "ground_crew" || user.role === "ground_crew_supervisor" || user.role === "rope_access_tech") {
         // Map form fields to database columns
+        // Handle both field name variations from different frontend forms
+        if (req.body.employeePhoneNumber !== undefined) {
+          updates.employeePhoneNumber = req.body.employeePhoneNumber || null;
+        }
+        if (req.body.smsNotificationsEnabled !== undefined) {
+          updates.smsNotificationsEnabled = req.body.smsNotificationsEnabled ?? false;
+        }
         if (req.body.phone !== undefined) {
           updates.employeePhoneNumber = req.body.phone || null;
         }
