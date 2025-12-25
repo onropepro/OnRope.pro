@@ -10270,6 +10270,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log(`[Team-Invite] SMS notification sent to ${technician.name}, SID: ${smsResult.messageId}`);
             smsStatus = 'sent';
             (debugInfo as any).twilioMessageSid = smsResult.messageId;
+            (debugInfo as any).twilioFormattedTo = (smsResult as any).formattedTo;
+            (debugInfo as any).twilioStatus = (smsResult as any).status;
           } else {
             console.log(`[Team-Invite] SMS notification failed for ${technician.name}: ${smsResult.error}`);
             smsStatus = 'failed';

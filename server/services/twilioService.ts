@@ -101,8 +101,8 @@ export async function sendSMS(to: string, body: string): Promise<{ success: bool
       to: formattedNumber
     });
 
-    console.log(`[Twilio] SMS sent successfully to ${formattedNumber}, SID: ${message.sid}`);
-    return { success: true, messageId: message.sid };
+    console.log(`[Twilio] SMS sent successfully to ${formattedNumber}, SID: ${message.sid}, status: ${message.status}`);
+    return { success: true, messageId: message.sid, formattedTo: formattedNumber, status: message.status };
   } catch (error: any) {
     console.error('[Twilio] Failed to send SMS:', error.message);
     return { success: false, error: error.message };
