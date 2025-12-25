@@ -3308,4 +3308,5 @@ export const databaseCosts = pgTable("database_costs", {
 export const insertDatabaseCostSchema = createInsertSchema(databaseCosts).omit({
   id: true,
   createdAt: true,
+  createdBy: true,
 });
