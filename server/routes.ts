@@ -6690,6 +6690,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
+      // Fetch all users with company role
+      const companies = await storage.getAllCompanies();
+      console.log(`[SuperUser] Found ${companies.length} companies`);
+      
+      // For each company, get the most recent activity from any user (owner + employees)
+      const companiesWithActivity = await Promise.all(companies.map(async (company) => {
+        try {
+          const { passwordHash, ...companyData } = company;
+          
+          // Query for the most recent activity across company owner and all employees
+          const activityResult = await db.select({
+            lastActivity: sql<Date>`MAX(last_activity_at)`
+          })
+          .from(users)
+          .where(
+            sql`${users.id} = ${company.id} OR ${users.companyId} = ${company.id}`
+          );
+          
+          const lastCompanyActivity = activityResult[0]?.lastActivity || company.lastActivityAt;
+          
+          return {
+            ...companyData,
+            lastCompanyActivity,
+          };
+        } catch (err) {
+          console.error(`[SuperUser] Error processing company ${company.id}:`, err);
+          const { passwordHash, ...companyData } = company;
+          return {
+            ...companyData,
+            lastCompanyActivity: company.lastActivityAt,
+          };
+        }
+      }));
+
+      res.json({ companies: companiesWithActivity });
+    } catch (error) {
+      console.error("[SuperUser] Get all companies error:", error);
+      res.status(500).json({ message: "Internal server error", error: String(error) });
+    }
   });
 
   // SuperUser: Get single company by ID
