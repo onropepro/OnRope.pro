@@ -10234,13 +10234,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: message || null,
       });
       
+      
       console.log(`[Team-Invite] Company ${companyId} sent invitation ${invitation.id} to technician ${technicianId} (${technician.name})`);
       
-      // Send SMS notification if technician has a valid phone number
-      // Team invitations are sent regardless of smsNotificationsEnabled since they are important one-time notifications
+      // Send SMS notification if technician has SMS enabled and valid phone number
       console.log(`[Team-Invite] Checking SMS for ${technician.name}: phone=${technician.employeePhoneNumber || 'none'}, smsEnabled=${technician.smsNotificationsEnabled}`);
       
-      if (technician.employeePhoneNumber) {
+      if (technician.smsNotificationsEnabled && technician.employeePhoneNumber) {
         try {
           const company = await storage.getUserById(companyId);
           const companyName = company?.companyName || 'An employer';
@@ -10258,6 +10258,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error(`[Team-Invite] SMS notification error for ${technician.name}:`, smsError);
           // Don't fail the invitation if SMS fails
         }
+      } else if (!technician.smsNotificationsEnabled) {
+        console.log(`[Team-Invite] SMS disabled for ${technician.name}, skipping SMS`);
       } else {
         console.log(`[Team-Invite] No phone number for ${technician.name}, skipping SMS`);
       }
