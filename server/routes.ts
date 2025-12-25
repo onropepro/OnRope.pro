@@ -7067,7 +7067,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only superuser or staff with manage_staff_accounts permission
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
           return res.status(403).json({ message: "Access denied. Insufficient permissions." });
         }
@@ -7088,7 +7088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single staff account
   app.get("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
           return res.status(403).json({ message: "Access denied. Insufficient permissions." });
         }
@@ -7236,7 +7236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only superuser or staff with view_founder_resources permission
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('view_founder_resources')) {
           return res.status(403).json({ message: "Access denied" });
         }
@@ -7861,7 +7861,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: View company dashboard data (impersonation mode - read-only)
   app.get("/api/superuser/impersonate/:companyId/dashboard", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7924,7 +7924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get company safety data (impersonation mode - read-only)
   app.get("/api/superuser/impersonate/:companyId/safety", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8769,7 +8769,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get account suspension status (SuperUser only)
   app.get("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
