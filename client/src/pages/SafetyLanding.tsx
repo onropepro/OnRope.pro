@@ -9,7 +9,6 @@ import { PublicHeader } from "@/components/PublicHeader";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
-import { SiteFooter } from "@/components/SiteFooter";
 import {
   Shield,
   CheckCircle2,
@@ -608,8 +607,6 @@ export default function SafetyLanding() {
           </p>
         </div>
       </section>
-
-      <SiteFooter />
 
       {/* Registration Modal */}
       <EmployerRegistration 

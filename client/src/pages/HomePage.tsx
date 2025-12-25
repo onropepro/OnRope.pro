@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import {
   ArrowRight,
   Clock,
@@ -827,8 +826,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      <SiteFooter />
     </div>
   );
 }

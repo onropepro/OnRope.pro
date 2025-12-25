@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import { trackPricingPageView } from "@/lib/analytics";
 import {
   ArrowRight,
@@ -744,8 +743,6 @@ export default function Pricing() {
           </p>
         </div>
       </section>
-
-      <SiteFooter />
     </div>
   );
 }
