@@ -959,6 +959,13 @@ export default function GroundCrewPortal() {
       label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
       items: [
         {
+          id: "job-board",
+          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
+          icon: Briefcase,
+          href: "/ground-crew-job-board",
+          isVisible: () => true,
+        },
+        {
           id: "invitations",
           label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
           icon: Mail,

@@ -37,6 +37,7 @@ type JobPosting = {
   benefits: string | null;
   workDays: string | null;
   experienceRequired: string | null;
+  positionType: string;
   status: string;
   createdAt: string;
   updatedAt: string;
@@ -124,6 +125,11 @@ const EXPERIENCE_OPTIONS = [
   { value: "expert", label: "10+ years" },
 ];
 
+const POSITION_TYPES = [
+  { value: "rope_access", label: "Rope Access Technician" },
+  { value: "ground_crew", label: "Ground Crew" },
+];
+
 export default function CompanyJobBoard() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
@@ -157,6 +163,7 @@ export default function CompanyJobBoard() {
     workDays: "",
     experienceRequired: "",
     expiresAt: "",
+    positionType: "rope_access",
   });
 
   const { data, isLoading } = useQuery<{ jobPostings: JobPosting[] }>({
@@ -345,6 +352,7 @@ export default function CompanyJobBoard() {
       workDays: "",
       experienceRequired: "",
       expiresAt: "",
+      positionType: "rope_access",
     });
   };
 
@@ -371,6 +379,7 @@ export default function CompanyJobBoard() {
       workDays: formData.workDays || null,
       experienceRequired: formData.experienceRequired || null,
       expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null,
+      positionType: formData.positionType,
     });
   };
 
@@ -399,6 +408,7 @@ export default function CompanyJobBoard() {
         workDays: formData.workDays || null,
         experienceRequired: formData.experienceRequired || null,
         expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null,
+        positionType: formData.positionType,
       },
     });
   };
@@ -427,6 +437,7 @@ export default function CompanyJobBoard() {
       workDays: job.workDays || "",
       experienceRequired: job.experienceRequired || "",
       expiresAt: job.expiresAt ? job.expiresAt.split("T")[0] : "",
+      positionType: job.positionType || "rope_access",
     });
     setEditingJob(job);
   };
@@ -649,6 +660,9 @@ export default function CompanyJobBoard() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <CardTitle className="text-base sm:text-lg truncate">{job.title}</CardTitle>
                         {getStatusBadge(job.status)}
+                        <Badge variant={job.positionType === "ground_crew" ? "secondary" : "default"} className="text-xs">
+                          {POSITION_TYPES.find(pt => pt.value === job.positionType)?.label || job.positionType}
+                        </Badge>
                       </div>
                       <CardDescription className="flex items-center gap-3 flex-wrap text-xs sm:text-sm">
                         {job.location && (
@@ -816,6 +830,23 @@ export default function CompanyJobBoard() {
                   <Label htmlFor="isRemote">{t("jobBoard.form.remote", "Remote position")}</Label>
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="positionType">{t("jobBoard.form.positionType", "Position Type")}</Label>
+              <Select value={formData.positionType} onValueChange={(v) => setFormData({ ...formData, positionType: v })}>
+                <SelectTrigger data-testid="select-position-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {POSITION_TYPES.map((pt) => (
+                    <SelectItem key={pt.value} value={pt.value}>{pt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {t("jobBoard.form.positionTypeHint", "Select whether this position is for rope access technicians or ground crew")}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

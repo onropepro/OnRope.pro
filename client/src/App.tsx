@@ -128,6 +128,7 @@ import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import PersonalSafetyDocuments from "@/pages/PersonalSafetyDocuments";
 import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
+import GroundCrewJobBoard from "@/pages/GroundCrewJobBoard";
 import TechnicianPracticeQuizzes from "@/pages/TechnicianPracticeQuizzes";
 import TechnicianPSR from "@/pages/TechnicianPSR";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
@@ -265,6 +266,11 @@ function Router() {
       <Route path="/technician-job-board">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianJobBoard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/ground-crew-job-board">
+        <ProtectedRoute allowedRoles={["ground_crew", "ground_crew_supervisor"]}>
+          <GroundCrewJobBoard />
         </ProtectedRoute>
       </Route>
       <Route path="/personal-safety-documents">

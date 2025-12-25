@@ -23415,21 +23415,28 @@ Do not include any other text, just the JSON object.`
     try {
       // Get only active, non-expired job postings
       const now = new Date();
+      const positionType = req.query.positionType as string | undefined;
+      
+      // Build conditions array
+      const conditions: any[] = [
+        eq(jobPostings.status, "active"),
+        or(
+          isNull(jobPostings.expiresAt),
+          gt(jobPostings.expiresAt, now)
+        )
+      ];
+      
+      // Add position type filter if specified
+      if (positionType && (positionType === "rope_access" || positionType === "ground_crew")) {
+        conditions.push(eq(jobPostings.positionType, positionType));
+      }
       
       const activeJobs = await db.select({
         job: jobPostings,
         companyName: users.companyName,
       }).from(jobPostings)
         .leftJoin(users, eq(jobPostings.companyId, users.id))
-        .where(
-          and(
-            eq(jobPostings.status, "active"),
-            or(
-              isNull(jobPostings.expiresAt),
-              gt(jobPostings.expiresAt, now)
-            )
-          )
-        )
+        .where(and(...conditions))
         .orderBy(desc(jobPostings.createdAt));
 
       const jobsWithCompany = activeJobs.map(item => ({
