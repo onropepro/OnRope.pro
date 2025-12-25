@@ -6686,7 +6686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/superuser/companies", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -6735,7 +6735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/superuser/companies/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -6757,7 +6757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get company analytics for SuperUser
   app.get("/api/superuser/companies/:id/analytics", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -6861,7 +6861,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/superuser/companies/:id/employees", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7296,7 +7296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all database costs with period summaries
   app.get("/api/superuser/database-costs", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7572,7 +7572,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get MRR metrics summary
   app.get("/api/superuser/metrics/mrr", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7597,7 +7597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get customer summary metrics
   app.get("/api/superuser/metrics/customers", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7612,7 +7612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get product usage metrics
   app.get("/api/superuser/metrics/usage", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7627,7 +7627,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get subscription breakdown by company
   app.get("/api/superuser/metrics/subscriptions", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7642,7 +7642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get combined dashboard metrics summary
   app.get("/api/superuser/metrics/summary", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7675,7 +7675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all feature requests with messages
   app.get("/api/superuser/feature-requests", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7777,7 +7777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all future ideas
   app.get("/api/superuser/future-ideas", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7967,7 +7967,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all buildings
   app.get("/api/superuser/buildings", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -7986,7 +7986,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get single building with project history
   app.get("/api/superuser/buildings/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -8471,7 +8471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all technicians (SuperUser only)
   app.get("/api/superuser/technicians", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -8548,7 +8548,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single technician details (SuperUser only)
   app.get("/api/superuser/technicians/:technicianId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -8801,7 +8801,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all SuperUser tasks with comments
   app.get("/api/superuser/tasks", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -9038,7 +9038,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get attachments for a task
   app.get("/api/superuser/tasks/:id/attachments", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
@@ -9116,7 +9116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Download attachment
   app.get("/api/superuser/tasks/:taskId/attachments/:attachmentId/download", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
