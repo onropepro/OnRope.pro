@@ -7055,6 +7055,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(403).json({ message: "Access denied. Insufficient permissions." });
     };
   };
+
+  // Inline helper to check superuser or staff permission (returns true if authorized)
+  const isSuperuserOrHasPermission = (req: Request, permission: string): boolean => {
+    if (req.session.userId === 'superuser') return true;
+    if (req.session.role === 'staff' && req.session.staffPermissions?.includes(permission)) return true;
+    return false;
+  };
   
   // Get all staff accounts (superuser or staff with manage_staff_accounts permission)
   app.get("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
