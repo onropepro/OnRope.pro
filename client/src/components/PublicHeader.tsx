@@ -142,7 +142,6 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
             >
               {t('login.header.pricing', 'Pricing')}
             </Button>
-            <InstallPWAButton stakeholderColor="#0B64A3" />
             <Button 
               variant="ghost"
               size="sm"
@@ -150,9 +149,9 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               className="hidden sm:inline-flex text-white hover:bg-white/10"
               data-testid="button-help-header"
             >
-              <HelpCircle className="w-4 h-4 mr-1" />
               {t('navigation.help', 'Help')}
             </Button>
+            <InstallPWAButton stakeholderColor="#0B64A3" />
             <LanguageDropdown 
               variant="ghost" 
               size="sm" 
