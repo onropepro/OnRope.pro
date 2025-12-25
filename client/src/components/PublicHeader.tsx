@@ -121,41 +121,43 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
         className={stakeholderColor ? "border-b border-white/20" : "bg-muted border-b border-border/50"}
         style={stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-end gap-3">
-          <Button 
-            variant="ghost"
-            size="sm"
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={onSignInClick || openLogin}
-            data-testid="button-sign-in-header"
-          >
-            {t('login.header.signIn', 'Sign In')}
-          </Button>
-          <Button 
-            variant="ghost"
-            size="sm"
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={() => setLocation("/pricing")}
-            data-testid="link-pricing-header"
-          >
-            {t('login.header.pricing', 'Pricing')}
-          </Button>
-          <InstallPWAButton stakeholderColor={stakeholderColor} />
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation("/help")}
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            data-testid="button-help-header"
-          >
-            <HelpCircle className="w-4 h-4 mr-1" />
-            {t('navigation.help', 'Help')}
-          </Button>
-          <LanguageDropdown 
-            variant="ghost" 
-            size="sm" 
-            stakeholderColor={stakeholderColor}
-          />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-start sm:justify-end overflow-x-auto">
+          <div className="flex items-center gap-1 sm:gap-2 w-max">
+            <Button 
+              variant="ghost"
+              size="sm"
+              className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
+              onClick={onSignInClick || openLogin}
+              data-testid="button-sign-in-header"
+            >
+              {t('login.header.signIn', 'Sign In')}
+            </Button>
+            <Button 
+              variant="ghost"
+              size="sm"
+              className={`hidden sm:inline-flex ${stakeholderColor ? "text-white hover:bg-white/10" : ""}`}
+              onClick={() => setLocation("/pricing")}
+              data-testid="link-pricing-header"
+            >
+              {t('login.header.pricing', 'Pricing')}
+            </Button>
+            <InstallPWAButton stakeholderColor={stakeholderColor} />
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/help")}
+              className={`hidden sm:inline-flex ${stakeholderColor ? "text-white hover:bg-white/10" : ""}`}
+              data-testid="button-help-header"
+            >
+              <HelpCircle className="w-4 h-4 mr-1" />
+              {t('navigation.help', 'Help')}
+            </Button>
+            <LanguageDropdown 
+              variant="ghost" 
+              size="sm" 
+              stakeholderColor={stakeholderColor}
+            />
+          </div>
         </div>
       </div>
 

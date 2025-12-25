@@ -278,7 +278,7 @@ export class Storage {
     if (membership.connectionType === 'primary') {
       // Primary connection - set suspendedAt on user record
       await this.updateUser(employeeId, {
-        suspendedAt: new Date().toISOString(),
+        suspendedAt: new Date(),
       });
     } else if (membership.connectionType === 'secondary' && membership.connectionId) {
       // Secondary connection - update the connection record status

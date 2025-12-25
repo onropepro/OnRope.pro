@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts, founderResources, insertFounderResourceSchema, databaseCosts, insertDatabaseCostSchema } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -25,7 +25,7 @@ import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
 import { sendQuoteNotificationSMS } from "./services/twilio";
-import { sendTeamInvitationSMS } from "./services/twilioService";
+import { sendTeamInvitationSMS, sendInvitationAcceptedSMS } from "./services/twilioService";
 import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
@@ -1845,20 +1845,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      // Check if user has been terminated (only applies to non-technicians)
+      // Check if user has been terminated (only applies to non-technicians and non-ground-crew)
       // Technicians can still access their portal even if terminated from a company
       // Self-resigned users (technicians who voluntarily left) are ALWAYS allowed to log in
-      const isTechnician = user.role === 'rope_access_tech' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      const isLinkableEmployee = user.role === 'rope_access_tech' || user.role === 'ground_crew' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
       const isSelfResigned = user.terminationReason === "Self-resigned";
       
-      if (user.terminatedDate && !isTechnician && !isSelfResigned) {
+      if (user.terminatedDate && !isLinkableEmployee && !isSelfResigned) {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
       // Check if user's seat has been suspended (company removed their seat)
       // Technicians can still access their portal even when suspended from a company
       // They just lose access to that specific company's dashboard
-      if (user.suspendedAt && !isTechnician) {
+      if (user.suspendedAt && !isLinkableEmployee) {
         return res.status(403).json({ message: "Your account access has been suspended. Please contact your employer for more information." });
       }
       
@@ -5452,9 +5452,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Only technicians can use this endpoint
-      if (user.role !== 'rope_access_tech') {
-        return res.status(403).json({ message: "Only technicians can leave a company" });
+      // Technicians and ground crew can use this endpoint
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians and ground crew can leave a company" });
       }
 
       // Must be linked to a company to leave
@@ -5541,7 +5541,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Only technicians can redeem referral codes
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can redeem referral codes" });
       }
 
@@ -5615,7 +5615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can upload documents through this endpoint" });
       }
 
@@ -5689,7 +5689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can delete documents through this endpoint" });
       }
 
@@ -6692,32 +6692,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Fetch all users with company role
       const companies = await storage.getAllCompanies();
+      console.log(`[SuperUser] Found ${companies.length} companies`);
       
       // For each company, get the most recent activity from any user (owner + employees)
       const companiesWithActivity = await Promise.all(companies.map(async (company) => {
-        const { passwordHash, ...companyData } = company;
-        
-        // Query for the most recent activity across company owner and all employees
-        const activityResult = await db.select({
-          lastActivity: sql<Date>`MAX(last_activity_at)`
-        })
-        .from(users)
-        .where(
-          sql`${users.id} = ${company.id} OR ${users.companyId} = ${company.id}`
-        );
-        
-        const lastCompanyActivity = activityResult[0]?.lastActivity || company.lastActivityAt;
-        
-        return {
-          ...companyData,
-          lastCompanyActivity, // Most recent activity from any user in the company
-        };
+        try {
+          const { passwordHash, ...companyData } = company;
+          
+          // Query for the most recent activity across company owner and all employees
+          const activityResult = await db.select({
+            lastActivity: sql<Date>`MAX(last_activity_at)`
+          })
+          .from(users)
+          .where(
+            sql`${users.id} = ${company.id} OR ${users.companyId} = ${company.id}`
+          );
+          
+          const lastCompanyActivity = activityResult[0]?.lastActivity || company.lastActivityAt;
+          
+          return {
+            ...companyData,
+            lastCompanyActivity,
+          };
+        } catch (err) {
+          console.error(`[SuperUser] Error processing company ${company.id}:`, err);
+          const { passwordHash, ...companyData } = company;
+          return {
+            ...companyData,
+            lastCompanyActivity: company.lastActivityAt,
+          };
+        }
       }));
 
       res.json({ companies: companiesWithActivity });
     } catch (error) {
-      console.error("Get all companies error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("[SuperUser] Get all companies error:", error);
+      res.status(500).json({ message: "Internal server error", error: String(error) });
     }
   });
 
@@ -7210,6 +7220,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message || "Failed to delete staff account" });
     }
   });
+
+  // ============================================
+  // FOUNDER RESOURCES API
+  // ============================================
+
+  // Get all founder resources
+  app.get("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser or staff with view_founder_resources permission
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('view_founder_resources')) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+
+      const resources = await db.select().from(founderResources).orderBy(founderResources.sortOrder);
+      res.json({ resources });
+    } catch (error: any) {
+      console.error("Get founder resources error:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch founder resources" });
+    }
+  });
+
+  // Add a founder resource
+  app.post("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser can add resources
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { name, url, description, icon, category } = req.body;
+
+      if (!name || !url) {
+        return res.status(400).json({ message: "Name and URL are required" });
+      }
+
+      // Get max sort order to add at the end
+      const maxOrder = await db.select({ max: sql<number>`COALESCE(MAX(sort_order), 0)` }).from(founderResources);
+      const newOrder = (maxOrder[0]?.max || 0) + 1;
+
+      const [resource] = await db.insert(founderResources).values({
+        name,
+        url,
+        description: description || null,
+        icon: icon || 'Link',
+        category: category || 'tools',
+        sortOrder: newOrder,
+        createdBy: 'superuser',
+      }).returning();
+
+      res.status(201).json({ resource });
+    } catch (error: any) {
+      console.error("Create founder resource error:", error);
+      res.status(500).json({ message: error.message || "Failed to create founder resource" });
+    }
+  });
+
+  // Delete a founder resource
+  app.delete("/api/founder-resources/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser can delete resources
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+
+  // Database Cost Tracking Endpoints
+  // Get all database costs with period summaries
+  app.get("/api/superuser/database-costs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const costs = await db.select().from(databaseCosts).orderBy(desc(databaseCosts.date));
+      
+      // Calculate period summaries
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+      const startOfDay = new Date(now);
+      startOfDay.setHours(0, 0, 0, 0);
+      
+      let allTime = 0, thisYear = 0, thisMonth = 0, thisWeek = 0, today = 0;
+      
+      costs.forEach(cost => {
+        const costDate = new Date(cost.date);
+        allTime += cost.amount;
+        if (costDate >= startOfYear) thisYear += cost.amount;
+        if (costDate >= startOfMonth) thisMonth += cost.amount;
+        if (costDate >= startOfWeek) thisWeek += cost.amount;
+        if (costDate >= startOfDay) today += cost.amount;
+      });
+      
+      res.json({
+        costs,
+        summary: {
+          allTime: Math.round(allTime * 100) / 100,
+          thisYear: Math.round(thisYear * 100) / 100,
+          thisMonth: Math.round(thisMonth * 100) / 100,
+          thisWeek: Math.round(thisWeek * 100) / 100,
+          today: Math.round(today * 100) / 100,
+        }
+      });
+    } catch (error) {
+      console.error("Get database costs error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Add a database cost entry
+  app.post("/api/superuser/database-costs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const parsed = insertDatabaseCostSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.errors });
+      }
+
+      const [newCost] = await db.insert(databaseCosts).values({
+        ...parsed.data,
+        createdBy: 'superuser',
+      }).returning();
+
+      res.status(201).json({ cost: newCost });
+    } catch (error) {
+      console.error("Add database cost error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete a database cost entry
+  app.delete("/api/superuser/database-costs/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const costId = req.params.id;
+      await db.delete(databaseCosts).where(eq(databaseCosts.id, costId));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete database cost error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+      }
+
+      const resourceId = req.params.id;
+      await db.delete(founderResources).where(eq(founderResources.id, resourceId));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Delete founder resource error:", error);
+      res.status(500).json({ message: error.message || "Failed to delete founder resource" });
+    }
+  });
+
 
   // SuperUser: Gift add-ons to an existing company
   app.post("/api/superuser/companies/:id/gift-addons", requireAuth, async (req: Request, res: Response) => {
@@ -10313,7 +10486,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view referral count" });
       }
       
@@ -10431,7 +10604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view their document requests" });
       }
       
@@ -10505,7 +10678,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can upload files to document requests" });
       }
       
@@ -10568,7 +10741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can update their document requests" });
       }
       
@@ -10772,6 +10945,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         console.log(`[Team-Invite] PLUS member ${user.id} (${user.name}) added secondary employer ${invitation.companyId} via invitation ${invitationId}`);
+        
+        // Send SMS to company owner about acceptance
+        if (company) {
+          const companyAny = company as any;
+          const ownerPhone = companyAny.employeePhoneNumber || companyAny.employee_phone_number;
+          const ownerSmsEnabled = companyAny.smsNotificationsEnabled ?? companyAny.sms_notifications_enabled;
+          if (ownerSmsEnabled && ownerPhone) {
+            try {
+              const smsResult = await sendInvitationAcceptedSMS(ownerPhone, user.name || 'A technician', user.role || 'rope_access_tech');
+              if (smsResult.success) {
+                console.log(`[Team-Invite] SMS sent to company owner about ${user.name} acceptance`);
+              }
+            } catch (smsErr) {
+              console.error('[Team-Invite] Failed to send acceptance SMS:', smsErr);
+            }
+          }
+        }
       } else {
         // Link the technician to the company and clear any previous termination status
         await storage.updateUser(user.id, {
@@ -10783,6 +10973,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         console.log(`[Team-Invite] Technician ${user.id} (${user.name}) accepted invitation ${invitationId} from company ${invitation.companyId}`);
+        
+        // Send SMS to company owner about acceptance
+        if (company) {
+          const companyAny = company as any;
+          const ownerPhone = companyAny.employeePhoneNumber || companyAny.employee_phone_number;
+          const ownerSmsEnabled = companyAny.smsNotificationsEnabled ?? companyAny.sms_notifications_enabled;
+          if (ownerSmsEnabled && ownerPhone) {
+            try {
+              const smsResult = await sendInvitationAcceptedSMS(ownerPhone, user.name || 'A technician', user.role || 'rope_access_tech');
+              if (smsResult.success) {
+                console.log(`[Team-Invite] SMS sent to company owner about ${user.name} acceptance`);
+              }
+            } catch (smsErr) {
+              console.error('[Team-Invite] Failed to send acceptance SMS:', smsErr);
+            }
+          }
+        }
       }
       
       res.json({ 
@@ -10843,7 +11050,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view employer connections" });
       }
       
@@ -10927,7 +11134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can manage employer connections" });
       }
       

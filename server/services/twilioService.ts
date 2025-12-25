@@ -113,14 +113,32 @@ export async function sendTeamInvitationSMS(
   phoneNumber: string,
   companyName: string
 ): Promise<{ success: boolean; error?: string }> {
-  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || 'onrope.pro';
-  const loginUrl = `https://${domain}/technician`;
-  const message = `${companyName} has sent you a team invite. Log in to your OnRopePro account to respond: ${loginUrl}`;
+  // Use production domain for cleaner SMS - shorter and more professional
+  // Twilio compliant: Sender ID + clear message + opt-out
+  const message = `OnRopePro: ${companyName} has invited you to join their team. Log in at onropepro.com to respond. Reply STOP to opt out.`;
   
   const result = await sendSMS(phoneNumber, message);
   
   if (result.success) {
     console.log(`[Twilio] Team invitation SMS sent to ${phoneNumber} for ${companyName}`);
+  }
+  
+  return result;
+}
+
+export async function sendInvitationAcceptedSMS(
+  phoneNumber: string,
+  employeeName: string,
+  employeeRole: string
+): Promise<{ success: boolean; error?: string; messageId?: string }> {
+  const roleDisplay = employeeRole === 'ground_crew' ? 'ground crew member' : 'technician';
+  // Twilio compliant: Sender ID + clear message + opt-out
+  const message = `OnRopePro: ${employeeName} has accepted your invitation and joined as a ${roleDisplay}. Reply STOP to opt out.`;
+  
+  const result = await sendSMS(phoneNumber, message);
+  
+  if (result.success) {
+    console.log(`[Twilio] Invitation accepted SMS sent to ${phoneNumber} for employee ${employeeName}`);
   }
   
   return result;

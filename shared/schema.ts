@@ -3250,6 +3250,7 @@ export const staffAccounts = pgTable("staff_accounts", {
   lastName: varchar("last_name", { length: 100 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  role: varchar("role", { length: 100 }),
   permissions: text("permissions").array().notNull().default([]), // Array of StaffPermission values
   isActive: boolean("is_active").default(true).notNull(),
   lastLoginAt: timestamp("last_login_at"),
@@ -3269,3 +3270,43 @@ export const insertStaffAccountSchema = createInsertSchema(staffAccounts).omit({
 
 export type StaffAccount = typeof staffAccounts.$inferSelect;
 export type InsertStaffAccount = z.infer<typeof insertStaffAccountSchema>;
+
+// ============================================
+// FOUNDER RESOURCES (Private founder links)
+// ============================================
+
+export const founderResources = pgTable("founder_resources", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  url: varchar("url", { length: 1000 }).notNull(),
+  description: varchar("description", { length: 500 }),
+  icon: varchar("icon", { length: 50 }).default("Link"), // Lucide icon name
+  category: varchar("category", { length: 50 }).default("tools"), // tools, notes, other
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: varchar("created_by"), // Staff/superuser who added it
+});
+
+export const insertFounderResourceSchema = createInsertSchema(founderResources).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FounderResource = typeof founderResources.$inferSelect;
+export type InsertFounderResource = z.infer<typeof insertFounderResourceSchema>;
+
+// Database Cost Tracking for SuperUser - tracks monthly database expenses
+export const databaseCosts = pgTable("database_costs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").notNull(), // The date/period this cost applies to
+  amount: real("amount").notNull(), // Cost in USD
+  notes: varchar("notes", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: varchar("created_by"), // superuser who added it
+});
+
+export const insertDatabaseCostSchema = createInsertSchema(databaseCosts).omit({
+  id: true,
+  createdAt: true,
+  createdBy: true,
+});
