@@ -57,7 +57,8 @@ export default function SafetyLanding() {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              PSR measures technician safety practices. CSR measures company safety culture.<br />
+              PSR measures technician safety practices.<br />
+              CSR measures company safety culture.<br />
               <strong className="text-white">When both are visible, the entire industry gets safer.</strong>
             </p>
             
@@ -154,7 +155,8 @@ export default function SafetyLanding() {
             Two Scores That Change Everything
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            When these scores matter, behavior changes. When behavior changes, people actually go home safe.
+            When these scores matter, behavior changes.<br />
+            When behavior changes, people actually go home safe.
           </p>
 
           <div className="grid md:grid-cols-2 gap-8">
