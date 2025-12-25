@@ -11867,6 +11867,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== DOCUMENT OCR ROUTES ====================
+  
+  // OCR scan driver's license to extract license number and expiry date
+  app.post("/api/ocr/drivers-license", uploadImage.single("image"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+      
+      const imageBase64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[OCR] Analyzing driver's license for user ${req.session.userId}`);
+      
+      const { analyzeDriversLicense } = await import("./gemini");
+      const result = await analyzeDriversLicense(imageBase64, mimeType);
+      
+      res.json({
+        success: result.success,
+        data: {
+          licenseNumber: result.licenseNumber,
+          expiryDate: result.expiryDate,
+          issuedDate: result.issuedDate,
+          name: result.name
+        },
+        confidence: result.confidence,
+        error: result.error
+      });
+    } catch (error: any) {
+      console.error("Driver's license OCR error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze driver's license" });
+    }
+  });
+  
+  // OCR scan void cheque to extract banking info
+  app.post("/api/ocr/void-cheque", uploadImage.single("image"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+      
+      const imageBase64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[OCR] Analyzing void cheque for user ${req.session.userId}`);
+      
+      const { analyzeVoidCheque } = await import("./gemini");
+      const result = await analyzeVoidCheque(imageBase64, mimeType);
+      
+      res.json({
+        success: result.success,
+        data: {
+          transitNumber: result.transitNumber,
+          institutionNumber: result.institutionNumber,
+          accountNumber: result.accountNumber
+        },
+        confidence: result.confidence,
+        error: result.error
+      });
+    } catch (error: any) {
+      console.error("Void cheque OCR error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze void cheque" });
+    }
+  });
+  
   // ==================== PROJECT ROUTES ====================
   
   // Upload rope access plan PDF
