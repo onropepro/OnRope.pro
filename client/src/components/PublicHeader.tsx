@@ -721,7 +721,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               <Button
                 variant="default"
                 size="sm"
-                className="font-semibold shadow-sm px-6"
+                className="font-semibold shadow-sm px-6 bg-[#AB4521] hover:bg-[#963b1c] text-white"
                 onClick={onSignInClick || openLogin}
                 data-testid="nav-sign-in"
               >
