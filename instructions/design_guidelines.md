@@ -171,6 +171,54 @@ White bg, rounded-3xl (24px), shadow-xl, gradient border (1px), p-8, subtle grad
 
 ## Navigation
 
+### Top Utility Bar (h-10)
+
+The top utility bar appears above the main navigation on public-facing pages. Its background color MUST match the hero gradient color of the current page to create visual continuity.
+
+**Color Mapping by Page:**
+| Page/Route | Utility Bar Color | Hex |
+|------------|-------------------|-----|
+| Homepage `/` | Ocean Blue | #0B64A3 |
+| Employer `/employer` | Ocean Blue | #0B64A3 |
+| Modules `/modules/*` | Ocean Blue | #0B64A3 |
+| Technician Job Board `/modules/technician-job-board` | Rust Brown | #AB4521 |
+| Technician `/technician` | Rust Brown | #AB4521 |
+| Property Manager `/property-manager` | Sage Green | #6E9075 |
+| Resident `/resident` | Mint Green | #86A59C |
+| Building Manager `/building-portal` | Warm Taupe | #B89685 |
+| Safety Manifesto `/safety` | Navy Blue | #193A63 |
+| Help pages | Matches stakeholder audience | varies |
+
+**Implementation (PublicHeader.tsx):**
+- Use `getStakeholderColor()` function to determine the correct color based on current route
+- Apply color via inline style: `style={{ backgroundColor: stakeholderColor }}`
+- Use `needsDarkText()` helper to determine if foreground text should be dark (for WCAG accessibility)
+- Pass stakeholder color and `useDarkText` flag to child components (InstallPWAButton, LanguageDropdown)
+
+**Foreground Text Color for Accessibility:**
+Some stakeholder colors are too light for white text (fails WCAG 4.5:1 contrast). Use dark text on these backgrounds:
+
+| Stakeholder | Background Color | Text Color | Hex |
+|-------------|------------------|------------|-----|
+| Resident | #86A59C (Mint) | Dark (`text-slate-900`) | contrast ~2.6:1 with white |
+| Property Manager | #6E9075 (Sage) | Dark (`text-slate-900`) | contrast ~3.2:1 with white |
+| Building Manager | #B89685 (Taupe) | Dark (`text-slate-900`) | contrast ~3.0:1 with white |
+| Employer/Modules | #0B64A3 (Ocean) | Light (`text-white`) | sufficient contrast |
+| Technician | #AB4521 (Rust) | Light (`text-white`) | sufficient contrast |
+| Safety | #193A63 (Navy) | Light (`text-white`) | sufficient contrast |
+
+**Hover States:**
+- Light backgrounds: `hover:bg-black/10`
+- Dark backgrounds: `hover:bg-white/10`
+
+**Border Colors:**
+- Light backgrounds: `border-black/10`
+- Dark backgrounds: `border-white/10`
+
+**Key Principle:** The top utility bar color creates a seamless visual connection with the hero section below, reinforcing stakeholder-specific branding throughout the page while maintaining WCAG accessibility standards.
+
+---
+
 **Desktop Header (h-16):**  
 Glass-white background with backdrop-blur-xl, shadow-sm, sticky top-0, logo 36px, Ocean Blue active nav items with 2px bottom accent, 32px avatar with gradient ring.
 

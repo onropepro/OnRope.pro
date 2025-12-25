@@ -14,15 +14,29 @@ interface PublicHeaderProps {
   stakeholderColor?: string;
 }
 
-// Stakeholder color constants
+// Stakeholder color constants - must match hero gradient colors
 const STAKEHOLDER_COLORS = {
   technician: "#AB4521",
   "property-manager": "#6E9075", 
   resident: "#86A59C",
-  "building-manager": "#4A6C8C",
+  "building-manager": "#B89685", // Warm Taupe per design guidelines
   "ground-crew": "#5D7B6F",
   employer: "#0B64A3", // Ocean Blue for employer - matches hero gradients
+  safety: "#193A63", // Navy Blue for safety manifesto page
 } as const;
+
+// Colors that require dark text for WCAG accessibility (lighter backgrounds)
+// These have insufficient contrast with white text (< 4.5:1 ratio)
+const LIGHT_BACKGROUND_COLORS: string[] = [
+  STAKEHOLDER_COLORS.resident,      // #86A59C - Mint Green
+  STAKEHOLDER_COLORS["property-manager"], // #6E9075 - Sage Green  
+  STAKEHOLDER_COLORS["building-manager"], // #B89685 - Warm Taupe
+];
+
+// Helper to determine if color needs dark foreground text
+const needsDarkText = (color: string): boolean => {
+  return LIGHT_BACKGROUND_COLORS.includes(color);
+};
 
 export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propStakeholderColor }: PublicHeaderProps) {
   const { t } = useTranslation();
@@ -40,9 +54,14 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
   const propertyManagerMenuRef = useRef<HTMLDivElement>(null);
   
   // Determine stakeholder color based on current path
-  const getStakeholderColor = (): string | null => {
+  // This color is used for BOTH the hero gradient AND the top utility bar
+  const getStakeholderColor = (): string => {
     if (propStakeholderColor) return propStakeholderColor;
     const path = location.toLowerCase();
+    // Safety manifesto page uses Navy Blue
+    if (path === '/safety') {
+      return STAKEHOLDER_COLORS.safety;
+    }
     // Homepage uses employer Ocean Blue
     if (path === '/') {
       return STAKEHOLDER_COLORS.employer;
@@ -84,10 +103,15 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
     if (path.startsWith('/building-portal') || path.startsWith('/building-manager')) {
       return STAKEHOLDER_COLORS["building-manager"];
     }
-    return null;
+    // Default to employer Ocean Blue
+    return STAKEHOLDER_COLORS.employer;
   };
   
   const stakeholderColor = getStakeholderColor();
+  const useDarkText = needsDarkText(stakeholderColor);
+  const textColorClass = useDarkText ? "text-slate-900" : "text-white";
+  const hoverBgClass = useDarkText ? "hover:bg-black/10" : "hover:bg-white/10";
+  const borderColorClass = useDarkText ? "border-black/10" : "border-white/10";
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -118,16 +142,17 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Top Utility Bar */}
+      {/* Top Utility Bar - matches hero gradient color per page */}
       <div 
-        className={`${location.toLowerCase() === '/safety' ? 'bg-[#193A63]' : 'bg-[#0B64A3]'} border-b border-white/10`}
+        className={`border-b ${borderColorClass}`}
+        style={{ backgroundColor: stakeholderColor }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-start sm:justify-end overflow-x-auto">
           <div className="flex items-center gap-1 sm:gap-2 w-max">
             <Button 
               variant="ghost"
               size="sm"
-              className="text-white hover:bg-white/10"
+              className={`${textColorClass} ${hoverBgClass}`}
               onClick={() => setLocation("/safety")}
               data-testid="button-safety-manifesto-header"
             >
@@ -136,7 +161,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
             <Button 
               variant="ghost"
               size="sm"
-              className="hidden sm:inline-flex text-white hover:bg-white/10"
+              className={`hidden sm:inline-flex ${textColorClass} ${hoverBgClass}`}
               onClick={() => setLocation("/pricing")}
               data-testid="link-pricing-header"
             >
@@ -146,16 +171,17 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/help")}
-              className="hidden sm:inline-flex text-white hover:bg-white/10"
+              className={`hidden sm:inline-flex ${textColorClass} ${hoverBgClass}`}
               data-testid="button-help-header"
             >
               {t('navigation.help', 'Help')}
             </Button>
-            <InstallPWAButton stakeholderColor="#0B64A3" />
+            <InstallPWAButton stakeholderColor={stakeholderColor} useDarkText={useDarkText} />
             <LanguageDropdown 
               variant="ghost" 
               size="sm" 
-              stakeholderColor="#0B64A3"
+              stakeholderColor={stakeholderColor}
+              useDarkText={useDarkText}
             />
           </div>
         </div>

@@ -11,10 +11,16 @@ import {
 
 interface InstallPWAButtonProps {
   stakeholderColor?: string | null;
+  useDarkText?: boolean;
 }
 
-export function InstallPWAButton({ stakeholderColor }: InstallPWAButtonProps) {
+export function InstallPWAButton({ stakeholderColor, useDarkText = false }: InstallPWAButtonProps) {
   const [showDialog, setShowDialog] = useState(false);
+
+  // Determine text/border styling based on background color contrast
+  const textColorClass = useDarkText ? "text-slate-900" : "text-white";
+  const borderColorClass = useDarkText ? "border-black/20" : "border-white/30";
+  const hoverBgClass = useDarkText ? "hover:bg-black/10" : "hover:bg-white/10";
 
   return (
     <>
@@ -22,7 +28,7 @@ export function InstallPWAButton({ stakeholderColor }: InstallPWAButtonProps) {
         onClick={() => setShowDialog(true)}
         variant="outline"
         size="sm"
-        className={stakeholderColor ? "gap-2 text-white border-white/30 hover:bg-white/10" : "gap-2"}
+        className={stakeholderColor ? `gap-2 ${textColorClass} ${borderColorClass} ${hoverBgClass}` : "gap-2"}
         data-testid="button-install-app"
       >
         <Download className="h-4 w-4" />
