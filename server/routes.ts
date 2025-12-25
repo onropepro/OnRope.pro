@@ -851,6 +851,12 @@ async function generatePmCode(): Promise<string> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Helper function to check if user is superuser or staff with specific permission
+  const isSuperuserOrHasPermission = (req: Request, permission: string): boolean => {
+    if (req.session.userId === 'superuser') return true;
+    if (req.session.role === 'staff' && req.session.staffPermissions?.includes(permission)) return true;
+    return false;
+  };
   // ==================== HELP CENTER ROUTES ====================
   app.use('/api/help', helpRouter);
   
@@ -7057,12 +7063,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Inline helper to check superuser or staff permission (returns true if authorized)
-  const isSuperuserOrHasPermission = (req: Request, permission: string): boolean => {
-    if (req.session.userId === 'superuser') return true;
-    if (req.session.role === 'staff' && req.session.staffPermissions?.includes(permission)) return true;
-    return false;
-  };
-  
   // Get all staff accounts (superuser or staff with manage_staff_accounts permission)
   app.get("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
     try {
