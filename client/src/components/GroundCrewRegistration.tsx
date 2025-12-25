@@ -218,7 +218,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
     t('groundCrewReg.benefits.fastOnboarding', 'Fast onboarding with any employer'),
     t('groundCrewReg.benefits.safetyForms', 'Digital safety forms and toolbox talks'),
     t('groundCrewReg.benefits.schedule', 'View your schedule and assignments'),
-    t('groundCrewReg.benefits.dataPortable', 'Your work history stays with you'),
+    t('groundCrewReg.benefits.dataPortable', 'You own your work history'),
   ];
 
   const welcomeBenefits = [
@@ -227,7 +227,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
     t('groundCrewReg.welcome.benefit3', 'Fast onboarding at new jobs'),
     t('groundCrewReg.welcome.benefit4', 'View your schedule anytime'),
     t('groundCrewReg.welcome.benefit5', 'GPS-verified clock in/out'),
-    t('groundCrewReg.welcome.benefit6', 'Your work history follows you'),
+    t('groundCrewReg.welcome.benefit6', 'You own your work history'),
   ];
 
   const employerBenefits = [
