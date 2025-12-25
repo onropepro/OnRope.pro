@@ -113,10 +113,9 @@ export async function sendTeamInvitationSMS(
   phoneNumber: string,
   companyName: string
 ): Promise<{ success: boolean; error?: string }> {
-  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || 'onropepro.com';
-  const loginUrl = `https://${domain}/technician`;
+  // Use production domain for cleaner SMS - shorter and more professional
   // Twilio compliant: Sender ID + clear message + opt-out
-  const message = `OnRopePro: ${companyName} has invited you to join their team. Log in to respond: ${loginUrl} Reply STOP to opt out.`;
+  const message = `OnRopePro: ${companyName} has invited you to join their team. Log in at onropepro.com to respond. Reply STOP to opt out.`;
   
   const result = await sendSMS(phoneNumber, message);
   
