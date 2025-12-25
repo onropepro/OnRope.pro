@@ -38,12 +38,16 @@ Users create a single portable account that connects to multiple entities:
 | [employer-dashboard-instructions-v1.0.md](./employer-dashboard-instructions-v1.0.md) | Company Owners, Staff | PRODUCTION-READY | Full company management dashboard with role-based access |
 | [technician-dashboard-instructions-v1.0.md](./technician-dashboard-instructions-v1.0.md) | Rope Access Technicians | PRODUCTION-READY | Personal portal with linked/unlinked states, PLUS access tier |
 | [resident-dashboard-instructions-v1.0.md](./resident-dashboard-instructions-v1.0.md) | Building Residents | PRODUCTION-READY | Feedback submission and project tracking |
+| [ground-crew-dashboard-instructions-v1.0.md](./ground-crew-dashboard-instructions-v1.0.md) | Ground Crew Workers | PRODUCTION-READY | Ground crew portal (~2K lines) - similar to technician but distinct role |
+| [property-manager-dashboard-instructions-v1.0.md](./property-manager-dashboard-instructions-v1.0.md) | Property Managers | PRODUCTION-READY | Vendor oversight and building management |
+
+**Note**: SuperUser dashboard documentation is out of scope for this series (internal platform management only).
 
 ### Shared Component Documents
 
 | Document | Scope | Status | Description |
 |----------|-------|--------|-------------|
-| [shared-dashboard-components-v1.0.md](./shared-dashboard-components-v1.0.md) | All Dashboards | PRODUCTION-READY | DashboardSidebar, DashboardLayout, stakeholder colors, customization patterns |
+| [shared-dashboard-components-v1.0.md](./shared-dashboard-components-v1.0.md) | Most Dashboards | PRODUCTION-READY | DashboardSidebar, DashboardLayout, stakeholder colors (Property Manager uses custom layout) |
 
 ---
 
@@ -55,6 +59,7 @@ Each stakeholder type has a distinct brand color used throughout their dashboard
 |-------------|-------------|----------|--------------|
 | Employer | Blue | `#0B64A3` | `--brand-employer` |
 | Technician | Rust | `#AB4521` | `--brand-technician` |
+| Ground Crew | Forest Green | `#5D7B6F` | `--brand-ground-crew` |
 | Property Manager | Sage | `#6E9075` | `--brand-pm` |
 | Resident | Teal | `#86A59C` | `--brand-resident` |
 | Building Manager | Taupe | `#B89685` | `--brand-bm` |
@@ -64,9 +69,19 @@ Each stakeholder type has a distinct brand color used throughout their dashboard
 
 ## Architecture Principles
 
-### Unified Sidebar Component
+### Sidebar Implementation
 
-All dashboards use `DashboardSidebar` with these capabilities:
+Most dashboards use the shared `DashboardSidebar` component:
+- **Employer**: Uses `DashboardSidebar` with `variant="employer"` (default)
+- **Technician**: Uses `DashboardSidebar` with `variant="technician"`
+- **Ground Crew**: Uses `DashboardSidebar` with `variant="ground-crew"`
+- **Resident**: Uses `DashboardSidebar` with `variant="resident"`
+
+**Exception**: Property Manager does NOT use `DashboardSidebar` - it implements a custom header/navigation layout. Layout updates for Property Manager must be handled separately.
+
+### DashboardSidebar Capabilities
+
+When using `DashboardSidebar`:
 - **Variant-based styling**: Pass `variant="employer"` or `variant="technician"` etc.
 - **Custom navigation groups**: Pass `customNavigationGroups` for role-specific menus
 - **Permission-based visibility**: Navigation items have `isVisible()` callbacks
@@ -74,9 +89,9 @@ All dashboards use `DashboardSidebar` with these capabilities:
 
 ### Key Architectural Decisions
 
-1. **Shared components > Custom rebuilds**: Use the unified sidebar/layout instead of rebuilding per dashboard
+1. **Shared components when possible**: Use the unified sidebar/layout for most dashboards
 2. **Permission checks at item level**: Each nav item checks user permissions via `isVisible()`
-3. **Consistent header structure**: All dashboards share similar header patterns (search, user profile, logout)
+3. **Consistent header patterns**: Most dashboards share similar header elements (search, user profile, logout)
 4. **Mobile-first with desktop sidebar**: Mobile uses bottom nav or full-screen menus
 
 ---
@@ -104,10 +119,12 @@ All dashboards use `DashboardSidebar` with these capabilities:
 |-------------|-------|---------------|
 | Employer | `/dashboard` | `client/src/pages/Dashboard.tsx` |
 | Technician | `/technician-portal` | `client/src/pages/TechnicianPortal.tsx` |
+| Ground Crew | `/ground-crew-portal` | `client/src/pages/GroundCrewPortal.tsx` |
 | Resident | `/resident-dashboard` | `client/src/pages/ResidentDashboard.tsx` |
-| Property Manager | `/property-manager-dashboard` | `client/src/pages/PropertyManagerDashboard.tsx` |
-| Building Manager | `/building-manager-dashboard` | `client/src/pages/BuildingManagerDashboard.tsx` |
-| SuperUser | `/superuser-dashboard` | `client/src/pages/SuperUserDashboard.tsx` |
+| Property Manager | `/property-manager` | `client/src/pages/PropertyManager.tsx` |
+| SuperUser | `/superuser` | `client/src/pages/SuperUser.tsx` |
+
+**Note**: Building Manager currently uses integrated features within Property Manager or other dashboards rather than a separate dedicated page.
 
 ---
 
