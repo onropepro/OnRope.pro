@@ -27,6 +27,7 @@ const footerLinks = {
     title: "STAKEHOLDERS",
     links: [
       { label: "For Employers", href: "/employer" },
+      { label: "For Technicians", href: "/technician" },
       { label: "For Property Managers", href: "/property-manager" },
       { label: "For Building Managers", href: "/building-manager" },
       { label: "For Residents", href: "/resident" },
