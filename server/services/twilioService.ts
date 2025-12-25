@@ -113,9 +113,10 @@ export async function sendTeamInvitationSMS(
   phoneNumber: string,
   companyName: string
 ): Promise<{ success: boolean; error?: string }> {
-  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || 'onrope.pro';
+  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || 'onropepro.com';
   const loginUrl = `https://${domain}/technician`;
-  const message = `${companyName} has sent you a team invite. Log in to your OnRopePro account to respond: ${loginUrl}`;
+  // Match quote message style which delivers successfully
+  const message = `You've received a team invitation from ${companyName}. Log in to respond: ${loginUrl}`;
   
   const result = await sendSMS(phoneNumber, message);
   
@@ -132,7 +133,7 @@ export async function sendInvitationAcceptedSMS(
   employeeRole: string
 ): Promise<{ success: boolean; error?: string; messageId?: string }> {
   const roleDisplay = employeeRole === 'ground_crew' ? 'ground crew member' : 'technician';
-  const message = `${employeeName} has accepted your team invite and has been added as a ${roleDisplay} to your company.`;
+  const message = `OnRopePro: ${employeeName} has accepted your team invitation and joined as a ${roleDisplay}.`;
   
   const result = await sendSMS(phoneNumber, message);
   
