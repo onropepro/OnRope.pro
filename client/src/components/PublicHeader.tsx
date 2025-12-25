@@ -569,7 +569,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               >
                 <span className="flex flex-col items-center leading-tight">
                   <span>Rope Access Technician</span>
-                  <span className="text-xs text-muted-foreground font-normal">/ Ground Crew</span>
+                  <span className="text-xs text-muted-foreground font-normal">& Ground Crew</span>
                 </span>
                 <ChevronDown className="w-3 h-3" />
               </Button>
