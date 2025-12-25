@@ -1845,20 +1845,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      // Check if user has been terminated (only applies to non-technicians)
+      // Check if user has been terminated (only applies to non-technicians and non-ground-crew)
       // Technicians can still access their portal even if terminated from a company
       // Self-resigned users (technicians who voluntarily left) are ALWAYS allowed to log in
-      const isTechnician = user.role === 'rope_access_tech' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      const isLinkableEmployee = user.role === 'rope_access_tech' || user.role === 'ground_crew' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
       const isSelfResigned = user.terminationReason === "Self-resigned";
       
-      if (user.terminatedDate && !isTechnician && !isSelfResigned) {
+      if (user.terminatedDate && !isLinkableEmployee && !isSelfResigned) {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
       // Check if user's seat has been suspended (company removed their seat)
       // Technicians can still access their portal even when suspended from a company
       // They just lose access to that specific company's dashboard
-      if (user.suspendedAt && !isTechnician) {
+      if (user.suspendedAt && !isLinkableEmployee) {
         return res.status(403).json({ message: "Your account access has been suspended. Please contact your employer for more information." });
       }
       
