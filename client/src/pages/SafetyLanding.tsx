@@ -493,7 +493,9 @@ export default function SafetyLanding() {
                 </div>
               </div>
               <p className="text-lg font-semibold text-foreground text-center pt-4">
-                When incentives align with safety, safety happens. Not as an afterthought. As the foundation of how the industry operates.
+                When incentives align with safety, safety happens. <br />
+                Not as an afterthought.<br />
+                As the foundation of how the industry operates.
               </p>
             </CardContent>
           </Card>
