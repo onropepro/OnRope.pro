@@ -1,9 +1,17 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BackButton } from "@/components/BackButton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Code,
   Rocket,
@@ -18,7 +26,15 @@ import {
   AlertCircle,
   ExternalLink,
   Mail,
-  BookOpen
+  BookOpen,
+  Plus,
+  Trash2,
+  Globe,
+  Database,
+  CreditCard,
+  MessageSquare,
+  Settings,
+  Shield
 } from "lucide-react";
 
 interface ResourceLink {
@@ -28,12 +44,37 @@ interface ResourceLink {
   icon: any;
 }
 
+interface DBResource {
+  id: string;
+  name: string;
+  url: string;
+  description: string | null;
+  icon: string | null;
+  category: string | null;
+  sortOrder: number | null;
+}
+
 interface StrategyItem {
   title: string;
   status: "completed" | "in-progress" | "planned";
   description: string;
   notes?: string;
 }
+
+const iconMap: Record<string, any> = {
+  Code,
+  Globe,
+  Database,
+  CreditCard,
+  Mail,
+  BookOpen,
+  FileText,
+  TrendingUp,
+  MessageSquare,
+  Settings,
+  Shield,
+  Link: LinkIcon,
+};
 
 const developmentTools: ResourceLink[] = [
   {
@@ -192,13 +233,135 @@ function StatusBadge({ status }: { status: "completed" | "in-progress" | "planne
 }
 
 export default function FounderResources() {
+  const { toast } = useToast();
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [newResource, setNewResource] = useState({ name: "", url: "", description: "", icon: "Link" });
+
+  // Fetch custom resources from database
+  const { data: customResources = [], isLoading } = useQuery<DBResource[]>({
+    queryKey: ["/api/founder-resources"],
+    select: (data: any) => data.resources || [],
+  });
+
+  // Add resource mutation
+  const addResourceMutation = useMutation({
+    mutationFn: async (resource: { name: string; url: string; description: string; icon: string }) => {
+      return apiRequest("POST", "/api/founder-resources", resource);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/founder-resources"] });
+      setAddDialogOpen(false);
+      setNewResource({ name: "", url: "", description: "", icon: "Link" });
+      toast({ title: "Resource added", description: "The resource has been added successfully." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to add resource", variant: "destructive" });
+    },
+  });
+
+  // Delete resource mutation
+  const deleteResourceMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest("DELETE", `/api/founder-resources/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/founder-resources"] });
+      toast({ title: "Resource deleted", description: "The resource has been removed." });
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message || "Failed to delete resource", variant: "destructive" });
+    },
+  });
+
+  const handleAddResource = () => {
+    if (!newResource.name || !newResource.url) {
+      toast({ title: "Error", description: "Name and URL are required", variant: "destructive" });
+      return;
+    }
+    addResourceMutation.mutate(newResource);
+  };
+
   return (
     <div className="min-h-screen page-gradient p-6">
       <div className="max-w-5xl mx-auto space-y-8">
         <BackButton to="/superuser" label="Back to Dashboard" />
-        <div>
-          <h1 className="text-4xl font-bold gradient-text">Founder Resources</h1>
-          <p className="text-muted-foreground mt-1">Private resources for Tommy & Glenn</p>
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-4xl font-bold gradient-text">Founder Resources</h1>
+            <p className="text-muted-foreground mt-1">Private resources for Tommy & Glenn</p>
+          </div>
+          <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-add-resource">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Resource
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Add New Resource</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    value={newResource.name}
+                    onChange={(e) => setNewResource({ ...newResource, name: e.target.value })}
+                    placeholder="Resource name"
+                    data-testid="input-resource-name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="url">URL</Label>
+                  <Input
+                    id="url"
+                    value={newResource.url}
+                    onChange={(e) => setNewResource({ ...newResource, url: e.target.value })}
+                    placeholder="https://example.com"
+                    data-testid="input-resource-url"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description (optional)</Label>
+                  <Input
+                    id="description"
+                    value={newResource.description}
+                    onChange={(e) => setNewResource({ ...newResource, description: e.target.value })}
+                    placeholder="Brief description"
+                    data-testid="input-resource-description"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="icon">Icon</Label>
+                  <Select value={newResource.icon} onValueChange={(v) => setNewResource({ ...newResource, icon: v })}>
+                    <SelectTrigger data-testid="select-resource-icon">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Link">Link</SelectItem>
+                      <SelectItem value="Code">Code</SelectItem>
+                      <SelectItem value="Globe">Globe</SelectItem>
+                      <SelectItem value="Database">Database</SelectItem>
+                      <SelectItem value="CreditCard">Payment</SelectItem>
+                      <SelectItem value="Mail">Email</SelectItem>
+                      <SelectItem value="BookOpen">Book</SelectItem>
+                      <SelectItem value="FileText">Document</SelectItem>
+                      <SelectItem value="MessageSquare">Chat</SelectItem>
+                      <SelectItem value="Settings">Settings</SelectItem>
+                      <SelectItem value="Shield">Security</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleAddResource} disabled={addResourceMutation.isPending} data-testid="button-save-resource">
+                  {addResourceMutation.isPending ? "Adding..." : "Add Resource"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -234,6 +397,43 @@ export default function FounderResources() {
                   <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                 </a>
               ))}
+              
+              {/* Custom resources from database */}
+              {customResources.map((resource) => {
+                const IconComponent = iconMap[resource.icon || "Link"] || LinkIcon;
+                return (
+                  <div
+                    key={resource.id}
+                    className="flex items-center justify-between p-3 rounded-md hover-elevate active-elevate-2 bg-muted/50 group"
+                    data-testid={`link-resource-${resource.id}`}
+                  >
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 flex-1"
+                    >
+                      <IconComponent className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <div className="font-medium">{resource.name}</div>
+                        <div className="text-sm text-muted-foreground">{resource.description || ""}</div>
+                      </div>
+                    </a>
+                    <div className="flex items-center gap-2">
+                      <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => deleteResourceMutation.mutate(resource.id)}
+                        data-testid={`button-delete-resource-${resource.id}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
 

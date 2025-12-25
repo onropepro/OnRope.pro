@@ -3269,3 +3269,27 @@ export const insertStaffAccountSchema = createInsertSchema(staffAccounts).omit({
 
 export type StaffAccount = typeof staffAccounts.$inferSelect;
 export type InsertStaffAccount = z.infer<typeof insertStaffAccountSchema>;
+
+// ============================================
+// FOUNDER RESOURCES (Private founder links)
+// ============================================
+
+export const founderResources = pgTable("founder_resources", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  url: varchar("url", { length: 1000 }).notNull(),
+  description: varchar("description", { length: 500 }),
+  icon: varchar("icon", { length: 50 }).default("Link"), // Lucide icon name
+  category: varchar("category", { length: 50 }).default("tools"), // tools, notes, other
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: varchar("created_by"), // Staff/superuser who added it
+});
+
+export const insertFounderResourceSchema = createInsertSchema(founderResources).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FounderResource = typeof founderResources.$inferSelect;
+export type InsertFounderResource = z.infer<typeof insertFounderResourceSchema>;

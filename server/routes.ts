@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts, founderResources, insertFounderResourceSchema } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -7210,6 +7210,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message || "Failed to delete staff account" });
     }
   });
+
+  // ============================================
+  // FOUNDER RESOURCES API
+  // ============================================
+
+  // Get all founder resources
+  app.get("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser or staff with view_founder_resources permission
+      if (req.session.userId !== 'superuser') {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('view_founder_resources')) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+
+      const resources = await db.select().from(founderResources).orderBy(founderResources.sortOrder);
+      res.json({ resources });
+    } catch (error: any) {
+      console.error("Get founder resources error:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch founder resources" });
+    }
+  });
+
+  // Add a founder resource
+  app.post("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser can add resources
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { name, url, description, icon, category } = req.body;
+
+      if (!name || !url) {
+        return res.status(400).json({ message: "Name and URL are required" });
+      }
+
+      // Get max sort order to add at the end
+      const maxOrder = await db.select({ max: sql<number>`COALESCE(MAX(sort_order), 0)` }).from(founderResources);
+      const newOrder = (maxOrder[0]?.max || 0) + 1;
+
+      const [resource] = await db.insert(founderResources).values({
+        name,
+        url,
+        description: description || null,
+        icon: icon || 'Link',
+        category: category || 'tools',
+        sortOrder: newOrder,
+        createdBy: 'superuser',
+      }).returning();
+
+      res.status(201).json({ resource });
+    } catch (error: any) {
+      console.error("Create founder resource error:", error);
+      res.status(500).json({ message: error.message || "Failed to create founder resource" });
+    }
+  });
+
+  // Delete a founder resource
+  app.delete("/api/founder-resources/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser can delete resources
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const resourceId = req.params.id;
+      await db.delete(founderResources).where(eq(founderResources.id, resourceId));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Delete founder resource error:", error);
+      res.status(500).json({ message: error.message || "Failed to delete founder resource" });
+    }
+  });
+
 
   // SuperUser: Gift add-ons to an existing company
   app.post("/api/superuser/companies/:id/gift-addons", requireAuth, async (req: Request, res: Response) => {
