@@ -470,7 +470,7 @@ describe('DashboardSidebar', () => {
 ## Related Documentation
 
 - [employer-dashboard-instructions-v1.0.md](./employer-dashboard-instructions-v1.0.md) - Uses these components
-- [technician-dashboard-instructions-v1.0.md](./technician-dashboard-instructions-v1.0.md) - Uses these components
+- [technician-passport-instructions-v1.0.md](./technician-passport-instructions-v1.0.md) - Uses these components
 - [resident-dashboard-instructions-v1.0.md](./resident-dashboard-instructions-v1.0.md) - Uses these components
 - `design_guidelines.md` - Visual design standards
 

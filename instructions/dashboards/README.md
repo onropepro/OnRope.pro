@@ -15,6 +15,44 @@ This directory contains comprehensive documentation for all stakeholder-specific
 3. Portable accounts connect users to multiple entities via connection codes
 4. Permission-based visibility controls what each user can access
 
+---
+
+## Official Terminology
+
+**CRITICAL**: Use consistent terminology across all documentation and UI:
+
+| Term | Definition | Route Example |
+|------|------------|---------------|
+| **Passport** | Personal portable profile view for Technicians and Ground Crew. Contains profile, certifications, documents, job board, and employer connections. Branded with role-specific color. | `/technician-portal`, `/ground-crew-portal` |
+| **Dashboard** | Company work dashboard accessed when connected to an employer. Uses employer's blue branding and navigation. Shows projects, safety forms, clock-in/out. | `/dashboard` |
+
+### Technician Experience
+- **Unlinked**: Passport only (rust-colored sidebar)
+- **Linked**: Passport (personal) + Dashboard (employer's blue sidebar)
+
+### Ground Crew Experience
+- **Unlinked**: Passport only (green sidebar)
+- **Linked**: Passport (personal) + Dashboard (employer's blue sidebar)
+
+```
+TERMINOLOGY REFERENCE:
+┌─────────────────────────────────────────────────────────────────┐
+│  PASSPORT (Personal)             │  DASHBOARD (Company)         │
+│  ────────────────────            │  ──────────────────          │
+│  /technician-portal              │  /dashboard                   │
+│  /ground-crew-portal             │                               │
+│                                  │                               │
+│  Role-branded sidebar            │  Employer blue sidebar        │
+│  Profile management              │  Company projects             │
+│  Certifications & docs           │  Safety forms                 │
+│  Job board                       │  Clock in/out                 │
+│  Employer connections            │  Team schedule                │
+│  PLUS features (Tech only)       │  Work session logging         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ### The Golden Rule
 
 ```
@@ -36,9 +74,9 @@ Users create a single portable account that connects to multiple entities:
 | Document | Stakeholder | Status | Description |
 |----------|-------------|--------|-------------|
 | [employer-dashboard-instructions-v1.0.md](./employer-dashboard-instructions-v1.0.md) | Company Owners, Staff | PRODUCTION-READY | Full company management dashboard with role-based access |
-| [technician-dashboard-instructions-v1.0.md](./technician-dashboard-instructions-v1.0.md) | Rope Access Technicians | PRODUCTION-READY | Personal portal with linked/unlinked states, PLUS access tier |
+| [technician-passport-instructions-v1.0.md](./technician-passport-instructions-v1.0.md) | Rope Access Technicians | PRODUCTION-READY | Passport (personal) with linked/unlinked states, PLUS access tier |
 | [resident-dashboard-instructions-v1.0.md](./resident-dashboard-instructions-v1.0.md) | Building Residents | PRODUCTION-READY | Feedback submission and project tracking |
-| [ground-crew-dashboard-instructions-v1.0.md](./ground-crew-dashboard-instructions-v1.0.md) | Ground Crew Workers | PRODUCTION-READY | Ground crew portal (~2K lines) - similar to technician but distinct role |
+| [ground-crew-passport-instructions-v1.0.md](./ground-crew-passport-instructions-v1.0.md) | Ground Crew Workers | PRODUCTION-READY | Passport (personal) - similar to technician but distinct role |
 | [property-manager-dashboard-instructions-v1.0.md](./property-manager-dashboard-instructions-v1.0.md) | Property Managers | PRODUCTION-READY | Vendor oversight and building management |
 
 **Note**: SuperUser dashboard documentation is out of scope for this series (internal platform management only).
@@ -87,20 +125,20 @@ When using `DashboardSidebar`:
 - **Permission-based visibility**: Navigation items have `isVisible()` callbacks
 - **User-customizable ordering**: Drag-and-drop reordering saved to `sidebar_preferences` table
 
-### Dual-Dashboard Pattern (Technician & Ground Crew)
+### Passport vs Dashboard Pattern (Technician & Ground Crew)
 
-**Critical**: Linked technicians and ground crew have access to **two separate dashboards**:
+**Critical**: Linked technicians and ground crew access **two separate experiences**:
 
-| Dashboard | Route | Sidebar | Purpose |
+| Experience | Route | Sidebar | Purpose |
 |-----------|-------|---------|---------|
-| Personal Portal | `/technician-portal` or `/ground-crew-portal` | Role-specific color | Profile, certifications, job board |
-| Work Dashboard | `/dashboard` | `variant="employer"` (blue) | Projects, clock-in/out, safety forms |
+| **Passport** | `/technician-portal` or `/ground-crew-portal` | Role-specific color | Profile, certifications, job board |
+| **Dashboard** | `/dashboard` | `variant="employer"` (blue) | Projects, clock-in/out, safety forms |
 
 When linked, these workers switch between:
-- Their **personal branded portal** for profile management
-- The **employer's work dashboard** (same layout as company staff)
+- Their **Passport** for personal profile management (role-branded)
+- The company **Dashboard** for work tasks (employer blue sidebar)
 
-See [technician-dashboard-instructions-v1.0.md](./technician-dashboard-instructions-v1.0.md) for detailed state documentation.
+See [technician-passport-instructions-v1.0.md](./technician-passport-instructions-v1.0.md) for detailed state documentation.
 
 ### Key Architectural Decisions
 

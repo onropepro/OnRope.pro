@@ -1,6 +1,6 @@
-# Ground Crew Dashboard (Portal) Instructions v1.0
+# Ground Crew Passport Instructions v1.0
 **System**: OnRopePro - Rope Access Management Platform  
-**Domain**: Ground Crew Personal Portal & Employment  
+**Domain**: Ground Crew Passport & Employment  
 **Version**: 1.0  
 **Last Updated**: December 25, 2024  
 **Status**: PRODUCTION-READY  
@@ -8,10 +8,19 @@
 
 ---
 
+## Terminology
+
+| Term | Definition |
+|------|------------|
+| **Passport** | The personal portable profile view (`/ground-crew-portal`). Contains profile, documents, job board, and employer connections. Uses forest green branding. |
+| **Dashboard** | The company work dashboard (`/dashboard`) accessed when linked to an employer. Uses employer's blue branding. |
+
+---
+
 ## Purpose and Goal
 
 ### Primary Objective
-The Ground Crew Portal is the personal dashboard for ground-based support workers who assist rope access technicians. Similar to the Technician Portal but with role-specific features, it manages profile information, employer connections, work history, and document uploads. Ground crew members work alongside technicians but do not perform rope access work themselves.
+The Ground Crew **Passport** is the personal portable profile for ground-based support workers who assist rope access technicians. Similar to the Technician Passport but with role-specific features, it manages profile information, employer connections, work history, and document uploads. Ground crew members work alongside technicians but do not perform rope access work themselves.
 
 ### Key Goals
 - **Profile Management**: Personal information, emergency contacts, payroll details
@@ -33,12 +42,12 @@ The Ground Crew Portal is the personal dashboard for ground-based support worker
 
 ```
 +-------------------------------------------------------------------------+
-|                      GROUND CREW PORTAL                                  |
+|                      GROUND CREW PASSPORT                                |
 +-------------------------------------------------------------------------+
 |                                                                          |
 |  +------------------+     +--------------------+     +------------------+|
-|  | DashboardSidebar |     | GroundCrewPortal   |     | Portal State     ||
-|  | (variant=gc)     |     | (~2K lines)        |     | (Linked/Unlinked)||
+|  | DashboardSidebar |     | GroundCrewPortal   |     | Account State    ||
+|  | (variant=gc)     |     | (.tsx ~2K lines)   |     | (Linked/Unlinked)||
 |  +------------------+     +--------------------+     +------------------+|
 |         |                         |                         |            |
 |         v                         v                         v            |
@@ -50,17 +59,17 @@ The Ground Crew Portal is the personal dashboard for ground-based support worker
 +-------------------------------------------------------------------------+
 ```
 
-### Portal States & Dashboard Experiences
+### Passport vs Dashboard Experiences
 
-**SAME PATTERN AS TECHNICIAN**: Ground crew can access **two completely separate dashboards** when linked:
+**SAME PATTERN AS TECHNICIAN**: Ground crew can access **two completely separate experiences** when linked:
 
 | Experience | Route | Component | Sidebar Variant | Brand Color |
 |------------|-------|-----------|-----------------|-------------|
-| Personal Portal | `/ground-crew-portal` | `GroundCrewPortal.tsx` | `variant="ground-crew"` | Forest Green `#5D7B6F` |
-| Work Dashboard | `/dashboard` | `Dashboard.tsx` via `DashboardLayout` | `variant="employer"` | Blue `#0B64A3` |
+| **Passport** | `/ground-crew-portal` | `GroundCrewPortal.tsx` | `variant="ground-crew"` | Forest Green `#5D7B6F` |
+| **Dashboard** | `/dashboard` | `Dashboard.tsx` via `DashboardLayout` | `variant="employer"` | Blue `#0B64A3` |
 
-**Unlinked**: Personal Portal only (green sidebar)  
-**Linked**: Both Personal Portal (green) AND Work Dashboard (blue employer sidebar)
+**Unlinked**: Passport only (green sidebar)  
+**Linked**: Both Passport (green) AND Dashboard (blue employer sidebar)
 
 ### Comparison: Ground Crew vs Technician
 
@@ -233,7 +242,7 @@ describe('Ground Crew Portal', () => {
 ## Related Documentation
 
 - [shared-dashboard-components-v1.0.md](./shared-dashboard-components-v1.0.md) - Sidebar and layout components
-- [technician-dashboard-instructions-v1.0.md](./technician-dashboard-instructions-v1.0.md) - Similar portal for technicians
+- [technician-passport-instructions-v1.0.md](./technician-passport-instructions-v1.0.md) - Similar passport for technicians
 - [employer-dashboard-instructions-v1.0.md](./employer-dashboard-instructions-v1.0.md) - Employer dashboard ground crew links to
 - `ConnectionsGuide.tsx` - Portable accounts architecture
 
