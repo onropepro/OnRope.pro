@@ -108,7 +108,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
 
   const navItems = [
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
-    { id: "technician", label: t('navigation.technician', 'Technician'), href: "/technician" },
+    { id: "technician", label: t('navigation.technician', 'Rope Access Technician / Ground Crew'), href: "/technician" },
     { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
     { id: "resident", label: t('navigation.resident', 'Resident'), href: "/resident" },
     { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-portal" },
@@ -565,7 +565,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
-                {t('navigation.technician', 'Technician')}
+                {t('navigation.technician', 'Rope Access Technician / Ground Crew')}
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showTechnicianMenu && (
@@ -870,7 +870,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
               >
-                <span>{t('navigation.technician', 'Technician')}</span>
+                <span>{t('navigation.technician', 'Rope Access Technician / Ground Crew')}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileTechnicianExpanded ? "rotate-180" : ""}`} />
               </button>
               
