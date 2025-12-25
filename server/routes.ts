@@ -7067,7 +7067,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only superuser or staff with manage_staff_accounts permission
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
           return res.status(403).json({ message: "Access denied. Insufficient permissions." });
         }
@@ -7088,7 +7088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single staff account
   app.get("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
           return res.status(403).json({ message: "Access denied. Insufficient permissions." });
         }
@@ -7236,7 +7236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only superuser or staff with view_founder_resources permission
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
         if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('view_founder_resources')) {
           return res.status(403).json({ message: "Access denied" });
         }
@@ -7861,7 +7861,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: View company dashboard data (impersonation mode - read-only)
   app.get("/api/superuser/impersonate/:companyId/dashboard", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -7924,7 +7924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get company safety data (impersonation mode - read-only)
   app.get("/api/superuser/impersonate/:companyId/safety", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -8769,7 +8769,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get account suspension status (SuperUser only)
   app.get("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
         return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
@@ -11864,6 +11864,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("SPRAT screenshot verification error:", error);
       res.status(500).json({ message: error.message || "Failed to analyze screenshot" });
+    }
+  });
+  
+  // ==================== DOCUMENT OCR ROUTES ====================
+  
+  // OCR scan driver's license to extract license number and expiry date
+  app.post("/api/ocr/drivers-license", verificationUpload.single("image"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+      
+      const imageBase64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[OCR] Analyzing driver's license for user ${req.session.userId}`);
+      
+      const { analyzeDriversLicense } = await import("./gemini");
+      const result = await analyzeDriversLicense(imageBase64, mimeType);
+      
+      res.json({
+        success: result.success,
+        data: {
+          licenseNumber: result.licenseNumber,
+          expiryDate: result.expiryDate,
+          issuedDate: result.issuedDate,
+          name: result.name
+        },
+        confidence: result.confidence,
+        error: result.error
+      });
+    } catch (error: any) {
+      console.error("Driver's license OCR error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze driver's license" });
+    }
+  });
+  
+  // OCR scan void cheque to extract banking info
+  app.post("/api/ocr/void-cheque", verificationUpload.single("image"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+      
+      const imageBase64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[OCR] Analyzing void cheque for user ${req.session.userId}`);
+      
+      const { analyzeVoidCheque } = await import("./gemini");
+      const result = await analyzeVoidCheque(imageBase64, mimeType);
+      
+      res.json({
+        success: result.success,
+        data: {
+          transitNumber: result.transitNumber,
+          institutionNumber: result.institutionNumber,
+          accountNumber: result.accountNumber
+        },
+        confidence: result.confidence,
+        error: result.error
+      });
+    } catch (error: any) {
+      console.error("Void cheque OCR error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze void cheque" });
     }
   });
   

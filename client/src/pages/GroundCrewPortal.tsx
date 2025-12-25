@@ -864,6 +864,100 @@ export default function GroundCrewPortal() {
         throw new Error(result.message || t.uploadFailed || "Upload failed");
       }
 
+      // OCR scanning for driver's license
+      if (docType === 'driversLicense' && file.type.startsWith('image/')) {
+        console.log('[GroundCrewPortal] Attempting OCR scan for driver\'s license...');
+        try {
+          const ocrFormData = new FormData();
+          ocrFormData.append('image', file);
+          
+          const ocrResponse = await fetch('/api/ocr/drivers-license', {
+            method: 'POST',
+            credentials: 'include',
+            body: ocrFormData,
+          });
+          
+          if (ocrResponse.ok) {
+            const ocrResult = await ocrResponse.json();
+            console.log('[GroundCrewPortal] OCR result:', ocrResult);
+            
+            if (ocrResult.success && ocrResult.data) {
+              let fieldsUpdated = 0;
+              
+              if (ocrResult.data.licenseNumber) {
+                form.setValue('driversLicenseNumber', ocrResult.data.licenseNumber);
+                fieldsUpdated++;
+              }
+              if (ocrResult.data.expiryDate) {
+                form.setValue('driversLicenseExpiry', ocrResult.data.expiryDate);
+                fieldsUpdated++;
+              }
+              if (ocrResult.data.issuedDate) {
+                form.setValue('driversLicenseIssuedDate', ocrResult.data.issuedDate);
+                fieldsUpdated++;
+              }
+              
+              if (fieldsUpdated > 0) {
+                toast({
+                  title: t.ocrSuccess || "Document Scanned",
+                  description: t.ocrFieldsAutofilled?.replace('{count}', String(fieldsUpdated)) || 
+                    `${fieldsUpdated} field(s) auto-filled from your driver's license. Please verify the information.`,
+                });
+              }
+            }
+          }
+        } catch (ocrError) {
+          console.error('[GroundCrewPortal] OCR scan failed:', ocrError);
+        }
+      }
+      
+      // OCR scanning for void cheque
+      if (docType === 'voidCheque' && file.type.startsWith('image/')) {
+        console.log('[GroundCrewPortal] Attempting OCR scan for void cheque...');
+        try {
+          const ocrFormData = new FormData();
+          ocrFormData.append('image', file);
+          
+          const ocrResponse = await fetch('/api/ocr/void-cheque', {
+            method: 'POST',
+            credentials: 'include',
+            body: ocrFormData,
+          });
+          
+          if (ocrResponse.ok) {
+            const ocrResult = await ocrResponse.json();
+            console.log('[GroundCrewPortal] OCR result:', ocrResult);
+            
+            if (ocrResult.success && ocrResult.data) {
+              let fieldsUpdated = 0;
+              
+              if (ocrResult.data.transitNumber) {
+                form.setValue('bankTransitNumber', ocrResult.data.transitNumber);
+                fieldsUpdated++;
+              }
+              if (ocrResult.data.institutionNumber) {
+                form.setValue('bankInstitutionNumber', ocrResult.data.institutionNumber);
+                fieldsUpdated++;
+              }
+              if (ocrResult.data.accountNumber) {
+                form.setValue('bankAccountNumber', ocrResult.data.accountNumber);
+                fieldsUpdated++;
+              }
+              
+              if (fieldsUpdated > 0) {
+                toast({
+                  title: t.ocrSuccess || "Document Scanned",
+                  description: t.ocrBankFieldsAutofilled?.replace('{count}', String(fieldsUpdated)) || 
+                    `${fieldsUpdated} banking field(s) auto-filled from your void cheque. Please verify the information.`,
+                });
+              }
+            }
+          }
+        } catch (ocrError) {
+          console.error('[GroundCrewPortal] OCR scan failed:', ocrError);
+        }
+      }
+
       toast({
         title: t.documentUploaded || "Document Uploaded",
         description: t.documentUploadedDesc || "Your document has been saved successfully.",
