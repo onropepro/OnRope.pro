@@ -3294,3 +3294,18 @@ export const insertFounderResourceSchema = createInsertSchema(founderResources).
 
 export type FounderResource = typeof founderResources.$inferSelect;
 export type InsertFounderResource = z.infer<typeof insertFounderResourceSchema>;
+
+// Database Cost Tracking for SuperUser - tracks monthly database expenses
+export const databaseCosts = pgTable("database_costs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").notNull(), // The date/period this cost applies to
+  amount: real("amount").notNull(), // Cost in USD
+  notes: varchar("notes", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: varchar("created_by"), // superuser who added it
+});
+
+export const insertDatabaseCostSchema = createInsertSchema(databaseCosts).omit({
+  id: true,
+  createdAt: true,
+});
