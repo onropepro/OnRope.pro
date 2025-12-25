@@ -115,7 +115,7 @@ export default function QuotingSalesLanding() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-[#AB4521] hover:bg-[#963b1c] text-white" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+              <Button size="lg" className="bg-[#0B64A3] hover:bg-[#09568d] text-white" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
                 {t('modules.quoting.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
@@ -1080,7 +1080,7 @@ export default function QuotingSalesLanding() {
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
             {t('modules.quotingSales.finalCta.description2', 'OnRopePro eliminates quote calculation time completely. Same-day quote delivery becomes your standard. Calculator apps get deleted from your phone. You reclaim eight hours per week.')}
           </p>
-          <Button size="lg" className="bg-white text-blue-700" onClick={() => setShowRegistration(true)} data-testid="button-final-cta">
+          <Button size="lg" className="bg-[#0B64A3] hover:bg-[#09568d] text-white" onClick={() => setShowRegistration(true)} data-testid="button-final-cta">
             {t('modules.quotingSales.finalCta.buttonText', 'Start Your Free 60-Day Trial')}
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
