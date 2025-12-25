@@ -11870,7 +11870,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== DOCUMENT OCR ROUTES ====================
   
   // OCR scan driver's license to extract license number and expiry date
-  app.post("/api/ocr/drivers-license", uploadImage.single("image"), async (req, res) => {
+  app.post("/api/ocr/drivers-license", verificationUpload.single("image"), async (req, res) => {
     try {
       if (!req.session.userId) {
         return res.status(401).json({ message: "Unauthorized - Please log in" });
@@ -11906,7 +11906,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // OCR scan void cheque to extract banking info
-  app.post("/api/ocr/void-cheque", uploadImage.single("image"), async (req, res) => {
+  app.post("/api/ocr/void-cheque", verificationUpload.single("image"), async (req, res) => {
     try {
       if (!req.session.userId) {
         return res.status(401).json({ message: "Unauthorized - Please log in" });
