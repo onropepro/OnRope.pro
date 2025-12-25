@@ -4941,11 +4941,73 @@ export default function Dashboard() {
 
                 {/* Active Projects */}
                 {projectsSubTab === "active" && (
-                <div className="space-y-4">
+                <>
                   {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
                     <p className="text-sm text-muted-foreground">{t('dashboard.projects.noActiveProjects', 'No active projects yet')}</p>
                   ) : (
-                    filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
+                    <>
+                      {/* Table View */}
+                      {projectViewMode === "table" && (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{t('dashboard.projects.columnName', 'Building')}</TableHead>
+                              <TableHead>{t('dashboard.projects.columnStrata', 'Strata')}</TableHead>
+                              <TableHead className="hidden md:table-cell">{t('dashboard.projects.columnJobType', 'Job Type')}</TableHead>
+                              <TableHead className="hidden lg:table-cell">{t('dashboard.projects.columnProgress', 'Progress')}</TableHead>
+                              <TableHead className="hidden xl:table-cell">{t('dashboard.projects.columnCreated', 'Created')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
+                              const progressType = getProgressType(project.jobType);
+                              const isHoursBased = progressType === 'hours';
+                              const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
+                              const isParkade = project.jobType === "parkade_pressure_cleaning";
+                              const isAnchorInspection = project.jobType === "anchor_inspection";
+                              
+                              let progressPercent = 0;
+                              if (isHoursBased && (project as any).overallCompletionPercentage != null) {
+                                progressPercent = (project as any).overallCompletionPercentage;
+                              } else if (isInSuite || isParkade) {
+                                const total = isParkade ? (project.totalStalls || project.floorCount || 0) : (project.floorCount || 0);
+                                progressPercent = total > 0 ? ((project.completedDrops || 0) / total) * 100 : 0;
+                              } else if (isAnchorInspection) {
+                                progressPercent = project.totalAnchors ? ((project.completedDrops || 0) / project.totalAnchors) * 100 : 0;
+                              } else {
+                                progressPercent = project.totalDrops ? ((project.completedDrops || 0) / project.totalDrops) * 100 : 0;
+                              }
+                              
+                              return (
+                                <TableRow 
+                                  key={project.id} 
+                                  className="cursor-pointer"
+                                  onClick={() => setLocation(`/projects/${project.id}`)}
+                                  data-testid={`table-row-project-${project.id}`}
+                                >
+                                  <TableCell className="font-medium">{project.buildingName}</TableCell>
+                                  <TableCell className="text-muted-foreground">{project.strataPlanNumber || "-"}</TableCell>
+                                  <TableCell className="text-muted-foreground hidden md:table-cell">{getJobTypeLabel(t, project.jobType)}</TableCell>
+                                  <TableCell className="hidden lg:table-cell">
+                                    <div className="flex items-center gap-2">
+                                      <Progress value={progressPercent} className="w-20 h-2" />
+                                      <span className="text-xs text-muted-foreground">{Math.round(progressPercent)}%</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-muted-foreground hidden xl:table-cell">
+                                    {project.createdAt ? formatTimestampDate(project.createdAt) : "-"}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      )}
+
+                      {/* Cards View */}
+                      {projectViewMode === "cards" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                       const isParkade = project.jobType === "parkade_pressure_cleaning";
                       const isAnchorInspection = project.jobType === "anchor_inspection";
@@ -5024,7 +5086,7 @@ export default function Dashboard() {
                       return (
                         <Card 
                           key={project.id} 
-                          className="group relative border-l-4 border-l-primary shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer overflow-visible bg-gradient-to-br from-background to-muted/30" 
+                          className="hover-elevate cursor-pointer" 
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >
@@ -5173,9 +5235,12 @@ export default function Dashboard() {
                           </CardContent>
                         </Card>
                       );
-                    })
+                    })}
+                        </div>
+                      )}
+                    </>
                   )}
-                </div>
+                </>
                 )}
 
                 {/* Past Projects */}
