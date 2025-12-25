@@ -121,6 +121,7 @@ export const users = pgTable("users", {
   bankAccountNumber: varchar("bank_account_number"), // Bank account number (optional)
   bankDocuments: text("bank_documents").array().default(sql`ARRAY[]::text[]`), // Array of void cheque document URLs
   employeePhoneNumber: varchar("employee_phone_number"), // Employee phone number (optional, separate from resident phoneNumber)
+  smsNotificationsEnabled: boolean("sms_notifications_enabled").default(false), // Whether employee wants to receive SMS notifications
   emergencyContactName: varchar("emergency_contact_name"), // Emergency contact name (optional)
   emergencyContactPhone: varchar("emergency_contact_phone"), // Emergency contact phone (optional)
   emergencyContactRelationship: varchar("emergency_contact_relationship"), // Emergency contact relationship (e.g., spouse, parent, sibling)
