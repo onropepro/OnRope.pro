@@ -93,20 +93,20 @@ export default function SafetyLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-[#AB4521]">PSR</div>
-                  <div className="text-base text-muted-foreground mt-1">Personal Safety Rating</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">Measured</div>
+                  <div className="text-base text-muted-foreground mt-1">Or it didn't happen</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-[#0B64A3]">CSR</div>
-                  <div className="text-base text-muted-foreground mt-1">Company Safety Rating</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">Portable</div>
+                  <div className="text-base text-muted-foreground mt-1">Follows you everywhere</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-600">Portable</div>
-                  <div className="text-base text-muted-foreground mt-1">Scores follow you</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">Visible</div>
+                  <div className="text-base text-muted-foreground mt-1">To everyone who matters</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-600">Visible</div>
-                  <div className="text-base text-muted-foreground mt-1">Creates accountability</div>
+                  <div className="text-2xl md:text-3xl font-bold text-foreground">Permanent</div>
+                  <div className="text-base text-muted-foreground mt-1">Can't be faked</div>
                 </div>
               </div>
             </CardContent>
