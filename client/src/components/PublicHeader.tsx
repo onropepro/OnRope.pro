@@ -567,10 +567,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
-                <span className="flex flex-col items-center leading-tight">
-                  <span>Rope Access Technician</span>
-                  <span className="text-xs text-muted-foreground font-normal">& Ground Crew</span>
-                </span>
+                {t('navigation.technician', 'Rope Access Technician / Ground Crew')}
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showTechnicianMenu && (
@@ -875,10 +872,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
               >
-                <span className="flex flex-col items-start leading-tight">
-                  <span>Rope Access Technician</span>
-                  <span className="text-xs text-muted-foreground font-normal">& Ground Crew</span>
-                </span>
+                <span>{t('navigation.technician', 'Rope Access Technician / Ground Crew')}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileTechnicianExpanded ? "rotate-180" : ""}`} />
               </button>
               

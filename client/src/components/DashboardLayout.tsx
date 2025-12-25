@@ -1,12 +1,8 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { useContext, ReactNode, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useContext, ReactNode } from "react";
 import { BrandingContext } from "@/App";
 import { DashboardSidebar, type NavGroup, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";
-import { DashboardHeader } from "@/components/DashboardHeader";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { User } from "@/lib/permissions";
 
 interface DashboardLayoutProps {
@@ -19,8 +15,6 @@ interface DashboardLayoutProps {
   headerContent?: React.ReactNode;
   onTabChange?: (tab: string) => void;
   activeTab?: string;
-  showHeader?: boolean;
-  onLogout?: () => void;
 }
 
 interface BrandingSettings {
@@ -41,36 +35,9 @@ export function DashboardLayout({
   headerContent,
   onTabChange: externalTabChange,
   activeTab: externalActiveTab,
-  showHeader = true,
-  onLogout: externalOnLogout,
 }: DashboardLayoutProps) {
-  const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const brandingContext = useContext(BrandingContext);
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
-    },
-    onSuccess: () => {
-      queryClient.clear();
-      setLocation("/login");
-    },
-  });
-
-  const handleLogout = () => {
-    if (externalOnLogout) {
-      externalOnLogout();
-    } else {
-      setShowLogoutDialog(true);
-    }
-  };
-
-  const confirmLogout = () => {
-    setShowLogoutDialog(false);
-    logoutMutation.mutate();
-  };
 
   // Correctly typed to match API response shape: { user: {...} }
   const { data: userData } = useQuery<{ user: User & { username?: string; companyId?: string } }>({
@@ -174,41 +141,9 @@ export function DashboardLayout({
         headerContent={headerContent}
       />
       
-      <main className="lg:pl-60 min-h-screen flex flex-col">
-        {showHeader && variant === "employer" && (
-          <DashboardHeader
-            currentUser={currentUser as any}
-            employees={employees || []}
-            onNavigateToEmployees={() => resolvedTabChange("employees")}
-            onLogout={handleLogout}
-          />
-        )}
-        <div className="flex-1">
-          {children}
-        </div>
+      <main className="lg:pl-60 min-h-screen">
+        {children}
       </main>
-
-      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('dashboard.logoutDialog.title', 'Log Out')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('dashboard.logoutDialog.description', 'Are you sure you want to log out? You will need to sign in again to access your dashboard.')}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-logout-cancel">
-              {t('common.cancel', 'Cancel')}
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmLogout}
-              data-testid="button-logout-confirm"
-            >
-              {t('dashboard.logoutDialog.confirm', 'Log Out')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

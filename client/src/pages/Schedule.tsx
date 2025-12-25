@@ -1097,6 +1097,17 @@ export default function Schedule() {
       onDragStart={(event) => setActiveEmployeeId(event.active.id as string)}
     >
     <div className="p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Calendar className="w-8 h-8 text-primary" />
+        <div>
+          <h1 className="text-2xl font-bold">{t('schedule.title', 'Schedule')}</h1>
+          <p className="text-sm text-muted-foreground">
+            {t('schedule.subtitle', "Manage your team's job assignments and schedule")}
+          </p>
+        </div>
+      </div>
+
       {/* Employee Availability - Collapsible on mobile */}
       <Collapsible open={availabilityOpen} onOpenChange={setAvailabilityOpen} className="md:hidden">
         <Card className="border-2 border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-lg backdrop-blur-sm">

@@ -1106,6 +1106,22 @@ export default function GroundCrewPortal() {
               
               <LanguageDropdown />
               
+              <button 
+                onClick={() => setActiveTab('profile')}
+                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                data-testid="link-user-profile"
+              >
+                <Avatar className="w-8 h-8 bg-[#5D7B6F]">
+                  <AvatarFallback className="bg-[#5D7B6F] text-white text-xs font-medium">
+                    {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
+                  <p className="text-xs text-slate-400 leading-tight">{t.groundCrewMember}</p>
+                </div>
+              </button>
+              
               <Button 
                 variant="ghost" 
                 size="icon" 

@@ -1207,9 +1207,6 @@ export default function Dashboard() {
   const [clientViewMode, setClientViewMode] = useState<"cards" | "table">("cards");
   const [clientSortField, setClientSortField] = useState<"name" | "company" | "email" | "phone">("name");
   const [clientSortDirection, setClientSortDirection] = useState<"asc" | "desc">("asc");
-  const [projectViewMode, setProjectViewMode] = useState<"cards" | "table">("cards");
-  const [projectSortField, setProjectSortField] = useState<"name" | "date" | "progress">("date");
-  const [projectSortDirection, setProjectSortDirection] = useState<"asc" | "desc">("desc");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [employeeToSuspendSeat, setEmployeeToSuspendSeat] = useState<any | null>(null); // For seat removal/suspend
   const [showDropDialog, setShowDropDialog] = useState(false);
@@ -3712,6 +3709,67 @@ export default function Dashboard() {
     <div className="min-h-screen w-full">
       {/* Main Content - sidebar is now provided by DashboardLayout wrapper */}
       <div className="flex-1 flex flex-col page-gradient min-h-screen">
+          {/* Header - Modern SaaS Design */}
+          <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+            <div className="h-full flex items-center justify-between gap-4">
+              {/* Left Side: Search */}
+              <div className="flex items-center gap-4 flex-1 min-w-0">
+                <div className="hidden md:flex flex-1 max-w-xl">
+                  <DashboardSearch />
+                </div>
+              </div>
+              
+              {/* Right Side: Actions Group */}
+              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                {/* License Expiry Warning - Inline in header */}
+                {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
+                  <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
+                )}
+                
+                {/* Trial Badge - Company owners only */}
+                {currentUser?.role === 'company' && (
+                  <SubscriptionRenewalBadge 
+                    subscriptionEndDate={currentUser.subscriptionEndDate} 
+                    subscriptionStatus={currentUser.subscriptionStatus}
+                  />
+                )}
+                
+                {/* Install App Button */}
+                <InstallPWAButton />
+                
+                {/* Notification Bell - Company owners only */}
+                {currentUser?.role === 'company' && (
+                  <NotificationBell />
+                )}
+                
+                {/* Language Selector */}
+                <LanguageDropdown />
+                
+                {/* User Profile - Clickable to go to Settings */}
+                <Link 
+                  href="/profile" 
+                  className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                  data-testid="link-user-profile"
+                >
+                  <Avatar className="w-8 h-8 bg-[#0B64A3]">
+                    <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
+                      {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="hidden lg:block">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
+                    <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role}</p>
+                  </div>
+                </Link>
+                
+                {/* Logout Button */}
+                <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                  <span className="material-icons text-xl">logout</span>
+                </Button>
+              </div>
+            </div>
+          </header>
+
       {/* Read-Only Mode Banner - Shows on all tabs */}
       {currentUser && isReadOnly(currentUser) && (
         <div 
@@ -3783,77 +3841,28 @@ export default function Dashboard() {
               </Card>
             )}
             
-            {/* Projects Database Card - matches Client Database layout */}
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="material-icons text-primary">apartment</span>
-                      {t('dashboard.projects.database', 'Project Database')}
-                    </CardTitle>
-                    <CardDescription>{t('dashboard.projects.databaseDescription', 'Manage building maintenance projects')}</CardDescription>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={projectViewMode === "cards" ? "default" : "outline"}
-                      size="icon"
-                      onClick={() => setProjectViewMode("cards")}
-                      data-testid="button-project-view-cards"
-                    >
-                      <span className="material-icons text-sm">grid_view</span>
-                    </Button>
-                    <Button
-                      variant={projectViewMode === "table" ? "default" : "outline"}
-                      size="icon"
-                      onClick={() => setProjectViewMode("table")}
-                      data-testid="button-project-view-table"
-                    >
-                      <span className="material-icons text-sm">view_list</span>
-                    </Button>
-                  </div>
+            {/* Search and Create */}
+            <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-primary/60 text-base">
+                    search
+                  </span>
+                  <Input
+                    placeholder={t('dashboard.projects.search.placeholder', 'Search by strata or job number...')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-14 pl-12 text-base shadow-sm border-2 focus-visible:ring-2"
+                    data-testid="input-search-projects"
+                  />
                 </div>
-                <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                  <div className="relative flex-1">
-                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                      search
-                    </span>
-                    <Input
-                      placeholder={t('dashboard.projects.search.placeholder', 'Search by strata or job number...')}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-10 pl-10"
-                      data-testid="input-search-projects"
-                    />
-                  </div>
-                  <Select value={projectSortField} onValueChange={(v) => setProjectSortField(v as any)}>
-                    <SelectTrigger className="w-full sm:w-40" data-testid="select-project-sort-field">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="name">{t('dashboard.projects.sortName', 'Name')}</SelectItem>
-                      <SelectItem value="date">{t('dashboard.projects.sortDate', 'Date')}</SelectItem>
-                      <SelectItem value="progress">{t('dashboard.projects.sortProgress', 'Progress')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setProjectSortDirection(d => d === "asc" ? "desc" : "asc")}
-                    data-testid="button-project-toggle-sort-direction"
-                  >
-                    <span className="material-icons text-sm">
-                      {projectSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
-                    </span>
-                  </Button>
-                  <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
+                <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
                   <DialogTrigger asChild>
                     <Button 
-                      className="gap-2" 
+                      className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
                       data-testid="button-create-project"
                       disabled={userIsReadOnly}
                     >
-                      <span className="material-icons text-sm">add</span>
+                      <span className="material-icons text-xl text-primary-foreground">add_circle</span>
                       <span className="hidden sm:inline">{t('dashboard.projects.newProject', 'New Project')}</span>
                     </Button>
                   </DialogTrigger>
@@ -4910,11 +4919,15 @@ export default function Dashboard() {
                     </div>
                   </DialogContent>
                 </Dialog>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Active/Past Tabs */}
-                <div className="flex items-center justify-end mb-4">
+              </div>
+
+              {/* Projects with Active/Past Tabs */}
+              <div>
+                <div className="flex items-center justify-between mb-6 mt-8">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-1 bg-primary rounded-full"></div>
+                    <h2 className="text-xl font-bold">{t('dashboard.projects.title', 'Projects')}</h2>
+                  </div>
                   {canViewPastProjects(currentUser) && (
                     <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
                       <TabsList className="bg-muted/80 p-1 h-auto">
@@ -4941,73 +4954,16 @@ export default function Dashboard() {
 
                 {/* Active Projects */}
                 {projectsSubTab === "active" && (
-                <>
+                <div className="space-y-4">
                   {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
-                    <p className="text-sm text-muted-foreground">{t('dashboard.projects.noActiveProjects', 'No active projects yet')}</p>
+                    <Card>
+                      <CardContent className="p-8 text-center text-muted-foreground">
+                        <span className="material-icons text-4xl mb-2 opacity-50">apartment</span>
+                        <div>{t('dashboard.projects.noActiveProjects', 'No active projects yet')}</div>
+                      </CardContent>
+                    </Card>
                   ) : (
-                    <>
-                      {/* Table View */}
-                      {projectViewMode === "table" && (
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>{t('dashboard.projects.columnName', 'Building')}</TableHead>
-                              <TableHead>{t('dashboard.projects.columnStrata', 'Strata')}</TableHead>
-                              <TableHead className="hidden md:table-cell">{t('dashboard.projects.columnJobType', 'Job Type')}</TableHead>
-                              <TableHead className="hidden lg:table-cell">{t('dashboard.projects.columnProgress', 'Progress')}</TableHead>
-                              <TableHead className="hidden xl:table-cell">{t('dashboard.projects.columnCreated', 'Created')}</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
-                              const progressType = getProgressType(project.jobType);
-                              const isHoursBased = progressType === 'hours';
-                              const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
-                              const isParkade = project.jobType === "parkade_pressure_cleaning";
-                              const isAnchorInspection = project.jobType === "anchor_inspection";
-                              
-                              let progressPercent = 0;
-                              if (isHoursBased && (project as any).overallCompletionPercentage != null) {
-                                progressPercent = (project as any).overallCompletionPercentage;
-                              } else if (isInSuite || isParkade) {
-                                const total = isParkade ? (project.totalStalls || project.floorCount || 0) : (project.floorCount || 0);
-                                progressPercent = total > 0 ? ((project.completedDrops || 0) / total) * 100 : 0;
-                              } else if (isAnchorInspection) {
-                                progressPercent = project.totalAnchors ? ((project.completedDrops || 0) / project.totalAnchors) * 100 : 0;
-                              } else {
-                                progressPercent = project.totalDrops ? ((project.completedDrops || 0) / project.totalDrops) * 100 : 0;
-                              }
-                              
-                              return (
-                                <TableRow 
-                                  key={project.id} 
-                                  className="cursor-pointer"
-                                  onClick={() => setLocation(`/projects/${project.id}`)}
-                                  data-testid={`table-row-project-${project.id}`}
-                                >
-                                  <TableCell className="font-medium">{project.buildingName}</TableCell>
-                                  <TableCell className="text-muted-foreground">{project.strataPlanNumber || "-"}</TableCell>
-                                  <TableCell className="text-muted-foreground hidden md:table-cell">{getJobTypeLabel(t, project.jobType)}</TableCell>
-                                  <TableCell className="hidden lg:table-cell">
-                                    <div className="flex items-center gap-2">
-                                      <Progress value={progressPercent} className="w-20 h-2" />
-                                      <span className="text-xs text-muted-foreground">{Math.round(progressPercent)}%</span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="text-muted-foreground hidden xl:table-cell">
-                                    {project.createdAt ? formatTimestampDate(project.createdAt) : "-"}
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      )}
-
-                      {/* Cards View */}
-                      {projectViewMode === "cards" && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
+                    filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                       const isParkade = project.jobType === "parkade_pressure_cleaning";
                       const isAnchorInspection = project.jobType === "anchor_inspection";
@@ -5086,7 +5042,7 @@ export default function Dashboard() {
                       return (
                         <Card 
                           key={project.id} 
-                          className="hover-elevate cursor-pointer" 
+                          className="group relative border-l-4 border-l-primary shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer overflow-visible bg-gradient-to-br from-background to-muted/30" 
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >
@@ -5235,12 +5191,9 @@ export default function Dashboard() {
                           </CardContent>
                         </Card>
                       );
-                    })}
-                        </div>
-                      )}
-                    </>
+                    })
                   )}
-                </>
+                </div>
                 )}
 
                 {/* Past Projects */}
@@ -5266,9 +5219,8 @@ export default function Dashboard() {
                     </TabsContent>
                   </Tabs>
                 )}
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
         )}
 
         {/* Remove old standalone past-projects tab - now integrated into projects tab */}

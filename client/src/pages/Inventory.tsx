@@ -1560,6 +1560,13 @@ export default function Inventory() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
+      {/* Header */}
+      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
+        <div className="px-4 h-14 flex items-center justify-between max-w-7xl mx-auto">
+          <h1 className="text-xl font-bold tracking-tight">{t('inventory.title', 'Inventory')}</h1>
+        </div>
+      </header>
+
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="flex flex-wrap w-full mb-4 h-auto gap-1 p-1">
