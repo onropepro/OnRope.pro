@@ -135,6 +135,8 @@ const translations = {
     fullName: "Full Name",
     email: "Email",
     phoneNumber: "Phone Number",
+    smsNotifications: "SMS Notifications",
+    smsNotificationsDescription: "Receive text messages for team invitations",
     birthday: "Birthday",
     address: "Address",
     streetAddress: "Street Address",
@@ -496,6 +498,8 @@ const translations = {
     fullName: "Nom complet",
     email: "Courriel",
     phoneNumber: "Numéro de téléphone",
+    smsNotifications: "Notifications SMS",
+    smsNotificationsDescription: "Recevoir des messages texte pour les invitations d'équipe",
     birthday: "Date de naissance",
     address: "Adresse",
     streetAddress: "Adresse civique",
@@ -857,6 +861,8 @@ const translations = {
     fullName: "Nombre Completo",
     email: "Correo Electronico",
     phoneNumber: "Numero de Telefono",
+    smsNotifications: "Notificaciones SMS",
+    smsNotificationsDescription: "Recibir mensajes de texto para invitaciones de equipo",
     birthday: "Fecha de Nacimiento",
     address: "Direccion",
     streetAddress: "Direccion",
@@ -1262,6 +1268,7 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
   name: z.string().min(1, t.errorNameRequired),
   email: z.string().email(t.errorInvalidEmail),
   employeePhoneNumber: z.string().min(1, t.errorPhoneRequired),
+  smsNotificationsEnabled: z.boolean().optional(),
   employeeStreetAddress: z.string().optional(),
   employeeCity: z.string().optional(),
   employeeProvinceState: z.string().optional(),
@@ -1479,6 +1486,7 @@ export default function TechnicianPortal() {
       name: "",
       email: "",
       employeePhoneNumber: "",
+      smsNotificationsEnabled: false,
       employeeStreetAddress: "",
       employeeCity: "",
       employeeProvinceState: "",
@@ -2414,6 +2422,7 @@ export default function TechnicianPortal() {
         name: user.name || "",
         email: user.email || "",
         employeePhoneNumber: user.employeePhoneNumber || "",
+        smsNotificationsEnabled: user.smsNotificationsEnabled ?? false,
         employeeStreetAddress: user.employeeStreetAddress || "",
         employeeCity: user.employeeCity || "",
         employeeProvinceState: user.employeeProvinceState || "",
@@ -3794,6 +3803,29 @@ export default function TechnicianPortal() {
                               <Input {...field} type="tel" data-testid="input-phone" />
                             </FormControl>
                             <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="smsNotificationsEnabled"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-sm font-medium">
+                                {t.smsNotifications}
+                              </FormLabel>
+                              <p className="text-sm text-muted-foreground">
+                                {t.smsNotificationsDescription}
+                              </p>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value ?? false}
+                                onCheckedChange={field.onChange}
+                                data-testid="switch-sms-notifications"
+                              />
+                            </FormControl>
                           </FormItem>
                         )}
                       />
