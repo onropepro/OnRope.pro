@@ -22536,7 +22536,7 @@ Do not include any other text, just the JSON object.`
   // ==================== WEATHER ROUTES ====================
 
   // Get weather data from Open-Meteo (free, no API key required)
-  app.get("/api/weather", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+  app.get("/api/weather", requireAuth, requireRole("company", "employee", "rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "labourer"), async (req: Request, res: Response) => {
     try {
       const lat = parseFloat(req.query.lat as string);
       const lon = parseFloat(req.query.lon as string);
