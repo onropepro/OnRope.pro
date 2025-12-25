@@ -115,7 +115,7 @@ export default function QuotingSalesLanding() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-[#AB4521] hover:bg-[#963b1c] text-white" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
+              <Button size="lg" className="bg-white text-[#0B64A3]" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
                 {t('modules.quoting.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
