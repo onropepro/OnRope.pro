@@ -10236,11 +10236,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[Team-Invite] Company ${companyId} sent invitation ${invitation.id} to technician ${technicianId} (${technician.name})`);
       
-      // Send SMS notification if technician has SMS enabled and valid phone number
-      if (technician.smsNotificationsEnabled && technician.employeePhoneNumber) {
+      // Send SMS notification if technician has a valid phone number
+      // Team invitations are sent regardless of smsNotificationsEnabled since they are important one-time notifications
+      console.log(`[Team-Invite] Checking SMS for ${technician.name}: phone=${technician.employeePhoneNumber || 'none'}, smsEnabled=${technician.smsNotificationsEnabled}`);
+      
+      if (technician.employeePhoneNumber) {
         try {
           const company = await storage.getUserById(companyId);
           const companyName = company?.companyName || 'An employer';
+          console.log(`[Team-Invite] Sending SMS to ${technician.employeePhoneNumber} from company ${companyName}`);
           const smsResult = await sendTeamInvitationSMS(
             technician.employeePhoneNumber,
             companyName
@@ -10254,10 +10258,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error(`[Team-Invite] SMS notification error for ${technician.name}:`, smsError);
           // Don't fail the invitation if SMS fails
         }
+      } else {
+        console.log(`[Team-Invite] No phone number for ${technician.name}, skipping SMS`);
       }
       
       res.json({
-      
         success: true, 
         message: `Invitation sent to ${technician.name}!`,
         invitationId: invitation.id
@@ -10267,7 +10272,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
-  
   // Get the count of technicians referred by the logged-in user
   app.get("/api/my-referral-count", requireAuth, async (req: Request, res: Response) => {
     try {
