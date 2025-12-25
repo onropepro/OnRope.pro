@@ -84,6 +84,7 @@ import HomePage from "@/pages/HomePage";
 import PayrollGuide from "@/pages/PayrollGuide";
 import MobileDesignGuide from "@/pages/MobileDesignGuide";
 import SafetyComplianceLanding from "@/pages/SafetyComplianceLanding";
+import SafetyLanding from "@/pages/SafetyLanding";
 import UserAccessLanding from "@/pages/UserAccessLanding";
 import ProjectManagementLanding from "@/pages/ProjectManagementLanding";
 import CSRLanding from "@/pages/CSRLanding";
@@ -443,6 +444,7 @@ function Router() {
       <Route path="/changelog/project-management" component={ProjectsGuide} />
       <Route path="/changelog/inventory" component={InventoryGuide} />
       <Route path="/changelog/safety" component={SafetyGuide} />
+      <Route path="/safety" component={SafetyLanding} />
       <Route path="/modules/safety-compliance" component={SafetyComplianceLanding} />
       <Route path="/modules/user-access-authentication" component={UserAccessLanding} />
       <Route path="/modules/project-management" component={ProjectManagementLanding} />
