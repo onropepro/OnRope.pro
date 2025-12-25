@@ -48,7 +48,7 @@ export default function SafetyLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-safety-label">
-              The PSR + CSR Flywheel
+              Raising the Bar for an Entire Industry
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
@@ -93,19 +93,19 @@ export default function SafetyLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">Measured</div>
+                  <div className="text-2xl md:text-3xl font-bold text-[#AB4521]">Measured</div>
                   <div className="text-base text-muted-foreground mt-1">Or it didn't happen</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">Portable</div>
+                  <div className="text-2xl md:text-3xl font-bold text-[#0B64A3]">Portable</div>
                   <div className="text-base text-muted-foreground mt-1">Follows you everywhere</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">Visible</div>
+                  <div className="text-2xl md:text-3xl font-bold text-emerald-600">Visible</div>
                   <div className="text-base text-muted-foreground mt-1">To everyone who matters</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">Permanent</div>
+                  <div className="text-2xl md:text-3xl font-bold text-violet-600">Permanent</div>
                   <div className="text-base text-muted-foreground mt-1">Can't be faked</div>
                 </div>
               </div>
