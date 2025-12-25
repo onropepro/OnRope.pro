@@ -4335,7 +4335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      res.json({ days });
+      res.json({ days, uniqueJobCount: activeProjects.length });
     } catch (error: any) {
       console.error('[Dashboard] Get week summary error:', error);
       res.status(500).json({ message: error.message || "Failed to get week summary" });

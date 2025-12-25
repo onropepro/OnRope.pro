@@ -18,7 +18,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
   const hasAccess = canViewSchedule(currentUser) || currentUser?.role === "company";
   const accentColor = branding?.primaryColor || "#0B64A3";
 
-  const { data: weekData, isLoading } = useQuery<{ days: WeekDay[] }>({
+  const { data: weekData, isLoading } = useQuery<{ days: WeekDay[]; uniqueJobCount: number }>({
     queryKey: ["/api/schedule/week-summary"],
     enabled: hasAccess,
   });
@@ -68,7 +68,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
     };
   });
 
-  const totalJobs = days.reduce((sum, d) => sum + d.jobCount, 0);
+  const totalJobs = weekData?.uniqueJobCount ?? 0;
 
   return (
     <div className="flex flex-col h-full">
