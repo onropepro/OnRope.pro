@@ -317,7 +317,7 @@ describe('Data Isolation', () => {
 ## Related Documentation
 
 - [shared-dashboard-components-v1.0.md](./shared-dashboard-components-v1.0.md) - Sidebar and layout components
-- [technician-dashboard-instructions-v1.0.md](./technician-dashboard-instructions-v1.0.md) - Technician portal that links to employers
+- [technician-passport-instructions-v1.0.md](./technician-passport-instructions-v1.0.md) - Technician passport that links to employers
 - `work-session-management-instructions-v1.0.md` - Time tracking integration
 - `safety-documentation-instructions-v1.0.md` - Safety compliance features
 

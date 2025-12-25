@@ -1,6 +1,6 @@
-# Technician Dashboard (Portal) Instructions v1.0
+# Technician Passport Instructions v1.0
 **System**: OnRopePro - Rope Access Management Platform  
-**Domain**: Technician Personal Portal & Employment  
+**Domain**: Technician Passport & Employment  
 **Version**: 1.0  
 **Last Updated**: December 25, 2024  
 **Status**: PRODUCTION-READY  
@@ -8,10 +8,19 @@
 
 ---
 
+## Terminology
+
+| Term | Definition |
+|------|------------|
+| **Passport** | The personal portable profile view (`/technician-portal`). Contains profile, certifications, documents, job board, and employer connections. Uses rust-colored branding. |
+| **Dashboard** | The company work dashboard (`/dashboard`) accessed when linked to an employer. Uses employer's blue branding. |
+
+---
+
 ## Purpose and Goal
 
 ### Primary Objective
-The Technician Portal is the personal dashboard for rope access technicians. It manages their profile, certifications, employer connections, work history, and safety documents. The portal supports two distinct states based on employment status, enabling technicians to maintain a portable account that follows them across employers.
+The Technician **Passport** is the personal portable profile for rope access technicians. It manages their profile, certifications, employer connections, work history, and safety documents. The Passport supports two distinct states based on employment status, enabling technicians to maintain a portable account that follows them across employers.
 
 ### Key Goals
 - **Profile Management**: Personal information, certifications, emergency contacts
@@ -34,12 +43,12 @@ The Technician Portal is the personal dashboard for rope access technicians. It 
 
 ```
 +-------------------------------------------------------------------------+
-|                      TECHNICIAN PORTAL                                   |
+|                      TECHNICIAN PASSPORT                                 |
 +-------------------------------------------------------------------------+
 |                                                                          |
 |  +------------------+     +--------------------+     +------------------+|
-|  | DashboardSidebar |     | TechnicianPortal   |     | Portal State     ||
-|  | (variant=tech)   |     | (~6.4K lines)      |     | (Linked/Unlinked)||
+|  | DashboardSidebar |     | TechnicianPortal   |     | Account State    ||
+|  | (variant=tech)   |     | (.tsx ~6.4K lines) |     | (Linked/Unlinked)||
 |  +------------------+     +--------------------+     +------------------+|
 |         |                         |                         |            |
 |         v                         v                         v            |
@@ -51,62 +60,63 @@ The Technician Portal is the personal dashboard for rope access technicians. It 
 |         v                                                                |
 |  +-------------------------------------------------------------------+  |
 |  |                    STATE-BASED FEATURES                            |  |
-|  |  UNLINKED: Job Board, Invitations    |  LINKED: Work Dashboard    |  |
+|  |  UNLINKED: Job Board, Invitations    |  LINKED: Dashboard Access  |  |
 |  |  PLUS: Multi-employer connections     |  Access to employer tools  |  |
 |  +-------------------------------------------------------------------+  |
 |                                                                          |
 +-------------------------------------------------------------------------+
 ```
 
-### Portal States & Dashboard Experiences
+### Passport vs Dashboard Experiences
 
-**CRITICAL ARCHITECTURE DISTINCTION**: Technicians can access **two completely separate dashboards** with different layouts and navigation:
+**CRITICAL ARCHITECTURE DISTINCTION**: Technicians can access **two completely separate experiences** with different layouts and navigation:
 
 | Experience | Route | Component | Sidebar Variant | Brand Color |
 |------------|-------|-----------|-----------------|-------------|
-| Personal Portal | `/technician-portal` | `TechnicianPortal.tsx` | `variant="technician"` | Rust `#AB4521` |
-| Work Dashboard | `/dashboard` | `Dashboard.tsx` via `DashboardLayout` | `variant="employer"` | Blue `#0B64A3` |
+| **Passport** | `/technician-portal` | `TechnicianPortal.tsx` | `variant="technician"` | Rust `#AB4521` |
+| **Dashboard** | `/dashboard` | `Dashboard.tsx` via `DashboardLayout` | `variant="employer"` | Blue `#0B64A3` |
 
 #### 1. UNLINKED State
 When `user.companyId` is null or `user.terminatedDate` is set:
-- **Personal Portal Only**: Uses `TechnicianPortal.tsx` with technician-branded sidebar
+- **Passport Only**: Uses `TechnicianPortal.tsx` with technician-branded sidebar
 - **Job Board Access**: Browse available positions
 - **Profile Visibility**: Control discoverability by employers
 - **Invitations**: Receive and respond to team invitations
 - **Self-Service Profile**: Manage certifications and documents
-- **"Go to Work Dashboard" button**: Disabled (no employer connection)
+- **"Go to Dashboard" button**: Disabled (no employer connection)
 
 #### 2. LINKED State
 When `user.companyId` is set and no termination:
 
-**Two Dashboard Access Points:**
+**Two Access Points:**
 
-1. **Personal Portal** (`/technician-portal`):
-   - Still uses `TechnicianPortal.tsx` with rust-colored technician sidebar
+1. **Passport** (`/technician-portal`):
+   - Uses `TechnicianPortal.tsx` with rust-colored technician sidebar
    - Manages personal profile, certifications, visibility settings
    - PLUS features, referral tracking, employer connections
 
-2. **Work Dashboard** (`/dashboard`):
+2. **Dashboard** (`/dashboard`):
    - Navigates to `Dashboard.tsx` wrapped in `DashboardLayout`
    - Uses **employer's blue sidebar** (`variant="employer"`)
    - Access to employer's projects, safety forms, clock-in/out
    - Technician sees same navigation as employer's other staff
-   - Button: "Go to Work Dashboard" on Personal Portal home tab
+   - Button: "Go to Dashboard" on Passport home tab
 
 ```
 LINKED TECHNICIAN HAS TWO EXPERIENCES:
 ┌─────────────────────────────────────────────────────────────────┐
-│  /technician-portal (Personal)     │  /dashboard (Work)        │
-│  ─────────────────────────────     │  ──────────────────       │
-│  TechnicianPortal.tsx              │  Dashboard.tsx             │
-│  variant="technician"              │  variant="employer"        │
-│  Brand: #AB4521 (Rust)             │  Brand: #0B64A3 (Blue)     │
-│                                    │                            │
-│  Personal profile management       │  Employer's projects       │
-│  Certifications & documents        │  Safety forms              │
-│  Job board browsing                │  Clock in/out              │
-│  Employer connections              │  Team schedule             │
-│  PLUS features                     │  Work session logging      │
+│  PASSPORT (Personal)               │  DASHBOARD (Company Work)  │
+│  ────────────────────              │  ────────────────────────  │
+│  /technician-portal                │  /dashboard                 │
+│  TechnicianPortal.tsx              │  Dashboard.tsx              │
+│  variant="technician"              │  variant="employer"         │
+│  Brand: #AB4521 (Rust)             │  Brand: #0B64A3 (Blue)      │
+│                                    │                             │
+│  Personal profile management       │  Employer's projects        │
+│  Certifications & documents        │  Safety forms               │
+│  Job board browsing                │  Clock in/out               │
+│  Employer connections              │  Team schedule              │
+│  PLUS features                     │  Work session logging       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
