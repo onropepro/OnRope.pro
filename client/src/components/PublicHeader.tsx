@@ -127,10 +127,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               variant="ghost"
               size="sm"
               className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-              onClick={onSignInClick || openLogin}
-              data-testid="button-sign-in-header"
+              onClick={() => setLocation("/safety")}
+              data-testid="button-safety-manifesto-header"
             >
-              {t('login.header.signIn', 'Sign In')}
+              Our Safety Manifesto
             </Button>
             <Button 
               variant="ghost"
@@ -187,7 +187,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </Button>
 
-          {/* Navigation - Right Aligned (Desktop) */}
+            {/* Navigation - Right Aligned (Desktop) */}
           <nav className="hidden lg:flex items-center justify-end gap-1 flex-1">
             {/* Employer with Modules Dropdown */}
             <div 
@@ -714,6 +714,19 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 {item.label}
               </Button>
             ))}
+
+            {/* Sign In - Button Style */}
+            <div className="pl-2">
+              <Button
+                variant="default"
+                size="sm"
+                className="font-semibold shadow-sm px-6"
+                onClick={onSignInClick || openLogin}
+                data-testid="nav-sign-in"
+              >
+                {t('login.header.signIn', 'Sign In')}
+              </Button>
+            </div>
           </nav>
         </div>
       </div>
