@@ -2810,6 +2810,9 @@ export const jobPostings = pgTable("job_postings", {
   workDays: varchar("work_days"), // e.g., "Monday to Friday", "Rotating shifts"
   experienceRequired: varchar("experience_required"), // e.g., "1-2 years", "3-5 years", "5+ years"
   
+  // Position type - which staff this job is for
+  positionType: varchar("position_type").notNull().default("rope_access"), // rope_access | ground_crew
+  
   // Status and visibility
   status: varchar("status").notNull().default("active"), // draft | active | paused | closed | expired
   
