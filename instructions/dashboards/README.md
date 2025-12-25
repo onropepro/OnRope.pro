@@ -87,12 +87,28 @@ When using `DashboardSidebar`:
 - **Permission-based visibility**: Navigation items have `isVisible()` callbacks
 - **User-customizable ordering**: Drag-and-drop reordering saved to `sidebar_preferences` table
 
+### Dual-Dashboard Pattern (Technician & Ground Crew)
+
+**Critical**: Linked technicians and ground crew have access to **two separate dashboards**:
+
+| Dashboard | Route | Sidebar | Purpose |
+|-----------|-------|---------|---------|
+| Personal Portal | `/technician-portal` or `/ground-crew-portal` | Role-specific color | Profile, certifications, job board |
+| Work Dashboard | `/dashboard` | `variant="employer"` (blue) | Projects, clock-in/out, safety forms |
+
+When linked, these workers switch between:
+- Their **personal branded portal** for profile management
+- The **employer's work dashboard** (same layout as company staff)
+
+See [technician-dashboard-instructions-v1.0.md](./technician-dashboard-instructions-v1.0.md) for detailed state documentation.
+
 ### Key Architectural Decisions
 
 1. **Shared components when possible**: Use the unified sidebar/layout for most dashboards
 2. **Permission checks at item level**: Each nav item checks user permissions via `isVisible()`
 3. **Consistent header patterns**: Most dashboards share similar header elements (search, user profile, logout)
 4. **Mobile-first with desktop sidebar**: Mobile uses bottom nav or full-screen menus
+5. **Linked workers share employer navigation**: When accessing Work Dashboard, technicians/ground crew see employer's sidebar
 
 ---
 

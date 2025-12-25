@@ -58,23 +58,57 @@ The Technician Portal is the personal dashboard for rope access technicians. It 
 +-------------------------------------------------------------------------+
 ```
 
-### Portal States
+### Portal States & Dashboard Experiences
 
-The technician portal operates in two primary states:
+**CRITICAL ARCHITECTURE DISTINCTION**: Technicians can access **two completely separate dashboards** with different layouts and navigation:
+
+| Experience | Route | Component | Sidebar Variant | Brand Color |
+|------------|-------|-----------|-----------------|-------------|
+| Personal Portal | `/technician-portal` | `TechnicianPortal.tsx` | `variant="technician"` | Rust `#AB4521` |
+| Work Dashboard | `/dashboard` | `Dashboard.tsx` via `DashboardLayout` | `variant="employer"` | Blue `#0B64A3` |
 
 #### 1. UNLINKED State
 When `user.companyId` is null or `user.terminatedDate` is set:
+- **Personal Portal Only**: Uses `TechnicianPortal.tsx` with technician-branded sidebar
 - **Job Board Access**: Browse available positions
 - **Profile Visibility**: Control discoverability by employers
 - **Invitations**: Receive and respond to team invitations
 - **Self-Service Profile**: Manage certifications and documents
+- **"Go to Work Dashboard" button**: Disabled (no employer connection)
 
 #### 2. LINKED State
 When `user.companyId` is set and no termination:
-- **Work Dashboard Access**: "Go to Work Dashboard" button active
-- **Employer Tools**: Access employer's projects, schedules
-- **Time Tracking**: Clock in/out on employer's projects
-- **Company Context**: See employer-specific information
+
+**Two Dashboard Access Points:**
+
+1. **Personal Portal** (`/technician-portal`):
+   - Still uses `TechnicianPortal.tsx` with rust-colored technician sidebar
+   - Manages personal profile, certifications, visibility settings
+   - PLUS features, referral tracking, employer connections
+
+2. **Work Dashboard** (`/dashboard`):
+   - Navigates to `Dashboard.tsx` wrapped in `DashboardLayout`
+   - Uses **employer's blue sidebar** (`variant="employer"`)
+   - Access to employer's projects, safety forms, clock-in/out
+   - Technician sees same navigation as employer's other staff
+   - Button: "Go to Work Dashboard" on Personal Portal home tab
+
+```
+LINKED TECHNICIAN HAS TWO EXPERIENCES:
+┌─────────────────────────────────────────────────────────────────┐
+│  /technician-portal (Personal)     │  /dashboard (Work)        │
+│  ─────────────────────────────     │  ──────────────────       │
+│  TechnicianPortal.tsx              │  Dashboard.tsx             │
+│  variant="technician"              │  variant="employer"        │
+│  Brand: #AB4521 (Rust)             │  Brand: #0B64A3 (Blue)     │
+│                                    │                            │
+│  Personal profile management       │  Employer's projects       │
+│  Certifications & documents        │  Safety forms              │
+│  Job board browsing                │  Clock in/out              │
+│  Employer connections              │  Team schedule             │
+│  PLUS features                     │  Work session logging      │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ### PLUS Access Tier
 

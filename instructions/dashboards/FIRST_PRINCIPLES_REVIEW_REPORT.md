@@ -200,6 +200,14 @@ None identified. Each document serves a distinct purpose.
 | Fictional variantStyles | shared-dashboard-components-v1.0.md | COMPLETED | Replaced with actual `STAKEHOLDER_COLORS` implementation |
 | Missing stakeholder docs noted | README.md | COMPLETED | Added PLANNED status for ground-crew and property-manager docs |
 
+### Documentation Corrections - Session 2
+
+| Item | Location | Status | Action Taken |
+|------|----------|--------|--------------|
+| Dual-dashboard pattern | technician-dashboard-instructions-v1.0.md | COMPLETED | Added explicit section explaining linked technicians have TWO dashboards (Personal + Work) with different sidebars |
+| Dual-dashboard pattern | ground-crew-dashboard-instructions-v1.0.md | COMPLETED | Added same dual-dashboard explanation for ground crew |
+| Dual-dashboard pattern | README.md | COMPLETED | Added "Dual-Dashboard Pattern" section explaining linked worker architecture |
+
 ### Future Documentation Additions - COMPLETED
 
 | Item | Priority | Status | File Created |

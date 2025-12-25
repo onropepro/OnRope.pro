@@ -50,6 +50,18 @@ The Ground Crew Portal is the personal dashboard for ground-based support worker
 +-------------------------------------------------------------------------+
 ```
 
+### Portal States & Dashboard Experiences
+
+**SAME PATTERN AS TECHNICIAN**: Ground crew can access **two completely separate dashboards** when linked:
+
+| Experience | Route | Component | Sidebar Variant | Brand Color |
+|------------|-------|-----------|-----------------|-------------|
+| Personal Portal | `/ground-crew-portal` | `GroundCrewPortal.tsx` | `variant="ground-crew"` | Forest Green `#5D7B6F` |
+| Work Dashboard | `/dashboard` | `Dashboard.tsx` via `DashboardLayout` | `variant="employer"` | Blue `#0B64A3` |
+
+**Unlinked**: Personal Portal only (green sidebar)  
+**Linked**: Both Personal Portal (green) AND Work Dashboard (blue employer sidebar)
+
 ### Comparison: Ground Crew vs Technician
 
 | Feature | Ground Crew | Technician |
@@ -62,6 +74,7 @@ The Ground Crew Portal is the personal dashboard for ground-based support worker
 | Job Board | `/ground-crew-job-board` | `/technician-job-board` |
 | PLUS Access Tier | No | Yes (referral system) |
 | Visibility Settings | No | Yes |
+| Work Dashboard Access | Yes (when linked) | Yes (when linked) |
 
 ### Integration Points
 
