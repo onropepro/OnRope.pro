@@ -40,6 +40,7 @@ import {
   Loader2
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const TECHNICIAN_COLOR = "#AB4521";
 const TECHNICIAN_GRADIENT_END = "#8B371A";
@@ -1122,6 +1123,9 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </footer>
+
+      <SiteFooter />
+
       {/* Registration Modal */}
       <TechnicianRegistration 
         open={showRegistration} 

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { PublicHeader } from "@/components/PublicHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { 
@@ -793,6 +794,8 @@ export default function Employer() {
           </div>
         </div>
       </section>
+
+      <SiteFooter />
 
       {/* Employer Registration Modal */}
       <EmployerRegistration 
