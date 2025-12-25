@@ -567,7 +567,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
-                <span className="flex flex-col items-start leading-tight">
+                <span className="flex flex-col items-center leading-tight">
                   <span>Rope Access Technician</span>
                   <span className="text-xs text-muted-foreground font-normal">& Ground Crew</span>
                 </span>
