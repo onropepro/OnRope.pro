@@ -242,11 +242,24 @@ export default function SafetyLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            The Flywheel: How Gamification Transforms an Industry
+            OnRopePro Is Giving Safety a Value
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
             A self-reinforcing cycle where everyone wins by prioritizing safety.
           </p>
+
+          <div className="max-w-3xl mx-auto mb-16 space-y-6">
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Safety has always been theoretical. Companies say the right words. Techs nod along. Nobody measures anything. Nothing changes.
+            </p>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              We're making safety practical. Measurable. Tradeable.
+              When a technician's PSR affects their job prospects, they care about their inspections. When a company's CSR affects their contract wins, they invest in their culture. When property managers choose vendors by safety score, the market rewards the right behavior.
+            </p>
+            <p className="text-lg font-medium text-foreground leading-relaxed">
+              This isn't compliance software. This is infrastructure that makes safety worth something. The entire industry rises because the incentives finally align.
+            </p>
+          </div>
 
           <div className="space-y-6">
             {/* Stage 1 */}
