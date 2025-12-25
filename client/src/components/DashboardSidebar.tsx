@@ -179,8 +179,8 @@ export function DashboardSidebar({
       label: t("dashboard.sidebar.myAccount", "MY ACCOUNT"),
       items: [
         {
-          id: "my-portal",
-          label: t("dashboard.sidebar.myPortal", "My Portal"),
+          id: "my-passport",
+          label: t("dashboard.sidebar.myPassport", "My Passport"),
           icon: UserIcon,
           href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
             ? "/ground-crew-portal?tab=home" 
