@@ -11104,7 +11104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       await storage.cancelTeamInvitation(invitationId);
       
-      console.log(\`[Team-Invite] Company \${companyId} cancelled invitation \${invitationId}\`);
+      console.log(`[Team-Invite] Company ${companyId} cancelled invitation ${invitationId}`);
       
       res.json({ success: true, message: "Invitation cancelled successfully" });
     } catch (error) {
