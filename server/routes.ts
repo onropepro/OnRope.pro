@@ -5452,9 +5452,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Only technicians can use this endpoint
-      if (user.role !== 'rope_access_tech') {
-        return res.status(403).json({ message: "Only technicians can leave a company" });
+      // Technicians and ground crew can use this endpoint
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians and ground crew can leave a company" });
       }
 
       // Must be linked to a company to leave
@@ -5541,7 +5541,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Only technicians can redeem referral codes
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can redeem referral codes" });
       }
 
@@ -5615,7 +5615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can upload documents through this endpoint" });
       }
 
@@ -5689,7 +5689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can delete documents through this endpoint" });
       }
 
@@ -10313,7 +10313,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view referral count" });
       }
       
@@ -10431,7 +10431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view their document requests" });
       }
       
@@ -10505,7 +10505,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can upload files to document requests" });
       }
       
@@ -10568,7 +10568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can update their document requests" });
       }
       
@@ -10877,7 +10877,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view employer connections" });
       }
       
@@ -10961,7 +10961,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can manage employer connections" });
       }
       
