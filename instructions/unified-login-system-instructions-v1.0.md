@@ -2,7 +2,7 @@
 **System**: Rope Access Management System  
 **Domain**: Authentication, Session Management, User Registration  
 **Version**: 1.0  
-**Last Updated**: December 25, 2024  
+**Last Updated**: December 25, 2025  
 **Status**: PRODUCTION-READY ✅  
 **Safety Critical**: Yes - Authentication failures can expose sensitive company and safety data
 
@@ -118,8 +118,8 @@ Provide a secure, unified authentication system that enables 8 distinct stakehol
 | `superuser` | Platform super administrator | Environment variables only | Username (env) |
 | `staff` | Internal platform staff | Created by SuperUser | Email |
 | `company` | Rope access company owner | /pricing → /register | Email, Company Name |
-| `rope_access_tech` | IRATA/SPRAT certified technician | /technician portal self-registration | Email, License # |
-| `ground_crew` | Ground support worker | /ground-crew portal self-registration | Email |
+| `rope_access_tech` | IRATA/SPRAT certified technician | /technician Passport self-registration | Email, License # |
+| `ground_crew` | Ground support worker | /ground-crew Passport self-registration | Email |
 | `property_manager` | Building property manager | /register with company code | Email |
 | `resident` | Building resident | /register with strata + unit | Email |
 | `building_manager` | Strata building manager | /building-portal | Building ID + PIN |
@@ -168,7 +168,7 @@ await req.session.save();
 
 ### 2. Technician Self-Registration
 
-**User Journey**: `/technician` (landing) → Click "Sign Up" → Multi-step form with OCR
+**User Journey**: `/technician` (landing) → Click "Sign Up" → Multi-step form with OCR → Technician Passport
 
 **Endpoint**: `POST /api/technician-register`
 
@@ -203,7 +203,7 @@ await req.session.save();
 
 ### 3. Ground Crew Self-Registration
 
-**User Journey**: `/ground-crew` (landing) → Click "Sign Up" → Registration form
+**User Journey**: `/ground-crew` (landing) → Click "Sign Up" → Registration form → Ground Crew Passport
 
 **Endpoint**: `POST /api/ground-crew-register`
 
@@ -361,7 +361,24 @@ if (user.isDisabled) {
 }
 ```
 
-**Important**: Technicians and ground crew (`LINKABLE_ROLES`) can always log in even if terminated or suspended from a specific company - they retain access to their personal portal.
+**Important**: Technicians and ground crew (`LINKABLE_ROLES`) can always log in even if terminated or suspended from a specific company - they retain access to their personal Passport.
+
+### Post-Login Redirect Flow
+
+After successful authentication, users are redirected based on their role:
+
+| Role | Redirect Destination | Notes |
+|------|---------------------|-------|
+| `rope_access_tech` | `/technician-portal` (Technician Passport) | Always goes to Passport first, can navigate to work Dashboard from there |
+| `ground_crew` | `/ground-crew-portal` (Ground Crew Passport) | Always goes to Passport first, can navigate to work Dashboard from there |
+| `company` | `/dashboard` | Employer Dashboard |
+| `property_manager` | `/property-manager` | Property Manager interface |
+| `resident` | `/resident-dashboard` | Resident Dashboard |
+| `building_manager` | `/building-portal` | Building Manager Portal |
+| `superuser` | `/superuser` | SuperUser administration |
+| `staff` | `/superuser` | Staff access to permitted sections |
+
+**Key Design Principle**: Technicians and Ground Crew always land on their **Passport** (personal account view) after login. From there, they can click "Go to Work Dashboard" to access the employer-branded work Dashboard (blue sidebar). This separation ensures their personal account remains the entry point, not tied to any single employer.
 
 ### Session Creation
 
