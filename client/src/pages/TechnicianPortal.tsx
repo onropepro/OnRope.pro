@@ -122,6 +122,7 @@ import {
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 type Language = 'en' | 'fr' | 'es';
 
@@ -3982,7 +3983,20 @@ export default function TechnicianPortal() {
                           <FormItem className="md:col-span-2">
                             <FormLabel>{t.streetAddress}</FormLabel>
                             <FormControl>
-                              <Input {...field} data-testid="input-street" />
+                              <AddressAutocomplete
+                                data-testid="input-street"
+                                placeholder={t.streetAddress}
+                                value={field.value || ""}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                onSelect={(address) => {
+                                  field.onChange(address.formatted);
+                                  form.setValue('employeeCity', address.city || '');
+                                  form.setValue('employeeProvinceState', address.state || '');
+                                  form.setValue('employeeCountry', address.country || '');
+                                  form.setValue('employeePostalCode', address.postcode || '');
+                                }}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
