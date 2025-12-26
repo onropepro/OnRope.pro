@@ -3320,7 +3320,7 @@ export default function TechnicianPortal() {
           </>
         )}
         
-        {/* MORE TAB - Feedback, referral, settings */}
+        {/* MORE TAB - referral, settings */}
         {activeTab === 'more' && (
           <>
             {/* Back to Home button */}
