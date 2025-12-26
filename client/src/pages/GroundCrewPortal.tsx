@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, parseLocalDate } from "@/lib/dateUtils";
@@ -74,6 +75,7 @@ import {
   FileArchive,
   File,
   Menu,
+  Info,
 } from "lucide-react";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
@@ -97,6 +99,7 @@ const translations = {
     birthday: "Birth Date",
     address: "Address",
     streetAddress: "Street Address",
+    addressPayrollInfo: "This information is required for payroll processing",
     city: "City",
     provinceState: "Province/State",
     country: "Country",
@@ -261,6 +264,7 @@ const translations = {
     birthday: "Date de Naissance",
     address: "Adresse",
     streetAddress: "Adresse",
+    addressPayrollInfo: "Ces informations sont requises pour le traitement de la paie",
     city: "Ville",
     provinceState: "Province/État",
     country: "Pays",
@@ -425,6 +429,7 @@ const translations = {
     birthday: "Fecha de Nacimiento",
     address: "Dirección",
     streetAddress: "Dirección",
+    addressPayrollInfo: "Esta información es necesaria para el procesamiento de nómina",
     city: "Ciudad",
     provinceState: "Provincia/Estado",
     country: "País",
@@ -1650,7 +1655,17 @@ export default function GroundCrewPortal() {
                     <Separator />
 
                     <div>
-                      <h3 className="text-lg font-semibold mb-4">{t.address}</h3>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        {t.address}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{t.addressPayrollInfo}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}

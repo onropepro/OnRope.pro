@@ -116,7 +116,8 @@ import {
   FileArchive,
   File,
   GraduationCap,
-  Menu
+  Menu,
+  Info
 } from "lucide-react";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
@@ -141,6 +142,7 @@ const translations = {
     birthday: "Birth Date",
     address: "Address",
     streetAddress: "Street Address",
+    addressPayrollInfo: "This information is required for payroll processing",
     city: "City",
     provinceState: "Province/State",
     country: "Country",
@@ -506,6 +508,7 @@ const translations = {
     birthday: "Date de naissance",
     address: "Adresse",
     streetAddress: "Adresse civique",
+    addressPayrollInfo: "Ces informations sont requises pour le traitement de la paie",
     city: "Ville",
     provinceState: "Province/État",
     country: "Pays",
@@ -871,6 +874,7 @@ const translations = {
     birthday: "Fecha de Nacimiento",
     address: "Direccion",
     streetAddress: "Direccion",
+    addressPayrollInfo: "Esta información es necesaria para el procesamiento de nómina",
     city: "Ciudad",
     provinceState: "Provincia/Estado",
     country: "Pais",
@@ -3961,6 +3965,14 @@ export default function TechnicianPortal() {
                     <h3 className="font-medium flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       {t.address}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{t.addressPayrollInfo}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
