@@ -306,6 +306,7 @@ const translations = {
     accessProjects: "Access projects, clock in/out, safety forms, auto-logging, work dashboard.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
+    dashboardDisabledSuspended: "Your seat has been suspended by your employer. Contact them to be reactivated.",
     selectEmployer: "Select Employer",
     selectEmployerDesc: "Choose which employer's dashboard to access",
     connectedEmployers: "Connected Employers",
@@ -669,6 +670,7 @@ const translations = {
     accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
+    dashboardDisabledSuspended: "Votre siège a été suspendu par votre employeur. Contactez-les pour être réactivé.",
     selectEmployer: "Sélectionner l'employeur",
     selectEmployerDesc: "Choisissez le tableau de bord de l'employeur à accéder",
     connectedEmployers: "Employeurs connectés",
@@ -1153,6 +1155,7 @@ const translations = {
     accessProjects: "Acceda a proyectos, fiche entrada/salida y formularios de seguridad",
     dashboardDisabledNoCompany: "Necesita estar vinculado con una empresa para acceder al Panel de Trabajo.",
     dashboardDisabledTerminated: "Su empleo ha sido terminado. Acepte una nueva invitacion para acceder al Panel.",
+    dashboardDisabledSuspended: "Su asiento ha sido suspendido por su empleador. Contáctelos para ser reactivado.",
     selectEmployer: "Seleccionar Empleador",
     selectEmployerDesc: "Elija a que panel de empleador acceder",
     connectedEmployers: "Empleadores Conectados",
@@ -1602,8 +1605,8 @@ export default function TechnicianPortal() {
     }>;
   }>({
     queryKey: ["/api/my-invitations"],
-    // Fetch invitations for: unlinked technicians, terminated technicians, or PLUS technicians (can connect to multiple employers)
-    enabled: !!user && user.role === 'rope_access_tech' && (!user.companyId || !!user.terminatedDate || !!user.hasPlusAccess),
+    // Fetch invitations for: unlinked technicians, terminated/suspended technicians, or PLUS technicians (can connect to multiple employers)
+    enabled: !!user && user.role === 'rope_access_tech' && (!user.companyId || !!user.terminatedDate || !!user.suspendedAt || !!user.hasPlusAccess),
   });
 
   const pendingInvitations = invitationsData?.invitations || [];
@@ -2749,11 +2752,11 @@ export default function TechnicianPortal() {
                 <div className="p-4 sm:p-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-lg ${user.companyId && !user.terminatedDate ? "bg-sky-50 dark:bg-sky-900/30" : "bg-slate-100 dark:bg-slate-800"}`}>
-                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate ? "text-sky-600 dark:text-sky-400" : "text-slate-400"}`} />
+                      <div className={`p-3 rounded-lg ${user.companyId && !user.terminatedDate && !user.suspendedAt ? "bg-sky-50 dark:bg-sky-900/30" : "bg-slate-100 dark:bg-slate-800"}`}>
+                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate && !user.suspendedAt ? "text-sky-600 dark:text-sky-400" : "text-slate-400"}`} />
                       </div>
                       <div>
-                        <p className={`font-semibold ${!user.companyId || user.terminatedDate ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
+                        <p className={`font-semibold ${!user.companyId || user.terminatedDate || user.suspendedAt ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
                         <p className="text-base text-slate-500 dark:text-slate-400">{t.accessProjects}</p>
                       </div>
                     </div>
@@ -2766,18 +2769,18 @@ export default function TechnicianPortal() {
                         }
                       }}
                       className="gap-2 bg-[#0B64A3] hover:bg-[#0B64A3]/90 text-white"
-                      disabled={!user.companyId || !!user.terminatedDate}
+                      disabled={!user.companyId || !!user.terminatedDate || !!user.suspendedAt}
                       data-testid="button-go-to-dashboard"
                     >
                       {t.goToWorkDashboard}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
-                  {(!user.companyId || user.terminatedDate) && (
+                  {(!user.companyId || user.terminatedDate || user.suspendedAt) && (
                     <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <p className="text-base text-slate-500 dark:text-slate-400 flex-1">
-                          {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                          {user.suspendedAt ? t.dashboardDisabledSuspended : user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
                         </p>
                         {pendingInvitations.length > 0 && (
                           <div className="flex flex-col gap-2 sm:items-end" data-testid="pending-invitations-section">

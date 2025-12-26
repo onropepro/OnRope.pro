@@ -201,6 +201,7 @@ const translations = {
     accessProjects: "Access projects, clock in/out, safety forms, and work dashboard.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
+    dashboardDisabledSuspended: "Your seat has been suspended by your employer. Contact them to be reactivated.",
     selectEmployer: "Select Employer",
     selectEmployerDesc: "Choose which employer's dashboard to access",
     connectedEmployers: "Connected Employers",
@@ -364,6 +365,7 @@ const translations = {
     accessProjects: "Accédez aux projets, pointage, formulaires de sécurité et tableau de bord.",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Une invitation est envoyée par votre employeur et apparaîtra ici.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
+    dashboardDisabledSuspended: "Votre siège a été suspendu par votre employeur. Contactez-les pour être réactivé.",
     selectEmployer: "Sélectionner Employeur",
     selectEmployerDesc: "Choisissez le tableau de bord de l'employeur",
     connectedEmployers: "Employeurs Connectés",
@@ -527,6 +529,7 @@ const translations = {
     accessProjects: "Acceda a proyectos, marcaje, formularios de seguridad y panel de trabajo.",
     dashboardDisabledNoCompany: "Necesita estar vinculado con una empresa para acceder al Panel de Trabajo. Una invitación es enviada por su empleador y aparecerá aquí.",
     dashboardDisabledTerminated: "Su empleo ha sido terminado. Acepte una nueva invitación para acceder al Panel de Trabajo.",
+    dashboardDisabledSuspended: "Su asiento ha sido suspendido por su empleador. Contáctelos para ser reactivado.",
     selectEmployer: "Seleccionar Empleador",
     selectEmployerDesc: "Elija el panel de qué empleador acceder",
     connectedEmployers: "Empleadores Conectados",
@@ -1273,29 +1276,29 @@ export default function GroundCrewPortal() {
                 <div className="p-4 sm:p-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-lg ${user.companyId && !user.terminatedDate ? "bg-[#5D7B6F]/10 dark:bg-[#5D7B6F]/20" : "bg-slate-100 dark:bg-slate-800"}`}>
-                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate ? "text-[#5D7B6F]" : "text-slate-400"}`} />
+                      <div className={`p-3 rounded-lg ${user.companyId && !user.terminatedDate && !user.suspendedAt ? "bg-[#5D7B6F]/10 dark:bg-[#5D7B6F]/20" : "bg-slate-100 dark:bg-slate-800"}`}>
+                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate && !user.suspendedAt ? "text-[#5D7B6F]" : "text-slate-400"}`} />
                       </div>
                       <div>
-                        <p className={`font-semibold ${!user.companyId || user.terminatedDate ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
+                        <p className={`font-semibold ${!user.companyId || user.terminatedDate || user.suspendedAt ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
                         <p className="text-base text-slate-500 dark:text-slate-400">{t.accessProjects}</p>
                       </div>
                     </div>
                     <Button
                       onClick={() => setLocation("/dashboard")}
                       className="gap-2 bg-[#0B64A3] hover:bg-[#0B64A3]/90 text-white"
-                      disabled={!user.companyId || !!user.terminatedDate}
+                      disabled={!user.companyId || !!user.terminatedDate || !!user.suspendedAt}
                       data-testid="button-go-to-dashboard"
                     >
                       {t.goToWorkDashboard}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
-                  {(!user.companyId || user.terminatedDate) && (
+                  {(!user.companyId || user.terminatedDate || user.suspendedAt) && (
                     <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <p className="text-base text-slate-500 dark:text-slate-400 flex-1">
-                          {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                          {user.suspendedAt ? t.dashboardDisabledSuspended : user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
                         </p>
                         {pendingInvitations.length > 0 && (
                           <div className="flex flex-col gap-2 sm:items-end" data-testid="pending-invitations-section">
@@ -1455,8 +1458,8 @@ export default function GroundCrewPortal() {
                 </button>
               </div>
 
-              {/* Current Employment Status Card - Only show when employed */}
-              {user.companyId && !user.terminatedDate && companyData?.company && (
+              {/* Current Employment Status Card - Only show when employed and not suspended */}
+              {user.companyId && !user.terminatedDate && !user.suspendedAt && companyData?.company && (
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
                   <div className="p-4 sm:p-5">
                     <div className="flex items-center gap-4">
@@ -1472,6 +1475,28 @@ export default function GroundCrewPortal() {
                           </Badge>
                         </div>
                         <p className="text-sm text-slate-500 dark:text-slate-400">{t.currentEmployer}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Suspended Status Card - Show when suspended */}
+              {user.companyId && user.suspendedAt && companyData?.company && (
+                <div className="bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-700 rounded-lg shadow-sm">
+                  <div className="p-4 sm:p-5">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/30">
+                        <Building2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.name}</p>
+                          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs">
+                            {t.suspended}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.dashboardDisabledSuspended}</p>
                       </div>
                     </div>
                   </div>
@@ -2044,7 +2069,7 @@ export default function GroundCrewPortal() {
                 </CardContent>
               </Card>
 
-              {user.companyId && !user.terminatedDate && (
+              {user.companyId && !user.terminatedDate && !user.suspendedAt && (
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -2066,6 +2091,28 @@ export default function GroundCrewPortal() {
                       >
                         {t.leaveCompany}
                       </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {user.companyId && user.suspendedAt && (
+                <Card className="border-amber-200 dark:border-amber-700">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-amber-600" />
+                      {t.currentEmployer}
+                      <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs ml-2">
+                        {t.suspended}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                      <div>
+                        <p className="font-medium">{companyData?.company?.name || 'Your Company'}</p>
+                        <p className="text-sm text-muted-foreground">{t.dashboardDisabledSuspended}</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
