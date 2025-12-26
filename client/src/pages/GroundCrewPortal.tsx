@@ -1459,7 +1459,7 @@ export default function GroundCrewPortal() {
               </div>
 
               {/* Current Employment Status Card - Only show when employed and not suspended */}
-              {user.companyId && !user.terminatedDate && !user.suspendedAt && companyData?.company && (
+              {user.companyId && !user.terminatedDate && !user.suspendedAt && (companyData?.company || companyData?.name || companyData?.companyName) && (
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
                   <div className="p-4 sm:p-5">
                     <div className="flex items-center gap-4">
@@ -1468,7 +1468,7 @@ export default function GroundCrewPortal() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.name}</p>
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData?.company?.name || companyData?.name || companyData?.companyName}</p>
                           <Badge variant="default" className="bg-green-600 text-xs">
                             <CheckCircle2 className="w-3 h-3 mr-1" />
                             {t.active}
@@ -1482,7 +1482,7 @@ export default function GroundCrewPortal() {
               )}
 
               {/* Suspended Status Card - Show when suspended */}
-              {user.companyId && user.suspendedAt && companyData?.company && (
+              {user.companyId && user.suspendedAt && (
                 <div className="bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-700 rounded-lg shadow-sm">
                   <div className="p-4 sm:p-5">
                     <div className="flex items-center gap-4">
@@ -1491,12 +1491,12 @@ export default function GroundCrewPortal() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.name}</p>
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData?.company?.name || companyData?.name || companyData?.companyName || t.linkedEmployer}</p>
                           <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs">
                             {t.inactive}
                           </Badge>
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.inactiveContactEmployer.replace('{company}', companyData.company.name)}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.inactiveContactEmployer.replace('{company}', companyData?.company?.name || companyData?.name || companyData?.companyName || t.linkedEmployer)}</p>
                       </div>
                     </div>
                   </div>
@@ -2074,7 +2074,7 @@ export default function GroundCrewPortal() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Building2 className="w-5 h-5" />
-                      {companyData?.company?.name || t.linkedEmployer}
+                      {companyData?.company?.name || companyData?.name || companyData?.companyName || t.linkedEmployer}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -2104,7 +2104,7 @@ export default function GroundCrewPortal() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Building2 className="w-5 h-5 text-amber-600" />
-                      {companyData?.company?.name || t.linkedEmployer}
+                      {companyData?.company?.name || companyData?.name || companyData?.companyName || t.linkedEmployer}
                       <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs ml-2">
                         {t.inactive}
                       </Badge>
@@ -2113,7 +2113,7 @@ export default function GroundCrewPortal() {
                   <CardContent>
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div>
-                        <p className="text-sm text-muted-foreground">{t.inactiveContactEmployer.replace('{company}', companyData?.company?.name || t.linkedEmployer)}</p>
+                        <p className="text-sm text-muted-foreground">{t.inactiveContactEmployer.replace('{company}', companyData?.company?.name || companyData?.name || companyData?.companyName || t.linkedEmployer)}</p>
                       </div>
                     </div>
                   </CardContent>
