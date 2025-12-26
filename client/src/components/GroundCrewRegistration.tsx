@@ -183,14 +183,14 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
       setStep("accountDetails");
     } else if (step === "accountDetails") {
       if (validateAccountBasics()) {
+        setStep("contact");
+      }
+    } else if (step === "contact") {
+      if (validateContactDetails()) {
         setStep("employer");
       }
     } else if (step === "employer") {
-      setStep("contact");
-    } else if (step === "contact") {
-      if (validateContactDetails()) {
-        handleSubmit();
-      }
+      handleSubmit();
     }
   };
 
@@ -198,10 +198,10 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
     setError("");
     if (step === "accountDetails") {
       setStep("welcome");
-    } else if (step === "employer") {
-      setStep("accountDetails");
     } else if (step === "contact") {
-      setStep("employer");
+      setStep("accountDetails");
+    } else if (step === "employer") {
+      setStep("contact");
     }
   };
 
@@ -217,8 +217,8 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
 
   const getStepNumber = () => {
     if (step === "accountDetails") return 1;
-    if (step === "employer") return 2;
-    if (step === "contact") return 3;
+    if (step === "contact") return 2;
+    if (step === "employer") return 3;
     if (step === "success") return 4;
     return 0;
   };
@@ -291,13 +291,13 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium`} style={{ backgroundColor: getStepNumber() >= 2 ? 'white' : 'rgba(255,255,255,0.2)', color: getStepNumber() >= 2 ? GROUND_CREW_COLOR : 'white' }}>
                   {getStepNumber() > 2 ? <Check className="w-3.5 h-3.5" /> : "2"}
                 </div>
-                <span className="text-sm font-medium">{t('groundCrewReg.steps.employer', 'Employer Info')}</span>
+                <span className="text-sm font-medium">{t('groundCrewReg.steps.contact', 'Address & Safety')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium`} style={{ backgroundColor: getStepNumber() >= 3 ? 'white' : 'rgba(255,255,255,0.2)', color: getStepNumber() >= 3 ? GROUND_CREW_COLOR : 'white' }}>
                   {getStepNumber() > 3 ? <Check className="w-3.5 h-3.5" /> : "3"}
                 </div>
-                <span className="text-sm font-medium">{t('groundCrewReg.steps.contact', 'Address & Safety')}</span>
+                <span className="text-sm font-medium">{t('groundCrewReg.steps.employer', 'Employer Info')}</span>
               </div>
             </div>
 
@@ -431,17 +431,17 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                             value={data.password}
                             onChange={(e) => setData({ ...data, password: e.target.value })}
                             placeholder="Min 8 characters"
+                            className="pr-10"
                             data-testid="input-password"
                           />
-                          <Button
+                          <button
                             type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             onClick={() => setShowPassword(!showPassword)}
+                            data-testid="button-toggle-password"
                           >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </Button>
+                          </button>
                         </div>
                       </div>
                       <div className="space-y-2">
@@ -453,17 +453,17 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                             value={data.confirmPassword}
                             onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
                             placeholder="Re-enter password"
+                            className="pr-10"
                             data-testid="input-confirm-password"
                           />
-                          <Button
+                          <button
                             type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            data-testid="button-toggle-confirm-password"
                           >
                             {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -481,7 +481,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                         onClick={handleContinue}
                         className="flex-1 gap-2 text-white"
                         style={{ backgroundColor: GROUND_CREW_COLOR }}
-                        data-testid="button-continue-to-employer"
+                        data-testid="button-continue-to-contact"
                       >
                         {t('common.continue', 'Continue')}
                         <ArrowRight className="w-4 h-4" />
@@ -536,6 +536,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                         variant="outline"
                         onClick={handleBack}
                         className="flex-1"
+                        disabled={registrationMutation.isPending}
                         data-testid="button-employer-back"
                       >
                         <ArrowLeft className="w-4 h-4 mr-2" />
@@ -545,10 +546,20 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                         onClick={handleContinue}
                         className="flex-1 gap-2 text-white"
                         style={{ backgroundColor: GROUND_CREW_COLOR }}
-                        data-testid="button-continue-to-contact"
+                        disabled={registrationMutation.isPending}
+                        data-testid="button-create-account"
                       >
-                        {t('common.continue', 'Continue')}
-                        <ArrowRight className="w-4 h-4" />
+                        {registrationMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            {t('groundCrewReg.creating', 'Creating Account...')}
+                          </>
+                        ) : (
+                          <>
+                            {t('groundCrewReg.createAccount', 'Create Account')}
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
                       </Button>
                     </div>
                   </motion.div>
@@ -665,20 +676,10 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                         onClick={handleContinue}
                         className="flex-1 gap-2 text-white"
                         style={{ backgroundColor: GROUND_CREW_COLOR }}
-                        disabled={registrationMutation.isPending}
-                        data-testid="button-create-account"
+                        data-testid="button-continue-to-employer"
                       >
-                        {registrationMutation.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            {t('groundCrewReg.creating', 'Creating Account...')}
-                          </>
-                        ) : (
-                          <>
-                            {t('groundCrewReg.createAccount', 'Create Account')}
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
+                        {t('common.continue', 'Continue')}
+                        <ArrowRight className="w-4 h-4" />
                       </Button>
                     </div>
                   </motion.div>
