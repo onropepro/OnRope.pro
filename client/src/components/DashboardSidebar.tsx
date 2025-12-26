@@ -34,6 +34,7 @@ import {
   hasFinancialAccess,
   canManageEmployees,
   canAccessQuotes,
+  hasPermission,
 } from "@/lib/permissions";
 import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -357,7 +358,7 @@ export function DashboardSidebar({
           label: t("dashboard.cards.clients.label", "Clients"),
           icon: Building,
           href: "/dashboard?tab=clients",
-          isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
+          isVisible: (user) => hasPermission(user, 'view_clients'),
         },
       ],
     },
