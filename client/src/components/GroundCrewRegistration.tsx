@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 
-type RegistrationStep = "welcome" | "accountDetails" | "employer" | "success";
+type RegistrationStep = "welcome" | "accountDetails" | "employer" | "contact" | "success";
 
 interface GroundCrewData {
   firstName: string;
@@ -124,7 +124,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
     },
   });
 
-  const validateAccountDetails = (): boolean => {
+  const validateAccountBasics = (): boolean => {
     if (!data.firstName.trim()) {
       setError(t('groundCrewReg.errors.firstNameRequired', 'First name is required'));
       return false;
@@ -161,6 +161,10 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
       setError(t('groundCrewReg.errors.passwordsMismatch', 'Passwords do not match'));
       return false;
     }
+    return true;
+  };
+
+  const validateContactDetails = (): boolean => {
     if (!data.emergencyContactName.trim()) {
       setError(t('groundCrewReg.errors.emergencyNameRequired', 'Emergency contact name is required'));
       return false;
@@ -178,12 +182,15 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
     if (step === "welcome") {
       setStep("accountDetails");
     } else if (step === "accountDetails") {
-      if (validateAccountDetails()) {
+      if (validateAccountBasics()) {
         setStep("employer");
       }
     } else if (step === "employer") {
-      // Submit registration from employer step
-      handleSubmit();
+      setStep("contact");
+    } else if (step === "contact") {
+      if (validateContactDetails()) {
+        handleSubmit();
+      }
     }
   };
 
@@ -193,6 +200,8 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
       setStep("welcome");
     } else if (step === "employer") {
       setStep("accountDetails");
+    } else if (step === "contact") {
+      setStep("employer");
     }
   };
 
@@ -209,7 +218,8 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
   const getStepNumber = () => {
     if (step === "accountDetails") return 1;
     if (step === "employer") return 2;
-    if (step === "success") return 3;
+    if (step === "contact") return 3;
+    if (step === "success") return 4;
     return 0;
   };
 
@@ -282,6 +292,12 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                   {getStepNumber() > 2 ? <Check className="w-3.5 h-3.5" /> : "2"}
                 </div>
                 <span className="text-sm font-medium">{t('groundCrewReg.steps.employer', 'Employer Info')}</span>
+              </div>
+              <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium`} style={{ backgroundColor: getStepNumber() >= 3 ? 'white' : 'rgba(255,255,255,0.2)', color: getStepNumber() >= 3 ? GROUND_CREW_COLOR : 'white' }}>
+                  {getStepNumber() > 3 ? <Check className="w-3.5 h-3.5" /> : "3"}
+                </div>
+                <span className="text-sm font-medium">{t('groundCrewReg.steps.contact', 'Address & Safety')}</span>
               </div>
             </div>
 
@@ -456,8 +472,111 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                       {t('groundCrewReg.passwordRequirements', 'Password must be at least 8 characters with uppercase, lowercase, and number')}
                     </p>
 
-                    {/* Optional Address Section */}
-                    <div className="pt-4 border-t">
+                    <div className="flex gap-3 pt-4">
+                      <Button variant="outline" onClick={handleBack} className="gap-2" data-testid="button-back">
+                        <ArrowLeft className="w-4 h-4" />
+                        {t('common.back', 'Back')}
+                      </Button>
+                      <Button 
+                        onClick={handleContinue}
+                        className="flex-1 gap-2 text-white"
+                        style={{ backgroundColor: GROUND_CREW_COLOR }}
+                        data-testid="button-continue-to-employer"
+                      >
+                        {t('common.continue', 'Continue')}
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              )}
+
+              {/* Employer Info - Review Benefits Before Creating Account */}
+              {step === "employer" && (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-6"
+                  >
+                    <div className="text-center">
+                      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${GROUND_CREW_COLOR}15` }}>
+                        <Briefcase className="w-8 h-8" style={{ color: GROUND_CREW_COLOR }} />
+                      </div>
+                      <h2 className="text-xl font-bold mb-1">{t('groundCrewReg.employer.reviewTitle', 'What You Get')}</h2>
+                      <p className="text-sm text-muted-foreground">{t('groundCrewReg.employer.subtitle', 'Here is what you get when connected to an employer')}</p>
+                    </div>
+
+                    <div className="space-y-3">
+                      {employerBenefits.map((benefit, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                          <ChevronRight className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GROUND_CREW_COLOR }} />
+                          <div>
+                            <h4 className="font-medium text-sm">{benefit.title}</h4>
+                            <p className="text-xs text-muted-foreground">{benefit.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="p-4 rounded-lg border border-dashed" style={{ borderColor: GROUND_CREW_COLOR }}>
+                      <p className="text-sm text-center">
+                        <strong>{t('groundCrewReg.employer.howToConnect', 'How to connect:')}</strong>{' '}
+                        {t('groundCrewReg.employer.connectInstructions', 'Your employer will send you an invitation. Accept it from your portal to unlock all features.')}
+                      </p>
+                    </div>
+
+                    {error && (
+                      <p className="text-sm text-destructive text-center">{error}</p>
+                    )}
+
+                    <div className="flex gap-3">
+                      <Button 
+                        variant="outline"
+                        onClick={handleBack}
+                        className="flex-1"
+                        data-testid="button-employer-back"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        {t('groundCrewReg.back', 'Back')}
+                      </Button>
+                      <Button 
+                        onClick={handleContinue}
+                        className="flex-1 gap-2 text-white"
+                        style={{ backgroundColor: GROUND_CREW_COLOR }}
+                        data-testid="button-continue-to-contact"
+                      >
+                        {t('common.continue', 'Continue')}
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              )}
+
+              {/* Contact Details Step - Address & Emergency Contact */}
+              {step === "contact" && (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <h2 className="text-xl font-bold mb-1">{t('groundCrewReg.contact.title', 'Address & Safety Contact')}</h2>
+                      <p className="text-sm text-muted-foreground">{t('groundCrewReg.contact.subtitle', 'Your address and emergency contact information')}</p>
+                    </div>
+
+                    {error && (
+                      <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm" data-testid="text-contact-error">
+                        {error}
+                      </div>
+                    )}
+
+                    {/* Address Section */}
+                    <div>
                       <h3 className="text-sm font-medium mb-3">{t('groundCrewReg.address.title', 'Address (Optional)')}</h3>
                       <div className="space-y-3">
                         <AddressAutocomplete
@@ -512,7 +631,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
 
                     {/* Emergency Contact Section */}
                     <div className="pt-4 border-t">
-                      <h3 className="text-sm font-medium mb-3">{t('groundCrewReg.emergency.title', 'Emergency Contact')}</h3>
+                      <h3 className="text-sm font-medium mb-3">{t('groundCrewReg.emergency.title', 'Emergency Contact')} *</h3>
                       <div className="space-y-3">
                         <Input
                           placeholder={t('groundCrewReg.fields.emergencyName', 'Contact Name')}
@@ -538,7 +657,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                     </div>
 
                     <div className="flex gap-3 pt-4">
-                      <Button variant="outline" onClick={handleBack} className="gap-2" data-testid="button-back">
+                      <Button variant="outline" onClick={handleBack} className="gap-2" data-testid="button-contact-back">
                         <ArrowLeft className="w-4 h-4" />
                         {t('common.back', 'Back')}
                       </Button>
@@ -557,81 +676,6 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                         ) : (
                           <>
                             {t('groundCrewReg.createAccount', 'Create Account')}
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              )}
-
-              {/* Employer Info - Review Benefits Before Creating Account */}
-              {step === "employer" && (
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="space-y-6"
-                  >
-                    <div className="text-center">
-                      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${GROUND_CREW_COLOR}15` }}>
-                        <Briefcase className="w-8 h-8" style={{ color: GROUND_CREW_COLOR }} />
-                      </div>
-                      <h2 className="text-xl font-bold mb-1">{t('groundCrewReg.employer.reviewTitle', 'What You Get')}</h2>
-                      <p className="text-sm text-muted-foreground">{t('groundCrewReg.employer.subtitle', 'Here is what you get when connected to an employer')}</p>
-                    </div>
-
-                    <div className="space-y-3">
-                      {employerBenefits.map((benefit, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <ChevronRight className="w-5 h-5 shrink-0 mt-0.5" style={{ color: GROUND_CREW_COLOR }} />
-                          <div>
-                            <h4 className="font-medium text-sm">{benefit.title}</h4>
-                            <p className="text-xs text-muted-foreground">{benefit.desc}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="p-4 rounded-lg border border-dashed" style={{ borderColor: GROUND_CREW_COLOR }}>
-                      <p className="text-sm text-center">
-                        <strong>{t('groundCrewReg.employer.howToConnect', 'How to connect:')}</strong>{' '}
-                        {t('groundCrewReg.employer.connectInstructions', 'Your employer will send you an invitation. Accept it from your portal to unlock all features.')}
-                      </p>
-                    </div>
-
-                    {error && (
-                      <p className="text-sm text-destructive text-center">{error}</p>
-                    )}
-
-                    <div className="flex gap-3">
-                      <Button 
-                        variant="outline"
-                        onClick={handleBack}
-                        className="flex-1"
-                        disabled={registrationMutation.isPending}
-                        data-testid="button-employer-back"
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        {t('groundCrewReg.back', 'Back')}
-                      </Button>
-                      <Button 
-                        onClick={handleContinue}
-                        className="flex-1 gap-2 text-white"
-                        style={{ backgroundColor: GROUND_CREW_COLOR }}
-                        disabled={registrationMutation.isPending}
-                        data-testid="button-complete-registration"
-                      >
-                        {registrationMutation.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            {t('groundCrewReg.creating', 'Creating Account...')}
-                          </>
-                        ) : (
-                          <>
-                            {t('groundCrewReg.completeRegistration', 'Complete Registration')}
                             <ArrowRight className="w-4 h-4" />
                           </>
                         )}
