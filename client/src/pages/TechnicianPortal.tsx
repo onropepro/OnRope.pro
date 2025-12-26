@@ -1668,6 +1668,12 @@ export default function TechnicianPortal() {
     queryKey: ["/api/my-performance-metrics"],
     enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
+
+  // Fetch company data for employment status display
+  const { data: companyData } = useQuery<any>({
+    queryKey: ["/api/companies", user?.companyId],
+    enabled: !!user?.companyId,
+  });
   
   // State for copy button
   const [codeCopied, setCodeCopied] = useState(false);
@@ -1876,6 +1882,9 @@ export default function TechnicianPortal() {
   const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
   const [showReferralInfoDialog, setShowReferralInfoDialog] = useState(false);
   const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
+  
+  // State for leave company confirmation dialog
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   
   // Query for employer connections (for PLUS members)
   type EmployerConnection = {
@@ -2831,6 +2840,62 @@ export default function TechnicianPortal() {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Current Employment Status Card - Only show when employed and not suspended */}
+            {user && user.companyId && !user.terminatedDate && !user.suspendedAt && companyData?.company && (
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+                <div className="p-4 sm:p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2.5 rounded-lg bg-green-50 dark:bg-green-900/30">
+                        <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.companyName || companyData.company.name}</p>
+                          <Badge variant="default" className="bg-green-600 text-xs">
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                            {t.active}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.linkedEmployer}</p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                      onClick={() => setShowLeaveConfirm(true)}
+                      data-testid="button-leave-company"
+                    >
+                      {t.leaveCompany}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Suspended/Inactive Status Card - Show when suspended */}
+            {user && user.companyId && user.suspendedAt && companyData?.company && (
+              <div className="bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-700 rounded-lg shadow-sm">
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/30">
+                      <Building2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.companyName || companyData.company.name}</p>
+                        <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs">
+                          {t.inactive}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{t.inactiveContactEmployer.replace('{company}', companyData.company.companyName || companyData.company.name)}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -5610,6 +5675,34 @@ export default function TechnicianPortal() {
               {deleteDocumentMutation.isPending 
                 ? (language === 'en' ? 'Deleting...' : 'Suppression...')
                 : (language === 'en' ? 'Delete' : 'Supprimer')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Leave Company Confirmation Dialog */}
+      <AlertDialog open={showLeaveConfirm} onOpenChange={setShowLeaveConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.leaveCompanyConfirm}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t.leaveCompanyWarning}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-leave-company">
+              {t.cancel}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                leaveCompanyMutation.mutate();
+                setShowLeaveConfirm(false);
+              }}
+              className="bg-destructive text-destructive-foreground"
+              disabled={leaveCompanyMutation.isPending}
+              data-testid="button-confirm-leave-company"
+            >
+              {leaveCompanyMutation.isPending ? t.loading : t.confirmLeave}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

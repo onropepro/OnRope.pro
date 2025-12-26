@@ -1462,20 +1462,31 @@ export default function GroundCrewPortal() {
               {user.companyId && !user.terminatedDate && !user.suspendedAt && companyData?.company && (
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
                   <div className="p-4 sm:p-5">
-                    <div className="flex items-center gap-4">
-                      <div className="p-2.5 rounded-lg bg-green-50 dark:bg-green-900/30">
-                        <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.companyName || companyData.company.name}</p>
-                          <Badge variant="default" className="bg-green-600 text-xs">
-                            <CheckCircle2 className="w-3 h-3 mr-1" />
-                            {t.active}
-                          </Badge>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="p-2.5 rounded-lg bg-green-50 dark:bg-green-900/30">
+                          <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.linkedEmployer}</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.companyName || companyData.company.name}</p>
+                            <Badge variant="default" className="bg-green-600 text-xs">
+                              <CheckCircle2 className="w-3 h-3 mr-1" />
+                              {t.active}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">{t.linkedEmployer}</p>
+                        </div>
                       </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                        onClick={() => setShowLeaveConfirm(true)}
+                        data-testid="button-leave-company-home"
+                      >
+                        {t.leaveCompany}
+                      </Button>
                     </div>
                   </div>
                 </div>
