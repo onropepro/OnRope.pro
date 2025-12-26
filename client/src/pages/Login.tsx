@@ -60,27 +60,35 @@ export default function Login() {
   }, [userData, isCheckingAuth, authError]);
 
   const redirectBasedOnRole = (role: string) => {
+    console.log("🔀 Login.tsx redirectBasedOnRole called with role:", role);
     switch (role) {
       case "resident":
+        console.log("🔀 Redirecting to /resident-dashboard");
         setLocation("/resident-dashboard");
         break;
       case "property_manager":
+        console.log("🔀 Redirecting to /property-manager");
         setLocation("/property-manager");
         break;
       case "superuser":
+        console.log("🔀 Redirecting to /superuser");
         setLocation("/superuser");
         break;
       case "building_manager":
+        console.log("🔀 Redirecting to /building-portal");
         setLocation("/building-portal");
         break;
       case "rope_access_tech":
+        console.log("🔀 Redirecting to /technician-portal");
         setLocation("/technician-portal");
         break;
       case "ground_crew":
       case "ground_crew_supervisor":
+        console.log("🔀 Redirecting to /ground-crew-portal");
         setLocation("/ground-crew-portal");
         break;
       default:
+        console.log("🔀 Redirecting to /dashboard (DEFAULT CASE) - role was:", role);
         setLocation("/dashboard");
     }
   };
