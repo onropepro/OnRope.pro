@@ -115,7 +115,8 @@ import {
   FileImage,
   FileArchive,
   File,
-  GraduationCap
+  GraduationCap,
+  Menu
 } from "lucide-react";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
@@ -1696,6 +1697,9 @@ export default function TechnicianPortal() {
   };
   
   const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl);
+  
+  // State for mobile sidebar
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const handleUrlChange = () => {
@@ -2588,24 +2592,34 @@ export default function TechnicianPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden lg:block">
-        <DashboardSidebar
-          currentUser={user}
-          activeTab={activeTab}
-          onTabChange={(tab) => setActiveTab(tab as TabType)}
-          variant="technician"
-          customNavigationGroups={technicianNavGroups}
-          showDashboardLink={false}
-        />
-      </div>
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
+      <DashboardSidebar
+        currentUser={user}
+        activeTab={activeTab}
+        onTabChange={(tab) => setActiveTab(tab as TabType)}
+        variant="technician"
+        customNavigationGroups={technicianNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
       
       {/* Main content wrapper - offset for sidebar on desktop */}
       <div className="lg:pl-60">
         <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
           <div className="h-full flex items-center justify-between gap-4">
-            {/* Left Side: Search */}
+            {/* Left Side: Hamburger menu (mobile) + Search */}
             <div className="flex items-center gap-4 flex-1 min-w-0">
+              {/* Mobile hamburger menu button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileSidebarOpen(true)}
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               <div className="hidden md:flex flex-1 max-w-xl">
                 <DashboardSearch />
               </div>
@@ -5707,82 +5721,6 @@ export default function TechnicianPortal() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Mobile Bottom Navigation - hidden on desktop */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom lg:hidden">
-        <div className="w-full px-4 md:px-6 flex items-center justify-around py-2">
-          <button
-            onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
-              activeTab === 'home' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-home"
-          >
-            <Home className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{t.tabHome}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
-              activeTab === 'profile' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-profile"
-          >
-            <User className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{t.tabProfile}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('visibility')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'visibility' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-visibility"
-          >
-            <Eye className="w-5 h-5" />
-            <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Visibility' : language === 'es' ? 'Visibilidad' : 'Visibilité'}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('invitations')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'invitations' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-invitations"
-          >
-            <Mail className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{language === 'en' ? 'Invites' : language === 'es' ? 'Invitaciones' : 'Invitations'}</span>
-            {pendingInvitations.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                {pendingInvitations.length}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab('more')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'more' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-more"
-          >
-            <MoreHorizontal className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{t.tabMore}</span>
-            {totalUnreadFeedback > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                {totalUnreadFeedback}
-              </span>
-            )}
-          </button>
-        </div>
-      </nav>
 
       {/* Experience Start Date Edit Dialog */}
       <Dialog open={editingExperience} onOpenChange={(open) => {

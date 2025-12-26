@@ -97,6 +97,10 @@ export interface DashboardSidebarProps {
   showDashboardLink?: boolean;
   dashboardLinkLabel?: string;
   headerContent?: React.ReactNode;
+  /** External control for mobile sidebar open state */
+  mobileOpen?: boolean;
+  /** Callback when mobile sidebar open state changes */
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 export function DashboardSidebar({
@@ -114,11 +118,23 @@ export function DashboardSidebar({
   showDashboardLink = true,
   dashboardLinkLabel,
   headerContent,
+  mobileOpen,
+  onMobileOpenChange,
 }: DashboardSidebarProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [customizeDialogOpen, setCustomizeDialogOpen] = useState(false);
+  
+  // Use external control if provided, otherwise use internal state
+  const isOpen = mobileOpen !== undefined ? mobileOpen : internalOpen;
+  const setIsOpen = (open: boolean) => {
+    if (onMobileOpenChange) {
+      onMobileOpenChange(open);
+    } else {
+      setInternalOpen(open);
+    }
+  };
 
   // Get brand color based on variant or custom override
   const BRAND_COLOR = customBrandColor || STAKEHOLDER_COLORS[variant];
@@ -384,6 +400,8 @@ export function DashboardSidebar({
     if (item.href) {
       setLocation(item.href);
     }
+    // Close mobile sidebar after navigation
+    setIsOpen(false);
   };
 
   // Use custom navigation groups if provided, otherwise use default employer groups
@@ -485,7 +503,7 @@ export function DashboardSidebar({
       {showDashboardLink && (
         <div className="px-3 pb-2">
           <button
-            onClick={() => onTabChange("home")}
+            onClick={() => { onTabChange("home"); setIsOpen(false); }}
             data-testid="sidebar-nav-dashboard"
             className={cn(
               "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
@@ -557,7 +575,7 @@ export function DashboardSidebar({
           {/* Settings button - hidden for technician variant (they have Profile in main nav) */}
           {variant !== "technician" && (
             <button
-              onClick={() => setLocation("/profile")}
+              onClick={() => { setLocation("/profile"); setIsOpen(false); }}
               data-testid="sidebar-nav-settings"
               className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
             >
@@ -566,7 +584,7 @@ export function DashboardSidebar({
             </button>
           )}
           <button
-            onClick={() => setLocation("/help")}
+            onClick={() => { setLocation("/help"); setIsOpen(false); }}
             data-testid="sidebar-nav-help"
             className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
           >

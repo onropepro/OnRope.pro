@@ -73,6 +73,7 @@ import {
   FileImage,
   FileArchive,
   File,
+  Menu,
 } from "lucide-react";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
@@ -646,6 +647,9 @@ export default function GroundCrewPortal() {
   
   const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl);
   const [isEditing, setIsEditing] = useState(false);
+  
+  // State for mobile sidebar
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const handleUrlChange = () => {
@@ -1203,21 +1207,32 @@ export default function GroundCrewPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <div className="hidden lg:block">
-        <DashboardSidebar
-          currentUser={user}
-          activeTab={activeTab}
-          onTabChange={(tab) => setActiveTab(tab as TabType)}
-          variant="ground-crew"
-          customNavigationGroups={groundCrewNavGroups}
-          showDashboardLink={false}
-        />
-      </div>
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
+      <DashboardSidebar
+        currentUser={user}
+        activeTab={activeTab}
+        onTabChange={(tab) => setActiveTab(tab as TabType)}
+        variant="ground-crew"
+        customNavigationGroups={groundCrewNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
       
       <div className="lg:pl-60">
         <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
           <div className="h-full flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 flex-1 min-w-0">
+              {/* Mobile hamburger menu button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileSidebarOpen(true)}
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               <div className="hidden md:flex flex-1 max-w-xl">
                 <DashboardSearch />
               </div>
