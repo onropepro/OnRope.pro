@@ -173,7 +173,6 @@ export default function ResetPassword() {
                 <Button
                   type="submit"
                   className="w-full"
-                  style={{ backgroundColor: RESIDENT_COLOR }}
                   disabled={isSubmitting}
                   data-testid="button-reset-password"
                 >
