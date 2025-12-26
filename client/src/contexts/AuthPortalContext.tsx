@@ -4,15 +4,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { User, KeyRound, Loader2, HardHat, Building2, Briefcase, Home } from "lucide-react";
+import { User, KeyRound, Loader2, HardHat, Building2, Briefcase, Home, Eye, EyeOff, ChevronRight, Clock } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
@@ -53,6 +53,7 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"signin" | "register">("signin");
+  const [showPassword, setShowPassword] = useState(false);
   
   const [showTechnicianRegistration, setShowTechnicianRegistration] = useState(false);
   const [showPropertyManagerRegistration, setShowPropertyManagerRegistration] = useState(false);
@@ -75,6 +76,7 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
 
   const closePortal = useCallback(() => {
     setIsOpen(false);
+    setShowPassword(false);
     form.reset();
   }, [form]);
 
@@ -180,165 +182,218 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
       {children}
       
       <Dialog open={isOpen} onOpenChange={(open) => !open && closePortal()}>
-        <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
-          <div className="flex flex-col items-center pt-6 pb-4 px-6">
-            <img src={onRopeProLogo} alt="OnRopePro" className="h-10 object-contain mb-4" />
-            <h2 className="text-xl font-bold">{t('login.signIn', 'Sign In')}</h2>
+        <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden shadow-2xl rounded-2xl">
+          <VisuallyHidden>
+            <DialogTitle>{t('login.signIn', 'Sign In')}</DialogTitle>
+            <DialogDescription>{t('login.modalDescription', 'Sign in to your account or register as a new user')}</DialogDescription>
+          </VisuallyHidden>
+          <div className="flex flex-col items-center pt-8 pb-2 px-6">
+            <img src={onRopeProLogo} alt="OnRopePro" className="h-12 object-contain mb-4" />
+            <h2 className="text-2xl font-bold">{t('login.signIn', 'Sign In')}</h2>
           </div>
           
-          <div className="px-6 pb-6">
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "signin" | "register")} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="signin" data-testid="tab-modal-signin">
+          <div className="px-6 pb-8">
+            <div className="flex justify-center mb-6">
+              <div className="inline-flex bg-muted p-1 rounded-full">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("signin")}
+                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                    activeTab === "signin"
+                      ? "bg-white dark:bg-slate-800 shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  data-testid="tab-modal-signin"
+                >
                   {t('login.signIn', 'Sign In')}
-                </TabsTrigger>
-                <TabsTrigger value="register" data-testid="tab-modal-register">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("register")}
+                  className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                    activeTab === "register"
+                      ? "bg-white dark:bg-slate-800 shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  data-testid="tab-modal-register"
+                >
                   {t('login.register', 'Register')}
-                </TabsTrigger>
-              </TabsList>
+                </button>
+              </div>
+            </div>
 
-              <TabsContent value="signin" className="mt-0">
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="identifier"
-                      render={({ field }) => (
-                        <FormItem>
+            {activeTab === "signin" && (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="identifier"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <User className="w-4 h-4" />
+                          {t('login.unifiedLabel', 'Email, License #, or Strata #')}
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="text"
+                            placeholder={t('login.unifiedPlaceholder', 'Enter email, license number, or strata number')}
+                            autoComplete="username"
+                            data-testid="input-modal-login-identifier"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between gap-2">
                           <FormLabel className="flex items-center gap-2">
-                            <User className="w-4 h-4" />
-                            {t('login.unifiedLabel', 'Email, License #, or Strata #')}
+                            <KeyRound className="w-4 h-4" />
+                            {t('login.passwordLabel', 'Password')}
                           </FormLabel>
-                          <FormControl>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              closePortal();
+                              setLocation("/reset-password");
+                            }}
+                            className="text-sm text-primary hover:underline"
+                            data-testid="link-modal-forgot-password"
+                          >
+                            {t('login.forgotPassword', 'Forgot password?')}
+                          </button>
+                        </div>
+                        <FormControl>
+                          <div className="relative">
                             <Input 
                               {...field} 
-                              type="text"
-                              placeholder={t('login.unifiedPlaceholder', 'Enter email, license number, or strata number')}
-                              autoComplete="username"
-                              data-testid="input-modal-login-identifier"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center justify-between gap-2">
-                            <FormLabel className="flex items-center gap-2">
-                              <KeyRound className="w-4 h-4" />
-                              {t('login.passwordLabel', 'Password')}
-                            </FormLabel>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                closePortal();
-                                setLocation("/reset-password");
-                              }}
-                              className="text-sm text-primary hover:underline"
-                              data-testid="link-modal-forgot-password"
-                            >
-                              {t('login.forgotPassword', 'Forgot password?')}
-                            </button>
-                          </div>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="password"
+                              type={showPassword ? "text" : "password"}
                               placeholder={t('login.passwordPlaceholder', 'Enter your password')}
                               autoComplete="current-password"
+                              className="pr-10"
                               data-testid="input-modal-login-password"
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                              data-testid="button-toggle-password"
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <Button 
-                      type="submit" 
-                      className="w-full" 
-                      size="lg"
-                      disabled={isSubmitting}
-                      data-testid="button-modal-login-submit"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          {t('login.signingIn', 'Signing in...')}
-                        </>
-                      ) : (
-                        t('login.signIn', 'Sign In')
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-              </TabsContent>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    size="lg"
+                    disabled={isSubmitting}
+                    data-testid="button-modal-login-submit"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        {t('login.signingIn', 'Signing in...')}
+                      </>
+                    ) : (
+                      t('login.signIn', 'Sign In')
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            )}
 
-              <TabsContent value="register" className="mt-0">
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground text-center mb-4">
+            {activeTab === "register" && (
+              <div className="space-y-4">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 mb-3">
+                    <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                      {t('login.quickSetup', 'Takes 60 seconds to set up')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
                     {t('login.selectAccountType', 'Select your account type to get started')}
                   </p>
-                  
-                  <Button 
-                    variant="outline"
-                    onClick={handleTechnicianRegister}
-                    className="w-full justify-start gap-3 h-12"
-                    data-testid="button-register-technician"
-                  >
-                    <HardHat className="w-5 h-5 text-amber-600" />
-                    <div className="text-left">
-                      <div className="font-medium">{t('login.technicianAccount', 'Technician')}</div>
-                      <div className="text-xs text-muted-foreground">{t('login.technicianDesc', 'Rope access professional')}</div>
-                    </div>
-                  </Button>
-
-                  <Button 
-                    variant="outline"
-                    onClick={handleEmployerRegister}
-                    className="w-full justify-start gap-3 h-12"
-                    data-testid="button-register-employer"
-                  >
-                    <Briefcase className="w-5 h-5 text-blue-600" />
-                    <div className="text-left">
-                      <div className="font-medium">{t('login.employerAccount', 'Employer')}</div>
-                      <div className="text-xs text-muted-foreground">{t('login.employerDesc', 'Rope access company')}</div>
-                    </div>
-                  </Button>
-
-                  <Button 
-                    variant="outline"
-                    onClick={handlePropertyManagerRegister}
-                    className="w-full justify-start gap-3 h-12"
-                    data-testid="button-register-property-manager"
-                  >
-                    <Building2 className="w-5 h-5 text-purple-600" />
-                    <div className="text-left">
-                      <div className="font-medium">{t('login.propertyManagerAccount', 'Property Manager')}</div>
-                      <div className="text-xs text-muted-foreground">{t('login.propertyManagerDesc', 'Building management')}</div>
-                    </div>
-                  </Button>
-
-                  <Button 
-                    variant="outline"
-                    onClick={handleResidentRegister}
-                    className="w-full justify-start gap-3 h-12"
-                    data-testid="button-register-resident"
-                  >
-                    <Home className="w-5 h-5 text-green-600" />
-                    <div className="text-left">
-                      <div className="font-medium">{t('login.residentAccount', 'Resident')}</div>
-                      <div className="text-xs text-muted-foreground">{t('login.residentDesc', 'Building resident')}</div>
-                    </div>
-                  </Button>
                 </div>
-              </TabsContent>
-            </Tabs>
+                
+                <button 
+                  type="button"
+                  onClick={handleTechnicianRegister}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-muted/50 hover:bg-muted hover:border-[#AB4521]/30 transition-all group"
+                  data-testid="button-register-technician"
+                >
+                  <div className="w-11 h-11 rounded-full bg-[#AB4521]/10 flex items-center justify-center flex-shrink-0">
+                    <HardHat className="w-5 h-5 text-[#AB4521]" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-foreground">{t('login.technicianAccount', 'Technician')}</div>
+                    <div className="text-sm text-muted-foreground">{t('login.technicianDesc', 'Rope access professional')}</div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[#AB4521] transition-colors" />
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={handleEmployerRegister}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-muted/50 hover:bg-muted hover:border-[#0B64A3]/30 transition-all group"
+                  data-testid="button-register-employer"
+                >
+                  <div className="w-11 h-11 rounded-full bg-[#0B64A3]/10 flex items-center justify-center flex-shrink-0">
+                    <Briefcase className="w-5 h-5 text-[#0B64A3]" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-foreground">{t('login.employerAccount', 'Employer')}</div>
+                    <div className="text-sm text-muted-foreground">{t('login.employerDesc', 'Rope access company')}</div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[#0B64A3] transition-colors" />
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={handlePropertyManagerRegister}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-muted/50 hover:bg-muted hover:border-[#6E9075]/30 transition-all group"
+                  data-testid="button-register-property-manager"
+                >
+                  <div className="w-11 h-11 rounded-full bg-[#6E9075]/10 flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 text-[#6E9075]" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-foreground">{t('login.propertyManagerAccount', 'Property Manager')}</div>
+                    <div className="text-sm text-muted-foreground">{t('login.propertyManagerDesc', 'Building management')}</div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[#6E9075] transition-colors" />
+                </button>
+
+                <button 
+                  type="button"
+                  onClick={handleResidentRegister}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-muted/50 hover:bg-muted hover:border-[#86A59C]/30 transition-all group"
+                  data-testid="button-register-resident"
+                >
+                  <div className="w-11 h-11 rounded-full bg-[#86A59C]/10 flex items-center justify-center flex-shrink-0">
+                    <Home className="w-5 h-5 text-[#86A59C]" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-foreground">{t('login.residentAccount', 'Resident')}</div>
+                    <div className="text-sm text-muted-foreground">{t('login.residentDesc', 'Building resident')}</div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[#86A59C] transition-colors" />
+                </button>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
