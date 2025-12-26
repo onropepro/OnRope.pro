@@ -183,8 +183,9 @@ const translations = {
     invitationError: "Error",
     invitationMessage: "Message",
     invitedOn: "Invited on",
-    currentEmployer: "Current Employer",
+    linkedEmployer: "Linked Employer",
     currentlyEmployedBy: "You are currently employed by",
+    inactiveContactEmployer: "You are currently inactive at {company}. Contact them to be reactivated.",
     leaveCompany: "Leave Company",
     leavingCompany: "Leaving...",
     leaveCompanyConfirm: "Are you sure you want to leave this company?",
@@ -346,7 +347,8 @@ const translations = {
     invitationError: "Erreur",
     invitationMessage: "Message",
     invitedOn: "Invité le",
-    currentEmployer: "Employeur Actuel",
+    linkedEmployer: "Employeur Lié",
+    inactiveContactEmployer: "Vous êtes actuellement inactif chez {company}. Contactez-les pour être réactivé.",
     currentlyEmployedBy: "Vous êtes actuellement employé par",
     leaveCompany: "Quitter l'Entreprise",
     leavingCompany: "Départ...",
@@ -509,7 +511,8 @@ const translations = {
     invitationError: "Error",
     invitationMessage: "Mensaje",
     invitedOn: "Invitado el",
-    currentEmployer: "Empleador Actual",
+    linkedEmployer: "Empleador Vinculado",
+    inactiveContactEmployer: "Actualmente está inactivo en {company}. Contáctelos para ser reactivado.",
     currentlyEmployedBy: "Actualmente empleado por",
     leaveCompany: "Dejar Empresa",
     leavingCompany: "Saliendo...",
@@ -1471,7 +1474,7 @@ export default function GroundCrewPortal() {
                             {t.active}
                           </Badge>
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.currentEmployer}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.linkedEmployer}</p>
                       </div>
                     </div>
                   </div>
@@ -1493,7 +1496,7 @@ export default function GroundCrewPortal() {
                             {t.inactive}
                           </Badge>
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.dashboardDisabledInactive}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.inactiveContactEmployer.replace('{company}', companyData.company.name)}</p>
                       </div>
                     </div>
                   </div>
@@ -2071,14 +2074,17 @@ export default function GroundCrewPortal() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Building2 className="w-5 h-5" />
-                      {t.currentEmployer}
+                      {companyData?.company?.name || t.linkedEmployer}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div>
-                        <p className="font-medium">{companyData?.company?.name || 'Your Company'}</p>
-                        <p className="text-sm text-muted-foreground">{t.currentlyEmployedBy}</p>
+                        <Badge variant="default" className="bg-green-600 text-xs mb-2">
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          {t.active}
+                        </Badge>
+                        <p className="text-sm text-muted-foreground">{t.linkedEmployer}</p>
                       </div>
                       <Button
                         variant="destructive"
@@ -2098,7 +2104,7 @@ export default function GroundCrewPortal() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Building2 className="w-5 h-5 text-amber-600" />
-                      {t.currentEmployer}
+                      {companyData?.company?.name || t.linkedEmployer}
                       <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs ml-2">
                         {t.inactive}
                       </Badge>
@@ -2107,8 +2113,7 @@ export default function GroundCrewPortal() {
                   <CardContent>
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div>
-                        <p className="font-medium">{companyData?.company?.name || 'Your Company'}</p>
-                        <p className="text-sm text-muted-foreground">{t.dashboardDisabledInactive}</p>
+                        <p className="text-sm text-muted-foreground">{t.inactiveContactEmployer.replace('{company}', companyData?.company?.name || t.linkedEmployer)}</p>
                       </div>
                     </div>
                   </CardContent>

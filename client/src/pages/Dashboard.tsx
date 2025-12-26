@@ -2844,7 +2844,7 @@ export default function Dashboard() {
       setEmployeeToSuspendSeat(null);
       const creditAmount = data.creditAmount || 0;
       toast({ 
-        title: t('dashboard.toast.employeeSuspended', 'Employee suspended'),
+        title: t('dashboard.toast.employeeInactive', 'Employee now inactive'),
         description: creditAmount > 0 
           ? t('dashboard.toast.seatRemovedWithCredit', `Seat removed. $${creditAmount.toFixed(2)} credit applied to your account.`)
           : t('dashboard.toast.seatRemoved', 'Seat removed from your subscription.')
@@ -7234,29 +7234,29 @@ export default function Dashboard() {
                   })()}
                 </div>
 
-                {/* Suspended Employees - Seat removed but can be reactivated */}
+                {/* Inactive Employees - Seat removed but can be reactivated */}
                 {(() => {
                   // Check both primary (suspendedAt) and secondary (connectionStatus) suspensions
-                  const suspendedEmployees = employees.filter((emp: any) => 
+                  const inactiveEmployees = employees.filter((emp: any) => 
                     (emp.suspendedAt || emp.connectionStatus === 'suspended') && !emp.terminatedDate
                   );
                   
-                  if (suspendedEmployees.length > 0) {
+                  if (inactiveEmployees.length > 0) {
                     return (
                       <div className="space-y-2 mt-6">
                         <div className="flex items-center gap-2">
                           <h3 className="text-lg font-medium text-amber-600 dark:text-amber-400">
-                            {t('dashboard.employees.suspendedEmployees', 'Suspended Employees')}
+                            {t('dashboard.employees.inactiveEmployees', 'Inactive Employees')}
                           </h3>
                           <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                            {suspendedEmployees.length}
+                            {inactiveEmployees.length}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {t('dashboard.employees.suspendedDesc', 'These employees had their seats removed. Purchase a new seat to reactivate them.')}
+                          {t('dashboard.employees.inactiveDesc', 'These employees had their seats removed. Purchase a new seat to reactivate them.')}
                         </p>
-                        {suspendedEmployees.map((employee: any) => (
-                          <Card key={employee.id} data-testid={`suspended-employee-card-${employee.id}`} className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+                        {inactiveEmployees.map((employee: any) => (
+                          <Card key={employee.id} data-testid={`inactive-employee-card-${employee.id}`} className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
                             <CardContent className="p-4">
                               <div className="flex items-center justify-between gap-3 flex-wrap">
                                 <div className="flex items-center gap-3">
@@ -7270,7 +7270,7 @@ export default function Dashboard() {
                                         {employee.role?.replace(/_/g, ' ') || 'Employee'}
                                       </Badge>
                                       <span className="text-xs text-muted-foreground">
-                                        {t('dashboard.employees.suspendedOn', 'Suspended:')} {formatTimestampDate(employee.suspendedAt)}
+                                        {t('dashboard.employees.inactiveSince', 'Inactive since:')} {formatTimestampDate(employee.suspendedAt)}
                                       </span>
                                     </div>
                                   </div>
@@ -7280,7 +7280,7 @@ export default function Dashboard() {
                                   size="sm"
                                   onClick={() => reactivateSuspendedMutation.mutate(employee.id)}
                                   disabled={reactivateSuspendedMutation.isPending}
-                                  data-testid={`button-reactivate-suspended-${employee.id}`}
+                                  data-testid={`button-reactivate-inactive-${employee.id}`}
                                 >
                                   {reactivateSuspendedMutation.isPending ? (
                                     <>
@@ -10398,17 +10398,17 @@ export default function Dashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Suspend Employee / Remove Seat Confirmation Dialog */}
+      {/* Remove Seat / Make Inactive Confirmation Dialog */}
       <AlertDialog open={employeeToSuspendSeat !== null} onOpenChange={(open) => !open && setEmployeeToSuspendSeat(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('dashboard.suspendEmployee.title', 'Suspend Employee')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.removeSeat.title', 'Remove Seat')}</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <span className="block">
-                {t('dashboard.suspendEmployee.description', 'Are you sure you want to suspend')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
+                {t('dashboard.removeSeat.description', 'Are you sure you want to remove the seat for')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
               </span>
               <span className="block text-amber-600 dark:text-amber-400">
-                {t('dashboard.suspendEmployee.warning', 'This will remove one seat from your subscription. The employee will lose access but can be reactivated later.')}
+                {t('dashboard.removeSeat.warning', 'This will remove one seat from your subscription. The employee will become inactive but can be reactivated later.')}
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -10425,7 +10425,7 @@ export default function Dashboard() {
               ) : (
                 <>
                   <span className="material-icons text-sm mr-1">person_remove</span>
-                  {t('dashboard.suspendEmployee.confirm', 'Suspend Employee')}
+                  {t('dashboard.removeSeat.confirm', 'Remove Seat')}
                 </>
               )}
             </AlertDialogAction>
