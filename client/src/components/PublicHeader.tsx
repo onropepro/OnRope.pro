@@ -94,6 +94,10 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
     if (path.startsWith('/technician')) {
       return STAKEHOLDER_COLORS.technician;
     }
+    // Ground crew paths
+    if (path.startsWith('/ground-crew')) {
+      return STAKEHOLDER_COLORS["ground-crew"];
+    }
     if (path.startsWith('/property-manager')) {
       return STAKEHOLDER_COLORS["property-manager"];
     }
