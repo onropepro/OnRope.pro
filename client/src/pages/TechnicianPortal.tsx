@@ -173,10 +173,10 @@ const translations = {
     verifyLicenseValidity: "Verify Your License Validity",
     verificationExplanation: "Employers require verified certification status to ensure compliance with safety regulations and insurance requirements. Verifying your license helps your employer confirm you're qualified for rope access work.",
     howItWorks: "How it works:",
-    step1: "Click \"Open IRATA Portal\" to open the verification page",
+    step1: 'Click "Open IRATA Portal" to open the verification page',
     step2: "Enter your last name and license number",
     step3: "Take a screenshot of the verification result",
-    step4: "Come back here and click \"Upload Screenshot\"",
+    step4: 'Come back here and click "Upload Screenshot"',
     openIrataPortal: "Open IRATA Portal",
     uploadVerificationScreenshot: "Upload Verification Screenshot",
     analyzingScreenshot: "Analyzing Screenshot...",
@@ -263,7 +263,7 @@ const translations = {
     verificationFailed: "Verification Failed",
     failedToAnalyze: "Failed to analyze screenshot",
     openSpratPortal: "Open SPRAT Portal",
-    spratStep1: "Click \"Open SPRAT Portal\" to open the verification page",
+    spratStep1: 'Click "Open SPRAT Portal" to open the verification page',
     spratVerificationExplanation: "Employers require verified SPRAT certification status to ensure compliance with safety regulations and insurance requirements.",
     privacyNotice: "Privacy Notice",
     privacyText: "Your personal information is securely stored and used only by your employer for HR and payroll purposes. We never share your data externally.",
@@ -628,7 +628,7 @@ const translations = {
     verificationFailed: "Échec de la vérification",
     failedToAnalyze: "Échec de l'analyse de la capture d'écran",
     openSpratPortal: "Ouvrir le portail SPRAT",
-    spratStep1: "Cliquez sur \"Ouvrir le portail SPRAT\" pour accéder à la page de vérification",
+    spratStep1: 'Cliquez sur « Ouvrir le portail SPRAT » pour accéder à la page de vérification',
     spratVerificationExplanation: "Les employeurs exigent que le statut de certification SPRAT soit vérifié pour assurer la conformité aux réglementations de sécurité et aux exigences d'assurance.",
     privacyNotice: "Avis de confidentialité",
     privacyText: "Vos informations personnelles sont stockées en toute sécurité et utilisées uniquement par votre employeur à des fins de RH et de paie. Nous ne partageons jamais vos données à l'externe.",
@@ -903,11 +903,11 @@ const translations = {
     verifyLicenseValidity: "Verificar la Validez de Su Licencia",
     verificationExplanation: "Los empleadores requieren el estado de certificacion verificado para garantizar el cumplimiento de las regulaciones de seguridad y los requisitos de seguro.",
     howItWorks: "Como funciona:",
-    step1: "Haga clic en \"Abrir Portal irata\" para abrir la pagina de verificacion",
+    step1: 'Haga clic en "Abrir Portal IRATA" para abrir la pagina de verificacion',
     step2: "Ingrese su apellido y numero de licencia",
     step3: "Tome una captura de pantalla del resultado de verificacion",
-    step4: "Regrese aqui y haga clic en \"Subir Captura\"",
-    openIrataPortal: "Abrir Portal irata",
+    step4: 'Regrese aqui y haga clic en "Subir Captura"',
+    openIrataPortal: "Abrir Portal IRATA",
     uploadVerificationScreenshot: "Subir Captura de Verificacion",
     analyzingScreenshot: "Analizando Captura...",
     name: "Nombre",
@@ -1119,7 +1119,7 @@ const translations = {
     verificationFailed: "Verificacion Fallida",
     failedToAnalyze: "Error al analizar la captura",
     openSpratPortal: "Abrir Portal SPRAT",
-    spratStep1: "Haga clic en \"Abrir Portal SPRAT\" para abrir la pagina de verificacion",
+    spratStep1: 'Haga clic en "Abrir Portal SPRAT" para abrir la pagina de verificacion',
     spratVerificationExplanation: "Los empleadores requieren el estado de certificacion SPRAT verificado para garantizar el cumplimiento.",
     privacyNotice: "Aviso de Privacidad",
     privacyText: "Su informacion personal esta almacenada de forma segura y solo es utilizada por su empleador para propositos de RRHH y nomina.",
@@ -4514,7 +4514,7 @@ export default function TechnicianPortal() {
                         <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm">
-                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity} (irata)
+                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity} (IRATA)
                           </h4>
                           <p className="text-xs text-muted-foreground leading-relaxed">
                             {t.verificationExplanation}
