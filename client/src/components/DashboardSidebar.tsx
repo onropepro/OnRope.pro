@@ -227,7 +227,7 @@ export function DashboardSidebar({
         },
         {
           id: "timesheets",
-          label: t("dashboard.sidebar.timesheets", "Timesheets"),
+          label: t("dashboard.sidebar.offSite", "Off-Site"),
           icon: Clock,
           href: "/non-billable-hours",
           badge: alertCounts.pendingTimesheets,
