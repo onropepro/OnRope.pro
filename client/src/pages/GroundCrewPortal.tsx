@@ -201,12 +201,12 @@ const translations = {
     accessProjects: "Access projects, clock in/out, safety forms, and work dashboard.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
-    dashboardDisabledSuspended: "Your seat has been suspended by your employer. Contact them to be reactivated.",
+    dashboardDisabledInactive: "You are currently inactive. Contact your employer to be reactivated.",
     selectEmployer: "Select Employer",
     selectEmployerDesc: "Choose which employer's dashboard to access",
     connectedEmployers: "Connected Employers",
     primaryEmployer: "Primary",
-    suspended: "Suspended",
+    inactive: "Inactive",
     active: "Active",
     setPrimary: "Set as Primary",
     continueToEmployer: "Continue",
@@ -220,8 +220,7 @@ const translations = {
     quickActions: "Quick Actions",
     yourStatus: "Your Status",
     employmentStatus: "Employment Status",
-    employed: "Employed",
-    notEmployed: "Not Employed",
+    notActive: "Not Active",
     referralProgram: "Referral Program",
     referralDesc: "Share your referral code with other ground crew workers",
     yourReferralCode: "Your Referral Code",
@@ -365,12 +364,12 @@ const translations = {
     accessProjects: "Accédez aux projets, pointage, formulaires de sécurité et tableau de bord.",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Une invitation est envoyée par votre employeur et apparaîtra ici.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
-    dashboardDisabledSuspended: "Votre siège a été suspendu par votre employeur. Contactez-les pour être réactivé.",
+    dashboardDisabledInactive: "Vous êtes actuellement inactif. Contactez votre employeur pour être réactivé.",
     selectEmployer: "Sélectionner Employeur",
     selectEmployerDesc: "Choisissez le tableau de bord de l'employeur",
     connectedEmployers: "Employeurs Connectés",
     primaryEmployer: "Principal",
-    suspended: "Suspendu",
+    inactive: "Inactif",
     active: "Actif",
     setPrimary: "Définir comme Principal",
     continueToEmployer: "Continuer",
@@ -384,8 +383,7 @@ const translations = {
     quickActions: "Actions Rapides",
     yourStatus: "Votre Statut",
     employmentStatus: "Statut d'Emploi",
-    employed: "Employé",
-    notEmployed: "Non Employé",
+    notActive: "Non Actif",
     referralProgram: "Programme de Parrainage",
     referralDesc: "Partagez votre code de parrainage avec d'autres travailleurs",
     yourReferralCode: "Votre Code de Parrainage",
@@ -529,12 +527,12 @@ const translations = {
     accessProjects: "Acceda a proyectos, marcaje, formularios de seguridad y panel de trabajo.",
     dashboardDisabledNoCompany: "Necesita estar vinculado con una empresa para acceder al Panel de Trabajo. Una invitación es enviada por su empleador y aparecerá aquí.",
     dashboardDisabledTerminated: "Su empleo ha sido terminado. Acepte una nueva invitación para acceder al Panel de Trabajo.",
-    dashboardDisabledSuspended: "Su asiento ha sido suspendido por su empleador. Contáctelos para ser reactivado.",
+    dashboardDisabledInactive: "Actualmente está inactivo. Contacte a su empleador para ser reactivado.",
     selectEmployer: "Seleccionar Empleador",
     selectEmployerDesc: "Elija el panel de qué empleador acceder",
     connectedEmployers: "Empleadores Conectados",
     primaryEmployer: "Principal",
-    suspended: "Suspendido",
+    inactive: "Inactivo",
     active: "Activo",
     setPrimary: "Establecer como Principal",
     continueToEmployer: "Continuar",
@@ -548,8 +546,7 @@ const translations = {
     quickActions: "Acciones Rápidas",
     yourStatus: "Su Estado",
     employmentStatus: "Estado de Empleo",
-    employed: "Empleado",
-    notEmployed: "No Empleado",
+    notActive: "No Activo",
     referralProgram: "Programa de Referidos",
     referralDesc: "Comparta su código de referido con otros trabajadores",
     yourReferralCode: "Su Código de Referido",
@@ -1298,7 +1295,7 @@ export default function GroundCrewPortal() {
                     <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <p className="text-base text-slate-500 dark:text-slate-400 flex-1">
-                          {user.suspendedAt ? t.dashboardDisabledSuspended : user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                          {user.suspendedAt ? t.dashboardDisabledInactive : user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
                         </p>
                         {pendingInvitations.length > 0 && (
                           <div className="flex flex-col gap-2 sm:items-end" data-testid="pending-invitations-section">
@@ -1471,7 +1468,7 @@ export default function GroundCrewPortal() {
                           <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.name}</p>
                           <Badge variant="default" className="bg-green-600 text-xs">
                             <CheckCircle2 className="w-3 h-3 mr-1" />
-                            {t.employed}
+                            {t.active}
                           </Badge>
                         </div>
                         <p className="text-sm text-slate-500 dark:text-slate-400">{t.currentEmployer}</p>
@@ -1493,10 +1490,10 @@ export default function GroundCrewPortal() {
                         <div className="flex items-center gap-2 mb-1">
                           <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.name}</p>
                           <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs">
-                            {t.suspended}
+                            {t.inactive}
                           </Badge>
                         </div>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.dashboardDisabledSuspended}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.dashboardDisabledInactive}</p>
                       </div>
                     </div>
                   </div>
@@ -2103,7 +2100,7 @@ export default function GroundCrewPortal() {
                       <Building2 className="w-5 h-5 text-amber-600" />
                       {t.currentEmployer}
                       <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs ml-2">
-                        {t.suspended}
+                        {t.inactive}
                       </Badge>
                     </CardTitle>
                   </CardHeader>
@@ -2111,7 +2108,7 @@ export default function GroundCrewPortal() {
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <div>
                         <p className="font-medium">{companyData?.company?.name || 'Your Company'}</p>
-                        <p className="text-sm text-muted-foreground">{t.dashboardDisabledSuspended}</p>
+                        <p className="text-sm text-muted-foreground">{t.dashboardDisabledInactive}</p>
                       </div>
                     </div>
                   </CardContent>

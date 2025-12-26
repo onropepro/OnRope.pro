@@ -306,12 +306,12 @@ const translations = {
     accessProjects: "Access projects, clock in/out, safety forms, auto-logging, work dashboard.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
-    dashboardDisabledSuspended: "Your seat has been suspended by your employer. Contact them to be reactivated.",
+    dashboardDisabledInactive: "You are currently inactive. Contact your employer to be reactivated.",
     selectEmployer: "Select Employer",
     selectEmployerDesc: "Choose which employer's dashboard to access",
     connectedEmployers: "Connected Employers",
     primaryEmployer: "Primary",
-    suspended: "Suspended",
+    inactive: "Inactive",
     active: "Active",
     setPrimary: "Set as Primary",
     continueToEmployer: "Continue",
@@ -670,12 +670,12 @@ const translations = {
     accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
-    dashboardDisabledSuspended: "Votre siège a été suspendu par votre employeur. Contactez-les pour être réactivé.",
+    dashboardDisabledInactive: "Vous êtes actuellement inactif. Contactez votre employeur pour être réactivé.",
     selectEmployer: "Sélectionner l'employeur",
     selectEmployerDesc: "Choisissez le tableau de bord de l'employeur à accéder",
     connectedEmployers: "Employeurs connectés",
     primaryEmployer: "Principal",
-    suspended: "Suspendu",
+    inactive: "Inactif",
     active: "Actif",
     setPrimary: "Définir comme principal",
     continueToEmployer: "Continuer",
@@ -1155,12 +1155,12 @@ const translations = {
     accessProjects: "Acceda a proyectos, fiche entrada/salida y formularios de seguridad",
     dashboardDisabledNoCompany: "Necesita estar vinculado con una empresa para acceder al Panel de Trabajo.",
     dashboardDisabledTerminated: "Su empleo ha sido terminado. Acepte una nueva invitacion para acceder al Panel.",
-    dashboardDisabledSuspended: "Su asiento ha sido suspendido por su empleador. Contáctelos para ser reactivado.",
+    dashboardDisabledInactive: "Actualmente está inactivo. Contacte a su empleador para ser reactivado.",
     selectEmployer: "Seleccionar Empleador",
     selectEmployerDesc: "Elija a que panel de empleador acceder",
     connectedEmployers: "Empleadores Conectados",
     primaryEmployer: "Principal",
-    suspended: "Suspendido",
+    inactive: "Inactivo",
     active: "Activo",
     setPrimary: "Establecer como Principal",
     continueToEmployer: "Continuar",
@@ -2780,7 +2780,7 @@ export default function TechnicianPortal() {
                     <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <p className="text-base text-slate-500 dark:text-slate-400 flex-1">
-                          {user.suspendedAt ? t.dashboardDisabledSuspended : user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                          {user.suspendedAt ? t.dashboardDisabledInactive : user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
                         </p>
                         {pendingInvitations.length > 0 && (
                           <div className="flex flex-col gap-2 sm:items-end" data-testid="pending-invitations-section">
@@ -5920,8 +5920,8 @@ export default function TechnicianPortal() {
                             </Badge>
                           )}
                           {isSuspended && (
-                            <Badge variant="destructive" className="text-xs">
-                              {t.suspended || "Suspended"}
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs">
+                              {t.inactive || "Inactive"}
                             </Badge>
                           )}
                         </div>
