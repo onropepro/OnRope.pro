@@ -871,57 +871,63 @@ export default function TechnicianJobBoard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="filter-country" className="text-xs text-muted-foreground">{t.country}</Label>
-                <select
-                  id="filter-country"
-                  value={filterCountry}
-                  onChange={(e) => {
-                    setFilterCountry(e.target.value);
+                <Select
+                  value={filterCountry || "all"}
+                  onValueChange={(value) => {
+                    setFilterCountry(value === "all" ? "" : value);
                     setFilterProvince("");
                     setFilterCity("");
                   }}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-country"
                 >
-                  <option value="">{t.allCountries}</option>
-                  {uniqueCountries.map(country => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-country" data-testid="select-filter-country">
+                    <SelectValue placeholder={t.allCountries} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allCountries}</SelectItem>
+                    {uniqueCountries.map(country => (
+                      <SelectItem key={country} value={country}>{country}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-1.5">
                 <Label htmlFor="filter-province" className="text-xs text-muted-foreground">{t.provinceState}</Label>
-                <select
-                  id="filter-province"
-                  value={filterProvince}
-                  onChange={(e) => {
-                    setFilterProvince(e.target.value);
+                <Select
+                  value={filterProvince || "all"}
+                  onValueChange={(value) => {
+                    setFilterProvince(value === "all" ? "" : value);
                     setFilterCity("");
                   }}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-province"
                 >
-                  <option value="">{t.allProvinces}</option>
-                  {uniqueProvinces.map(province => (
-                    <option key={province} value={province}>{province}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-province" data-testid="select-filter-province">
+                    <SelectValue placeholder={t.allProvinces} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allProvinces}</SelectItem>
+                    {uniqueProvinces.map(province => (
+                      <SelectItem key={province} value={province}>{province}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-1.5">
                 <Label htmlFor="filter-city" className="text-xs text-muted-foreground">{t.city}</Label>
-                <select
-                  id="filter-city"
-                  value={filterCity}
-                  onChange={(e) => setFilterCity(e.target.value)}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-city"
+                <Select
+                  value={filterCity || "all"}
+                  onValueChange={(value) => setFilterCity(value === "all" ? "" : value)}
                 >
-                  <option value="">{t.allCities}</option>
-                  {uniqueCities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-city" data-testid="select-filter-city">
+                    <SelectValue placeholder={t.allCities} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allCities}</SelectItem>
+                    {uniqueCities.map(city => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             

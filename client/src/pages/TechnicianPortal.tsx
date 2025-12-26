@@ -2913,32 +2913,6 @@ export default function TechnicianPortal() {
                 <p className="text-sm text-slate-500 dark:text-slate-400">{t.editProfile}</p>
               </button>
               
-              {/* Feedback - Pink theme */}
-              <button
-                onClick={() => {
-                  if (totalUnreadFeedback > 0) {
-                    setShowMyFeedbackDialog(true);
-                  } else {
-                    setShowFeedbackDialog(true);
-                  }
-                }}
-                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all relative"
-                data-testid="quick-action-feedback"
-              >
-                <div className="w-10 h-10 rounded-lg bg-pink-50 dark:bg-pink-900/30 flex items-center justify-center mb-3">
-                  <MessageSquare className="w-5 h-5 text-pink-600 dark:text-pink-400" />
-                </div>
-                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.feedback}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {totalUnreadFeedback > 0 ? t.viewMyFeedback : t.sendFeedback}
-                </p>
-                {totalUnreadFeedback > 0 && (
-                  <Badge variant="destructive" className="absolute top-2 right-2 text-xs">
-                    {totalUnreadFeedback}
-                  </Badge>
-                )}
-              </button>
-              
               {/* My Logged Hours - Sky theme */}
               <button
                 onClick={() => setLocation("/technician-logged-hours")}
@@ -3349,7 +3323,7 @@ export default function TechnicianPortal() {
           </>
         )}
         
-        {/* MORE TAB - Feedback, referral, settings */}
+        {/* MORE TAB - referral, settings */}
         {activeTab === 'more' && (
           <>
             {/* Back to Home button */}
@@ -3363,49 +3337,6 @@ export default function TechnicianPortal() {
               {t.backToHome}
             </Button>
             
-            {/* Feedback Card */}
-            {user && (
-              <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-full bg-purple-500/20">
-                        <MessageSquare className="w-6 h-6 text-purple-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{t.feedback}</p>
-                        <p className="text-base text-muted-foreground">{t.feedbackDesc}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowMyFeedbackDialog(true)}
-                        className="gap-2 relative h-11"
-                        data-testid="button-view-my-feedback"
-                      >
-                        <Mail className="w-4 h-4" />
-                        {t.viewMyFeedback}
-                        {totalUnreadFeedback > 0 && (
-                          <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs">
-                            {totalUnreadFeedback}
-                          </Badge>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowFeedbackDialog(true)}
-                        className="gap-2 h-11"
-                        data-testid="button-send-feedback"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                        {t.sendFeedback}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </>
         )}
 

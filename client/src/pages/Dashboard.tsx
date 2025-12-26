@@ -257,6 +257,37 @@ const getJobTypeLabel = (t: (key: string) => string, jobType: string): string =>
 // Flat list of all permissions for compatibility
 const AVAILABLE_PERMISSIONS = PERMISSION_CATEGORIES.flatMap(cat => cat.permissions);
 
+// Quote-related permissions that should auto-select view_clients
+const QUOTE_PERMISSIONS = ['view_quotes', 'create_quotes', 'edit_quotes', 'delete_quotes', 'view_quote_financials'];
+
+// Helper function to handle permission cascading (quotes -> clients)
+const handlePermissionChange = (
+  currentPermissions: string[],
+  permissionId: string,
+  checked: boolean
+): string[] => {
+  let newPermissions = checked
+    ? [...currentPermissions, permissionId]
+    : currentPermissions.filter((p) => p !== permissionId);
+
+  // If a quote permission is being enabled, also enable view_clients
+  if (checked && QUOTE_PERMISSIONS.includes(permissionId)) {
+    if (!newPermissions.includes('view_clients')) {
+      newPermissions = [...newPermissions, 'view_clients'];
+    }
+  }
+
+  // If a quote permission is being disabled, check if any quote permissions remain
+  if (!checked && QUOTE_PERMISSIONS.includes(permissionId)) {
+    const hasRemainingQuotePermissions = newPermissions.some((p) => QUOTE_PERMISSIONS.includes(p));
+    if (!hasRemainingQuotePermissions) {
+      newPermissions = newPermissions.filter((p) => p !== 'view_clients');
+    }
+  }
+
+  return newPermissions;
+};
+
 const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
@@ -6621,13 +6652,12 @@ export default function Dashboard() {
                                                 <Checkbox
                                                   checked={field.value?.includes(permission.id)}
                                                   onCheckedChange={(checked) => {
-                                                    return checked
-                                                      ? field.onChange([...field.value, permission.id])
-                                                      : field.onChange(
-                                                          field.value?.filter(
-                                                            (value) => value !== permission.id
-                                                          )
-                                                        )
+                                                    const newPermissions = handlePermissionChange(
+                                                      field.value || [],
+                                                      permission.id,
+                                                      !!checked
+                                                    );
+                                                    field.onChange(newPermissions);
                                                   }}
                                                   data-testid={`checkbox-permission-${permission.id}`}
                                                 />
@@ -9610,13 +9640,12 @@ export default function Dashboard() {
                                           <Checkbox
                                             checked={field.value?.includes(permission.id)}
                                             onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([...field.value, permission.id])
-                                                : field.onChange(
-                                                    field.value?.filter(
-                                                      (value) => value !== permission.id
-                                                    )
-                                                  )
+                                              const newPermissions = handlePermissionChange(
+                                                field.value || [],
+                                                permission.id,
+                                                !!checked
+                                              );
+                                              field.onChange(newPermissions);
                                             }}
                                             data-testid={`checkbox-edit-permission-${permission.id}`}
                                           />
@@ -12093,13 +12122,12 @@ export default function Dashboard() {
                                             <Checkbox
                                               checked={field.value?.includes(permission.id)}
                                               onCheckedChange={(checked) => {
-                                                return checked
-                                                  ? field.onChange([...field.value, permission.id])
-                                                  : field.onChange(
-                                                      field.value?.filter(
-                                                        (value) => value !== permission.id
-                                                      )
-                                                    )
+                                                const newPermissions = handlePermissionChange(
+                                                  field.value || [],
+                                                  permission.id,
+                                                  !!checked
+                                                );
+                                                field.onChange(newPermissions);
                                               }}
                                               data-testid={`checkbox-invitation-permission-${permission.id}`}
                                             />
