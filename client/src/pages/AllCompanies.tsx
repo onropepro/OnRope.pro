@@ -25,7 +25,7 @@ export default function AllCompanies() {
   // Check if user is superuser or staff with view_companies permission
   const isSuperuser = userData?.user?.role === 'superuser';
   const isStaffWithPermission = userData?.user?.role === 'staff' && 
-    userData?.user?.staffPermissions?.includes('view_companies');
+    userData?.user?.permissions?.includes('view_companies');
   const hasAccess = isSuperuser || isStaffWithPermission;
 
   // Only redirect after user data has loaded and we know they don't have access
