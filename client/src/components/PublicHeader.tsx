@@ -112,10 +112,10 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
   };
   
   const stakeholderColor = getStakeholderColor();
-  const useDarkText = needsDarkText(stakeholderColor);
-  const textColorClass = useDarkText ? "text-slate-900" : "text-white";
-  const hoverBgClass = useDarkText ? "hover:bg-black/10" : "hover:bg-white/10";
-  const borderColorClass = useDarkText ? "border-black/10" : "border-white/10";
+  const useDarkText = false;
+  const textColorClass = "text-white";
+  const hoverBgClass = "hover:bg-white/10";
+  const borderColorClass = "border-white/10";
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

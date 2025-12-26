@@ -192,30 +192,18 @@ The top utility bar appears above the main navigation on public-facing pages. It
 **Implementation (PublicHeader.tsx):**
 - Use `getStakeholderColor()` function to determine the correct color based on current route
 - Apply color via inline style: `style={{ backgroundColor: stakeholderColor }}`
-- Use `needsDarkText()` helper to determine if foreground text should be dark (for WCAG accessibility)
-- Pass stakeholder color and `useDarkText` flag to child components (InstallPWAButton, LanguageDropdown)
+- Pass stakeholder color and `useDarkText=false` flag to child components (InstallPWAButton, LanguageDropdown)
 
-**Foreground Text Color for Accessibility:**
-Some stakeholder colors are too light for white text (fails WCAG 4.5:1 contrast). Use dark text on these backgrounds:
+**Foreground Text Color:**
+Text in the top utility bar should ALWAYS be white (#FFFFFF) regardless of the stakeholder background color:
 
-| Stakeholder | Background Color | Text Color | Hex |
-|-------------|------------------|------------|-----|
-| Resident | #86A59C (Mint) | Dark (`text-slate-900`) | contrast ~2.6:1 with white |
-| Property Manager | #6E9075 (Sage) | Dark (`text-slate-900`) | contrast ~3.2:1 with white |
-| Building Manager | #B89685 (Taupe) | Dark (`text-slate-900`) | contrast ~3.0:1 with white |
-| Employer/Modules | #0B64A3 (Ocean) | Light (`text-white`) | sufficient contrast |
-| Technician | #AB4521 (Rust) | Light (`text-white`) | sufficient contrast |
-| Safety | #193A63 (Navy) | Light (`text-white`) | sufficient contrast |
+| Element | Text Color | Class |
+|---------|------------|-------|
+| All text | White | `text-white` |
+| Hover state | White with 10% bg | `hover:bg-white/10` |
+| Borders | White at 10% opacity | `border-white/10` |
 
-**Hover States:**
-- Light backgrounds: `hover:bg-black/10`
-- Dark backgrounds: `hover:bg-white/10`
-
-**Border Colors:**
-- Light backgrounds: `border-black/10`
-- Dark backgrounds: `border-white/10`
-
-**Key Principle:** The top utility bar color creates a seamless visual connection with the hero section below, reinforcing stakeholder-specific branding throughout the page while maintaining WCAG accessibility standards.
+**Key Principle:** The top utility bar color creates a seamless visual connection with the hero section below, reinforcing stakeholder-specific branding throughout the page. All text in the utility bar is white (#FFFFFF) for consistent branding.
 
 ---
 
