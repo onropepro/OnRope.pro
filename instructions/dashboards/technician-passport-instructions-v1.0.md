@@ -2,7 +2,7 @@
 **System**: OnRopePro - Rope Access Management Platform  
 **Domain**: Technician Passport & Employment  
 **Version**: 1.0  
-**Last Updated**: December 25, 2024  
+**Last Updated**: December 26, 2024  
 **Status**: PRODUCTION-READY  
 **Safety Critical**: Indirect - Tracks certifications and safety documentation
 
@@ -169,15 +169,28 @@ users.hasPlusAccess     // Can connect to multiple employers
 - **Enforcement mechanism**: Personal data stored on user record, not employer-controlled
 
 #### 2. LINKED VS UNLINKED STATE DETERMINATION
-**Rule**: State determined by `companyId` presence and `terminatedDate` absence
+**Rule**: State determined by `companyId` presence, `terminatedDate` absence, AND `suspendedAt` absence
 
 ```typescript
+// Linked state: Has employer, not terminated, and not inactive
 const isLinked = user.companyId && !user.terminatedDate;
+
+// Dashboard access: Must also not be suspended (inactive)
+const canAccessDashboard = user.companyId && !user.terminatedDate && !user.suspendedAt;
+
+// Can receive invitations when unlinked, terminated, or has PLUS access
 const canReceiveInvitations = !user.companyId || !!user.terminatedDate || user.hasPlusAccess;
 ```
 
-- **Impact if violated**: Incorrect feature access
-- **Enforcement mechanism**: State checked before rendering state-specific features
+**Employment Status Terminology:**
+| Status | Database Field | UI Label | Description |
+|--------|---------------|----------|-------------|
+| **Active** | `suspendedAt = null` | "Active" | Employee can access Work Dashboard |
+| **Inactive** | `suspendedAt = <date>` | "Inactive" | Temporary seat removal (slow periods) - cannot access Dashboard |
+| **Terminated** | `terminatedDate = <date>` | N/A | Permanent separation - must accept new invitation |
+
+- **Impact if violated**: Incorrect feature access, inactive employees accessing work tools
+- **Enforcement mechanism**: State checked before rendering state-specific features and Dashboard access
 
 #### 3. PLUS ACCESS UNLOCKING
 **Rule**: PLUS access granted when referred technician completes verification
@@ -224,13 +237,21 @@ client/src/pages/TechnicianPortal.tsx (~6,400 lines)
 // Linked state: Has employer and not terminated
 const isLinked = user.companyId && !user.terminatedDate;
 
-// "Go to Work Dashboard" button enabled when linked
+// Dashboard access requires: linked AND not inactive (suspended)
+const canAccessDashboard = isLinked && !user.suspendedAt;
+
+// "Go to Work Dashboard" button enabled when can access dashboard
 <Button
-  disabled={!user.companyId || !!user.terminatedDate}
+  disabled={!user.companyId || !!user.terminatedDate || !!user.suspendedAt}
   onClick={() => setLocation('/dashboard')}
 >
   {t.goToWorkDashboard}
 </Button>
+
+// Disabled states show appropriate messaging:
+// - No companyId: "You need to be linked with a company..."
+// - terminatedDate set: "Your employment has been terminated..."
+// - suspendedAt set: "You are currently inactive. Contact your employer..."
 ```
 
 ### Navigation Groups
@@ -451,3 +472,4 @@ describe('Team Invitations', () => {
 ## Version History
 
 - **v1.0** (December 25, 2024): Initial documentation
+- **v1.1** (December 26, 2024): Added suspendedAt field documentation, Active/Inactive terminology, updated state determination logic

@@ -2,7 +2,7 @@
 **System**: OnRopePro - Rope Access Management Platform  
 **Domain**: Ground Crew Passport & Employment  
 **Version**: 1.0  
-**Last Updated**: December 25, 2024  
+**Last Updated**: December 26, 2024  
 **Status**: PRODUCTION-READY  
 **Safety Critical**: Indirect - Tracks employment and personal safety documents
 
@@ -71,6 +71,13 @@ The Ground Crew **Passport** is the personal portable profile for ground-based s
 **Unlinked**: Passport only (green sidebar)  
 **Linked**: Both Passport (green) AND Dashboard (blue employer sidebar)
 
+**Employment Status Terminology:**
+| Status | Database Field | UI Label | Description |
+|--------|---------------|----------|-------------|
+| **Active** | `suspendedAt = null` | "Active" | Employee can access Work Dashboard |
+| **Inactive** | `suspendedAt = <date>` | "Inactive" | Temporary seat removal (slow periods) - cannot access Dashboard |
+| **Terminated** | `terminatedDate = <date>` | N/A | Permanent separation - must accept new invitation |
+
 ### Comparison: Ground Crew vs Technician
 
 | Feature | Ground Crew | Technician |
@@ -108,12 +115,30 @@ The Ground Crew **Passport** is the personal portable profile for ground-based s
 // Ground crew maintains personal data independent of employer
 users.role = 'ground_crew'  // or 'ground_crew_supervisor'
 users.companyId             // Current employer (nullable)
+users.suspendedAt           // Temporary inactivation date (nullable)
+users.terminatedDate        // Permanent separation date (nullable)
 ```
 
 - **Impact if violated**: Employment history lost on job change
 - **Enforcement mechanism**: Personal data on user record, not employer-controlled
 
-#### 2. ROLE-BASED FEATURE VISIBILITY
+#### 2. DASHBOARD ACCESS CONTROL
+**Rule**: Dashboard access requires linked status AND active (not suspended) status
+
+```typescript
+// Dashboard access: Has employer, not terminated, and not inactive
+const canAccessDashboard = user.companyId && !user.terminatedDate && !user.suspendedAt;
+
+// Disabled states show appropriate messaging:
+// - No companyId: "You need to be linked with a company..."
+// - terminatedDate set: "Your employment has been terminated..."
+// - suspendedAt set: "You are currently inactive. Contact your employer..."
+```
+
+- **Impact if violated**: Inactive employees could access work tools
+- **Enforcement mechanism**: State checked before enabling Dashboard button
+
+#### 3. ROLE-BASED FEATURE VISIBILITY
 **Rule**: Ground crew does not see technician-specific features
 
 Ground crew portal excludes:
@@ -251,3 +276,4 @@ describe('Ground Crew Portal', () => {
 ## Version History
 
 - **v1.0** (December 25, 2024): Initial documentation
+- **v1.1** (December 26, 2024): Added suspendedAt field documentation, Active/Inactive terminology, dashboard access control invariant
