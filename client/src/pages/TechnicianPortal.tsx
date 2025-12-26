@@ -137,7 +137,7 @@ const translations = {
     phoneNumber: "Phone Number",
     smsNotifications: "SMS Notifications",
     smsNotificationsDescription: "Receive text messages for team invitations",
-    birthday: "Birthday",
+    birthday: "Birth Date",
     address: "Address",
     streetAddress: "Street Address",
     city: "City",
@@ -1959,7 +1959,7 @@ export default function TechnicianPortal() {
       // Additional profile fields
       { label: getLabel('Emergency Contact', 'Contact d\'urgence', 'Contacto de Emergencia'), complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
       { label: getLabel('Banking Info', 'Info bancaire', 'Info Bancaria'), complete: !!user.bankAccountNumber },
-      { label: getLabel('Birthday', 'Date de naissance', 'Cumpleaños'), complete: !!user.birthday },
+      { label: getLabel('Birth Date', 'Date de naissance', 'Fecha de Nacimiento'), complete: !!user.birthday },
       { label: getLabel('First Aid', 'Premiers soins', 'Primeros Auxilios'), complete: !!user.hasFirstAid },
       { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber },
       { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.streetAddress },
@@ -3930,7 +3930,7 @@ export default function TechnicianPortal() {
                         name="birthday"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t.birthday}</FormLabel>
+                            <FormLabel>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></FormLabel>
                             <FormControl>
                               <Input {...field} type="date" data-testid="input-birthday" />
                             </FormControl>
@@ -4262,7 +4262,7 @@ export default function TechnicianPortal() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InfoItem label={t.email} value={user.email} icon={<Mail className="w-4 h-4" />} />
                     <InfoItem label={t.phoneNumber} value={user.employeePhoneNumber} icon={<Phone className="w-4 h-4" />} />
-                    <InfoItem label={t.birthday} value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
+                    <InfoItem label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>} value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
                   </div>
                 </div>
 

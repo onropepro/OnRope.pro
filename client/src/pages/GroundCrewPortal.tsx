@@ -93,7 +93,7 @@ const translations = {
     phoneNumber: "Phone Number",
     smsNotifications: "SMS Notifications",
     smsNotificationsDescription: "Receive text messages for team invitations",
-    birthday: "Birthday",
+    birthday: "Birth Date",
     address: "Address",
     streetAddress: "Street Address",
     city: "City",
@@ -1622,7 +1622,7 @@ export default function GroundCrewPortal() {
                         name="birthday"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t.birthday}</FormLabel>
+                            <FormLabel>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></FormLabel>
                             <FormControl>
                               <Input {...field} type="date" disabled={!isEditing} data-testid="input-birthday" />
                             </FormControl>
