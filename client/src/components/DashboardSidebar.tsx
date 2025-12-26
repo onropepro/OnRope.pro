@@ -607,16 +607,18 @@ export function DashboardSidebar({
 
   return (
     <>
-      {/* Mobile Toggle Button - visible only on small screens */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-3 left-3 z-30 lg:hidden"
-        onClick={() => setIsOpen(true)}
-        data-testid="button-sidebar-toggle"
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
+      {/* Mobile Toggle Button - visible only on small screens, hidden when external control is used */}
+      {!onMobileOpenChange && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed top-3 left-3 z-30 lg:hidden"
+          onClick={() => setIsOpen(true)}
+          data-testid="button-sidebar-toggle"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      )}
 
       {/* Mobile Overlay */}
       {isOpen && (
