@@ -34,6 +34,7 @@ import NonBillableHours from "@/pages/NonBillableHours";
 import Inventory from "@/pages/Inventory";
 import HoursAnalytics from "@/pages/HoursAnalytics";
 import ScheduleRouter from "@/pages/ScheduleRouter";
+import Weather from "@/pages/Weather";
 import SuperUser from "@/pages/SuperUser";
 import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
@@ -48,6 +49,7 @@ import SuperUserTechnicians from "@/pages/SuperUserTechnicians";
 import SuperUserTasks from "@/pages/SuperUserTasks";
 import SuperUserJobBoard from "@/pages/SuperUserJobBoard";
 import SuperUserFutureIdeas from "@/pages/SuperUserFutureIdeas";
+import SuperUserStaffAccounts from "@/pages/SuperUserStaffAccounts";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -76,11 +78,13 @@ import LanguageGuide from "@/pages/LanguageGuide";
 import GPSGuide from "@/pages/GPSGuide";
 import PropertyManagerGuide from "@/pages/PropertyManagerGuide";
 import CSRGuide from "@/pages/CSRGuide";
+import PSRGuide from "@/pages/PSRGuide";
 import TechnicianRegistrationGuide from "@/pages/TechnicianRegistrationGuide";
 import HomePage from "@/pages/HomePage";
 import PayrollGuide from "@/pages/PayrollGuide";
 import MobileDesignGuide from "@/pages/MobileDesignGuide";
 import SafetyComplianceLanding from "@/pages/SafetyComplianceLanding";
+import SafetyLanding from "@/pages/SafetyLanding";
 import UserAccessLanding from "@/pages/UserAccessLanding";
 import ProjectManagementLanding from "@/pages/ProjectManagementLanding";
 import CSRLanding from "@/pages/CSRLanding";
@@ -104,6 +108,7 @@ import PropertyManagerLanding from "@/pages/PropertyManagerLanding";
 import PropertyManagerInterfaceLanding from "@/pages/PropertyManagerInterfaceLanding";
 import CSRPropertyManagerLanding from "@/pages/CSRPropertyManagerLanding";
 import TechnicianLanding from "@/pages/TechnicianLanding";
+import GroundCrewLanding from "@/pages/GroundCrewLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -119,10 +124,14 @@ import ForBuildingManagers from "@/pages/help/stakeholders/ForBuildingManagers";
 import ForPropertyManagers from "@/pages/help/stakeholders/ForPropertyManagers";
 import ForResidents from "@/pages/help/stakeholders/ForResidents";
 import TechnicianPortal from "@/pages/TechnicianPortal";
+import GroundCrewPortal from "@/pages/GroundCrewPortal";
 import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import PersonalSafetyDocuments from "@/pages/PersonalSafetyDocuments";
 import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
+import GroundCrewJobBoard from "@/pages/GroundCrewJobBoard";
+import TechnicianPracticeQuizzes from "@/pages/TechnicianPracticeQuizzes";
+import TechnicianPSR from "@/pages/TechnicianPSR";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
 import VisibleTechniciansBrowser from "@/pages/VisibleTechniciansBrowser";
 import NotFound from "@/pages/not-found";
@@ -144,6 +153,8 @@ function WithDashboardLayout({ children, allowedRoles }: WithDashboardLayoutProp
   );
 }
 
+import { SiteFooter } from "@/components/SiteFooter";
+
 function Router() {
   const [location] = useLocation();
   
@@ -153,313 +164,379 @@ function Router() {
     window.scrollTo(0, 0);
   }, [location]);
   
+  // Public routes that should show the footer
+  const publicRoutes = [
+    "/",
+    "/register",
+    "/login",
+    "/employer",
+    "/resident",
+    "/reset-password",
+    "/property-manager",
+    "/technician",
+    "/ground-crew",
+    "/pricing",
+    "/get-license",
+    "/complete-registration",
+    "/link",
+    "/safety",
+    "/help",
+    "/roi-calculator",
+    "/changelog"
+  ];
+
+  const showFooter = publicRoutes.some(route => 
+    location === route || 
+    location.startsWith("/modules/") || 
+    location.startsWith("/help/") ||
+    location.startsWith("/changelog/")
+  );
+
   return (
-    <Switch>
-      <Route path="/" component={HomePage} />
-      <Route path="/register" component={Register} />
-      <Route path="/login" component={Login} />
-      <Route path="/employer" component={Employer} />
-      <Route path="/resident" component={ResidentLanding} />
-      <Route path="/reset-password" component={ResetPassword} />
-      <Route path="/property-manager" component={PropertyManagerLanding} />
-      <Route path="/property-manager/company-safety-rating" component={CSRPropertyManagerLanding} />
-      <Route path="/technician" component={TechnicianLanding} />
-      <Route path="/pricing" component={Pricing} />
-      <Route path="/get-license" component={GetLicense} />
-      <Route path="/complete-registration" component={CompleteRegistration} />
-      <Route path="/link" component={ResidentLink} />
-      <Route path="/superuser">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUser />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/companies/:id">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <CompanyDetail />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/view-as/:companyId">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <ViewAsCompany />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/feature-requests">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserFeatureRequests />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/metrics">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserMetrics />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/goals">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserGoalsOverview />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/companies">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <AllCompanies />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/founder-resources">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <FounderResources />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/technicians">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserTechnicians />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/buildings">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserBuildings />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/tasks">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserTasks />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/job-board">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserJobBoard />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/superuser/future-ideas">
-        <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserFutureIdeas />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/building-portal" component={BuildingPortal} />
-      <Route path="/technician-portal">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
-          <TechnicianPortal />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/technician-logged-hours">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
-          <TechnicianLoggedHours />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/technician-job-board">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
-          <TechnicianJobBoard />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/personal-safety-documents">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
-          <PersonalSafetyDocuments />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/resident-dashboard">
-        <ProtectedRoute allowedRoles={["resident"]}>
-          <ResidentDashboard />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/property-manager">
-        <ProtectedRoute allowedRoles={["property_manager"]}>
-          <PropertyManager />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/property-manager/quotes/:quoteId">
-        <ProtectedRoute allowedRoles={["property_manager"]}>
-          <PropertyManagerQuoteDetail />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/pm-dashboard">
-        <ProtectedRoute allowedRoles={["property_manager"]}>
-          <PropertyManager />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/dashboard">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <Dashboard />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/job-board">
-        <WithDashboardLayout allowedRoles={["company"]}>
-          <CompanyJobBoard />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/talent-browser">
-        <ProtectedRoute allowedRoles={["company", "superuser"]}>
-          <VisibleTechniciansBrowser />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/complaints/:id">
-        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "resident"]}>
-          <ComplaintDetail />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/projects/:id/work-sessions">
-        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech"]}>
-          <WorkSessionHistory />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/projects/:id">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <ProjectDetail />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/profile">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <Profile />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/property-manager-settings">
-        <ProtectedRoute allowedRoles={["property_manager"]}>
-          <PropertyManagerSettings />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/manage-subscription">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
-          <ManageSubscription />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/harness-inspection">
-        <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
-          <HarnessInspectionForm />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/safety-forms">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <SafetyForms />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/toolbox-meeting">
-        <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
-          <ToolboxMeetingForm />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/flha-form">
-        <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
-          <FlhaForm />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/incident-report">
-        <ProtectedRoute allowedRoles={["operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"]}>
-          <IncidentReportForm />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/method-statement">
-        <ProtectedRoute allowedRoles={["rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"]}>
-          <MethodStatementForm />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/payroll">
-        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
-          <Payroll />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/quotes">
-        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]}>
-          <Quotes />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/active-workers">
-        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
-          <ActiveWorkers />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/non-billable-hours">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <NonBillableHours />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/inventory">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <Inventory />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/hours-analytics">
-        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
-          <HoursAnalytics />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/schedule">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <ScheduleRouter />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/residents">
-        <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
-          <ResidentsManagement />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/documents">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <Documents />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/my-logged-hours">
-        <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
-          <MyLoggedHours />
-        </WithDashboardLayout>
-      </Route>
-      <Route path="/changelog" component={Changelog} />
-      <Route path="/changelog/authentication" component={UserAccessGuide} />
-      <Route path="/changelog/project-management" component={ProjectsGuide} />
-      <Route path="/changelog/inventory" component={InventoryGuide} />
-      <Route path="/changelog/safety" component={SafetyGuide} />
-      <Route path="/modules/safety-compliance" component={SafetyComplianceLanding} />
-      <Route path="/modules/user-access-authentication" component={UserAccessLanding} />
-      <Route path="/modules/project-management" component={ProjectManagementLanding} />
-      <Route path="/modules/work-session-time-tracking" component={WorkSessionLanding} />
-      <Route path="/modules/company-safety-rating" component={CSRLanding} />
-      <Route path="/modules/irata-sprat-task-logging" component={IRATATaskLoggingLanding} />
-      <Route path="/modules/document-management" component={DocumentManagementLanding} />
-      <Route path="/modules/employee-management" component={EmployeeManagementLanding} />
-      <Route path="/modules/technician-passport" component={TechnicianPassportLanding} />
-      <Route path="/modules/technician-job-board" component={TechnicianJobBoardLanding} />
-      <Route path="/modules/employer-job-board" component={EmployerJobBoardLanding} />
-      <Route path="/modules/gear-inventory" component={GearInventoryLanding} />
-      <Route path="/modules/scheduling-calendar" component={SchedulingCalendarLanding} />
-      <Route path="/modules/payroll-financial" component={PayrollFinancialLanding} />
-      <Route path="/modules/quoting-sales-pipeline" component={QuotingSalesLanding} />
-      <Route path="/modules/white-label-branding" component={WhiteLabelBrandingLanding} />
-      <Route path="/modules/resident-portal" component={ResidentPortalLanding} />
-      <Route path="/modules/property-manager-interface" component={PropertyManagerInterfaceLanding} />
-      <Route path="/modules/client-relationship-management" component={CRMLanding} />
-      <Route path="/changelog/user-access" component={UserAccessGuide} />
-      <Route path="/changelog/projects" component={ProjectsGuide} />
-      <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />
-      <Route path="/changelog/irata-logging" component={IRATALoggingGuide} />
-      <Route path="/changelog/documents" component={DocumentManagementGuide} />
-      <Route path="/changelog/employees" component={EmployeeManagementGuide} />
-      <Route path="/changelog/scheduling" component={SchedulingGuide} />
-      <Route path="/changelog/quoting" component={QuotingGuide} />
-      <Route path="/changelog/crm" component={CRMGuide} />
-      <Route path="/changelog/resident-portal" component={ResidentPortalGuide} />
-      <Route path="/changelog/branding" component={BrandingGuide} />
-      <Route path="/changelog/platform-admin" component={PlatformAdminGuide} />
-      <Route path="/changelog/analytics" component={AnalyticsGuide} />
-      <Route path="/changelog/language" component={LanguageGuide} />
-      <Route path="/changelog/gps" component={GPSGuide} />
-      <Route path="/changelog/property-manager" component={PropertyManagerGuide} />
-      <Route path="/changelog/csr" component={CSRGuide} />
-      <Route path="/changelog/technician-registration" component={TechnicianRegistrationGuide} />
-      <Route path="/changelog/payroll" component={PayrollGuide} />
-      <Route path="/changelog/mobile-design" component={MobileDesignGuide} />
-      <Route path="/changelog/job-board" component={JobBoardGuide} />
-      <Route path="/changelog/connections" component={ConnectionsGuide} />
-      <Route path="/changelog/pricing" component={Pricing} />
-      <Route path="/roi-calculator" component={ROICalculator} />
-      <Route path="/help" component={HelpCenter} />
-      <Route path="/help/search" component={HelpSearch} />
-      <Route path="/help/modules/:slug" component={HelpArticle} />
-      <Route path="/help/getting-started" component={GettingStarted} />
-      <Route path="/help/tools/roi-calculator" component={HelpROICalculator} />
-      <Route path="/help/tools/feature-finder" component={FeatureFinder} />
-      <Route path="/help/for-company-owners" component={ForCompanyOwners} />
-      <Route path="/help/for-technicians" component={ForTechnicians} />
-      <Route path="/help/for-building-managers" component={ForBuildingManagers} />
-      <Route path="/help/for-property-managers" component={ForPropertyManagers} />
-      <Route path="/help/for-residents" component={ForResidents} />
-      <Route component={NotFound} />
-    </Switch>
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <Switch>
+          <Route path="/" component={HomePage} />
+          <Route path="/register" component={Register} />
+          <Route path="/login" component={Login} />
+          <Route path="/employer" component={Employer} />
+          <Route path="/resident" component={ResidentLanding} />
+          <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/property-manager" component={PropertyManagerLanding} />
+          <Route path="/property-manager/company-safety-rating" component={CSRPropertyManagerLanding} />
+          <Route path="/technician" component={TechnicianLanding} />
+          <Route path="/ground-crew" component={GroundCrewLanding} />
+          <Route path="/pricing" component={Pricing} />
+          <Route path="/get-license" component={GetLicense} />
+          <Route path="/complete-registration" component={CompleteRegistration} />
+          <Route path="/link" component={ResidentLink} />
+          <Route path="/superuser">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUser />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/companies/:id">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <CompanyDetail />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/view-as/:companyId">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <ViewAsCompany />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/feature-requests">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserFeatureRequests />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/metrics">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserMetrics />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/goals">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserGoalsOverview />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/companies">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <AllCompanies />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/founder-resources">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <FounderResources />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/technicians">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserTechnicians />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/buildings">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserBuildings />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/tasks">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserTasks />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/job-board">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserJobBoard />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/future-ideas">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserFutureIdeas />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/staff-accounts">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserStaffAccounts />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/building-portal" component={BuildingPortal} />
+          <Route path="/technician-portal">
+            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+              <TechnicianPortal />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/ground-crew-portal">
+            <ProtectedRoute allowedRoles={["ground_crew", "ground_crew_supervisor"]}>
+              <GroundCrewPortal />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/technician-logged-hours">
+            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+              <TechnicianLoggedHours />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/technician-job-board">
+            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+              <TechnicianJobBoard />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/ground-crew-job-board">
+            <ProtectedRoute allowedRoles={["ground_crew", "ground_crew_supervisor"]}>
+              <GroundCrewJobBoard />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/personal-safety-documents">
+            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+              <PersonalSafetyDocuments />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/technician-practice-quizzes">
+            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+              <TechnicianPracticeQuizzes />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/technician-psr">
+            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+              <TechnicianPSR />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/resident-dashboard">
+            <ProtectedRoute allowedRoles={["resident"]}>
+              <ResidentDashboard />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/property-manager">
+            <ProtectedRoute allowedRoles={["property_manager"]}>
+              <PropertyManager />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/property-manager/quotes/:quoteId">
+            <ProtectedRoute allowedRoles={["property_manager"]}>
+              <PropertyManagerQuoteDetail />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/pm-dashboard">
+            <ProtectedRoute allowedRoles={["property_manager"]}>
+              <PropertyManager />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/dashboard">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <Dashboard />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/job-board">
+            <WithDashboardLayout allowedRoles={["company"]}>
+              <CompanyJobBoard />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/talent-browser">
+            <ProtectedRoute allowedRoles={["company", "superuser"]}>
+              <VisibleTechniciansBrowser />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/complaints/:id">
+            <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "resident"]}>
+              <ComplaintDetail />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/projects/:id/work-sessions">
+            <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech"]}>
+              <WorkSessionHistory />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/projects/:id">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <ProjectDetail />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/profile">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <Profile />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/property-manager-settings">
+            <ProtectedRoute allowedRoles={["property_manager"]}>
+              <PropertyManagerSettings />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/manage-subscription">
+            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+              <ManageSubscription />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/harness-inspection">
+            <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
+              <HarnessInspectionForm />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/safety-forms">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <SafetyForms />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/toolbox-meeting">
+            <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
+              <ToolboxMeetingForm />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/flha-form">
+            <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
+              <FlhaForm />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/incident-report">
+            <ProtectedRoute allowedRoles={["operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"]}>
+              <IncidentReportForm />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/method-statement">
+            <ProtectedRoute allowedRoles={["rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"]}>
+              <MethodStatementForm />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/payroll">
+            <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
+              <Payroll />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/quotes">
+            <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]}>
+              <Quotes />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/active-workers">
+            <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
+              <ActiveWorkers />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/non-billable-hours">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <NonBillableHours />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/inventory">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <Inventory />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/hours-analytics">
+            <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
+              <HoursAnalytics />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/schedule">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <ScheduleRouter />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/weather">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <Weather />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/residents">
+            <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
+              <ResidentsManagement />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/documents">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <Documents />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/my-logged-hours">
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
+              <MyLoggedHours />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/changelog" component={Changelog} />
+          <Route path="/changelog/authentication" component={UserAccessGuide} />
+          <Route path="/changelog/project-management" component={ProjectsGuide} />
+          <Route path="/changelog/inventory" component={InventoryGuide} />
+          <Route path="/changelog/safety" component={SafetyGuide} />
+          <Route path="/safety" component={SafetyLanding} />
+          <Route path="/modules/safety-compliance" component={SafetyComplianceLanding} />
+          <Route path="/modules/user-access-authentication" component={UserAccessLanding} />
+          <Route path="/modules/project-management" component={ProjectManagementLanding} />
+          <Route path="/modules/work-session-time-tracking" component={WorkSessionLanding} />
+          <Route path="/modules/company-safety-rating" component={CSRLanding} />
+          <Route path="/modules/irata-sprat-task-logging" component={IRATATaskLoggingLanding} />
+          <Route path="/modules/document-management" component={DocumentManagementLanding} />
+          <Route path="/modules/employee-management" component={EmployeeManagementLanding} />
+          <Route path="/modules/technician-passport" component={TechnicianPassportLanding} />
+          <Route path="/modules/technician-job-board" component={TechnicianJobBoardLanding} />
+          <Route path="/modules/employer-job-board" component={EmployerJobBoardLanding} />
+          <Route path="/modules/gear-inventory" component={GearInventoryLanding} />
+          <Route path="/modules/scheduling-calendar" component={SchedulingCalendarLanding} />
+          <Route path="/modules/payroll-financial" component={PayrollFinancialLanding} />
+          <Route path="/modules/quoting-sales-pipeline" component={QuotingSalesLanding} />
+          <Route path="/modules/white-label-branding" component={WhiteLabelBrandingLanding} />
+          <Route path="/modules/resident-portal" component={ResidentPortalLanding} />
+          <Route path="/modules/property-manager-interface" component={PropertyManagerInterfaceLanding} />
+          <Route path="/modules/client-relationship-management" component={CRMLanding} />
+          <Route path="/changelog/user-access" component={UserAccessGuide} />
+          <Route path="/changelog/projects" component={ProjectsGuide} />
+          <Route path="/changelog/time-tracking" component={TimeTrackingGuide} />
+          <Route path="/changelog/irata-logging" component={IRATALoggingGuide} />
+          <Route path="/changelog/documents" component={DocumentManagementGuide} />
+          <Route path="/changelog/employees" component={EmployeeManagementGuide} />
+          <Route path="/changelog/scheduling" component={SchedulingGuide} />
+          <Route path="/changelog/quoting" component={QuotingGuide} />
+          <Route path="/changelog/crm" component={CRMGuide} />
+          <Route path="/changelog/resident-portal" component={ResidentPortalGuide} />
+          <Route path="/changelog/branding" component={BrandingGuide} />
+          <Route path="/changelog/platform-admin" component={PlatformAdminGuide} />
+          <Route path="/changelog/analytics" component={AnalyticsGuide} />
+          <Route path="/changelog/language" component={LanguageGuide} />
+          <Route path="/changelog/gps" component={GPSGuide} />
+          <Route path="/changelog/property-manager" component={PropertyManagerGuide} />
+          <Route path="/changelog/csr" component={CSRGuide} />
+          <Route path="/changelog/psr" component={PSRGuide} />
+          <Route path="/changelog/technician-registration" component={TechnicianRegistrationGuide} />
+          <Route path="/changelog/payroll" component={PayrollGuide} />
+          <Route path="/changelog/mobile-design" component={MobileDesignGuide} />
+          <Route path="/changelog/job-board" component={JobBoardGuide} />
+          <Route path="/changelog/connections" component={ConnectionsGuide} />
+          <Route path="/changelog/pricing" component={Pricing} />
+          <Route path="/roi-calculator" component={ROICalculator} />
+          <Route path="/help" component={HelpCenter} />
+          <Route path="/help/search" component={HelpSearch} />
+          <Route path="/help/modules/:slug" component={HelpArticle} />
+          <Route path="/help/getting-started" component={GettingStarted} />
+          <Route path="/help/tools/roi-calculator" component={HelpROICalculator} />
+          <Route path="/help/tools/feature-finder" component={FeatureFinder} />
+          <Route path="/help/for-company-owners" component={ForCompanyOwners} />
+          <Route path="/help/for-technicians" component={ForTechnicians} />
+          <Route path="/help/for-building-managers" component={ForBuildingManagers} />
+          <Route path="/help/for-property-managers" component={ForPropertyManagers} />
+          <Route path="/help/for-residents" component={ForResidents} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+      {showFooter && <SiteFooter />}
+    </div>
   );
 }
 

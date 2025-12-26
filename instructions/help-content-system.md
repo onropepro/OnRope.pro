@@ -197,8 +197,26 @@ If no markdown file exists, the system attempts to extract content from the TSX 
 | `property-manager-interface` | Property Manager Interface | communication | YES | Complete |
 | `white-label-branding` | White-Label Branding | customization | YES | Complete |
 | `analytics-reporting` | Analytics & Reporting | operations | YES | Complete |
+| `personal-safety-rating` | Personal Safety Rating (PSR) | safety | YES | Complete |
 
-**Summary:** 16 of 16 modules have dedicated markdown content in `server/help-content/modules/`.
+**Summary:** 17 of 17 modules have dedicated markdown content in `server/help-content/modules/`.
+
+---
+
+## Popular Topics (December 2025)
+
+Popular Topics are help articles that appear in the "Popular Topics" section of the Help Center rather than the modules grid. They ARE in `guideRegistry` for RAG indexing, but have `hideFromModulesGrid: true` flag.
+
+| Slug | Title | Location | Has Markdown? | hideFromModulesGrid |
+|------|-------|----------|---------------|---------------------|
+| `dashboard-customization` | Dashboard Customization | Popular Topics | YES | true |
+
+**Implementation:**
+- Popular Topics entries in `guideRegistry` have `hideFromModulesGrid: true`
+- The `/api/help/modules` endpoint filters these out so they don't appear in the modules grid
+- RAG still indexes them because they're in `guideRegistry`
+- Static `TopicCard` components in HelpCenter.tsx link to them in the Popular Topics section
+- The URL pattern `/help/modules/dashboard-customization` still works
 
 **Note:** There should be exactly ONE entry per module in guideRegistry. The previous duplicate `resident-portal-user-guide` entry was removed in December 2025.
 

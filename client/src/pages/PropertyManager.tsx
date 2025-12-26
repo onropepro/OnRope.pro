@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users, Map, MapPin, Save, Loader2 } from "lucide-react";
+import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users, Map, MapPin, Save, Loader2, Copy, Check } from "lucide-react";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { PropertyManagerBuildingsMap, MapBuildingData } from "@/components/PropertyManagerBuildingsMap";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
@@ -200,6 +200,7 @@ export default function PropertyManager() {
   const [selectedVendor, setSelectedVendor] = useState<VendorSummary | null>(null);
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [pmCodeCopied, setPmCodeCopied] = useState(false);
   const [strataNumber, setStrataNumber] = useState("");
   const [uploadingAnchorInspection, setUploadingAnchorInspection] = useState(false);
   const [vendorToRemove, setVendorToRemove] = useState<VendorSummary | null>(null);
@@ -238,6 +239,7 @@ export default function PropertyManager() {
       email: "",
       propertyManagerPhoneNumber: "",
       propertyManagerSmsOptIn: false,
+      propertyManagementCompany: "",
       currentPassword: "",
       newPassword: "",
     },
@@ -863,6 +865,7 @@ export default function PropertyManager() {
                     email: userData?.user?.email || "",
                     propertyManagerPhoneNumber: userData?.user?.propertyManagerPhoneNumber || "",
                     propertyManagerSmsOptIn: userData?.user?.propertyManagerSmsOptIn || false,
+                    propertyManagementCompany: userData?.user?.propertyManagementCompany || "",
                     currentPassword: "",
                     newPassword: "",
                   });
@@ -885,6 +888,52 @@ export default function PropertyManager() {
             </DropdownMenu>
           </div>
         </div>
+
+        {/* PM Code Section */}
+        {userData?.user?.pmCode && (
+          <Card className="mb-6" data-testid="card-pm-code">
+            <CardContent className="py-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-primary/10">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      {t('propertyManager.pmCode.label', 'Your PM Code')}
+                    </p>
+                    <p className="font-mono text-lg font-semibold tracking-wider" data-testid="text-pm-code">
+                      {userData.user.pmCode}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(userData.user.pmCode);
+                    setPmCodeCopied(true);
+                    setTimeout(() => setPmCodeCopied(false), 2000);
+                    toast({
+                      title: t('propertyManager.pmCode.copied', 'Code Copied'),
+                      description: t('propertyManager.pmCode.copiedDesc', 'Your PM code has been copied to clipboard'),
+                    });
+                  }}
+                  data-testid="button-copy-pm-code"
+                >
+                  {pmCodeCopied ? (
+                    <Check className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Copy className="h-4 w-4 mr-2" />
+                  )}
+                  {pmCodeCopied 
+                    ? t('propertyManager.pmCode.copiedButton', 'Copied') 
+                    : t('propertyManager.pmCode.copyButton', 'Copy Code')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="mb-6">
           <Card data-testid="card-buildings-map">
@@ -1538,6 +1587,23 @@ export default function PropertyManager() {
                           placeholder={t('propertyManager.accountSettings.emailPlaceholder', 'your.email@example.com')}
                           {...field}
                           data-testid="input-account-email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="propertyManagementCompany"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('propertyManager.accountSettings.company', 'Property Management Company')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('propertyManager.accountSettings.companyPlaceholder', 'e.g., ABC Property Management')}
+                          {...field}
+                          data-testid="input-account-company"
                         />
                       </FormControl>
                       <FormMessage />

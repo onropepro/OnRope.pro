@@ -1122,6 +1122,7 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </footer>
+
       {/* Registration Modal */}
       <TechnicianRegistration 
         open={showRegistration} 

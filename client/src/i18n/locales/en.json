@@ -447,7 +447,7 @@
     "changelog": "Changelog",
     "safetyRating": "Safety Rating",
     "employer": "Employer",
-    "technician": "Technician",
+    "technician": "Rope Access Technician / Ground Crew",
     "resident": "Resident",
     "buildingManager": "Building Manager",
     "modules": {
@@ -9633,8 +9633,8 @@
     "year": "year",
     "hour": "hr",
     "goToWorkDashboard": "Go to Work Dashboard",
-    "accessProjects": "Access projects, clock in/out, and safety forms. Must be linked to a company.",
-    "dashboardDisabledNoCompany": "You need to be linked with a company to access the Work Dashboard. Accept an invitation below to get started.",
+    "accessProjects": "Access projects, clock in/out, safety forms, auto-logging, work dashboard.",
+    "dashboardDisabledNoCompany": "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     "dashboardDisabledTerminated": "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
     "selectEmployer": "Select Employer",
     "selectEmployerDesc": "Choose which employer",
@@ -12555,7 +12555,7 @@
     },
     "socialProof": {
       "title": "Built by Rope Access. For Rope Access.",
-      "description": "OnRopePro was created by a Level 3 IRATA technician and operations manager who got tired of running a rope access company with spreadsheets, WhatsApp, and good intentions. Every feature exists because we needed it ourselves."
+      "description": "OnRopePro was created by a Level 3 rope access technician and former operations manager who got tired of running a rope access company with spreadsheets, WhatsApp, and good intentions. Every feature exists because we needed it ourselves."
     },
     "problem": {
       "title": "The Problem With How You're Running Things Now",
@@ -12600,7 +12600,7 @@
       }
     },
     "modules": {
-      "title": "18 Modules. One Platform. All Connected. All Included.",
+      "title": "19 Modules. One Platform. All Connected. All Included.",
       "subtitle": "Everything you need to run a profitable rope access company, from first quote to final payment and every drop inbetween.",
       "categories": {
         "all": "All Modules",
@@ -12636,8 +12636,12 @@
           "desc": "Digital forms, PDF plans, and audit-ready documentation"
         },
         "companySafetyRating": {
-          "name": "Safety Rating",
+          "name": "Company Safety Rating",
           "desc": "Real-time company safety score based on inspections and compliance"
+        },
+        "personalSafetyRating": {
+          "name": "Personal Safety Rating",
+          "desc": "Portable technician safety score that follows you across employers"
         },
         "irataSpratLogging": {
           "name": "IRATA/SPRAT Logging",
@@ -12729,7 +12733,7 @@
       "title": "Why Companies Like Yours Trust OnRopePro",
       "builtBy": {
         "title": "Built by Rope Access",
-        "description": "Created by a Level 3 IRATA technician. Every feature designed for how rope access companies actually work, not adapted from generic field service software."
+        "description": "Created by a Level 3 rope access technician. Every feature designed for how rope access companies actually work, not adapted from generic field service software."
       },
       "dataControl": {
         "title": "Your Data, Your Control",

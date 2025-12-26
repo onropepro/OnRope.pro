@@ -52,6 +52,7 @@ import {
   Package,
   Gauge,
   ClipboardCheck,
+  UserCheck,
 } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -129,6 +130,7 @@ const moduleData = [
   { key: "whiteLabel", icon: Palette, category: "operations" },
   { key: "safetyCompliance", icon: Shield, category: "safety" },
   { key: "companySafetyRating", icon: Gauge, category: "safety" },
+  { key: "personalSafetyRating", icon: UserCheck, category: "safety" },
   { key: "irataSpratLogging", icon: ClipboardCheck, category: "safety" },
   { key: "documentManagement", icon: FileText, category: "safety" },
   { key: "employeeManagement", icon: UserCog, category: "team" },

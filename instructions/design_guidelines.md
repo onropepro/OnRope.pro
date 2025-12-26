@@ -171,6 +171,42 @@ White bg, rounded-3xl (24px), shadow-xl, gradient border (1px), p-8, subtle grad
 
 ## Navigation
 
+### Top Utility Bar (h-10)
+
+The top utility bar appears above the main navigation on public-facing pages. Its background color MUST match the hero gradient color of the current page to create visual continuity.
+
+**Color Mapping by Page:**
+| Page/Route | Utility Bar Color | Hex |
+|------------|-------------------|-----|
+| Homepage `/` | Ocean Blue | #0B64A3 |
+| Employer `/employer` | Ocean Blue | #0B64A3 |
+| Modules `/modules/*` | Ocean Blue | #0B64A3 |
+| Technician Job Board `/modules/technician-job-board` | Rust Brown | #AB4521 |
+| Technician `/technician` | Rust Brown | #AB4521 |
+| Property Manager `/property-manager` | Sage Green | #6E9075 |
+| Resident `/resident` | Mint Green | #86A59C |
+| Building Manager `/building-portal` | Warm Taupe | #B89685 |
+| Safety Manifesto `/safety` | Navy Blue | #193A63 |
+| Help pages | Matches stakeholder audience | varies |
+
+**Implementation (PublicHeader.tsx):**
+- Use `getStakeholderColor()` function to determine the correct color based on current route
+- Apply color via inline style: `style={{ backgroundColor: stakeholderColor }}`
+- Pass stakeholder color and `useDarkText=false` flag to child components (InstallPWAButton, LanguageDropdown)
+
+**Foreground Text Color:**
+Text in the top utility bar should ALWAYS be white (#FFFFFF) regardless of the stakeholder background color:
+
+| Element | Text Color | Class |
+|---------|------------|-------|
+| All text | White | `text-white` |
+| Hover state | White with 10% bg | `hover:bg-white/10` |
+| Borders | White at 10% opacity | `border-white/10` |
+
+**Key Principle:** The top utility bar color creates a seamless visual connection with the hero section below, reinforcing stakeholder-specific branding throughout the page. All text in the utility bar is white (#FFFFFF) for consistent branding.
+
+---
+
 **Desktop Header (h-16):**  
 Glass-white background with backdrop-blur-xl, shadow-sm, sticky top-0, logo 36px, Ocean Blue active nav items with 2px bottom accent, 32px avatar with gradient ring.
 

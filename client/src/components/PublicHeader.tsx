@@ -9,20 +9,36 @@ import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users,
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
-  activeNav?: "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "modules";
+  activeNav?: "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew" | "modules";
   onSignInClick?: () => void;
+  stakeholderColor?: string;
 }
 
-// Stakeholder color constants
+// Stakeholder color constants - must match hero gradient colors
 const STAKEHOLDER_COLORS = {
   technician: "#AB4521",
   "property-manager": "#6E9075", 
   resident: "#86A59C",
-  "building-manager": "#4A6C8C",
+  "building-manager": "#B89685", // Warm Taupe per design guidelines
+  "ground-crew": "#5D7B6F",
   employer: "#0B64A3", // Ocean Blue for employer - matches hero gradients
+  safety: "#193A63", // Navy Blue for safety manifesto page
 } as const;
 
-export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
+// Colors that require dark text for WCAG accessibility (lighter backgrounds)
+// These have insufficient contrast with white text (< 4.5:1 ratio)
+const LIGHT_BACKGROUND_COLORS: string[] = [
+  STAKEHOLDER_COLORS.resident,      // #86A59C - Mint Green
+  STAKEHOLDER_COLORS["property-manager"], // #6E9075 - Sage Green  
+  STAKEHOLDER_COLORS["building-manager"], // #B89685 - Warm Taupe
+];
+
+// Helper to determine if color needs dark foreground text
+const needsDarkText = (color: string): boolean => {
+  return LIGHT_BACKGROUND_COLORS.includes(color);
+};
+
+export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propStakeholderColor }: PublicHeaderProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const { openLogin } = useAuthPortal();
@@ -38,8 +54,14 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
   const propertyManagerMenuRef = useRef<HTMLDivElement>(null);
   
   // Determine stakeholder color based on current path
-  const getStakeholderColor = (): string | null => {
+  // This color is used for BOTH the hero gradient AND the top utility bar
+  const getStakeholderColor = (): string => {
+    if (propStakeholderColor) return propStakeholderColor;
     const path = location.toLowerCase();
+    // Safety manifesto page uses Navy Blue
+    if (path === '/safety') {
+      return STAKEHOLDER_COLORS.safety;
+    }
     // Homepage uses employer Ocean Blue
     if (path === '/') {
       return STAKEHOLDER_COLORS.employer;
@@ -72,6 +94,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     if (path.startsWith('/technician')) {
       return STAKEHOLDER_COLORS.technician;
     }
+    // Ground crew paths
+    if (path.startsWith('/ground-crew')) {
+      return STAKEHOLDER_COLORS["ground-crew"];
+    }
     if (path.startsWith('/property-manager')) {
       return STAKEHOLDER_COLORS["property-manager"];
     }
@@ -81,10 +107,15 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     if (path.startsWith('/building-portal') || path.startsWith('/building-manager')) {
       return STAKEHOLDER_COLORS["building-manager"];
     }
-    return null;
+    // Default to employer Ocean Blue
+    return STAKEHOLDER_COLORS.employer;
   };
   
   const stakeholderColor = getStakeholderColor();
+  const useDarkText = false;
+  const textColorClass = "text-white";
+  const hoverBgClass = "hover:bg-white/10";
+  const borderColorClass = "border-white/10";
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -107,7 +138,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
 
   const navItems = [
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
-    { id: "technician", label: t('navigation.technician', 'Technician'), href: "/technician" },
+    { id: "technician", label: t('navigation.technician', 'Rope Access Technician / Ground Crew'), href: "/technician" },
     { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
     { id: "resident", label: t('navigation.resident', 'Resident'), href: "/resident" },
     { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-portal" },
@@ -115,46 +146,48 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Top Utility Bar */}
+      {/* Top Utility Bar - matches hero gradient color per page */}
       <div 
-        className={stakeholderColor ? "border-b border-white/20" : "bg-muted border-b border-border/50"}
-        style={stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
+        className={`border-b ${borderColorClass}`}
+        style={{ backgroundColor: stakeholderColor }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-end gap-3">
-          <Button 
-            variant="ghost"
-            size="sm"
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={onSignInClick || openLogin}
-            data-testid="button-sign-in-header"
-          >
-            {t('login.header.signIn', 'Sign In')}
-          </Button>
-          <Button 
-            variant="ghost"
-            size="sm"
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={() => setLocation("/pricing")}
-            data-testid="link-pricing-header"
-          >
-            {t('login.header.pricing', 'Pricing')}
-          </Button>
-          <InstallPWAButton stakeholderColor={stakeholderColor} />
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation("/help")}
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            data-testid="button-help-header"
-          >
-            <HelpCircle className="w-4 h-4 mr-1" />
-            {t('navigation.help', 'Help')}
-          </Button>
-          <LanguageDropdown 
-            variant="ghost" 
-            size="sm" 
-            stakeholderColor={stakeholderColor}
-          />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-start sm:justify-end overflow-x-auto">
+          <div className="flex items-center gap-1 sm:gap-2 w-max">
+            <Button 
+              variant="ghost"
+              size="sm"
+              className={`${textColorClass} ${hoverBgClass}`}
+              onClick={() => setLocation("/safety")}
+              data-testid="button-safety-manifesto-header"
+            >
+              Our Safety Manifesto
+            </Button>
+            <Button 
+              variant="ghost"
+              size="sm"
+              className={`hidden sm:inline-flex ${textColorClass} ${hoverBgClass}`}
+              onClick={() => setLocation("/pricing")}
+              data-testid="link-pricing-header"
+            >
+              {t('login.header.pricing', 'Pricing')}
+            </Button>
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/help")}
+              className={`hidden sm:inline-flex ${textColorClass} ${hoverBgClass}`}
+              data-testid="button-help-header"
+            >
+              {t('navigation.help', 'Help')}
+            </Button>
+            <InstallPWAButton stakeholderColor={stakeholderColor} useDarkText={useDarkText} />
+            <LanguageDropdown 
+              variant="ghost" 
+              size="sm" 
+              stakeholderColor={stakeholderColor}
+              useDarkText={useDarkText}
+            />
+          </div>
         </div>
       </div>
 
@@ -184,7 +217,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </Button>
 
-          {/* Navigation - Right Aligned (Desktop) */}
+            {/* Navigation - Right Aligned (Desktop) */}
           <nav className="hidden lg:flex items-center justify-end gap-1 flex-1">
             {/* Employer with Modules Dropdown */}
             <div 
@@ -564,7 +597,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
-                {t('navigation.technician', 'Technician')}
+                <span className="flex flex-col items-center leading-tight">
+                  <span>Rope Access Technician</span>
+                  <span className="text-xs text-muted-foreground font-normal">& Ground Crew</span>
+                </span>
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showTechnicianMenu && (
@@ -603,6 +639,26 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.technicianJobBoard.description', 'Browse jobs, apply instantly, control profile visibility')}</div>
                       </div>
                     </button>
+                    
+                    <div className="border-t pt-3 mt-2">
+                      <div className="text-xs font-medium text-muted-foreground mb-2 px-1">{t('navigation.supportRoles', 'Support Roles')}</div>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
+                        onClick={() => {
+                          setLocation("/ground-crew");
+                          setShowTechnicianMenu(false);
+                        }}
+                        data-testid="nav-ground-crew"
+                      >
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform" style={{ backgroundColor: "#5D7B6F20" }}>
+                          <HardHat className="w-5 h-5" style={{ color: "#5D7B6F" }} />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.groundCrew.title', 'Ground Crew')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.groundCrew.description', 'Support techs from the ground, no heights required')}</div>
+                        </div>
+                      </button>
+                    </div>
                     </div>
                   </div>
                 </div>
@@ -688,6 +744,19 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 {item.label}
               </Button>
             ))}
+
+            {/* Sign In - Button Style */}
+            <div className="pl-2">
+              <Button
+                variant="default"
+                size="sm"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover-elevate active-elevate-2 border border-primary-border min-h-8 rounded-md text-xs font-semibold shadow-sm px-6 hover:bg-[#963b1c] text-white bg-[#193A63]"
+                onClick={onSignInClick || openLogin}
+                data-testid="nav-sign-in"
+              >
+                {t('login.header.signIn', 'Sign In')}
+              </Button>
+            </div>
           </nav>
         </div>
       </div>
@@ -849,7 +918,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
               >
-                <span>{t('navigation.technician', 'Technician')}</span>
+                <span>{t('navigation.technician', 'Rope Access Technician / Ground Crew')}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileTechnicianExpanded ? "rotate-180" : ""}`} />
               </button>
               

@@ -25,7 +25,16 @@ import {
   HardHat,
   FileWarning,
   MessageSquare,
+  Database,
 } from "lucide-react";
+
+interface DatabaseCostSummary {
+  allTime: number;
+  thisYear: number;
+  thisMonth: number;
+  thisWeek: number;
+  today: number;
+}
 
 interface MetricsSummary {
   mrr: number;
@@ -167,6 +176,10 @@ export default function SuperUserMetrics() {
 
   const { data: metrics, isLoading, error } = useQuery<MetricsSummary>({
     queryKey: ["/api/superuser/metrics/summary"],
+  });
+
+  const { data: dbCostsData, isLoading: dbCostsLoading } = useQuery<{ costs: any[], summary: DatabaseCostSummary }>({
+    queryKey: ["/api/superuser/database-costs"],
   });
 
   if (error) {
@@ -620,6 +633,75 @@ export default function SuperUserMetrics() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Database Costs Section */}
+        <Card data-testid="card-database-costs">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-5 w-5 text-orange-500" />
+              {t('superuser.metrics.databaseCosts', 'Database Costs')}
+            </CardTitle>
+            <CardDescription>
+              {t('superuser.metrics.databaseCostsDesc', 'Manual tracking of database usage costs by period')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dbCostsLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Skeleton key={i} className="h-20 w-full" />
+                ))}
+              </div>
+            ) : dbCostsData?.summary ? (
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="text-center p-4 rounded-lg border">
+                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                    {formatCurrency(dbCostsData.summary.allTime)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('superuser.metrics.allTime', 'All Time')}
+                  </p>
+                </div>
+                <div className="text-center p-4 rounded-lg border">
+                  <p className="text-2xl font-bold text-primary">
+                    {formatCurrency(dbCostsData.summary.thisYear)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('superuser.metrics.thisYear', 'This Year')}
+                  </p>
+                </div>
+                <div className="text-center p-4 rounded-lg border">
+                  <p className="text-2xl font-bold text-primary">
+                    {formatCurrency(dbCostsData.summary.thisMonth)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('superuser.metrics.thisMonth', 'This Month')}
+                  </p>
+                </div>
+                <div className="text-center p-4 rounded-lg border">
+                  <p className="text-2xl font-bold text-primary">
+                    {formatCurrency(dbCostsData.summary.thisWeek)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('superuser.metrics.thisWeek', 'This Week')}
+                  </p>
+                </div>
+                <div className="text-center p-4 rounded-lg border">
+                  <p className="text-2xl font-bold text-primary">
+                    {formatCurrency(dbCostsData.summary.today)}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('superuser.metrics.today', 'Today')}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-4">
+                {t('superuser.metrics.noCostData', 'No cost data recorded yet')}
+              </p>
+            )}
+          </CardContent>
+        </Card>
         </div>
       </div>
     </SuperUserLayout>

@@ -40,10 +40,13 @@ import {
   X,
   Trash2
 } from "lucide-react";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
-type ApplicationWithJob = JobApplication & { jobPosting: JobPosting };
+type JobPostingWithCompany = JobPosting & { companyName?: string | null };
+type ApplicationWithJob = JobApplication & { jobPosting: JobPostingWithCompany | null };
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 
@@ -144,6 +147,7 @@ const translations = {
     statusRefused: "Offer Declined",
     jobOfferReceived: "You received a job offer!",
     receivedOn: "Received",
+    fromCompany: "from",
     refuseOffer: "Decline Offer",
     deleteApplication: "Delete",
     offerRefused: "Offer Declined",
@@ -292,6 +296,7 @@ const translations = {
     statusRefused: "Offre refusee",
     jobOfferReceived: "Vous avez recu une offre d'emploi!",
     receivedOn: "Recu le",
+    fromCompany: "de",
     refuseOffer: "Refuser l'offre",
     deleteApplication: "Supprimer",
     offerRefused: "Offre refusee",
@@ -351,11 +356,11 @@ const translations = {
 export default function TechnicianJobBoard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [language, setLanguage] = useState<Language>(() => {
-    // Use same localStorage key as TechnicianPortal for consistency
-    const saved = localStorage.getItem("techPortalLanguage");
-    return (saved === "fr" ? "fr" : "en") as Language;
-  });
+  const { i18n } = useTranslation();
+  
+  // Use global i18n language, not local storage
+  const language: Language = (i18n.language === 'fr' || i18n.language === 'es') ? 
+    (i18n.language === 'fr' ? 'fr' : 'en') : 'en';
   const t = translations[language];
 
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
@@ -376,7 +381,12 @@ export default function TechnicianJobBoard() {
   });
 
   const { data: jobsData, isLoading: jobsLoading } = useQuery<{ jobPostings: JobPosting[] }>({
-    queryKey: ["/api/job-postings/public"],
+    queryKey: ["/api/job-postings/public", "rope_access"],
+    queryFn: async () => {
+      const res = await fetch("/api/job-postings/public?positionType=rope_access", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch jobs");
+      return res.json();
+    },
   });
 
   const { data: applicationsData } = useQuery<{ applications: ApplicationWithJob[] }>({
@@ -619,38 +629,50 @@ export default function TechnicianJobBoard() {
     return `$${min || max} ${periodLabel}`;
   };
 
+  const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img 
-              src={onRopeProLogo} 
-              alt="OnRopePro" 
-              className="h-8 w-auto"
-            />
-            <div>
-              <h1 className="text-lg font-bold">{t.title}</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">{t.subtitle}</p>
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden lg:block">
+        <DashboardSidebar
+          currentUser={user as any}
+          activeTab="job-board"
+          onTabChange={() => {}}
+          variant="technician"
+          customNavigationGroups={technicianNavGroups}
+          showDashboardLink={false}
+        />
+      </div>
+      
+      {/* Main content wrapper - offset for sidebar on desktop */}
+      <div className="lg:pl-60">
+        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            {/* Left Side: Page Title */}
+            <div className="flex items-center gap-3">
+              <h1 className="text-lg font-semibold">{t.title}</h1>
+            </div>
+            
+            {/* Right Side: Actions Group */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <LanguageDropdown />
+              {/* Mobile back button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLocation("/technician-portal")}
+                className="lg:hidden gap-1.5"
+                data-testid="button-back-to-portal"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">{t.backToPortal}</span>
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <LanguageDropdown />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLocation("/technician-portal")}
-              className="gap-1.5"
-              data-testid="button-back-to-portal"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.backToPortal}</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        <main className="px-4 sm:px-6 py-6 space-y-6">
         {/* PLUS Required Gate */}
         {user && !(user as any).hasPlusAccess && (
           <Card className="border-amber-500/50 bg-gradient-to-r from-amber-500/10 to-transparent">
@@ -712,139 +734,6 @@ export default function TechnicianJobBoard() {
         {/* Main content - only shown for PLUS users */}
         {(user as any)?.hasPlusAccess && (
           <>
-        {/* Visibility Settings Card */}
-        <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-primary/10">
-                {user?.isVisibleToEmployers ? (
-                  <Eye className="w-5 h-5 text-primary" />
-                ) : (
-                  <EyeOff className="w-5 h-5 text-muted-foreground" />
-                )}
-              </div>
-              <div className="flex-1">
-                <CardTitle className="text-lg">{t.visibilitySettings}</CardTitle>
-                <CardDescription>{t.visibilityDesc}</CardDescription>
-              </div>
-              <div className="flex items-center gap-3">
-                <Label htmlFor="visibility-toggle" className="text-sm font-medium">
-                  {user?.isVisibleToEmployers ? t.visibleToEmployers : t.hiddenFromEmployers}
-                </Label>
-                <Switch
-                  id="visibility-toggle"
-                  checked={user?.isVisibleToEmployers || false}
-                  onCheckedChange={handleVisibilityToggle}
-                  disabled={visibilityMutation.isPending}
-                  data-testid="switch-visibility"
-                />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {user?.isVisibleToEmployers ? (
-              <div className="space-y-3">
-                <Alert className="border-green-500/50 bg-green-50 dark:bg-green-950/30">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  <AlertTitle className="text-green-700 dark:text-green-400">{t.visibleToEmployers}</AlertTitle>
-                  <AlertDescription className="text-green-600 dark:text-green-300">
-                    {t.visibilityEnabled}
-                    {user.visibilityEnabledAt && (
-                      <span className="block mt-1 text-sm">
-                        {t.enabledSince}: {format(new Date(user.visibilityEnabledAt), "PPP")}
-                      </span>
-                    )}
-                  </AlertDescription>
-                </Alert>
-                <div className="pt-2">
-                  <p className="text-sm font-medium text-muted-foreground mb-2">{t.whatEmployersSee}</p>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                    {t.visibleFields.map((field, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-3 h-3 text-green-500" />
-                        {field}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ) : (
-              <Alert>
-                <EyeOff className="w-4 h-4" />
-                <AlertTitle>{t.hiddenFromEmployers}</AlertTitle>
-                <AlertDescription>{t.visibilityDisabled}</AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Expected Salary Card - Only show when visibility is enabled */}
-        {user?.isVisibleToEmployers && (
-          <Card className="border-muted">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-primary" />
-                {t.expectedSalary}
-              </CardTitle>
-              <CardDescription>{t.expectedSalaryDesc}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>{t.minimumSalary}</Label>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={expectedSalaryMin}
-                    onChange={(e) => setExpectedSalaryMin(e.target.value)}
-                    data-testid="input-salary-min"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t.maximumSalary}</Label>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={expectedSalaryMax}
-                    onChange={(e) => setExpectedSalaryMax(e.target.value)}
-                    data-testid="input-salary-max"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t.salaryPeriod}</Label>
-                  <Select value={expectedSalaryPeriod} onValueChange={setExpectedSalaryPeriod}>
-                    <SelectTrigger data-testid="select-salary-period">
-                      <SelectValue placeholder={t.selectPeriod} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hourly">{t.perHour}</SelectItem>
-                      <SelectItem value="daily">{t.perDay}</SelectItem>
-                      <SelectItem value="weekly">{t.perWeek}</SelectItem>
-                      <SelectItem value="monthly">{t.perMonth}</SelectItem>
-                      <SelectItem value="yearly">{t.perYear}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="mt-4 flex justify-end">
-                <Button 
-                  onClick={handleSaveSalary}
-                  disabled={salaryMutation.isPending}
-                  data-testid="button-save-salary"
-                >
-                  {salaryMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : (
-                    <Save className="w-4 h-4 mr-2" />
-                  )}
-                  {t.saveSalary}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <Separator />
 
         {/* My Applications & Offers Section */}
         {myApplications.length > 0 && (
@@ -898,6 +787,11 @@ export default function TechnicianJobBoard() {
                               )}
                               <h3 className="font-semibold">
                                 {app.jobPosting?.title || "Unknown Job"}
+                                {app.jobPosting?.companyName && (
+                                  <span className="font-normal text-muted-foreground ml-1">
+                                    {t.fromCompany} {app.jobPosting.companyName}
+                                  </span>
+                                )}
                               </h3>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -977,57 +871,63 @@ export default function TechnicianJobBoard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="filter-country" className="text-xs text-muted-foreground">{t.country}</Label>
-                <select
-                  id="filter-country"
-                  value={filterCountry}
-                  onChange={(e) => {
-                    setFilterCountry(e.target.value);
+                <Select
+                  value={filterCountry || "all"}
+                  onValueChange={(value) => {
+                    setFilterCountry(value === "all" ? "" : value);
                     setFilterProvince("");
                     setFilterCity("");
                   }}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-country"
                 >
-                  <option value="">{t.allCountries}</option>
-                  {uniqueCountries.map(country => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-country" data-testid="select-filter-country">
+                    <SelectValue placeholder={t.allCountries} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allCountries}</SelectItem>
+                    {uniqueCountries.map(country => (
+                      <SelectItem key={country} value={country}>{country}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-1.5">
                 <Label htmlFor="filter-province" className="text-xs text-muted-foreground">{t.provinceState}</Label>
-                <select
-                  id="filter-province"
-                  value={filterProvince}
-                  onChange={(e) => {
-                    setFilterProvince(e.target.value);
+                <Select
+                  value={filterProvince || "all"}
+                  onValueChange={(value) => {
+                    setFilterProvince(value === "all" ? "" : value);
                     setFilterCity("");
                   }}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-province"
                 >
-                  <option value="">{t.allProvinces}</option>
-                  {uniqueProvinces.map(province => (
-                    <option key={province} value={province}>{province}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-province" data-testid="select-filter-province">
+                    <SelectValue placeholder={t.allProvinces} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allProvinces}</SelectItem>
+                    {uniqueProvinces.map(province => (
+                      <SelectItem key={province} value={province}>{province}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-1.5">
                 <Label htmlFor="filter-city" className="text-xs text-muted-foreground">{t.city}</Label>
-                <select
-                  id="filter-city"
-                  value={filterCity}
-                  onChange={(e) => setFilterCity(e.target.value)}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-city"
+                <Select
+                  value={filterCity || "all"}
+                  onValueChange={(value) => setFilterCity(value === "all" ? "" : value)}
                 >
-                  <option value="">{t.allCities}</option>
-                  {uniqueCities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-city" data-testid="select-filter-city">
+                    <SelectValue placeholder={t.allCities} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allCities}</SelectItem>
+                    {uniqueCities.map(city => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
@@ -1154,6 +1054,7 @@ export default function TechnicianJobBoard() {
           </>
         )}
       </main>
+      </div>
 
       {/* Job Details Dialog */}
       <Dialog open={!!selectedJob} onOpenChange={(open) => !open && setSelectedJob(null)}>

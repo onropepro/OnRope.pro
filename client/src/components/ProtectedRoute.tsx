@@ -41,12 +41,16 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
         setLocation("/resident-dashboard");
       } else if (user.role === "superuser") {
         setLocation("/superuser");
+      } else if (user.role === "staff") {
+        setLocation("/superuser");
       } else if (user.role === "property_manager") {
         setLocation("/property-manager");
       } else if (user.role === "building_manager") {
         setLocation("/building-portal");
       } else if (user.role === "rope_access_tech") {
         setLocation("/technician-portal");
+      } else if (user.role === "ground_crew") {
+        setLocation("/ground-crew-portal");
       } else {
         setLocation("/dashboard");
       }

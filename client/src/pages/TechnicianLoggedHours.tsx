@@ -13,10 +13,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, parseLocalDate } from "@/lib/dateUtils";
 import { IRATA_TASK_TYPES, type IrataTaskLog, type HistoricalHours } from "@shared/schema";
+import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { 
   ArrowLeft, 
   Clock, 
@@ -34,7 +39,14 @@ import {
   Check,
   FileDown,
   Lock,
-  Edit2
+  Edit2,
+  Crown,
+  LogOut,
+  Award,
+  Briefcase,
+  FileText,
+  HelpCircle,
+  User as UserIcon
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -400,10 +412,10 @@ const getTaskIcon = (taskId: string): string => {
 export default function TechnicianLoggedHours() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [language] = useState<Language>(() => {
-    const stored = localStorage.getItem('technicianLanguage');
-    return (stored === 'fr' ? 'fr' : 'en') as Language;
-  });
+  const { i18n } = useTranslation();
+  
+  // Use global i18n language, not local storage
+  const language: Language = i18n.language === 'fr' ? 'fr' : 'en';
   const t = translations[language];
   const dateLocale = language === 'fr' ? fr : enUS;
   
@@ -1250,6 +1262,61 @@ export default function TechnicianLoggedHours() {
   const sortedProjects = Object.entries(groupedByProject)
     .sort(([, a], [, b]) => b.totalHours - a.totalHours);
 
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      await apiRequest("POST", "/api/logout");
+      queryClient.clear();
+      setLocation("/technician");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  // Technician navigation groups for sidebar
+  const technicianNavGroups: NavGroup[] = [
+    {
+      id: "main",
+      label: language === 'fr' ? "Principal" : "Main",
+      items: [
+        {
+          id: "portal",
+          label: language === 'fr' ? "Mon Portail" : "My Portal",
+          icon: UserIcon,
+          href: "/technician-portal",
+          isVisible: () => true,
+        },
+        {
+          id: "logged-hours",
+          label: language === 'fr' ? "Mes Heures" : "My Logged Hours",
+          icon: Clock,
+          href: "/technician-logged-hours",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "resources",
+      label: language === 'fr' ? "Ressources" : "Resources",
+      items: [
+        {
+          id: "job-board",
+          label: language === 'fr' ? "Offres d'emploi" : "Job Board",
+          icon: Briefcase,
+          href: "/technician-jobs",
+          isVisible: () => true,
+        },
+        {
+          id: "help",
+          label: language === 'fr' ? "Aide" : "Help",
+          icon: HelpCircle,
+          href: "/help",
+          isVisible: () => true,
+        },
+      ],
+    },
+  ];
+
   if (logsLoading || historicalLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -1262,49 +1329,137 @@ export default function TechnicianLoggedHours() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 z-[100] bg-card border-b shadow-sm">
-        <div className="px-4 py-3 flex items-center justify-between gap-3 max-w-4xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/technician-portal")}
-              data-testid="button-back-to-portal"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="font-semibold text-lg">{t.title}</h1>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden lg:block">
+        <DashboardSidebar
+          currentUser={user}
+          activeTab="logged-hours"
+          onTabChange={() => {}}
+          variant="technician"
+          customNavigationGroups={technicianNavGroups}
+          showDashboardLink={false}
+        />
+      </div>
+      
+      {/* Main content wrapper - offset for sidebar on desktop */}
+      <div className="lg:pl-60">
+        {/* Persistent Top Header Bar */}
+        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            {/* Left Side: Back Button + Search */}
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/technician-portal")}
+                data-testid="button-back-to-portal"
+                className="lg:hidden"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div className="hidden md:flex flex-1 max-w-xl">
+                <DashboardSearch />
+              </div>
+            </div>
+            
+            {/* Right Side: Actions Group */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              {/* PLUS Badge - Technicians with PLUS access */}
+              {user?.role === 'rope_access_tech' && user?.hasPlusAccess && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge 
+                      variant="default" 
+                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-xs px-2 py-0.5 font-bold border-0 cursor-help" 
+                      data-testid="badge-pro"
+                    >
+                      <Crown className="w-3 h-3 mr-1 fill-current" />
+                      PLUS
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{language === 'fr' ? "Vous avez un accès PLUS" : "You have PLUS access"}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              
+              {/* Language Selector */}
+              <LanguageDropdown />
+              
+              {/* User Profile - Clickable to go to Portal */}
+              <button 
+                onClick={() => setLocation("/technician-portal")}
+                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                data-testid="link-user-profile"
+              >
+                <Avatar className="w-8 h-8 bg-[#AB4521]">
+                  <AvatarFallback className="bg-[#AB4521] text-white text-xs font-medium">
+                    {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
+                  <p className="text-xs text-slate-400 leading-tight">{language === 'fr' ? 'Technicien' : 'Technician'}</p>
+                </div>
+              </button>
+              
+              {/* Logout Button */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                data-testid="button-logout" 
+                onClick={handleLogout} 
+                className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
             </div>
           </div>
-          {user?.hasPlusAccess ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowExportDialog(true)}
-              className="gap-2"
-              data-testid="button-export-pdf"
-            >
-              <FileDown className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.exportPdf}</span>
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2 opacity-70"
-              disabled
-              data-testid="button-export-pdf-locked"
-            >
-              <Lock className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.plusFeature}</span>
-            </Button>
-          )}
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Page Title Bar */}
+        <div className="sticky top-14 z-[90] bg-card border-b shadow-sm">
+          <div className="px-4 py-3 flex items-center justify-between gap-3 max-w-4xl mx-auto">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setLocation("/technician-portal")}
+                data-testid="button-back-to-portal-mobile"
+                className="lg:hidden"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <h1 className="font-semibold text-lg">{t.title}</h1>
+            </div>
+            {user?.hasPlusAccess ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowExportDialog(true)}
+                className="gap-2"
+                data-testid="button-export-pdf"
+              >
+                <FileDown className="w-4 h-4" />
+                <span className="hidden sm:inline">{t.exportPdf}</span>
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 opacity-70"
+                disabled
+                data-testid="button-export-pdf-locked"
+              >
+                <Lock className="w-4 h-4" />
+                <span className="hidden sm:inline">{t.plusFeature}</span>
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <main className="max-w-4xl mx-auto px-4 py-6 space-y-6 pb-20">
         {/* Important disclaimer notice - MUST BE HIGHLY VISIBLE */}
         <div className="p-4 bg-red-500/15 border-2 border-red-500/50 rounded-lg shadow-sm">
           <div className="flex items-start gap-3">
@@ -2913,6 +3068,7 @@ export default function TechnicianLoggedHours() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

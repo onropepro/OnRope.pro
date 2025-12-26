@@ -78,7 +78,8 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"), // for property_manager role
   propertyManagementCompany: varchar("property_management_company"), // for property_manager role
   propertyManagerPhoneNumber: varchar("property_manager_phone_number"), // for property_manager role - SMS notifications
-  propertyManagerSmsOptIn: boolean("property_manager_sms_opt_in").default(false), // for property_manager role - opt-in to receive SMS notifications for new quotes
+  propertyManagerSmsOptIn: boolean("property_manager_sms_opt_in").default(true), // for property_manager role - opt-in to receive SMS notifications for new quotes (defaults to true for better UX)
+  pmCode: varchar("pm_code", { length: 10 }).unique(), // Unique 10-character code for property managers (similar to company's propertyManagerCode)
   
   // Resident-specific fields
   strataPlanNumber: varchar("strata_plan_number"), // for resident role
@@ -120,6 +121,7 @@ export const users = pgTable("users", {
   bankAccountNumber: varchar("bank_account_number"), // Bank account number (optional)
   bankDocuments: text("bank_documents").array().default(sql`ARRAY[]::text[]`), // Array of void cheque document URLs
   employeePhoneNumber: varchar("employee_phone_number"), // Employee phone number (optional, separate from resident phoneNumber)
+  smsNotificationsEnabled: boolean("sms_notifications_enabled").default(true), // Whether employee wants to receive SMS notifications
   emergencyContactName: varchar("emergency_contact_name"), // Emergency contact name (optional)
   emergencyContactPhone: varchar("emergency_contact_phone"), // Emergency contact phone (optional)
   emergencyContactRelationship: varchar("emergency_contact_relationship"), // Emergency contact relationship (e.g., spouse, parent, sibling)
@@ -1768,6 +1770,7 @@ export const updatePropertyManagerAccountSchema = z.object({
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   propertyManagerPhoneNumber: z.string().optional(),
   propertyManagerSmsOptIn: z.boolean().optional(),
+  propertyManagementCompany: z.string().optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),
 }).refine((data) => {
@@ -1792,6 +1795,9 @@ export const updatePropertyManagerAccountSchema = z.object({
 
 export type UpdatePropertyManagerAccount = z.infer<typeof updatePropertyManagerAccountSchema>;
 
+// Helper to handle null values for optional numbers (forms often send null instead of undefined)
+const optionalNumber = z.union([z.number(), z.null()]).transform(v => v === null ? undefined : v).optional();
+
 export const insertClientSchema = createInsertSchema(clients).omit({
   id: true,
   createdAt: true,
@@ -1800,14 +1806,14 @@ export const insertClientSchema = createInsertSchema(clients).omit({
   lmsNumbers: z.array(z.object({
     number: z.string(),
     address: z.string(),
-    stories: z.number().optional(),
-    units: z.number().optional(),
-    parkingStalls: z.number().optional(),
-    dailyDropTarget: z.number().optional(),
-    totalDropsNorth: z.number().optional(),
-    totalDropsEast: z.number().optional(),
-    totalDropsSouth: z.number().optional(),
-    totalDropsWest: z.number().optional(),
+    stories: optionalNumber,
+    units: optionalNumber,
+    parkingStalls: optionalNumber,
+    dailyDropTarget: optionalNumber,
+    totalDropsNorth: optionalNumber,
+    totalDropsEast: optionalNumber,
+    totalDropsSouth: optionalNumber,
+    totalDropsWest: optionalNumber,
   })).optional(),
 });
 
@@ -2808,6 +2814,9 @@ export const jobPostings = pgTable("job_postings", {
   workDays: varchar("work_days"), // e.g., "Monday to Friday", "Rotating shifts"
   experienceRequired: varchar("experience_required"), // e.g., "1-2 years", "3-5 years", "5+ years"
   
+  // Position type - which staff this job is for
+  positionType: varchar("position_type").notNull().default("rope_access"), // rope_access | ground_crew
+  
   // Status and visibility
   status: varchar("status").notNull().default("active"), // draft | active | paused | closed | expired
   
@@ -3182,3 +3191,122 @@ export const insertDashboardPreferencesSchema = createInsertSchema(dashboardPref
 
 export type DashboardPreferences = typeof dashboardPreferences.$inferSelect;
 export type InsertDashboardPreferences = z.infer<typeof insertDashboardPreferencesSchema>;
+
+// ============================================
+// SIDEBAR PREFERENCES
+// ============================================
+
+// Sidebar Preferences - Stores user's customized sidebar menu item ordering
+export const sidebarPreferences = pgTable("sidebar_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  dashboardVariant: varchar("dashboard_variant", { length: 30 }).notNull(), // employer, technician, etc.
+  groupId: varchar("group_id", { length: 50 }).notNull(), // Group identifier (e.g., "operations", "team")
+  itemId: varchar("item_id", { length: 50 }).notNull(), // Item identifier (e.g., "projects", "schedule")
+  position: integer("position").notNull(), // Order position within the group (0-indexed)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_sidebar_prefs_user").on(table.userId),
+  index("IDX_sidebar_prefs_user_variant").on(table.userId, table.dashboardVariant),
+]);
+
+export const insertSidebarPreferencesSchema = createInsertSchema(sidebarPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type SidebarPreferences = typeof sidebarPreferences.$inferSelect;
+export type InsertSidebarPreferences = z.infer<typeof insertSidebarPreferencesSchema>;
+
+// ============================================
+// STAFF ACCOUNTS (Internal App Management)
+// ============================================
+
+// Available permissions for staff accounts (maps to sidebar items)
+export const STAFF_PERMISSIONS = [
+  'view_dashboard',           // Dashboard
+  'view_companies',           // View All Companies
+  'view_technicians',         // Technician Database
+  'view_buildings',           // Global Buildings
+  'view_job_board',           // Job Board
+  'view_tasks',               // Task List
+  'view_feature_requests',    // Feature Requests
+  'view_future_ideas',        // Future Ideas
+  'view_metrics',             // Platform Metrics
+  'view_goals',               // Goals & KPIs
+  'view_changelog',           // Changelog
+  'view_founder_resources',   // Founder Resources
+  'manage_staff_accounts',    // Staff Accounts (create, edit, delete)
+] as const;
+
+export type StaffPermission = typeof STAFF_PERMISSIONS[number];
+
+// Staff Accounts - Internal accounts for platform management (not visible anywhere on site)
+export const staffAccounts = pgTable("staff_accounts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  firstName: varchar("first_name", { length: 100 }).notNull(),
+  lastName: varchar("last_name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  role: varchar("role", { length: 100 }),
+  permissions: text("permissions").array().notNull().default([]), // Array of StaffPermission values
+  isActive: boolean("is_active").default(true).notNull(),
+  lastLoginAt: timestamp("last_login_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  createdBy: varchar("created_by"), // Staff account who created this account
+}, (table) => [
+  index("IDX_staff_email").on(table.email),
+]);
+
+export const insertStaffAccountSchema = createInsertSchema(staffAccounts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastLoginAt: true,
+});
+
+export type StaffAccount = typeof staffAccounts.$inferSelect;
+export type InsertStaffAccount = z.infer<typeof insertStaffAccountSchema>;
+
+// ============================================
+// FOUNDER RESOURCES (Private founder links)
+// ============================================
+
+export const founderResources = pgTable("founder_resources", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  url: varchar("url", { length: 1000 }).notNull(),
+  description: varchar("description", { length: 500 }),
+  icon: varchar("icon", { length: 50 }).default("Link"), // Lucide icon name
+  category: varchar("category", { length: 50 }).default("tools"), // tools, notes, other
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: varchar("created_by"), // Staff/superuser who added it
+});
+
+export const insertFounderResourceSchema = createInsertSchema(founderResources).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FounderResource = typeof founderResources.$inferSelect;
+export type InsertFounderResource = z.infer<typeof insertFounderResourceSchema>;
+
+// Database Cost Tracking for SuperUser - tracks monthly database expenses
+export const databaseCosts = pgTable("database_costs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  date: timestamp("date").notNull(), // The date/period this cost applies to
+  amount: real("amount").notNull(), // Cost in USD
+  notes: varchar("notes", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: varchar("created_by"), // superuser who added it
+});
+
+export const insertDatabaseCostSchema = createInsertSchema(databaseCosts).omit({
+  id: true,
+  createdAt: true,
+  createdBy: true,
+});

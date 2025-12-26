@@ -65,7 +65,8 @@ import {
   LogOut, 
   Edit2, 
   Save, 
-  X, 
+  X,
+  Check, 
   MapPin, 
   Phone, 
   Mail, 
@@ -113,10 +114,9 @@ import {
   Download,
   FileImage,
   FileArchive,
-  File
+  File,
+  GraduationCap
 } from "lucide-react";
-import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
-import { QuizSection } from "@/components/QuizSection";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
@@ -135,6 +135,8 @@ const translations = {
     fullName: "Full Name",
     email: "Email",
     phoneNumber: "Phone Number",
+    smsNotifications: "SMS Notifications",
+    smsNotificationsDescription: "Receive text messages for team invitations",
     birthday: "Birthday",
     address: "Address",
     streetAddress: "Street Address",
@@ -286,7 +288,8 @@ const translations = {
     invitationError: "Error",
     invitationMessage: "Message",
     invitedOn: "Invited on",
-    currentEmployer: "Current Employer",
+    linkedEmployer: "Linked Employer",
+    inactiveContactEmployer: "You are currently inactive at {company}. Contact them to be reactivated.",
     currentlyEmployedBy: "You are currently employed by",
     leaveCompany: "Leave Company",
     leavingCompany: "Leaving...",
@@ -301,14 +304,15 @@ const translations = {
     year: "year",
     hour: "hr",
     goToWorkDashboard: "Go to Work Dashboard",
-    accessProjects: "Access projects, clock in/out, and safety forms. Must be linked to a company.",
-    dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. Accept an invitation below to get started.",
+    accessProjects: "Access projects, clock in/out, safety forms, auto-logging, work dashboard.",
+    dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
+    dashboardDisabledInactive: "You are currently inactive. Contact your employer to be reactivated.",
     selectEmployer: "Select Employer",
     selectEmployerDesc: "Choose which employer's dashboard to access",
     connectedEmployers: "Connected Employers",
     primaryEmployer: "Primary",
-    suspended: "Suspended",
+    inactive: "Inactive",
     active: "Active",
     setPrimary: "Set as Primary",
     continueToEmployer: "Continue",
@@ -381,6 +385,14 @@ const translations = {
     noReferralsYet: "No referrals yet. Share your code to get started!",
     joinedOn: "Joined",
     noReferralCodeYet: "No referral code yet",
+    enterReferralCode: "Enter a Referral Code",
+    enterReferralCodeDesc: "Have a friend's referral code? Enter it here to help them earn PLUS access.",
+    referralCodePlaceholder: "Enter code (e.g., ABCD1234EFGH)",
+    redeemCode: "Redeem Code",
+    redeemingCode: "Redeeming...",
+    referralCodeRedeemed: "Referral code redeemed!",
+    referralCodeRedeemedDesc: "Thank you! Your referrer will now have PLUS access.",
+    alreadyRedeemedCode: "You've already redeemed a referral code",
     editExpirationDate: "Edit Expiration Date",
     setExpirationDate: "Set Expiration Date",
     expirationDateUpdated: "Expiration date updated",
@@ -449,14 +461,16 @@ const translations = {
     tabEmployer: "Employer View",
     tabWork: "Work",
     tabMore: "More",
-    employerProfileTitle: "What Employers See",
-    employerProfileDesc: "This is how your profile appears to potential employers browsing the talent pool.",
+    employerProfileTitle: "Get Discovered by Employers",
+    employerProfileDesc: "When visible, employers searching for certified technicians can find and connect with you.",
     editEmployerProfile: "Edit",
     saveEmployerProfile: "Save",
     cancelEdit: "Cancel",
-    visibilityStatus: "Visibility Status",
-    visibleToEmployers: "Visible to Employers",
-    hiddenFromEmployers: "Hidden from Employers",
+    visibilityStatus: "Talent Pool Visibility",
+    visibleToEmployers: "You're Discoverable",
+    hiddenFromEmployers: "Profile Hidden",
+    visibilityOnDesc: "Employers can find you in talent searches. Turn off anytime.",
+    visibilityOffDesc: "Toggle on to appear in employer searches and get job opportunities.",
     makeVisible: "Make Visible",
     makeHidden: "Hide Profile",
     yourSpecialties: "Your Specialties",
@@ -486,6 +500,8 @@ const translations = {
     fullName: "Nom complet",
     email: "Courriel",
     phoneNumber: "Numéro de téléphone",
+    smsNotifications: "Notifications SMS",
+    smsNotificationsDescription: "Recevoir des messages texte pour les invitations d'équipe",
     birthday: "Date de naissance",
     address: "Adresse",
     streetAddress: "Adresse civique",
@@ -637,7 +653,8 @@ const translations = {
     invitationError: "Erreur",
     invitationMessage: "Message",
     invitedOn: "Invité le",
-    currentEmployer: "Employeur actuel",
+    linkedEmployer: "Employeur Lié",
+    inactiveContactEmployer: "Vous êtes actuellement inactif chez {company}. Contactez-les pour être réactivé.",
     currentlyEmployedBy: "Vous êtes actuellement employé par",
     leaveCompany: "Quitter l'entreprise",
     leavingCompany: "Départ en cours...",
@@ -655,11 +672,12 @@ const translations = {
     accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
+    dashboardDisabledInactive: "Vous êtes actuellement inactif. Contactez votre employeur pour être réactivé.",
     selectEmployer: "Sélectionner l'employeur",
     selectEmployerDesc: "Choisissez le tableau de bord de l'employeur à accéder",
     connectedEmployers: "Employeurs connectés",
     primaryEmployer: "Principal",
-    suspended: "Suspendu",
+    inactive: "Inactif",
     active: "Actif",
     setPrimary: "Définir comme principal",
     continueToEmployer: "Continuer",
@@ -732,6 +750,14 @@ const translations = {
     noReferralsYet: "Pas encore de parrainages. Partagez votre code pour commencer!",
     joinedOn: "Inscrit le",
     noReferralCodeYet: "Pas encore de code de parrainage",
+    enterReferralCode: "Entrer un code de parrainage",
+    enterReferralCodeDesc: "Vous avez un code de parrainage d'un ami? Entrez-le ici pour l'aider a obtenir l'acces PLUS.",
+    referralCodePlaceholder: "Entrer le code (ex: ABCD1234EFGH)",
+    redeemCode: "Echanger le code",
+    redeemingCode: "Echange en cours...",
+    referralCodeRedeemed: "Code de parrainage echange!",
+    referralCodeRedeemedDesc: "Merci! Votre parrain aura maintenant l'acces PLUS.",
+    alreadyRedeemedCode: "Vous avez deja echange un code de parrainage",
     editExpirationDate: "Modifier la date d'expiration",
     setExpirationDate: "Définir la date d'expiration",
     expirationDateUpdated: "Date d'expiration mise à jour",
@@ -800,14 +826,16 @@ const translations = {
     tabEmployer: "Vue Employeur",
     tabWork: "Travail",
     tabMore: "Plus",
-    employerProfileTitle: "Ce que voient les employeurs",
-    employerProfileDesc: "Voici comment votre profil apparaît aux employeurs potentiels.",
+    employerProfileTitle: "Soyez découvert par les employeurs",
+    employerProfileDesc: "Lorsque visible, les employeurs recherchant des techniciens certifiés peuvent vous trouver et vous contacter.",
     editEmployerProfile: "Modifier",
     saveEmployerProfile: "Sauvegarder",
     cancelEdit: "Annuler",
-    visibilityStatus: "Statut de visibilité",
-    visibleToEmployers: "Visible aux employeurs",
-    hiddenFromEmployers: "Caché des employeurs",
+    visibilityStatus: "Visibilité dans le bassin de talents",
+    visibleToEmployers: "Vous êtes découvrable",
+    hiddenFromEmployers: "Profil caché",
+    visibilityOnDesc: "Les employeurs peuvent vous trouver. Désactivez à tout moment.",
+    visibilityOffDesc: "Activez pour apparaître dans les recherches et recevoir des opportunités.",
     makeVisible: "Rendre visible",
     makeHidden: "Cacher le profil",
     yourSpecialties: "Vos spécialités",
@@ -837,6 +865,8 @@ const translations = {
     fullName: "Nombre Completo",
     email: "Correo Electronico",
     phoneNumber: "Numero de Telefono",
+    smsNotifications: "Notificaciones SMS",
+    smsNotificationsDescription: "Recibir mensajes de texto para invitaciones de equipo",
     birthday: "Fecha de Nacimiento",
     address: "Direccion",
     streetAddress: "Direccion",
@@ -1002,6 +1032,14 @@ const translations = {
     noReferralsYet: "Aun no hay referencias. Comparta su codigo para comenzar!",
     joinedOn: "Unido el",
     noReferralCodeYet: "Aun no hay codigo de referencia",
+    enterReferralCode: "Ingresar un codigo de referencia",
+    enterReferralCodeDesc: "Tienes el codigo de referencia de un amigo? Ingresalo aqui para ayudarle a obtener acceso PLUS.",
+    referralCodePlaceholder: "Ingresar codigo (ej: ABCD1234EFGH)",
+    redeemCode: "Canjear codigo",
+    redeemingCode: "Canjeando...",
+    referralCodeRedeemed: "Codigo de referencia canjeado!",
+    referralCodeRedeemedDesc: "Gracias! Tu referidor ahora tendra acceso PLUS.",
+    alreadyRedeemedCode: "Ya has canjeado un codigo de referencia",
     editExpirationDate: "Editar fecha de vencimiento",
     setExpirationDate: "Establecer fecha de vencimiento",
     expirationDateUpdated: "Fecha de vencimiento actualizada",
@@ -1101,7 +1139,8 @@ const translations = {
     invitationError: "Error",
     invitationMessage: "Mensaje",
     invitedOn: "Invitado el",
-    currentEmployer: "Empleador Actual",
+    linkedEmployer: "Empleador Vinculado",
+    inactiveContactEmployer: "Actualmente está inactivo en {company}. Contáctelos para ser reactivado.",
     currentlyEmployedBy: "Actualmente esta empleado por",
     leaveCompany: "Dejar Empresa",
     leavingCompany: "Saliendo...",
@@ -1119,11 +1158,12 @@ const translations = {
     accessProjects: "Acceda a proyectos, fiche entrada/salida y formularios de seguridad",
     dashboardDisabledNoCompany: "Necesita estar vinculado con una empresa para acceder al Panel de Trabajo.",
     dashboardDisabledTerminated: "Su empleo ha sido terminado. Acepte una nueva invitacion para acceder al Panel.",
+    dashboardDisabledInactive: "Actualmente está inactivo. Contacte a su empleador para ser reactivado.",
     selectEmployer: "Seleccionar Empleador",
     selectEmployerDesc: "Elija a que panel de empleador acceder",
     connectedEmployers: "Empleadores Conectados",
     primaryEmployer: "Principal",
-    suspended: "Suspendido",
+    inactive: "Inactivo",
     active: "Activo",
     setPrimary: "Establecer como Principal",
     continueToEmployer: "Continuar",
@@ -1192,14 +1232,16 @@ const translations = {
     tabEmployer: "Vista Empleador",
     tabWork: "Trabajo",
     tabMore: "Mas",
-    employerProfileTitle: "Lo que ven los empleadores",
-    employerProfileDesc: "Asi es como su perfil aparece a los empleadores potenciales.",
+    employerProfileTitle: "Sea descubierto por empleadores",
+    employerProfileDesc: "Cuando es visible, los empleadores que buscan tecnicos certificados pueden encontrarlo y contactarlo.",
     editEmployerProfile: "Editar",
     saveEmployerProfile: "Guardar",
     cancelEdit: "Cancelar",
-    visibilityStatus: "Estado de Visibilidad",
-    visibleToEmployers: "Visible para Empleadores",
-    hiddenFromEmployers: "Oculto de Empleadores",
+    visibilityStatus: "Visibilidad en el banco de talentos",
+    visibleToEmployers: "Eres descubrible",
+    hiddenFromEmployers: "Perfil oculto",
+    visibilityOnDesc: "Los empleadores pueden encontrarte. Desactiva en cualquier momento.",
+    visibilityOffDesc: "Activa para aparecer en busquedas y recibir oportunidades de trabajo.",
     makeVisible: "Hacer Visible",
     makeHidden: "Ocultar Perfil",
     yourSpecialties: "Sus Especialidades",
@@ -1232,6 +1274,7 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
   name: z.string().min(1, t.errorNameRequired),
   email: z.string().email(t.errorInvalidEmail),
   employeePhoneNumber: z.string().min(1, t.errorPhoneRequired),
+  smsNotificationsEnabled: z.boolean().optional(),
   employeeStreetAddress: z.string().optional(),
   employeeCity: z.string().optional(),
   employeeProvinceState: z.string().optional(),
@@ -1249,6 +1292,8 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
   driversLicenseExpiry: z.string().optional(),
   birthday: z.string().optional(),
   specialMedicalConditions: z.string().optional(),
+  firstAidType: z.string().optional(),
+  firstAidExpiry: z.string().optional(),
   irataBaselineHours: z.string().optional(),
   ropeAccessStartDate: z.string().optional(),
   ropeAccessSpecialties: z.array(z.string()).optional(),
@@ -1374,7 +1419,7 @@ function MySubmittedDocuments({ language }: { language: Language }) {
 
 export default function TechnicianPortal() {
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [specialtyCategory, setSpecialtyCategory] = useState<JobCategory | "">("");
@@ -1447,6 +1492,7 @@ export default function TechnicianPortal() {
       name: "",
       email: "",
       employeePhoneNumber: "",
+      smsNotificationsEnabled: false,
       employeeStreetAddress: "",
       employeeCity: "",
       employeeProvinceState: "",
@@ -1464,6 +1510,8 @@ export default function TechnicianPortal() {
       driversLicenseExpiry: "",
       birthday: "",
       specialMedicalConditions: "",
+      firstAidType: "",
+      firstAidExpiry: "",
       irataBaselineHours: "",
       ropeAccessStartDate: "",
       ropeAccessSpecialties: [],
@@ -1560,8 +1608,8 @@ export default function TechnicianPortal() {
     }>;
   }>({
     queryKey: ["/api/my-invitations"],
-    // Fetch invitations for: unlinked technicians, terminated technicians, or PLUS technicians (can connect to multiple employers)
-    enabled: !!user && user.role === 'rope_access_tech' && (!user.companyId || !!user.terminatedDate || !!user.hasPlusAccess),
+    // Fetch invitations for: unlinked technicians, terminated/suspended technicians, or PLUS technicians (can connect to multiple employers)
+    enabled: !!user && user.role === 'rope_access_tech' && (!user.companyId || !!user.terminatedDate || !!user.suspendedAt || !!user.hasPlusAccess),
   });
 
   const pendingInvitations = invitationsData?.invitations || [];
@@ -1620,16 +1668,48 @@ export default function TechnicianPortal() {
     queryKey: ["/api/my-performance-metrics"],
     enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
+
+  // Fetch company data for employment status display
+  const { data: companyData } = useQuery<any>({
+    queryKey: ["/api/companies", user?.companyId],
+    enabled: !!user?.companyId,
+  });
   
   // State for copy button
   const [codeCopied, setCodeCopied] = useState(false);
+  
+  // State for entering a referral code
+  const [referralCodeInput, setReferralCodeInput] = useState("");
   
   // State for PLUS benefits dialog
   const [showPlusBenefits, setShowPlusBenefits] = useState(false);
   
   // Mobile-friendly tab navigation
-  type TabType = 'home' | 'profile' | 'employer' | 'work' | 'more';
-  const [activeTab, setActiveTab] = useState<TabType>('home');
+  type TabType = 'home' | 'profile' | 'employer' | 'work' | 'more' | 'invitations' | 'visibility';
+  const getTabFromUrl = (): TabType => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    if (tab === 'home' || tab === 'profile' || tab === 'employer' || tab === 'work' || tab === 'more' || tab === 'invitations' || tab === 'visibility') {
+      return tab;
+    }
+    return 'home';
+  };
+  
+  const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl);
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const tab = getTabFromUrl();
+      setActiveTab(tab);
+    };
+    
+    handleUrlChange();
+    window.addEventListener('popstate', handleUrlChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+    };
+  }, [location]);
   
   // State for editing employer profile specialties
   const [isEditingEmployerProfile, setIsEditingEmployerProfile] = useState(false);
@@ -1694,28 +1774,81 @@ export default function TechnicianPortal() {
           isVisible: () => true,
         },
         {
-          id: "employer",
-          label: language === 'en' ? "Employer" : "Employeur",
-          icon: Eye,
-          onClick: () => setActiveTab('employer'),
-          isVisible: () => true,
-        },
-        {
-          id: "work",
-          label: t.tabWork || "Work",
-          icon: Briefcase,
-          onClick: () => setActiveTab('work'),
-          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
-          badgeType: "alert",
-          isVisible: () => true,
-        },
-        {
           id: "more",
           label: t.tabMore || "More",
           icon: MoreHorizontal,
           onClick: () => setActiveTab('more'),
           badge: totalUnreadFeedback > 0 ? totalUnreadFeedback : undefined,
           badgeType: "info",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "employment",
+      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
+      items: [
+        {
+          id: "job-board",
+          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
+          icon: Briefcase,
+          href: "/technician-job-board",
+          isVisible: () => true,
+        },
+        {
+          id: "visibility",
+          label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
+          icon: Eye,
+          onClick: () => setActiveTab('visibility'),
+          isVisible: () => true,
+        },
+        {
+          id: "invitations",
+          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
+          icon: Mail,
+          onClick: () => setActiveTab('invitations'),
+          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
+          badgeType: "alert",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "logging",
+      label: language === 'en' ? "LOGGING" : language === 'es' ? "REGISTRO" : "JOURNALISATION",
+      items: [
+        {
+          id: "logged-hours",
+          label: language === 'en' ? "Logged Hours" : language === 'es' ? "Horas Registradas" : "Heures enregistrées",
+          icon: Clock,
+          href: "/technician-logged-hours",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "safety",
+      label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
+      items: [
+        {
+          id: "personal-safety-docs",
+          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de sécurité",
+          icon: Shield,
+          href: "/personal-safety-documents",
+          isVisible: () => true,
+        },
+        {
+          id: "psr",
+          label: language === 'en' ? "Safety Rating (PSR)" : language === 'es' ? "Calificacion (PSR)" : "Cote de sécurité (PSR)",
+          icon: Award,
+          href: "/technician-psr",
+          isVisible: () => true,
+        },
+        {
+          id: "practice-quizzes",
+          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz de pratique",
+          icon: GraduationCap,
+          href: "/technician-practice-quizzes",
           isVisible: () => true,
         },
       ],
@@ -1749,6 +1882,9 @@ export default function TechnicianPortal() {
   const [showEmployerSelectDialog, setShowEmployerSelectDialog] = useState(false);
   const [showReferralInfoDialog, setShowReferralInfoDialog] = useState(false);
   const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(null);
+  
+  // State for leave company confirmation dialog
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   
   // Query for employer connections (for PLUS members)
   type EmployerConnection = {
@@ -1934,6 +2070,29 @@ export default function TechnicianPortal() {
     },
     onError: (error: any) => {
       console.error("Failed to generate referral code:", error);
+    },
+  });
+
+  // Mutation to redeem a referral code after registration
+  const redeemReferralCodeMutation = useMutation({
+    mutationFn: async (referralCode: string) => {
+      return apiRequest("POST", "/api/user/redeem-referral-code", { referralCode });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setReferralCodeInput("");
+      toast({
+        title: t.referralCodeRedeemed,
+        description: t.referralCodeRedeemedDesc,
+      });
+    },
+    onError: (error: any) => {
+      console.error("Failed to redeem referral code:", error);
+      toast({
+        title: language === 'en' ? 'Error' : language === 'es' ? 'Error' : 'Erreur',
+        description: error.message || (language === 'en' ? 'Failed to redeem referral code' : language === 'es' ? 'Error al canjear codigo' : 'Echec de l\'echange du code'),
+        variant: "destructive",
+      });
     },
   });
 
@@ -2208,6 +2367,100 @@ export default function TechnicianPortal() {
         throw new Error(result.message || t.uploadFailed);
       }
 
+      // OCR scanning for driver's license
+      if (docType === 'driversLicense' && file.type.startsWith('image/')) {
+        console.log('[TechnicianPortal] Attempting OCR scan for driver\'s license...');
+        try {
+          const ocrFormData = new FormData();
+          ocrFormData.append('image', file);
+          
+          const ocrResponse = await fetch('/api/ocr/drivers-license', {
+            method: 'POST',
+            credentials: 'include',
+            body: ocrFormData,
+          });
+          
+          if (ocrResponse.ok) {
+            const ocrResult = await ocrResponse.json();
+            console.log('[TechnicianPortal] OCR result:', ocrResult);
+            
+            if (ocrResult.success && ocrResult.data) {
+              let fieldsUpdated = 0;
+              
+              if (ocrResult.data.licenseNumber) {
+                form.setValue('driversLicenseNumber', ocrResult.data.licenseNumber);
+                fieldsUpdated++;
+              }
+              if (ocrResult.data.expiryDate) {
+                form.setValue('driversLicenseExpiry', ocrResult.data.expiryDate);
+                fieldsUpdated++;
+              }
+              if (ocrResult.data.issuedDate) {
+                form.setValue('driversLicenseIssuedDate', ocrResult.data.issuedDate);
+                fieldsUpdated++;
+              }
+              
+              if (fieldsUpdated > 0) {
+                toast({
+                  title: t.ocrSuccess || "Document Scanned",
+                  description: t.ocrFieldsAutofilled?.replace('{count}', String(fieldsUpdated)) || 
+                    `${fieldsUpdated} field(s) auto-filled from your driver's license. Please verify the information.`,
+                });
+              }
+            }
+          }
+        } catch (ocrError) {
+          console.error('[TechnicianPortal] OCR scan failed:', ocrError);
+        }
+      }
+      
+      // OCR scanning for void cheque
+      if (docType === 'voidCheque' && file.type.startsWith('image/')) {
+        console.log('[TechnicianPortal] Attempting OCR scan for void cheque...');
+        try {
+          const ocrFormData = new FormData();
+          ocrFormData.append('image', file);
+          
+          const ocrResponse = await fetch('/api/ocr/void-cheque', {
+            method: 'POST',
+            credentials: 'include',
+            body: ocrFormData,
+          });
+          
+          if (ocrResponse.ok) {
+            const ocrResult = await ocrResponse.json();
+            console.log('[TechnicianPortal] OCR result:', ocrResult);
+            
+            if (ocrResult.success && ocrResult.data) {
+              let fieldsUpdated = 0;
+              
+              if (ocrResult.data.transitNumber) {
+                form.setValue('bankTransitNumber', ocrResult.data.transitNumber);
+                fieldsUpdated++;
+              }
+              if (ocrResult.data.institutionNumber) {
+                form.setValue('bankInstitutionNumber', ocrResult.data.institutionNumber);
+                fieldsUpdated++;
+              }
+              if (ocrResult.data.accountNumber) {
+                form.setValue('bankAccountNumber', ocrResult.data.accountNumber);
+                fieldsUpdated++;
+              }
+              
+              if (fieldsUpdated > 0) {
+                toast({
+                  title: t.ocrSuccess || "Document Scanned",
+                  description: t.ocrBankFieldsAutofilled?.replace('{count}', String(fieldsUpdated)) || 
+                    `${fieldsUpdated} banking field(s) auto-filled from your void cheque. Please verify the information.`,
+                });
+              }
+            }
+          }
+        } catch (ocrError) {
+          console.error('[TechnicianPortal] OCR scan failed:', ocrError);
+        }
+      }
+
       toast({
         title: t.documentUploaded,
         description: t.documentUploadedDesc,
@@ -2278,6 +2531,7 @@ export default function TechnicianPortal() {
         name: user.name || "",
         email: user.email || "",
         employeePhoneNumber: user.employeePhoneNumber || "",
+        smsNotificationsEnabled: user.smsNotificationsEnabled ?? false,
         employeeStreetAddress: user.employeeStreetAddress || "",
         employeeCity: user.employeeCity || "",
         employeeProvinceState: user.employeeProvinceState || "",
@@ -2295,6 +2549,8 @@ export default function TechnicianPortal() {
         driversLicenseExpiry: user.driversLicenseExpiry || "",
         birthday: user.birthday || "",
         specialMedicalConditions: user.specialMedicalConditions || "",
+        firstAidType: user.firstAidType || "",
+        firstAidExpiry: user.firstAidExpiry || "",
         irataBaselineHours: user.irataBaselineHours || "",
         ropeAccessStartDate: user.ropeAccessStartDate || "",
         ropeAccessSpecialties: user.ropeAccessSpecialties || [],
@@ -2460,14 +2716,14 @@ export default function TechnicianPortal() {
                 <div className="flex items-center gap-3 flex-wrap">
                   <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                    <p className="font-semibold text-base text-amber-700 dark:text-amber-400 flex items-center gap-2">
                       {t.certificationExpiryBannerTitle}
                       <Badge variant="secondary" className="gap-1">
                         <Star className="w-3 h-3" />
                         PLUS
                       </Badge>
                     </p>
-                    <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-0.5">{t.plusLockedDesc}</p>
+                    <p className="text-base text-amber-600/80 dark:text-amber-400/80 mt-0.5">{t.plusLockedDesc}</p>
                   </div>
                 </div>
               </div>
@@ -2481,8 +2737,8 @@ export default function TechnicianPortal() {
               <div className="flex items-center gap-3 flex-wrap">
                 <AlertTriangle className="w-5 h-5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm">{t.certificationExpiryBannerTitle}</p>
-                  <div className="text-xs mt-0.5 space-y-0.5">
+                  <p className="font-semibold text-base">{t.certificationExpiryBannerTitle}</p>
+                  <div className="text-base mt-0.5 space-y-0.5">
                     {urgentCerts.map((cert) => (
                       <p key={cert.type}>
                         {t.certificationExpiryBannerMessage
@@ -2508,12 +2764,12 @@ export default function TechnicianPortal() {
                 <div className="p-4 sm:p-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-lg ${user.companyId && !user.terminatedDate ? "bg-sky-50 dark:bg-sky-900/30" : "bg-slate-100 dark:bg-slate-800"}`}>
-                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate ? "text-sky-600 dark:text-sky-400" : "text-slate-400"}`} />
+                      <div className={`p-3 rounded-lg ${user.companyId && !user.terminatedDate && !user.suspendedAt ? "bg-sky-50 dark:bg-sky-900/30" : "bg-slate-100 dark:bg-slate-800"}`}>
+                        <Briefcase className={`w-6 h-6 ${user.companyId && !user.terminatedDate && !user.suspendedAt ? "text-sky-600 dark:text-sky-400" : "text-slate-400"}`} />
                       </div>
                       <div>
-                        <p className={`font-semibold ${!user.companyId || user.terminatedDate ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.accessProjects}</p>
+                        <p className={`font-semibold ${!user.companyId || user.terminatedDate || user.suspendedAt ? "text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>{t.goToWorkDashboard}</p>
+                        <p className="text-base text-slate-500 dark:text-slate-400">{t.accessProjects}</p>
                       </div>
                     </div>
                     <Button
@@ -2525,18 +2781,121 @@ export default function TechnicianPortal() {
                         }
                       }}
                       className="gap-2 bg-[#0B64A3] hover:bg-[#0B64A3]/90 text-white"
-                      disabled={!user.companyId || !!user.terminatedDate}
+                      disabled={!user.companyId || !!user.terminatedDate || !!user.suspendedAt}
                       data-testid="button-go-to-dashboard"
                     >
                       {t.goToWorkDashboard}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
-                  {(!user.companyId || user.terminatedDate) && (
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                      {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
-                    </p>
+                  {(!user.companyId || user.terminatedDate || user.suspendedAt) && (
+                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <p className="text-base text-slate-500 dark:text-slate-400 flex-1">
+                          {user.suspendedAt ? t.dashboardDisabledInactive : user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                        </p>
+                        {pendingInvitations.length > 0 && (
+                          <div className="flex flex-col gap-2 sm:items-end" data-testid="pending-invitations-section">
+                            {pendingInvitations.map((invitation) => (
+                              <div 
+                                key={invitation.id} 
+                                className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
+                                data-testid={`invitation-card-${invitation.id}`}
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-green-800 dark:text-green-300 truncate">
+                                    {t.invitedBy} {invitation.company.name}
+                                  </p>
+                                </div>
+                                <div className="flex gap-1.5 flex-shrink-0">
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    className="bg-green-600 hover:bg-green-700 text-white h-7 px-2"
+                                    onClick={() => acceptInvitationMutation.mutate(invitation.id)}
+                                    disabled={processingInvitationId === invitation.id}
+                                    data-testid={`button-accept-invitation-${invitation.id}`}
+                                  >
+                                    {processingInvitationId === invitation.id ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                      <Check className="w-3 h-3" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 px-2 border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                                    onClick={() => declineInvitationMutation.mutate(invitation.id)}
+                                    disabled={processingInvitationId === invitation.id}
+                                    data-testid={`button-decline-invitation-${invitation.id}`}
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* Current Employment Status Card - Only show when employed and not suspended */}
+            {user && user.companyId && !user.terminatedDate && !user.suspendedAt && companyData?.company && (
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+                <div className="p-4 sm:p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2.5 rounded-lg bg-green-50 dark:bg-green-900/30">
+                        <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.companyName || companyData.company.name}</p>
+                          <Badge variant="default" className="bg-green-600 text-xs">
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                            {t.active}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">{t.linkedEmployer}</p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                      onClick={() => setShowLeaveConfirm(true)}
+                      data-testid="button-leave-company"
+                    >
+                      {t.leaveCompany}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Suspended/Inactive Status Card - Show when suspended */}
+            {user && user.companyId && user.suspendedAt && companyData?.company && (
+              <div className="bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-700 rounded-lg shadow-sm">
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/30">
+                      <Building2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-semibold text-slate-900 dark:text-slate-100">{companyData.company.companyName || companyData.company.name}</p>
+                        <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs">
+                          {t.inactive}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{t.inactiveContactEmployer.replace('{company}', companyData.company.companyName || companyData.company.name)}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -2558,7 +2917,7 @@ export default function TechnicianPortal() {
                         <h3 className="font-semibold text-slate-900 dark:text-slate-100">
                           {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
                         </h3>
-                        <span className="text-sm font-semibold text-[#0B64A3]">{profileCompletion.percentage}%</span>
+                        <span className="text-base font-semibold text-[#0B64A3]">{profileCompletion.percentage}%</span>
                       </div>
                       <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mb-3">
                         <div 
@@ -2566,7 +2925,7 @@ export default function TechnicianPortal() {
                           style={{ width: `${profileCompletion.percentage}%` }}
                         />
                       </div>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                      <p className="text-base text-slate-500 dark:text-slate-400 mb-3">
                         {language === 'en' 
                           ? 'Complete your profile to connect with employers instantly' 
                           : language === 'es'
@@ -2605,8 +2964,8 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center mb-3">
                   <Briefcase className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.jobBoard}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t.browseJobs}</p>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.jobBoard}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.browseJobs}</p>
               </button>
               
               {/* Profile - Slate theme */}
@@ -2618,34 +2977,8 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
                   <User className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.tabProfile}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t.editProfile}</p>
-              </button>
-              
-              {/* Feedback - Pink theme */}
-              <button
-                onClick={() => {
-                  if (totalUnreadFeedback > 0) {
-                    setShowMyFeedbackDialog(true);
-                  } else {
-                    setShowFeedbackDialog(true);
-                  }
-                }}
-                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all relative"
-                data-testid="quick-action-feedback"
-              >
-                <div className="w-10 h-10 rounded-lg bg-pink-50 dark:bg-pink-900/30 flex items-center justify-center mb-3">
-                  <MessageSquare className="w-5 h-5 text-pink-600 dark:text-pink-400" />
-                </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.feedback}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {totalUnreadFeedback > 0 ? t.viewMyFeedback : t.sendFeedback}
-                </p>
-                {totalUnreadFeedback > 0 && (
-                  <Badge variant="destructive" className="absolute top-2 right-2 text-xs">
-                    {totalUnreadFeedback}
-                  </Badge>
-                )}
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.tabProfile}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.editProfile}</p>
               </button>
               
               {/* My Logged Hours - Sky theme */}
@@ -2657,8 +2990,8 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-sky-50 dark:bg-sky-900/30 flex items-center justify-center mb-3">
                   <Clock className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.myLoggedHours}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t.viewLoggedHoursDesc}</p>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.myLoggedHours}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.viewLoggedHoursDesc}</p>
                 {(combinedTotalHours > 0 || workSessionHours > 0) && (
                   <p className="text-sm font-bold text-[#0B64A3] mt-1" data-testid="text-home-total-logged-hours">
                     {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
@@ -2675,8 +3008,21 @@ export default function TechnicianPortal() {
                 <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center mb-3">
                   <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <p className="font-semibold text-sm text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.personalSafetyDocs}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t.personalSafetyDocsDesc}</p>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">{t.personalSafetyDocs}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.personalSafetyDocsDesc}</p>
+              </button>
+              
+              {/* PSR - Amber theme */}
+              <button
+                onClick={() => setLocation("/technician-psr")}
+                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 text-left hover:shadow-md transition-all"
+                data-testid="quick-action-psr"
+              >
+                <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center mb-3">
+                  <Award className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <p className="font-semibold text-base text-slate-900 dark:text-slate-100 group-hover:text-[#0B64A3] transition-colors">PSR</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.performanceSafetyRating}</p>
               </button>
             </div>
 
@@ -2684,28 +3030,12 @@ export default function TechnicianPortal() {
             {user && user.role === 'rope_access_tech' && (
               <TechnicianDocumentRequests language={language} />
             )}
-
-            {/* Safety Quizzes Section - Show for all technicians (certification/safety quizzes always available) */}
-            {user && user.role === 'rope_access_tech' && !user.terminatedDate && (
-              <QuizSection />
-            )}
           </>
         )}
 
-        {/* EMPLOYER VIEW TAB - What employers see */}
-        {activeTab === 'employer' && user && (
+        {/* MY VISIBILITY TAB - What employers see and visibility settings */}
+        {activeTab === 'visibility' && user && (
           <>
-            {/* Back to Home button */}
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab('home')}
-              className="gap-2 -mt-2 mb-2"
-              data-testid="button-back-to-home-employer"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t.backToHome}
-            </Button>
-
             {/* Employer Profile - Glass-morphism container matching Resident Profile style */}
             {(user.role === 'rope_access_tech' || user.role === 'company') && (
               <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
@@ -2717,7 +3047,7 @@ export default function TechnicianPortal() {
                     </div>
                     <div>
                       <h2 className="text-xl font-bold">{t.employerProfileTitle}</h2>
-                      <p className="text-sm text-muted-foreground">{t.employerProfileDesc}</p>
+                      <p className="text-base text-muted-foreground">{t.employerProfileDesc}</p>
                     </div>
                   </div>
                   {!isEditingEmployerProfile ? (
@@ -2741,9 +3071,9 @@ export default function TechnicianPortal() {
                 </div>
 
                 {/* Visibility Status - Compact inline */}
-                <div className={`flex items-center justify-between p-4 rounded-lg mb-6 ${user.isVisibleToEmployers ? "bg-green-500/10 border border-green-500/20" : "bg-amber-500/10 border border-amber-500/20"}`}>
+                <div className={`flex items-center justify-between p-4 rounded-lg mb-6 gap-4 ${user.isVisibleToEmployers ? "bg-green-500/10 border border-green-500/20" : "bg-amber-500/10 border border-amber-500/20"}`}>
                   <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${user.isVisibleToEmployers ? "bg-green-500/20" : "bg-amber-500/20"}`}>
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${user.isVisibleToEmployers ? "bg-green-500/20" : "bg-amber-500/20"}`}>
                       {user.isVisibleToEmployers ? (
                         <Eye className="w-5 h-5 text-green-600 dark:text-green-400" />
                       ) : (
@@ -2751,9 +3081,9 @@ export default function TechnicianPortal() {
                       )}
                     </div>
                     <div>
-                      <p className="font-medium">{t.visibilityStatus}</p>
+                      <p className="font-medium">{user.isVisibleToEmployers ? t.visibleToEmployers : t.hiddenFromEmployers}</p>
                       <p className="text-sm text-muted-foreground">
-                        {user.isVisibleToEmployers ? t.visibleToEmployers : t.hiddenFromEmployers}
+                        {user.isVisibleToEmployers ? t.visibilityOnDesc : t.visibilityOffDesc}
                       </p>
                     </div>
                   </div>
@@ -2932,7 +3262,7 @@ export default function TechnicianPortal() {
                             );
                           })}
                           {(user.ropeAccessSpecialties || []).length === 0 && (
-                            <p className="text-sm text-muted-foreground italic">{t.addYourFirstSpecialty}</p>
+                            <p className="text-base text-muted-foreground italic">{t.addYourFirstSpecialty}</p>
                           )}
                         </div>
 
@@ -3022,7 +3352,7 @@ export default function TechnicianPortal() {
                           })
                         ) : (
                           <div className="text-center w-full py-4">
-                            <p className="text-sm text-muted-foreground italic mb-2">{t.addYourFirstSpecialty}</p>
+                            <p className="text-base text-muted-foreground italic mb-2">{t.addYourFirstSpecialty}</p>
                             <Button
                               variant="outline"
                               size="sm"
@@ -3061,50 +3391,7 @@ export default function TechnicianPortal() {
           </>
         )}
         
-        {/* WORK TAB - Job board, invitations, employer */}
-        {activeTab === 'work' && (
-          <>
-            {/* Back to Home button */}
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab('home')}
-              className="gap-2 -mt-2 mb-2"
-              data-testid="button-back-to-home-work"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t.backToHome}
-            </Button>
-            
-            {/* Job Board Card */}
-            {user && (
-              <Card className="border-blue-500/50 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-full bg-blue-500/20">
-                        <Briefcase className="w-6 h-6 text-blue-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{t.jobBoard}</p>
-                        <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => setLocation("/technician-job-board")}
-                      className="gap-2 bg-blue-600 hover:bg-blue-700 h-12"
-                      data-testid="button-browse-jobs"
-                    >
-                      {t.browseJobs}
-                      <ArrowRight className="w-5 h-5" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
-        
-        {/* MORE TAB - Feedback, referral, settings */}
+        {/* MORE TAB - referral, settings */}
         {activeTab === 'more' && (
           <>
             {/* Back to Home button */}
@@ -3118,144 +3405,163 @@ export default function TechnicianPortal() {
               {t.backToHome}
             </Button>
             
-            {/* Feedback Card */}
-            {user && (
-              <Card className="border-purple-500/30 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-full bg-purple-500/20">
-                        <MessageSquare className="w-6 h-6 text-purple-500" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{t.feedback}</p>
-                        <p className="text-sm text-muted-foreground">{t.feedbackDesc}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowMyFeedbackDialog(true)}
-                        className="gap-2 relative h-11"
-                        data-testid="button-view-my-feedback"
-                      >
-                        <Mail className="w-4 h-4" />
-                        {t.viewMyFeedback}
-                        {totalUnreadFeedback > 0 && (
-                          <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 min-w-5 text-xs">
-                            {totalUnreadFeedback}
-                          </Badge>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowFeedbackDialog(true)}
-                        className="gap-2 h-11"
-                        data-testid="button-send-feedback"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                        {t.sendFeedback}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </>
         )}
 
-        {/* Team Invitations Section - Show for unlinked technicians, self-resigned technicians, OR PLUS technicians (WORK TAB) */}
-        {activeTab === 'work' && user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate || user.hasPlusAccess) && (
-          <Card className="border-primary/30 bg-primary/5">
-            <CardHeader>
+        {/* TEAM INVITATIONS TAB - Employer invitations to link accounts */}
+        {activeTab === 'invitations' && user && user.role === 'rope_access_tech' && (
+          <>
+            {/* Back to Home button */}
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab('home')}
+              className="gap-2 -mt-2 mb-2"
+              data-testid="button-back-to-home-invitations"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t.backToHome}
+            </Button>
+            
+            <Card className="border-primary/30 bg-primary/5">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Mail className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{t.teamInvitations}</CardTitle>
+                    <CardDescription>{t.pendingInvitations}</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {pendingInvitations.length === 0 ? (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <Building className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                    <p className="font-medium">{t.noInvitations}</p>
+                    <p className="text-base mt-1">{t.noInvitationsDesc}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {pendingInvitations.map((invitation) => (
+                      <div
+                        key={invitation.id}
+                        className="p-4 rounded-lg border bg-card shadow-sm"
+                        data-testid={`invitation-card-${invitation.id}`}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="space-y-1">
+                            <p className="font-medium text-lg flex items-center gap-2">
+                              <Building className="w-4 h-4 text-muted-foreground" />
+                              {invitation.company.name}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {t.invitedOn} {formatLocalDate(invitation.createdAt)}
+                            </p>
+                            {invitation.message && (
+                              <div className="mt-2 p-3 bg-muted rounded-md">
+                                <p className="text-sm">
+                                  <span className="font-medium">{t.invitationMessage}:</span> {invitation.message}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex gap-2 sm:flex-shrink-0">
+                            <Button
+                              variant="outline"
+                              size="default"
+                              onClick={() => declineInvitationMutation.mutate(invitation.id)}
+                              disabled={processingInvitationId === invitation.id}
+                              className="flex-1 sm:flex-none gap-2"
+                              data-testid={`button-decline-invitation-${invitation.id}`}
+                            >
+                              {processingInvitationId === invitation.id && declineInvitationMutation.isPending ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  {t.decliningInvitation}
+                                </>
+                              ) : (
+                                <>
+                                  <X className="w-4 h-4" />
+                                  {t.declineInvitation}
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              size="default"
+                              onClick={() => acceptInvitationMutation.mutate(invitation.id)}
+                              disabled={processingInvitationId === invitation.id}
+                              className="flex-1 sm:flex-none gap-2"
+                              data-testid={`button-accept-invitation-${invitation.id}`}
+                            >
+                              {processingInvitationId === invitation.id && acceptInvitationMutation.isPending ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  {t.acceptingInvitation}
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  {t.acceptInvitation}
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {/* Enter a Referral Code Section - Only show for technicians who haven't used one (MORE TAB) */}
+        {activeTab === 'more' && user && user.role === 'rope_access_tech' && !user.referredByCode && (
+          <Card className="border border-slate-200 dark:border-slate-700">
+            <CardHeader className="pb-2">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Mail className="w-5 h-5 text-primary" />
+                <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                  <Gift className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">{t.teamInvitations}</CardTitle>
-                  <CardDescription>{t.pendingInvitations}</CardDescription>
+                  <CardTitle className="text-lg">{t.enterReferralCode}</CardTitle>
+                  <CardDescription>
+                    {t.enterReferralCodeDesc}
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {pendingInvitations.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground">
-                  <Building className="w-10 h-10 mx-auto mb-3 opacity-50" />
-                  <p className="font-medium">{t.noInvitations}</p>
-                  <p className="text-sm mt-1">{t.noInvitationsDesc}</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {pendingInvitations.map((invitation) => (
-                    <div
-                      key={invitation.id}
-                      className="p-4 rounded-lg border bg-card shadow-sm"
-                      data-testid={`invitation-card-${invitation.id}`}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="space-y-1">
-                          <p className="font-medium text-lg flex items-center gap-2">
-                            <Building className="w-4 h-4 text-muted-foreground" />
-                            {invitation.company.name}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {t.invitedOn} {formatLocalDate(invitation.createdAt)}
-                          </p>
-                          {invitation.message && (
-                            <div className="mt-2 p-3 bg-muted rounded-md">
-                              <p className="text-sm">
-                                <span className="font-medium">{t.invitationMessage}:</span> {invitation.message}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex gap-2 sm:flex-shrink-0">
-                          <Button
-                            variant="outline"
-                            size="default"
-                            onClick={() => declineInvitationMutation.mutate(invitation.id)}
-                            disabled={processingInvitationId === invitation.id}
-                            className="flex-1 sm:flex-none gap-2"
-                            data-testid={`button-decline-invitation-${invitation.id}`}
-                          >
-                            {processingInvitationId === invitation.id && declineInvitationMutation.isPending ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {t.decliningInvitation}
-                              </>
-                            ) : (
-                              <>
-                                <X className="w-4 h-4" />
-                                {t.declineInvitation}
-                              </>
-                            )}
-                          </Button>
-                          <Button
-                            size="default"
-                            onClick={() => acceptInvitationMutation.mutate(invitation.id)}
-                            disabled={processingInvitationId === invitation.id}
-                            className="flex-1 sm:flex-none gap-2"
-                            data-testid={`button-accept-invitation-${invitation.id}`}
-                          >
-                            {processingInvitationId === invitation.id && acceptInvitationMutation.isPending ? (
-                              <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {t.acceptingInvitation}
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle2 className="w-4 h-4" />
-                                {t.acceptInvitation}
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  placeholder={t.referralCodePlaceholder}
+                  value={referralCodeInput}
+                  onChange={(e) => setReferralCodeInput(e.target.value.toUpperCase())}
+                  className="flex-1 font-mono tracking-wider"
+                  maxLength={20}
+                  data-testid="input-redeem-referral-code"
+                />
+                <Button
+                  onClick={() => redeemReferralCodeMutation.mutate(referralCodeInput)}
+                  disabled={!referralCodeInput.trim() || redeemReferralCodeMutation.isPending}
+                  className="gap-2"
+                  data-testid="button-redeem-referral-code"
+                >
+                  {redeemReferralCodeMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t.redeemingCode}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4" />
+                      {t.redeemCode}
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -3370,193 +3676,11 @@ export default function TechnicianPortal() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">{t.noReferralsYet}</p>
+                    <p className="text-base text-muted-foreground">{t.noReferralsYet}</p>
                   )}
                 </div>
               )}
             </CardContent>
-          </Card>
-        )}
-
-        {/* Performance & Safety Rating Card - Show for technicians and company owners (HOME TAB) */}
-        {activeTab === 'home' && user && (user.role === 'rope_access_tech' || user.role === 'company') && (
-          <Card className="border-muted overflow-visible">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-gradient-to-br from-amber-500/20 to-yellow-400/20">
-                  <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                </div>
-                <div className="flex-1">
-                  <CardTitle className="text-lg">PSR</CardTitle>
-                  <p className="text-xs text-muted-foreground">{t.performanceSafetyRating}</p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {performanceData?.summary?.totalSessions && performanceData.summary.totalSessions > 0 ? (
-                <div className="space-y-4">
-                  {/* Main Score Display */}
-                  <div className="p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-400/10 border border-amber-200/30 dark:border-amber-800/30">
-                    <div className="flex items-center gap-4">
-                      <div className="text-4xl font-bold text-amber-600 dark:text-amber-400" data-testid="text-performance-score">
-                        {performanceData.summary.averageScore}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{t.overallScore}</p>
-                        <Badge 
-                          variant={performanceData.summary.overallRating === 'excellent' ? 'default' : 
-                                   performanceData.summary.overallRating === 'good' ? 'secondary' : 'destructive'}
-                          className={performanceData.summary.overallRating === 'excellent' ? 
-                            'bg-green-500 text-white' : 
-                            performanceData.summary.overallRating === 'good' ? 
-                            'bg-blue-500 text-white' : ''}
-                          data-testid="badge-performance-rating"
-                        >
-                          {performanceData.summary.overallRating === 'excellent' ? t.ratingExcellent :
-                           performanceData.summary.overallRating === 'good' ? t.ratingGood :
-                           performanceData.summary.overallRating === 'needs_improvement' ? t.ratingNeedsImprovement :
-                           t.ratingPoor}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    {/* Improvement hints - show when not excellent */}
-                    {(performanceData.summary.overallRating === 'needs_improvement' || 
-                      performanceData.summary.overallRating === 'poor') && 
-                      (performanceData.summary.harnessCompliance < 80 || performanceData.summary.documentCompliance < 100) && (
-                      <div className="mt-3 pt-3 border-t border-amber-200/30 dark:border-amber-800/30">
-                        <p className="text-xs font-medium text-muted-foreground mb-1">{t.improvementNeeded}</p>
-                        <ul className="text-xs text-muted-foreground space-y-1">
-                          {performanceData.summary.harnessCompliance < 80 && (
-                            <li className="flex items-center gap-1.5" data-testid="hint-harness">
-                              <AlertTriangle className="w-3 h-3 text-amber-500" />
-                              {t.improveHarness}
-                            </li>
-                          )}
-                          {performanceData.summary.documentCompliance < 100 && (
-                            <li className="flex items-center gap-1.5" data-testid="hint-docs">
-                              <AlertTriangle className="w-3 h-3 text-amber-500" />
-                              {t.improveDocs}
-                            </li>
-                          )}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Stats Row */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="p-3 rounded-lg bg-muted/50 text-center">
-                      <p className="text-xl font-semibold" data-testid="text-harness-compliance">
-                        {performanceData.summary.harnessCompliance}%
-                      </p>
-                      <p className="text-xs text-muted-foreground">{t.harnessCompliance}</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/50 text-center">
-                      <p className="text-xl font-semibold" data-testid="text-document-compliance">
-                        {performanceData.summary.documentCompliance}%
-                      </p>
-                      <p className="text-xs text-muted-foreground">{t.documentCompliance}</p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/50 text-center">
-                      <p className="text-xl font-semibold" data-testid="text-sessions-count">
-                        {performanceData.summary.totalSessions}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{t.sessionsAnalyzed}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <Shield className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
-                  <p className="font-medium text-muted-foreground">{t.noPerformanceData}</p>
-                  <p className="text-sm text-muted-foreground">{t.noPerformanceDataDesc}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Current Employer Section - Show for linked technicians (not terminated) (WORK TAB) */}
-        {activeTab === 'work' && user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
-          <Card className="border-muted">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-muted">
-                    <Building className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">{t.currentEmployer}</CardTitle>
-                    <CardDescription>
-                      {t.currentlyEmployedBy} <span className="font-medium text-foreground">{user.companyName || "your company"}</span>
-                    </CardDescription>
-                  </div>
-                </div>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className="gap-2 text-destructive border-destructive/30"
-                      data-testid="button-leave-company"
-                    >
-                      <UserMinus className="w-4 h-4" />
-                      {t.leaveCompany}
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{t.leaveCompanyConfirm}</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {t.leaveCompanyWarning}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel data-testid="button-cancel-leave">{t.cancelLeave}</AlertDialogCancel>
-                      <AlertDialogAction 
-                        onClick={() => leaveCompanyMutation.mutate()}
-                        disabled={leaveCompanyMutation.isPending}
-                        className="bg-destructive text-destructive-foreground gap-2"
-                        data-testid="button-confirm-leave"
-                      >
-                        {leaveCompanyMutation.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            {t.leavingCompany}
-                          </>
-                        ) : (
-                          t.confirmLeave
-                        )}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </CardHeader>
-            {/* Compensation Display */}
-            {(user.hourlyRate || user.salary) && (
-              <CardContent className="pt-0">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <div className="p-2 rounded-full bg-green-500/10">
-                    <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">{t.yourCompensation}</p>
-                    <p className="text-lg font-semibold">
-                      {user.isSalary && user.salary ? (
-                        <>
-                          ${Number(user.salary).toLocaleString()}<span className="text-sm font-normal text-muted-foreground">/{t.year}</span>
-                        </>
-                      ) : user.hourlyRate ? (
-                        <>
-                          ${Number(user.hourlyRate).toFixed(2)}<span className="text-sm font-normal text-muted-foreground">/{t.hour}</span>
-                        </>
-                      ) : null}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            )}
           </Card>
         )}
 
@@ -3584,7 +3708,7 @@ export default function TechnicianPortal() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <h3 className="font-semibold text-sm">
+                        <h3 className="font-semibold text-base">
                           {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
                         </h3>
                         <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
@@ -3595,7 +3719,7 @@ export default function TechnicianPortal() {
                           style={{ width: `${profileCompletion.percentage}%` }}
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground mb-2">
+                      <p className="text-sm text-muted-foreground mb-2">
                         {language === 'en' 
                           ? 'Complete your profile to connect with employers instantly' 
                           : language === 'es'
@@ -3638,7 +3762,7 @@ export default function TechnicianPortal() {
                       >
                         {t.yourReferralCode}
                       </button>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{language === 'en' ? 'Share with friends to earn rewards' : language === 'es' ? 'Comparte con amigos para ganar recompensas' : 'Partagez avec vos amis pour gagner des récompenses'}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{language === 'en' ? 'Share with another tech and instantly get upgraded to PLUS' : language === 'es' ? 'Comparte con otro técnico y actualízate a PLUS al instante' : 'Partagez avec un autre technicien et obtenez un accès PLUS instantané'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -3775,6 +3899,29 @@ export default function TechnicianPortal() {
                               <Input {...field} type="tel" data-testid="input-phone" />
                             </FormControl>
                             <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="smsNotificationsEnabled"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-sm font-medium">
+                                {t.smsNotifications}
+                              </FormLabel>
+                              <p className="text-sm text-muted-foreground">
+                                {t.smsNotificationsDescription}
+                              </p>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value ?? false}
+                                onCheckedChange={field.onChange}
+                                data-testid="switch-sms-notifications"
+                              />
+                            </FormControl>
                           </FormItem>
                         )}
                       />
@@ -4126,7 +4273,7 @@ export default function TechnicianPortal() {
                     <MapPin className="w-4 h-4" />
                     {t.address}
                   </h3>
-                  <p className="text-sm">
+                  <p className="text-base">
                     {user.employeeStreetAddress && (
                       <>
                         {user.employeeStreetAddress}<br />
@@ -4328,7 +4475,7 @@ export default function TechnicianPortal() {
                               </p>
                             </>
                           ) : (
-                            <p className="text-sm text-muted-foreground italic">{t.addExperience}</p>
+                            <p className="text-base text-muted-foreground italic">{t.addExperience}</p>
                           )}
                         </div>
                       </div>
@@ -4784,7 +4931,7 @@ export default function TechnicianPortal() {
                         </div>
                         <div className="space-y-1">
                           <p className="font-semibold text-base">{t.myLoggedHours}</p>
-                          <p className="text-sm text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                          <p className="text-base text-muted-foreground">{t.viewLoggedHoursDesc}</p>
                           <p className="text-xs text-primary/80 font-medium">{t.loggedHoursFeatures}</p>
                           {(combinedTotalHours > 0 || workSessionHours > 0) && (
                             <div className="pt-2">
@@ -5290,7 +5437,7 @@ export default function TechnicianPortal() {
                           );
                         })}
                         {(form.watch("ropeAccessSpecialties") || []).length === 0 && (
-                          <p className="text-sm text-muted-foreground italic">{t.noSpecialties}</p>
+                          <p className="text-base text-muted-foreground italic">{t.noSpecialties}</p>
                         )}
                       </div>
                       
@@ -5365,7 +5512,7 @@ export default function TechnicianPortal() {
                           );
                         })
                       ) : (
-                        <p className="text-sm text-muted-foreground italic">{t.noSpecialties}</p>
+                        <p className="text-base text-muted-foreground italic">{t.noSpecialties}</p>
                       )}
                     </div>
                   )}
@@ -5468,7 +5615,7 @@ export default function TechnicianPortal() {
                   ) : (
                     <div className="p-4 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 text-center">
                       <Lock className="w-6 h-6 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">{t.plusLockedFeature}</p>
+                      <p className="text-base text-muted-foreground">{t.plusLockedFeature}</p>
                       <p className="text-xs text-muted-foreground mt-1">{t.plusLockedDesc}</p>
                     </div>
                   )}
@@ -5533,6 +5680,34 @@ export default function TechnicianPortal() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Leave Company Confirmation Dialog */}
+      <AlertDialog open={showLeaveConfirm} onOpenChange={setShowLeaveConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.leaveCompanyConfirm}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t.leaveCompanyWarning}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-leave-company">
+              {t.cancel}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                leaveCompanyMutation.mutate();
+                setShowLeaveConfirm(false);
+              }}
+              className="bg-destructive text-destructive-foreground"
+              disabled={leaveCompanyMutation.isPending}
+              data-testid="button-confirm-leave-company"
+            >
+              {leaveCompanyMutation.isPending ? t.loading : t.confirmLeave}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Mobile Bottom Navigation - hidden on desktop */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom lg:hidden">
         <div className="w-full px-4 md:px-6 flex items-center justify-around py-2">
@@ -5561,28 +5736,28 @@ export default function TechnicianPortal() {
             <span className="text-[10px] font-medium">{t.tabProfile}</span>
           </button>
           <button
-            onClick={() => setActiveTab('employer')}
+            onClick={() => setActiveTab('visibility')}
             className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'employer' 
+              activeTab === 'visibility' 
                 ? 'text-primary bg-primary/10' 
                 : 'text-muted-foreground'
             }`}
-            data-testid="tab-employer"
+            data-testid="tab-visibility"
           >
             <Eye className="w-5 h-5" />
-            <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Employer' : 'Employeur'}</span>
+            <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Visibility' : language === 'es' ? 'Visibilidad' : 'Visibilité'}</span>
           </button>
           <button
-            onClick={() => setActiveTab('work')}
+            onClick={() => setActiveTab('invitations')}
             className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'work' 
+              activeTab === 'invitations' 
                 ? 'text-primary bg-primary/10' 
                 : 'text-muted-foreground'
             }`}
-            data-testid="tab-work"
+            data-testid="tab-invitations"
           >
-            <Briefcase className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{t.tabWork}</span>
+            <Mail className="w-5 h-5" />
+            <span className="text-[10px] font-medium">{language === 'en' ? 'Invites' : language === 'es' ? 'Invitaciones' : 'Invitations'}</span>
             {pendingInvitations.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                 {pendingInvitations.length}
@@ -5841,8 +6016,8 @@ export default function TechnicianPortal() {
                             </Badge>
                           )}
                           {isSuspended && (
-                            <Badge variant="destructive" className="text-xs">
-                              {t.suspended || "Suspended"}
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs">
+                              {t.inactive || "Inactive"}
                             </Badge>
                           )}
                         </div>
@@ -6266,19 +6441,19 @@ function InfoItem({
   if (!value) {
     return (
       <div className="space-y-1">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm text-muted-foreground/50 italic">Not provided</p>
+        <p className="text-sm text-muted-foreground flex items-center gap-1">{icon}{label}</p>
+        <p className="text-base text-muted-foreground/50 italic">Not provided</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-1">
-      <p className="text-xs text-muted-foreground flex items-center gap-1">
+      <p className="text-sm text-muted-foreground flex items-center gap-1">
         {icon}
         {label}
       </p>
-      <p className="text-sm">{value}</p>
+      <p className="text-base">{value}</p>
     </div>
   );
 }

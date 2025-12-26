@@ -150,7 +150,7 @@ export default function SuperUserTechnicians() {
     },
   });
 
-  const { data: technicianDetailData, isLoading: isLoadingDetail } = useQuery<TechnicianDetailResponse>({
+  const { data: technicianDetailData, isLoading: isLoadingDetail, error: detailError } = useQuery<TechnicianDetailResponse>({
     queryKey: ["/api/superuser/technicians", "detail", selectedTechnician],
     queryFn: async () => {
       const res = await fetch(`/api/superuser/technicians/${selectedTechnician}`, { credentials: "include" });
@@ -453,6 +453,12 @@ export default function SuperUserTechnicians() {
             {isLoadingDetail ? (
               <div className="flex items-center justify-center py-12">
                 <span className="material-icons animate-spin text-4xl text-muted-foreground">sync</span>
+              </div>
+            ) : detailError ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <span className="material-icons text-4xl text-destructive mb-4">error</span>
+                <p className="text-destructive font-medium">Failed to load technician details</p>
+                <p className="text-sm text-muted-foreground mt-2">{(detailError as Error).message}</p>
               </div>
             ) : technicianDetailData?.technician ? (
               <ScrollArea className="max-h-[70vh]">

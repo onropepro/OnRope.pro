@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts, founderResources, insertFounderResourceSchema, databaseCosts, insertDatabaseCostSchema } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -25,6 +25,7 @@ import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
 import { sendQuoteNotificationSMS } from "./services/twilio";
+import { sendTeamInvitationSMS, sendInvitationAcceptedSMS } from "./services/twilioService";
 import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
@@ -164,6 +165,18 @@ function canViewCSR(user: any): boolean {
   // All other roles need explicit permission
   const permissions = normalizePermissions(user.permissions);
   return permissions.includes('view_csr');
+}
+
+// Helper function to check if user can manage clients
+function canManageClients(user: any): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // All other roles need explicit permission
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('manage_clients');
 }
 
 // Helper function to get CSR rating label and color based on percentage
@@ -811,7 +824,39 @@ async function generateReferralCode(): Promise<string> {
   throw new Error('Failed to generate unique referral code after maximum attempts');
 }
 
+// Generate unique 10-character PM code for property managers using cryptographically secure randomness
+async function generatePmCode(): Promise<string> {
+  const crypto = await import('crypto');
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
+  const codeLength = 10;
+  const maxAttempts = 10;
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const randomBytes = crypto.randomBytes(codeLength);
+    let code = '';
+    
+    for (let i = 0; i < codeLength; i++) {
+      const randomIndex = randomBytes[i] % characters.length;
+      code += characters.charAt(randomIndex);
+    }
+    
+    // Check if code already exists
+    const [existing] = await db.select().from(users).where(eq(users.pmCode, code)).limit(1);
+    if (!existing) {
+      return code;
+    }
+  }
+  
+  throw new Error('Failed to generate unique PM code after maximum attempts');
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Helper function to check if user is superuser or staff with specific permission
+  const isSuperuserOrHasPermission = (req: Request, permission: string): boolean => {
+    if (req.session.userId === 'superuser') return true;
+    if (req.session.role === 'staff' && req.session.staffPermissions?.includes(permission)) return true;
+    return false;
+  };
   // ==================== HELP CENTER ROUTES ====================
   app.use('/api/help', helpRouter);
   
@@ -1601,6 +1646,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Ground crew self-registration endpoint - SECURITY: Rate limited to prevent abuse
+  app.post("/api/ground-crew-register", registrationRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        streetAddress,
+        city,
+        provinceState,
+        country,
+        postalCode,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        employerCode,
+      } = req.body;
+
+      // Validate required fields
+      if (!firstName || !lastName || !email || !password || !phone || !emergencyContactName || !emergencyContactPhone) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      console.log(`[Ground-Crew-Register] Starting registration for ${email}`);
+
+      // Case-insensitive email check for existing user
+      const normalizedEmail = email.toLowerCase();
+      const existingUser = await storage.getUserByEmail(email);
+      
+      if (existingUser) {
+        console.log(`[Ground-Crew-Register] Email already exists: ${email}`);
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      // If employer code is provided, validate it
+      let invitingEmployer = null;
+      if (employerCode) {
+        // Look up the employer by their company's property manager code (used for invitations)
+        const companyResults = await db.select().from(users).where(
+          and(
+            eq(users.role, 'company'),
+            sql`LOWER(${users.propertyManagerCode}) = ${employerCode.toLowerCase()}`
+          )
+        ).limit(1);
+        
+        if (companyResults.length === 0) {
+          console.log(`[Ground-Crew-Register] Invalid employer code: ${employerCode}`);
+          return res.status(400).json({ message: "Invalid employer code" });
+        }
+        invitingEmployer = companyResults[0];
+        console.log(`[Ground-Crew-Register] Valid employer code found for company: ${invitingEmployer.companyName}`);
+      }
+
+      // Create the ground crew user (pending company approval)
+      const user = await storage.createUser({
+        name: `${firstName} ${lastName}`,
+        email,
+        role: 'ground_crew',
+        passwordHash: password, // storage.createUser will hash this
+        companyId: invitingEmployer ? invitingEmployer.id : null,
+        
+        // Address fields
+        employeeStreetAddress: streetAddress || null,
+        employeeCity: city || null,
+        employeeProvinceState: provinceState || null,
+        employeeCountry: country || null,
+        employeePostalCode: postalCode || null,
+        
+        // Contact info
+        employeePhoneNumber: phone,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship: emergencyContactRelationship || null,
+        
+        // Start date - use timezone-safe utility
+        startDate: getTodayString(),
+      });
+
+      console.log('[Ground-Crew-Register] User created:', user.id);
+
+      // Create session and auto-login the ground crew member
+      req.session.userId = user.id;
+      req.session.role = user.role;
+      
+      console.log(`[Ground-Crew-Register] Session created for ground crew: ${user.id}, email: ${user.email}`);
+      
+      // Save session before responding
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            console.error(`[Ground-Crew-Register] Session save error:`, err);
+            reject(err);
+          } else {
+            console.log(`[Ground-Crew-Register] Session saved successfully for ${user.email}`);
+            resolve();
+          }
+        });
+      });
+
+      // Return success with user data
+      const { passwordHash, ...userWithoutPassword } = user;
+      res.json({ 
+        success: true,
+        message: "Registration completed successfully.",
+        user: userWithoutPassword,
+      });
+    } catch (error: any) {
+      console.error('[Ground-Crew-Register] Error:', error);
+      res.status(500).json({ message: error.message || "Registration failed" });
+    }
+  });
+
   // Login endpoint - SECURITY: Rate limited to prevent brute force attacks
   app.post("/api/login", loginRateLimiter, async (req: Request, res: Response) => {
     try {
@@ -1642,6 +1801,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // STAFF ACCOUNT CHECK - Check if this is a staff account login
+      const staffAccount = await storage.verifyStaffAccountPassword(identifier, password);
+      if (staffAccount) {
+        // Create staff session
+        req.session.userId = staffAccount.id;
+        req.session.role = 'staff';
+        req.session.staffPermissions = staffAccount.permissions as string[];
+        
+        await new Promise<void>((resolve, reject) => {
+          req.session.save((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+        
+        // Return staff account payload
+        return res.json({
+          user: {
+            id: staffAccount.id,
+            name: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            email: staffAccount.email,
+            role: 'staff',
+            permissions: staffAccount.permissions,
+          }
+        });
+      }
+      
       // Try to find user by email, company name, or rope access license number
       let user = await storage.getUserByEmail(identifier);
       
@@ -1665,20 +1851,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      // Check if user has been terminated (only applies to non-technicians)
+      // Check if user has been terminated (only applies to non-technicians and non-ground-crew)
       // Technicians can still access their portal even if terminated from a company
       // Self-resigned users (technicians who voluntarily left) are ALWAYS allowed to log in
-      const isTechnician = user.role === 'rope_access_tech' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      const isLinkableEmployee = user.role === 'rope_access_tech' || user.role === 'ground_crew' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
       const isSelfResigned = user.terminationReason === "Self-resigned";
       
-      if (user.terminatedDate && !isTechnician && !isSelfResigned) {
+      if (user.terminatedDate && !isLinkableEmployee && !isSelfResigned) {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
       // Check if user's seat has been suspended (company removed their seat)
       // Technicians can still access their portal even when suspended from a company
       // They just lose access to that specific company's dashboard
-      if (user.suspendedAt && !isTechnician) {
+      if (user.suspendedAt && !isLinkableEmployee) {
         return res.status(403).json({ message: "Your account access has been suspended. Please contact your employer for more information." });
       }
       
@@ -3786,6 +3972,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================================================================
 
   // =====================================================================
+  // SIDEBAR PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // Get user's sidebar preferences for a specific dashboard variant
+  app.get("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant } = req.query;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant query parameter is required" });
+      }
+
+      const validVariants = ['employer', 'technician', 'property-manager', 'resident', 'building-manager', 'ground-crew'];
+      if (!validVariants.includes(variant)) {
+        return res.status(400).json({ message: `Invalid variant. Must be one of: ${validVariants.join(', ')}` });
+      }
+
+      const prefs = await db.select()
+        .from(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ))
+        .orderBy(asc(sidebarPreferences.groupId), asc(sidebarPreferences.position));
+
+      // Group by groupId for easier frontend consumption
+      const grouped: Record<string, { itemId: string; position: number }[]> = {};
+      for (const pref of prefs) {
+        if (!grouped[pref.groupId]) {
+          grouped[pref.groupId] = [];
+        }
+        grouped[pref.groupId].push({
+          itemId: pref.itemId,
+          position: pref.position,
+        });
+      }
+
+      res.json({ 
+        preferences: grouped,
+        variant,
+        isDefault: prefs.length === 0,
+      });
+    } catch (error: any) {
+      console.error('[Sidebar] Get preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to get sidebar preferences" });
+    }
+  });
+
+  // Save user's sidebar preferences for a specific dashboard variant
+  app.put("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant, groups } = req.body;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant is required" });
+      }
+
+      const validVariants = ['employer', 'technician', 'property-manager', 'resident', 'building-manager', 'ground-crew'];
+      if (!validVariants.includes(variant)) {
+        return res.status(400).json({ message: `Invalid variant. Must be one of: ${validVariants.join(', ')}` });
+      }
+
+      if (!groups || typeof groups !== 'object') {
+        return res.status(400).json({ message: "groups must be an object with groupId keys" });
+      }
+
+      // Validate structure: groups is Record<string, { itemId: string; position: number }[]>
+      const inserts: { userId: string; dashboardVariant: string; groupId: string; itemId: string; position: number }[] = [];
+      for (const [groupId, items] of Object.entries(groups)) {
+        if (!Array.isArray(items)) {
+          return res.status(400).json({ message: `Group ${groupId} must contain an array of items` });
+        }
+        for (const item of items as any[]) {
+          if (!item.itemId || typeof item.position !== 'number') {
+            return res.status(400).json({ message: `Each item must have itemId and position` });
+          }
+          inserts.push({
+            userId,
+            dashboardVariant: variant,
+            groupId,
+            itemId: item.itemId,
+            position: item.position,
+          });
+        }
+      }
+
+      // Delete existing preferences for this variant
+      await db.delete(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ));
+
+      // Insert new preferences
+      if (inserts.length > 0) {
+        await db.insert(sidebarPreferences).values(inserts);
+      }
+
+      res.json({ success: true, variant, groupCount: Object.keys(groups).length });
+    } catch (error: any) {
+      console.error('[Sidebar] Save preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to save sidebar preferences" });
+    }
+  });
+
+  // Reset sidebar preferences to default for a specific variant
+  app.delete("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant } = req.query;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant query parameter is required" });
+      }
+
+      await db.delete(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ));
+
+      res.json({ success: true, message: "Sidebar preferences reset to default" });
+    } catch (error: any) {
+      console.error('[Sidebar] Reset preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to reset sidebar preferences" });
+    }
+  });
+
+  // =====================================================================
+  // END SIDEBAR PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // =====================================================================
   // DASHBOARD CARD DATA ENDPOINTS
   // =====================================================================
 
@@ -4020,7 +4341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      res.json({ days });
+      res.json({ days, uniqueJobCount: activeProjects.length });
     } catch (error: any) {
       console.error('[Dashboard] Get week summary error:', error);
       res.status(500).json({ message: error.message || "Failed to get week summary" });
@@ -4691,6 +5012,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Handle Staff account session
+      if (req.session.role === 'staff') {
+        const staffAccount = await storage.getStaffAccountById(req.session.userId!);
+        if (!staffAccount || !staffAccount.isActive) {
+          return res.status(401).json({ message: "Staff account not found or disabled" });
+        }
+        
+        return res.json({
+          user: {
+            id: staffAccount.id,
+            name: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            fullName: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            email: staffAccount.email,
+            role: 'staff',
+            permissions: staffAccount.permissions,
+          }
+        });
+      }
+      
       let user = await storage.getUserById(req.session.userId!);
       
       if (!user) {
@@ -4767,6 +5107,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateUser(user.id, updates);
           // Refetch user to get the updated codes
           user = await storage.getUserById(user.id) || user;
+        }
+      }
+      
+      // Auto-generate PM code if property manager doesn't have one
+      if (user.role === 'property_manager' && !user.pmCode) {
+        try {
+          console.log('[/api/user] Property manager missing PM code, generating...');
+          const pmCode = await generatePmCode();
+          await storage.updateUser(user.id, { pmCode });
+          user = await storage.getUserById(user.id) || user;
+          console.log(`[/api/user] PM code generated: ${pmCode}`);
+        } catch (error) {
+          console.error('[/api/user] Failed to generate PM code:', error);
         }
       }
       
@@ -4868,6 +5221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         email,
         employeePhoneNumber,
+        smsNotificationsEnabled,
         employeeStreetAddress,
         employeeCity,
         employeeProvinceState,
@@ -4918,11 +5272,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         email,
         employeePhoneNumber,
+        smsNotificationsEnabled,
         emergencyContactName,
         emergencyContactPhone,
       };
 
       // Add optional address fields only if provided
+      if (smsNotificationsEnabled !== undefined) updateData.smsNotificationsEnabled = smsNotificationsEnabled ?? false;
       if (employeeStreetAddress !== undefined) updateData.employeeStreetAddress = employeeStreetAddress || null;
       if (employeeCity !== undefined) updateData.employeeCity = employeeCity || null;
       if (employeeProvinceState !== undefined) updateData.employeeProvinceState = employeeProvinceState || null;
@@ -5102,9 +5458,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Only technicians can use this endpoint
-      if (user.role !== 'rope_access_tech') {
-        return res.status(403).json({ message: "Only technicians can leave a company" });
+      // Technicians and ground crew can use this endpoint
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians and ground crew can leave a company" });
       }
 
       // Must be linked to a company to leave
@@ -5176,6 +5532,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Redeem a referral code after registration
+  // Allows technicians who missed entering a code during signup to help their referrer earn PLUS
+  app.post("/api/user/redeem-referral-code", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians can redeem referral codes
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can redeem referral codes" });
+      }
+
+      // Check if user has already used a referral code
+      if (user.referredByUserId || user.referredByCode) {
+        return res.status(400).json({ message: "You have already redeemed a referral code" });
+      }
+
+      const { referralCode } = req.body;
+      if (!referralCode || !referralCode.trim()) {
+        return res.status(400).json({ message: "Referral code is required" });
+      }
+
+      const normalizedCode = referralCode.trim().toUpperCase();
+
+      // Validate the referral code exists and belongs to a technician
+      const referrer = await storage.getUserByReferralCode(normalizedCode);
+      if (!referrer) {
+        return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+      }
+
+      // Verify the referrer is an active technician
+      if (referrer.role !== 'rope_access_tech') {
+        return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+      }
+
+      // Can't use your own referral code
+      if (referrer.id === userId) {
+        return res.status(400).json({ message: "You cannot use your own referral code" });
+      }
+
+      // Update the user with the referral information
+      await storage.updateUser(userId, {
+        referredByUserId: referrer.id,
+        referredByCode: normalizedCode,
+      });
+
+      console.log(`[Referral] User ${userId} redeemed referral code ${normalizedCode} from ${referrer.id}`);
+
+      res.json({ 
+        success: true,
+        message: `Referral code redeemed successfully! ${referrer.name || 'The referrer'} will now have PLUS access.`,
+        referrerName: referrer.name
+      });
+    } catch (error: any) {
+      console.error("[Referral] Error redeeming referral code:", error);
+      res.status(500).json({ message: error.message || "Failed to redeem referral code" });
+    }
+  });
+
   // Multer config for technician document uploads (images or PDFs)
   const technicianDocumentUpload = multer({
     storage: multer.memoryStorage(),
@@ -5199,7 +5621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can upload documents through this endpoint" });
       }
 
@@ -5273,7 +5695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can delete documents through this endpoint" });
       }
 
@@ -5324,6 +5746,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("[Technician] Error deleting document:", error);
+      res.status(500).json({ message: error.message || "Failed to delete document" });
+    }
+  });
+
+  // Ground Crew: Upload documents (void cheque, driver's license, first aid)
+  app.post("/api/ground-crew/upload-document", requireAuth, technicianDocumentUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'ground_crew' && user.role !== 'ground_crew_supervisor') {
+        return res.status(403).json({ message: "Only ground crew members can upload documents through this endpoint" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { documentType } = req.body;
+      if (!documentType) {
+        return res.status(400).json({ message: "Document type is required" });
+      }
+
+      const validTypes = ['voidCheque', 'driversLicense', 'firstAidCertificate'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Upload file to object storage
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
+      const filename = `ground-crew-${userId}-${documentType}-${timestamp}.${extension}`;
+      
+      const url = await objectStorageService.uploadPublicFile(filename, req.file.buffer, req.file.mimetype);
+      
+      console.log(`[GroundCrew] Uploaded ${documentType} for user ${userId}:`, url);
+
+      // Update the user's document arrays based on document type
+      let updateData: any = {};
+      
+      if (documentType === 'voidCheque') {
+        const existingDocs = user.bankDocuments || [];
+        updateData.bankDocuments = [...existingDocs, url];
+      } else if (documentType === 'driversLicense') {
+        const existingDocs = user.driversLicenseDocuments || [];
+        updateData.driversLicenseDocuments = [...existingDocs, url];
+      } else if (documentType === 'firstAidCertificate') {
+        const existingDocs = user.firstAidDocuments || [];
+        updateData.firstAidDocuments = [...existingDocs, url];
+      }
+
+      await storage.updateUser(userId, updateData);
+
+      res.json({ 
+        message: "Document uploaded successfully",
+        url,
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[GroundCrew] Error uploading document:", error);
+      res.status(500).json({ message: error.message || "Failed to upload document" });
+    }
+  });
+
+  // Ground Crew: Delete uploaded document
+  app.delete("/api/ground-crew/document", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'ground_crew' && user.role !== 'ground_crew_supervisor') {
+        return res.status(403).json({ message: "Only ground crew members can delete documents through this endpoint" });
+      }
+
+      const { documentType, documentUrl } = req.body;
+      if (!documentType || !documentUrl) {
+        return res.status(400).json({ message: "Document type and URL are required" });
+      }
+
+      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Get the current document array and remove the URL
+      let currentDocs: string[] = [];
+      
+      if (documentType === 'bankDocuments') {
+        currentDocs = user.bankDocuments || [];
+      } else if (documentType === 'driversLicenseDocuments') {
+        currentDocs = user.driversLicenseDocuments || [];
+      } else if (documentType === 'firstAidDocuments') {
+        currentDocs = user.firstAidDocuments || [];
+      }
+
+      // Check if the document exists
+      if (!currentDocs.includes(documentUrl)) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      // Remove the document URL from the array
+      const updatedDocs = currentDocs.filter(url => url !== documentUrl);
+      const updateData: any = {};
+      updateData[documentType] = updatedDocs;
+
+      await storage.updateUser(userId, updateData);
+
+      console.log(`[GroundCrew] Deleted ${documentType} document for user ${userId}`);
+
+      res.json({ 
+        message: "Document deleted successfully",
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[GroundCrew] Error deleting document:", error);
       res.status(500).json({ message: error.message || "Failed to delete document" });
     }
   });
@@ -5635,7 +6181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const { name, email, propertyManagerPhoneNumber, propertyManagerSmsOptIn, currentPassword, newPassword } = validationResult.data;
+      const { name, email, propertyManagerPhoneNumber, propertyManagerSmsOptIn, propertyManagementCompany, currentPassword, newPassword } = validationResult.data;
       
       // Get current property manager data
       const currentUser = await storage.getUserById(propertyManagerId);
@@ -5679,11 +6225,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .where(eq(users.id, propertyManagerId));
       }
       
+      // Update property management company if provided
+      if (propertyManagementCompany !== undefined) {
+        await db.update(users)
+          .set({ propertyManagementCompany: propertyManagementCompany || null })
+          .where(eq(users.id, propertyManagerId));
+      }
+      
       // Update SMS opt-in if provided
       if (propertyManagerSmsOptIn !== undefined) {
         await db.update(users)
           .set({ propertyManagerSmsOptIn })
           .where(eq(users.id, propertyManagerId));
+      }
+      
+      // Sync property manager profile changes to linked client records
+      // This ensures companies see up-to-date PM information
+      try {
+        const pmLinks = await db.select()
+          .from(propertyManagerCompanyLinks)
+          .where(eq(propertyManagerCompanyLinks.propertyManagerId, propertyManagerId));
+        
+        if (pmLinks.length > 0) {
+          // Get updated PM data
+          const updatedPM = await storage.getUserById(propertyManagerId);
+          if (updatedPM) {
+            // Parse name into firstName and lastName
+            const nameParts = (updatedPM.name || '').trim().split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            
+            // Update client records in each linked company
+            // Match by strata number (building) since email may be empty
+            for (const link of pmLinks) {
+              if (!link.companyId) continue;
+              
+              // Find clients in this company that have this strata number in their lmsNumbers
+              // or match by email if available
+              const strataNumber = link.strataNumber;
+              
+              // Get all clients in this company
+              const companyClients = await db.select()
+                .from(clients)
+                .where(eq(clients.companyId, link.companyId));
+              
+              // Find clients that match by email OR by strata number in lmsNumbers
+              for (const client of companyClients) {
+                const matchesByEmail = client.email && client.email.toLowerCase() === updatedPM.email?.toLowerCase();
+                const lmsNumbers = client.lmsNumbers as Array<{ number: string }> | null;
+                const matchesByStrata = strataNumber && lmsNumbers?.some(
+                  (lms) => lms.number?.toUpperCase() === strataNumber.toUpperCase()
+                );
+                
+                if (matchesByEmail || matchesByStrata) {
+                  // Build update object with only non-empty values
+                  const updateData: Record<string, any> = { updatedAt: new Date() };
+                  if (firstName) updateData.firstName = firstName;
+                  if (lastName) updateData.lastName = lastName;
+                  if (updatedPM.propertyManagementCompany) updateData.company = updatedPM.propertyManagementCompany;
+                  if (updatedPM.propertyManagerPhoneNumber) updateData.phoneNumber = updatedPM.propertyManagerPhoneNumber;
+                  // Also sync email to ensure future syncs work by email
+                  if (updatedPM.email && !client.email) updateData.email = updatedPM.email;
+                  
+                  await db.update(clients)
+                    .set(updateData)
+                    .where(eq(clients.id, client.id));
+                  
+                  console.log(`[PM Sync] Updated client ${client.id} (${client.firstName} ${client.lastName}) with PM data`);
+                }
+              }
+            }
+            console.log(`[PM Sync] Completed sync for PM ${updatedPM.email} across ${pmLinks.length} linked companies`);
+          }
+        }
+      } catch (syncError) {
+        // Non-blocking - log but don't fail the request
+        console.error("[PM Sync] Error syncing PM profile to client records:", syncError);
       }
       
       res.json({ message: "Account settings updated successfully" });
@@ -5748,6 +6365,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verify this property manager is the recipient of the quote
       if (quote.recipientPropertyManagerId !== propertyManagerId) {
         return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Track first view: update viewedAt, collaborationStatus, and pipelineStage
+      if (!quote.viewedAt) {
+        await storage.updateQuote(quoteId, {
+          viewedAt: new Date(),
+          collaborationStatus: 'viewed',
+          pipelineStage: 'review',
+          stageUpdatedAt: new Date()
+        } as any);
+        
+        console.log(`[Quote] Property manager ${propertyManagerId} viewed quote ${quote.quoteNumber} - moved to 'In Review'`);
+        
+        // Log the view event in quote history
+        await db.insert(quoteHistory).values({
+          quoteId: quote.id,
+          companyId: quote.companyId,
+          eventType: 'viewed',
+          actorUserId: propertyManagerId,
+          actorName: 'Property Manager',
+          notes: `Quote first viewed by property manager`,
+        });
       }
       
       // Get the company info for display
@@ -6027,6 +6666,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update quote collaboration status to negotiation
       await storage.updateQuoteCollaborationStatus(quoteId, 'negotiation');
       
+      // Update quote pipeline stage to negotiation so it appears in the pipeline
+      await storage.updateQuote(quoteId, { pipelineStage: 'negotiation' } as any);
+      
+      // Send real-time WebSocket notification to company
+      wsHub.notifyQuoteCounterOffer(quote.companyId, {
+        id: quote.id,
+        quoteNumber: quote.quoteNumber,
+        buildingName: quote.buildingName,
+        strataPlanNumber: quote.strataPlanNumber,
+        propertyManagerName: senderName,
+        counterOfferAmount: String(counterOfferAmount),
+      });
+      
+      console.log(`[Counter-Offer] PM ${senderName} submitted counter-offer of $${counterOfferAmount} for quote ${quote.quoteNumber}`);
+      
       res.json({ message, success: true });
     } catch (error) {
       console.error("Counter-offer error:", error);
@@ -6038,38 +6692,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/superuser/companies", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       // Fetch all users with company role
       const companies = await storage.getAllCompanies();
+      console.log(`[SuperUser] Found ${companies.length} companies`);
       
       // For each company, get the most recent activity from any user (owner + employees)
       const companiesWithActivity = await Promise.all(companies.map(async (company) => {
-        const { passwordHash, ...companyData } = company;
-        
-        // Query for the most recent activity across company owner and all employees
-        const activityResult = await db.select({
-          lastActivity: sql<Date>`MAX(last_activity_at)`
-        })
-        .from(users)
-        .where(
-          sql`${users.id} = ${company.id} OR ${users.companyId} = ${company.id}`
-        );
-        
-        const lastCompanyActivity = activityResult[0]?.lastActivity || company.lastActivityAt;
-        
-        return {
-          ...companyData,
-          lastCompanyActivity, // Most recent activity from any user in the company
-        };
+        try {
+          const { passwordHash, ...companyData } = company;
+          
+          // Query for the most recent activity across company owner and all employees
+          const activityResult = await db.select({
+            lastActivity: sql<Date>`MAX(last_activity_at)`
+          })
+          .from(users)
+          .where(
+            sql`${users.id} = ${company.id} OR ${users.companyId} = ${company.id}`
+          );
+          
+          const lastCompanyActivity = activityResult[0]?.lastActivity || company.lastActivityAt;
+          
+          return {
+            ...companyData,
+            lastCompanyActivity,
+          };
+        } catch (err) {
+          console.error(`[SuperUser] Error processing company ${company.id}:`, err);
+          const { passwordHash, ...companyData } = company;
+          return {
+            ...companyData,
+            lastCompanyActivity: company.lastActivityAt,
+          };
+        }
       }));
 
       res.json({ companies: companiesWithActivity });
     } catch (error) {
-      console.error("Get all companies error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("[SuperUser] Get all companies error:", error);
+      res.status(500).json({ message: "Internal server error", error: String(error) });
     }
   });
 
@@ -6077,8 +6741,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/superuser/companies/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const company = await storage.getUserById(req.params.id);
@@ -6099,8 +6763,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get company analytics for SuperUser
   app.get("/api/superuser/companies/:id/analytics", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.id;
@@ -6203,8 +6867,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/superuser/companies/:id/employees", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.id;
@@ -6251,8 +6915,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/superuser/gift-company", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { companyName, email, password, tier, licenseKey } = req.body;
@@ -6378,12 +7042,361 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== STAFF ACCOUNTS (Internal Platform Management) ====================
+  
+  // Helper to check if user is superuser or has specific staff permission
+  const requireSuperuserOrStaffPermission = (permission: string) => {
+    return async (req: Request, res: Response, next: Function) => {
+      if (req.session.userId === 'superuser') {
+        return next();
+      }
+      
+      if (req.session.role === 'staff') {
+        const permissions = req.session.staffPermissions || [];
+        if (permissions.includes(permission)) {
+          return next();
+        }
+      }
+      
+      return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+    };
+  };
+
+  // Inline helper to check superuser or staff permission (returns true if authorized)
+  // Get all staff accounts (superuser or staff with manage_staff_accounts permission)
+  app.get("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser or staff with manage_staff_accounts permission
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const accounts = await storage.getAllStaffAccounts();
+      
+      // Remove password hashes from response
+      const safeAccounts = accounts.map(({ passwordHash, ...rest }) => rest);
+      
+      res.json({ staffAccounts: safeAccounts });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Get all error:', error);
+      res.status(500).json({ message: error.message || "Failed to get staff accounts" });
+    }
+  });
+  
+  // Get single staff account
+  app.get("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const account = await storage.getStaffAccountById(req.params.id);
+      if (!account) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Get by ID error:', error);
+      res.status(500).json({ message: error.message || "Failed to get staff account" });
+    }
+  });
+  
+  // Create staff account
+  app.post("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const { firstName, lastName, email, password, permissions, isActive } = req.body;
+      
+      if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: "Missing required fields: firstName, lastName, email, password" });
+      }
+      
+      // Check if email already exists
+      const existing = await storage.getStaffAccountByEmail(email);
+      if (existing) {
+        return res.status(400).json({ message: "A staff account with this email already exists" });
+      }
+      
+      // Validate permissions
+      const validPermissions = [
+        'view_dashboard', 'view_companies', 'view_technicians', 'view_buildings',
+        'view_job_board', 'view_tasks', 'view_feature_requests', 'view_future_ideas',
+        'view_metrics', 'view_goals', 'view_changelog', 'view_founder_resources',
+        'manage_staff_accounts'
+      ];
+      
+      const requestedPermissions = permissions || [];
+      const invalidPermissions = requestedPermissions.filter((p: string) => !validPermissions.includes(p));
+      if (invalidPermissions.length > 0) {
+        return res.status(400).json({ message: `Invalid permissions: ${invalidPermissions.join(', ')}` });
+      }
+      
+      const account = await storage.createStaffAccount({
+        firstName,
+        lastName,
+        email,
+        passwordHash: password, // Will be hashed in storage
+        permissions: requestedPermissions,
+        isActive: isActive !== false,
+        createdBy: req.session.userId === 'superuser' ? 'superuser' : req.session.userId,
+      });
+      
+      console.log(`[Staff-Accounts] Created account for ${email} by ${req.session.userId}`);
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ success: true, message: "Staff account created", staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Create error:', error);
+      res.status(500).json({ message: error.message || "Failed to create staff account" });
+    }
+  });
+  
+  // Update staff account
+  app.patch("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const { firstName, lastName, email, password, permissions, isActive } = req.body;
+      const updates: any = {};
+      
+      if (firstName !== undefined) updates.firstName = firstName;
+      if (lastName !== undefined) updates.lastName = lastName;
+      if (email !== undefined) updates.email = email;
+      if (password !== undefined) updates.passwordHash = password; // Will be hashed in storage
+      if (permissions !== undefined) updates.permissions = permissions;
+      if (isActive !== undefined) updates.isActive = isActive;
+      
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: "No updates provided" });
+      }
+      
+      const account = await storage.updateStaffAccount(req.params.id, updates);
+      if (!account) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      console.log(`[Staff-Accounts] Updated account ${req.params.id} by ${req.session.userId}`);
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ success: true, message: "Staff account updated", staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Update error:', error);
+      res.status(500).json({ message: error.message || "Failed to update staff account" });
+    }
+  });
+  
+  // Delete staff account
+  app.delete("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      // Prevent deleting yourself
+      if (req.session.role === 'staff' && req.session.userId === req.params.id) {
+        return res.status(400).json({ message: "You cannot delete your own account" });
+      }
+      
+      const deleted = await storage.deleteStaffAccount(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      console.log(`[Staff-Accounts] Deleted account ${req.params.id} by ${req.session.userId}`);
+      
+      res.json({ success: true, message: "Staff account deleted" });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Delete error:', error);
+      res.status(500).json({ message: error.message || "Failed to delete staff account" });
+    }
+  });
+
+  // ============================================
+  // FOUNDER RESOURCES API
+  // ============================================
+
+  // Get all founder resources
+  app.get("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser or staff with view_founder_resources permission
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('view_founder_resources')) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+
+      const resources = await db.select().from(founderResources).orderBy(founderResources.sortOrder);
+      res.json({ resources });
+    } catch (error: any) {
+      console.error("Get founder resources error:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch founder resources" });
+    }
+  });
+
+  // Add a founder resource
+  app.post("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser can add resources
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const { name, url, description, icon, category } = req.body;
+
+      if (!name || !url) {
+        return res.status(400).json({ message: "Name and URL are required" });
+      }
+
+      // Get max sort order to add at the end
+      const maxOrder = await db.select({ max: sql<number>`COALESCE(MAX(sort_order), 0)` }).from(founderResources);
+      const newOrder = (maxOrder[0]?.max || 0) + 1;
+
+      const [resource] = await db.insert(founderResources).values({
+        name,
+        url,
+        description: description || null,
+        icon: icon || 'Link',
+        category: category || 'tools',
+        sortOrder: newOrder,
+        createdBy: 'superuser',
+      }).returning();
+
+      res.status(201).json({ resource });
+    } catch (error: any) {
+      console.error("Create founder resource error:", error);
+      res.status(500).json({ message: error.message || "Failed to create founder resource" });
+    }
+  });
+
+  // Delete a founder resource
+  app.delete("/api/founder-resources/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser can delete resources
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+
+  // Database Cost Tracking Endpoints
+  // Get all database costs with period summaries
+  app.get("/api/superuser/database-costs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const costs = await db.select().from(databaseCosts).orderBy(desc(databaseCosts.date));
+      
+      // Calculate period summaries
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+      const startOfDay = new Date(now);
+      startOfDay.setHours(0, 0, 0, 0);
+      
+      let allTime = 0, thisYear = 0, thisMonth = 0, thisWeek = 0, today = 0;
+      
+      costs.forEach(cost => {
+        const costDate = new Date(cost.date);
+        allTime += cost.amount;
+        if (costDate >= startOfYear) thisYear += cost.amount;
+        if (costDate >= startOfMonth) thisMonth += cost.amount;
+        if (costDate >= startOfWeek) thisWeek += cost.amount;
+        if (costDate >= startOfDay) today += cost.amount;
+      });
+      
+      res.json({
+        costs,
+        summary: {
+          allTime: Math.round(allTime * 100) / 100,
+          thisYear: Math.round(thisYear * 100) / 100,
+          thisMonth: Math.round(thisMonth * 100) / 100,
+          thisWeek: Math.round(thisWeek * 100) / 100,
+          today: Math.round(today * 100) / 100,
+        }
+      });
+    } catch (error) {
+      console.error("Get database costs error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Add a database cost entry
+  app.post("/api/superuser/database-costs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const parsed = insertDatabaseCostSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.errors });
+      }
+
+      const [newCost] = await db.insert(databaseCosts).values({
+        ...parsed.data,
+        createdBy: 'superuser',
+      }).returning();
+
+      res.status(201).json({ cost: newCost });
+    } catch (error) {
+      console.error("Add database cost error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete a database cost entry
+  app.delete("/api/superuser/database-costs/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const costId = req.params.id;
+      await db.delete(databaseCosts).where(eq(databaseCosts.id, costId));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete database cost error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+      }
+
+      const resourceId = req.params.id;
+      await db.delete(founderResources).where(eq(founderResources.id, resourceId));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Delete founder resource error:", error);
+      res.status(500).json({ message: error.message || "Failed to delete founder resource" });
+    }
+  });
+
+
   // SuperUser: Gift add-ons to an existing company
   app.post("/api/superuser/companies/:id/gift-addons", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.id;
@@ -6476,8 +7489,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/superuser/companies/:id/remove-legacy-seats", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -6559,8 +7572,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get MRR metrics summary
   app.get("/api/superuser/metrics/mrr", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const mrrMetrics = await storage.calculateLiveMrrMetrics();
@@ -6584,8 +7597,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get customer summary metrics
   app.get("/api/superuser/metrics/customers", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const customerMetrics = await storage.getCustomerSummaryMetrics();
@@ -6599,8 +7612,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get product usage metrics
   app.get("/api/superuser/metrics/usage", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const usageMetrics = await storage.getProductUsageMetrics();
@@ -6614,8 +7627,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get subscription breakdown by company
   app.get("/api/superuser/metrics/subscriptions", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const subscriptionBreakdown = await storage.getSubscriptionBreakdown();
@@ -6629,8 +7642,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get combined dashboard metrics summary
   app.get("/api/superuser/metrics/summary", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       // Fetch all metrics in parallel
@@ -6662,8 +7675,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all feature requests with messages
   app.get("/api/superuser/feature-requests", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const requestsWithMessages = await storage.getFeatureRequestsWithMessages();
@@ -6699,8 +7712,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update feature request status
   app.patch("/api/superuser/feature-requests/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const requestId = req.params.id;
@@ -6727,8 +7740,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Send message on feature request
   app.post("/api/superuser/feature-requests/:id/messages", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const requestId = req.params.id;
@@ -6764,8 +7777,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all future ideas
   app.get("/api/superuser/future-ideas", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const ideas = await db.select().from(futureIdeas).orderBy(desc(futureIdeas.createdAt));
@@ -6779,8 +7792,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Create a future idea
   app.post("/api/superuser/future-ideas", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const parsed = insertFutureIdeaSchema.safeParse(req.body);
@@ -6799,8 +7812,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update a future idea
   app.patch("/api/superuser/future-ideas/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const ideaId = req.params.id;
@@ -6832,8 +7845,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Delete a future idea
   app.delete("/api/superuser/future-ideas/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const ideaId = req.params.id;
@@ -6848,8 +7861,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: View company dashboard data (impersonation mode - read-only)
   app.get("/api/superuser/impersonate/:companyId/dashboard", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.companyId;
@@ -6911,8 +7924,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get company safety data (impersonation mode - read-only)
   app.get("/api/superuser/impersonate/:companyId/safety", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.companyId;
@@ -6954,8 +7967,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all buildings
   app.get("/api/superuser/buildings", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const allBuildings = await storage.getAllBuildings();
@@ -6973,8 +7986,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get single building with project history
   app.get("/api/superuser/buildings/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const building = await storage.getBuildingById(req.params.id);
@@ -7015,8 +8028,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update building details
   app.patch("/api/superuser/buildings/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const building = await storage.getBuildingById(req.params.id);
@@ -7045,8 +8058,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Reset building password
   app.post("/api/superuser/buildings/:id/reset-password", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const building = await storage.getBuildingById(req.params.id);
@@ -7068,8 +8081,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Geocode a building's address to get lat/lng
   app.post("/api/superuser/buildings/:id/geocode", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const building = await storage.getBuildingById(req.params.id);
@@ -7134,8 +8147,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Batch geocode all buildings without coordinates
   app.post("/api/superuser/buildings/geocode-all", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const allBuildings = await storage.getAllBuildings();
@@ -7458,8 +8471,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all technicians (SuperUser only)
   app.get("/api/superuser/technicians", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const page = parseInt(req.query.page as string) || 1;
@@ -7535,8 +8548,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single technician details (SuperUser only)
   app.get("/api/superuser/technicians/:technicianId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { technicianId } = req.params;
@@ -7580,6 +8593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Personal Info
         birthday: technician.birthday,
         employeePhoneNumber: technician.employeePhoneNumber,
+        smsNotificationsEnabled: technician.smsNotificationsEnabled,
         employeeStreetAddress: technician.employeeStreetAddress,
         employeeCity: technician.employeeCity,
         employeeProvinceState: technician.employeeProvinceState,
@@ -7643,8 +8657,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle PLUS access for a technician (SuperUser only)
   app.put("/api/superuser/technicians/:technicianId/plus-access", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { technicianId } = req.params;
@@ -7680,8 +8694,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Disable/Enable account (SuperUser only) - for fraud or misuse
   app.put("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { userId } = req.params;
@@ -7755,8 +8769,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get account suspension status (SuperUser only)
   app.get("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { userId } = req.params;
@@ -7787,8 +8801,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all SuperUser tasks with comments
   app.get("/api/superuser/tasks", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const tasks = await db.query.superuserTasks.findMany({
@@ -7825,8 +8839,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new SuperUser task
   app.post("/api/superuser/tasks", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { title, description, section, assignee, dueDate, priority, createdBy } = req.body;
@@ -7855,8 +8869,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update a SuperUser task (status, details)
   app.patch("/api/superuser/tasks/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -7926,8 +8940,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a SuperUser task
   app.delete("/api/superuser/tasks/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -7944,8 +8958,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add a comment to a SuperUser task
   app.post("/api/superuser/tasks/:id/comments", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -7971,8 +8985,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a comment
   app.delete("/api/superuser/tasks/:taskId/comments/:commentId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { commentId } = req.params;
@@ -8024,8 +9038,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get attachments for a task
   app.get("/api/superuser/tasks/:id/attachments", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -8044,8 +9058,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload attachment to a task
   app.post("/api/superuser/tasks/:id/attachments", requireAuth, taskAttachmentUpload.single('file'), async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -8102,8 +9116,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Download attachment
   app.get("/api/superuser/tasks/:taskId/attachments/:attachmentId/download", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { attachmentId } = req.params;
@@ -8141,8 +9155,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete attachment
   app.delete("/api/superuser/tasks/:taskId/attachments/:attachmentId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { attachmentId } = req.params;
@@ -8466,6 +9480,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         if (req.body.timezone !== undefined) {
           updates.timezone = req.body.timezone || "America/Vancouver";
+        }
+      }
+      
+      // Ground crew and rope access tech profile fields
+      if (user.role === "ground_crew" || user.role === "ground_crew_supervisor" || user.role === "rope_access_tech") {
+        // Map form fields to database columns
+        // Handle both field name variations from different frontend forms
+        if (req.body.employeePhoneNumber !== undefined) {
+          updates.employeePhoneNumber = req.body.employeePhoneNumber || null;
+        }
+        if (req.body.smsNotificationsEnabled !== undefined) {
+          updates.smsNotificationsEnabled = req.body.smsNotificationsEnabled ?? false;
+        }
+        if (req.body.phone !== undefined) {
+          updates.employeePhoneNumber = req.body.phone || null;
+        }
+        if (req.body.birthday !== undefined) {
+          updates.birthday = req.body.birthday || null;
+        }
+        if (req.body.address !== undefined) {
+          updates.employeeStreetAddress = req.body.address || null;
+        }
+        if (req.body.city !== undefined) {
+          updates.employeeCity = req.body.city || null;
+        }
+        if (req.body.provinceState !== undefined) {
+          updates.employeeProvinceState = req.body.provinceState || null;
+        }
+        if (req.body.country !== undefined) {
+          updates.employeeCountry = req.body.country || null;
+        }
+        if (req.body.postalCode !== undefined) {
+          updates.employeePostalCode = req.body.postalCode || null;
+        }
+        // Emergency contact fields
+        if (req.body.emergencyContactName !== undefined) {
+          updates.emergencyContactName = req.body.emergencyContactName || null;
+        }
+        if (req.body.emergencyContactPhone !== undefined) {
+          updates.emergencyContactPhone = req.body.emergencyContactPhone || null;
+        }
+        if (req.body.emergencyContactRelationship !== undefined) {
+          updates.emergencyContactRelationship = req.body.emergencyContactRelationship || null;
+        }
+        // Payroll and license fields
+        if (req.body.sin !== undefined) {
+          updates.sin = req.body.sin || null;
+        }
+        if (req.body.bankTransit !== undefined) {
+          updates.bankTransit = req.body.bankTransit || null;
+        }
+        if (req.body.bankInstitution !== undefined) {
+          updates.bankInstitution = req.body.bankInstitution || null;
+        }
+        if (req.body.bankAccount !== undefined) {
+          updates.bankAccount = req.body.bankAccount || null;
+        }
+        if (req.body.driversLicenseNumber !== undefined) {
+          updates.driversLicenseNumber = req.body.driversLicenseNumber || null;
+        }
+        if (req.body.driversLicenseIssuedDate !== undefined) {
+          updates.driversLicenseIssuedDate = req.body.driversLicenseIssuedDate || null;
+        }
+        if (req.body.driversLicenseExpiry !== undefined) {
+          updates.driversLicenseExpiry = req.body.driversLicenseExpiry || null;
+        }
+        // Medical and first aid fields
+        if (req.body.specialMedicalConditions !== undefined) {
+          updates.specialMedicalConditions = req.body.specialMedicalConditions || null;
+        }
+        if (req.body.firstAidType !== undefined) {
+          updates.firstAidType = req.body.firstAidType || null;
+        }
+        if (req.body.firstAidExpiry !== undefined) {
+          updates.firstAidExpiry = req.body.firstAidExpiry || null;
         }
       }
       
@@ -9101,17 +10190,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ found: false, message: "This technician is already connected to your company" });
       }
       
-      // If technician is linked to another company and doesn't have PLUS access
-      if (technician.companyId && !technician.hasPlusAccess) {
+      // Technicians are visible to employers if they have visibility toggle on
+      // OR if they have PLUS access (which allows multi-employer connections)
+      const isVisible = technician.isVisibleToEmployers || technician.hasPlusAccess;
+      
+      // If technician is linked to another company, doesn't have PLUS, AND hasn't enabled visibility
+      if (technician.companyId && !technician.hasPlusAccess && !technician.isVisibleToEmployers) {
         return res.json({ 
           found: false, 
-          message: "This technician is already linked to another company. They need Technician PLUS to connect with multiple employers." 
+          message: "This technician is not currently visible to employers. They need to enable their visibility toggle or have Technician PLUS." 
         });
       }
       
       // Return limited info for privacy (don't expose sensitive fields)
       const { passwordHash, socialInsuranceNumber, bankTransitNumber, bankInstitutionNumber, 
               bankAccountNumber, driversLicenseNumber, specialMedicalConditions, ...safeInfo } = technician;
+      
+      // Check if technician is linked to another employer AND has visibility on
+      // This means their current employer can see they're advertising to other companies
+      const hasEmployerVisibilityWarning = !!technician.companyId && technician.isVisibleToEmployers;
       
       res.json({ 
         found: true, 
@@ -9128,8 +10225,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           hasFirstAid: safeInfo.hasFirstAid,
           firstAidType: safeInfo.firstAidType,
           hasPlusAccess: safeInfo.hasPlusAccess,
-          isAlreadyLinked: !!technician.companyId, // Tell frontend if this is a PLUS multi-employer link
-        }
+          isAlreadyLinked: !!technician.companyId,
+          isVisibleToEmployers: technician.isVisibleToEmployers,
+        },
+        warning: hasEmployerVisibilityWarning 
+          ? "This technician is currently employed and has their employer visibility turned on. Their current employer may be aware they are visible to other companies."
+          : null
       });
     } catch (error) {
       console.error("Search technicians error:", error);
@@ -9162,26 +10263,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician
+      // Find the technician or ground crew member
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
+        return res.status(404).json({ message: "Team member not found" });
       }
       
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "This user is not a technician" });
+      const LINKABLE_ROLES = ['rope_access_tech', 'ground_crew'];
+      if (!LINKABLE_ROLES.includes(technician.role)) {
+        return res.status(400).json({ message: "This user cannot be linked to a company" });
       }
       
       // Check if already linked to THIS company
       if (technician.companyId === companyId) {
-        return res.status(400).json({ message: "This technician is already linked to your company" });
+        return res.status(400).json({ message: "This team member is already linked to your company" });
       }
       
       // Check existing employer connections
       const existingConnections = (technician.employerConnections || []) as any[];
       const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
       if (alreadyConnected) {
-        return res.status(400).json({ message: "This technician is already connected to your company" });
+        return res.status(400).json({ message: "This team member is already connected to your company" });
       }
       
       // Get company name for the connection
@@ -9267,26 +10369,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician
+      // Find the technician or ground crew member
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
+        return res.status(404).json({ message: "Team member not found" });
       }
       
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "This user is not a technician" });
+      const INVITABLE_ROLES = ['rope_access_tech', 'ground_crew'];
+      if (!INVITABLE_ROLES.includes(technician.role)) {
+        return res.status(400).json({ message: "This user cannot be invited to a company" });
       }
       
       // Check if already linked to THIS company
       if (technician.companyId === companyId) {
-        return res.status(400).json({ message: "This technician is already linked to your company" });
+        return res.status(400).json({ message: "This team member is already linked to your company" });
       }
       
       // Check existing employer connections
       const existingConnections = (technician.employerConnections || []) as any[];
       const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
       if (alreadyConnected) {
-        return res.status(400).json({ message: "This technician is already connected to your company" });
+        return res.status(400).json({ message: "This team member is already connected to your company" });
       }
       
       // If linked to another company, require PLUS access
@@ -9311,19 +10414,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: message || null,
       });
       
+      
       console.log(`[Team-Invite] Company ${companyId} sent invitation ${invitation.id} to technician ${technicianId} (${technician.name})`);
       
-      res.json({ 
+      // Handle both camelCase and snake_case field names from Drizzle ORM
+      const techAny = technician as any;
+      const technicianPhone = techAny.employeePhoneNumber || techAny.employee_phone_number;
+      const smsEnabled = techAny.smsNotificationsEnabled ?? techAny.sms_notifications_enabled;
+      
+      // Debug info for response
+      const debugInfo = {
+        technicianId,
+        technicianName: technician.name,
+        rawPhoneField: technicianPhone,
+        rawSmsEnabled: smsEnabled,
+        invitationId: invitation.id,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log(`[Team-Invite] DEBUG: raw fields - phone=${technicianPhone}, smsEnabled=${smsEnabled}`);
+      
+      let smsStatus = 'not_attempted';
+      let smsError: string | null = null;
+      
+      if (smsEnabled && technicianPhone) {
+        try {
+          const company = await storage.getUserById(companyId);
+          const companyName = company?.companyName || 'An employer';
+          console.log(`[Team-Invite] Sending SMS to ${technicianPhone} from company ${companyName}`);
+          const smsResult = await sendTeamInvitationSMS(
+            technicianPhone,
+            companyName
+          );
+          if (smsResult.success) {
+            console.log(`[Team-Invite] SMS notification sent to ${technician.name}, SID: ${smsResult.messageId}`);
+            smsStatus = 'sent';
+            (debugInfo as any).twilioMessageSid = smsResult.messageId;
+            (debugInfo as any).twilioFormattedTo = (smsResult as any).formattedTo;
+            (debugInfo as any).twilioStatus = (smsResult as any).status;
+          } else {
+            console.log(`[Team-Invite] SMS notification failed for ${technician.name}: ${smsResult.error}`);
+            smsStatus = 'failed';
+            smsError = smsResult.error || null;
+          }
+        } catch (smsErr: any) {
+          console.error(`[Team-Invite] SMS notification error for ${technician.name}:`, smsErr);
+          smsStatus = 'error';
+          smsError = smsErr.message;
+        }
+      } else if (!smsEnabled) {
+        console.log(`[Team-Invite] SMS disabled for ${technician.name}, skipping SMS`);
+        smsStatus = 'skipped_disabled';
+      } else {
+        console.log(`[Team-Invite] No phone number for ${technician.name}, skipping SMS`);
+        smsStatus = 'skipped_no_phone';
+      }
+      
+      res.json({
         success: true, 
         message: `Invitation sent to ${technician.name}!`,
-        invitationId: invitation.id
+        invitationId: invitation.id,
+        debug: {
+          ...debugInfo,
+          smsStatus,
+          smsError
+        }
       });
     } catch (error) {
       console.error("Send team invitation error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
-  
   // Get the count of technicians referred by the logged-in user
   app.get("/api/my-referral-count", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -9332,7 +10493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view referral count" });
       }
       
@@ -9450,7 +10611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view their document requests" });
       }
       
@@ -9524,7 +10685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can upload files to document requests" });
       }
       
@@ -9587,7 +10748,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can update their document requests" });
       }
       
@@ -9701,7 +10862,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view invitations" });
       }
       
@@ -9791,6 +10952,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         console.log(`[Team-Invite] PLUS member ${user.id} (${user.name}) added secondary employer ${invitation.companyId} via invitation ${invitationId}`);
+        
+        // Send SMS to company owner about acceptance
+        if (company) {
+          const companyAny = company as any;
+          const ownerPhone = companyAny.employeePhoneNumber || companyAny.employee_phone_number;
+          const ownerSmsEnabled = companyAny.smsNotificationsEnabled ?? companyAny.sms_notifications_enabled;
+          if (ownerSmsEnabled && ownerPhone) {
+            try {
+              const smsResult = await sendInvitationAcceptedSMS(ownerPhone, user.name || 'A technician', user.role || 'rope_access_tech');
+              if (smsResult.success) {
+                console.log(`[Team-Invite] SMS sent to company owner about ${user.name} acceptance`);
+              }
+            } catch (smsErr) {
+              console.error('[Team-Invite] Failed to send acceptance SMS:', smsErr);
+            }
+          }
+        }
       } else {
         // Link the technician to the company and clear any previous termination status
         await storage.updateUser(user.id, {
@@ -9802,6 +10980,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         console.log(`[Team-Invite] Technician ${user.id} (${user.name}) accepted invitation ${invitationId} from company ${invitation.companyId}`);
+        
+        // Send SMS to company owner about acceptance
+        if (company) {
+          const companyAny = company as any;
+          const ownerPhone = companyAny.employeePhoneNumber || companyAny.employee_phone_number;
+          const ownerSmsEnabled = companyAny.smsNotificationsEnabled ?? companyAny.sms_notifications_enabled;
+          if (ownerSmsEnabled && ownerPhone) {
+            try {
+              const smsResult = await sendInvitationAcceptedSMS(ownerPhone, user.name || 'A technician', user.role || 'rope_access_tech');
+              if (smsResult.success) {
+                console.log(`[Team-Invite] SMS sent to company owner about ${user.name} acceptance`);
+              }
+            } catch (smsErr) {
+              console.error('[Team-Invite] Failed to send acceptance SMS:', smsErr);
+            }
+          }
+        }
       }
       
       res.json({ 
@@ -9862,7 +11057,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view employer connections" });
       }
       
@@ -9946,7 +11141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can manage employer connections" });
       }
       
@@ -10022,6 +11217,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: inv.technician.email,
           // Phone and address
           employeePhoneNumber: inv.technician.employeePhoneNumber,
+        smsNotificationsEnabled,
           employeeStreetAddress: inv.technician.employeeStreetAddress,
           employeeCity: inv.technician.employeeCity,
           employeeProvinceState: inv.technician.employeeProvinceState,
@@ -10081,6 +11277,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get pending onboarding invitations (acknowledged but not converted - technician has no hourlyRate)
+  // Get pending invitations SENT by this company (not yet responded)
+  app.get("/api/sent-invitations", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only company owners and authorized roles can view sent invitations
+      const authorizedRoles = ['owner', 'company', 'admin', 'operations_manager'];
+      if (!authorizedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only authorized users can view sent invitations" });
+      }
+      
+      const invitations = await storage.getPendingSentInvitationsForCompany(companyId);
+      
+      const safeInvitations = invitations.map(inv => ({
+        id: inv.id,
+        createdAt: inv.createdAt,
+        message: inv.message,
+        technician: {
+          id: inv.technician.id,
+          name: inv.technician.name,
+          email: inv.technician.email,
+          employeePhoneNumber: inv.technician.employeePhoneNumber,
+          role: inv.technician.role,
+        }
+      }));
+      
+      res.json({ invitations: safeInvitations });
+    } catch (error) {
+      console.error("Get sent invitations error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Cancel a pending invitation
+  app.delete("/api/sent-invitations/:invitationId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { invitationId } = req.params;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only company owners and authorized roles can cancel invitations
+      const authorizedRoles = ['owner', 'company', 'admin', 'operations_manager'];
+      if (!authorizedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only authorized users can cancel invitations" });
+      }
+      
+      // Verify the invitation exists and belongs to this company
+      const invitation = await storage.getTeamInvitationById(invitationId);
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      if (invitation.companyId !== companyId) {
+        return res.status(403).json({ message: "You can only cancel your own company's invitations" });
+      }
+      
+      if (invitation.status !== 'pending') {
+        return res.status(400).json({ message: "Only pending invitations can be cancelled" });
+      }
+      
+      await storage.cancelTeamInvitation(invitationId);
+      
+      console.log(`[Team-Invite] Company ${companyId} cancelled invitation ${invitationId}`);
+      
+      res.json({ success: true, message: "Invitation cancelled successfully" });
+    } catch (error) {
+      console.error("Cancel invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/pending-onboarding-invitations", requireAuth, async (req: Request, res: Response) => {
     try {
       const user = await storage.getUserById(req.session.userId!);
@@ -10111,6 +11394,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: inv.technician.name,
           email: inv.technician.email,
           employeePhoneNumber: inv.technician.employeePhoneNumber,
+        smsNotificationsEnabled,
           employeeStreetAddress: inv.technician.employeeStreetAddress,
           employeeCity: inv.technician.employeeCity,
           employeeProvinceState: inv.technician.employeeProvinceState,
@@ -10580,6 +11864,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("SPRAT screenshot verification error:", error);
       res.status(500).json({ message: error.message || "Failed to analyze screenshot" });
+    }
+  });
+  
+  // ==================== DOCUMENT OCR ROUTES ====================
+  
+  // OCR scan driver's license to extract license number and expiry date
+  app.post("/api/ocr/drivers-license", verificationUpload.single("image"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+      
+      const imageBase64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[OCR] Analyzing driver's license for user ${req.session.userId}`);
+      
+      const { analyzeDriversLicense } = await import("./gemini");
+      const result = await analyzeDriversLicense(imageBase64, mimeType);
+      
+      res.json({
+        success: result.success,
+        data: {
+          licenseNumber: result.licenseNumber,
+          expiryDate: result.expiryDate,
+          issuedDate: result.issuedDate,
+          name: result.name
+        },
+        confidence: result.confidence,
+        error: result.error
+      });
+    } catch (error: any) {
+      console.error("Driver's license OCR error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze driver's license" });
+    }
+  });
+  
+  // OCR scan void cheque to extract banking info
+  app.post("/api/ocr/void-cheque", verificationUpload.single("image"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+      
+      const imageBase64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[OCR] Analyzing void cheque for user ${req.session.userId}`);
+      
+      const { analyzeVoidCheque } = await import("./gemini");
+      const result = await analyzeVoidCheque(imageBase64, mimeType);
+      
+      res.json({
+        success: result.success,
+        data: {
+          transitNumber: result.transitNumber,
+          institutionNumber: result.institutionNumber,
+          accountNumber: result.accountNumber
+        },
+        confidence: result.confidence,
+        error: result.error
+      });
+    } catch (error: any) {
+      console.error("Void cheque OCR error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze void cheque" });
     }
   });
   
@@ -11088,6 +12445,197 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // ==================== CLIENT ROUTES ====================
+  
+  // Search property managers by pmCode, name, or email (for company owners)
+  app.get("/api/property-managers/search", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage_clients permission
+      if (!canManageClients(currentUser)) {
+        return res.status(403).json({ message: "Access denied - insufficient permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const query = (req.query.q as string || "").trim().toLowerCase();
+      if (!query || query.length < 2) {
+        return res.json({ results: [] });
+      }
+      
+      // Search users with role 'property_manager' by pmCode, name (firstName + lastName), or email
+      const allPMs = await db.select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        pmCode: users.pmCode,
+        propertyManagementCompany: users.propertyManagementCompany,
+        propertyManagerPhoneNumber: users.propertyManagerPhoneNumber,
+      }).from(users).where(eq(users.role, 'property_manager'));
+      
+      // Filter by search query
+      const results = allPMs.filter(pm => {
+        const fullName = `${pm.firstName || ''} ${pm.lastName || ''}`.toLowerCase().trim();
+        const email = (pm.email || '').toLowerCase();
+        const pmCode = (pm.pmCode || '').toLowerCase();
+        
+        return pmCode.includes(query) || 
+               fullName.includes(query) || 
+               email.includes(query);
+      }).slice(0, 20); // Limit to 20 results
+      
+      // Check if any of these PMs are already linked to this company
+      const linkedPMs = await db.select({ propertyManagerId: propertyManagerCompanyLinks.propertyManagerId })
+        .from(propertyManagerCompanyLinks)
+        .where(eq(propertyManagerCompanyLinks.companyId, companyId));
+      const linkedPMIds = new Set(linkedPMs.map(l => l.propertyManagerId));
+      
+      // Return results with linked status
+      const resultsWithStatus = results.map(pm => ({
+        id: pm.id,
+        email: pm.email,
+        name: `${pm.firstName || ''} ${pm.lastName || ''}`.trim() || pm.email,
+        pmCode: pm.pmCode,
+        company: pm.propertyManagementCompany,
+        phone: pm.propertyManagerPhoneNumber,
+        isLinked: linkedPMIds.has(pm.id),
+      }));
+      
+      res.json({ results: resultsWithStatus });
+    } catch (error) {
+      console.error("Error searching property managers:", error);
+      res.status(500).json({ message: "Failed to search property managers" });
+    }
+  });
+  
+  // Get all linked property managers for this company (for quote recipient dropdown)
+  app.get("/api/property-managers/linked", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get all PM links for this company
+      const pmLinks = await db.select()
+        .from(propertyManagerCompanyLinks)
+        .where(eq(propertyManagerCompanyLinks.companyId, companyId));
+      
+      // Fetch full PM details for each link
+      const linkedPMs = await Promise.all(
+        pmLinks.map(async (link) => {
+          const pm = await storage.getUserById(link.propertyManagerId);
+          if (!pm || pm.role !== 'property_manager') return null;
+          return {
+            id: pm.id,
+            name: `${pm.firstName || ''} ${pm.lastName || ''}`.trim() || pm.email,
+            email: pm.email,
+            phone: pm.propertyManagerPhoneNumber,
+            company: pm.propertyManagementCompany,
+            smsOptIn: pm.propertyManagerSmsOptIn,
+            strataNumber: link.strataNumber,
+          };
+        })
+      );
+      
+      res.json(linkedPMs.filter(Boolean));
+    } catch (error) {
+      console.error("Error fetching linked property managers:", error);
+      res.status(500).json({ message: "Failed to fetch linked property managers" });
+    }
+  });
+  
+  // Link a property manager to this company
+  app.post("/api/property-managers/:pmId/link", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage_clients permission
+      if (!canManageClients(currentUser)) {
+        return res.status(403).json({ message: "Access denied - insufficient permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const pmId = req.params.pmId;
+      
+      // Get the company to access propertyManagerCode
+      const company = currentUser.role === "company" ? currentUser : await storage.getUserById(companyId);
+      if (!company || !company.propertyManagerCode) {
+        return res.status(400).json({ message: "Company does not have a property manager code configured" });
+      }
+      
+      // Verify the PM exists and is a property_manager
+      const pm = await storage.getUserById(pmId);
+      if (!pm || pm.role !== 'property_manager') {
+        return res.status(404).json({ message: "Property manager not found" });
+      }
+      
+      // Check if already linked
+      const existingLinks = await db.select()
+        .from(propertyManagerCompanyLinks)
+        .where(and(
+          eq(propertyManagerCompanyLinks.propertyManagerId, pmId),
+          eq(propertyManagerCompanyLinks.companyId, companyId)
+        ));
+      
+      if (existingLinks.length > 0) {
+        return res.status(400).json({ message: "Property manager is already linked to your company" });
+      }
+      
+      // Check if a client already exists for this PM email
+      const existingClients = await storage.getClientsByCompany(companyId);
+      const existingClient = existingClients.find((c: any) => 
+        c.email && pm.email && c.email.toLowerCase() === pm.email.toLowerCase()
+      );
+      
+      // Create the link with company code
+      await db.insert(propertyManagerCompanyLinks).values({
+        id: crypto.randomUUID(),
+        propertyManagerId: pmId,
+        companyId: companyId,
+        companyCode: company.propertyManagerCode,
+      });
+      
+      // Create a client record for this PM if one doesn't exist
+      if (!existingClient) {
+        const pmName = `${pm.firstName || ''} ${pm.lastName || ''}`.trim();
+        await storage.createClient({
+          companyId: companyId,
+          firstName: pm.firstName || '',
+          lastName: pm.lastName || '',
+          company: pm.propertyManagementCompany || '',
+          email: pm.email || '',
+          phoneNumber: pm.propertyManagerPhoneNumber || '',
+          address: '',
+          billingAddress: '',
+        });
+      }
+      
+      res.json({ success: true, message: "Property manager linked and added to client database" });
+    } catch (error) {
+      console.error("Error linking property manager:", error);
+      res.status(500).json({ message: "Failed to link property manager" });
+    }
+  });
   
   // Get all clients for the company
   app.get("/api/clients", requireAuth, async (req: Request, res: Response) => {
@@ -17367,6 +18915,269 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workforce Safety Score (WSS) - Average of all employee PSRs
+  // Educational metric only - does not affect CSR
+  app.get("/api/workforce-safety-score", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only employers can view WSS
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Only employers can view WSS" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get all active employees for this company
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
+      
+      if (activeEmployees.length === 0) {
+        return res.json({
+          wssScore: 0,
+          wssLabel: "No Employees",
+          employeeCount: 0,
+          description: "Add employees to calculate Workforce Safety Score",
+        });
+      }
+      
+      // Calculate PSR for each employee
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const totalSafetyQuizTypes = 6;
+      
+      let totalPSR = 0;
+      let employeesWithPSR = 0;
+      
+      for (const employee of activeEmployees) {
+        // 1. Certification Score (25%)
+        let certScore = 0;
+        if (employee.irataLevel || employee.spratLevel) {
+          const expirationDate = employee.irataLevel 
+            ? (employee.irataExpirationDate ? new Date(employee.irataExpirationDate) : null)
+            : (employee.spratExpirationDate ? new Date(employee.spratExpirationDate) : null);
+          const verified = employee.irataLevel 
+            ? !!employee.irataVerifiedAt 
+            : !!employee.spratVerifiedAt;
+          
+          if (expirationDate && expirationDate > today) {
+            certScore = verified ? 100 : 75;
+          } else if (expirationDate && expirationDate <= today) {
+            certScore = 25;
+          } else {
+            certScore = 50;
+          }
+        }
+        
+        // 2. Safety Documents Score (25%) - Personal harness inspections
+        let docsScore = 0;
+        const personalInspections = await storage.getPersonalHarnessInspections(employee.id);
+        const recentInspections = personalInspections.filter((insp: any) => 
+          new Date(insp.inspectionDate) >= thirtyDaysAgo
+        );
+        const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+        if (recentInspections.length > 0) {
+          docsScore = Math.round((passedInspections.length / recentInspections.length) * 100);
+        }
+        
+        // 3. Safety Quizzes Score (25%)
+        let quizScore = 0;
+        const allAttempts = await storage.getAllQuizAttemptsByEmployee(employee.id);
+        const safetyQuizAttempts = allAttempts.filter((a: any) => 
+          a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+        );
+        const passedQuizzes = new Set(
+          safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+        );
+        quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+        
+        // 4. Work History Score (25%)
+        let workScore = 50; // Default for new employees
+        const workSessionsList = await db.select()
+          .from(workSessions)
+          .where(eq(workSessions.employeeId, employee.id));
+        const completedSessions = workSessionsList.filter((ws: any) => ws.clockOutTime);
+        
+        const incidentReportsList = await db.select()
+          .from(incidentReports)
+          .where(eq(incidentReports.companyId, companyId));
+        const technicianIncidents = incidentReportsList.filter((ir: any) => 
+          ir.reportedById === employee.id || 
+          (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(employee.id))
+        );
+        
+        if (completedSessions.length > 0) {
+          const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+          workScore = Math.max(100 - incidentPenalty, 50);
+        }
+        
+        // Calculate employee PSR (25% each component)
+        const employeePSR = Math.round(
+          (certScore * 0.25) + 
+          (docsScore * 0.25) + 
+          (quizScore * 0.25) + 
+          (workScore * 0.25)
+        );
+        
+        totalPSR += employeePSR;
+        employeesWithPSR++;
+      }
+      
+      // Calculate average WSS
+      const wssScore = employeesWithPSR > 0 ? Math.round(totalPSR / employeesWithPSR) : 0;
+      
+      // Determine label
+      let wssLabel = "Critical";
+      if (wssScore >= 90) wssLabel = "Excellent";
+      else if (wssScore >= 70) wssLabel = "Good";
+      else if (wssScore >= 50) wssLabel = "Fair";
+      
+      res.json({
+        wssScore,
+        wssLabel,
+        employeeCount: employeesWithPSR,
+        description: "Average of all employee Personal Safety Ratings (PSR). Educational metric only - does not affect CSR.",
+      });
+    } catch (error) {
+      console.error("Get WSS error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Workforce Safety Score Details - Individual employee PSR breakdown
+  app.get("/api/workforce-safety-score/details", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Only employers can view WSS details" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
+      
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const totalSafetyQuizTypes = 6;
+      
+      const employeePSRDetails = [];
+      
+      for (const employee of activeEmployees) {
+        // 1. Certification Score (25%)
+        let certScore = 0;
+        let certStatus = "none";
+        if (employee.irataLevel || employee.spratLevel) {
+          const expirationDate = employee.irataLevel 
+            ? (employee.irataExpirationDate ? new Date(employee.irataExpirationDate) : null)
+            : (employee.spratExpirationDate ? new Date(employee.spratExpirationDate) : null);
+          const verified = employee.irataLevel 
+            ? !!employee.irataVerifiedAt 
+            : !!employee.spratVerifiedAt;
+          
+          if (expirationDate && expirationDate > today) {
+            certScore = verified ? 100 : 75;
+            certStatus = verified ? "verified" : "unverified";
+          } else if (expirationDate && expirationDate <= today) {
+            certScore = 25;
+            certStatus = "expired";
+          } else {
+            certScore = 50;
+            certStatus = "no_expiry";
+          }
+        }
+        
+        // 2. Safety Documents Score (25%)
+        let docsScore = 0;
+        const personalInspections = await storage.getPersonalHarnessInspections(employee.id);
+        const recentInspections = personalInspections.filter((insp: any) => 
+          new Date(insp.inspectionDate) >= thirtyDaysAgo
+        );
+        const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+        if (recentInspections.length > 0) {
+          docsScore = Math.round((passedInspections.length / recentInspections.length) * 100);
+        }
+        
+        // 3. Safety Quizzes Score (25%)
+        let quizScore = 0;
+        const allAttempts = await storage.getAllQuizAttemptsByEmployee(employee.id);
+        const safetyQuizAttempts = allAttempts.filter((a: any) => 
+          a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+        );
+        const passedQuizzes = new Set(
+          safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+        );
+        quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+        
+        // 4. Work History Score (25%)
+        let workScore = 50;
+        const workSessionsList = await db.select()
+          .from(workSessions)
+          .where(eq(workSessions.employeeId, employee.id));
+        const completedSessions = workSessionsList.filter((ws: any) => ws.clockOutTime);
+        
+        const incidentReportsList = await db.select()
+          .from(incidentReports)
+          .where(eq(incidentReports.companyId, companyId));
+        const technicianIncidents = incidentReportsList.filter((ir: any) => 
+          ir.reportedById === employee.id || 
+          (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(employee.id))
+        );
+        
+        if (completedSessions.length > 0) {
+          const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+          workScore = Math.max(100 - incidentPenalty, 50);
+        }
+        
+        // Calculate employee PSR
+        const overallPSR = Math.round(
+          (certScore * 0.25) + 
+          (docsScore * 0.25) + 
+          (quizScore * 0.25) + 
+          (workScore * 0.25)
+        );
+        
+        employeePSRDetails.push({
+          id: employee.id,
+          name: employee.name,
+          role: employee.employeeRole || employee.role,
+          overallPSR,
+          components: {
+            certifications: { score: certScore, status: certStatus },
+            safetyDocs: { score: docsScore, recentInspections: recentInspections.length },
+            quizzes: { score: quizScore, passed: passedQuizzes.size, total: totalSafetyQuizTypes },
+            workHistory: { score: workScore, sessions: completedSessions.length, incidents: technicianIncidents.length },
+          },
+        });
+      }
+      
+      // Sort by PSR score descending
+      employeePSRDetails.sort((a, b) => b.overallPSR - a.overallPSR);
+      
+      res.json({ employees: employeePSRDetails });
+    } catch (error) {
+      console.error("Get WSS details error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Get CSR for a linked vendor company
   // SIMPLIFIED: Uses the same calculation as company CSR endpoint to ensure consistency
   app.get("/api/property-managers/vendors/:linkId/csr", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
@@ -19410,32 +21221,113 @@ Do not include any other text, just the JSON object.`
       // Get the complete quote with services (after transaction)
       const fullQuote = await storage.getQuoteById(quoteWithServices.id);
       
-      // Auto-link property manager based on strata number (non-blocking)
+      // Link property manager and send notifications
       let smsResult: { sent: boolean; error?: string } = { sent: false };
       try {
-        // Find property manager linked to this company with matching strata number
-        const pmLinks = await db.select()
-          .from(propertyManagerCompanyLinks)
-          .where(
-            and(
-              eq(propertyManagerCompanyLinks.companyId, companyId),
-              eq(propertyManagerCompanyLinks.strataNumber, fullQuote!.strataPlanNumber)
-            )
-          );
+        let propertyManager: any = null;
         
-        if (pmLinks.length > 0) {
-          const pmLink = pmLinks[0];
-          const propertyManager = await storage.getUserById(pmLink.propertyManagerId);
+        // Check if PM was manually selected in the request
+        if (req.body.recipientPropertyManagerId) {
+          propertyManager = await storage.getUserById(req.body.recipientPropertyManagerId);
+          if (propertyManager && propertyManager.role !== 'property_manager') {
+            propertyManager = null; // Invalid - not a PM
+          }
+        }
+        
+        // If no manual selection, try auto-linking based on strata number
+        if (!propertyManager && fullQuote!.strataPlanNumber) {
+          const pmLinks = await db.select()
+            .from(propertyManagerCompanyLinks)
+            .where(
+              and(
+                eq(propertyManagerCompanyLinks.companyId, companyId),
+                eq(propertyManagerCompanyLinks.strataNumber, fullQuote!.strataPlanNumber)
+              )
+            );
           
-          if (propertyManager && propertyManager.role === 'property_manager') {
-            // Link the quote to this property manager
+          if (pmLinks.length > 0) {
+            propertyManager = await storage.getUserById(pmLinks[0].propertyManagerId);
+          }
+        }
+        
+        if (propertyManager && propertyManager.role === 'property_manager') {
+            // If PM was manually selected and quote has a strata number, update/add PM's strata link
+            if (req.body.recipientPropertyManagerId && fullQuote!.strataPlanNumber) {
+              const existingLink = await db.select()
+                .from(propertyManagerCompanyLinks)
+                .where(
+                  and(
+                    eq(propertyManagerCompanyLinks.propertyManagerId, propertyManager.id),
+                    eq(propertyManagerCompanyLinks.companyId, companyId)
+                  )
+                )
+                .limit(1);
+              
+              if (existingLink.length > 0) {
+                // Update existing link with the strata number if not already set or different
+                if (!existingLink[0].strataNumber || existingLink[0].strataNumber !== fullQuote!.strataPlanNumber) {
+                  await db.update(propertyManagerCompanyLinks)
+                    .set({ strataNumber: fullQuote!.strataPlanNumber })
+                    .where(eq(propertyManagerCompanyLinks.id, existingLink[0].id));
+                  console.log(`[Quote] Updated PM link with strata number ${fullQuote!.strataPlanNumber} for ${propertyManager.email}`);
+                }
+              }
+            }
+            
+            // Link the quote to this property manager and move to submitted stage
             await storage.updateQuote(fullQuote!.id, { 
               recipientPropertyManagerId: propertyManager.id,
               collaborationStatus: 'sent',
-              sentAt: new Date()
+              sentAt: new Date(),
+              pipelineStage: 'submitted',
+              stageUpdatedAt: new Date()
             } as any);
             
-            console.log(`[Quote] Auto-linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
+            console.log(`[Quote] Linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
+            
+            // Save building info to PM's client record if one exists
+            try {
+              const pmClient = await db.select()
+                .from(clients)
+                .where(
+                  and(
+                    eq(clients.companyId, companyId),
+                    eq(clients.email, propertyManager.email)
+                  )
+                )
+                .limit(1);
+              
+              if (pmClient.length > 0 && fullQuote!.strataPlanNumber) {
+                const existingBuildings = (pmClient[0].lmsNumbers as any[]) || [];
+                
+                // Check if this strata/building already exists
+                const existingBuildingIndex = existingBuildings.findIndex(
+                  (b: any) => b.number === fullQuote!.strataPlanNumber
+                );
+                
+                if (existingBuildingIndex === -1) {
+                  // Add the new building from the quote
+                  const newBuilding = {
+                    number: fullQuote!.strataPlanNumber,
+                    buildingName: fullQuote!.buildingName || '',
+                    address: fullQuote!.buildingAddress || '',
+                    stories: fullQuote!.floorCount || null,
+                    units: fullQuote!.unitCount || null,
+                    parkingStalls: fullQuote!.parkingStalls || null
+                  };
+                  
+                  await db.update(clients)
+                    .set({ lmsNumbers: [...existingBuildings, newBuilding] })
+                    .where(eq(clients.id, pmClient[0].id));
+                  
+                  console.log(`[Quote] Added building ${fullQuote!.buildingName} (${fullQuote!.strataPlanNumber}) to PM client record`);
+                } else {
+                  console.log(`[Quote] Building ${fullQuote!.strataPlanNumber} already exists in PM client record`);
+                }
+              }
+            } catch (clientError: any) {
+              console.warn(`[Quote] Could not update PM client record: ${clientError?.message}`);
+            }
             
             // Get company name for WebSocket notification
             const companyUser = await storage.getUserById(companyId);
@@ -19455,22 +21347,19 @@ Do not include any other text, just the JSON object.`
             
             // Send SMS notification if PM has phone and opted in
             if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
-              const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-                ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-                : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
-              const quoteViewUrl = `${baseUrl}/property-manager/quotes/${fullQuote!.id}`;
-              
               // Get company name for SMS
               const company = await storage.getUserById(companyId);
               const companyName = company?.companyName || 'Rope Access Company';
-              const grandTotal = fullQuote!.services?.reduce((sum: number, s: any) => sum + Number(s.totalCost || 0), 0) || 0;
+              
+              // Extract service types from quote services
+              const serviceTypes = fullQuote!.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
               
               const smsResponse = await sendQuoteNotificationSMS(
                 propertyManager.propertyManagerPhoneNumber,
                 fullQuote!.buildingName,
                 companyName,
-                grandTotal,
-                quoteViewUrl
+                serviceTypes,
+                fullQuote!.strataPlanNumber
               );
               
               if (smsResponse.success) {
@@ -19483,7 +21372,6 @@ Do not include any other text, just the JSON object.`
             } else if (propertyManager.propertyManagerPhoneNumber && !propertyManager.propertyManagerSmsOptIn) {
               console.log(`[SMS] Skipped - property manager ${propertyManager.email} has not opted-in to SMS notifications`);
             }
-          }
         }
       } catch (pmError: any) {
         console.error("[Quote] Auto-link property manager error (non-blocking):", pmError?.message || pmError);
@@ -20895,18 +22783,15 @@ Do not include any other text, just the JSON object.`
           
           // If they have a phone number AND opted-in to SMS, send SMS notification
           if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
-            // Build the deep link URL to the specific quote
-            const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-              ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-              : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
-            const quoteViewUrl = `${baseUrl}/property-manager/quotes/${quote.id}`;
+            // Extract service types from quote services
+            const serviceTypes = quote.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
             
             const smsResponse = await sendQuoteNotificationSMS(
               propertyManager.propertyManagerPhoneNumber,
               quote.buildingName,
               companyName,
-              grandTotal,
-              quoteViewUrl
+              serviceTypes,
+              quote.strataPlanNumber
             );
             if (smsResponse.success) {
               console.log(`[SMS] Quote notification sent to ${propertyManager.propertyManagerPhoneNumber}, SID: ${smsResponse.messageId}`);
@@ -20932,6 +22817,68 @@ Do not include any other text, just the JSON object.`
     } catch (error) {
       console.error("Email quote error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== WEATHER ROUTES ====================
+
+  // Get weather data from Open-Meteo (free, no API key required)
+  app.get("/api/weather", requireAuth, requireRole("company", "employee", "rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "labourer"), async (req: Request, res: Response) => {
+    try {
+      const lat = parseFloat(req.query.lat as string);
+      const lon = parseFloat(req.query.lon as string);
+      
+      if (isNaN(lat) || isNaN(lon)) {
+        return res.status(400).json({ message: "Invalid coordinates. Please provide lat and lon query parameters." });
+      }
+      
+      // Fetch from Open-Meteo API - free, no key required
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto&forecast_days=2`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Open-Meteo API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Transform the data for easier frontend consumption
+      const current = {
+        temperature: data.current?.temperature_2m,
+        temperatureUnit: data.current_units?.temperature_2m || "°C",
+        humidity: data.current?.relative_humidity_2m,
+        weatherCode: data.current?.weather_code,
+        windSpeed: data.current?.wind_speed_10m,
+        windSpeedUnit: data.current_units?.wind_speed_10m || "km/h",
+        windDirection: data.current?.wind_direction_10m,
+        windGusts: data.current?.wind_gusts_10m,
+        time: data.current?.time,
+      };
+      
+      // Build hourly forecast
+      const hourly = [];
+      if (data.hourly?.time) {
+        for (let i = 0; i < data.hourly.time.length; i++) {
+          hourly.push({
+            time: data.hourly.time[i],
+            temperature: data.hourly.temperature_2m?.[i],
+            weatherCode: data.hourly.weather_code?.[i],
+            windSpeed: data.hourly.wind_speed_10m?.[i],
+            windDirection: data.hourly.wind_direction_10m?.[i],
+            windGusts: data.hourly.wind_gusts_10m?.[i],
+          });
+        }
+      }
+      
+      res.json({
+        current,
+        hourly,
+        timezone: data.timezone,
+        location: { lat, lon },
+      });
+    } catch (error) {
+      console.error("Weather API error:", error);
+      res.status(500).json({ message: "Failed to fetch weather data" });
     }
   });
 
@@ -21914,21 +23861,28 @@ Do not include any other text, just the JSON object.`
     try {
       // Get only active, non-expired job postings
       const now = new Date();
+      const positionType = req.query.positionType as string | undefined;
+      
+      // Build conditions array
+      const conditions: any[] = [
+        eq(jobPostings.status, "active"),
+        or(
+          isNull(jobPostings.expiresAt),
+          gt(jobPostings.expiresAt, now)
+        )
+      ];
+      
+      // Add position type filter if specified
+      if (positionType && (positionType === "rope_access" || positionType === "ground_crew")) {
+        conditions.push(eq(jobPostings.positionType, positionType));
+      }
       
       const activeJobs = await db.select({
         job: jobPostings,
         companyName: users.companyName,
       }).from(jobPostings)
         .leftJoin(users, eq(jobPostings.companyId, users.id))
-        .where(
-          and(
-            eq(jobPostings.status, "active"),
-            or(
-              isNull(jobPostings.expiresAt),
-              gt(jobPostings.expiresAt, now)
-            )
-          )
-        )
+        .where(and(...conditions))
         .orderBy(desc(jobPostings.createdAt));
 
       const jobsWithCompany = activeJobs.map(item => ({
@@ -22115,11 +24069,19 @@ Do not include any other text, just the JSON object.`
         .where(eq(jobApplications.technicianId, currentUser.id))
         .orderBy(desc(jobApplications.appliedAt));
 
-      // Fetch job posting details for each application
+      // Fetch job posting details and company info for each application
       const applicationsWithJobs = await Promise.all(
         applications.map(async (app) => {
           const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, app.jobPostingId));
-          return { ...app, jobPosting: job };
+          let companyName = null;
+          if (job?.companyId) {
+            const [company] = await db.select({ 
+              companyName: users.companyName, 
+              name: users.name 
+            }).from(users).where(eq(users.id, job.companyId));
+            companyName = company?.companyName || company?.name || null;
+          }
+          return { ...app, jobPosting: job ? { ...job, companyName } : null };
         })
       );
 
@@ -22630,6 +24592,210 @@ Do not include any other text, just the JSON object.`
   // END JOB APPLICATIONS ENDPOINTS
   // =====================================================================
 
+  // Get technician's Personal Safety Rating (PSR)
+  app.get("/api/technician/psr", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const ALLOWED_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "company"];
+      if (!ALLOWED_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians can view PSR" });
+      }
+
+      // 1. Certification Score (25% of total)
+      let certScore = 0;
+      let certStatus = "none";
+      let certDetails: any = { level: null, expirationDate: null, daysUntilExpiry: null, verified: false };
+      
+      const today = new Date();
+      if (currentUser.irataLevel || currentUser.spratLevel) {
+        const certType = currentUser.irataLevel ? "IRATA" : "SPRAT";
+        const level = currentUser.irataLevel || currentUser.spratLevel;
+        const expirationDate = currentUser.irataLevel 
+          ? (currentUser.irataExpirationDate ? new Date(currentUser.irataExpirationDate) : null)
+          : (currentUser.spratExpirationDate ? new Date(currentUser.spratExpirationDate) : null);
+        const verified = currentUser.irataLevel 
+          ? !!currentUser.irataVerifiedAt 
+          : !!currentUser.spratVerifiedAt;
+
+        certDetails = {
+          type: certType,
+          level,
+          expirationDate: expirationDate?.toISOString() || null,
+          daysUntilExpiry: expirationDate ? Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : null,
+          verified,
+        };
+
+        if (expirationDate && expirationDate > today) {
+          certScore = verified ? 100 : 75;
+          certStatus = verified ? "verified" : "unverified";
+        } else if (expirationDate && expirationDate <= today) {
+          certScore = 25;
+          certStatus = "expired";
+        } else {
+          certScore = 50;
+          certStatus = "no_expiry_date";
+        }
+      }
+
+      // 2. Safety Documents Score (25% of total) - Personal harness inspections
+      let docsScore = 0;
+      let docsStatus = "none";
+      const personalInspections = await storage.getPersonalHarnessInspections(currentUser.id);
+      
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const recentInspections = personalInspections.filter((insp: any) => 
+        new Date(insp.inspectionDate) >= thirtyDaysAgo
+      );
+      
+      const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+      const inspectionCount = recentInspections.length;
+      
+      if (inspectionCount === 0) {
+        docsScore = 0;
+        docsStatus = "none";
+      } else {
+        docsScore = Math.round((passedInspections.length / Math.max(inspectionCount, 1)) * 100);
+        docsStatus = docsScore >= 80 ? "good" : docsScore >= 50 ? "fair" : "poor";
+      }
+
+      const docsDetails = {
+        totalInspections: personalInspections.length,
+        recentInspections: inspectionCount,
+        passedRecent: passedInspections.length,
+        last30Days: inspectionCount,
+      };
+
+      // 3. Safety Quizzes Score (25% of total)
+      let quizScore = 0;
+      let quizStatus = "none";
+      const allAttempts = await storage.getAllQuizAttemptsByEmployee(currentUser.id);
+      
+      const safetyQuizAttempts = allAttempts.filter((a: any) => 
+        a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+      );
+      
+      const passedQuizzes = new Set(
+        safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+      );
+      
+      const totalSafetyQuizTypes = 6;
+      quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+      quizStatus = quizScore >= 80 ? "good" : quizScore >= 50 ? "fair" : quizScore > 0 ? "started" : "none";
+
+      const quizDetails = {
+        totalAttempts: safetyQuizAttempts.length,
+        passedQuizTypes: passedQuizzes.size,
+        totalQuizTypes: totalSafetyQuizTypes,
+        quizzesPassed: Array.from(passedQuizzes),
+      };
+
+      // 4. Work History Score (25% of total) - Only for employer-linked technicians
+      let workScore = 0;
+      let workStatus = "not_applicable";
+      let workDetails: any = { isLinked: false };
+
+      const connections = await db.select()
+        .from(technicianEmployerConnections)
+        .where(
+          and(
+            eq(technicianEmployerConnections.technicianId, currentUser.id),
+            eq(technicianEmployerConnections.status, "active")
+          )
+        );
+
+      if (connections.length > 0 || currentUser.companyId) {
+        workDetails.isLinked = true;
+        const companyId = currentUser.companyId || connections[0]?.companyId;
+        
+        if (companyId) {
+          const workSessions = await storage.getWorkSessionsByEmployeeId(currentUser.id);
+          const completedSessions = workSessions.filter((ws: any) => ws.clockOutTime);
+          
+          const incidentReportsList = await db.select()
+            .from(incidentReports)
+            .where(eq(incidentReports.companyId, companyId));
+          
+          const technicianIncidents = incidentReportsList.filter((ir: any) => 
+            ir.reportedById === currentUser.id || 
+            (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(currentUser.id))
+          );
+
+          workDetails = {
+            isLinked: true,
+            totalSessions: completedSessions.length,
+            incidentCount: technicianIncidents.length,
+          };
+
+          if (completedSessions.length === 0) {
+            workScore = 50;
+            workStatus = "new";
+          } else {
+            const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+            workScore = Math.max(100 - incidentPenalty, 50);
+            workStatus = workScore >= 90 ? "excellent" : workScore >= 70 ? "good" : "fair";
+          }
+        }
+      }
+
+      // Calculate overall PSR
+      const weights = { cert: 0.25, docs: 0.25, quiz: 0.25, work: 0.25 };
+      
+      let overallScore: number;
+      if (!workDetails.isLinked) {
+        overallScore = Math.round(
+          (certScore * 0.33) + 
+          (docsScore * 0.33) + 
+          (quizScore * 0.34)
+        );
+      } else {
+        overallScore = Math.round(
+          (certScore * weights.cert) + 
+          (docsScore * weights.docs) + 
+          (quizScore * weights.quiz) + 
+          (workScore * weights.work)
+        );
+      }
+
+      res.json({
+        overallScore,
+        isLinkedToEmployer: workDetails.isLinked,
+        components: {
+          certifications: {
+            score: certScore,
+            status: certStatus,
+            details: certDetails,
+            weight: workDetails.isLinked ? 25 : 33,
+          },
+          safetyDocs: {
+            score: docsScore,
+            status: docsStatus,
+            details: docsDetails,
+            weight: workDetails.isLinked ? 25 : 33,
+          },
+          quizzes: {
+            score: quizScore,
+            status: quizStatus,
+            details: quizDetails,
+            weight: workDetails.isLinked ? 25 : 34,
+          },
+          workHistory: {
+            score: workScore,
+            status: workStatus,
+            details: workDetails,
+            weight: workDetails.isLinked ? 25 : 0,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Get technician PSR error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Toggle technician visibility to employers
   app.patch("/api/technician/visibility", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -22918,7 +25084,7 @@ Do not include any other text, just the JSON object.`
       // Fetch all quiz attempts for visible technicians (for PSR calculation)
       const techIds = visibleTechs.map(t => t.id);
       const allQuizAttempts = techIds.length > 0 
-        ? await db.select().from(quizAttempts).where(sql`${quizAttempts.employeeId} = ANY(${techIds})`)
+        ? await db.select().from(quizAttempts).where(inArray(quizAttempts.employeeId, techIds))
         : [];
       
       // Group quiz attempts by employee ID

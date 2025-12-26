@@ -257,6 +257,37 @@ const getJobTypeLabel = (t: (key: string) => string, jobType: string): string =>
 // Flat list of all permissions for compatibility
 const AVAILABLE_PERMISSIONS = PERMISSION_CATEGORIES.flatMap(cat => cat.permissions);
 
+// Quote-related permissions that should auto-select view_clients
+const QUOTE_PERMISSIONS = ['view_quotes', 'create_quotes', 'edit_quotes', 'delete_quotes', 'view_quote_financials'];
+
+// Helper function to handle permission cascading (quotes -> clients)
+const handlePermissionChange = (
+  currentPermissions: string[],
+  permissionId: string,
+  checked: boolean
+): string[] => {
+  let newPermissions = checked
+    ? [...currentPermissions, permissionId]
+    : currentPermissions.filter((p) => p !== permissionId);
+
+  // If a quote permission is being enabled, also enable view_clients
+  if (checked && QUOTE_PERMISSIONS.includes(permissionId)) {
+    if (!newPermissions.includes('view_clients')) {
+      newPermissions = [...newPermissions, 'view_clients'];
+    }
+  }
+
+  // If a quote permission is being disabled, check if any quote permissions remain
+  if (!checked && QUOTE_PERMISSIONS.includes(permissionId)) {
+    const hasRemainingQuotePermissions = newPermissions.some((p) => QUOTE_PERMISSIONS.includes(p));
+    if (!hasRemainingQuotePermissions) {
+      newPermissions = newPermissions.filter((p) => p !== 'view_clients');
+    }
+  }
+
+  return newPermissions;
+};
+
 const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
@@ -1181,6 +1212,10 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState("");
   const [showClientDialog, setShowClientDialog] = useState(false);
   const [showBusinessCardScanner, setShowBusinessCardScanner] = useState(false);
+  const [showPMSearchDialog, setShowPMSearchDialog] = useState(false);
+  const [pmSearchQuery, setPMSearchQuery] = useState("");
+  const [pmSearchResults, setPMSearchResults] = useState<Array<{ id: string; email: string; name: string; pmCode: string | null; company: string | null; phone: string | null; isLinked: boolean }>>([]);
+  const [pmSearchLoading, setPMSearchLoading] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
   const [showClientDetailDialog, setShowClientDetailDialog] = useState(false);
@@ -1228,6 +1263,8 @@ export default function Dashboard() {
   const [onRopeProSearchType, setOnRopeProSearchType] = useState<'irata' | 'sprat' | 'email'>('irata'); // Search type for OnRopePro
   const [onRopeProSearchValue, setOnRopeProSearchValue] = useState(''); // Search value for OnRopePro
   const [foundTechnician, setFoundTechnician] = useState<any>(null); // Found technician from search
+  const [inviteDebugResponse, setInviteDebugResponse] = useState<any>(null); // Debug info from last invite
+  const [technicianSearchWarning, setTechnicianSearchWarning] = useState<string | null>(null); // Warning from search
   const [technicianSearching, setTechnicianSearching] = useState(false); // Loading state for search
   const [technicianLinking, setTechnicianLinking] = useState(false); // Loading state for linking
   const [editEmployeeFormStep, setEditEmployeeFormStep] = useState<1 | 2>(1); // Track edit form step
@@ -1567,6 +1604,56 @@ export default function Dashboard() {
   });
 
   const pendingOnboardingInvitations = pendingOnboardingData?.invitations || [];
+
+  // Query for sent invitations (pending, not yet responded)
+  const { data: sentInvitationsData } = useQuery<{
+    invitations: Array<{
+      id: string;
+      createdAt: string;
+      message?: string;
+      technician: {
+        id: string;
+        name: string;
+        email: string;
+        employeePhoneNumber?: string;
+        role: string;
+      };
+    }>;
+  }>({
+    queryKey: ["/api/sent-invitations"],
+    enabled: userData?.user?.role === 'owner' || userData?.user?.role === 'company' || userData?.user?.role === 'admin' || userData?.user?.role === 'operations_manager',
+  });
+
+  const sentInvitations = sentInvitationsData?.invitations || [];
+
+  // Mutation to cancel a sent invitation
+  const cancelInvitationMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      const response = await fetch(`/api/sent-invitations/${invitationId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to cancel invitation');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sent-invitations"] });
+      toast({
+        title: t('dashboard.invitations.cancelled', 'Invitation Cancelled'),
+        description: t('dashboard.invitations.cancelledDesc', 'The invitation has been cancelled.'),
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
   // Mutation to acknowledge accepted invitation
   const acknowledgeInvitationMutation = useMutation({
@@ -2274,6 +2361,7 @@ export default function Dashboard() {
     
     setTechnicianSearching(true);
     setFoundTechnician(null);
+    setTechnicianSearchWarning(null);
     
     try {
       const response = await fetch(`/api/technicians/search?searchType=${onRopeProSearchType}&searchValue=${encodeURIComponent(onRopeProSearchValue)}`, {
@@ -2288,6 +2376,7 @@ export default function Dashboard() {
       
       if (data.found) {
         setFoundTechnician(data.technician);
+        setTechnicianSearchWarning(data.warning || null);
       } else {
         toast({ 
           title: "No technician found", 
@@ -2322,6 +2411,14 @@ export default function Dashboard() {
       
       const data = await response.json();
       
+      // Store debug response for visibility
+      setInviteDebugResponse({
+        timestamp: new Date().toISOString(),
+        status: response.status,
+        statusOk: response.ok,
+        data
+      });
+      
       if (!response.ok) {
         throw new Error(data.message || "Invitation failed");
       }
@@ -2333,6 +2430,10 @@ export default function Dashboard() {
         description: data.message || t('dashboard.toast.invitationSentDesc', `An invitation has been sent to ${foundTechnician.name}. They can accept or decline in their portal.`),
       });
     } catch (error: any) {
+      setInviteDebugResponse({
+        timestamp: new Date().toISOString(),
+        error: error.message
+      });
       toast({ 
         title: t('dashboard.toast.invitationFailed', 'Failed to send invitation'), 
         description: error.message, 
@@ -2743,7 +2844,7 @@ export default function Dashboard() {
       setEmployeeToSuspendSeat(null);
       const creditAmount = data.creditAmount || 0;
       toast({ 
-        title: t('dashboard.toast.employeeSuspended', 'Employee suspended'),
+        title: t('dashboard.toast.employeeInactive', 'Employee now inactive'),
         description: creditAmount > 0 
           ? t('dashboard.toast.seatRemovedWithCredit', `Seat removed. $${creditAmount.toFixed(2)} credit applied to your account.`)
           : t('dashboard.toast.seatRemoved', 'Seat removed from your subscription.')
@@ -5565,6 +5666,30 @@ export default function Dashboard() {
         {activeTab === "employees" && (
           <div>
             <div className="space-y-4">
+              {/* Debug Panel for Invite Response */}
+              {inviteDebugResponse && (
+                <Card className="border-amber-500 bg-amber-50 dark:bg-amber-950/20" data-testid="card-invite-debug">
+                  <CardHeader className="flex flex-row items-center justify-between gap-2 py-2 px-4">
+                    <div className="flex items-center gap-2">
+                      <span className="material-icons text-amber-600">bug_report</span>
+                      <span className="font-medium text-amber-800 dark:text-amber-200">Invite Debug Response</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setInviteDebugResponse(null)}
+                      data-testid="button-clear-debug"
+                    >
+                      <span className="material-icons">close</span>
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4">
+                    <pre className="text-xs bg-background p-3 rounded overflow-auto max-h-64 border">
+                      {JSON.stringify(inviteDebugResponse, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
               {/* Seat Usage Information */}
               {employeesData?.seatInfo && (
                 <Card data-testid="card-seat-info">
@@ -5933,6 +6058,16 @@ export default function Dashboard() {
                                 </div>
                               )}
                             </div>
+                            
+                            {/* Warning if technician is employed and has visibility on */}
+                            {technicianSearchWarning && (
+                              <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                                <span className="material-icons text-amber-500 text-lg mt-0.5">warning</span>
+                                <p className="text-sm text-amber-700 dark:text-amber-400">
+                                  {technicianSearchWarning}
+                                </p>
+                              </div>
+                            )}
                             
                             <Button 
                               type="button"
@@ -6517,13 +6652,12 @@ export default function Dashboard() {
                                                 <Checkbox
                                                   checked={field.value?.includes(permission.id)}
                                                   onCheckedChange={(checked) => {
-                                                    return checked
-                                                      ? field.onChange([...field.value, permission.id])
-                                                      : field.onChange(
-                                                          field.value?.filter(
-                                                            (value) => value !== permission.id
-                                                          )
-                                                        )
+                                                    const newPermissions = handlePermissionChange(
+                                                      field.value || [],
+                                                      permission.id,
+                                                      !!checked
+                                                    );
+                                                    field.onChange(newPermissions);
                                                   }}
                                                   data-testid={`checkbox-permission-${permission.id}`}
                                                 />
@@ -6645,6 +6779,62 @@ export default function Dashboard() {
                               >
                                 <span className="material-icons mr-2 text-sm">person_add</span>
                                 {t('dashboard.employees.completeOnboarding', 'Complete Onboarding')}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pending Sent Invitations */}
+                {sentInvitations.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-medium flex items-center gap-2">
+                      <span className="material-icons text-amber-500">mail_outline</span>
+                      {t('dashboard.employees.pendingSentInvitations', 'Pending Invitations')}
+                      <Badge variant="secondary" className="ml-2">{sentInvitations.length}</Badge>
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t('dashboard.employees.pendingSentInvitationsDesc', 'Invitations sent that are awaiting response')}
+                    </p>
+                    <div className="grid gap-3">
+                      {sentInvitations.map((inv) => (
+                        <Card key={inv.id} className="border-amber-200 dark:border-amber-800" data-testid={`sent-invitation-${inv.id}`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-medium">{inv.technician.name}</span>
+                                  <Badge variant="outline" className="text-xs">
+                                    {inv.technician.role === 'ground_crew' ? t('dashboard.employees.groundCrew', 'Ground Crew') : t('dashboard.employees.ropeAccessTech', 'Rope Access Tech')}
+                                  </Badge>
+                                </div>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  <span className="material-icons text-xs mr-1 align-middle">email</span>
+                                  {inv.technician.email}
+                                </div>
+                                {inv.technician.employeePhoneNumber && (
+                                  <div className="text-sm text-muted-foreground">
+                                    <span className="material-icons text-xs mr-1 align-middle">phone</span>
+                                    {inv.technician.employeePhoneNumber}
+                                  </div>
+                                )}
+                                <div className="text-xs text-muted-foreground mt-2">
+                                  {t('dashboard.employees.sentOn', 'Sent')} {new Date(inv.createdAt).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => cancelInvitationMutation.mutate(inv.id)}
+                                disabled={cancelInvitationMutation.isPending}
+                                className="text-destructive hover:text-destructive"
+                                data-testid={`button-cancel-invitation-${inv.id}`}
+                              >
+                                <span className="material-icons text-sm mr-1">close</span>
+                                {t('dashboard.employees.cancelInvitation', 'Cancel')}
                               </Button>
                             </div>
                           </CardContent>
@@ -7044,29 +7234,29 @@ export default function Dashboard() {
                   })()}
                 </div>
 
-                {/* Suspended Employees - Seat removed but can be reactivated */}
+                {/* Inactive Employees - Seat removed but can be reactivated */}
                 {(() => {
                   // Check both primary (suspendedAt) and secondary (connectionStatus) suspensions
-                  const suspendedEmployees = employees.filter((emp: any) => 
+                  const inactiveEmployees = employees.filter((emp: any) => 
                     (emp.suspendedAt || emp.connectionStatus === 'suspended') && !emp.terminatedDate
                   );
                   
-                  if (suspendedEmployees.length > 0) {
+                  if (inactiveEmployees.length > 0) {
                     return (
                       <div className="space-y-2 mt-6">
                         <div className="flex items-center gap-2">
                           <h3 className="text-lg font-medium text-amber-600 dark:text-amber-400">
-                            {t('dashboard.employees.suspendedEmployees', 'Suspended Employees')}
+                            {t('dashboard.employees.inactiveEmployees', 'Inactive Employees')}
                           </h3>
                           <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                            {suspendedEmployees.length}
+                            {inactiveEmployees.length}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {t('dashboard.employees.suspendedDesc', 'These employees had their seats removed. Purchase a new seat to reactivate them.')}
+                          {t('dashboard.employees.inactiveDesc', 'These employees had their seats removed. Purchase a new seat to reactivate them.')}
                         </p>
-                        {suspendedEmployees.map((employee: any) => (
-                          <Card key={employee.id} data-testid={`suspended-employee-card-${employee.id}`} className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+                        {inactiveEmployees.map((employee: any) => (
+                          <Card key={employee.id} data-testid={`inactive-employee-card-${employee.id}`} className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
                             <CardContent className="p-4">
                               <div className="flex items-center justify-between gap-3 flex-wrap">
                                 <div className="flex items-center gap-3">
@@ -7080,7 +7270,7 @@ export default function Dashboard() {
                                         {employee.role?.replace(/_/g, ' ') || 'Employee'}
                                       </Badge>
                                       <span className="text-xs text-muted-foreground">
-                                        {t('dashboard.employees.suspendedOn', 'Suspended:')} {formatTimestampDate(employee.suspendedAt)}
+                                        {t('dashboard.employees.inactiveSince', 'Inactive since:')} {formatTimestampDate(employee.suspendedAt)}
                                       </span>
                                     </div>
                                   </div>
@@ -7090,7 +7280,7 @@ export default function Dashboard() {
                                   size="sm"
                                   onClick={() => reactivateSuspendedMutation.mutate(employee.id)}
                                   disabled={reactivateSuspendedMutation.isPending}
-                                  data-testid={`button-reactivate-suspended-${employee.id}`}
+                                  data-testid={`button-reactivate-inactive-${employee.id}`}
                                 >
                                   {reactivateSuspendedMutation.isPending ? (
                                     <>
@@ -7777,6 +7967,24 @@ export default function Dashboard() {
                     {t('dashboard.clientDatabase.scanCard', 'Scan Business Card')}
                   </Button>
                 )}
+                
+                {/* Search Property Manager Button */}
+                {(currentUser?.role === "company" || currentUser?.role === "employee") && (
+                  <Button 
+                    variant="outline"
+                    className="h-12 gap-2" 
+                    onClick={() => {
+                      setPMSearchQuery("");
+                      setPMSearchResults([]);
+                      setShowPMSearchDialog(true);
+                    }}
+                    data-testid="button-search-pm"
+                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                  >
+                    <span className="material-icons">person_search</span>
+                    {t('dashboard.clientDatabase.searchPM', 'Find Property Manager')}
+                  </Button>
+                )}
               </div>
 
               {/* Business Card Scanner Dialog */}
@@ -7798,6 +8006,154 @@ export default function Dashboard() {
                   setShowClientDialog(true);
                 }}
               />
+
+              {/* Property Manager Search Dialog */}
+              <Dialog open={showPMSearchDialog} onOpenChange={setShowPMSearchDialog}>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <span className="material-icons text-primary">person_search</span>
+                      {t('dashboard.pmSearch.title', 'Find Property Manager')}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {t('dashboard.pmSearch.description', 'Search by PM code, name, or email to link them to your company')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                        search
+                      </span>
+                      <Input
+                        placeholder={t('dashboard.pmSearch.placeholder', 'Enter PM code, name, or email...')}
+                        value={pmSearchQuery}
+                        onChange={async (e) => {
+                          const query = e.target.value;
+                          setPMSearchQuery(query);
+                          
+                          if (query.trim().length < 2) {
+                            setPMSearchResults([]);
+                            return;
+                          }
+                          
+                          setPMSearchLoading(true);
+                          try {
+                            const response = await fetch(`/api/property-managers/search?q=${encodeURIComponent(query)}`);
+                            if (response.ok) {
+                              const data = await response.json();
+                              setPMSearchResults(data.results || []);
+                            }
+                          } catch (error) {
+                            console.error("PM search error:", error);
+                          } finally {
+                            setPMSearchLoading(false);
+                          }
+                        }}
+                        className="h-10 pl-10"
+                        data-testid="input-search-pm"
+                      />
+                    </div>
+                    
+                    {pmSearchLoading && (
+                      <div className="text-center py-4 text-muted-foreground text-sm">
+                        {t('dashboard.pmSearch.searching', 'Searching...')}
+                      </div>
+                    )}
+                    
+                    {!pmSearchLoading && pmSearchQuery.length >= 2 && pmSearchResults.length === 0 && (
+                      <div className="text-center py-6 text-muted-foreground">
+                        <span className="material-icons text-3xl mb-2 block">search_off</span>
+                        <p className="text-sm">{t('dashboard.pmSearch.noResults', 'No property managers found')}</p>
+                      </div>
+                    )}
+                    
+                    {pmSearchResults.length > 0 && (
+                      <div className="space-y-2 max-h-80 overflow-y-auto">
+                        {pmSearchResults.map((pm) => (
+                          <div 
+                            key={pm.id} 
+                            className="p-3 border rounded-md hover-elevate"
+                            data-testid={`pm-result-${pm.id}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate">{pm.name || pm.email}</p>
+                                {pm.company && (
+                                  <p className="text-sm text-muted-foreground truncate">{pm.company}</p>
+                                )}
+                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                  {pm.pmCode && (
+                                    <Badge variant="outline" className="font-mono text-xs">
+                                      {pm.pmCode}
+                                    </Badge>
+                                  )}
+                                  {pm.email && (
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <span className="material-icons text-xs">mail</span>
+                                      {pm.email}
+                                    </span>
+                                  )}
+                                  {pm.phone && (
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <span className="material-icons text-xs">phone</span>
+                                      {pm.phone}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              {pm.isLinked ? (
+                                <Badge variant="secondary" className="shrink-0">
+                                  <span className="material-icons text-xs mr-1">check_circle</span>
+                                  {t('dashboard.pmSearch.linked', 'Linked')}
+                                </Badge>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  onClick={async () => {
+                                    try {
+                                      const response = await apiRequest("POST", `/api/property-managers/${pm.id}/link`);
+                                      if (response.ok) {
+                                        toast({
+                                          title: t('dashboard.pmSearch.linkSuccess', 'Property Manager Linked'),
+                                          description: t('dashboard.pmSearch.linkSuccessDesc', '{{name}} has been linked and added to your client database', { name: pm.name || pm.email }),
+                                        });
+                                        // Invalidate clients query to refresh the list
+                                        queryClient.invalidateQueries({ queryKey: ['/api/clients'] });
+                                        // Update local state to show as linked
+                                        setPMSearchResults(prev => 
+                                          prev.map(p => p.id === pm.id ? { ...p, isLinked: true } : p)
+                                        );
+                                      } else {
+                                        const error = await response.json();
+                                        toast({
+                                          title: t('dashboard.pmSearch.linkError', 'Link Failed'),
+                                          description: error.message || t('dashboard.pmSearch.linkErrorDesc', 'Could not link property manager'),
+                                          variant: "destructive",
+                                        });
+                                      }
+                                    } catch (error) {
+                                      console.error("Link PM error:", error);
+                                      toast({
+                                        title: t('dashboard.pmSearch.linkError', 'Link Failed'),
+                                        description: t('dashboard.pmSearch.linkErrorDesc', 'Could not link property manager'),
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }}
+                                  data-testid={`button-link-pm-${pm.id}`}
+                                >
+                                  <span className="material-icons text-sm mr-1">link</span>
+                                  {t('dashboard.pmSearch.link', 'Link')}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               {/* Clients List */}
               <Card>
@@ -9284,13 +9640,12 @@ export default function Dashboard() {
                                           <Checkbox
                                             checked={field.value?.includes(permission.id)}
                                             onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([...field.value, permission.id])
-                                                : field.onChange(
-                                                    field.value?.filter(
-                                                      (value) => value !== permission.id
-                                                    )
-                                                  )
+                                              const newPermissions = handlePermissionChange(
+                                                field.value || [],
+                                                permission.id,
+                                                !!checked
+                                              );
+                                              field.onChange(newPermissions);
                                             }}
                                             data-testid={`checkbox-edit-permission-${permission.id}`}
                                           />
@@ -10043,17 +10398,17 @@ export default function Dashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Suspend Employee / Remove Seat Confirmation Dialog */}
+      {/* Remove Seat / Make Inactive Confirmation Dialog */}
       <AlertDialog open={employeeToSuspendSeat !== null} onOpenChange={(open) => !open && setEmployeeToSuspendSeat(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('dashboard.suspendEmployee.title', 'Suspend Employee')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.removeSeat.title', 'Remove Seat')}</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <span className="block">
-                {t('dashboard.suspendEmployee.description', 'Are you sure you want to suspend')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
+                {t('dashboard.removeSeat.description', 'Are you sure you want to remove the seat for')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
               </span>
               <span className="block text-amber-600 dark:text-amber-400">
-                {t('dashboard.suspendEmployee.warning', 'This will remove one seat from your subscription. The employee will lose access but can be reactivated later.')}
+                {t('dashboard.removeSeat.warning', 'This will remove one seat from your subscription. The employee will become inactive but can be reactivated later.')}
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -10070,7 +10425,7 @@ export default function Dashboard() {
               ) : (
                 <>
                   <span className="material-icons text-sm mr-1">person_remove</span>
-                  {t('dashboard.suspendEmployee.confirm', 'Suspend Employee')}
+                  {t('dashboard.removeSeat.confirm', 'Remove Seat')}
                 </>
               )}
             </AlertDialogAction>
@@ -11767,13 +12122,12 @@ export default function Dashboard() {
                                             <Checkbox
                                               checked={field.value?.includes(permission.id)}
                                               onCheckedChange={(checked) => {
-                                                return checked
-                                                  ? field.onChange([...field.value, permission.id])
-                                                  : field.onChange(
-                                                      field.value?.filter(
-                                                        (value) => value !== permission.id
-                                                      )
-                                                    )
+                                                const newPermissions = handlePermissionChange(
+                                                  field.value || [],
+                                                  permission.id,
+                                                  !!checked
+                                                );
+                                                field.onChange(newPermissions);
                                               }}
                                               data-testid={`checkbox-invitation-permission-${permission.id}`}
                                             />

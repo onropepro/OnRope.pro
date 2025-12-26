@@ -22,17 +22,30 @@ import {
   Menu,
   X,
   Building,
+  Cloud,
+  SlidersHorizontal,
+  User as UserIcon,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
 import type { User } from "@/lib/permissions";
 import {
   hasFinancialAccess,
   canManageEmployees,
   canAccessQuotes,
+  hasPermission,
 } from "@/lib/permissions";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { SidebarCustomizeDialog } from "./SidebarCustomizeDialog";
+
+interface SidebarPreferencesResponse {
+  preferences: Record<string, { itemId: string; position: number }[]>;
+  variant: string;
+  isDefault: boolean;
+}
 
 export interface NavItem {
   id: string;
@@ -51,7 +64,7 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager";
+export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew";
 
 export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
   employer: "#0B64A3",
@@ -59,6 +72,7 @@ export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
   "property-manager": "#6E9075",
   resident: "#86A59C",
   "building-manager": "#B89685",
+  "ground-crew": "#5D7B6F",
 };
 
 export interface DashboardSidebarProps {
@@ -104,9 +118,37 @@ export function DashboardSidebar({
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [customizeDialogOpen, setCustomizeDialogOpen] = useState(false);
 
   // Get brand color based on variant or custom override
   const BRAND_COLOR = customBrandColor || STAKEHOLDER_COLORS[variant];
+
+  // Fetch sidebar preferences for ordering
+  const { data: sidebarPreferences } = useQuery<SidebarPreferencesResponse>({
+    queryKey: ["/api/sidebar/preferences", variant],
+    queryFn: async () => {
+      const response = await fetch(`/api/sidebar/preferences?variant=${variant}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch sidebar preferences");
+      }
+      return response.json();
+    },
+    enabled: !!currentUser,
+    retry: false,
+  });
+
+  // Fetch pending invitations for technicians and ground crew
+  const { data: invitationsData } = useQuery<{ invitations: any[] }>({
+    queryKey: ["/api/my-invitations"],
+    enabled: !!currentUser && (
+      currentUser.role === 'rope_access_tech' || 
+      currentUser.role === 'ground_crew' || 
+      currentUser.role === 'ground_crew_supervisor'
+    ),
+    refetchInterval: 60000, // Refresh every minute
+  });
+  
+  const pendingInvitationsCount = invitationsData?.invitations?.length || 0;
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -134,6 +176,32 @@ export function DashboardSidebar({
 
   const navigationGroups: NavGroup[] = [
     {
+      id: "my-account",
+      label: t("dashboard.sidebar.myAccount", "MY ACCOUNT"),
+      items: [
+        {
+          id: "my-passport",
+          label: t("dashboard.sidebar.myPassport", "My Passport"),
+          icon: UserIcon,
+          href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
+            ? "/ground-crew-portal?tab=home" 
+            : "/technician-portal?tab=home",
+          isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
+        },
+        {
+          id: "invitations",
+          label: t("dashboard.sidebar.invitations", "Invitations"),
+          icon: Mail,
+          href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
+            ? "/ground-crew-portal?tab=invitations" 
+            : "/technician-portal?tab=invitations",
+          badge: pendingInvitationsCount > 0 ? pendingInvitationsCount : undefined,
+          badgeType: pendingInvitationsCount > 0 ? "alert" : undefined,
+          isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
+        },
+      ],
+    },
+    {
       id: "operations",
       label: t("dashboard.categories.operations", "OPERATIONS"),
       items: [
@@ -152,8 +220,15 @@ export function DashboardSidebar({
           isVisible: () => true,
         },
         {
+          id: "weather",
+          label: t("dashboard.sidebar.weather", "Weather"),
+          icon: Cloud,
+          href: "/weather",
+          isVisible: () => true,
+        },
+        {
           id: "timesheets",
-          label: t("dashboard.sidebar.timesheets", "Timesheets"),
+          label: t("dashboard.sidebar.offSite", "Off-Site"),
           icon: Clock,
           href: "/non-billable-hours",
           badge: alertCounts.pendingTimesheets,
@@ -179,6 +254,7 @@ export function DashboardSidebar({
           id: "certifications",
           label: t("dashboard.sidebar.certifications", "Certifications"),
           icon: Award,
+          href: "/dashboard",
           onClick: () => onTabChange("employees"),
           isVisible: (user) => canManageEmployees(user),
         },
@@ -282,7 +358,7 @@ export function DashboardSidebar({
           label: t("dashboard.cards.clients.label", "Clients"),
           icon: Building,
           href: "/dashboard?tab=clients",
-          isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
+          isVisible: (user) => hasPermission(user, 'view_clients'),
         },
       ],
     },
@@ -300,22 +376,58 @@ export function DashboardSidebar({
   };
 
   const handleItemClick = (item: NavItem) => {
+    // Call onClick first if provided (e.g., tab changes)
+    if (item.onClick) {
+      item.onClick();
+    }
+    // Then navigate if href is provided
     if (item.href) {
       setLocation(item.href);
-    } else if (item.onClick) {
-      item.onClick();
     }
   };
 
   // Use custom navigation groups if provided, otherwise use default employer groups
   const activeNavigationGroups = customNavigationGroups || navigationGroups;
   
-  const filteredGroups = activeNavigationGroups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => item.isVisible(currentUser)),
-    }))
-    .filter((group) => group.items.length > 0);
+  // Apply custom ordering from preferences
+  const filteredGroups = useMemo(() => {
+    const groups = activeNavigationGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => item.isVisible(currentUser)),
+      }))
+      .filter((group) => group.items.length > 0);
+
+    // If we have saved preferences, apply the custom ordering (with defensive guards)
+    if (sidebarPreferences && !sidebarPreferences.isDefault && sidebarPreferences.preferences) {
+      return groups.map((group) => {
+        const savedOrder = sidebarPreferences.preferences[group.id];
+        if (!savedOrder || !Array.isArray(savedOrder) || savedOrder.length === 0) return group;
+
+        // Create a map of items for quick lookup
+        const itemMap = new Map(group.items.map((item) => [item.id, item]));
+        const orderedItems: NavItem[] = [];
+
+        // First add items in saved order
+        savedOrder
+          .sort((a, b) => a.position - b.position)
+          .forEach(({ itemId }) => {
+            const item = itemMap.get(itemId);
+            if (item) {
+              orderedItems.push(item);
+              itemMap.delete(itemId);
+            }
+          });
+
+        // Add any remaining items that weren't in saved preferences
+        itemMap.forEach((item) => orderedItems.push(item));
+
+        return { ...group, items: orderedItems };
+      });
+    }
+
+    return groups;
+  }, [activeNavigationGroups, currentUser, sidebarPreferences]);
 
   const displayCompanyName = companyName || "My Company";
   const isDashboardActive = activeTab === "home" || activeTab === "" || !activeTab;
@@ -332,32 +444,28 @@ export function DashboardSidebar({
   const sidebarContent = (
     <>
       {/* Logo Header - h-14 (56px) */}
-      <div className="h-14 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="h-14 flex items-center justify-center px-4 border-b border-slate-100 dark:border-slate-800 relative">
         {whitelabelBrandingActive && brandingLogoUrl ? (
           <img
             src={brandingLogoUrl}
             alt="Company Logo"
-            className="h-7 w-auto max-w-[160px] object-contain"
+            className="h-8 w-auto max-w-[180px] object-contain"
             data-testid="img-sidebar-logo"
           />
         ) : (
-          <div className="flex items-center gap-2.5" data-testid="sidebar-default-logo">
-            <div 
-              className="flex h-7 w-7 items-center justify-center rounded-md text-white font-semibold text-sm"
-              style={{ backgroundColor: getBrandColor() }}
-            >
-              OR
-            </div>
-            <span className="font-medium text-base text-slate-900 dark:text-slate-100">
-              OnRopePro
-            </span>
+          <div className="flex items-center justify-center" data-testid="sidebar-default-logo">
+            <img
+              src={onRopeProLogo}
+              alt="OnRopePro"
+              className="h-10 w-auto object-contain"
+            />
           </div>
         )}
         {/* Close button for mobile */}
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="lg:hidden absolute right-2"
           onClick={() => setIsOpen(false)}
           data-testid="button-sidebar-close"
         >
@@ -380,7 +488,7 @@ export function DashboardSidebar({
             onClick={() => onTabChange("home")}
             data-testid="sidebar-nav-dashboard"
             className={cn(
-              "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium transition-colors",
+              "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
               isDashboardActive 
                 ? "text-white shadow-sm"
                 : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
@@ -396,9 +504,9 @@ export function DashboardSidebar({
       {/* Navigation Groups - Scrollable */}
       <nav className="flex-1 overflow-y-auto px-3 py-1">
         {filteredGroups.map((group) => (
-          <div key={group.id} className="mb-4">
+          <div key={group.id} className="mb-3">
             {/* Group Header */}
-            <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider px-3 py-2">
+            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 py-1.5">
               {group.label}
             </div>
             
@@ -414,7 +522,7 @@ export function DashboardSidebar({
                     onClick={() => handleItemClick(item)}
                     data-testid={`sidebar-nav-${item.id}`}
                     className={cn(
-                      "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium transition-colors",
+                      "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
                       isActive 
                         ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
                         : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
@@ -443,32 +551,37 @@ export function DashboardSidebar({
         ))}
       </nav>
 
-      {/* Footer - Settings, Help, and Language */}
+      {/* Footer - Settings and Help */}
       <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
         <div className="space-y-0.5">
-          <button
-            onClick={() => setLocation("/profile")}
-            data-testid="sidebar-nav-settings"
-            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-          >
-            <Settings className="h-4 w-4 shrink-0" />
-            <span>{t("dashboard.sidebar.settings", "Settings")}</span>
-          </button>
+          {/* Settings button - hidden for technician variant (they have Profile in main nav) */}
+          {variant !== "technician" && (
+            <button
+              onClick={() => setLocation("/profile")}
+              data-testid="sidebar-nav-settings"
+              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <Settings className="h-4 w-4 shrink-0" />
+              <span>{t("dashboard.sidebar.settings", "Settings")}</span>
+            </button>
+          )}
           <button
             onClick={() => setLocation("/help")}
             data-testid="sidebar-nav-help"
-            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+            className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
           >
             <HelpCircle className="h-4 w-4 shrink-0" />
             <span>{t("dashboard.sidebar.help", "Help Center")}</span>
           </button>
-        </div>
-        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-          <LanguageDropdown 
-            variant="ghost" 
-            size="sm"
-            className="w-full justify-start text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          />
+          {/* Customize Sidebar button */}
+          <button
+            onClick={() => setCustomizeDialogOpen(true)}
+            data-testid="sidebar-nav-customize"
+            className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
+            <SlidersHorizontal className="h-4 w-4 shrink-0" />
+            <span>{t("dashboard.sidebar.customize", "Customize")}</span>
+          </button>
         </div>
       </div>
     </>
@@ -507,6 +620,15 @@ export function DashboardSidebar({
       >
         {sidebarContent}
       </aside>
+
+      {/* Sidebar Customization Dialog */}
+      <SidebarCustomizeDialog
+        open={customizeDialogOpen}
+        onOpenChange={setCustomizeDialogOpen}
+        variant={variant}
+        navigationGroups={activeNavigationGroups}
+        currentUser={currentUser}
+      />
     </>
   );
 }

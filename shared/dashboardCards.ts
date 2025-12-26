@@ -19,6 +19,7 @@ export const CARD_REGISTRY: CardDefinition[] = [
   { id: 'time-notclocked', name: 'Not Clocked In', description: 'Scheduled but not started', category: 'OPERATIONS', permission: 'manageEmployees', size: 'single' },
   { id: 'time-today', name: 'Today\'s Hours', description: 'Company-wide total', category: 'OPERATIONS', permission: 'viewWorkSessions', size: 'single' },
   { id: 'time-my', name: 'My Time Today', description: 'Current user\'s status', category: 'OPERATIONS', permission: null, size: 'single' },
+  { id: 'ops-weather', name: 'Weather', description: 'Wind & conditions', category: 'OPERATIONS', permission: null, refreshInterval: 300000, size: 'single' },
 
   // FINANCIAL
   { id: 'pay-period', name: 'Pay Period Summary', description: 'Dates, hours, cost', category: 'FINANCIAL', permission: 'canAccessFinancials', size: 'single' },

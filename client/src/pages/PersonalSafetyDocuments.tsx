@@ -29,18 +29,20 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { TechnicianHeader } from "@/components/TechnicianHeader";
 import {
   ArrowLeft,
   ClipboardCheck,
   AlertTriangle,
   CheckCircle2,
-  Shield,
   FileText,
   Download,
   Trash2,
   Loader2,
   Plus,
 } from "lucide-react";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory, type EquipmentFindings, type InspectionResult } from "@shared/schema";
 
 const inspectionFormSchema = z.object({
@@ -365,26 +367,29 @@ export default function PersonalSafetyDocuments() {
     doc.save(`Personal_Inspection_${inspection.inspectionDate}.pdf`);
   };
 
+  const { i18n } = useTranslation();
+  const language = i18n.language as 'en' | 'fr' | 'es';
+
+  const technicianNavGroups = getTechnicianNavGroups(language);
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-6 px-4 max-w-4xl">
-        <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/technician-portal")}
-            data-testid="button-back-to-portal"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-3">
-            <Shield className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-2xl font-semibold">Personal Safety Documents</h1>
-              <p className="text-sm text-muted-foreground">Track your personal equipment inspections</p>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      <div className="hidden lg:block">
+        <DashboardSidebar
+          currentUser={currentUser}
+          activeTab="personal-safety-docs"
+          onTabChange={() => {}}
+          variant="technician"
+          customNavigationGroups={technicianNavGroups}
+          showDashboardLink={false}
+        />
+      </div>
+      
+      <div className="lg:pl-60">
+        <TechnicianHeader language={language} />
+
+        <main className="p-4 sm:p-6 lg:p-8">
+          <div className="max-w-4xl mx-auto">
 
         <Card className="mb-4 border-primary/20 bg-primary/5">
           <CardContent className="p-4">
@@ -771,6 +776,8 @@ export default function PersonalSafetyDocuments() {
             </Form>
           </>
         )}
+          </div>
+        </main>
       </div>
     </div>
   );

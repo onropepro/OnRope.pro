@@ -194,6 +194,7 @@ interface VisibleTechnician {
 export default function VisibleTechniciansBrowser() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [certFilter, setCertFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
@@ -201,10 +202,9 @@ export default function VisibleTechniciansBrowser() {
   const [showJobOfferDialog, setShowJobOfferDialog] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [offerMessage, setOfferMessage] = useState("");
-  const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem("dashboardLanguage");
-    return (saved === "fr" ? "fr" : "en") as Language;
-  });
+  
+  // Use global i18n language, not local storage
+  const language: Language = i18n.language === 'fr' ? 'fr' : 'en';
   const t = translations[language];
 
   const { data: userData } = useQuery<{ user: UserType }>({
@@ -299,7 +299,14 @@ export default function VisibleTechniciansBrowser() {
   const filteredTechnicians = technicians.filter(tech => {
     const name = getDisplayName(tech).toLowerCase();
     const location = getLocation(tech)?.toLowerCase() || "";
-    const matchesSearch = name.includes(searchQuery.toLowerCase()) || location.includes(searchQuery.toLowerCase());
+    const irataLicense = (tech.irataLicenseNumber || "").toLowerCase();
+    const spratLicense = (tech.spratLicenseNumber || "").toLowerCase();
+    const searchLower = searchQuery.toLowerCase();
+    
+    const matchesSearch = name.includes(searchLower) || 
+                          location.includes(searchLower) ||
+                          irataLicense.includes(searchLower) ||
+                          spratLicense.includes(searchLower);
 
     let matchesCert = true;
     if (certFilter === "irata") {

@@ -132,11 +132,9 @@ export default function TechnicianLogin() {
   useEffect(() => {
     if (userData?.user) {
       if (userData.user.role === "rope_access_tech") {
-        if (userData.user.companyId && !userData.user.terminatedDate) {
-          setLocation("/dashboard");
-        } else {
-          setLocation("/technician-portal");
-        }
+        setLocation("/technician-portal");
+      } else if (userData.user.role === "ground_crew") {
+        setLocation("/ground-crew-portal");
       } else if (userData.user.role === "resident") {
         setLocation("/resident-dashboard");
       } else if (userData.user.role === "property_manager") {
@@ -187,11 +185,9 @@ export default function TechnicianLogin() {
       });
       
       if (user.role === "rope_access_tech") {
-        if (user.companyId && !user.terminatedDate) {
-          setLocation("/dashboard");
-        } else {
-          setLocation("/technician-portal");
-        }
+        setLocation("/technician-portal");
+      } else if (user.role === "ground_crew") {
+        setLocation("/ground-crew-portal");
       } else {
         setLocation("/dashboard");
       }

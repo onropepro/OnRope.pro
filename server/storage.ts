@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, quoteMessages, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, QuoteMessage, InsertQuoteMessage, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile, ResidentFeedbackPhotoQueue, InsertResidentFeedbackPhotoQueue } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, quoteMessages, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue, staffAccounts } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, QuoteMessage, InsertQuoteMessage, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile, ResidentFeedbackPhotoQueue, InsertResidentFeedbackPhotoQueue, StaffAccount, InsertStaffAccount } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -15,7 +15,9 @@ export class Storage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    // Case-insensitive email lookup
+    const normalizedEmail = email.toLowerCase().trim();
+    const result = await db.select().from(users).where(sql`LOWER(${users.email}) = ${normalizedEmail}`).limit(1);
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
@@ -276,7 +278,7 @@ export class Storage {
     if (membership.connectionType === 'primary') {
       // Primary connection - set suspendedAt on user record
       await this.updateUser(employeeId, {
-        suspendedAt: new Date().toISOString(),
+        suspendedAt: new Date(),
       });
     } else if (membership.connectionType === 'secondary' && membership.connectionId) {
       // Secondary connection - update the connection record status
@@ -481,10 +483,13 @@ export class Storage {
   }
 
   async getTechnicianByEmail(email: string): Promise<User | undefined> {
-    // Search for ANY technician by email (including already linked ones for PLUS access)
+    // Search for ANY technician or ground crew by email (including already linked ones for PLUS access)
     const results = await db.select().from(users).where(
       and(
-        eq(users.role, "rope_access_tech"),
+        or(
+          eq(users.role, "rope_access_tech"),
+          eq(users.role, "ground_crew")
+        ),
         eq(users.email, email.toLowerCase())
       )
     ).limit(1);
@@ -4464,6 +4469,32 @@ export class Storage {
     return result[0];
   }
 
+  async cancelTeamInvitation(invitationId: string): Promise<void> {
+    await db.delete(teamInvitations)
+      .where(eq(teamInvitations.id, invitationId));
+  }
+
+  async getPendingSentInvitationsForCompany(companyId: string): Promise<(TeamInvitation & { technician: User })[]> {
+    const results = await db.select({
+      invitation: teamInvitations,
+      technician: users,
+    })
+      .from(teamInvitations)
+      .innerJoin(users, eq(teamInvitations.technicianId, users.id))
+      .where(
+        and(
+          eq(teamInvitations.companyId, companyId),
+          eq(teamInvitations.status, "pending")
+        )
+      )
+      .orderBy(desc(teamInvitations.createdAt));
+    
+    return results.map(r => ({
+      ...r.invitation,
+      technician: r.technician
+    }));
+  }
+
   async getInvitationsForCompany(companyId: string): Promise<TeamInvitation[]> {
     return db.select()
       .from(teamInvitations)
@@ -4757,6 +4788,77 @@ export class Storage {
       .where(eq(technicianDocumentRequestFiles.id, id))
       .returning();
     return result.length > 0;
+  }
+
+  // Staff Account operations
+  async getStaffAccountById(id: string): Promise<StaffAccount | undefined> {
+    const result = await db.select()
+      .from(staffAccounts)
+      .where(eq(staffAccounts.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async getStaffAccountByEmail(email: string): Promise<StaffAccount | undefined> {
+    const normalizedEmail = email.toLowerCase().trim();
+    const result = await db.select()
+      .from(staffAccounts)
+      .where(sql`LOWER(${staffAccounts.email}) = ${normalizedEmail}`)
+      .limit(1);
+    return result[0];
+  }
+
+  async getAllStaffAccounts(): Promise<StaffAccount[]> {
+    return db.select()
+      .from(staffAccounts)
+      .orderBy(desc(staffAccounts.createdAt));
+  }
+
+  async createStaffAccount(data: InsertStaffAccount): Promise<StaffAccount> {
+    const passwordHash = await bcrypt.hash(data.passwordHash, SALT_ROUNDS);
+    const result = await db.insert(staffAccounts).values({
+      ...data,
+      email: data.email.toLowerCase().trim(),
+      passwordHash,
+    }).returning();
+    return result[0];
+  }
+
+  async updateStaffAccount(id: string, updates: Partial<StaffAccount>): Promise<StaffAccount | undefined> {
+    const updateData: any = { ...updates, updatedAt: new Date() };
+    
+    // If updating password, hash it
+    if (updates.passwordHash) {
+      updateData.passwordHash = await bcrypt.hash(updates.passwordHash, SALT_ROUNDS);
+    }
+    
+    const result = await db.update(staffAccounts)
+      .set(updateData)
+      .where(eq(staffAccounts.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteStaffAccount(id: string): Promise<boolean> {
+    const result = await db.delete(staffAccounts)
+      .where(eq(staffAccounts.id, id))
+      .returning();
+    return result.length > 0;
+  }
+
+  async verifyStaffAccountPassword(email: string, password: string): Promise<StaffAccount | null> {
+    const account = await this.getStaffAccountByEmail(email);
+    if (!account || !account.isActive) return null;
+    
+    const valid = await bcrypt.compare(password, account.passwordHash);
+    if (!valid) return null;
+    
+    // Update last login
+    await db.update(staffAccounts)
+      .set({ lastLoginAt: new Date() })
+      .where(eq(staffAccounts.id, account.id));
+    
+    return account;
   }
 }
 

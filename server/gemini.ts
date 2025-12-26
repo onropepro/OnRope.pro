@@ -869,3 +869,198 @@ If the image is not a business card or is unreadable, set success to false and e
     };
   }
 }
+
+export interface DriversLicenseOCRResult {
+  success: boolean;
+  licenseNumber: string | null;
+  expiryDate: string | null;
+  issuedDate: string | null;
+  name: string | null;
+  confidence: "high" | "medium" | "low";
+  error: string | null;
+}
+
+export async function analyzeDriversLicense(
+  imageBase64: string,
+  mimeType: string = "image/jpeg"
+): Promise<DriversLicenseOCRResult> {
+  try {
+    console.log("[Drivers License OCR] Starting analysis...");
+    
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `You are analyzing an image of a driver's license. Extract the following information:
+
+1. License number - The driver's license number/ID
+2. Expiry date - When the license expires (format as YYYY-MM-DD)
+3. Issued date - When the license was issued (format as YYYY-MM-DD)
+4. Name - The license holder's name
+
+This could be a driver's license from any country (Canada, USA, etc.). Look for fields like:
+- "DL", "License No", "Licence", "Driver Licence Number", etc.
+- "EXP", "Expiry", "Expires", "Valid Until", etc.
+- "ISS", "Issued", "Issue Date", etc.
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "success": boolean,
+  "licenseNumber": string or null,
+  "expiryDate": string or null (YYYY-MM-DD format),
+  "issuedDate": string or null (YYYY-MM-DD format),
+  "name": string or null,
+  "confidence": "high" | "medium" | "low",
+  "error": string or null
+}
+
+If this is not a driver's license or is unreadable, set success to false and explain in error.`
+            },
+            {
+              inlineData: {
+                mimeType,
+                data: imageBase64
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            success: { type: Type.BOOLEAN },
+            licenseNumber: { type: Type.STRING, nullable: true },
+            expiryDate: { type: Type.STRING, nullable: true },
+            issuedDate: { type: Type.STRING, nullable: true },
+            name: { type: Type.STRING, nullable: true },
+            confidence: { type: Type.STRING },
+            error: { type: Type.STRING, nullable: true }
+          },
+          required: ["success", "confidence"]
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}") as DriversLicenseOCRResult;
+    
+    // Normalize dates
+    if (result.expiryDate) {
+      result.expiryDate = normalizeExpiryDate(result.expiryDate);
+    }
+    if (result.issuedDate) {
+      result.issuedDate = normalizeExpiryDate(result.issuedDate);
+    }
+    
+    console.log("[Drivers License OCR] Analysis result:", JSON.stringify(result));
+    return result;
+  } catch (error: any) {
+    console.error("[Drivers License OCR] Analysis error:", error);
+    return {
+      success: false,
+      licenseNumber: null,
+      expiryDate: null,
+      issuedDate: null,
+      name: null,
+      confidence: "low",
+      error: `Analysis failed: ${error.message || "Unknown error"}`
+    };
+  }
+}
+
+export interface VoidChequeOCRResult {
+  success: boolean;
+  transitNumber: string | null;
+  institutionNumber: string | null;
+  accountNumber: string | null;
+  confidence: "high" | "medium" | "low";
+  error: string | null;
+}
+
+export async function analyzeVoidCheque(
+  imageBase64: string,
+  mimeType: string = "image/jpeg"
+): Promise<VoidChequeOCRResult> {
+  try {
+    console.log("[Void Cheque OCR] Starting analysis...");
+    
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `You are analyzing an image of a void cheque or bank document. Extract the banking information:
+
+1. Transit Number (Branch Number) - Usually 5 digits, identifies the branch
+2. Institution Number - Usually 3 digits, identifies the bank (e.g., 001=BMO, 002=Scotiabank, 003=RBC, 004=TD, 006=National Bank, 010=CIBC)
+3. Account Number - Usually 7-12 digits, identifies the account
+
+In Canada, the numbers at the bottom of a cheque are typically in this order:
+[Transit/Branch (5 digits)] [Institution (3 digits)] [Account Number (7-12 digits)]
+
+Sometimes shown as: TTTTT-III-AAAAAAA or with symbols between them.
+
+The numbers may also be labeled as:
+- "Branch/Transit", "Succursale"
+- "Institution", "Banque"
+- "Account", "Compte"
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "success": boolean,
+  "transitNumber": string or null (5 digits, branch/transit number),
+  "institutionNumber": string or null (3 digits, bank institution number),
+  "accountNumber": string or null (7-12 digits, account number),
+  "confidence": "high" | "medium" | "low",
+  "error": string or null
+}
+
+If this is not a cheque or banking document, or is unreadable, set success to false and explain in error.`
+            },
+            {
+              inlineData: {
+                mimeType,
+                data: imageBase64
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            success: { type: Type.BOOLEAN },
+            transitNumber: { type: Type.STRING, nullable: true },
+            institutionNumber: { type: Type.STRING, nullable: true },
+            accountNumber: { type: Type.STRING, nullable: true },
+            confidence: { type: Type.STRING },
+            error: { type: Type.STRING, nullable: true }
+          },
+          required: ["success", "confidence"]
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}") as VoidChequeOCRResult;
+    console.log("[Void Cheque OCR] Analysis result:", JSON.stringify(result));
+    return result;
+  } catch (error: any) {
+    console.error("[Void Cheque OCR] Analysis error:", error);
+    return {
+      success: false,
+      transitNumber: null,
+      institutionNumber: null,
+      accountNumber: null,
+      confidence: "low",
+      error: `Analysis failed: ${error.message || "Unknown error"}`
+    };
+  }
+}
