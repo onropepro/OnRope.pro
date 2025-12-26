@@ -187,9 +187,8 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
             <DialogTitle>{t('login.signIn', 'Sign In')}</DialogTitle>
             <DialogDescription>{t('login.modalDescription', 'Sign in to your account or register as a new user')}</DialogDescription>
           </VisuallyHidden>
-          <div className="flex flex-col items-center pt-8 pb-2 px-6">
-            <img src={onRopeProLogo} alt="OnRopePro" className="h-12 object-contain mb-4" />
-            <h2 className="text-2xl font-bold">{t('login.signIn', 'Sign In')}</h2>
+          <div className="flex flex-col items-center pt-8 pb-4 px-6">
+            <img src={onRopeProLogo} alt="OnRopePro" className="h-12 object-contain" />
           </div>
           
           <div className="px-6 pb-8">
