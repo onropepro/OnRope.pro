@@ -5610,7 +5610,7 @@
     "confirmDeletePreviousHours": "Êtes-vous sûr de vouloir supprimer cette entrée d",
     "deleteConfirm": "Supprimer",
     "cancelDelete": "Annuler",
-    "logbookDisclaimer": "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet irata/SPRAT officiel - ce journal numérique ne le remplace pas.",
+    "logbookDisclaimer": "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas.",
     "jobBoardDesc": "Parcourir les opportunites et rendre votre profil visible aux employeurs",
     "browseJobs": "Parcourir les offres",
     "yourReferralCode": "Votre code de parrainage",
@@ -9979,7 +9979,7 @@
       },
       "disclaimer": {
         "title": "Important : Responsabilité de conformité en matière de sécurité",
-        "text": "OnRopePro aide à documenter les procédures de sécurité, mais vous restez entièrement responsable de la sécurité au travail et de la conformité réglementaire. Ce logiciel ne remplace pas les professionnels de la sécurité qualifiés, la formation irata/SPRAT, les inspections d'équipement par des inspecteurs certifiés, ou le respect de toutes les réglementations OSHA/WorkSafeBC applicables."
+        "text": "OnRopePro aide à documenter les procédures de sécurité, mais vous restez entièrement responsable de la sécurité au travail et de la conformité réglementaire. Ce logiciel ne remplace pas les professionnels de la sécurité qualifiés, la formation IRATA/SPRAT, les inspections d'équipement par des inspecteurs certifiés, ou le respect de toutes les réglementations OSHA/WorkSafeBC applicables."
       },
       "benefits": {
         "title": "Qui beneficie de ce module",

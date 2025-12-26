@@ -198,7 +198,7 @@ export default function AnalyticsGuide() {
                 <div className="bg-muted p-3 rounded text-sm space-y-1">
                   <p><strong>Key Metrics:</strong></p>
                   <ul className="list-disc list-inside space-y-0.5">
-                    <li><strong>irata Certification Status</strong>: Expiration tracking</li>
+                    <li><strong>IRATA Certification Status</strong>: Expiration tracking</li>
                     <li><strong>Hours Logged</strong>: Total work time per employee</li>
                     <li><strong>Harness Inspection Status</strong>: Compliance tracking</li>
                     <li><strong>Equipment Assignments</strong>: Gear utilization</li>

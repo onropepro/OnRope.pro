@@ -186,7 +186,7 @@ export default function UserAccessGuide() {
                     <HardHat className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">irata Level Tracking</h3>
+                    <h3 className="font-semibold">IRATA Level Tracking</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Track irata/SPRAT certification levels for each technician. Filter by qualification when assigning crews to projects.
                     </p>
@@ -287,13 +287,13 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="owner-3" className={`border rounded-lg px-4 ${openItems.includes("owner-3") ? "bg-white dark:bg-white/10" : ""}`}>
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium text-base">Can't track irata certifications</span>
+                  <span className="text-left font-medium text-base">Can't track IRATA certifications</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed text-base">
-                    <p>You've got 15 technicians with different irata levels. Client contracts require Level 2 or higher for certain buildings. Insurance audits demand proof of certification levels. But you're tracking this in a spreadsheet that's always outdated.</p>
+                    <p>You've got 15 technicians with different IRATA levels. Client contracts require Level 2 or higher for certain buildings. Insurance audits demand proof of certification levels. But you're tracking this in a spreadsheet that's always outdated.</p>
                     <p><span className="font-medium text-foreground">Example:</span> A client asks: "Which of your technicians are Level 2 or 3 and available next week?" You're digging through certification files, checking expiry dates, cross-referencing the schedule. This takes 30 minutes.</p>
-                    <p><span className="font-medium text-foreground">Solution:</span> Each employee profile includes irata level Level 1, 2, or 3) tracked in the system. When you need to assign work or respond to client requirements, you see certification levels instantly.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Each employee profile includes IRATA level Level 1, 2, or 3) tracked in the system. When you need to assign work or respond to client requirements, you see certification levels instantly.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Instant visibility into team qualifications. Respond to client questions in seconds, not minutes.</p>
                   </div>
                 </AccordionContent>
@@ -1184,7 +1184,7 @@ export default function UserAccessGuide() {
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Company owner navigates to employee management</li>
                   <li>Enters employee details: name, email, temporary password</li>
-                  <li>Adds irata level and hourly rate if applicable)</li>
+                  <li>Adds IRATA level and hourly rate if applicable)</li>
                   <li>Selects base role from dropdown standard or custom)</li>
                   <li>Assigns granular permissions across all categories</li>
                   <li>Employee can immediately log in and change password</li>

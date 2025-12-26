@@ -1650,7 +1650,7 @@ export default function Profile() {
 
                 {user?.techLevel && (
                   <div className="pt-2">
-                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'irata Level')}</div>
+                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'IRATA Level')}</div>
                     <div className="text-sm font-medium">{user.techLevel}</div>
                   </div>
                 )}
@@ -2311,7 +2311,7 @@ export default function Profile() {
 
                 {user?.techLevel && (
                   <div className="pt-2">
-                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'irata Level')}</div>
+                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'IRATA Level')}</div>
                     <div className="text-sm font-medium">{user.techLevel}</div>
                   </div>
                 )}

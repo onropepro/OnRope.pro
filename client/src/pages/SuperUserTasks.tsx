@@ -82,7 +82,7 @@ const SECTIONS = [
   "User Access & Authentication",
   "Project Management",
   "Work Session & Time Tracking",
-  "irata / SPRAT Task Logging",
+  "IRATA / SPRAT Task Logging",
   "Safety & Compliance",
   "Company Safety Rating (CSR)",
   "Document Management",

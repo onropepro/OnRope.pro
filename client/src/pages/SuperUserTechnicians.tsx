@@ -274,7 +274,7 @@ export default function SuperUserTechnicians() {
           variant={tech.irataVerified ? "default" : "outline"}
           className={tech.irataVerified ? "bg-blue-600" : ""}
         >
-          irata L{tech.irataLevel} {tech.irataVerified && "✓"}
+          IRATA L{tech.irataLevel} {tech.irataVerified && "✓"}
         </Badge>
       );
     }
@@ -540,11 +540,11 @@ export default function SuperUserTechnicians() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
                       {technicianDetailData.technician.irataLevel && (
                         <>
-                          <InfoItem label="irata Level" value={`Level ${technicianDetailData.technician.irataLevel}`} />
-                          <InfoItem label="irata License" value={technicianDetailData.technician.irataLicenseNumber} />
-                          <InfoItem label="irata Expiry" value={formatDate(technicianDetailData.technician.irataExpiry)} />
+                          <InfoItem label="IRATA Level" value={`Level ${technicianDetailData.technician.irataLevel}`} />
+                          <InfoItem label="IRATA License" value={technicianDetailData.technician.irataLicenseNumber} />
+                          <InfoItem label="IRATA Expiry" value={formatDate(technicianDetailData.technician.irataExpiry)} />
                           <InfoItem 
-                            label="irata Verified" 
+                            label="IRATA Verified" 
                             value={
                               technicianDetailData.technician.irataVerified 
                                 ? `Yes (${formatDate(technicianDetailData.technician.irataVerifiedAt)})` 
@@ -552,7 +552,7 @@ export default function SuperUserTechnicians() {
                             } 
                           />
                           {technicianDetailData.technician.irataBaselineHours && (
-                            <InfoItem label="irata Baseline Hours" value={technicianDetailData.technician.irataBaselineHours} />
+                            <InfoItem label="IRATA Baseline Hours" value={technicianDetailData.technician.irataBaselineHours} />
                           )}
                         </>
                       )}
@@ -651,7 +651,7 @@ export default function SuperUserTechnicians() {
                       <DocumentCount label="Bank Docs" count={technicianDetailData.technician.bankDocuments?.length || 0} />
                       <DocumentCount label="License Docs" count={technicianDetailData.technician.driversLicenseDocuments?.length || 0} />
                       <DocumentCount label="First Aid" count={technicianDetailData.technician.firstAidDocuments?.length || 0} />
-                      <DocumentCount label="irata Docs" count={technicianDetailData.technician.irataDocuments?.length || 0} />
+                      <DocumentCount label="IRATA Docs" count={technicianDetailData.technician.irataDocuments?.length || 0} />
                       <DocumentCount label="SPRAT Docs" count={technicianDetailData.technician.spratDocuments?.length || 0} />
                     </div>
                   </div>

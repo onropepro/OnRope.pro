@@ -103,7 +103,7 @@ const translations = {
     weekly: "per week",
     monthly: "per month",
     annually: "per year",
-    irataLevel: "irata Level",
+    irataLevel: "IRATA Level",
     spratLevel: "SPRAT Level",
     close: "Close",
     apply: "Express Interest",
@@ -1024,7 +1024,7 @@ export default function TechnicianJobBoard() {
                             <Award className="w-4 h-4 text-amber-500" />
                             {job.requiredIrataLevel && (
                               <Badge variant="outline" className="border-amber-500 text-amber-600">
-                                irata {job.requiredIrataLevel}
+                                IRATA {job.requiredIrataLevel}
                               </Badge>
                             )}
                             {job.requiredSpratLevel && (

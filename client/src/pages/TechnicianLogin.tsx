@@ -210,7 +210,7 @@ export default function TechnicianLogin() {
     {
       icon: FileText,
       title: "Logbook Reference",
-      description: "Every session recorded. Building, tasks, height, hours. Fill out your irata logbook from real data, not guesswork two weeks later."
+      description: "Every session recorded. Building, tasks, height, hours. Fill out your IRATA logbook from real data, not guesswork two weeks later."
     },
     {
       icon: Award,

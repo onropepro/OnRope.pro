@@ -272,7 +272,7 @@ export default function MyLoggedHours() {
             <div>
               <h1 className="text-lg sm:text-xl font-bold tracking-tight">{t('loggedHours.title', 'My Logged Hours')}</h1>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {t('loggedHours.subtitle', 'irata Logbook')}
+                {t('loggedHours.subtitle', 'IRATA Logbook')}
               </p>
             </div>
           </div>
@@ -396,12 +396,12 @@ export default function MyLoggedHours() {
               {upgradeProgress.isMaxLevel ? (
                 <div className="text-center py-4">
                   <span className="material-icons text-4xl text-amber-600 mb-2">emoji_events</span>
-                  <p className="font-medium">{t('loggedHours.maxLevelReached', 'Congratulations! You have reached irata Level 3')}</p>
-                  <p className="text-sm text-muted-foreground">{t('loggedHours.highestLevel', 'This is the highest irata certification level')}</p>
+                  <p className="font-medium">{t('loggedHours.maxLevelReached', 'Congratulations! You have reached IRATA Level 3')}</p>
+                  <p className="text-sm text-muted-foreground">{t('loggedHours.highestLevel', 'This is the highest IRATA certification level')}</p>
                 </div>
               ) : upgradeProgress.noLevel ? (
                 <div className="text-center py-4">
-                  <p className="text-muted-foreground">{t('loggedHours.noLevelSet', 'Set your irata level in your profile to track upgrade progress')}</p>
+                  <p className="text-muted-foreground">{t('loggedHours.noLevelSet', 'Set your IRATA level in your profile to track upgrade progress')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -526,7 +526,7 @@ export default function MyLoggedHours() {
                 <span className="material-icons text-6xl text-muted-foreground/30">assignment</span>
                 <h3 className="text-lg font-medium mt-4">{t('loggedHours.noLoggedHoursYet', 'No logged hours yet')}</h3>
                 <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-                  {t('loggedHours.noLoggedHoursDesc', "When you end a work session, you'll be prompted to log the irata tasks you performed. Your logged hours will appear here for your irata certification logbook.")}
+                  {t('loggedHours.noLoggedHoursDesc', "When you end a work session, you'll be prompted to log the IRATA tasks you performed. Your logged hours will appear here for your IRATA certification logbook.")}
                 </p>
               </div>
             ) : (
@@ -613,7 +613,7 @@ export default function MyLoggedHours() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <span className="material-icons">info</span>
-                {t('loggedHours.irataCertInfo', 'irata Certification Info')}
+                {t('loggedHours.irataCertInfo', 'IRATA Certification Info')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -658,7 +658,7 @@ export default function MyLoggedHours() {
               {t('loggedHours.setPriorHoursTitle', 'Set Prior Logbook Hours')}
             </DialogTitle>
             <DialogDescription>
-              {t('loggedHours.setPriorHoursDesc', 'Enter the total number of hours you have recorded in your irata logbook before using this system. This will be added to your hours logged here to show your complete total.')}
+              {t('loggedHours.setPriorHoursDesc', 'Enter the total number of hours you have recorded in your IRATA logbook before using this system. This will be added to your hours logged here to show your complete total.')}
             </DialogDescription>
           </DialogHeader>
           
@@ -718,7 +718,7 @@ export default function MyLoggedHours() {
               {t('loggedHours.certBaselineTitle', 'Certification Upgrade Baseline')}
             </DialogTitle>
             <DialogDescription>
-              {t('loggedHours.certBaselineDesc', 'Enter your total logbook hours and the date when you achieved your current irata level. This helps track your progress toward the next level.')}
+              {t('loggedHours.certBaselineDesc', 'Enter your total logbook hours and the date when you achieved your current IRATA level. This helps track your progress toward the next level.')}
             </DialogDescription>
           </DialogHeader>
           
@@ -737,7 +737,7 @@ export default function MyLoggedHours() {
                 data-testid="input-cert-baseline-hours"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {t('loggedHours.hoursAtUpgradeNote', 'Your total logged hours when you passed your last irata assessment')}
+                {t('loggedHours.hoursAtUpgradeNote', 'Your total logged hours when you passed your last IRATA assessment')}
               </p>
             </div>
 
@@ -752,7 +752,7 @@ export default function MyLoggedHours() {
                 data-testid="input-cert-baseline-date"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {t('loggedHours.dateOfUpgradeNote', 'The date you achieved your current irata level')}
+                {t('loggedHours.dateOfUpgradeNote', 'The date you achieved your current IRATA level')}
               </p>
             </div>
           </div>

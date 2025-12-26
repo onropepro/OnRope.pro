@@ -336,12 +336,12 @@ export default function FlhaForm() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">{t('safetyForms.flha.icopTitle', 'irata International Code of Practice (ICOP)')}</CardTitle>
+              <CardTitle className="text-lg">{t('safetyForms.flha.icopTitle', 'IRATA International Code of Practice (ICOP)')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              {t('safetyForms.flha.icopDescription', 'All rope access operations must comply with the irata International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.')}
+              {t('safetyForms.flha.icopDescription', 'All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.')}
             </p>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="text-xs">
@@ -363,7 +363,7 @@ export default function FlhaForm() {
                   className="flex items-center gap-1 hover:text-primary"
                   data-testid="link-irata-icop-info"
                 >
-                  {t('safetyForms.flha.viewICOPInfo', 'View irata ICOP Information')}
+                  {t('safetyForms.flha.viewICOPInfo', 'View IRATA ICOP Information')}
                 </a>
               </Badge>
             </div>

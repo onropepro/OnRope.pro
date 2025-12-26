@@ -178,7 +178,7 @@ const recentChangesData: RecentChange[] = [
   {
     date: "December 9, 2025",
     title: "Technician Landing Page Updates",
-    description: "Added irata expiry problem to feature scroller, changed 'Most Popular' badge to 'This One Is Better' for Plus tier, reordered Plus features to prioritize certification expiry alerts. Updated referral messaging to correctly state one-sided benefit (referrer only gets Plus)",
+    description: "Added IRATA expiry problem to feature scroller, changed 'Most Popular' badge to 'This One Is Better' for Plus tier, reordered Plus features to prioritize certification expiry alerts. Updated referral messaging to correctly state one-sided benefit (referrer only gets Plus)",
     type: "improvement"
   },
   {
@@ -202,7 +202,7 @@ const recentChangesData: RecentChange[] = [
   {
     date: "December 8, 2025",
     title: "Previous Work Experience Entry",
-    description: "Technicians can record prior rope access work experience in their personal logbook. Enter date ranges, hours worked, building name/address/height, select from 19 irata task types, and add notes. These entries are stored separately and clearly marked as 'not counted in certification totals'",
+    description: "Technicians can record prior rope access work experience in their personal logbook. Enter date ranges, hours worked, building name/address/height, select from 19 IRATA task types, and add notes. These entries are stored separately and clearly marked as 'not counted in certification totals'",
     type: "feature"
   },
   {
@@ -232,13 +232,13 @@ const recentChangesData: RecentChange[] = [
   {
     date: "December 6, 2025",
     title: "Team Invitation System",
-    description: "Complete invitation-based workflow for adding technicians to your team. Search for self-registered technicians by irata license, SPRAT license, or email. Send invitations that appear in the technician's portal with accept/decline options. Full bilingual support (EN/FR)",
+    description: "Complete invitation-based workflow for adding technicians to your team. Search for self-registered technicians by IRATA license, SPRAT license, or email. Send invitations that appear in the technician's portal with accept/decline options. Full bilingual support (EN/FR)",
     type: "feature"
   },
   {
     date: "December 6, 2025",
     title: "AI License Verification",
-    description: "irata and SPRAT license verification using Gemini AI screenshot analysis. Technicians upload a screenshot from the official verification portal, and AI validates their license number, level, and expiration date against their registered credentials",
+    description: "IRATA and SPRAT license verification using Gemini AI screenshot analysis. Technicians upload a screenshot from the official verification portal, and AI validates their license number, level, and expiration date against their registered credentials",
     type: "feature"
   },
   {
@@ -286,7 +286,7 @@ const recentChangesData: RecentChange[] = [
   {
     date: "December 4, 2025",
     title: "Comprehensive Code Audit & Bug Fixes",
-    description: "Fixed 7 bugs including: irata license expiration timezone parsing, inventory compliance rating date handling, PDF filename timezone issues, quote service hours data loss on edit, debug console logs removal, bulk export graceful error handling with partial success support, and quote pipeline data integrity logging",
+    description: "Fixed 7 bugs including: IRATA license expiration timezone parsing, inventory compliance rating date handling, PDF filename timezone issues, quote service hours data loss on edit, debug console logs removal, bulk export graceful error handling with partial success support, and quote pipeline data integrity logging",
     type: "fix"
   },
   {
@@ -370,7 +370,7 @@ const recentChangesData: RecentChange[] = [
   {
     date: "November 10, 2025",
     title: "Hours Logging Prompt",
-    description: "Automatic prompt asking technicians if they want to log irata hours after ending work sessions",
+    description: "Automatic prompt asking technicians if they want to log IRATA hours after ending work sessions",
     type: "improvement"
   },
   {
@@ -439,7 +439,7 @@ const pagesData: PageCategory[] = [
       { name: "User Access Guide", path: "/changelog/user-access", description: "Roles, permissions, and authentication", roles: ["Public"] },
       { name: "Projects Guide", path: "/changelog/projects", description: "Project management and job types", roles: ["Public"] },
       { name: "Time Tracking Guide", path: "/changelog/time-tracking", description: "Work sessions and clock in/out", roles: ["Public"] },
-      { name: "irata Logging Guide", path: "/changelog/irata-logging", description: "Task logging for certification progression", roles: ["Public"] },
+      { name: "IRATA Logging Guide", path: "/changelog/irata-logging", description: "Task logging for certification progression", roles: ["Public"] },
       { name: "Document Management Guide", path: "/changelog/documents", description: "Document storage and compliance tracking", roles: ["Public"] },
       { name: "Employee Management Guide", path: "/changelog/employees", description: "Workforce administration and certifications", roles: ["Public"] },
       { name: "Scheduling Guide", path: "/changelog/scheduling", description: "Calendar and time-off management", roles: ["Public"] },
@@ -493,7 +493,7 @@ const pagesData: PageCategory[] = [
     pages: [
       { name: "Technician Dashboard", path: "/technician", description: "Personal technician portal with profile and certifications", roles: ["Technician"] },
       { name: "My Profile", path: "/technician/profile", description: "Personal information, certifications, and documents", roles: ["Technician"] },
-      { name: "My Logged Hours", path: "/technician/hours", description: "irata task logging history and statistics", roles: ["Technician"] },
+      { name: "My Logged Hours", path: "/technician/hours", description: "IRATA task logging history and statistics", roles: ["Technician"] },
       { name: "My Gear", path: "/technician/gear", description: "Personal equipment assignments", roles: ["Technician"] },
       { name: "My Employers", path: "/technician/employers", description: "Connected companies and PLUS multi-employer management", roles: ["Technician"] },
       { name: "Pending Invitations", path: "/technician/invitations", description: "Team invitations from companies", roles: ["Technician"] },
@@ -545,7 +545,7 @@ const pagesData: PageCategory[] = [
     pages: [
       { name: "Schedule", path: "/schedule", description: "Calendar and employee scheduling", roles: ["Company", "Ops Manager", "Supervisor"] },
       { name: "Active Workers", path: "/active-workers", description: "Real-time worker tracking", roles: ["Company", "Ops Manager", "Supervisor"] },
-      { name: "My Logged Hours", path: "/my-logged-hours", description: "irata task logging history", roles: ["irata Technicians"] },
+      { name: "My Logged Hours", path: "/my-logged-hours", description: "IRATA task logging history", roles: ["IRATA Technicians"] },
       { name: "Non-Billable Hours", path: "/non-billable-hours", description: "Non-billable time entries", roles: ["All Employees"] },
       { name: "Hours Analytics", path: "/hours-analytics", description: "Billable vs non-billable insights", roles: ["Company", "Ops Manager", "Supervisor"] },
     ]
@@ -685,12 +685,12 @@ const changelogData: ChangelogSection[] = [
     status: "complete"
   },
   {
-    title: "irata Task Logging System",
+    title: "IRATA Task Logging System",
     icon: ClipboardCheck,
     iconColor: "text-action-500 dark:text-action-400",
-    description: "Comprehensive work hours logging for irata certification progression",
+    description: "Comprehensive work hours logging for IRATA certification progression",
     features: [
-      "Task selection dialog after ending work sessions (irata technicians only)",
+      "Task selection dialog after ending work sessions (IRATA technicians only)",
       "20+ canonical rope access task types including rope transfer, ascending, descending, rigging, deviation, rescue techniques",
       "Server-derived metadata from authoritative work session and project records",
       "Security hardening with canonical task validation and ownership verification",
@@ -770,7 +770,7 @@ const changelogData: ChangelogSection[] = [
     description: "Complete workforce administration with team invitations and certification tracking",
     features: [
       "Employee profile management with contact details",
-      "irata and SPRAT certification level and expiration tracking",
+      "IRATA and SPRAT certification level and expiration tracking",
       "Team invitation system: Search technicians by license or email, send invitations",
       "Technician accepts/declines invitations from their portal",
       "Owner notification when technicians accept invitations",
@@ -793,7 +793,7 @@ const changelogData: ChangelogSection[] = [
     features: [
       "Simplified 4-screen registration flow (down from 20 screens)",
       "Personal info: Name, email, password, phone",
-      "Certification info: irata/SPRAT level, license number, expiration",
+      "Certification info: IRATA/SPRAT level, license number, expiration",
       "Contact info: Address with Geoapify autocomplete",
       "Financial info: SIN (encrypted), banking details for payroll",
       "Referral code system: 12-character unique codes for technicians",
@@ -1050,7 +1050,7 @@ const changelogData: ChangelogSection[] = [
     features: [
       "Company and SuperUser job posting with salary ranges and requirements",
       "Multiple job types: Full-time, Part-time, Contract, Seasonal, Project-based",
-      "Required certifications specification (irata Level 1/2/3, SPRAT, etc.)",
+      "Required certifications specification (IRATA Level 1/2/3, SPRAT, etc.)",
       "Technician job browsing with filter and search capabilities",
       "Profile visibility toggle to make technician profiles discoverable by employers",
       "Visible profiles display resume, safety rating, name, experience, and certifications",
@@ -1152,7 +1152,7 @@ export default function Changelog() {
             const isUserAccessSection = section.title === "Authentication & User Management";
             const isProjectsSection = section.title === "Project Management System";
             const isTimeTrackingSection = section.title === "Work Session & Time Tracking";
-            const isIRATASection = section.title === "irata Task Logging System";
+            const isIRATASection = section.title === "IRATA Task Logging System";
             const isDocumentSection = section.title === "Document Management";
             const isEmployeeSection = section.title === "Employee Management";
             const isSchedulingSection = section.title === "Scheduling & Time-Off Management";

@@ -309,7 +309,7 @@ const employeeSchema = z.object({
   emergencyContactName: z.string().optional(),
   emergencyContactPhone: z.string().optional(),
   specialMedicalConditions: z.string().optional(),
-  // irata fields
+  // IRATA fields
   irataLevel: z.string().optional(),
   irataLicenseNumber: z.string().optional(),
   irataIssuedDate: z.string().optional(),
@@ -341,7 +341,7 @@ const editEmployeeSchema = z.object({
   emergencyContactName: z.string().optional(),
   emergencyContactPhone: z.string().optional(),
   specialMedicalConditions: z.string().optional(),
-  // irata fields
+  // IRATA fields
   irataLevel: z.string().optional(),
   irataLicenseNumber: z.string().optional(),
   irataIssuedDate: z.string().optional(),
@@ -4718,8 +4718,8 @@ export default function Dashboard() {
                                 <FormDescription className="text-xs mt-2">
                                   <span className="font-medium text-foreground">{t('dashboard.projectForm.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
                                   {isRockScaling
-                                    ? t('dashboard.projectForm.siteHeightExplain', 'Site height is required for irata logbook entries. Technicians need this to track work at height for certification progression.')
-                                    : t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for irata logbook entries. Technicians need this to track work at height for certification progression.')
+                                    ? t('dashboard.projectForm.siteHeightExplain', 'Site height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')
+                                    : t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')
                                   }
                                 </FormDescription>
                                 {!isRockScaling && floorCount && parseInt(floorCount) > 0 && (
@@ -5953,7 +5953,7 @@ export default function Dashboard() {
                           <label className="text-sm font-medium">Search by</label>
                           <div className="grid grid-cols-3 gap-3">
                             {[
-                              { value: 'irata', label: 'irata License', icon: 'badge' },
+                              { value: 'irata', label: 'IRATA License', icon: 'badge' },
                               { value: 'sprat', label: 'SPRAT License', icon: 'verified' },
                               { value: 'email', label: 'Email', icon: 'email' },
                             ].map((option) => (
@@ -5977,7 +5977,7 @@ export default function Dashboard() {
                         {/* Search Input */}
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            {onRopeProSearchType === 'irata' ? 'irata License Number' :
+                            {onRopeProSearchType === 'irata' ? 'IRATA License Number' :
                              onRopeProSearchType === 'sprat' ? 'SPRAT License Number' :
                              'Email Address'}
                           </label>
@@ -6027,7 +6027,7 @@ export default function Dashboard() {
                             <div className="grid grid-cols-2 gap-3 pt-2 border-t">
                               {foundTechnician.irataLevel && (
                                 <div className="text-sm">
-                                  <span className="text-muted-foreground">irata:</span>
+                                  <span className="text-muted-foreground">IRATA:</span>
                                   <span className="ml-2 font-medium">{foundTechnician.irataLevel}</span>
                                   {foundTechnician.irataLicenseNumber && (
                                     <span className="text-muted-foreground ml-1">({foundTechnician.irataLicenseNumber})</span>
@@ -6434,14 +6434,14 @@ export default function Dashboard() {
                           />
 
                           <div className="border-t pt-4 mt-4">
-                            <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'irata Certification (Optional)')}</h4>
+                            <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification (Optional)')}</h4>
                             <div className="space-y-4">
                               <FormField
                                 control={employeeForm.control}
                                 name="irataLevel"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>{t('dashboard.employeeForm.irataLevel', 'irata Level')}</FormLabel>
+                                    <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                                     <Select onValueChange={field.onChange} value={field.value}>
                                       <FormControl>
                                         <SelectTrigger className="h-12" data-testid="select-irata-level">
@@ -6466,7 +6466,7 @@ export default function Dashboard() {
                                     name="irataLicenseNumber"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'irata License Number')}</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
                                         <FormControl>
                                           <Input placeholder="License number" {...field} data-testid="input-irata-license" className="h-12" />
                                         </FormControl>
@@ -6480,7 +6480,7 @@ export default function Dashboard() {
                                     name="irataIssuedDate"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'irata Issued Date')}</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'IRATA Issued Date')}</FormLabel>
                                         <FormControl>
                                           <Input type="date" {...field} data-testid="input-irata-issued" className="h-12" />
                                         </FormControl>
@@ -6494,7 +6494,7 @@ export default function Dashboard() {
                                     name="irataExpirationDate"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'irata Expiration Date')}</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'IRATA Expiration Date')}</FormLabel>
                                         <FormControl>
                                           <Input type="date" {...field} data-testid="input-irata-expiration" className="h-12" />
                                         </FormControl>
@@ -6730,7 +6730,7 @@ export default function Dashboard() {
                                 <div className="text-sm text-muted-foreground">{inv.technician.email}</div>
                                 {inv.technician.irataLevel && (
                                   <Badge variant="outline" className="text-xs mt-1">
-                                    irata {inv.technician.irataLevel}
+                                    IRATA {inv.technician.irataLevel}
                                   </Badge>
                                 )}
                                 {inv.technician.spratLevel && !inv.technician.irataLevel && (
@@ -6865,7 +6865,7 @@ export default function Dashboard() {
                     }
                     
                     return activeEmployees.map((employee: any) => {
-                      // Check irata license expiration status using timezone-safe date parsing
+                      // Check IRATA license expiration status using timezone-safe date parsing
                       const irataStatus = employee.irataExpirationDate ? (() => {
                         const expirationDate = parseLocalDate(employee.irataExpirationDate);
                         if (!expirationDate) return null;
@@ -7094,17 +7094,17 @@ export default function Dashboard() {
                               ))}
                               {employee.techLevel && (
                                 <Badge variant="outline" className="text-xs">
-                                  irata {employee.techLevel}
+                                  IRATA {employee.techLevel}
                                 </Badge>
                               )}
                             </div>
 
-                            {/* irata Details */}
+                            {/* IRATA Details */}
                             {employee.irataLevel && (
                               <div className="text-sm text-muted-foreground space-y-1 pt-2 border-t">
                                 <div className="flex items-center gap-2">
                                   <span className="material-icons text-sm">workspace_premium</span>
-                                  <span>{t('dashboard.employees.irataLevel', 'irata Level')} {employee.irataLevel}</span>
+                                  <span>{t('dashboard.employees.irataLevel', 'IRATA Level')} {employee.irataLevel}</span>
                                 </div>
                                 {employee.irataLicenseNumber && (
                                   <div className="ml-6">{t('dashboard.employees.license', 'License:')} {employee.irataLicenseNumber}</div>
@@ -7415,7 +7415,7 @@ export default function Dashboard() {
                                   ))}
                                   {employee.techLevel && (
                                     <Badge variant="outline" className="text-xs">
-                                      irata {employee.techLevel}
+                                      IRATA {employee.techLevel}
                                     </Badge>
                                   )}
                                 </div>
@@ -9166,7 +9166,7 @@ export default function Dashboard() {
                     name="techLevel"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('dashboard.employeeForm.irataLevel', 'irata Level')}</FormLabel>
+                        <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="h-12" data-testid="select-edit-tech-level">
@@ -9412,14 +9412,14 @@ export default function Dashboard() {
                     />
 
                     <div className="border-t pt-4 mt-4">
-                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'irata Certification (Optional)')}</h4>
+                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification (Optional)')}</h4>
                       <div className="space-y-4">
                         <FormField
                           control={editEmployeeForm.control}
                           name="irataLevel"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('dashboard.employeeForm.irataLevel', 'irata Level')}</FormLabel>
+                              <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="h-12" data-testid="select-edit-irata-level">
@@ -9444,7 +9444,7 @@ export default function Dashboard() {
                               name="irataLicenseNumber"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'irata License Number')}</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
                                   <FormControl>
                                     <Input placeholder="License number" {...field} data-testid="input-edit-irata-license" className="h-12" />
                                   </FormControl>
@@ -9458,7 +9458,7 @@ export default function Dashboard() {
                               name="irataIssuedDate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'irata Issued Date')}</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'IRATA Issued Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-edit-irata-issued" className="h-12" />
                                   </FormControl>
@@ -9472,7 +9472,7 @@ export default function Dashboard() {
                               name="irataExpirationDate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'irata Expiration Date')}</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'IRATA Expiration Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-edit-irata-expiration" className="h-12" />
                                   </FormControl>
@@ -9819,7 +9819,7 @@ export default function Dashboard() {
                       {employeeToView.techLevel && (
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.techLevel', 'Tech Level')}</div>
-                          <div className="text-sm font-medium">irata {employeeToView.techLevel}</div>
+                          <div className="text-sm font-medium">IRATA {employeeToView.techLevel}</div>
                         </div>
                       )}
                       {employeeToView.ropeAccessStartDate && (
@@ -9860,14 +9860,14 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* irata Certification */}
+                  {/* IRATA Certification */}
                   {(employeeToView.irataLevel || employeeToView.irataLicenseNumber || employeeToView.irataExpirationDate || (employeeToView.irataDocuments?.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2 justify-between">
                           <div className="flex items-center gap-2">
                             <span className="material-icons text-lg">workspace_premium</span>
-                            {t('dashboard.employeeDetails.irataCertification', 'irata Certification')}
+                            {t('dashboard.employeeDetails.irataCertification', 'IRATA Certification')}
                           </div>
                           {employeeToView.irataVerifiedAt ? (
                             <Badge variant="default" className="bg-green-600">
@@ -10788,7 +10788,7 @@ export default function Dashboard() {
                       <div className="space-y-0.5">
                         <FormLabel>{t('dashboard.endDay.logRopeAccessHours', 'Log rope access hours for your logbook?')}</FormLabel>
                         <FormDescription className="text-xs">
-                          {t('dashboard.endDay.logRopeAccessHoursDesc', 'Track actual time on ropes for irata/SPRAT certification')}
+                          {t('dashboard.endDay.logRopeAccessHoursDesc', 'Track actual time on ropes for IRATA/SPRAT certification')}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -11184,7 +11184,7 @@ export default function Dashboard() {
   <div class="report-container">
     <div class="report-header">
       <div class="report-title">ROPE ACCESS EQUIPMENT INSPECTION REPORT</div>
-      <div class="report-subtitle">irata Compliant Documentation</div>
+      <div class="report-subtitle">IRATA Compliant Documentation</div>
     </div>
     
     <div class="metadata-grid">
@@ -11282,7 +11282,7 @@ export default function Dashboard() {
     </div>
     
     <div class="footer">
-      This inspection report was generated in accordance with irata International Code of Practice.<br>
+      This inspection report was generated in accordance with IRATA International Code of Practice.<br>
       Document generated on ${formatLocalDateLong(new Date().toISOString())}
     </div>
   </div>
@@ -11652,7 +11652,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-2 mt-1">
                         {acceptedInvitations[0]?.technician?.irataLevel && (
                           <Badge variant="secondary" className="text-xs">
-                            irata {acceptedInvitations[0]?.technician?.irataLevel}
+                            IRATA {acceptedInvitations[0]?.technician?.irataLevel}
                           </Badge>
                         )}
                         {acceptedInvitations[0]?.technician?.spratLevel && (
@@ -11825,7 +11825,7 @@ export default function Dashboard() {
                       {employeeForm.watch("irataLevel") && (
                         <div className="col-span-2 flex items-center gap-2">
                           <span className="text-muted-foreground">{t('dashboard.employeeForm.certifications', 'Certifications')}:</span>
-                          <Badge variant="secondary">irata Level {employeeForm.watch("irataLevel")}</Badge>
+                          <Badge variant="secondary">IRATA Level {employeeForm.watch("irataLevel")}</Badge>
                         </div>
                       )}
                       {employeeForm.watch("hasFirstAid") && (
@@ -11845,13 +11845,13 @@ export default function Dashboard() {
                     </h4>
                     
                     <div className="space-y-3">
-                      {/* irata License */}
+                      {/* IRATA License */}
                       {(invitationToConvert?.technician?.irataLicenseNumber || invitationToConvert?.technician?.irataDocuments?.length > 0) && (
                         <div className="flex items-center justify-between p-3 bg-background rounded-md border">
                           <div className="flex items-center gap-3">
                             <span className="material-icons text-orange-500">badge</span>
                             <div>
-                              <p className="font-medium text-sm">{t('dashboard.invitations.irataLicense', 'irata License')}</p>
+                              <p className="font-medium text-sm">{t('dashboard.invitations.irataLicense', 'IRATA License')}</p>
                               {invitationToConvert?.technician?.irataLicenseNumber && (
                                 <p className="text-xs text-muted-foreground">
                                   {t('dashboard.invitations.licenseNumber', 'License #')}: {invitationToConvert.technician.irataLicenseNumber}
