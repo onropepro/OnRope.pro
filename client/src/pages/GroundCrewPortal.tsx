@@ -110,7 +110,7 @@ const translations = {
     transit: "Transit",
     institution: "Institution",
     account: "Account",
-    driversLicense: "Driver's License",
+    driversLicense: "Driver License",
     licenseNumber: "License #",
     issuedDate: "Issued Date",
     expiry: "Expiry",
@@ -130,10 +130,10 @@ const translations = {
     uploadVoidCheque: "Upload Void Cheque",
     replaceVoidCheque: "Replace Void Cheque",
     addVoidCheque: "Add Another Void Cheque",
-    uploadDriversLicense: "Upload Driver's License",
+    uploadDriversLicense: "Upload License",
     replaceDriversLicense: "Replace License",
     addDriversLicense: "Add License Photo",
-    uploadDriversAbstract: "Upload Driver's Abstract",
+    uploadDriversAbstract: "Upload Abstract",
     replaceDriversAbstract: "Replace Abstract",
     addDriversAbstract: "Add Abstract",
     uploadFirstAidCert: "Upload First Aid Certificate",
@@ -1920,7 +1920,7 @@ export default function GroundCrewPortal() {
                           ) : (
                             <Upload className="w-4 h-4 mr-2" />
                           )}
-                          {t.uploadDriversLicense || "Upload Driver's License"}
+                          {t.uploadDriversLicense || "Upload License"}
                         </Button>
                         {user?.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
                           <div className="mt-2 space-y-2">
@@ -1928,7 +1928,7 @@ export default function GroundCrewPortal() {
                               <div key={index} className="flex items-center gap-2 text-sm">
                                 <CheckCircle2 className="w-4 h-4 text-green-500" />
                                 <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                                  {t.driversLicense || "Driver's License"} #{index + 1}
+                                  {t.driversLicense || "Driver License"} #{index + 1}
                                 </a>
                                 <Button
                                   type="button"
