@@ -156,6 +156,21 @@ class WebSocketHub {
     await this.invalidateUserSessions(userId);
   }
 
+  // Notify user that their historical hours have been updated (added/deleted)
+  // This enables real-time sync across multiple devices
+  notifyHistoricalHoursUpdated(userId: string) {
+    const userConnections = this.connections.get(userId);
+    if (userConnections) {
+      const message = JSON.stringify({ type: 'historical-hours:updated' });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified user ${userId} of historical hours update`);
+    }
+  }
+
   // Notify technician that their access to a specific company has been suspended
   // This does NOT logout the technician - they can still access their portal
   notifyEmployerSuspension(userId: string, companyId: string, companyName: string) {

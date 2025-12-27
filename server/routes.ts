@@ -16243,6 +16243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         countsTowardTotal: data.countsTowardTotal ?? false,
       });
       
+      wsHub.notifyHistoricalHoursUpdated(currentUser.id);
       res.json({ historicalHours: entry, message: "Previous hours added successfully" });
     } catch (error) {
       console.error("Create historical hours error:", error);
@@ -16270,6 +16271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       await storage.deleteHistoricalHours(req.params.id);
+      wsHub.notifyHistoricalHoursUpdated(currentUser.id);
       res.json({ success: true, message: "Previous hours deleted successfully" });
     } catch (error) {
       console.error("Delete historical hours error:", error);
@@ -16377,6 +16379,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log(`[Logbook-Scan] Created ${createdEntries.length} entries, ${errors.length} errors`);
+      
+      // Notify across devices
+      if (createdEntries.length > 0) {
+        wsHub.notifyHistoricalHoursUpdated(currentUser.id);
+      }
       
       res.json({
         success: true,

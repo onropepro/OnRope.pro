@@ -69,6 +69,10 @@ export function usePermissionSync(isAuthenticated: boolean) {
             });
             // Invalidate quotes query to refresh the list
             queryClient.invalidateQueries({ queryKey: ['/api/property-managers/me/quotes'] });
+          } else if (data.type === 'historical-hours:updated') {
+            // Historical hours were added/deleted on another device - sync silently
+            queryClient.invalidateQueries({ queryKey: ['/api/my-historical-hours'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/my-irata-task-logs'] });
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
