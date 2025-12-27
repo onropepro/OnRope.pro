@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,7 +39,6 @@ import {
 import { format, differenceInYears } from "date-fns";
 import type { User as UserType } from "@shared/schema";
 import { JOB_TYPES } from "@shared/jobTypes";
-import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 type Language = 'en' | 'fr';
 
@@ -332,15 +332,20 @@ export default function VisibleTechniciansBrowser() {
     );
   }
 
+  // Configure unified header with back button
+  const handleBackClick = useCallback(() => {
+    setLocation('/dashboard');
+  }, [setLocation]);
+
+  useSetHeaderConfig({
+    pageTitle: t.title,
+    pageDescription: t.subtitle,
+    onBackClick: handleBackClick,
+    showSearch: false,
+  }, [t.title, t.subtitle, handleBackClick]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <EmployerDashboardHeader
-        currentUser={user}
-        pageTitle={t.title}
-        pageDescription={t.subtitle}
-        showSearch={false}
-      />
-
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         {/* Search and Filters */}
         <Card>

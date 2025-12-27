@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -194,27 +193,27 @@ export default function ActiveWorkers() {
     );
   }
 
+  // Configure unified header with back button
+  const handleBackClick = useCallback(() => {
+    setLocation('/dashboard');
+  }, [setLocation]);
+
+  const activeCountBadge = useMemo(() => (
+    <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 flex-shrink-0">
+      {activeWorkers.length} {t('activeWorkers.active', 'active')}
+    </Badge>
+  ), [activeWorkers.length, t]);
+
+  useSetHeaderConfig({
+    pageTitle: t('activeWorkers.title', 'Active Workers'),
+    pageDescription: t('activeWorkers.subtitle', "Real-time view of who's working where"),
+    onBackClick: handleBackClick,
+    actionButtons: activeCountBadge,
+    showSearch: false,
+  }, [t, handleBackClick, activeCountBadge]);
+
   return (
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b shadow-sm">
-        <div className="max-w-4xl mx-auto p-3 sm:p-4">
-          <div className="flex items-center gap-3">
-            <BackButton size="icon" />
-            <MainMenuButton size="icon" />
-            <div className="flex-1 min-w-0">
-              <h1 className="text-lg sm:text-2xl font-bold truncate">{t('activeWorkers.title', 'Active Workers')}</h1>
-              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
-                {t('activeWorkers.subtitle', "Real-time view of who's working where")}
-              </p>
-            </div>
-            <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 flex-shrink-0">
-              {activeWorkers.length} {t('activeWorkers.active', 'active')}
-            </Badge>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-6xl mx-auto p-4">
         <Tabs defaultValue="workers" className="w-full">
           <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-2 mb-6">

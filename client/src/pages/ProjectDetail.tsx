@@ -29,8 +29,9 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { format } from "date-fns";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { parseLocalDate, formatTimestampDate, getTodayString, formatDurationMs } from "@/lib/dateUtils";
@@ -1209,77 +1210,53 @@ export default function ProjectDetail() {
     { name: t('projectDetail.progress.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
+  // Configure unified header with back button and project name
+  const handleBackClick = useCallback(() => {
+    setLocation("/dashboard?tab=projects");
+  }, [setLocation]);
+
+  const headerActionButtons = useMemo(() => (
+    <>
+      {!activeSession && project.status === "active" && (
+        <Button
+          onClick={() => {
+            if (hasHarnessInspectionToday) {
+              setShowStartDayDialog(true);
+            } else {
+              setShowHarnessInspectionDialog(true);
+            }
+          }}
+          className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
+          data-testid="button-start-day"
+        >
+          <span className="material-icons mr-2 text-base">play_circle</span>
+          {t('projectDetail.workSession.startSession', 'Start Work Session')}
+        </Button>
+      )}
+      {activeSession && (
+        <Button
+          onClick={() => setShowEndDayDialog(true)}
+          variant="destructive"
+          className="h-10"
+          data-testid="button-end-day"
+        >
+          <span className="material-icons mr-2 text-base">stop_circle</span>
+          {t('projectDetail.workSession.endSession', 'End Day')}
+        </Button>
+      )}
+    </>
+  ), [activeSession, project.status, hasHarnessInspectionToday, t]);
+
+  useSetHeaderConfig({
+    pageTitle: project.buildingName || t('projectDetail.title', 'Project'),
+    pageDescription: project.buildingAddress ? `${project.strataPlanNumber} - ${project.jobType.replace(/_/g, ' ')}` : undefined,
+    onBackClick: handleBackClick,
+    actionButtons: headerActionButtons,
+    showSearch: false,
+  }, [project.buildingName, project.buildingAddress, project.strataPlanNumber, project.jobType, handleBackClick, headerActionButtons, t]);
+
   return (
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b shadow-sm">
-        <div className="max-w-2xl mx-auto p-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => setLocation("/dashboard?tab=projects")}
-              className="h-12 gap-2"
-              data-testid="button-back"
-            >
-              <span className="material-icons">arrow_back</span>
-              {t('common.back', 'Back')}
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold">{project.buildingName}</h1>
-              {project.buildingAddress && (
-                <p className="text-xs text-muted-foreground mt-0.5">{project.buildingAddress}</p>
-              )}
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-xs text-muted-foreground">
-                  {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
-                </p>
-                {project.companyResidentCode && (
-                  <>
-                    <span className="text-muted-foreground/50">•</span>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-muted-foreground">Code:</span>
-                      <Badge variant="outline" className="font-mono text-xs" data-testid="badge-resident-code">
-                        {project.companyResidentCode}
-                      </Badge>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-            {/* Start Work Session Button - Available to all users when no active session exists */}
-            {!activeSession && project.status === "active" && (
-              <Button
-                onClick={() => {
-                  // If user already did harness inspection today, skip the dialog
-                  if (hasHarnessInspectionToday) {
-                    setShowStartDayDialog(true);
-                  } else {
-                    setShowHarnessInspectionDialog(true);
-                  }
-                }}
-                className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
-                data-testid="button-start-day"
-              >
-                <span className="material-icons mr-2 text-base">play_circle</span>
-                {t('projectDetail.workSession.startSession', 'Start Work Session')}
-              </Button>
-            )}
-            {/* End Day Button - Shown when there IS an active session */}
-            {activeSession && (
-              <Button
-                onClick={() => setShowEndDayDialog(true)}
-                variant="destructive"
-                className="h-10"
-                data-testid="button-end-day"
-              >
-                <span className="material-icons mr-2 text-base">stop_circle</span>
-                {t('projectDetail.workSession.endSession', 'End Day')}
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-2xl mx-auto p-4 space-y-6">
         {/* Progress Card */}
         <Card className="glass-card border-0 shadow-premium">

@@ -4,8 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { parseLocalDate } from "@/lib/dateUtils";
@@ -15,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import { Progress } from "@/components/ui/progress";
@@ -262,42 +261,43 @@ export default function MyLoggedHours() {
     );
   }
 
+  // Configure unified header with back button and user info
+  const handleBackClick = useCallback(() => {
+    setLocation('/dashboard');
+  }, [setLocation]);
+
+  const userInfoBadges = useMemo(() => (
+    <div className="flex flex-col items-start sm:items-end gap-1">
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="material-icons text-sm text-muted-foreground hidden sm:inline">person</span>
+        <span className="font-semibold text-sm sm:text-base truncate max-w-[150px] sm:max-w-none" data-testid="text-employee-name">{currentUser?.name}</span>
+        {currentUser?.irataLevel && (
+          <Badge variant="outline" className="flex items-center gap-1 text-xs">
+            <span className="material-icons text-xs">verified</span>
+            {t('loggedHours.level', 'Level')} {currentUser.irataLevel}
+          </Badge>
+        )}
+      </div>
+      {currentUser?.irataLicenseNumber && (
+        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
+          <span className="material-icons text-xs">badge</span>
+          <span>{t('loggedHours.license', 'License')}:</span>
+          <span className="font-medium text-foreground" data-testid="text-irata-license">{currentUser.irataLicenseNumber}</span>
+        </div>
+      )}
+    </div>
+  ), [currentUser?.name, currentUser?.irataLevel, currentUser?.irataLicenseNumber, t]);
+
+  useSetHeaderConfig({
+    pageTitle: t('loggedHours.title', 'My Logged Hours'),
+    pageDescription: t('loggedHours.subtitle', 'IRATA Logbook'),
+    onBackClick: handleBackClick,
+    actionButtons: userInfoBadges,
+    showSearch: false,
+  }, [t, handleBackClick, userInfoBadges]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <BackButton size="icon" />
-            <MainMenuButton size="icon" />
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight">{t('loggedHours.title', 'My Logged Hours')}</h1>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t('loggedHours.subtitle', 'IRATA Logbook')}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col items-start sm:items-end gap-1 pl-12 sm:pl-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="material-icons text-sm text-muted-foreground hidden sm:inline">person</span>
-              <span className="font-semibold text-sm sm:text-base truncate max-w-[150px] sm:max-w-none" data-testid="text-employee-name">{currentUser?.name}</span>
-              {currentUser?.irataLevel && (
-                <Badge variant="outline" className="flex items-center gap-1 text-xs">
-                  <span className="material-icons text-xs">verified</span>
-                  {t('loggedHours.level', 'Level')} {currentUser.irataLevel}
-                </Badge>
-              )}
-            </div>
-            {currentUser?.irataLicenseNumber && (
-              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
-                <span className="material-icons text-xs">badge</span>
-                <span>{t('loggedHours.license', 'License')}:</span>
-                <span className="font-medium text-foreground" data-testid="text-irata-license">{currentUser.irataLicenseNumber}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card className="bg-primary/5 border-primary/20">

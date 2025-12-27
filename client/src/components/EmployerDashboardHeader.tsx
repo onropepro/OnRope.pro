@@ -354,38 +354,36 @@ export function EmployerDashboardHeader({
     <>
       <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
         <div className="h-full flex items-center justify-between gap-4">
-          {/* Left Side: Page Title or Search */}
+          {/* Left Side: Back button (if provided) + Page Title + Search */}
           <div className="flex items-center gap-4 flex-1 min-w-0">
-            {pageTitle ? (
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleBackClick}
-                  data-testid="button-back-dashboard"
-                >
-                  <span className="material-icons">arrow_back</span>
-                </Button>
-                {logoUrl && (
-                  <img 
-                    src={logoUrl} 
-                    alt="Company Logo" 
-                    className="h-10 w-auto object-contain"
-                    data-testid="img-company-logo"
-                  />
+            {/* Back button - only shown if onBackClick is explicitly provided */}
+            {onBackClick && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleBackClick}
+                data-testid="button-back-dashboard"
+              >
+                <span className="material-icons">arrow_back</span>
+              </Button>
+            )}
+            
+            {/* Page Title - shown independently of back button */}
+            {pageTitle && (
+              <div className="flex-shrink-0">
+                <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>
+                {pageDescription && (
+                  <p className="text-sm text-muted-foreground">{pageDescription}</p>
                 )}
-                <div>
-                  <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>
-                  {pageDescription && (
-                    <p className="text-sm text-muted-foreground">{pageDescription}</p>
-                  )}
-                </div>
               </div>
-            ) : showSearch ? (
+            )}
+            
+            {/* Search - shown when showSearch is true and there's space */}
+            {showSearch && (
               <div className="hidden md:flex flex-1 max-w-xl">
                 <DashboardSearch />
               </div>
-            ) : null}
+            )}
           </div>
           
           {/* Center: Action Buttons (if provided) */}

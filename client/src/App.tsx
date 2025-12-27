@@ -352,9 +352,9 @@ function Router() {
             </WithDashboardLayout>
           </Route>
           <Route path="/talent-browser">
-            <ProtectedRoute allowedRoles={["company", "superuser"]}>
+            <WithDashboardLayout allowedRoles={["company", "superuser"]}>
               <VisibleTechniciansBrowser />
-            </ProtectedRoute>
+            </WithDashboardLayout>
           </Route>
           <Route path="/complaints/:id">
             <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "resident"]}>

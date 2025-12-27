@@ -74,7 +74,7 @@ import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDia
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
-import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -3724,6 +3724,15 @@ export default function Dashboard() {
     }
   };
 
+  // Configure unified header - no page title for dashboard (shows search), no back button
+  useSetHeaderConfig({
+    showSearch: true,
+    showNotifications: true,
+    showLanguageDropdown: true,
+    showProfile: true,
+    showLogout: true,
+  }, []);
+
   if (projectsLoading || employeesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -3740,69 +3749,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full">
-      {/* Main Content - sidebar is now provided by DashboardLayout wrapper */}
+      {/* Main Content - sidebar and header are now provided by DashboardLayout wrapper */}
       <div className="flex-1 flex flex-col page-gradient min-h-screen">
-          {/* Header - Modern SaaS Design */}
-          <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
-            <div className="h-full flex items-center justify-between gap-4">
-              {/* Left Side: Search */}
-              <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="hidden md:flex flex-1 max-w-xl">
-                  <DashboardSearch />
-                </div>
-              </div>
-              
-              {/* Right Side: Actions Group */}
-              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                {/* License Expiry Warning - Inline in header */}
-                {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
-                  <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
-                )}
-                
-                {/* Trial Badge - Company owners only */}
-                {currentUser?.role === 'company' && (
-                  <SubscriptionRenewalBadge 
-                    subscriptionEndDate={currentUser.subscriptionEndDate} 
-                    subscriptionStatus={currentUser.subscriptionStatus}
-                  />
-                )}
-                
-                {/* Install App Button */}
-                <InstallPWAButton />
-                
-                {/* Notification Bell - Company owners only */}
-                {currentUser?.role === 'company' && (
-                  <NotificationBell />
-                )}
-                
-                {/* Language Selector */}
-                <LanguageDropdown />
-                
-                {/* User Profile - Clickable to go to Settings */}
-                <Link 
-                  href="/profile" 
-                  className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
-                  data-testid="link-user-profile"
-                >
-                  <Avatar className="w-8 h-8 bg-[#0B64A3]">
-                    <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
-                      {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="hidden lg:block">
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
-                    <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role}</p>
-                  </div>
-                </Link>
-                
-                {/* Logout Button */}
-                <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
-                  <span className="material-icons text-xl">logout</span>
-                </Button>
-              </div>
-            </div>
-          </header>
-
       {/* Read-Only Mode Banner - Shows on all tabs */}
       {currentUser && isReadOnly(currentUser) && (
         <div 
