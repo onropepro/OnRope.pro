@@ -1,21 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { queryClient } from "@/lib/queryClient";
 
 export function PWARefreshButton() {
-  const [isPWA, setIsPWA] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    const isStandalone = 
-      window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true;
-    
-    setIsPWA(isStandalone);
-  }, []);
-
-  if (!isPWA) return null;
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
