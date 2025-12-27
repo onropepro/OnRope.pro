@@ -3007,16 +3007,11 @@ export default function TechnicianPortal() {
                       </p>
                       {profileCompletion.incompleteFields.length > 0 && (
                         <div className="flex flex-wrap gap-2">
-                          {profileCompletion.incompleteFields.slice(0, 3).map((field, i) => (
+                          {profileCompletion.incompleteFields.map((field, i) => (
                             <span key={i} className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
                               {field.label}
                             </span>
                           ))}
-                          {profileCompletion.incompleteFields.length > 3 && (
-                            <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600">
-                              +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : language === 'es' ? 'más' : 'de plus'}
-                            </span>
-                          )}
                         </div>
                       )}
                     </div>
@@ -3836,16 +3831,11 @@ export default function TechnicianPortal() {
                       </p>
                       {profileCompletion.incompleteFields.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
-                          {profileCompletion.incompleteFields.slice(0, 3).map((field, i) => (
+                          {profileCompletion.incompleteFields.map((field, i) => (
                             <Badge key={i} variant="outline" className="text-xs bg-background">
                               {field.label}
                             </Badge>
                           ))}
-                          {profileCompletion.incompleteFields.length > 3 && (
-                            <Badge variant="outline" className="text-xs bg-background">
-                              +{profileCompletion.incompleteFields.length - 3} {language === 'en' ? 'more' : language === 'es' ? 'más' : 'de plus'}
-                            </Badge>
-                          )}
                         </div>
                       )}
                     </div>
