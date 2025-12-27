@@ -240,10 +240,11 @@ const translations = {
     userCertifications: "My Certifications",
     myCertificationsDesc: "Upload and manage your professional certifications",
     addCertification: "Add Certification",
-    certificationDescription: "Description (optional)",
+    certificationDescription: "Description",
     certificationDescriptionPlaceholder: "e.g., IRATA Level 3, Safety Training, etc.",
     certificationExpiry: "Expiry Date (optional)",
     uploadCertification: "Upload Certification",
+    descriptionRequired: "Description is required",
     noCertifications: "No certifications uploaded yet",
     deleteCertification: "Delete Certification",
     deleteCertificationConfirm: "Are you sure you want to delete this certification?",
@@ -641,10 +642,11 @@ const translations = {
     userCertifications: "Mes Certifications",
     myCertificationsDesc: "Téléversez et gérez vos certifications professionnelles",
     addCertification: "Ajouter une Certification",
-    certificationDescription: "Description (optionnel)",
+    certificationDescription: "Description",
     certificationDescriptionPlaceholder: "ex., IRATA Niveau 3, Formation Sécurité, etc.",
     certificationExpiry: "Date d'expiration (optionnel)",
     uploadCertification: "Téléverser la Certification",
+    descriptionRequired: "La description est requise",
     noCertifications: "Aucune certification téléversée",
     deleteCertification: "Supprimer la Certification",
     deleteCertificationConfirm: "Êtes-vous sûr de vouloir supprimer cette certification ?",
@@ -1174,10 +1176,11 @@ const translations = {
     userCertifications: "Mis Certificaciones",
     myCertificationsDesc: "Sube y gestiona tus certificaciones profesionales",
     addCertification: "Agregar Certificación",
-    certificationDescription: "Descripción (opcional)",
+    certificationDescription: "Descripción",
     certificationDescriptionPlaceholder: "ej., IRATA Nivel 3, Capacitación de Seguridad, etc.",
     certificationExpiry: "Fecha de Vencimiento (opcional)",
     uploadCertification: "Subir Certificación",
+    descriptionRequired: "La descripción es obligatoria",
     noCertifications: "No hay certificaciones subidas",
     deleteCertification: "Eliminar Certificación",
     deleteCertificationConfirm: "¿Estás seguro de que quieres eliminar esta certificación?",
@@ -6623,6 +6626,11 @@ function CertificationsManager({ t }: { t: any }) {
   });
   
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!description.trim()) {
+      toast({ title: t.descriptionRequired || "Description is required", variant: "destructive" });
+      if (e.target) e.target.value = "";
+      return;
+    }
     const file = e.target.files?.[0];
     if (file) {
       setIsUploading(true);
