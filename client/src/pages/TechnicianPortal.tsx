@@ -1,11 +1,12 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 
 // Helper to detect iOS PWA standalone mode
 const isIOSPWA = (): boolean => {
@@ -123,6 +124,7 @@ import {
   Info
 } from "lucide-react";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
+import { DocumentReviews } from "@/components/DocumentReviews";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -1602,6 +1604,7 @@ export default function TechnicianPortal() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
+  const [profileInnerTab, setProfileInnerTab] = useState<string>('personal');
   const [isVerifying, setIsVerifying] = useState(false);
   const [specialtyCategory, setSpecialtyCategory] = useState<JobCategory | "">("");
   const [selectedSpecialtyJobType, setSelectedSpecialtyJobType] = useState<string>("");
@@ -1666,6 +1669,12 @@ export default function TechnicianPortal() {
   });
 
   const user = userData?.user;
+
+  // Check if technician has pending required documents to sign (blocks portal access)
+  const { data: pendingDocsData, isLoading: pendingDocsLoading } = useQuery<{ hasPendingDocuments: boolean; pendingCount: number }>({
+    queryKey: ["/api/document-reviews/pending-check"],
+    enabled: !!user?.companyId,
+  });
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -1887,19 +1896,20 @@ export default function TechnicianPortal() {
   // State for mobile sidebar
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  // Use wouter's useSearch hook to track query string changes
+  const searchString = useSearch();
+
+  // Sync activeTab with URL query params whenever search string changes
   useEffect(() => {
-    const handleUrlChange = () => {
-      const tab = getTabFromUrl();
+    const params = new URLSearchParams(searchString);
+    const tab = params.get('tab');
+    if (tab === 'home' || tab === 'profile' || tab === 'employer' || tab === 'work' || tab === 'more' || tab === 'invitations' || tab === 'visibility') {
       setActiveTab(tab);
-    };
-    
-    handleUrlChange();
-    window.addEventListener('popstate', handleUrlChange);
-    
-    return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-    };
-  }, [location]);
+    } else if (!tab && location === '/technician-portal') {
+      // Default to home when no tab specified
+      setActiveTab('home');
+    }
+  }, [searchString, location]);
   
   // State for editing employer profile specialties
   const [isEditingEmployerProfile, setIsEditingEmployerProfile] = useState(false);
@@ -1943,107 +1953,11 @@ export default function TechnicianPortal() {
   
   const totalUnreadFeedback = myFeedbackData?.requests?.reduce((sum, r) => sum + r.unreadCount, 0) ?? 0;
 
-  // Technician sidebar navigation groups for desktop
-  const technicianNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: "NAVIGATION",
-      items: [
-        {
-          id: "home",
-          label: t.tabHome || "Home",
-          icon: Home,
-          onClick: () => setActiveTab('home'),
-          isVisible: () => true,
-        },
-        {
-          id: "profile",
-          label: t.tabProfile || "Profile",
-          icon: User,
-          onClick: () => setActiveTab('profile'),
-          isVisible: () => true,
-        },
-        {
-          id: "more",
-          label: t.tabMore || "More",
-          icon: MoreHorizontal,
-          onClick: () => setActiveTab('more'),
-          badge: totalUnreadFeedback > 0 ? totalUnreadFeedback : undefined,
-          badgeType: "info",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "employment",
-      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
-          icon: Briefcase,
-          href: "/technician-job-board",
-          isVisible: () => true,
-        },
-        {
-          id: "visibility",
-          label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
-          icon: Eye,
-          onClick: () => setActiveTab('visibility'),
-          isVisible: () => true,
-        },
-        {
-          id: "invitations",
-          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
-          icon: Mail,
-          onClick: () => setActiveTab('invitations'),
-          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
-          badgeType: "alert",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "logging",
-      label: language === 'en' ? "LOGGING" : language === 'es' ? "REGISTRO" : "JOURNALISATION",
-      items: [
-        {
-          id: "logged-hours",
-          label: language === 'en' ? "Logged Hours" : language === 'es' ? "Horas Registradas" : "Heures enregistrées",
-          icon: Clock,
-          href: "/technician-logged-hours",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "safety",
-      label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
-      items: [
-        {
-          id: "personal-safety-docs",
-          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de sécurité",
-          icon: Shield,
-          href: "/personal-safety-documents",
-          isVisible: () => true,
-        },
-        {
-          id: "psr",
-          label: language === 'en' ? "Safety Rating (PSR)" : language === 'es' ? "Calificacion (PSR)" : "Cote de sécurité (PSR)",
-          icon: Award,
-          href: "/technician-psr",
-          isVisible: () => true,
-        },
-        {
-          id: "practice-quizzes",
-          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz de pratique",
-          icon: GraduationCap,
-          href: "/technician-practice-quizzes",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  // Use shared technician navigation groups
+  const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es', {
+    pendingInvitationsCount: pendingInvitations.length,
+    unreadFeedbackCount: totalUnreadFeedback,
+  });
   
   // Mark all feedback as read when the dialog opens
   useEffect(() => {
@@ -2150,19 +2064,19 @@ export default function TechnicianPortal() {
     
     const profileFields = [
       // Fields typically filled during registration
-      { label: getLabel('Full Name', 'Nom complet', 'Nombre Completo'), complete: !!user.name },
-      { label: getLabel('Email', 'Courriel', 'Correo'), complete: !!user.email },
-      { label: getLabel('Phone Number', 'Numéro de téléphone', 'Teléfono'), complete: !!user.phone || !!user.employeePhoneNumber },
-      { label: getLabel('IRATA/SPRAT Cert', 'Certification IRATA/SPRAT', 'Cert. IRATA/SPRAT'), complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber },
+      { label: getLabel('Full Name', 'Nom complet', 'Nombre Completo'), complete: !!user.name, sectionId: 'personal' },
+      { label: getLabel('Email', 'Courriel', 'Correo'), complete: !!user.email, sectionId: 'personal' },
+      { label: getLabel('Phone Number', 'Numéro de téléphone', 'Teléfono'), complete: !!user.phone || !!user.employeePhoneNumber, sectionId: 'personal' },
+      { label: getLabel('IRATA/SPRAT Cert', 'Certification IRATA/SPRAT', 'Cert. IRATA/SPRAT'), complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber, sectionId: 'certifications' },
       // Additional profile fields
-      { label: getLabel('Emergency Contact', 'Contact d\'urgence', 'Contacto de Emergencia'), complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
-      { label: getLabel('Banking Info', 'Info bancaire', 'Info Bancaria'), complete: !!user.bankAccountNumber },
-      { label: getLabel('Birth Date', 'Date de naissance', 'Fecha de Nacimiento'), complete: !!user.birthday },
-      { label: getLabel('First Aid', 'Premiers soins', 'Primeros Auxilios'), complete: !!user.hasFirstAid },
-      { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber },
-      { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.employeeStreetAddress },
+      { label: getLabel('Emergency Contact', 'Contact d\'urgence', 'Contacto de Emergencia'), complete: !!user.emergencyContactName && !!user.emergencyContactPhone, sectionId: 'personal' },
+      { label: getLabel('Banking Info', 'Info bancaire', 'Info Bancaria'), complete: !!user.bankAccountNumber, sectionId: 'payroll' },
+      { label: getLabel('Birth Date', 'Date de naissance', 'Fecha de Nacimiento'), complete: !!user.birthday, sectionId: 'personal' },
+      { label: getLabel('First Aid', 'Premiers soins', 'Primeros Auxilios'), complete: !!user.hasFirstAid, sectionId: 'certifications' },
+      { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber, sectionId: 'driver' },
+      { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.employeeStreetAddress, sectionId: 'personal' },
       // Employer-visible profile fields
-      { label: getLabel('Specialties', 'Spécialités', 'Especialidades'), complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) },
+      { label: getLabel('Specialties', 'Spécialités', 'Especialidades'), complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0), sectionId: 'resume' },
     ];
     
     const completedCount = profileFields.filter(f => f.complete).length;
@@ -2761,10 +2675,29 @@ export default function TechnicianPortal() {
     updateMutation.mutate(data);
   };
 
-  if (isLoading) {
+  if (isLoading || (user?.companyId && pendingDocsLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse">{t.loadingProfile}</div>
+      </div>
+    );
+  }
+
+  // Block access if there are pending documents to sign
+  if (user?.companyId && pendingDocsData?.hasPendingDocuments) {
+    return (
+      <div className="min-h-screen bg-background p-4 md:p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {i18nT('documents.requiredReviewTitle', 'Required Document Review')}
+            </h1>
+            <p className="text-muted-foreground">
+              {i18nT('documents.requiredReviewDesc', 'You must review and sign the following company safety documents before accessing the portal.')}
+            </p>
+          </div>
+          <DocumentReviews companyDocuments={[]} />
+        </div>
       </div>
     );
   }
@@ -3087,7 +3020,18 @@ export default function TechnicianPortal() {
                       {profileCompletion.incompleteFields.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
                           {profileCompletion.incompleteFields.map((field, i) => (
-                            <Badge key={i} variant="outline" className="text-xs bg-background">
+                            <Badge 
+                              key={i} 
+                              variant="outline" 
+                              className="text-xs bg-background cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveTab('profile');
+                                setProfileInnerTab(field.sectionId);
+                                setIsEditing(true);
+                              }}
+                              data-testid={`badge-incomplete-${field.sectionId}-${i}`}
+                            >
                               {field.label}
                             </Badge>
                           ))}
@@ -3911,7 +3855,16 @@ export default function TechnicianPortal() {
                       {profileCompletion.incompleteFields.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
                           {profileCompletion.incompleteFields.map((field, i) => (
-                            <Badge key={i} variant="outline" className="text-xs bg-background">
+                            <Badge 
+                              key={i} 
+                              variant="outline" 
+                              className="text-xs bg-background cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                              onClick={() => {
+                                setProfileInnerTab(field.sectionId);
+                                setIsEditing(true);
+                              }}
+                              data-testid={`badge-profile-incomplete-${field.sectionId}-${i}`}
+                            >
                               {field.label}
                             </Badge>
                           ))}
@@ -3983,7 +3936,7 @@ export default function TechnicianPortal() {
           </CardHeader>
 
           <CardContent>
-            <Tabs defaultValue="personal" className="w-full">
+            <Tabs value={profileInnerTab} onValueChange={setProfileInnerTab} className="w-full">
               <div className="w-full overflow-x-auto mb-6 border-b border-border">
                 <TabsList className="bg-transparent h-auto p-0 gap-0">
                   <TabsTrigger 

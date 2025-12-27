@@ -5,6 +5,7 @@ import {
   Briefcase,
   Eye,
   Mail,
+  Clock,
   Shield,
   Award,
   GraduationCap,
@@ -13,7 +14,17 @@ import type { NavGroup } from "@/components/DashboardSidebar";
 
 type Language = 'en' | 'fr' | 'es';
 
-export function getTechnicianNavGroups(language: Language): NavGroup[] {
+export interface TechnicianNavOptions {
+  pendingInvitationsCount?: number;
+  unreadFeedbackCount?: number;
+}
+
+export function getTechnicianNavGroups(
+  language: Language,
+  options?: TechnicianNavOptions
+): NavGroup[] {
+  const { pendingInvitationsCount = 0, unreadFeedbackCount = 0 } = options || {};
+  
   return [
     {
       id: "main",
@@ -38,6 +49,8 @@ export function getTechnicianNavGroups(language: Language): NavGroup[] {
           label: language === 'en' ? "More" : language === 'es' ? "Más" : "Plus",
           icon: MoreHorizontal,
           href: "/technician-portal?tab=more",
+          badge: unreadFeedbackCount > 0 ? unreadFeedbackCount : undefined,
+          badgeType: "info" as const,
           isVisible: () => true,
         },
       ],
@@ -65,6 +78,21 @@ export function getTechnicianNavGroups(language: Language): NavGroup[] {
           label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
           icon: Mail,
           href: "/technician-portal?tab=invitations",
+          badge: pendingInvitationsCount > 0 ? pendingInvitationsCount : undefined,
+          badgeType: "alert" as const,
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "logging",
+      label: language === 'en' ? "LOGGING" : language === 'es' ? "REGISTRO" : "JOURNALISATION",
+      items: [
+        {
+          id: "logged-hours",
+          label: language === 'en' ? "Logged Hours" : language === 'es' ? "Horas Registradas" : "Heures enregistrées",
+          icon: Clock,
+          href: "/technician-logged-hours",
           isVisible: () => true,
         },
       ],
