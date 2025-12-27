@@ -5333,10 +5333,11 @@ export default function TechnicianPortal() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InfoItem label="SIN" value={maskSensitiveData(user.socialInsuranceNumber)} />
-                    <InfoItem 
-                      label="Bank Account" 
-                      value={maskBankAccount(user.bankTransitNumber, user.bankInstitutionNumber, user.bankAccountNumber)} 
-                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <InfoItem label="Transit Number" value={maskSensitiveData(user.bankTransitNumber)} />
+                    <InfoItem label="Branch Number" value={maskSensitiveData(user.bankInstitutionNumber)} />
+                    <InfoItem label="Account Number" value={maskSensitiveData(user.bankAccountNumber)} />
                   </div>
                   
                   {/* Upload void cheque button - always visible if no banking documents exist */}
