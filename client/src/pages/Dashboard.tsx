@@ -44,7 +44,6 @@ import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canAccessQuotes, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule, canViewPastProjects } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
-import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { SubscriptionRenewalBadge } from "@/components/SubscriptionRenewalBadge";

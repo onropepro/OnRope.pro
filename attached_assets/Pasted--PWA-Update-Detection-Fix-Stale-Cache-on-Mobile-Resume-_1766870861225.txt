@@ -1,0 +1,86 @@
+## PWA Update Detection - Fix Stale Cache on Mobile Resume
+
+### Problem Description
+When users open OnRopePro as a PWA (installed to home screen) on mobile devices, code changes deployed to the server are not reflected in the app. Users see stale cached content indefinitely until they fully close the PWA and reopen it.
+
+**Root Cause:** The PWA uses vite-plugin-pwa with `autoUpdate` mode, which handles service worker updates automatically - but only when an update check is triggered. Mobile PWAs suspend/resume rather than reload when switching apps. The service worker update check only fires on actual page navigation or explicit `registration.update()` calls, not on app resume.
+
+**Current State:** A manual refresh button was added to the header as a workaround. This is a band-aid solution that requires users to know about and manually trigger updates.
+
+### Solution
+1. Remove the manual refresh button from the header
+2. Implement automatic service worker update checks whenever the app regains visibility (user switches back to the PWA)
+
+### Implementation
+
+**Step 1: Remove the refresh button**
+- Locate and remove the refresh/sync button currently in the header (appears as a circular arrows icon near the language selector)
+- This is likely in `client/src/components/PublicHeader.tsx` or similar header component
+- Remove the button, its onClick handler, and any related imports (likely RefreshCw or similar from lucide-react)
+
+**Step 2: Create `client/src/hooks/usePWAUpdateCheck.ts`**
+```typescript
+import { useEffect } from 'react';
+
+export function usePWAUpdateCheck() {
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+
+    const checkForUpdate = async () => {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.update();
+      } catch (error) {
+        // Silent fail - update check is best-effort
+        console.debug('SW update check failed:', error);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkForUpdate();
+      }
+    };
+
+    // Check on initial mount
+    checkForUpdate();
+
+    // Check whenever app comes back to foreground
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+}
+```
+
+**Step 3: Add hook to App.tsx (or root layout)**
+```typescript
+import { usePWAUpdateCheck } from '@/hooks/usePWAUpdateCheck';
+
+function App() {
+  usePWAUpdateCheck();
+  // ... rest of app
+}
+```
+
+### Why This Works
+- `registration.update()` forces the service worker to check for a new version immediately
+- `autoUpdate` mode in vite-plugin-pwa already handles skipWaiting/claim automatically once an update is detected
+- `visibilitychange` event fires when mobile PWA resumes from background
+- Combined with existing autoUpdate config, new code activates seamlessly without user intervention
+
+### No Manual UI Needed
+The existing autoUpdate behavior will reload the page automatically when the new SW takes control. Users don't need to know or care about versions - they just switch back to the app and it's current.
+
+### Acceptance Criteria
+- [ ] Refresh button removed from header
+- [ ] Hook created at `client/src/hooks/usePWAUpdateCheck.ts`
+- [ ] Hook called in App.tsx or root layout component
+- [ ] App checks for updates on visibility change (returning to app)
+- [ ] App checks for updates on initial page load
+- [ ] New deployments reflect within seconds of resuming the PWA
+- [ ] No errors in console when offline (silent fail)
+- [ ] Works on iOS Safari PWA and Android Chrome PWA
+- [ ] No visual/UI changes to header other than button removal

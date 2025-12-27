@@ -8,8 +8,7 @@ import { usePermissionSync } from "@/hooks/use-permission-sync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AuthPortalProvider } from "@/contexts/AuthPortalContext";
-import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { usePWAUpdateCheck } from "@/hooks/usePWAUpdateCheck";
 
 // Pages
 import Register from "@/pages/Register";
@@ -804,50 +803,10 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-function GlobalRefreshButton() {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await queryClient.invalidateQueries();
-      window.location.reload();
-    } finally {
-      setTimeout(() => setIsRefreshing(false), 1000);
-    }
-  };
-
-  return (
-    <button
-      onClick={handleRefresh}
-      disabled={isRefreshing}
-      style={{
-        position: 'fixed',
-        top: '8px',
-        right: '200px',
-        zIndex: 999999,
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%',
-        backgroundColor: '#0B64A3',
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-      }}
-      data-testid="button-global-refresh"
-      aria-label="Refresh page"
-      title="Refresh page"
-    >
-      <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} style={{ width: '20px', height: '20px' }} />
-    </button>
-  );
-}
 
 function App() {
+  usePWAUpdateCheck();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -859,7 +818,6 @@ function App() {
             </BrandingProvider>
           </AuthPortalProvider>
         </ErrorBoundary>
-        <GlobalRefreshButton />
       </TooltipProvider>
     </QueryClientProvider>
   );
