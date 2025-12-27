@@ -56,6 +56,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -153,6 +154,21 @@ const translations = {
     contactName: "Contact Name",
     contactPhone: "Contact Phone",
     relationship: "Relationship",
+    relationshipPlaceholder: "Select relationship",
+    relationshipOptions: {
+      mother: "Mother",
+      father: "Father",
+      spouse: "Spouse",
+      partner: "Partner",
+      brother: "Brother",
+      sister: "Sister",
+      son: "Son",
+      daughter: "Daughter",
+      grandparent: "Grandparent",
+      friend: "Friend",
+      roommate: "Roommate",
+      other: "Other",
+    },
     payrollInfo: "Payroll Information",
     sin: "Social Insurance Number",
     bankAccount: "Bank Account",
@@ -526,6 +542,21 @@ const translations = {
     contactName: "Nom du contact",
     contactPhone: "Téléphone du contact",
     relationship: "Relation",
+    relationshipPlaceholder: "Sélectionner la relation",
+    relationshipOptions: {
+      mother: "Mère",
+      father: "Père",
+      spouse: "Époux/Épouse",
+      partner: "Partenaire",
+      brother: "Frère",
+      sister: "Sœur",
+      son: "Fils",
+      daughter: "Fille",
+      grandparent: "Grand-parent",
+      friend: "Ami(e)",
+      roommate: "Colocataire",
+      other: "Autre",
+    },
     payrollInfo: "Informations de paie",
     sin: "Numéro d'assurance sociale",
     bankAccount: "Compte bancaire",
@@ -899,6 +930,21 @@ const translations = {
     contactName: "Nombre del Contacto",
     contactPhone: "Telefono del Contacto",
     relationship: "Relacion",
+    relationshipPlaceholder: "Seleccionar relacion",
+    relationshipOptions: {
+      mother: "Madre",
+      father: "Padre",
+      spouse: "Esposo/Esposa",
+      partner: "Pareja",
+      brother: "Hermano",
+      sister: "Hermana",
+      son: "Hijo",
+      daughter: "Hija",
+      grandparent: "Abuelo/Abuela",
+      friend: "Amigo/Amiga",
+      roommate: "Companero de cuarto",
+      other: "Otro",
+    },
     payrollInfo: "Informacion de Nomina",
     sin: "Numero de Seguro Social",
     bankAccount: "Cuenta Bancaria",
@@ -4064,10 +4110,28 @@ export default function TechnicianPortal() {
                         name="emergencyContactRelationship"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Relationship</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="e.g., Spouse, Parent" data-testid="input-emergency-relationship" />
-                            </FormControl>
+                            <FormLabel>{t.relationship}</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value || ""}>
+                              <FormControl>
+                                <SelectTrigger data-testid="select-emergency-relationship">
+                                  <SelectValue placeholder={t.relationshipPlaceholder} />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="mother">{t.relationshipOptions.mother}</SelectItem>
+                                <SelectItem value="father">{t.relationshipOptions.father}</SelectItem>
+                                <SelectItem value="spouse">{t.relationshipOptions.spouse}</SelectItem>
+                                <SelectItem value="partner">{t.relationshipOptions.partner}</SelectItem>
+                                <SelectItem value="brother">{t.relationshipOptions.brother}</SelectItem>
+                                <SelectItem value="sister">{t.relationshipOptions.sister}</SelectItem>
+                                <SelectItem value="son">{t.relationshipOptions.son}</SelectItem>
+                                <SelectItem value="daughter">{t.relationshipOptions.daughter}</SelectItem>
+                                <SelectItem value="grandparent">{t.relationshipOptions.grandparent}</SelectItem>
+                                <SelectItem value="friend">{t.relationshipOptions.friend}</SelectItem>
+                                <SelectItem value="roommate">{t.relationshipOptions.roommate}</SelectItem>
+                                <SelectItem value="other">{t.relationshipOptions.other}</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
