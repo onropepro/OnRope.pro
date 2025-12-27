@@ -1073,6 +1073,55 @@ export default function ProjectDetail() {
     setMissedUnitNumber("");
   };
 
+  // Configure unified header with back button and project name
+  // These hooks must be called unconditionally before any early returns
+  const handleBackClick = useCallback(() => {
+    setLocation("/dashboard?tab=projects");
+  }, [setLocation]);
+
+  const headerActionButtons = useMemo(() => {
+    if (!project) return null;
+    return (
+      <>
+        {!activeSession && project.status === "active" && (
+          <Button
+            onClick={() => {
+              if (hasHarnessInspectionToday) {
+                setShowStartDayDialog(true);
+              } else {
+                setShowHarnessInspectionDialog(true);
+              }
+            }}
+            className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
+            data-testid="button-start-day"
+          >
+            <span className="material-icons mr-2 text-base">play_circle</span>
+            {t('projectDetail.workSession.startSession', 'Start Work Session')}
+          </Button>
+        )}
+        {activeSession && (
+          <Button
+            onClick={() => setShowEndDayDialog(true)}
+            variant="destructive"
+            className="h-10"
+            data-testid="button-end-day"
+          >
+            <span className="material-icons mr-2 text-base">stop_circle</span>
+            {t('projectDetail.workSession.endSession', 'End Day')}
+          </Button>
+        )}
+      </>
+    );
+  }, [activeSession, project, hasHarnessInspectionToday, t]);
+
+  useSetHeaderConfig({
+    pageTitle: project?.buildingName || t('projectDetail.title', 'Project'),
+    pageDescription: project?.buildingAddress ? `${project.strataPlanNumber} - ${project.jobType.replace(/_/g, ' ')}` : undefined,
+    onBackClick: handleBackClick,
+    actionButtons: headerActionButtons,
+    showSearch: false,
+  }, [project?.buildingName, project?.buildingAddress, project?.strataPlanNumber, project?.jobType, handleBackClick, headerActionButtons, t]);
+
   // If there's a render error, show it
   if (renderError) {
     return (
@@ -1210,51 +1259,6 @@ export default function ProjectDetail() {
     { name: t('projectDetail.progress.validReason', 'Valid Reason'), value: validReasonCount, color: "hsl(var(--warning))" },
     { name: t('projectDetail.progress.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
-
-  // Configure unified header with back button and project name
-  const handleBackClick = useCallback(() => {
-    setLocation("/dashboard?tab=projects");
-  }, [setLocation]);
-
-  const headerActionButtons = useMemo(() => (
-    <>
-      {!activeSession && project.status === "active" && (
-        <Button
-          onClick={() => {
-            if (hasHarnessInspectionToday) {
-              setShowStartDayDialog(true);
-            } else {
-              setShowHarnessInspectionDialog(true);
-            }
-          }}
-          className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
-          data-testid="button-start-day"
-        >
-          <span className="material-icons mr-2 text-base">play_circle</span>
-          {t('projectDetail.workSession.startSession', 'Start Work Session')}
-        </Button>
-      )}
-      {activeSession && (
-        <Button
-          onClick={() => setShowEndDayDialog(true)}
-          variant="destructive"
-          className="h-10"
-          data-testid="button-end-day"
-        >
-          <span className="material-icons mr-2 text-base">stop_circle</span>
-          {t('projectDetail.workSession.endSession', 'End Day')}
-        </Button>
-      )}
-    </>
-  ), [activeSession, project.status, hasHarnessInspectionToday, t]);
-
-  useSetHeaderConfig({
-    pageTitle: project.buildingName || t('projectDetail.title', 'Project'),
-    pageDescription: project.buildingAddress ? `${project.strataPlanNumber} - ${project.jobType.replace(/_/g, ' ')}` : undefined,
-    onBackClick: handleBackClick,
-    actionButtons: headerActionButtons,
-    showSearch: false,
-  }, [project.buildingName, project.buildingAddress, project.strataPlanNumber, project.jobType, handleBackClick, headerActionButtons, t]);
 
   return (
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
