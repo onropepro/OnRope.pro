@@ -328,9 +328,10 @@ export function EmployerDashboardHeader({
     try {
       trackLogout();
       await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-      window.location.href = '/login';
+      // Redirect employers to main landing page
+      window.location.href = '/';
     } catch (error) {
-      window.location.href = '/login';
+      window.location.href = '/';
     }
   };
 

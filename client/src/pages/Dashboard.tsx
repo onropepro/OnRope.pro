@@ -3231,11 +3231,14 @@ export default function Dashboard() {
       });
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
-      // Redirect technicians to technician login, others to regular login
+      // Redirect to role-appropriate landing pages
       if (userRole === 'rope_access_tech') {
         setLocation("/technician");
+      } else if (userRole === 'ground_crew' || userRole === 'ground_crew_supervisor') {
+        setLocation("/ground-crew");
       } else {
-        setLocation("/login");
+        // Employers/company owners go to main landing page
+        setLocation("/");
       }
     } catch (error) {
       toast({ title: t('dashboard.toast.error', 'Error'), description: t('dashboard.toast.logoutFailed', 'Failed to logout'), variant: "destructive" });
