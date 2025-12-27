@@ -812,11 +812,11 @@ function App() {
             <BrandingProvider>
               <Router />
               <Toaster />
-              <PWARefreshButton />
             </BrandingProvider>
           </AuthPortalProvider>
         </ErrorBoundary>
       </TooltipProvider>
+      <PWARefreshButton />
     </QueryClientProvider>
   );
 }
