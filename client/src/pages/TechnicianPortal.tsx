@@ -1966,7 +1966,7 @@ export default function TechnicianPortal() {
       // Fields typically filled during registration
       { label: getLabel('Full Name', 'Nom complet', 'Nombre Completo'), complete: !!user.name },
       { label: getLabel('Email', 'Courriel', 'Correo'), complete: !!user.email },
-      { label: getLabel('Phone Number', 'Numéro de téléphone', 'Teléfono'), complete: !!user.phone },
+      { label: getLabel('Phone Number', 'Numéro de téléphone', 'Teléfono'), complete: !!user.phone || !!user.employeePhoneNumber },
       { label: getLabel('IRATA/SPRAT Cert', 'Certification IRATA/SPRAT', 'Cert. IRATA/SPRAT'), complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber },
       // Additional profile fields
       { label: getLabel('Emergency Contact', 'Contact d\'urgence', 'Contacto de Emergencia'), complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
