@@ -2525,7 +2525,7 @@ export default function TechnicianLoggedHours() {
             </Button>
           </div>
 
-          <ScrollArea className="flex-1 max-h-[50vh]">
+          <ScrollArea className="flex-1 min-h-0 max-h-[60vh] sm:max-h-[50vh]">
             <div className="space-y-3 py-2 pr-4">
               {scannedEntries.map((entry) => {
                 const hasDate = !!entry.date;
@@ -2646,34 +2646,11 @@ export default function TechnicianLoggedHours() {
             </div>
           </ScrollArea>
 
-          <DialogFooter className="border-t pt-4 gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowReviewDialog(false);
-                setScannedEntries([]);
-                logbookInputRef.current?.click();
-              }}
-              className="gap-2"
-              data-testid="button-retry-scan"
-            >
-              <Camera className="w-4 h-4" />
-              {t.retryPhoto}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setShowReviewDialog(false);
-                setScannedEntries([]);
-              }}
-              data-testid="button-cancel-scan"
-            >
-              {t.cancel}
-            </Button>
+          <DialogFooter className="border-t pt-4 flex-col-reverse sm:flex-row gap-2 flex-shrink-0">
             <Button
               onClick={handleCommitScannedEntries}
               disabled={isCommitting || !scannedEntries.some(e => e.selected && e.date && e.hours)}
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
               data-testid="button-commit-scanned"
             >
               {isCommitting ? (
@@ -2687,6 +2664,30 @@ export default function TechnicianLoggedHours() {
                   {t.addSelectedEntries} ({scannedEntries.filter(e => e.selected && e.date && e.hours).length})
                 </>
               )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowReviewDialog(false);
+                setScannedEntries([]);
+              }}
+              className="w-full sm:w-auto"
+              data-testid="button-cancel-scan"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowReviewDialog(false);
+                setScannedEntries([]);
+                logbookInputRef.current?.click();
+              }}
+              className="gap-2 w-full sm:w-auto"
+              data-testid="button-retry-scan"
+            >
+              <Camera className="w-4 h-4" />
+              {t.retryPhoto}
             </Button>
           </DialogFooter>
         </DialogContent>
