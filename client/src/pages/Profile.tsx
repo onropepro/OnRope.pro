@@ -15,7 +15,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { RefreshButton } from "@/components/RefreshButton";
 import { SubscriptionManagement } from "@/components/SubscriptionManagement";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
@@ -1178,7 +1177,6 @@ export default function Profile() {
 
   useSetHeaderConfig({
     pageTitle: t('profile.title', 'Profile'),
-    actionButtons: <RefreshButton />,
   }, [t]);
 
   return (
