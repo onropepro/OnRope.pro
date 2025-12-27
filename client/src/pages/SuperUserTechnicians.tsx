@@ -501,7 +501,7 @@ export default function SuperUserTechnicians() {
                           </div>
                           <InfoItem label="Company" value={technicianDetailData.company.name} />
                           <InfoItem label="Company Email" value={technicianDetailData.company.email} />
-                          <InfoItem label="Subscription Tier" value={technicianDetailData.company.subscriptionTier || "None"} />
+                          <InfoItem label="Plan" value="OnRopePro" />
                           <InfoItem label="Start Date" value={formatDate(technicianDetailData.technician.startDate)} />
                           {technicianDetailData.technician.isSalary ? (
                             <InfoItem label="Salary" value={technicianDetailData.technician.salary ? `$${Number(technicianDetailData.technician.salary).toLocaleString()}/year` : "Not set"} />

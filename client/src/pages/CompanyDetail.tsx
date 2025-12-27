@@ -191,7 +191,7 @@ export default function CompanyDetail() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Subscription Tier</p>
-                  <p className="text-sm font-medium capitalize">{company.subscriptionTier || 'None'}</p>
+                  <p className="text-sm font-medium capitalize">OnRopePro</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Status</p>

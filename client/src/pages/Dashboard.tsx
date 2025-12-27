@@ -3813,7 +3813,7 @@ export default function Dashboard() {
                     {projectsData.projectInfo.tier && projectsData.projectInfo.tier !== 'none' && (
                       <div className="text-right">
                         <Badge variant="secondary" data-testid="badge-project-tier-status">
-                          {projectsData.projectInfo.tier.charAt(0).toUpperCase() + projectsData.projectInfo.tier.slice(1)}
+                          OnRopePro
                         </Badge>
                       </div>
                     )}

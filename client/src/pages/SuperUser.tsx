@@ -21,7 +21,7 @@ interface GiftCompanyForm {
 function generateLicenseKey(tier: string): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   const generateSegment = () => Array(5).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
-  const tierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : '4';
+  const tierSuffix = 'P';
   return `GIFT-${generateSegment()}-${generateSegment()}-${generateSegment()}-${tierSuffix}`;
 }
 
@@ -56,8 +56,8 @@ export default function SuperUser() {
     companyName: '',
     email: '',
     password: '',
-    tier: 'basic',
-    licenseKey: generateLicenseKey('basic'),
+    tier: 'onropepro',
+    licenseKey: generateLicenseKey('onropepro'),
   });
 
   const { data: metricsData } = useQuery<MetricsData>({
@@ -102,7 +102,7 @@ export default function SuperUser() {
         title: "Account Created",
         description: data.message,
       });
-      setFormData({ companyName: '', email: '', password: '', tier: 'basic', licenseKey: generateLicenseKey('basic') });
+      setFormData({ companyName: '', email: '', password: '', tier: 'onropepro', licenseKey: generateLicenseKey('onropepro') });
       queryClient.invalidateQueries({ queryKey: ['/api/superuser/companies'] });
     },
     onError: (error: any) => {
@@ -520,43 +520,24 @@ export default function SuperUser() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tier">Subscription Tier</Label>
+                <Label htmlFor="tier">Plan</Label>
                 <Select
                   value={formData.tier}
                   onValueChange={handleTierChange}
                 >
                   <SelectTrigger data-testid="select-tier">
-                    <SelectValue placeholder="Select tier" />
+                    <SelectValue placeholder="Select plan" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="basic" data-testid="option-tier-basic">
+                    <SelectItem value="onropepro" data-testid="option-tier-onropepro">
                       <div className="flex items-center justify-between w-full gap-4">
-                        <span>Basic</span>
-                        <span className="text-muted-foreground text-xs">2 projects, 4 seats</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="starter" data-testid="option-tier-starter">
-                      <div className="flex items-center justify-between w-full gap-4">
-                        <span>Starter</span>
-                        <span className="text-muted-foreground text-xs">5 projects, 10 seats</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="premium" data-testid="option-tier-premium">
-                      <div className="flex items-center justify-between w-full gap-4">
-                        <span>Premium</span>
-                        <span className="text-muted-foreground text-xs">9 projects, 18 seats</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="enterprise" data-testid="option-tier-enterprise">
-                      <div className="flex items-center justify-between w-full gap-4">
-                        <span>Enterprise</span>
-                        <span className="text-muted-foreground text-xs">Unlimited</span>
+                        <span>OnRopePro</span>
+                        <span className="text-muted-foreground text-xs">$99/mo, unlimited projects</span>
                       </div>
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
               {/* License Key Preview */}
               <div className="space-y-2">
                 <Label>License Key</Label>

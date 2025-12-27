@@ -204,7 +204,7 @@ export default function ViewAsCompany() {
           <div>
             <h1 className="text-3xl font-bold gradient-text">{company.companyName || 'Company Dashboard'}</h1>
             <p className="text-muted-foreground mt-1">
-              {company.email} | Tier: <span className="capitalize">{company.subscriptionTier || 'None'}</span>
+              {company.email} | Plan: OnRopePro
             </p>
           </div>
           <Badge 

@@ -113,7 +113,7 @@ export function SubscriptionRenewalBadge({ subscriptionEndDate, subscriptionStat
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-sm">Subscription Details</h4>
             <Badge variant={isTrialing ? "secondary" : "default"} className="text-xs">
-              {isTrialing ? 'Trial' : tierNames[subscriptionData?.tier || ''] || 'Active'}
+              {isTrialing ? 'Trial' : 'OnRopePro'}
             </Badge>
           </div>
           
@@ -142,7 +142,7 @@ export function SubscriptionRenewalBadge({ subscriptionEndDate, subscriptionStat
                 
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Plan</span>
-                  <span className="font-medium">{tierNames[subscriptionData.tier] || subscriptionData.tier}</span>
+                  <span className="font-medium">{'OnRopePro'}</span>
                 </div>
 
                 {(subscriptionData.additionalSeatsCount > 0 || subscriptionData.giftedSeatsCount > 0) && (
