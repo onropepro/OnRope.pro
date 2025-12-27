@@ -1367,7 +1367,7 @@
       "salaryDescription": "Annual salary amount",
       "personalDetails": "Personal Details (Optional)",
       "startDate": "Start Date",
-      "birthday": "Birthday",
+      "birthday": "Birth Date",
       "socialInsuranceNumber": "Social Insurance Number",
       "driversLicenseNumber": "Driver's License Number",
       "driversLicenseProvince": "Driver's License Province/State",
@@ -6137,7 +6137,7 @@
         },
         "audit": {
           "title": "Audit-Ready PDFs in Four Clicks",
-          "description": "When the irata auditor calls, you don't panic. You search and export.",
+          "description": "When the IRATA auditor calls, you don't panic. You search and export.",
           "bullet1": "Search by date, technician, or serial number",
           "bullet2": "Professional PDFs with embedded signatures",
           "bullet3": "Same PDFs for insurance and property managers",
@@ -6170,7 +6170,7 @@
         },
         "liability": {
           "title": "For the operator worried about liability",
-          "p1": "Rope access work is dangerous. Everyone knows it. That's why irata and SPRAT exist. That's why inspections are mandatory.",
+          "p1": "Rope access work is dangerous. Everyone knows it. That's why IRATA and SPRAT exist. That's why inspections are mandatory.",
           "p2": "But mandatory and documented are not the same thing.",
           "p3": "If a harness fails and someone gets hurt, the investigation starts with one question: can you prove you inspected it? Can you prove you trained your people? Can you prove you discussed the specific hazards of this specific job?",
           "p4": "With paper forms, you're hoping the right pieces of paper exist and can be found. With digital records, you know exactly what exists because you can search for it."
@@ -6193,7 +6193,7 @@
         },
         "auditPdfs": {
           "title": "Audit-Ready PDFs",
-          "description": "Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or irata audits."
+          "description": "Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or IRATA audits."
         },
         "automaticFlagging": {
           "title": "Automatic Flagging",
@@ -6240,7 +6240,7 @@
         },
         "auditPrep": {
           "title": "Audit Preparation: Days to Minutes",
-          "description": "The scramble before an irata audit used to take days. Now it takes minutes. Search. Export. Done."
+          "description": "The scramble before an IRATA audit used to take days. Now it takes minutes. Search. Export. Done."
         },
         "liability": {
           "title": "Liability Protection",
@@ -6266,7 +6266,7 @@
         },
         "q2": {
           "question": "We're too small to need software.",
-          "answer": "The smaller you are, the more every audit matters. One failed irata audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software."
+          "answer": "The smaller you are, the more every audit matters. One failed IRATA audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software."
         },
         "q3": {
           "question": "Paper has worked fine so far.",
@@ -6287,7 +6287,7 @@
       },
       "disclaimer": {
         "title": "Important: Safety Compliance Responsibility",
-        "text": "OnRopePro helps document safety procedures, but you remain fully responsible for workplace safety and regulatory compliance. This software does not replace qualified safety professionals, irata/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations."
+        "text": "OnRopePro helps document safety procedures, but you remain fully responsible for workplace safety and regulatory compliance. This software does not replace qualified safety professionals, IRATA/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations."
       }
     },
     "projects": {
@@ -9469,7 +9469,7 @@
     "fullName": "Full Name",
     "email": "Email",
     "phoneNumber": "Phone Number",
-    "birthday": "Birthday",
+    "birthday": "Birth Date",
     "address": "Address",
     "streetAddress": "Street Address",
     "city": "City",
@@ -9507,7 +9507,7 @@
     "step2": "Enter your last name and license number",
     "step3": "Take a screenshot of the verification result",
     "step4": "Come back here and click \\",
-    "openIrataPortal": "Open irata Portal",
+    "openIrataPortal": "Open IRATA Portal",
     "uploadVerificationScreenshot": "Upload Verification Screenshot",
     "analyzingScreenshot": "Analyzing Screenshot...",
     "name": "Name",
@@ -9536,10 +9536,10 @@
     "uploadVoidCheque": "Upload Void Cheque",
     "replaceVoidCheque": "Replace Void Cheque",
     "addVoidCheque": "Add Another Void Cheque",
-    "uploadDriversLicense": "Upload Driver",
+    "uploadDriversLicense": "Upload License",
     "replaceDriversLicense": "Replace License",
     "addDriversLicense": "Add License Photo",
-    "uploadDriversAbstract": "Upload Driver",
+    "uploadDriversAbstract": "Upload Abstract",
     "replaceDriversAbstract": "Replace Abstract",
     "addDriversAbstract": "Add Abstract",
     "uploadFirstAidCert": "Upload First Aid Certificate",
@@ -9548,9 +9548,9 @@
     "uploadCertificationCard": "Upload Certification Card",
     "replaceCertificationCard": "Replace Card",
     "addCertificationCard": "Add Card",
-    "uploadIrataCertificationCard": "Upload irata Card",
+    "uploadIrataCertificationCard": "Upload IRATA Card",
     "uploadSpratCertificationCard": "Upload SPRAT Card",
-    "irataCertificationCard": "irata Certification Card",
+    "irataCertificationCard": "IRATA Certification Card",
     "spratCertificationCard": "SPRAT Certification Card",
     "experience": "Experience",
     "ropeAccessExperience": "Rope Access Experience",
@@ -9561,7 +9561,7 @@
     "startedOn": "Started on",
     "notSet": "Not set",
     "resume": "Resume / CV",
-    "uploadResume": "Upload Resume",
+    "uploadResume": "Upload Resume / CV",
     "addResume": "Add Another Resume",
     "specialties": "Rope Access Specialties",
     "specialtiesDesc": "Select the job types you specialize in",
@@ -9586,7 +9586,7 @@
     "invalidFile": "Invalid file",
     "uploadImageFile": "Please upload an image file (screenshot)",
     "verificationSuccessful": "Verification Successful",
-    "irataVerified": "Your irata license has been verified!",
+    "irataVerified": "Your IRATA license has been verified!",
     "spratVerified": "Your SPRAT license has been verified!",
     "verificationIssue": "Verification Issue",
     "couldNotVerify": "Could not verify license from screenshot",
@@ -9688,7 +9688,7 @@
     "confirmDeletePreviousHours": "Are you sure you want to delete this previous hours entry?",
     "deleteConfirm": "Delete",
     "cancelDelete": "Cancel",
-    "logbookDisclaimer": "This is a personal tracking tool only. You must still record all hours in your official irata/SPRAT logbook - this digital log does not replace it.",
+    "logbookDisclaimer": "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
     "jobBoardDesc": "Browse opportunities and make your profile visible to employers",
     "browseJobs": "Browse Jobs",
     "yourReferralCode": "Your Referral Code",

@@ -136,7 +136,7 @@ const translations = {
     eligibleForUpgrade: "Eligible for upgrade!",
     setBaseline: "Set Baseline",
     updateBaseline: "Update Baseline",
-    irataRequirements: "irata requires 1,000 hours and 1 year between levels",
+    irataRequirements: "IRATA requires 1,000 hours and 1 year between levels",
     spratRequirements: "SPRAT requires 500 hours and 6 months between levels",
     currentLevel: "Current Level",
     nextLevel: "Next Level",
@@ -296,7 +296,7 @@ const translations = {
     eligibleForUpgrade: "Éligible pour la mise à niveau!",
     setBaseline: "Définir la base",
     updateBaseline: "Mettre à jour la base",
-    irataRequirements: "irata exige 1 000 heures et 1 an entre les niveaux",
+    irataRequirements: "IRATA exige 1 000 heures et 1 an entre les niveaux",
     spratRequirements: "SPRAT exige 500 heures et 6 mois entre les niveaux",
     currentLevel: "Niveau actuel",
     nextLevel: "Niveau suivant",
@@ -1488,7 +1488,7 @@ export default function TechnicianLoggedHours() {
               <CardDescription>{t.certificationProgressDesc}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* irata Progress */}
+              {/* IRATA Progress */}
               {irataLevel && !irataProgress.isMaxLevel && !irataProgress.noLevel && (
                 <div className="space-y-3 p-3 rounded-lg bg-muted/30">
                   <div className="flex items-center justify-between">

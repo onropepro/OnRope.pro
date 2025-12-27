@@ -1014,7 +1014,7 @@ export default function ProjectsGuide() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-2">
-                <p className="text-sm text-muted-foreground">Crew assignments pull from employee directory with qualification filtering (irata Level, certifications). Performance metrics generated from project work sessions.</p>
+                <p className="text-sm text-muted-foreground">Crew assignments pull from employee directory with qualification filtering (IRATA Level, certifications). Performance metrics generated from project work sessions.</p>
                 <div className="flex items-center gap-2 text-sm">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   <span>Ensure qualified crew assigned for safety + client confidence</span>

@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, parseLocalDate } from "@/lib/dateUtils";
@@ -73,6 +74,8 @@ import {
   FileImage,
   FileArchive,
   File,
+  Menu,
+  Info,
 } from "lucide-react";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
@@ -93,9 +96,10 @@ const translations = {
     phoneNumber: "Phone Number",
     smsNotifications: "SMS Notifications",
     smsNotificationsDescription: "Receive text messages for team invitations",
-    birthday: "Birthday",
+    birthday: "Birth Date",
     address: "Address",
     streetAddress: "Street Address",
+    addressPayrollInfo: "This information is required for payroll processing",
     city: "City",
     provinceState: "Province/State",
     country: "Country",
@@ -110,7 +114,7 @@ const translations = {
     transit: "Transit",
     institution: "Institution",
     account: "Account",
-    driversLicense: "Driver's License",
+    driversLicense: "Driver License",
     licenseNumber: "License #",
     issuedDate: "Issued Date",
     expiry: "Expiry",
@@ -130,10 +134,10 @@ const translations = {
     uploadVoidCheque: "Upload Void Cheque",
     replaceVoidCheque: "Replace Void Cheque",
     addVoidCheque: "Add Another Void Cheque",
-    uploadDriversLicense: "Upload Driver's License",
+    uploadDriversLicense: "Upload License",
     replaceDriversLicense: "Replace License",
     addDriversLicense: "Add License Photo",
-    uploadDriversAbstract: "Upload Driver's Abstract",
+    uploadDriversAbstract: "Upload Abstract",
     replaceDriversAbstract: "Replace Abstract",
     addDriversAbstract: "Add Abstract",
     uploadFirstAidCert: "Upload First Aid Certificate",
@@ -260,6 +264,7 @@ const translations = {
     birthday: "Date de Naissance",
     address: "Adresse",
     streetAddress: "Adresse",
+    addressPayrollInfo: "Ces informations sont requises pour le traitement de la paie",
     city: "Ville",
     provinceState: "Province/État",
     country: "Pays",
@@ -424,6 +429,7 @@ const translations = {
     birthday: "Fecha de Nacimiento",
     address: "Dirección",
     streetAddress: "Dirección",
+    addressPayrollInfo: "Esta información es necesaria para el procesamiento de nómina",
     city: "Ciudad",
     provinceState: "Provincia/Estado",
     country: "País",
@@ -646,6 +652,9 @@ export default function GroundCrewPortal() {
   
   const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl);
   const [isEditing, setIsEditing] = useState(false);
+  
+  // State for mobile sidebar
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const handleUrlChange = () => {
@@ -1203,21 +1212,32 @@ export default function GroundCrewPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <div className="hidden lg:block">
-        <DashboardSidebar
-          currentUser={user}
-          activeTab={activeTab}
-          onTabChange={(tab) => setActiveTab(tab as TabType)}
-          variant="ground-crew"
-          customNavigationGroups={groundCrewNavGroups}
-          showDashboardLink={false}
-        />
-      </div>
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
+      <DashboardSidebar
+        currentUser={user}
+        activeTab={activeTab}
+        onTabChange={(tab) => setActiveTab(tab as TabType)}
+        variant="ground-crew"
+        customNavigationGroups={groundCrewNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
       
       <div className="lg:pl-60">
         <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
           <div className="h-full flex items-center justify-between gap-4">
             <div className="flex items-center gap-4 flex-1 min-w-0">
+              {/* Mobile hamburger menu button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileSidebarOpen(true)}
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               <div className="hidden md:flex flex-1 max-w-xl">
                 <DashboardSearch />
               </div>
@@ -1622,7 +1642,7 @@ export default function GroundCrewPortal() {
                         name="birthday"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t.birthday}</FormLabel>
+                            <FormLabel>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></FormLabel>
                             <FormControl>
                               <Input {...field} type="date" disabled={!isEditing} data-testid="input-birthday" />
                             </FormControl>
@@ -1635,7 +1655,17 @@ export default function GroundCrewPortal() {
                     <Separator />
 
                     <div>
-                      <h3 className="text-lg font-semibold mb-4">{t.address}</h3>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        {t.address}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{t.addressPayrollInfo}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
@@ -1920,7 +1950,7 @@ export default function GroundCrewPortal() {
                           ) : (
                             <Upload className="w-4 h-4 mr-2" />
                           )}
-                          {t.uploadDriversLicense || "Upload Driver's License"}
+                          {t.uploadDriversLicense || "Upload License"}
                         </Button>
                         {user?.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
                           <div className="mt-2 space-y-2">
@@ -1928,7 +1958,7 @@ export default function GroundCrewPortal() {
                               <div key={index} className="flex items-center gap-2 text-sm">
                                 <CheckCircle2 className="w-4 h-4 text-green-500" />
                                 <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                                  {t.driversLicense || "Driver's License"} #{index + 1}
+                                  {t.driversLicense || "Driver License"} #{index + 1}
                                 </a>
                                 <Button
                                   type="button"

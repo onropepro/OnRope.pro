@@ -5534,10 +5534,10 @@
     "uploadVoidCheque": "Subir Cheque Nulo",
     "replaceVoidCheque": "Reemplazar Cheque Nulo",
     "addVoidCheque": "Agregar Otro Cheque Nulo",
-    "uploadDriversLicense": "Subir Licencia de Conducir",
+    "uploadDriversLicense": "Subir Licencia",
     "replaceDriversLicense": "Reemplazar Licencia",
     "addDriversLicense": "Agregar Foto de Licencia",
-    "uploadDriversAbstract": "Subir Abstracto de Conductor",
+    "uploadDriversAbstract": "Subir Abstracto",
     "replaceDriversAbstract": "Reemplazar Abstracto",
     "addDriversAbstract": "Agregar Abstracto",
     "uploadFirstAidCert": "Subir Certificado de Primeros Auxilios",
@@ -5686,7 +5686,7 @@
     "confirmDeletePreviousHours": "Estas seguro de que quieres eliminar esta entrada de horas anteriores?",
     "deleteConfirm": "Eliminar",
     "cancelDelete": "Cancelar",
-    "logbookDisclaimer": "Esta es una herramienta de seguimiento personal unicamente. Aun debes registrar todas las horas en tu bitacora oficial irata/SPRAT - este registro digital no la reemplaza.",
+    "logbookDisclaimer": "Esta es una herramienta de seguimiento personal unicamente. Aun debes registrar todas las horas en tu bitacora oficial IRATA/SPRAT - este registro digital no la reemplaza.",
     "jobBoardDesc": "Explora oportunidades y haz tu perfil visible para empleadores",
     "browseJobs": "Explorar Trabajos",
     "yourReferralCode": "Tu Codigo de Referido",
@@ -9928,7 +9928,7 @@
       },
       "disclaimer": {
         "title": "Importante: Responsabilidad de cumplimiento de seguridad",
-        "text": "OnRopePro ayuda a documentar procedimientos de seguridad, pero tu sigues siendo completamente responsable de la seguridad laboral y el cumplimiento regulatorio. Este software no reemplaza a profesionales de seguridad calificados, entrenamiento irata/SPRAT, inspecciones de equipo por inspectores certificados, o el cumplimiento de todas las regulaciones OSHA/WorkSafeBC aplicables."
+        "text": "OnRopePro ayuda a documentar procedimientos de seguridad, pero tu sigues siendo completamente responsable de la seguridad laboral y el cumplimiento regulatorio. Este software no reemplaza a profesionales de seguridad calificados, entrenamiento IRATA/SPRAT, inspecciones de equipo por inspectores certificados, o el cumplimiento de todas las regulaciones OSHA/WorkSafeBC aplicables."
       },
       "benefits": {
         "title": "Quien se beneficia de este modulo",

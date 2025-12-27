@@ -115,11 +115,14 @@ import {
   FileImage,
   FileArchive,
   File,
-  GraduationCap
+  GraduationCap,
+  Menu,
+  Info
 } from "lucide-react";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 type Language = 'en' | 'fr' | 'es';
 
@@ -137,9 +140,10 @@ const translations = {
     phoneNumber: "Phone Number",
     smsNotifications: "SMS Notifications",
     smsNotificationsDescription: "Receive text messages for team invitations",
-    birthday: "Birthday",
+    birthday: "Birth Date",
     address: "Address",
     streetAddress: "Street Address",
+    addressPayrollInfo: "This information is required for payroll processing",
     city: "City",
     provinceState: "Province/State",
     country: "Country",
@@ -154,7 +158,7 @@ const translations = {
     transit: "Transit",
     institution: "Institution",
     account: "Account",
-    driversLicense: "Driver's License",
+    driversLicense: "Driver License",
     licenseNumber: "License #",
     issuedDate: "Issued Date",
     expiry: "Expiry",
@@ -173,11 +177,11 @@ const translations = {
     verifyLicenseValidity: "Verify Your License Validity",
     verificationExplanation: "Employers require verified certification status to ensure compliance with safety regulations and insurance requirements. Verifying your license helps your employer confirm you're qualified for rope access work.",
     howItWorks: "How it works:",
-    step1: "Click \"Open irata Portal\" to open the verification page",
+    step1: 'Click "Open IRATA Portal" to open the verification page',
     step2: "Enter your last name and license number",
     step3: "Take a screenshot of the verification result",
-    step4: "Come back here and click \"Upload Screenshot\"",
-    openIrataPortal: "Open irata Portal",
+    step4: 'Come back here and click "Upload Screenshot"',
+    openIrataPortal: "Open IRATA Portal",
     uploadVerificationScreenshot: "Upload Verification Screenshot",
     analyzingScreenshot: "Analyzing Screenshot...",
     name: "Name",
@@ -206,10 +210,10 @@ const translations = {
     uploadVoidCheque: "Upload Void Cheque",
     replaceVoidCheque: "Replace Void Cheque",
     addVoidCheque: "Add Another Void Cheque",
-    uploadDriversLicense: "Upload Driver's License",
+    uploadDriversLicense: "Upload License",
     replaceDriversLicense: "Replace License",
     addDriversLicense: "Add License Photo",
-    uploadDriversAbstract: "Upload Driver's Abstract",
+    uploadDriversAbstract: "Upload Abstract",
     replaceDriversAbstract: "Replace Abstract",
     addDriversAbstract: "Add Abstract",
     uploadFirstAidCert: "Upload First Aid Certificate",
@@ -218,9 +222,9 @@ const translations = {
     uploadCertificationCard: "Upload Certification Card",
     replaceCertificationCard: "Replace Card",
     addCertificationCard: "Add Card",
-    uploadIrataCertificationCard: "Upload irata Card",
+    uploadIrataCertificationCard: "Upload IRATA Card",
     uploadSpratCertificationCard: "Upload SPRAT Card",
-    irataCertificationCard: "irata Certification Card",
+    irataCertificationCard: "IRATA Certification Card",
     spratCertificationCard: "SPRAT Certification Card",
     experience: "Experience",
     ropeAccessExperience: "Rope Access Experience",
@@ -231,7 +235,7 @@ const translations = {
     startedOn: "Started on",
     notSet: "Not set",
     resume: "Resume / CV",
-    uploadResume: "Upload Resume",
+    uploadResume: "Upload Resume / CV",
     addResume: "Add Another Resume",
     specialties: "Rope Access Specialties",
     specialtiesDesc: "Select the job types you specialize in",
@@ -256,14 +260,14 @@ const translations = {
     invalidFile: "Invalid file",
     uploadImageFile: "Please upload an image file (screenshot)",
     verificationSuccessful: "Verification Successful",
-    irataVerified: "Your irata license has been verified!",
+    irataVerified: "Your IRATA license has been verified!",
     spratVerified: "Your SPRAT license has been verified!",
     verificationIssue: "Verification Issue",
     couldNotVerify: "Could not verify license from screenshot",
     verificationFailed: "Verification Failed",
     failedToAnalyze: "Failed to analyze screenshot",
     openSpratPortal: "Open SPRAT Portal",
-    spratStep1: "Click \"Open SPRAT Portal\" to open the verification page",
+    spratStep1: 'Click "Open SPRAT Portal" to open the verification page',
     spratVerificationExplanation: "Employers require verified SPRAT certification status to ensure compliance with safety regulations and insurance requirements.",
     privacyNotice: "Privacy Notice",
     privacyText: "Your personal information is securely stored and used only by your employer for HR and payroll purposes. We never share your data externally.",
@@ -505,6 +509,7 @@ const translations = {
     birthday: "Date de naissance",
     address: "Adresse",
     streetAddress: "Adresse civique",
+    addressPayrollInfo: "Ces informations sont requises pour le traitement de la paie",
     city: "Ville",
     provinceState: "Province/État",
     country: "Pays",
@@ -519,7 +524,7 @@ const translations = {
     transit: "Transit",
     institution: "Institution",
     account: "Compte",
-    driversLicense: "Permis de conduire",
+    driversLicense: "Permis de Conduire",
     licenseNumber: "Numéro de permis",
     issuedDate: "Date d'émission",
     expiry: "Expiration",
@@ -538,7 +543,7 @@ const translations = {
     verifyLicenseValidity: "Vérifier la validité de votre licence",
     verificationExplanation: "Les employeurs exigent un statut de certification vérifié pour assurer la conformité aux règlements de sécurité et aux exigences d'assurance. La vérification de votre licence aide votre employeur à confirmer que vous êtes qualifié pour le travail d'accès sur corde.",
     howItWorks: "Comment ça fonctionne:",
-    step1: "Cliquez sur « Ouvrir le portail irata » pour ouvrir la page de vérification",
+    step1: "Cliquez sur « Ouvrir le portail IRATA » pour ouvrir la page de vérification",
     step2: "Entrez votre nom de famille et votre numéro de licence",
     step3: "Prenez une capture d'écran du résultat de la vérification",
     step4: "Revenez ici et cliquez sur « Téléverser la capture d'écran »",
@@ -571,10 +576,10 @@ const translations = {
     uploadVoidCheque: "Téléverser un chèque annulé",
     replaceVoidCheque: "Remplacer le chèque annulé",
     addVoidCheque: "Ajouter un autre chèque",
-    uploadDriversLicense: "Téléverser le permis de conduire",
+    uploadDriversLicense: "Téléverser Permis",
     replaceDriversLicense: "Remplacer le permis",
     addDriversLicense: "Ajouter une photo",
-    uploadDriversAbstract: "Téléverser le relevé de conduite",
+    uploadDriversAbstract: "Téléverser Relevé",
     replaceDriversAbstract: "Remplacer le relevé",
     addDriversAbstract: "Ajouter un relevé",
     uploadFirstAidCert: "Téléverser le certificat de premiers soins",
@@ -596,7 +601,7 @@ const translations = {
     startedOn: "Début le",
     notSet: "Non défini",
     resume: "Curriculum vitae",
-    uploadResume: "Téléverser CV",
+    uploadResume: "Téléverser CV / Curriculum",
     addResume: "Ajouter un autre CV",
     specialties: "Spécialités d'accès sur corde",
     specialtiesDesc: "Sélectionnez les types de travaux dans lesquels vous vous spécialisez",
@@ -621,14 +626,14 @@ const translations = {
     invalidFile: "Fichier invalide",
     uploadImageFile: "Veuillez téléverser un fichier image (capture d'écran)",
     verificationSuccessful: "Vérification réussie",
-    irataVerified: "Votre licence irata a été vérifiée!",
+    irataVerified: "Votre licence IRATA a été vérifiée!",
     spratVerified: "Votre licence SPRAT a été vérifiée!",
     verificationIssue: "Problème de vérification",
     couldNotVerify: "Impossible de vérifier la licence à partir de la capture d'écran",
     verificationFailed: "Échec de la vérification",
     failedToAnalyze: "Échec de l'analyse de la capture d'écran",
     openSpratPortal: "Ouvrir le portail SPRAT",
-    spratStep1: "Cliquez sur \"Ouvrir le portail SPRAT\" pour accéder à la page de vérification",
+    spratStep1: 'Cliquez sur « Ouvrir le portail SPRAT » pour accéder à la page de vérification',
     spratVerificationExplanation: "Les employeurs exigent que le statut de certification SPRAT soit vérifié pour assurer la conformité aux réglementations de sécurité et aux exigences d'assurance.",
     privacyNotice: "Avis de confidentialité",
     privacyText: "Vos informations personnelles sont stockées en toute sécurité et utilisées uniquement par votre employeur à des fins de RH et de paie. Nous ne partageons jamais vos données à l'externe.",
@@ -870,6 +875,7 @@ const translations = {
     birthday: "Fecha de Nacimiento",
     address: "Direccion",
     streetAddress: "Direccion",
+    addressPayrollInfo: "Esta información es necesaria para el procesamiento de nómina",
     city: "Ciudad",
     provinceState: "Provincia/Estado",
     country: "Pais",
@@ -903,11 +909,11 @@ const translations = {
     verifyLicenseValidity: "Verificar la Validez de Su Licencia",
     verificationExplanation: "Los empleadores requieren el estado de certificacion verificado para garantizar el cumplimiento de las regulaciones de seguridad y los requisitos de seguro.",
     howItWorks: "Como funciona:",
-    step1: "Haga clic en \"Abrir Portal irata\" para abrir la pagina de verificacion",
+    step1: 'Haga clic en "Abrir Portal IRATA" para abrir la pagina de verificacion',
     step2: "Ingrese su apellido y numero de licencia",
     step3: "Tome una captura de pantalla del resultado de verificacion",
-    step4: "Regrese aqui y haga clic en \"Subir Captura\"",
-    openIrataPortal: "Abrir Portal irata",
+    step4: 'Regrese aqui y haga clic en "Subir Captura"',
+    openIrataPortal: "Abrir Portal IRATA",
     uploadVerificationScreenshot: "Subir Captura de Verificacion",
     analyzingScreenshot: "Analizando Captura...",
     name: "Nombre",
@@ -950,7 +956,7 @@ const translations = {
     resume: "Curriculum",
     noResume: "Sin curriculum subido",
     noResumeDesc: "Suba un curriculum para que los empleadores lo vean",
-    uploadResume: "Subir Curriculum",
+    uploadResume: "Subir CV / Curriculum",
     addResume: "Agregar Curriculum",
     uploadResumeDesc: "Suba su curriculum en formato PDF o documento",
     dragDropResume: "Arrastre y suelte su curriculum aqui",
@@ -1068,10 +1074,10 @@ const translations = {
     uploadVoidCheque: "Subir Cheque Anulado",
     replaceVoidCheque: "Reemplazar Cheque",
     addVoidCheque: "Agregar Otro Cheque",
-    uploadDriversLicense: "Subir Licencia de Conducir",
+    uploadDriversLicense: "Subir Licencia",
     replaceDriversLicense: "Reemplazar Licencia",
     addDriversLicense: "Agregar Foto de Licencia",
-    uploadDriversAbstract: "Subir Extracto de Conductor",
+    uploadDriversAbstract: "Subir Extracto",
     replaceDriversAbstract: "Reemplazar Extracto",
     addDriversAbstract: "Agregar Extracto",
     uploadFirstAidCert: "Subir Certificado de Primeros Auxilios",
@@ -1112,14 +1118,14 @@ const translations = {
     invalidFile: "Archivo invalido",
     uploadImageFile: "Por favor suba un archivo de imagen (captura)",
     verificationSuccessful: "Verificacion Exitosa",
-    irataVerified: "Su licencia irata ha sido verificada!",
+    irataVerified: "Su licencia IRATA ha sido verificada!",
     spratVerified: "Su licencia SPRAT ha sido verificada!",
     verificationIssue: "Problema de Verificacion",
     couldNotVerify: "No se pudo verificar la licencia de la captura",
     verificationFailed: "Verificacion Fallida",
     failedToAnalyze: "Error al analizar la captura",
     openSpratPortal: "Abrir Portal SPRAT",
-    spratStep1: "Haga clic en \"Abrir Portal SPRAT\" para abrir la pagina de verificacion",
+    spratStep1: 'Haga clic en "Abrir Portal SPRAT" para abrir la pagina de verificacion',
     spratVerificationExplanation: "Los empleadores requieren el estado de certificacion SPRAT verificado para garantizar el cumplimiento.",
     privacyNotice: "Aviso de Privacidad",
     privacyText: "Su informacion personal esta almacenada de forma segura y solo es utilizada por su empleador para propositos de RRHH y nomina.",
@@ -1696,6 +1702,9 @@ export default function TechnicianPortal() {
   };
   
   const [activeTab, setActiveTab] = useState<TabType>(getTabFromUrl);
+  
+  // State for mobile sidebar
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     const handleUrlChange = () => {
@@ -1959,7 +1968,7 @@ export default function TechnicianPortal() {
       // Additional profile fields
       { label: getLabel('Emergency Contact', 'Contact d\'urgence', 'Contacto de Emergencia'), complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
       { label: getLabel('Banking Info', 'Info bancaire', 'Info Bancaria'), complete: !!user.bankAccountNumber },
-      { label: getLabel('Birthday', 'Date de naissance', 'Cumpleaños'), complete: !!user.birthday },
+      { label: getLabel('Birth Date', 'Date de naissance', 'Fecha de Nacimiento'), complete: !!user.birthday },
       { label: getLabel('First Aid', 'Premiers soins', 'Primeros Auxilios'), complete: !!user.hasFirstAid },
       { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber },
       { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.streetAddress },
@@ -2588,24 +2597,34 @@ export default function TechnicianPortal() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden lg:block">
-        <DashboardSidebar
-          currentUser={user}
-          activeTab={activeTab}
-          onTabChange={(tab) => setActiveTab(tab as TabType)}
-          variant="technician"
-          customNavigationGroups={technicianNavGroups}
-          showDashboardLink={false}
-        />
-      </div>
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
+      <DashboardSidebar
+        currentUser={user}
+        activeTab={activeTab}
+        onTabChange={(tab) => setActiveTab(tab as TabType)}
+        variant="technician"
+        customNavigationGroups={technicianNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
       
       {/* Main content wrapper - offset for sidebar on desktop */}
       <div className="lg:pl-60">
         <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
           <div className="h-full flex items-center justify-between gap-4">
-            {/* Left Side: Search */}
+            {/* Left Side: Hamburger menu (mobile) + Search */}
             <div className="flex items-center gap-4 flex-1 min-w-0">
+              {/* Mobile hamburger menu button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileSidebarOpen(true)}
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               <div className="hidden md:flex flex-1 max-w-xl">
                 <DashboardSearch />
               </div>
@@ -3806,7 +3825,7 @@ export default function TechnicianPortal() {
                     {user.irataLevel && (
                       <Badge variant="secondary" className="gap-1">
                         <Award className="w-3 h-3" />
-                        irata {user.irataLevel}
+                        IRATA {user.irataLevel}
                       </Badge>
                     )}
                     {user.spratLevel && (
@@ -3930,7 +3949,7 @@ export default function TechnicianPortal() {
                         name="birthday"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t.birthday}</FormLabel>
+                            <FormLabel>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></FormLabel>
                             <FormControl>
                               <Input {...field} type="date" data-testid="input-birthday" />
                             </FormControl>
@@ -3947,6 +3966,14 @@ export default function TechnicianPortal() {
                     <h3 className="font-medium flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       {t.address}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{t.addressPayrollInfo}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -3956,7 +3983,20 @@ export default function TechnicianPortal() {
                           <FormItem className="md:col-span-2">
                             <FormLabel>{t.streetAddress}</FormLabel>
                             <FormControl>
-                              <Input {...field} data-testid="input-street" />
+                              <AddressAutocomplete
+                                data-testid="input-street"
+                                placeholder={t.streetAddress}
+                                value={field.value || ""}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                onSelect={(address) => {
+                                  field.onChange(address.formatted);
+                                  form.setValue('employeeCity', address.city || '');
+                                  form.setValue('employeeProvinceState', address.state || '');
+                                  form.setValue('employeeCountry', address.country || '');
+                                  form.setValue('employeePostalCode', address.postcode || '');
+                                }}
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -4262,7 +4302,7 @@ export default function TechnicianPortal() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InfoItem label={t.email} value={user.email} icon={<Mail className="w-4 h-4" />} />
                     <InfoItem label={t.phoneNumber} value={user.employeePhoneNumber} icon={<Phone className="w-4 h-4" />} />
-                    <InfoItem label={t.birthday} value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
+                    <InfoItem label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>} value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
                   </div>
                 </div>
 
@@ -4338,7 +4378,7 @@ export default function TechnicianPortal() {
                                   }
                                   return <><span>{formattedDate}</span>{badge}</>;
                                 } catch (e) {
-                                  console.error('Failed to parse irata expiration date:', e);
+                                  console.error('Failed to parse IRATA expiration date:', e);
                                   return <span className="text-muted-foreground italic">{t.notSet}</span>;
                                 }
                               })()
@@ -4494,14 +4534,14 @@ export default function TechnicianPortal() {
                     </div>
                   </div>
                   
-                  {/* irata License Verification Section - Available to all technicians */}
+                  {/* IRATA License Verification Section - Available to all technicians */}
                   <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
                       {/* Show verified status if already verified */}
                       {user.irataVerifiedAt && (
                         <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                           <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-medium text-green-700 dark:text-green-400">irata {t.licenseVerified}</p>
+                            <p className="text-sm font-medium text-green-700 dark:text-green-400">IRATA {t.licenseVerified}</p>
                             <p className="text-xs text-muted-foreground">
                               {t.lastVerified}: {formatDateTime(user.irataVerifiedAt)}
                               {user.irataVerificationStatus && ` (${user.irataVerificationStatus})`}
@@ -4514,7 +4554,7 @@ export default function TechnicianPortal() {
                         <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm">
-                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity} (irata)
+                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity} (IRATA)
                           </h4>
                           <p className="text-xs text-muted-foreground leading-relaxed">
                             {t.verificationExplanation}
@@ -4626,11 +4666,11 @@ export default function TechnicianPortal() {
                         </div>
                       )}
                       
-                      {/* irata Certification Card Upload - inside verification section */}
+                      {/* IRATA Certification Card Upload - inside verification section */}
                       <div className="pt-3 border-t border-primary/20 space-y-3">
                         <p className="text-sm font-medium">{t.irataCertificationCard}</p>
                         
-                        {/* Display existing irata documents */}
+                        {/* Display existing IRATA documents */}
                         {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                           <div className="space-y-2">
                             {user.irataDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
@@ -4656,7 +4696,7 @@ export default function TechnicianPortal() {
                                     ) : isImage ? (
                                       <img 
                                         src={url} 
-                                        alt={`irata certification ${index + 1}`}
+                                        alt={`IRATA certification ${index + 1}`}
                                         className="w-full object-contain"
                                         style={{ maxHeight: '200px', minHeight: '80px' }}
                                         onError={(e) => {
@@ -5708,82 +5748,6 @@ export default function TechnicianPortal() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Mobile Bottom Navigation - hidden on desktop */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t z-50 safe-area-inset-bottom lg:hidden">
-        <div className="w-full px-4 md:px-6 flex items-center justify-around py-2">
-          <button
-            onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
-              activeTab === 'home' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-home"
-          >
-            <Home className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{t.tabHome}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors ${
-              activeTab === 'profile' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-profile"
-          >
-            <User className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{t.tabProfile}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('visibility')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'visibility' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-visibility"
-          >
-            <Eye className="w-5 h-5" />
-            <span className="text-[10px] font-medium leading-tight text-center">{language === 'en' ? 'Visibility' : language === 'es' ? 'Visibilidad' : 'Visibilité'}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('invitations')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'invitations' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-invitations"
-          >
-            <Mail className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{language === 'en' ? 'Invites' : language === 'es' ? 'Invitaciones' : 'Invitations'}</span>
-            {pendingInvitations.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                {pendingInvitations.length}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab('more')}
-            className={`flex flex-col items-center gap-1 px-3 py-2 min-w-[56px] rounded-lg transition-colors relative ${
-              activeTab === 'more' 
-                ? 'text-primary bg-primary/10' 
-                : 'text-muted-foreground'
-            }`}
-            data-testid="tab-more"
-          >
-            <MoreHorizontal className="w-5 h-5" />
-            <span className="text-[10px] font-medium">{t.tabMore}</span>
-            {totalUnreadFeedback > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                {totalUnreadFeedback}
-              </span>
-            )}
-          </button>
-        </div>
-      </nav>
-
       {/* Experience Start Date Edit Dialog */}
       <Dialog open={editingExperience} onOpenChange={(open) => {
         if (!open) {
@@ -6403,7 +6367,7 @@ export default function TechnicianPortal() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  {language === 'en' ? 'Enhanced irata task logging' : 'Journalisation irata amelioree'}
+                  {language === 'en' ? 'Enhanced IRATA task logging' : 'Journalisation IRATA amelioree'}
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />

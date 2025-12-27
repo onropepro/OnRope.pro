@@ -196,7 +196,7 @@ const salesStrategy: StrategyItem[] = [
   {
     title: "Partnership Strategy",
     status: "planned",
-    description: "Partner with irata and SPRAT certification bodies for referrals",
+    description: "Partner with IRATA and SPRAT certification bodies for referrals",
   },
 ];
 

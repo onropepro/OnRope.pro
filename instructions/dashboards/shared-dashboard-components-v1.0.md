@@ -90,6 +90,12 @@ interface DashboardSidebarProps {
   customNavigationGroups?: NavGroup[];  // Override default navigation
   showDashboardLink?: boolean;  // Whether to show link back to main dashboard
   
+  // Mobile sidebar external control (optional)
+  // When these props are provided, the parent component controls the mobile sidebar state
+  // and the built-in hamburger menu button is hidden
+  mobileOpen?: boolean;  // External control of mobile sidebar visibility
+  onMobileOpenChange?: (open: boolean) => void;  // Callback when mobile sidebar should open/close
+  
   // Optional branding and display props
   brandingLogoUrl?: string | null;
   whitelabelBrandingActive?: boolean;
@@ -127,8 +133,12 @@ variant = "employer"  // Default in function destructuring
 />
 ```
 
-#### Technician Portal
+#### Technician Portal (with external mobile control)
 ```tsx
+// In TechnicianPortal.tsx
+const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+// Sidebar component with external mobile control
 <DashboardSidebar
   currentUser={user}
   activeTab={activeTab}
@@ -136,8 +146,25 @@ variant = "employer"  // Default in function destructuring
   variant="technician"
   customNavigationGroups={technicianNavGroups}
   showDashboardLink={false}
+  mobileOpen={mobileSidebarOpen}
+  onMobileOpenChange={setMobileSidebarOpen}
 />
+
+// Header with hamburger menu button (when using external control)
+<header className="sticky top-0 z-[100] h-14 ...">
+  <Button
+    variant="ghost"
+    size="icon"
+    className="lg:hidden"
+    onClick={() => setMobileSidebarOpen(true)}
+  >
+    <Menu className="h-5 w-5" />
+  </Button>
+  {/* ... other header content */}
+</header>
 ```
+
+**Note**: When using external control (`mobileOpen`/`onMobileOpenChange`), the built-in hamburger button is hidden. The parent component must provide its own trigger button.
 
 ### Variant-Based Styling
 

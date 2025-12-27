@@ -1011,6 +1011,25 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                 {item.label}
               </button>
             ))}
+
+            {/* Sign In Button - Mobile */}
+            <div className="pt-4 mt-4 border-t border-border">
+              <Button
+                variant="default"
+                className="w-full font-semibold text-white bg-[#193A63] hover:bg-[#0d2340]"
+                onClick={() => {
+                  if (onSignInClick) {
+                    onSignInClick();
+                  } else {
+                    openLogin();
+                  }
+                  setMobileMenuOpen(false);
+                }}
+                data-testid="nav-mobile-sign-in"
+              >
+                {t('login.header.signIn', 'Sign In')}
+              </Button>
+            </div>
           </nav>
         </div>
       )}
