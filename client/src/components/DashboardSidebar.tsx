@@ -2,6 +2,11 @@ import { useLocation } from "wouter";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Building2,
   Users,
   Calendar,
@@ -16,6 +21,7 @@ import {
   Settings,
   HelpCircle,
   ChevronRight,
+  ChevronDown,
   Award,
   Wrench,
   ClipboardCheck,
@@ -36,7 +42,7 @@ import {
   canAccessQuotes,
   hasPermission,
 } from "@/lib/permissions";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { SidebarCustomizeDialog } from "./SidebarCustomizeDialog";
@@ -125,6 +131,56 @@ export function DashboardSidebar({
   const [location, setLocation] = useLocation();
   const [internalOpen, setInternalOpen] = useState(false);
   const [customizeDialogOpen, setCustomizeDialogOpen] = useState(false);
+  
+  // Collapsible group state - tracks which groups are expanded
+  // Initialize with empty Set, will be populated by effect based on variant
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  
+  // Track variant to detect changes and reload state
+  const [loadedVariant, setLoadedVariant] = useState<string | null>(null);
+
+  // Load collapsed state from localStorage when variant changes
+  useEffect(() => {
+    if (loadedVariant === variant) return;
+    
+    try {
+      const storageKey = `sidebar-collapsed-${variant}`;
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        setCollapsedGroups(new Set(JSON.parse(stored)));
+      } else {
+        setCollapsedGroups(new Set()); // All groups expanded by default
+      }
+    } catch {
+      setCollapsedGroups(new Set());
+    }
+    setLoadedVariant(variant);
+  }, [variant, loadedVariant]);
+
+  // Persist collapsed state to localStorage (only after initial load)
+  useEffect(() => {
+    if (loadedVariant !== variant) return; // Don't persist until we've loaded for this variant
+    
+    try {
+      const storageKey = `sidebar-collapsed-${variant}`;
+      localStorage.setItem(storageKey, JSON.stringify(Array.from(collapsedGroups)));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [collapsedGroups, variant, loadedVariant]);
+
+  // Toggle group collapse state
+  const toggleGroupCollapse = useCallback((groupId: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  }, []);
   
   // Use external control if provided, otherwise use internal state
   const isOpen = mobileOpen !== undefined ? mobileOpen : internalOpen;
@@ -521,52 +577,74 @@ export function DashboardSidebar({
 
       {/* Navigation Groups - Scrollable */}
       <nav className="flex-1 overflow-y-auto px-3 py-1">
-        {filteredGroups.map((group) => (
-          <div key={group.id} className="mb-3">
-            {/* Group Header */}
-            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 py-1.5">
-              {group.label}
-            </div>
-            
-            {/* Group Items */}
-            <div className="space-y-0.5">
-              {group.items.map((item) => {
-                const Icon = item.icon;
-                const isActive = isActiveItem(item);
+        {filteredGroups.map((group) => {
+          const isCollapsed = collapsedGroups.has(group.id);
+          
+          return (
+            <Collapsible
+              key={group.id}
+              open={!isCollapsed}
+              onOpenChange={() => toggleGroupCollapse(group.id)}
+              className="mb-3"
+            >
+              {/* Group Header with Toggle */}
+              <CollapsibleTrigger
+                className="w-full flex items-center justify-between px-3 py-1.5 group"
+                data-testid={`sidebar-group-toggle-${group.id}`}
+              >
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  {group.label}
+                </span>
+                <ChevronDown 
+                  className={cn(
+                    "h-3.5 w-3.5 text-slate-400 transition-transform duration-200",
+                    isCollapsed && "-rotate-90"
+                  )}
+                />
+              </CollapsibleTrigger>
+              
+              {/* Group Items - Collapsible */}
+              <CollapsibleContent>
+                <div className="space-y-0.5 pt-0.5">
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = isActiveItem(item);
 
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleItemClick(item)}
-                    data-testid={`sidebar-nav-${item.id}`}
-                    className={cn(
-                      "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
-                      isActive 
-                        ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-                    )}
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span className="flex-1 text-left truncate">{item.label}</span>
-                    {item.badge !== undefined && item.badge > 0 && (
-                      <span
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handleItemClick(item)}
+                        data-testid={`sidebar-nav-${item.id}`}
                         className={cn(
-                          "flex items-center justify-center rounded-full text-sm font-medium h-5 min-w-5 px-1.5",
-                          item.badgeType === "alert" 
-                            ? "bg-rose-500 text-white"
-                            : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                          "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
+                          isActive 
+                            ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                         )}
-                        data-testid={`badge-${item.id}-count`}
                       >
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span className="flex-1 text-left truncate">{item.label}</span>
+                        {item.badge !== undefined && item.badge > 0 && (
+                          <span
+                            className={cn(
+                              "flex items-center justify-center rounded-full text-sm font-medium h-5 min-w-5 px-1.5",
+                              item.badgeType === "alert" 
+                                ? "bg-rose-500 text-white"
+                                : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                            )}
+                            data-testid={`badge-${item.id}-count`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          );
+        })}
       </nav>
 
       {/* Footer - Settings and Help */}
