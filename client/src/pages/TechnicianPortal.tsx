@@ -2937,15 +2937,17 @@ export default function TechnicianPortal() {
                     </Badge>
                   </div>
                   <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate mb-2">{companyData.company.companyName || companyData.company.name}</p>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 h-6 px-2"
-                    onClick={() => setShowLeaveConfirm(true)}
-                    data-testid="button-leave-company"
-                  >
-                    {t.leaveCompany}
-                  </Button>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 h-6 px-2"
+                      onClick={() => setShowLeaveConfirm(true)}
+                      data-testid="button-leave-company"
+                    >
+                      {t.leaveCompany}
+                    </Button>
+                  </div>
                 </div>
               )}
               
