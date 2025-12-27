@@ -308,7 +308,7 @@ const translations = {
     year: "year",
     hour: "hr",
     goToWorkDashboard: "You are in Your Personal Passport View.",
-    goToWorkDashboardButton: "Go To Work Dashboard",
+    goToWorkDashboardButton: "Go to Work Dashboard",
     accessProjects: "Go to Work Dashboard to access the company dashboard. View projects, schedule, clock in/out, safety forms, auto-logging, etc.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
@@ -2977,6 +2977,52 @@ export default function TechnicianPortal() {
 
             {/* Quick Actions Grid - 4 columns on desktop, 2 on mobile */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {/* Linked Employer Card - Show when employed and not suspended */}
+              {user && user.companyId && !user.terminatedDate && !user.suspendedAt && companyData?.company && (
+                <div 
+                  className="group bg-white dark:bg-slate-900 border border-green-200 dark:border-green-700 rounded-lg shadow-sm p-4 text-left"
+                  data-testid="quick-action-linked-employer"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-3">
+                    <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate">{companyData.company.companyName || companyData.company.name}</p>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <Badge variant="default" className="bg-green-600 text-xs">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      {t.active}
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 h-6 px-2"
+                      onClick={() => setShowLeaveConfirm(true)}
+                      data-testid="button-leave-company"
+                    >
+                      {t.leaveCompany}
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Inactive/Suspended Employer Card */}
+              {user && user.companyId && user.suspendedAt && companyData?.company && (
+                <div 
+                  className="group bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-700 rounded-lg shadow-sm p-4 text-left"
+                  data-testid="quick-action-inactive-employer"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center mb-3">
+                    <Building2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate mb-1">{companyData.company.companyName || companyData.company.name}</p>
+                  <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 text-xs">
+                    {t.inactive}
+                  </Badge>
+                </div>
+              )}
+
               {/* Job Board - Purple theme */}
               <button
                 onClick={() => setLocation("/technician-job-board")}
