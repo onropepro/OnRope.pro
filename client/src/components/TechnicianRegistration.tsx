@@ -328,7 +328,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       <DialogContent className="max-w-5xl p-0 gap-0 overflow-hidden max-h-[90vh]">
         <div className="flex flex-col lg:flex-row min-h-[600px] max-h-[90vh]">
           {/* Left Panel - Rust Brown sidebar (Technician color) */}
-          <div className="hidden lg:flex lg:w-[320px] bg-[#AB4521] text-white p-8 flex-col">
+          <div className="hidden lg:flex lg:w-[320px] bg-[#2874A6] text-white p-8 flex-col">
             <div className="mb-8">
               <HardHat className="w-10 h-10 mb-4" />
               <h2 className="text-xl font-bold mb-2">{t('techReg.sidebar.title', 'Your Urban Rope Access Work Passport')}</h2>
@@ -338,25 +338,25 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
             {/* Progress Steps */}
             <div className="space-y-3 mb-6">
               <div className={`flex items-center gap-3 ${getStepNumber() >= 1 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 1 ? 'bg-white text-[#AB4521]' : 'bg-white/20'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 1 ? 'bg-white text-[#2874A6]' : 'bg-white/20'}`}>
                   {getStepNumber() > 1 ? <Check className="w-3.5 h-3.5" /> : "1"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.accountDetails', 'Account Details')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 2 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#AB4521]' : 'bg-white/20'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#2874A6]' : 'bg-white/20'}`}>
                   {getStepNumber() > 2 ? <Check className="w-3.5 h-3.5" /> : "2"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.certification', 'Certification')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#AB4521]' : 'bg-white/20'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#2874A6]' : 'bg-white/20'}`}>
                   {getStepNumber() > 3 ? <Check className="w-3.5 h-3.5" /> : "3"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.referral', 'Referral (Optional)')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 4 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 4 ? 'bg-white text-[#AB4521]' : 'bg-white/20'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 4 ? 'bg-white text-[#2874A6]' : 'bg-white/20'}`}>
                   {getStepNumber() > 4 ? <Check className="w-3.5 h-3.5" /> : "4"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.employer', 'Employer Info')}</span>
@@ -409,7 +409,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   <Button 
                     size="lg" 
-                    className="w-full gap-2 rounded-full bg-[#AB4521]"
+                    className="w-full gap-2 rounded-full bg-[#2874A6]"
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
@@ -540,7 +540,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       {t('techReg.buttons.back', 'Back')}
                     </Button>
                     <Button 
-                      className="flex-1 gap-2 bg-[#AB4521]"
+                      className="flex-1 gap-2 bg-[#2874A6]"
                       onClick={handleContinue}
                       data-testid="button-continue-to-certification"
                     >
@@ -571,7 +571,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                         type="button"
                         className={`p-4 rounded-lg border-2 text-center font-medium transition-all ${
                           data.certification === cert.value
-                            ? "border-[#AB4521] bg-[#AB4521]/10 text-[#AB4521]"
+                            ? "border-[#2874A6] bg-[#2874A6]/10 text-[#2874A6]"
                             : "border-border hover:border-muted-foreground/50"
                         }`}
                         onClick={() => setData({ ...data, certification: cert.value as CertificationType })}
@@ -586,7 +586,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   {(data.certification === "irata" || data.certification === "both") && (
                     <div className="space-y-4 mb-4 p-4 rounded-lg bg-muted/50">
                       <h4 className="font-medium flex items-center gap-2">
-                        <Award className="w-4 h-4 text-[#AB4521]" />
+                        <Award className="w-4 h-4 text-[#2874A6]" />
                         {t('techReg.certification.irataDetails', 'IRATA Details')}
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
@@ -599,7 +599,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                                 type="button"
                                 className={`flex-1 py-2 rounded-md border text-sm font-medium transition-all ${
                                   data.irataLevel === level
-                                    ? "border-[#AB4521] bg-[#AB4521] text-white"
+                                    ? "border-[#2874A6] bg-[#2874A6] text-white"
                                     : "border-border hover:border-muted-foreground/50"
                                 }`}
                                 onClick={() => setData({ ...data, irataLevel: level })}
@@ -629,7 +629,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   {(data.certification === "sprat" || data.certification === "both") && (
                     <div className="space-y-4 mb-4 p-4 rounded-lg bg-muted/50">
                       <h4 className="font-medium flex items-center gap-2">
-                        <Award className="w-4 h-4 text-[#AB4521]" />
+                        <Award className="w-4 h-4 text-[#2874A6]" />
                         {t('techReg.certification.spratDetails', 'SPRAT Details')}
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
@@ -642,7 +642,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                                 type="button"
                                 className={`flex-1 py-2 rounded-md border text-sm font-medium transition-all ${
                                   data.spratLevel === level
-                                    ? "border-[#AB4521] bg-[#AB4521] text-white"
+                                    ? "border-[#2874A6] bg-[#2874A6] text-white"
                                     : "border-border hover:border-muted-foreground/50"
                                 }`}
                                 onClick={() => setData({ ...data, spratLevel: level })}
@@ -718,7 +718,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       {t('techReg.buttons.back', 'Back')}
                     </Button>
                     <Button 
-                      className="flex-1 gap-2 bg-[#AB4521]"
+                      className="flex-1 gap-2 bg-[#2874A6]"
                       onClick={handleContinue}
                       data-testid="button-continue-to-referral"
                     >
@@ -835,7 +835,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       {t('techReg.buttons.back', 'Back')}
                     </Button>
                     <Button 
-                      className="flex-1 gap-2 bg-[#AB4521]"
+                      className="flex-1 gap-2 bg-[#2874A6]"
                       onClick={handleContinue}
                       disabled={registrationMutation.isPending}
                       data-testid="button-create-account"
@@ -886,7 +886,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   </div>
 
                   <Button 
-                    className="w-full gap-2 bg-[#AB4521]"
+                    className="w-full gap-2 bg-[#2874A6]"
                     onClick={handleContinue}
                     data-testid="button-continue-to-success"
                   >
@@ -966,7 +966,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   <Button 
                     size="lg"
-                    className="w-full gap-2 rounded-full bg-[#AB4521]"
+                    className="w-full gap-2 rounded-full bg-[#2874A6]"
                     onClick={() => {
                       handleClose();
                       setLocation("/technician");

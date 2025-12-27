@@ -630,10 +630,10 @@ export default function Employer() {
       <section className="py-16 md:py-24 px-4 bg-white dark:bg-slate-950">
         <div className="max-w-5xl mx-auto">
           <Card className="overflow-hidden">
-            <CardHeader className="bg-[#AB4521]/10 border-b">
+            <CardHeader className="bg-[#2874A6]/10 border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 flex items-center justify-center">
-                  <HardHat className="w-5 h-5 text-[#AB4521]" />
+                <div className="w-10 h-10 rounded-lg bg-[#2874A6]/20 flex items-center justify-center">
+                  <HardHat className="w-5 h-5 text-[#2874A6]" />
                 </div>
                 <CardTitle className="text-xl">For Your Technicians</CardTitle>
               </div>

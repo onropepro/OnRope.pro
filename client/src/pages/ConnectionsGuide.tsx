@@ -132,7 +132,7 @@ export default function ConnectionsGuide() {
 
               <div className="grid md:grid-cols-4 gap-3">
                 <div className="bg-white dark:bg-amber-900 rounded p-3 text-center">
-                  <Wrench className="w-6 h-6 mx-auto mb-1 text-[#AB4521]" />
+                  <Wrench className="w-6 h-6 mx-auto mb-1 text-[#2874A6]" />
                   <p className="font-bold text-amber-900 dark:text-amber-100 text-sm">Technician</p>
                   <p className="text-xs text-amber-800 dark:text-amber-200">Connects to Employers</p>
                 </div>
@@ -171,10 +171,10 @@ export default function ConnectionsGuide() {
 
           {/* Technician to Employer */}
           <Card className="overflow-hidden">
-            <CardHeader className="bg-[#AB4521]/10 dark:bg-[#AB4521]/20 border-b">
+            <CardHeader className="bg-[#2874A6]/10 dark:bg-[#2874A6]/20 border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 dark:bg-[#AB4521]/30 flex items-center justify-center">
-                  <Wrench className="w-5 h-5 text-[#AB4521]" />
+                <div className="w-10 h-10 rounded-lg bg-[#2874A6]/20 dark:bg-[#2874A6]/30 flex items-center justify-center">
+                  <Wrench className="w-5 h-5 text-[#2874A6]" />
                 </div>
                 <div>
                   <CardTitle className="text-xl">Technician to Employer</CardTitle>
@@ -184,7 +184,7 @@ export default function ConnectionsGuide() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                <div className="bg-[#AB4521]/5 dark:bg-[#AB4521]/10 rounded-lg p-4">
+                <div className="bg-[#2874A6]/5 dark:bg-[#2874A6]/10 rounded-lg p-4">
                   <p className="font-semibold text-foreground mb-2">How to Connect:</p>
                   <p className="text-base text-muted-foreground">
                     Company admins add technicians directly via email, or technicians accept pending invitations in their portal. PLUS tier technicians can connect to unlimited employers simultaneously.
@@ -510,7 +510,7 @@ export default function ConnectionsGuide() {
           {/* Technicians */}
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
-              <Wrench className="w-5 h-5 text-[#AB4521]" />
+              <Wrench className="w-5 h-5 text-[#2874A6]" />
               <h3 className="text-xl md:text-2xl font-semibold">For Technicians</h3>
             </div>
 
