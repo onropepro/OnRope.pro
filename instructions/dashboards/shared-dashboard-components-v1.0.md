@@ -255,6 +255,31 @@ Badge types:
 - `alert`: Red/urgent - requires attention
 - `success`: Green - positive indicator
 
+### Collapsible Navigation Groups
+
+Navigation groups can be collapsed/expanded by clicking the group header. The collapse state is persisted per dashboard variant in localStorage.
+
+**Behavior:**
+- Each group header includes a chevron icon indicating collapse state
+- Clicking the header toggles the group's visibility
+- Collapsed state is saved independently for each dashboard variant
+- When switching between dashboards (e.g., employer to technician), each variant loads its own collapse preferences
+
+**Storage Key Pattern:**
+```
+sidebar-collapsed-${variant}
+// Examples:
+// sidebar-collapsed-employer
+// sidebar-collapsed-technician
+// sidebar-collapsed-property-manager
+```
+
+**Implementation Details:**
+- Uses Radix UI `Collapsible` component for accessible expand/collapse
+- `loadedVariant` state prevents cross-contamination between variants
+- Write effect only persists after state is loaded for current variant
+- ChevronDown icon rotates -90deg when group is collapsed
+
 ---
 
 ## Sidebar Preferences (User Customization)
