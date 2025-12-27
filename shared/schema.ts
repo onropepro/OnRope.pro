@@ -3334,3 +3334,38 @@ export const insertDatabaseCostSchema = createInsertSchema(databaseCosts).omit({
   createdAt: true,
   createdBy: true,
 });
+
+// ============================================
+// API RESPONSE TYPES
+// Used for typing React Query hooks and API responses
+// ============================================
+
+// User API responses
+export type UserResponse = {
+  user: UserPublic;
+};
+
+export type UserWithMessageResponse = {
+  user: UserPublic;
+  message?: string;
+};
+
+// Company data (company is a User with role='company')
+export type CompanyResponse = {
+  company: UserPublic;
+};
+
+// Team invitations response (TeamInvitation already defined above)
+export type InvitationsResponse = {
+  invitations: TeamInvitation[];
+};
+
+// Project response (Project already defined above)
+export type ProjectsResponse = {
+  projects: Project[];
+};
+
+// Client response (Client already defined above)
+export type ClientsResponse = {
+  clients: Client[];
+};
