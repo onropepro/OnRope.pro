@@ -4305,6 +4305,14 @@ export default function TechnicianPortal() {
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4" />
                     {t.address}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t.addressPayrollInfo}</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </h3>
                   <p className="text-base">
                     {user.employeeStreetAddress && (
