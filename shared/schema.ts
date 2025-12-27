@@ -1370,6 +1370,30 @@ export const companyDocuments = pgTable("company_documents", {
   index("IDX_company_docs_template").on(table.companyId, table.templateId),
 ]);
 
+// User certifications table - for technician additional certifications
+export const userCertifications = pgTable("user_certifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  fileName: varchar("file_name").notNull(),
+  fileUrl: text("file_url").notNull(),
+  description: text("description"),
+  expiryDate: date("expiry_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_user_certs_user").on(table.userId),
+  index("IDX_user_certs_expiry").on(table.userId, table.expiryDate),
+]);
+
+export const insertUserCertificationSchema = createInsertSchema(userCertifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertUserCertification = z.infer<typeof insertUserCertificationSchema>;
+export type UserCertification = typeof userCertifications.$inferSelect;
+
 // Pay period configuration table - one per company
 export const payPeriodConfig = pgTable("pay_period_config", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
