@@ -8,6 +8,7 @@ import { usePermissionSync } from "@/hooks/use-permission-sync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AuthPortalProvider } from "@/contexts/AuthPortalContext";
+import { PWARefreshButton } from "@/components/PWARefreshButton";
 
 // Pages
 import Register from "@/pages/Register";
@@ -811,6 +812,7 @@ function App() {
             <BrandingProvider>
               <Router />
               <Toaster />
+              <PWARefreshButton />
             </BrandingProvider>
           </AuthPortalProvider>
         </ErrorBoundary>

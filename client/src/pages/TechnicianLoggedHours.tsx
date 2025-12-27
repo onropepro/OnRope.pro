@@ -33,6 +33,7 @@ import {
   CheckCircle2,
   MapPin,
   ChevronRight,
+  ChevronDown,
   AlertTriangle,
   Camera,
   Scan,
@@ -47,8 +48,13 @@ import {
   FileText,
   HelpCircle,
   User as UserIcon,
-  Menu
+  Menu,
+  Filter,
+  CalendarRange
 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
@@ -201,6 +207,16 @@ const translations = {
     totalWorkHours: "Total Work Hours",
     workSessionsCount: "Work Sessions",
     previousHoursCount: "Previous Hours Entries",
+    filterByDate: "Filter by Date",
+    dateRange: "Date Range",
+    from: "From",
+    clearFilter: "Clear Filter",
+    downloadFiltered: "Download Filtered PDF",
+    entriesInRange: "entries in range",
+    hoursInRange: "hours in range",
+    allEntries: "All Entries",
+    noEntriesMatch: "No entries match your filter",
+    entries: "entries",
     detailedLog: "Detailed Log",
     plusFeature: "PLUS Feature",
     plusLockedDesc: "Refer a technician to unlock",
@@ -361,6 +377,16 @@ const translations = {
     totalWorkHours: "Total des heures de travail",
     workSessionsCount: "Sessions de travail",
     previousHoursCount: "Entrées d'heures précédentes",
+    filterByDate: "Filtrer par date",
+    dateRange: "Plage de dates",
+    from: "Du",
+    clearFilter: "Effacer le filtre",
+    downloadFiltered: "Télécharger le PDF filtré",
+    entriesInRange: "entrées dans la plage",
+    hoursInRange: "heures dans la plage",
+    allEntries: "Toutes les entrées",
+    noEntriesMatch: "Aucune entrée ne correspond à votre filtre",
+    entries: "entrées",
     detailedLog: "Journal détaillé",
     plusFeature: "Fonctionnalité PLUS",
     plusLockedDesc: "Parrainez un technicien pour débloquer",
@@ -480,6 +506,11 @@ export default function TechnicianLoggedHours() {
   
   // Scan explanation dialog state
   const [showScanExplanationDialog, setShowScanExplanationDialog] = useState(false);
+  
+  // Date range filter state for previous hours
+  const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(undefined);
+  const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(undefined);
+  const [expandedYears, setExpandedYears] = useState<Set<string>>(new Set());
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -536,6 +567,60 @@ export default function TechnicianLoggedHours() {
   
   // Combined total = baseline + work sessions + manual hours (excludes previous/historical)
   const combinedTotalHours = baselineHours + totalLoggedHours + totalManualHours;
+  
+  // Filter previous hours by date range (with overlap logic)
+  const filteredPreviousHours = previousHoursEntries.filter((entry) => {
+    if (!filterStartDate && !filterEndDate) return true;
+    if (!entry.startDate) return false;
+    try {
+      const entryStart = parseLocalDate(entry.startDate);
+      const entryEnd = entry.endDate ? parseLocalDate(entry.endDate) : entryStart;
+      if (filterStartDate && entryEnd < filterStartDate) return false;
+      if (filterEndDate && entryStart > filterEndDate) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  
+  // Group filtered entries by year and month (with null safety)
+  const groupedByYearMonth = filteredPreviousHours.reduce((acc, entry) => {
+    if (!entry.startDate) return acc;
+    let date: Date;
+    try {
+      date = parseLocalDate(entry.startDate);
+    } catch {
+      return acc;
+    }
+    const year = format(date, 'yyyy');
+    const month = format(date, 'MMMM yyyy', { locale: dateLocale });
+    const monthKey = format(date, 'yyyy-MM');
+    
+    if (!acc[year]) {
+      acc[year] = { months: {}, totalHours: 0, entryCount: 0 };
+    }
+    if (!acc[year].months[monthKey]) {
+      acc[year].months[monthKey] = { label: month, entries: [], totalHours: 0 };
+    }
+    
+    acc[year].months[monthKey].entries.push(entry);
+    acc[year].months[monthKey].totalHours += parseFloat(entry.hoursWorked || "0");
+    acc[year].totalHours += parseFloat(entry.hoursWorked || "0");
+    acc[year].entryCount += 1;
+    
+    return acc;
+  }, {} as Record<string, { 
+    months: Record<string, { label: string; entries: HistoricalHours[]; totalHours: number }>;
+    totalHours: number;
+    entryCount: number;
+  }>);
+  
+  // Sort years descending (most recent first)
+  const sortedYears = Object.keys(groupedByYearMonth).sort((a, b) => parseInt(b) - parseInt(a));
+  
+  // Calculate filtered totals
+  const filteredTotalHours = filteredPreviousHours.reduce((sum, entry) => sum + parseFloat(entry.hoursWorked || "0"), 0);
+  const hasActiveFilter = filterStartDate || filterEndDate;
 
   // Certification upgrade progress calculations
   const irataLevel = user?.irataLevel || null;
@@ -1423,6 +1508,23 @@ export default function TechnicianLoggedHours() {
           </div>
         </header>
 
+        {/* Important disclaimer notice - MUST BE AT TOP for maximum visibility */}
+        <div className="bg-amber-500/15 border-b-2 border-amber-500/50 px-4 py-3">
+          <div className="max-w-4xl mx-auto flex items-start gap-3">
+            <div className="p-1.5 bg-amber-500/20 rounded-full flex-shrink-0">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide">
+                {t.importantNotice}
+              </p>
+              <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                {t.logbookDisclaimer}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Page Title Bar */}
         <div className="sticky top-14 z-[90] bg-card border-b shadow-sm">
           <div className="px-4 py-3 flex items-center justify-between gap-3 max-w-4xl mx-auto">
@@ -1465,23 +1567,6 @@ export default function TechnicianLoggedHours() {
         </div>
 
         <main className="max-w-4xl mx-auto px-4 py-6 space-y-6 pb-20">
-        {/* Important disclaimer notice - MUST BE HIGHLY VISIBLE */}
-        <div className="p-4 bg-red-500/15 border-2 border-red-500/50 rounded-lg shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-red-500/20 rounded-full flex-shrink-0">
-              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
-            </div>
-            <div>
-              <p className="text-base font-bold text-red-700 dark:text-red-300 uppercase tracking-wide mb-1">
-                {t.importantNotice}
-              </p>
-              <p className="text-base font-semibold text-red-700 dark:text-red-300">
-                {t.logbookDisclaimer}
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Certification Upgrade Progress Card */}
         {(irataLevel || spratLevel) && (
           <Card>
@@ -2028,6 +2113,88 @@ export default function TechnicianLoggedHours() {
               </CardContent>
             </Card>
 
+            {/* Date Range Filter */}
+            {previousHoursEntries.length > 0 && (
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <CalendarRange className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">{t.filterByDate}</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className="gap-2" data-testid="button-filter-start-date">
+                            <Calendar className="w-4 h-4" />
+                            {filterStartDate ? format(filterStartDate, 'PP', { locale: dateLocale }) : t.from}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarPicker
+                            mode="single"
+                            selected={filterStartDate}
+                            onSelect={setFilterStartDate}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <span className="text-muted-foreground">{t.to}</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className="gap-2" data-testid="button-filter-end-date">
+                            <Calendar className="w-4 h-4" />
+                            {filterEndDate ? format(filterEndDate, 'PP', { locale: dateLocale }) : t.endDate}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarPicker
+                            mode="single"
+                            selected={filterEndDate}
+                            onSelect={setFilterEndDate}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      {hasActiveFilter && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => { setFilterStartDate(undefined); setFilterEndDate(undefined); }}
+                          data-testid="button-clear-filter"
+                        >
+                          {t.clearFilter}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  {hasActiveFilter && (
+                    <div className="mt-3 pt-3 border-t flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">
+                        {filteredPreviousHours.length} {t.entriesInRange} ({filteredTotalHours.toFixed(1)} {t.hoursInRange})
+                      </p>
+                      {user?.hasPlusAccess && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="gap-2"
+                          onClick={() => {
+                            if (filterStartDate) setExportStartDate(format(filterStartDate, 'yyyy-MM-dd'));
+                            if (filterEndDate) setExportEndDate(format(filterEndDate, 'yyyy-MM-dd'));
+                            setShowExportDialog(true);
+                          }}
+                          data-testid="button-download-filtered-pdf"
+                        >
+                          <FileDown className="w-4 h-4" />
+                          {t.downloadFiltered}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {previousHoursEntries.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
@@ -2036,89 +2203,156 @@ export default function TechnicianLoggedHours() {
                   <p className="text-sm text-muted-foreground mt-1">{t.noPreviousHoursDesc}</p>
                 </CardContent>
               </Card>
+            ) : filteredPreviousHours.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Filter className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <p className="font-medium text-muted-foreground">{t.noEntriesMatch}</p>
+                  <Button 
+                    variant="link" 
+                    onClick={() => { setFilterStartDate(undefined); setFilterEndDate(undefined); }}
+                    data-testid="button-clear-filter-empty"
+                  >
+                    {t.clearFilter}
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
-              <div className="space-y-3">
-                {previousHoursEntries.map((entry) => (
-                  <Card key={entry.id}>
-                    <CardContent className="p-4">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-sm">
-                              {format(parseLocalDate(entry.startDate), 'PP', { locale: dateLocale })} {t.to} {format(parseLocalDate(entry.endDate), 'PP', { locale: dateLocale })}
-                            </span>
-                            <Badge variant="secondary">
-                              {parseFloat(entry.hoursWorked).toFixed(1)} {t.hr}
-                            </Badge>
-                          </div>
-                          
-                          {(entry.buildingName || entry.buildingAddress) && (
-                            <div className="flex items-start gap-2 mb-2">
-                              <Building className="w-4 h-4 text-muted-foreground mt-0.5" />
-                              <div>
-                                {entry.buildingName && <p className="font-medium">{entry.buildingName}</p>}
-                                {entry.buildingAddress && (
-                                  <p className="text-sm text-muted-foreground">{entry.buildingAddress}</p>
-                                )}
-                                {entry.buildingHeight && (
-                                  <p className="text-sm text-muted-foreground">{t.buildingHeight}: {entry.buildingHeight}</p>
-                                )}
+              <div className="space-y-4">
+                {sortedYears.map((year) => {
+                  const yearData = groupedByYearMonth[year];
+                  const isExpanded = expandedYears.has(year);
+                  const sortedMonths = Object.keys(yearData.months).sort((a, b) => b.localeCompare(a));
+                  
+                  return (
+                    <Collapsible
+                      key={year}
+                      open={isExpanded}
+                      onOpenChange={(open) => {
+                        const newExpanded = new Set(expandedYears);
+                        if (open) newExpanded.add(year);
+                        else newExpanded.delete(year);
+                        setExpandedYears(newExpanded);
+                      }}
+                    >
+                      <Card>
+                        <CollapsibleTrigger asChild>
+                          <CardHeader 
+                            className="cursor-pointer hover-elevate py-3"
+                            data-testid={`collapsible-year-${year}`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-3">
+                                {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                                <CardTitle className="text-lg">{year}</CardTitle>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary">{yearData.entryCount} {t.entries}</Badge>
+                                <Badge variant="outline">{yearData.totalHours.toFixed(1)} {t.hr}</Badge>
                               </div>
                             </div>
-                          )}
-                          
-                          {entry.previousEmployer && (
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {t.employer}: {entry.previousEmployer}
-                            </p>
-                          )}
-                          
-                          <div className="flex flex-wrap gap-1">
-                            {(entry.tasksPerformed || []).map((taskId) => (
-                              <Badge key={taskId} variant="outline" className="text-xs">
-                                <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
-                                {getTaskLabel(taskId, language)}
-                              </Badge>
-                            ))}
-                          </div>
-                          
-                          {entry.notes && (
-                            <p className="text-sm text-muted-foreground mt-2 italic">{entry.notes}</p>
-                          )}
-                        </div>
-                        
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive"
-                              data-testid={`button-delete-historical-${entry.id}`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>{t.delete}</AlertDialogTitle>
-                              <AlertDialogDescription>{t.confirmDelete}</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>{t.cancelDelete}</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => deleteHistoricalMutation.mutate(entry.id)}
-                                className="bg-destructive text-destructive-foreground"
-                              >
-                                {t.deleteConfirm}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                          </CardHeader>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <CardContent className="pt-0 space-y-4">
+                            {sortedMonths.map((monthKey) => {
+                              const monthData = yearData.months[monthKey];
+                              return (
+                                <div key={monthKey} className="space-y-2">
+                                  <div className="flex items-center justify-between py-2 border-b">
+                                    <h4 className="font-medium text-sm">{monthData.label}</h4>
+                                    <span className="text-sm text-muted-foreground">{monthData.totalHours.toFixed(1)} {t.hr}</span>
+                                  </div>
+                                  <div className="space-y-2 pl-2">
+                                    {monthData.entries.sort((a, b) => parseLocalDate(b.startDate).getTime() - parseLocalDate(a.startDate).getTime()).map((entry) => (
+                                      <div key={entry.id} className="p-3 rounded-lg bg-muted/30 border">
+                                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                                          <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                              <Calendar className="w-4 h-4 text-muted-foreground" />
+                                              <span className="text-sm">
+                                                {format(parseLocalDate(entry.startDate), 'PP', { locale: dateLocale })} {t.to} {format(parseLocalDate(entry.endDate), 'PP', { locale: dateLocale })}
+                                              </span>
+                                              <Badge variant="secondary">
+                                                {parseFloat(entry.hoursWorked).toFixed(1)} {t.hr}
+                                              </Badge>
+                                            </div>
+                                            
+                                            {(entry.buildingName || entry.buildingAddress) && (
+                                              <div className="flex items-start gap-2 mb-2">
+                                                <Building className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                                <div>
+                                                  {entry.buildingName && <p className="font-medium">{entry.buildingName}</p>}
+                                                  {entry.buildingAddress && (
+                                                    <p className="text-sm text-muted-foreground">{entry.buildingAddress}</p>
+                                                  )}
+                                                  {entry.buildingHeight && (
+                                                    <p className="text-sm text-muted-foreground">{t.buildingHeight}: {entry.buildingHeight}</p>
+                                                  )}
+                                                </div>
+                                              </div>
+                                            )}
+                                            
+                                            {entry.previousEmployer && (
+                                              <p className="text-sm text-muted-foreground mb-2">
+                                                {t.employer}: {entry.previousEmployer}
+                                              </p>
+                                            )}
+                                            
+                                            <div className="flex flex-wrap gap-1">
+                                              {(entry.tasksPerformed || []).map((taskId) => (
+                                                <Badge key={taskId} variant="outline" className="text-xs">
+                                                  <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
+                                                  {getTaskLabel(taskId, language)}
+                                                </Badge>
+                                              ))}
+                                            </div>
+                                            
+                                            {entry.notes && (
+                                              <p className="text-sm text-muted-foreground mt-2 italic">{entry.notes}</p>
+                                            )}
+                                          </div>
+                                          
+                                          <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                              <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-destructive"
+                                                data-testid={`button-delete-historical-${entry.id}`}
+                                              >
+                                                <Trash2 className="w-4 h-4" />
+                                              </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                              <AlertDialogHeader>
+                                                <AlertDialogTitle>{t.delete}</AlertDialogTitle>
+                                                <AlertDialogDescription>{t.confirmDelete}</AlertDialogDescription>
+                                              </AlertDialogHeader>
+                                              <AlertDialogFooter>
+                                                <AlertDialogCancel>{t.cancelDelete}</AlertDialogCancel>
+                                                <AlertDialogAction
+                                                  onClick={() => deleteHistoricalMutation.mutate(entry.id)}
+                                                  className="bg-destructive text-destructive-foreground"
+                                                >
+                                                  {t.deleteConfirm}
+                                                </AlertDialogAction>
+                                              </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                          </AlertDialog>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </CardContent>
+                        </CollapsibleContent>
+                      </Card>
+                    </Collapsible>
+                  );
+                })}
               </div>
             )}
           </TabsContent>
