@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -16,7 +17,6 @@ import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Pla
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 type JobPosting = {
   id: string;
@@ -474,45 +474,44 @@ export default function CompanyJobBoard() {
     return null;
   };
 
+  useSetHeaderConfig({
+    pageTitle: t("jobBoard.title", "Job Board"),
+    pageDescription: t("jobBoard.subtitle", "Post and manage job opportunities"),
+    actionButtons: (
+      <>
+        <Button 
+          variant={showSentOffers ? "default" : "outline"}
+          onClick={() => setShowSentOffers(!showSentOffers)} 
+          className="gap-2" 
+          data-testid="button-sent-offers"
+        >
+          <Send className="w-4 h-4" />
+          <span className="hidden sm:inline">{t("jobBoard.sentOffers", "Sent Offers")}</span>
+          {refusedOffers.length > 0 && (
+            <Badge variant="destructive" className="ml-1">{refusedOffers.length}</Badge>
+          )}
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={() => setLocation("/talent-browser")} 
+          className="gap-2" 
+          data-testid="button-browse-talent"
+        >
+          <Users className="w-4 h-4" />
+          <span className="hidden sm:inline">{t("jobBoard.browseTalent", "Browse Talent")}</span>
+          <span className="sm:hidden">{t("jobBoard.talent", "Talent")}</span>
+        </Button>
+        <Button onClick={() => setIsCreateOpen(true)} className="gap-2" data-testid="button-create-job">
+          <Plus className="w-4 h-4" />
+          <span className="hidden sm:inline">{t("jobBoard.createJob", "Create Job Posting")}</span>
+          <span className="sm:hidden">{t("jobBoard.create", "Create")}</span>
+        </Button>
+      </>
+    ),
+  }, [t, showSentOffers, refusedOffers.length, setLocation, setIsCreateOpen, setShowSentOffers]);
+
   return (
     <div className="min-h-screen page-gradient">
-      <EmployerDashboardHeader
-        currentUser={currentUser}
-        pageTitle={t("jobBoard.title", "Job Board")}
-        pageDescription={t("jobBoard.subtitle", "Post and manage job opportunities")}
-        actionButtons={
-          <>
-            <Button 
-              variant={showSentOffers ? "default" : "outline"}
-              onClick={() => setShowSentOffers(!showSentOffers)} 
-              className="gap-2" 
-              data-testid="button-sent-offers"
-            >
-              <Send className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("jobBoard.sentOffers", "Sent Offers")}</span>
-              {refusedOffers.length > 0 && (
-                <Badge variant="destructive" className="ml-1">{refusedOffers.length}</Badge>
-              )}
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setLocation("/talent-browser")} 
-              className="gap-2" 
-              data-testid="button-browse-talent"
-            >
-              <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("jobBoard.browseTalent", "Browse Talent")}</span>
-              <span className="sm:hidden">{t("jobBoard.talent", "Talent")}</span>
-            </Button>
-            <Button onClick={() => setIsCreateOpen(true)} className="gap-2" data-testid="button-create-job">
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">{t("jobBoard.createJob", "Create Job Posting")}</span>
-              <span className="sm:hidden">{t("jobBoard.create", "Create")}</span>
-            </Button>
-          </>
-        }
-      />
-
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {/* Sent Offers Section */}
         {showSentOffers && (

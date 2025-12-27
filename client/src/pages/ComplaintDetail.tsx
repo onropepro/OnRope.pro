@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { queryClient } from "@/lib/queryClient";
@@ -16,7 +17,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { formatTimestampDate, formatTime } from "@/lib/dateUtils";
-import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 // Official Resident color from stakeholder palette
 const RESIDENT_COLOR = "#86A59C";
@@ -204,27 +204,26 @@ export default function ComplaintDetail() {
     setLocation(dashboardPath);
   };
 
+  useSetHeaderConfig({
+    pageTitle: t('feedbackDetail.feedbackDetails', 'Feedback Details'),
+    onBackClick: handleBack,
+    showSearch: false,
+    actionButtons: (
+      <Badge 
+        variant="secondary" 
+        className={complaint.status === "open" 
+          ? "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20" 
+          : "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
+        }
+        data-testid="badge-status"
+      >
+        {complaint.status === "open" ? t('feedbackDetail.statusOpen', 'Open') : t('feedbackDetail.statusClosed', 'Closed')}
+      </Badge>
+    ),
+  }, [t, complaint?.status, handleBack]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <EmployerDashboardHeader
-        currentUser={userData?.user}
-        pageTitle={t('feedbackDetail.feedbackDetails', 'Feedback Details')}
-        showSearch={false}
-        onBackClick={handleBack}
-        actionButtons={
-          <Badge 
-            variant="secondary" 
-            className={complaint.status === "open" 
-              ? "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20" 
-              : "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
-            }
-            data-testid="badge-status"
-          >
-            {complaint.status === "open" ? t('feedbackDetail.statusOpen', 'Open') : t('feedbackDetail.statusClosed', 'Closed')}
-          </Badge>
-        }
-      />
-
       <div className="p-4 max-w-2xl mx-auto space-y-4">
         {/* Complaint Info */}
         <Card>

@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,6 @@ import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { COMMON_TIMEZONES } from "@/lib/timezoneUtils";
-import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -1176,20 +1176,13 @@ export default function Profile() {
   const branding = brandingData || {};
   const hasLogo = !!(branding.subscriptionActive && branding.logoUrl);
 
+  useSetHeaderConfig({
+    pageTitle: t('profile.title', 'Profile'),
+    actionButtons: <RefreshButton />,
+  }, [t]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <EmployerDashboardHeader
-        currentUser={user}
-        pageTitle={t('profile.title', 'Profile')}
-        showSearch={false}
-        logoUrl={hasLogo ? branding.logoUrl : undefined}
-        actionButtons={
-          <>
-            <RefreshButton />
-          </>
-        }
-      />
-
       <div className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
         {user?.role === "company" ? (
           <Tabs defaultValue="profile" className="w-full">

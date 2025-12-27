@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
@@ -18,7 +19,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
 import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight } from "lucide-react";
-import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
@@ -1559,14 +1559,13 @@ export default function Inventory() {
     return Math.round((compliantWorkDays / totalWorkDays) * 100);
   }, [inspectionFilter, inspectionDays, allSessions, harnessInspections]);
 
+  useSetHeaderConfig({
+    pageTitle: t('inventory.title', 'Inventory'),
+    showSearch: false,
+  }, [t]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <EmployerDashboardHeader
-        currentUser={currentUser}
-        pageTitle={t('inventory.title', 'Inventory')}
-        showSearch={false}
-      />
-
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="flex flex-wrap w-full mb-4 h-auto gap-1 p-1">

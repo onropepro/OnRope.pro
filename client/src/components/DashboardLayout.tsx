@@ -3,6 +3,8 @@ import { useLocation } from "wouter";
 import { useContext, ReactNode } from "react";
 import { BrandingContext } from "@/App";
 import { DashboardSidebar, type NavGroup, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";
+import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
+import { useHeaderConfig, HeaderConfigProvider } from "@/contexts/HeaderConfigContext";
 import type { User } from "@/lib/permissions";
 
 interface DashboardLayoutProps {
@@ -25,7 +27,7 @@ interface BrandingSettings {
   pwaAppIconUrl?: string | null;
 }
 
-export function DashboardLayout({ 
+function DashboardLayoutInner({ 
   children,
   variant = "employer",
   customNavigationGroups,
@@ -36,6 +38,7 @@ export function DashboardLayout({
   onTabChange: externalTabChange,
   activeTab: externalActiveTab,
 }: DashboardLayoutProps) {
+  const { config: headerConfig } = useHeaderConfig();
   const [location, setLocation] = useLocation();
   const brandingContext = useContext(BrandingContext);
 
@@ -141,12 +144,40 @@ export function DashboardLayout({
         headerContent={headerContent}
       />
       
-      <main className="lg:pl-60 min-h-screen">
-        {children}
+      <main className="lg:pl-60 min-h-screen flex flex-col">
+        {variant === "employer" && (
+          <EmployerDashboardHeader
+            currentUser={currentUser}
+            employees={employees}
+            logoUrl={brandingData?.logoUrl || undefined}
+            pageTitle={headerConfig?.pageTitle}
+            pageDescription={headerConfig?.pageDescription}
+            actionButtons={headerConfig?.actionButtons}
+            onBackClick={headerConfig?.onBackClick || undefined}
+            showSearch={headerConfig?.showSearch ?? true}
+            showNotifications={headerConfig?.showNotifications ?? true}
+            showLanguageDropdown={headerConfig?.showLanguageDropdown ?? true}
+            showProfile={headerConfig?.showProfile ?? true}
+            showLogout={headerConfig?.showLogout ?? true}
+          />
+        )}
+        <div className="flex-1">
+          {children}
+        </div>
       </main>
     </div>
   );
 }
 
+export function DashboardLayout(props: DashboardLayoutProps) {
+  return (
+    <HeaderConfigProvider>
+      <DashboardLayoutInner {...props} />
+    </HeaderConfigProvider>
+  );
+}
+
 // Re-export types for convenience
 export { type NavGroup, type NavItem, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";
+export { useSetHeaderConfig } from "@/contexts/HeaderConfigContext";
+export type { HeaderConfig } from "@/contexts/HeaderConfigContext";
