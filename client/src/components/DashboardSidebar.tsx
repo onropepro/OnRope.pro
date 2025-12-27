@@ -140,11 +140,12 @@ export function DashboardSidebar({
   const [loadedVariant, setLoadedVariant] = useState<string | null>(null);
 
   // Load collapsed state from localStorage when variant changes
+  // Version 2: Reset to new defaults (only OPERATIONS open for employer)
   useEffect(() => {
     if (loadedVariant === variant) return;
     
     try {
-      const storageKey = `sidebar-collapsed-${variant}`;
+      const storageKey = `sidebar-collapsed-v2-${variant}`;
       const stored = localStorage.getItem(storageKey);
       if (stored) {
         setCollapsedGroups(new Set(JSON.parse(stored)));
@@ -167,7 +168,7 @@ export function DashboardSidebar({
     if (loadedVariant !== variant) return; // Don't persist until we've loaded for this variant
     
     try {
-      const storageKey = `sidebar-collapsed-${variant}`;
+      const storageKey = `sidebar-collapsed-v2-${variant}`;
       localStorage.setItem(storageKey, JSON.stringify(Array.from(collapsedGroups)));
     } catch {
       // Ignore storage errors
