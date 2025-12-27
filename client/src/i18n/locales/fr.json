@@ -14298,5 +14298,167 @@
       "privacyPolicy": "Politique de confidentialité",
       "termsOfService": "Conditions d'utilisation"
     }
+  },
+  "safetyManifesto": {
+    "hero": {
+      "badge": "Élever les standards pour toute une industrie",
+      "title": "La sécurité est soit mesurée",
+      "titleHighlight": "soit inventée.",
+      "description1": "Le PSR mesure les pratiques de sécurité des techniciens.",
+      "description2": "Le CSR mesure la culture de sécurité des entreprises.",
+      "description3": "Quand les deux sont visibles, toute l'industrie devient plus sûre.",
+      "ctaButton": "Commencez à bâtir votre dossier de sécurité",
+      "signInButton": "Connexion",
+      "freeNote": "Gratuit pour les techniciens. Toujours. 14 jours d'essai pour les entreprises."
+    },
+    "stats": {
+      "measured": "Mesuré",
+      "measuredDesc": "Ou ça ne s'est pas produit",
+      "portable": "Portable",
+      "portableDesc": "Vous suit partout",
+      "visible": "Visible",
+      "visibleDesc": "Par tous ceux qui comptent",
+      "permanent": "Permanent",
+      "permanentDesc": "Ne peut pas être falsifié"
+    },
+    "problem": {
+      "title": "Théâtre de sécurité vs Culture de sécurité",
+      "intro": "La plupart des entreprises d'accès sur corde parlent de sécurité. Certaines ont des classeurs pleins de procédures qui dorment au bureau. Quelques-unes les suivent vraiment.",
+      "p1": "Le problème, c'est que personne ne peut faire la différence. Un technicien qui passe des entretiens dans deux entreprises entend le même discours: \"Nous prenons la sécurité au sérieux.\" Une entreprise fait des inspections quotidiennes de harnais, tient de vraies réunions de sécurité et s'assure que tout le monde comprend les procédures. L'autre vous donne l'équipement et dit \"ne tombez pas.\"",
+      "p2": "Un gestionnaire immobilier qui évalue des soumissions voit les mêmes affirmations de sécurité dans chaque proposition. Tout le monde a un \"programme de sécurité complet.\" Personne ne peut le prouver. Le prix devient le seul différenciateur.",
+      "p3": "Ce système ne protège personne.",
+      "solution": "OnRopePro change l'équation en rendant la sécurité mesurable, portable et visible. Pas des déclarations de sécurité. Des actions de sécurité. Documentées, horodatées, agrégées en scores qui suivent les techniciens et les entreprises partout où ils vont."
+    },
+    "scores": {
+      "title": "Deux scores qui changent tout",
+      "subtitle": "Quand ces scores comptent, le comportement change.",
+      "subtitle2": "Quand le comportement change, les gens rentrent vraiment chez eux en sécurité.",
+      "psr": {
+        "title": "PSR: Cote de sécurité personnelle",
+        "description": "Votre dossier de sécurité individuel, agrégé de chaque employeur pour lequel vous avez travaillé sur OnRopePro.",
+        "item1": "À quelle fréquence vous complétez les inspections de harnais",
+        "item2": "À quelle vitesse vous accusez réception des documents de sécurité",
+        "item3": "Votre taux de conformité dans le temps, pas seulement aujourd'hui",
+        "footer": "Votre PSR est portable. Il vous appartient, pas à votre employeur. Quand vous postulez pour un nouvel emploi, les employeurs voient votre cote de sécurité avant de vous embaucher."
+      },
+      "csr": {
+        "title": "CSR: Cote de sécurité d'entreprise",
+        "description": "La culture de sécurité de votre entreprise, calculée à partir des données opérationnelles dans quatre catégories.",
+        "item1": "Documentation de base (25%)",
+        "item2": "Documentation de projet (25%)",
+        "item3": "Inspections de harnais (25%)",
+        "item4": "Accusé de réception des documents (5%)",
+        "footer": "Le CSR est visible par les gestionnaires immobiliers. Quand ils comparent les soumissions, ils comparent 86% contre 43%. Badge vert contre badge rouge."
+      }
+    },
+    "flywheel": {
+      "title": "OnRopePro donne une valeur à la sécurité",
+      "subtitle": "Un cycle auto-renforçant où tout le monde gagne en priorisant la sécurité.",
+      "intro1": "La sécurité a toujours été théorique. Les entreprises disent les bons mots. Les techniciens acquiescent. Personne ne mesure rien. Rien ne change.",
+      "intro2": "Nous rendons la sécurité pratique. Mesurable. Échangeable. Quand le PSR d'un technicien affecte ses perspectives d'emploi, il se soucie de ses inspections. Quand le CSR d'une entreprise affecte ses contrats, elle investit dans sa culture. Quand les gestionnaires immobiliers choisissent des prestataires par score de sécurité, le marché récompense le bon comportement.",
+      "intro3": "Ce n'est pas un logiciel de conformité. C'est une infrastructure qui donne de la valeur à la sécurité. Toute l'industrie s'élève parce que les incitations s'alignent enfin.",
+      "stage1": {
+        "title": "Les techniciens commencent à se soucier de leur score",
+        "description": "Quand le PSR vous suit partout, vous commencez à faire attention. Cette inspection de harnais que vous aviez l'habitude de sauter quand vous étiez \"pressé\"? Elle affecte votre score. Soudain, la sécurité n'est plus quelque chose dont le patron vous harcèle. C'est votre réputation professionnelle. C'est du capital de carrière."
+      },
+      "stage2": {
+        "title": "Les employeurs embauchent en fonction du PSR",
+        "description": "Un technicien postule avec un PSR de 92%. Un autre postule avec un PSR de 58%. Mêmes certifications. Expérience similaire. En qui faites-vous confiance pour la réputation de votre entreprise? Les employeurs commencent à filtrer les candidats à haut PSR. Le message se répand: si vous voulez les bons emplois, maintenez votre cote."
+      },
+      "stage3": {
+        "title": "Les techniciens à haut PSR élèvent les standards de l'entreprise",
+        "description": "Quand vous embauchez des gens qui prennent la sécurité au sérieux, la culture de votre entreprise change. Ils font leurs inspections sans qu'on leur rappelle. Ils signent les documents rapidement. Ils se tiennent mutuellement responsables. Votre CSR augmente parce que votre équipe fait vraiment le travail."
+      },
+      "stage4": {
+        "title": "Les gestionnaires immobiliers choisissent les prestataires à haut CSR",
+        "description": "Deux soumissions sur la table. Prix similaires. Un prestataire affiche 91% de CSR. L'autre affiche 52% de CSR. Le gestionnaire immobilier a des préoccupations de responsabilité. Le conseil pose des questions. Le prestataire à haut CSR gagne. Pas parce qu'il a mieux parlé. Parce qu'il a prouvé qu'il est meilleur."
+      },
+      "stage5": {
+        "title": "La pression du marché force l'amélioration de l'industrie",
+        "description": "Les entreprises qui perdent des contrats face aux concurrents à haut CSR ont le choix: s'améliorer ou continuer à perdre. Les cow-boys qui cassent les prix tout en coupant les coins se retrouvent exclus des contrats de qualité.",
+        "conclusion": "Le standard de l'industrie s'élève. Pas à cause de la réglementation. Parce que les incitations se sont alignées."
+      }
+    },
+    "stakeholders": {
+      "title": "Ce que cela signifie pour vous",
+      "technicians": {
+        "title": "Pour les techniciens",
+        "item1": "PSR plus élevé = Meilleures opportunités",
+        "item2": "Votre dossier de sécurité vous protège en cas d'incident",
+        "item3": "Évaluez les employeurs avant de vous engager",
+        "quote": "\"Préféreriez-vous travailler pour une entreprise avec un CSR de 40 ou de 95? Votre vie est en jeu.\"",
+        "learnMore": "En savoir plus"
+      },
+      "employers": {
+        "title": "Pour les propriétaires d'entreprise",
+        "item1": "Gagnez des contrats que vous aviez l'habitude de perdre",
+        "item2": "Attirez de meilleurs techniciens",
+        "item3": "Protégé quand WorkSafe arrive",
+        "quote": "\"Je sais que tous mes employés ont lu ce document parce qu'ils l'ont signé.\"",
+        "learnMore": "En savoir plus"
+      },
+      "propertyManagers": {
+        "title": "Pour les gestionnaires immobiliers",
+        "item1": "Comparez les prestataires objectivement",
+        "item2": "Documentez la diligence raisonnable",
+        "item3": "Exposition à la responsabilité réduite",
+        "quote": "\"Ils ont un CSR de 92%. Leur documentation est complète et à jour.\"",
+        "learnMore": "En savoir plus"
+      }
+    },
+    "whyMatters": {
+      "title": "Pourquoi c'est important au-delà des affaires",
+      "subtitle": "Le vrai objectif: que les gens rentrent chez eux en sécurité.",
+      "p1": "L'accès sur corde est un travail dangereux. Les chutes tuent. Les défaillances d'équipement tuent. Les procédures sautées tuent.",
+      "p2": "L'industrie parle de sécurité parce que tout le monde connaît les enjeux. Mais parler ne suffit pas. Ce sont les systèmes qui imposent la sécurité qui protègent réellement les gens.",
+      "psrPoint": "Le PSR fait que les techniciens se soucient",
+      "psrPointDesc": "de leurs propres pratiques de sécurité parce que ces pratiques affectent maintenant leurs carrières.",
+      "csrPoint": "Le CSR fait que les entreprises se soucient",
+      "csrPointDesc": "de leur culture de sécurité parce que cette culture affecte maintenant leurs revenus.",
+      "pmPoint": "Le comportement des gestionnaires immobiliers",
+      "pmPointDesc": "fait que le marché récompense la sécurité parce que les prestataires à haut CSR gagnent les contrats.",
+      "conclusion1": "Quand les incitations s'alignent avec la sécurité, la sécurité se produit.",
+      "conclusion2": "Pas comme une réflexion après coup.",
+      "conclusion3": "Comme le fondement du fonctionnement de l'industrie."
+    },
+    "faqs": {
+      "title": "Questions fréquemment posées",
+      "newPsr": {
+        "question": "Et si je n'ai jamais utilisé OnRopePro avant? Est-ce que je commence avec un PSR de zéro?",
+        "answer": "Les nouveaux techniciens commencent à construire leur PSR dès leur première inspection. Il n'y a pas de pénalité pour être nouveau. Votre score reflète votre historique réel sur la plateforme."
+      },
+      "fakeInspection": {
+        "question": "Puis-je falsifier une inspection de harnais juste pour maintenir mon score?",
+        "answer": "Non. Le système vous oblige à passer par chaque catégorie d'équipement. Les articles défaillants retirent automatiquement l'équipement de l'inventaire. Le processus prend 30 secondes quand il est fait honnêtement. Le falsifier prendrait plus de temps et créerait des problèmes de gestion d'équipement."
+      },
+      "psrEmployer": {
+        "question": "Qu'arrive-t-il à mon PSR si mon employeur a un faible CSR?",
+        "answer": "Votre PSR est indépendant. Il suit votre conformité individuelle, pas le score global de votre employeur. Un technicien discipliné travaillant pour une entreprise désorganisée construit quand même un PSR solide grâce à ses propres actions."
+      },
+      "newCompany": {
+        "question": "Nous sommes une nouvelle entreprise. Ne serons-nous pas désavantagés avec un court historique?",
+        "answer": "Les nouvelles entreprises peuvent atteindre 100% de CSR immédiatement en téléchargeant les documents de base et en maintenant une conformité quotidienne. L'historique compte pour résister aux manquements occasionnels, mais les nouvelles entreprises avec des pratiques disciplinées construisent rapidement des scores compétitifs."
+      },
+      "pmSeePsr": {
+        "question": "Les gestionnaires immobiliers voient-ils les cotes individuelles des techniciens?",
+        "answer": "Non. Les gestionnaires immobiliers ne voient que le CSR de l'entreprise. Le PSR individuel est visible par les employeurs lors de l'embauche, pas par les parties externes."
+      },
+      "disagreeCsr": {
+        "question": "Et si je ne suis pas d'accord avec le calcul de mon CSR?",
+        "answer": "Le tableau de bord montre exactement où vous perdez des points. Si la documentation affiche 85% mais que vous pensez être à 100%, vous pouvez voir exactement quels documents manquent de signatures. Le système ne cache pas sa logique."
+      },
+      "surveillance": {
+        "question": "Cela ressemble à de la surveillance. Est-ce le cas?",
+        "answer": "C'est de la responsabilisation. De la même façon que les heures de vol et les certifications d'un pilote sont suivies, vos actions de sécurité professionnelles sont suivies. Cela vous protège quand les choses tournent mal. Cela construit votre réputation quand les choses vont bien. Vos données vous appartiennent et voyagent avec vous."
+      }
+    },
+    "cta": {
+      "title": "Commencez à bâtir votre dossier de sécurité aujourd'hui",
+      "description": "Vos pratiques de sécurité sont soit mesurées, soit inventées. Commencez à mesurer.",
+      "getStarted": "Commencez gratuitement",
+      "learnCsr": "En savoir plus sur le CSR",
+      "learnPsr": "En savoir plus sur le PSR",
+      "freeNote": "Gratuit pour les techniciens. Toujours. 14 jours d'essai pour les entreprises. Pas de carte de crédit requise."
+    }
   }
 }

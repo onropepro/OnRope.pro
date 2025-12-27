@@ -8,6 +8,7 @@ import { Link, useLocation } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
+import { useTranslation } from "react-i18next";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   Shield,
@@ -36,6 +37,7 @@ export default function SafetyLanding() {
   const [, setLocation] = useLocation();
   const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -48,32 +50,32 @@ export default function SafetyLanding() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1" data-testid="badge-safety-label">
-              Raising the Bar for an Entire Industry
+              {t('safetyManifesto.hero.badge')}
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              Safety Is Either Measured<br />
-              <span className="text-blue-100">or It's Made Up.</span>
+              {t('safetyManifesto.hero.title')}<br />
+              <span className="text-blue-100">{t('safetyManifesto.hero.titleHighlight')}</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              PSR measures technician safety practices.<br />
-              CSR measures company safety culture.<br />
-              <strong className="text-white">When both are visible, the entire industry gets safer.</strong>
+              {t('safetyManifesto.hero.description1')}<br />
+              {t('safetyManifesto.hero.description2')}<br />
+              <strong className="text-white">{t('safetyManifesto.hero.description3')}</strong>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" className="bg-white text-[#193a63] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
-                Start Building Your Safety Record
+                {t('safetyManifesto.hero.ctaButton')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-hero-signin">
-                Sign In
+                {t('safetyManifesto.hero.signInButton')}
               </Button>
             </div>
             
             <p className="text-sm text-blue-200 pt-2">
-              Free for technicians. Always. 14-day trial for companies.
+              {t('safetyManifesto.hero.freeNote')}
             </p>
           </div>
         </div>
@@ -93,20 +95,20 @@ export default function SafetyLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-[#AB4521]">Measured</div>
-                  <div className="text-base text-muted-foreground mt-1">Or it didn't happen</div>
+                  <div className="text-2xl md:text-3xl font-bold text-[#AB4521]">{t('safetyManifesto.stats.measured')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('safetyManifesto.stats.measuredDesc')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-[#0B64A3]">Portable</div>
-                  <div className="text-base text-muted-foreground mt-1">Follows you everywhere</div>
+                  <div className="text-2xl md:text-3xl font-bold text-[#0B64A3]">{t('safetyManifesto.stats.portable')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('safetyManifesto.stats.portableDesc')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-emerald-600">Visible</div>
-                  <div className="text-base text-muted-foreground mt-1">To everyone who matters</div>
+                  <div className="text-2xl md:text-3xl font-bold text-emerald-600">{t('safetyManifesto.stats.visible')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('safetyManifesto.stats.visibleDesc')}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-violet-600">Permanent</div>
-                  <div className="text-base text-muted-foreground mt-1">Can't be faked</div>
+                  <div className="text-2xl md:text-3xl font-bold text-violet-600">{t('safetyManifesto.stats.permanent')}</div>
+                  <div className="text-base text-muted-foreground mt-1">{t('safetyManifesto.stats.permanentDesc')}</div>
                 </div>
               </div>
             </CardContent>
@@ -120,26 +122,26 @@ export default function SafetyLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
-            Safety Theater vs. Safety Culture
+            {t('safetyManifesto.problem.title')}
           </h2>
           
           <Card className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4 text-muted-foreground">
               <p className="text-lg leading-relaxed font-medium text-foreground">
-                Most rope access companies talk about safety. Some have binders full of procedures sitting in the office. A few actually follow them.
+                {t('safetyManifesto.problem.intro')}
               </p>
               <p className="text-base">
-                The problem is nobody can tell the difference. A technician interviewing at two companies hears the same pitch: "We take safety seriously." One company does daily harness inspections, holds real toolbox meetings, and makes sure everyone understands the procedures. The other company hands you gear and says "don't fall."
+                {t('safetyManifesto.problem.p1')}
               </p>
               <p className="text-base">
-                A property manager evaluating bids sees the same safety claims in every proposal. Everyone has a "comprehensive safety program." Nobody can prove it. Price becomes the only differentiator.
+                {t('safetyManifesto.problem.p2')}
               </p>
               <p className="text-base font-medium text-foreground">
-                This system protects nobody.
+                {t('safetyManifesto.problem.p3')}
               </p>
               <Separator className="my-6" />
               <p className="text-base">
-                OnRopePro changes the equation by making safety measurable, portable, and visible. Not safety claims. Safety actions. Documented, timestamped, aggregated into scores that follow technicians and companies everywhere they go.
+                {t('safetyManifesto.problem.solution')}
               </p>
             </CardContent>
           </Card>
@@ -152,11 +154,11 @@ export default function SafetyLanding() {
       <section id="scores" className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Two Scores That Change Everything
+            {t('safetyManifesto.scores.title')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            When these scores matter, behavior changes.<br />
-            When behavior changes, people actually go home safe.
+            {t('safetyManifesto.scores.subtitle')}<br />
+            {t('safetyManifesto.scores.subtitle2')}
           </p>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -167,29 +169,29 @@ export default function SafetyLanding() {
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style={{backgroundColor: 'rgba(171, 69, 33, 0.1)'}}>
                   <UserCheck className="w-6 h-6" style={{color: '#AB4521'}} />
                 </div>
-                <CardTitle className="text-xl">PSR: Personal Safety Rating</CardTitle>
+                <CardTitle className="text-xl">{t('safetyManifesto.scores.psr.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-base text-muted-foreground">
-                  Your individual safety record, aggregated across every employer you've ever worked for on OnRopePro.
+                  {t('safetyManifesto.scores.psr.description')}
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
                     <CheckCircle2 className="w-5 h-5 mt-0.5 text-emerald-600" />
-                    <span className="text-base">How often you complete harness inspections</span>
+                    <span className="text-base">{t('safetyManifesto.scores.psr.item1')}</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <CheckCircle2 className="w-5 h-5 mt-0.5 text-emerald-600" />
-                    <span className="text-base">How quickly you acknowledge safety documents</span>
+                    <span className="text-base">{t('safetyManifesto.scores.psr.item2')}</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <CheckCircle2 className="w-5 h-5 mt-0.5 text-emerald-600" />
-                    <span className="text-base">Your compliance rate over time, not just today</span>
+                    <span className="text-base">{t('safetyManifesto.scores.psr.item3')}</span>
                   </div>
                 </div>
                 <Separator />
                 <p className="text-base font-medium">
-                  Your PSR is portable. It belongs to you, not your employer. When you apply for a new job, employers see your safety rating before they hire you.
+                  {t('safetyManifesto.scores.psr.footer')}
                 </p>
               </CardContent>
             </Card>
@@ -201,33 +203,33 @@ export default function SafetyLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Shield className="w-6 h-6 text-[#0B64A3]" />
                 </div>
-                <CardTitle className="text-xl">CSR: Company Safety Rating</CardTitle>
+                <CardTitle className="text-xl">{t('safetyManifesto.scores.csr.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-base text-muted-foreground">
-                  Your company's safety culture, calculated from operational data across four categories.
+                  {t('safetyManifesto.scores.csr.description')}
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
                     <FileCheck className="w-5 h-5 mt-0.5 text-[#0B64A3]" />
-                    <span className="text-base">Core Documentation (25%)</span>
+                    <span className="text-base">{t('safetyManifesto.scores.csr.item1')}</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <ClipboardCheck className="w-5 h-5 mt-0.5 text-[#0B64A3]" />
-                    <span className="text-base">Project Documentation (25%)</span>
+                    <span className="text-base">{t('safetyManifesto.scores.csr.item2')}</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <HardHat className="w-5 h-5 mt-0.5 text-[#0B64A3]" />
-                    <span className="text-base">Harness Inspections (25%)</span>
+                    <span className="text-base">{t('safetyManifesto.scores.csr.item3')}</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Users className="w-5 h-5 mt-0.5 text-[#0B64A3]" />
-                    <span className="text-base">Document Acknowledgment (5%)</span>
+                    <span className="text-base">{t('safetyManifesto.scores.csr.item4')}</span>
                   </div>
                 </div>
                 <Separator />
                 <p className="text-base font-medium">
-                  CSR is visible to property managers. When they compare bids, they're comparing 86% versus 43%. Green badge versus red badge.
+                  {t('safetyManifesto.scores.csr.footer')}
                 </p>
               </CardContent>
             </Card>
@@ -241,22 +243,21 @@ export default function SafetyLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            OnRopePro Is Giving Safety a Value
+            {t('safetyManifesto.flywheel.title')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            A self-reinforcing cycle where everyone wins by prioritizing safety.
+            {t('safetyManifesto.flywheel.subtitle')}
           </p>
 
           <div className="max-w-3xl mx-auto mb-16 space-y-6">
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Safety has always been theoretical. Companies say the right words. Techs nod along. Nobody measures anything. Nothing changes.
+              {t('safetyManifesto.flywheel.intro1')}
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              We're making safety practical. Measurable. Tradeable.
-              When a technician's PSR affects their job prospects, they care about their inspections. When a company's CSR affects their contract wins, they invest in their culture. When property managers choose vendors by safety score, the market rewards the right behavior.
+              {t('safetyManifesto.flywheel.intro2')}
             </p>
             <p className="text-lg font-medium text-foreground leading-relaxed">
-              This isn't compliance software. This is infrastructure that makes safety worth something. The entire industry rises because the incentives finally align.
+              {t('safetyManifesto.flywheel.intro3')}
             </p>
           </div>
 
@@ -267,9 +268,9 @@ export default function SafetyLanding() {
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shrink-0" style={{backgroundColor: '#AB4521'}}>1</div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Technicians Start Caring About Their Score</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('safetyManifesto.flywheel.stage1.title')}</h3>
                     <p className="text-base text-muted-foreground">
-                      When PSR follows you everywhere, you start paying attention. That harness inspection you used to skip when you were "in a hurry"? It affects your score. Suddenly, safety isn't something the boss nags you about. It's your professional reputation. It's career capital.
+                      {t('safetyManifesto.flywheel.stage1.description')}
                     </p>
                   </div>
                 </div>
@@ -282,9 +283,9 @@ export default function SafetyLanding() {
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-[#0B64A3] flex items-center justify-center font-bold text-white shrink-0">2</div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Employers Hire Based on PSR</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('safetyManifesto.flywheel.stage2.title')}</h3>
                     <p className="text-base text-muted-foreground">
-                      A technician applies with a 92% PSR. Another applies with a 58% PSR. Same certifications. Similar experience. Which one do you trust with your company's reputation? Employers start filtering for high-PSR candidates. The message spreads: if you want the good jobs, maintain your rating.
+                      {t('safetyManifesto.flywheel.stage2.description')}
                     </p>
                   </div>
                 </div>
@@ -297,9 +298,9 @@ export default function SafetyLanding() {
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-white shrink-0">3</div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">High-PSR Techs Raise Company Standards</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('safetyManifesto.flywheel.stage3.title')}</h3>
                     <p className="text-base text-muted-foreground">
-                      When you hire people who take safety seriously, your company culture shifts. They do their inspections without being reminded. They sign documents promptly. They hold each other accountable. Your CSR rises because your team is actually doing the work.
+                      {t('safetyManifesto.flywheel.stage3.description')}
                     </p>
                   </div>
                 </div>
@@ -312,9 +313,9 @@ export default function SafetyLanding() {
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shrink-0" style={{backgroundColor: '#6E9075'}}>4</div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Property Managers Choose High-CSR Vendors</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('safetyManifesto.flywheel.stage4.title')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Two bids on the table. Similar pricing. One vendor shows 91% CSR. The other shows 52% CSR. The property manager has liability concerns. The board asks questions. The high-CSR vendor wins. Not because they talked better. Because they proved they're better.
+                      {t('safetyManifesto.flywheel.stage4.description')}
                     </p>
                   </div>
                 </div>
@@ -327,12 +328,12 @@ export default function SafetyLanding() {
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-violet-500 flex items-center justify-center font-bold text-white shrink-0">5</div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Market Pressure Forces Industry Improvement</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('safetyManifesto.flywheel.stage5.title')}</h3>
                     <p className="text-base text-muted-foreground">
-                      Companies losing bids to high-CSR competitors have a choice: improve or keep losing. The cowboys who undercut on price while cutting corners find themselves locked out of quality contracts. 
+                      {t('safetyManifesto.flywheel.stage5.description')}
                     </p>
                     <p className="text-base text-muted-foreground">
-                      <strong className="text-foreground">The industry standard rises. Not because of regulation. Because the incentives aligned.</strong>
+                      <strong className="text-foreground">{t('safetyManifesto.flywheel.stage5.conclusion')}</strong>
                     </p>
                   </div>
                 </div>
@@ -348,7 +349,7 @@ export default function SafetyLanding() {
       <section className="pt-8 md:pt-12 pb-16 md:pb-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            What This Means For You
+            {t('safetyManifesto.stakeholders.title')}
           </h2>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -359,28 +360,28 @@ export default function SafetyLanding() {
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style={{backgroundColor: 'rgba(171, 69, 33, 0.1)'}}>
                   <HardHat className="w-6 h-6" style={{color: '#AB4521'}} />
                 </div>
-                <CardTitle className="text-lg">For Technicians</CardTitle>
+                <CardTitle className="text-lg">{t('safetyManifesto.stakeholders.technicians.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Higher PSR = Better opportunities</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.technicians.item1')}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Your safety record protects you in incidents</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.technicians.item2')}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Evaluate employers before you commit</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.technicians.item3')}</span>
                 </div>
                 <Separator className="my-3" />
                 <p className="text-sm text-muted-foreground italic">
-                  "Would you rather work for a company with a 40 CSR or a 95 CSR? Your life is on the line."
+                  {t('safetyManifesto.stakeholders.technicians.quote')}
                 </p>
                 <Link href="/technician">
                   <Button variant="outline" size="sm" className="w-full mt-2" data-testid="button-learn-technician">
-                    Learn More <ChevronRight className="w-4 h-4 ml-1" />
+                    {t('safetyManifesto.stakeholders.technicians.learnMore')} <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardContent>
@@ -393,28 +394,28 @@ export default function SafetyLanding() {
                 <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-3">
                   <Briefcase className="w-6 h-6 text-[#0B64A3]" />
                 </div>
-                <CardTitle className="text-lg">For Company Owners</CardTitle>
+                <CardTitle className="text-lg">{t('safetyManifesto.stakeholders.employers.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Win contracts you used to lose</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.employers.item1')}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Attract better technicians</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.employers.item2')}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Protected when WorkSafe shows up</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.employers.item3')}</span>
                 </div>
                 <Separator className="my-3" />
                 <p className="text-sm text-muted-foreground italic">
-                  "I know all my people have read this document because they've signed it."
+                  {t('safetyManifesto.stakeholders.employers.quote')}
                 </p>
                 <Link href="/employer">
                   <Button variant="outline" size="sm" className="w-full mt-2" data-testid="button-learn-employer">
-                    Learn More <ChevronRight className="w-4 h-4 ml-1" />
+                    {t('safetyManifesto.stakeholders.employers.learnMore')} <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardContent>
@@ -427,28 +428,28 @@ export default function SafetyLanding() {
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style={{backgroundColor: 'rgba(110, 144, 117, 0.1)'}}>
                   <Building2 className="w-6 h-6" style={{color: '#6E9075'}} />
                 </div>
-                <CardTitle className="text-lg">For Property Managers</CardTitle>
+                <CardTitle className="text-lg">{t('safetyManifesto.stakeholders.propertyManagers.title')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Defensible vendor selection</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.propertyManagers.item1')}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Leverage to improve vendor performance</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.propertyManagers.item2')}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-1 text-emerald-600" />
-                  <span className="text-base">Reduced liability exposure</span>
+                  <span className="text-base">{t('safetyManifesto.stakeholders.propertyManagers.item3')}</span>
                 </div>
                 <Separator className="my-3" />
                 <p className="text-sm text-muted-foreground italic">
-                  "They have a 92% CSR. Their documentation is complete and current."
+                  {t('safetyManifesto.stakeholders.propertyManagers.quote')}
                 </p>
                 <Link href="/property-manager">
                   <Button variant="outline" size="sm" className="w-full mt-2" data-testid="button-learn-pm">
-                    Learn More <ChevronRight className="w-4 h-4 ml-1" />
+                    {t('safetyManifesto.stakeholders.propertyManagers.learnMore')} <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
               </CardContent>
@@ -463,38 +464,38 @@ export default function SafetyLanding() {
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Why This Matters Beyond Business
+            {t('safetyManifesto.whyMatters.title')}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
-            The real goal: people going home safe.
+            {t('safetyManifesto.whyMatters.subtitle')}
           </p>
           
           <Card className="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950 border-slate-200 dark:border-slate-800">
             <CardContent className="p-6 md:p-8 space-y-4">
               <p className="text-base text-muted-foreground">
-                Rope access is dangerous work. Falls kill. Equipment failures kill. Skipped procedures kill.
+                {t('safetyManifesto.whyMatters.p1')}
               </p>
               <p className="text-base text-muted-foreground">
-                The industry talks about safety because everyone knows the stakes. But talking isn't enough. Systems that enforce safety are what actually protect people.
+                {t('safetyManifesto.whyMatters.p2')}
               </p>
               <div className="space-y-3 py-4">
                 <div className="flex items-start gap-3">
                   <Target className="w-5 h-5 mt-0.5 text-[#AB4521]" />
-                  <p className="text-base"><strong>PSR makes technicians care</strong> about their own safety practices because those practices now affect their careers.</p>
+                  <p className="text-base"><strong>{t('safetyManifesto.whyMatters.psrPoint')}</strong> {t('safetyManifesto.whyMatters.psrPointDesc')}</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <Target className="w-5 h-5 mt-0.5 text-[#0B64A3]" />
-                  <p className="text-base"><strong>CSR makes companies care</strong> about their safety culture because that culture now affects their revenue.</p>
+                  <p className="text-base"><strong>{t('safetyManifesto.whyMatters.csrPoint')}</strong> {t('safetyManifesto.whyMatters.csrPointDesc')}</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <Target className="w-5 h-5 mt-0.5 text-[#6E9075]" />
-                  <p className="text-base"><strong>Property manager behavior</strong> makes the market reward safety because vendors with high CSR win contracts.</p>
+                  <p className="text-base"><strong>{t('safetyManifesto.whyMatters.pmPoint')}</strong> {t('safetyManifesto.whyMatters.pmPointDesc')}</p>
                 </div>
               </div>
               <p className="text-lg font-semibold text-foreground text-center pt-4">
-                When incentives align with safety, safety happens. <br />
-                Not as an afterthought.<br />
-                As the foundation of how the industry operates.
+                {t('safetyManifesto.whyMatters.conclusion1')} <br />
+                {t('safetyManifesto.whyMatters.conclusion2')}<br />
+                {t('safetyManifesto.whyMatters.conclusion3')}
               </p>
             </CardContent>
           </Card>
@@ -507,70 +508,70 @@ export default function SafetyLanding() {
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Frequently Asked Questions
+            {t('safetyManifesto.faqs.title')}
           </h2>
           
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="new-psr" className="bg-white dark:bg-slate-950 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium" data-testid="accordion-new-psr">
-                What if I've never used OnRopePro before? Do I start with a zero PSR?
+                {t('safetyManifesto.faqs.newPsr.question')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                New technicians start building their PSR from their first inspection. There's no penalty for being new. Your score reflects your actual history on the platform.
+                {t('safetyManifesto.faqs.newPsr.answer')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="fake-inspection" className="bg-white dark:bg-slate-950 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium" data-testid="accordion-fake-inspection">
-                Can I fake a harness inspection just to keep my score up?
+                {t('safetyManifesto.faqs.fakeInspection.question')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                No. The system requires you to step through each equipment category. Failed items automatically retire in inventory. The process takes 30 seconds when done honestly. Gaming it would take longer and create equipment management problems.
+                {t('safetyManifesto.faqs.fakeInspection.answer')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="psr-employer" className="bg-white dark:bg-slate-950 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium" data-testid="accordion-psr-employer">
-                What happens to my PSR if my employer has a low CSR?
+                {t('safetyManifesto.faqs.psrEmployer.question')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                Your PSR is independent. It tracks your individual compliance, not your employer's overall score. A disciplined tech working for a disorganized company still builds strong PSR through their own actions.
+                {t('safetyManifesto.faqs.psrEmployer.answer')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="new-company" className="bg-white dark:bg-slate-950 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium" data-testid="accordion-new-company">
-                We're a new company. Won't we be at a disadvantage with a short history?
+                {t('safetyManifesto.faqs.newCompany.question')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                New companies can reach 100% CSR immediately by uploading core documents and maintaining daily compliance. History matters for weathering occasional lapses, but new companies with disciplined practices quickly build competitive scores.
+                {t('safetyManifesto.faqs.newCompany.answer')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="pm-see-psr" className="bg-white dark:bg-slate-950 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium" data-testid="accordion-pm-see-psr">
-                Do property managers see individual technician ratings?
+                {t('safetyManifesto.faqs.pmSeePsr.question')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                No. Property managers see company CSR only. Individual PSR is visible to employers during hiring, not to external parties.
+                {t('safetyManifesto.faqs.pmSeePsr.answer')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="disagree-csr" className="bg-white dark:bg-slate-950 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium" data-testid="accordion-disagree-csr">
-                What if I disagree with my CSR calculation?
+                {t('safetyManifesto.faqs.disagreeCsr.question')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                The dashboard shows exactly where you're losing points. If documentation shows 85% but you believe you're at 100%, you can see exactly which documents are missing signatures. The system doesn't hide its logic.
+                {t('safetyManifesto.faqs.disagreeCsr.answer')}
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="surveillance" className="bg-white dark:bg-slate-950 rounded-lg border px-6">
               <AccordionTrigger className="text-left text-base font-medium" data-testid="accordion-surveillance">
-                This seems like surveillance. Is it?
+                {t('safetyManifesto.faqs.surveillance.question')}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground pb-4">
-                It's accountability. The same way a pilot's flight hours and certifications are tracked, your professional safety actions are tracked. This protects you when things go wrong. It builds your reputation when things go right. Your data belongs to you and travels with you.
+                {t('safetyManifesto.faqs.surveillance.answer')}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -581,29 +582,29 @@ export default function SafetyLanding() {
       <section className="py-16 md:py-20 px-4 text-center" style={{backgroundColor: '#193a63'}}>
         <div className="max-w-3xl mx-auto text-white">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Start Building Your Safety Record Today
+            {t('safetyManifesto.cta.title')}
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Your safety practices are either measured or they're made up. Start measuring.
+            {t('safetyManifesto.cta.description')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-[#193a63] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-start">
-              Get Started Free
+              {t('safetyManifesto.cta.getStarted')}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Link href="/modules/company-safety-rating">
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" data-testid="button-cta-csr">
-                Learn About CSR
+                {t('safetyManifesto.cta.learnCsr')}
               </Button>
             </Link>
             <Link href="/changelog/psr">
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" data-testid="button-cta-psr">
-                Learn About PSR
+                {t('safetyManifesto.cta.learnPsr')}
               </Button>
             </Link>
           </div>
           <p className="text-sm text-blue-200 mt-6">
-            Free for technicians. Always. 14-day trial for companies. No credit card required.
+            {t('safetyManifesto.cta.freeNote')}
           </p>
         </div>
       </section>
