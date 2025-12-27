@@ -1395,6 +1395,15 @@ const translations = {
 // North American phone regex - accepts (xxx) xxx-xxxx, xxx-xxx-xxxx, or 10 digits
 const phoneRegex = /^(\(\d{3}\)\s?\d{3}-\d{4}|\d{3}-\d{3}-\d{4}|\d{10})$/;
 
+// Format phone number for display as (xxx) xxx-xxxx
+const formatPhoneNumber = (phone: string | null | undefined): string | null => {
+  if (!phone) return null;
+  // Remove all non-digits
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length !== 10) return phone; // Return as-is if not 10 digits
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+
 const createProfileSchema = (t: typeof translations['en']) => z.object({
   name: z.string().min(1, t.errorNameRequired),
   email: z.string().email(t.errorInvalidEmail),
@@ -4476,7 +4485,7 @@ export default function TechnicianPortal() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InfoItem label={t.email} value={user.email} icon={<Mail className="w-4 h-4" />} />
-                    <InfoItem label={t.phoneNumber} value={user.employeePhoneNumber} icon={<Phone className="w-4 h-4" />} />
+                    <InfoItem label={t.phoneNumber} value={formatPhoneNumber(user.employeePhoneNumber)} icon={<Phone className="w-4 h-4" />} />
                     <InfoItem label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>} value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
                   </div>
                 </div>
@@ -5329,7 +5338,7 @@ export default function TechnicianPortal() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <InfoItem label="Name" value={user.emergencyContactName} />
-                    <InfoItem label="Phone" value={user.emergencyContactPhone} />
+                    <InfoItem label="Phone" value={formatPhoneNumber(user.emergencyContactPhone)} />
                     <InfoItem label="Relationship" value={user.emergencyContactRelationship} />
                   </div>
                 </div>

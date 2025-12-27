@@ -642,6 +642,15 @@ type TabType = 'home' | 'profile' | 'invitations' | 'more';
 // North American phone regex - accepts (xxx) xxx-xxxx, xxx-xxx-xxxx, or 10 digits
 const phoneRegex = /^(\(\d{3}\)\s?\d{3}-\d{4}|\d{3}-\d{3}-\d{4}|\d{10})$/;
 
+// Format phone number for display as (xxx) xxx-xxxx
+const formatPhoneNumber = (phone: string | null | undefined): string | null => {
+  if (!phone) return null;
+  // Remove all non-digits
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length !== 10) return phone; // Return as-is if not 10 digits
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+};
+
 const createProfileSchema = (t: typeof translations['en']) => z.object({
   name: z.string().min(1, t.errorNameRequired),
   email: z.string().email(t.errorInvalidEmail),
