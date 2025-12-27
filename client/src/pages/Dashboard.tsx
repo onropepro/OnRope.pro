@@ -1239,6 +1239,7 @@ export default function Dashboard() {
   const [clientSortField, setClientSortField] = useState<"name" | "company" | "email" | "phone">("name");
   const [clientSortDirection, setClientSortDirection] = useState<"asc" | "desc">("asc");
   const [projectsViewMode, setProjectsViewMode] = useState<"cards" | "list">("cards");
+  const [employeesViewMode, setEmployeesViewMode] = useState<"cards" | "list">("cards");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [employeeToSuspendSeat, setEmployeeToSuspendSeat] = useState<any | null>(null); // For seat removal/suspend
   const [showDropDialog, setShowDropDialog] = useState(false);
@@ -6985,8 +6986,37 @@ export default function Dashboard() {
                 )}
 
                 {/* Active Employees */}
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">{t('dashboard.employees.activeEmployees', 'Active Employees')}</h3>
+                <Card>
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <span className="material-icons text-primary">people</span>
+                          {t('dashboard.employees.activeEmployees', 'Active Employees')}
+                        </CardTitle>
+                        <CardDescription>{t('dashboard.employees.activeEmployeesDescription', 'Team members currently active in your company')}</CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant={employeesViewMode === "cards" ? "default" : "outline"}
+                          size="icon"
+                          onClick={() => setEmployeesViewMode("cards")}
+                          data-testid="button-employees-view-cards"
+                        >
+                          <span className="material-icons text-sm">grid_view</span>
+                        </Button>
+                        <Button
+                          variant={employeesViewMode === "list" ? "default" : "outline"}
+                          size="icon"
+                          onClick={() => setEmployeesViewMode("list")}
+                          data-testid="button-employees-view-list"
+                        >
+                          <span className="material-icons text-sm">view_list</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
                   {(() => {
                     // Exclude both primary suspended (suspendedAt) and secondary suspended (connectionStatus)
                     const activeEmployees = employees.filter((emp: any) => 
@@ -6995,16 +7025,124 @@ export default function Dashboard() {
                     
                     if (activeEmployees.length === 0) {
                       return (
-                        <Card>
-                          <CardContent className="p-8 text-center text-muted-foreground">
-                            <span className="material-icons text-4xl mb-2 opacity-50">people</span>
-                            <div>{t('dashboard.employees.noActiveEmployees', 'No active employees yet')}</div>
-                          </CardContent>
-                        </Card>
+                        <div className="p-8 text-center text-muted-foreground">
+                          <span className="material-icons text-4xl mb-2 opacity-50">people</span>
+                          <div>{t('dashboard.employees.noActiveEmployees', 'No active employees yet')}</div>
+                        </div>
+                      );
+                    }
+
+                    // Table/List view
+                    if (employeesViewMode === "list") {
+                      return (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{t('dashboard.employees.name', 'Name')}</TableHead>
+                              <TableHead>{t('dashboard.employees.role', 'Role')}</TableHead>
+                              <TableHead className="hidden md:table-cell">{t('dashboard.employees.email', 'Email')}</TableHead>
+                              <TableHead className="hidden lg:table-cell">{t('dashboard.employees.phone', 'Phone')}</TableHead>
+                              <TableHead className="hidden xl:table-cell">{t('dashboard.employees.certification', 'Certification')}</TableHead>
+                              <TableHead className="text-right">{t('dashboard.employees.actions', 'Actions')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {activeEmployees.map((employee: any) => (
+                              <TableRow 
+                                key={employee.id} 
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() => {
+                                  setEmployeeToView(employee);
+                                  setShowEmployeeDetailDialog(true);
+                                }}
+                                data-testid={`employee-row-${employee.id}`}
+                              >
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">{employee.name || employee.companyName || employee.email}</span>
+                                    {employee.role === 'rope_access_tech' && employee.hasPlusAccess && (
+                                      <Badge 
+                                        variant="default" 
+                                        className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0"
+                                      >
+                                        <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
+                                        PLUS
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="secondary" className="text-xs capitalize">
+                                    {employee.role?.replace(/_/g, ' ') || 'Employee'}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="hidden md:table-cell">{employee.email}</TableCell>
+                                <TableCell className="hidden lg:table-cell">{employee.employeePhoneNumber || '-'}</TableCell>
+                                <TableCell className="hidden xl:table-cell">
+                                  {employee.irataLevel ? (
+                                    <Badge variant="outline" className="text-xs">IRATA {employee.irataLevel}</Badge>
+                                  ) : employee.spratLevel ? (
+                                    <Badge variant="outline" className="text-xs">SPRAT {employee.spratLevel}</Badge>
+                                  ) : '-'}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex justify-end gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditEmployee(employee);
+                                      }}
+                                      data-testid={`button-edit-employee-row-${employee.id}`}
+                                      disabled={userIsReadOnly}
+                                    >
+                                      <span className="material-icons text-sm">edit</span>
+                                    </Button>
+                                    {user?.role === "company" && employee.id !== user?.id && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEmployeeToSuspendSeat(employee);
+                                        }}
+                                        data-testid={`button-remove-seat-row-${employee.id}`}
+                                        className="text-amber-600 hover:text-amber-700"
+                                        disabled={userIsReadOnly}
+                                      >
+                                        <span className="material-icons text-sm mr-1">person_remove</span>
+                                        {t('dashboard.employees.removeSeat', 'Remove Seat')}
+                                      </Button>
+                                    )}
+                                    {employee.id !== user?.id && (
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEmployeeToDelete(employee.id);
+                                        }}
+                                        data-testid={`button-unlink-employee-row-${employee.id}`}
+                                        className="text-amber-600 hover:text-amber-700"
+                                        disabled={userIsReadOnly}
+                                      >
+                                        <span className="material-icons text-sm">link_off</span>
+                                      </Button>
+                                    )}
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       );
                     }
                     
-                    return activeEmployees.map((employee: any) => {
+                    // Cards view
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {activeEmployees.map((employee: any) => {
                       // Check IRATA license expiration status using timezone-safe date parsing
                       const irataStatus = employee.irataExpirationDate ? (() => {
                         const expirationDate = parseLocalDate(employee.irataExpirationDate);
@@ -7370,9 +7508,12 @@ export default function Dashboard() {
                         </CardContent>
                       </Card>
                       );
-                    });
+                    })}
+                      </div>
+                    );
                   })()}
-                </div>
+                  </CardContent>
+                </Card>
 
                 {/* Inactive Employees - Seat removed but can be reactivated */}
                 {(() => {
