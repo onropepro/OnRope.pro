@@ -1034,6 +1034,8 @@
         "description": "Team assignments"
       },
       "documents": {
+    "requiredReviewTitle": "Required Document Review",
+    "requiredReviewDesc": "You must review and sign the following company safety documents before accessing the dashboard.",
         "label": "Documents and Training",
         "description": "All company files"
       },

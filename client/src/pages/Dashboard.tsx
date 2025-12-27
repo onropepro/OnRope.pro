@@ -73,6 +73,7 @@ import { BusinessCardScanner } from "@/components/BusinessCardScanner";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardOverview } from "@/components/DashboardOverview";
+import { DocumentReviews } from "@/components/DocumentReviews";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { useSetHeaderConfig } from "@/components/DashboardLayout";
 
@@ -1326,6 +1327,12 @@ export default function Dashboard() {
   // Fetch current user to get company info
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
+  });
+
+  // Check if employee has pending required documents to sign (blocks dashboard access)
+  const { data: pendingDocsData, isLoading: pendingDocsLoading } = useQuery<{ hasPendingDocuments: boolean; pendingCount: number }>({
+    queryKey: ["/api/document-reviews/pending-check"],
+    enabled: !!userData?.user && ['rope_access_tech', 'ground_crew'].includes(userData.user.role),
   });
 
   // Fetch unread feature request message count for company owners
@@ -3735,6 +3742,39 @@ export default function Dashboard() {
     showProfile: true,
     showLogout: true,
   }, []);
+
+  // Block dashboard access if employee has pending required documents to sign
+  const isTechOrGroundCrew = ['rope_access_tech', 'ground_crew'].includes(user?.role || '');
+  
+  // While checking for pending documents, show loading for technicians/ground crew
+  if (isTechOrGroundCrew && pendingDocsLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium">{t('common.loading', 'Loading...')}</div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Block access if there are pending documents to sign
+  if (pendingDocsData?.hasPendingDocuments && isTechOrGroundCrew) {
+    return (
+      <div className="min-h-screen bg-background p-4 md:p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {t('documents.requiredReviewTitle', 'Required Document Review')}
+            </h1>
+            <p className="text-muted-foreground">
+              {t('documents.requiredReviewDesc', 'You must review and sign the following company safety documents before accessing the dashboard.')}
+            </p>
+          </div>
+          <DocumentReviews companyDocuments={[]} />
+        </div>
+      </div>
+    );
+  }
 
   if (projectsLoading || employeesLoading) {
     return (
