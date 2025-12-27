@@ -40,12 +40,12 @@ export default function ForTechnicians() {
     {
       icon: Clock,
       title: 'Time Tracking',
-      description: 'Clock in/out with GPS, track billable hours, view your timesheet',
+      description: 'Clock in/out with GPS, log manual hours when employer doesn\'t use OnRopePro, track your total',
     },
     {
       icon: Award,
       title: 'IRATA/SPRAT Logging',
-      description: 'Log work hours for certification progression and renewals',
+      description: 'Track hours for certification progression - manual hours count toward totals, previous hours are reference only',
     },
     {
       icon: FileText,
