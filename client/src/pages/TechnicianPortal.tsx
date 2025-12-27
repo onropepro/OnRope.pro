@@ -1429,13 +1429,34 @@ const maskSensitiveData = (value: string | null | undefined): string | null => {
 
 // Helper function to mask bank account composite (transit-institution-account)
 const maskBankAccount = (transit: string | null | undefined, institution: string | null | undefined, account: string | null | undefined): string | null => {
-  if (!transit || !institution || !account) return null;
-  const fullAccount = `${transit}-${institution}-${account}`;
-  // Show only last 4 digits of the account number
-  const maskedAccount = account.length > 4 
-    ? 'x'.repeat(account.length - 4) + account.slice(-4)
-    : account;
-  return `xxx-xxx-${maskedAccount}`;
+  // Build parts array with masked values - show any parts that exist
+  const parts: string[] = [];
+  
+  if (transit) {
+    // Mask transit: show last 2 digits if length > 2, otherwise show all
+    const maskedTransit = transit.length > 2
+      ? 'x'.repeat(transit.length - 2) + transit.slice(-2)
+      : transit;
+    parts.push(maskedTransit);
+  }
+  
+  if (institution) {
+    // Mask institution: show last 1 digit if length > 1, otherwise show all  
+    const maskedInstitution = institution.length > 1
+      ? 'x'.repeat(institution.length - 1) + institution.slice(-1)
+      : institution;
+    parts.push(maskedInstitution);
+  }
+  
+  if (account) {
+    // Mask account: show last 4 digits if length > 4, otherwise show all
+    const maskedAccount = account.length > 4 
+      ? 'x'.repeat(account.length - 4) + account.slice(-4)
+      : account;
+    parts.push(maskedAccount);
+  }
+  
+  return parts.length > 0 ? parts.join('-') : null;
 };
 
 // Helper component to display submitted documents from document requests
