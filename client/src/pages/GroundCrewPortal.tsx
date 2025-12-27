@@ -258,7 +258,7 @@ const translations = {
     helpCenterDesc: "Get help with using the platform",
     openHelpCenter: "Open Help Center",
     completeYourProfile: "Complete Your Passport Profile",
-    completeProfileDesc: "Complete your profile to connect with employers instantly",
+    completeProfileDesc: "Your profile is shared with employers when you apply for jobs or accept team invitations",
     jobBoard: "Job Board",
     browseJobs: "Browse Jobs",
     profile: "Profile",
@@ -441,7 +441,7 @@ const translations = {
     helpCenterDesc: "Obtenez de l'aide pour utiliser la plateforme",
     openHelpCenter: "Ouvrir le Centre d'Aide",
     completeYourProfile: "Complétez votre Profil Passeport",
-    completeProfileDesc: "Complétez votre profil pour vous connecter instantanément avec les employeurs",
+    completeProfileDesc: "Votre profil est partagé avec les employeurs lorsque vous postulez à des emplois ou acceptez des invitations",
     jobBoard: "Offres d'emploi",
     browseJobs: "Parcourir",
     profile: "Profil",
@@ -624,7 +624,7 @@ const translations = {
     helpCenterDesc: "Obtenga ayuda para usar la plataforma",
     openHelpCenter: "Abrir Centro de Ayuda",
     completeYourProfile: "Complete Su Perfil de Pasaporte",
-    completeProfileDesc: "Complete su perfil para conectarse con empleadores al instante",
+    completeProfileDesc: "Tu perfil se comparte con los empleadores cuando solicitas trabajos o aceptas invitaciones de equipo",
     jobBoard: "Bolsa de Trabajo",
     browseJobs: "Buscar Trabajos",
     profile: "Perfil",
@@ -1404,51 +1404,51 @@ export default function GroundCrewPortal() {
 
               {/* Profile Completion Card - Show until complete */}
               {!profileCompletion.isComplete && (
-                <div 
-                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow" 
+                <Card 
+                  className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20 cursor-pointer hover:shadow-md transition-shadow" 
                   onClick={() => setActiveTab('profile')}
                   data-testid="card-profile-completion-home"
                 >
-                  <div className="p-4 sm:p-5">
+                  <CardContent className="pt-4 pb-4">
                     <div className="flex items-start gap-4">
-                      <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-900/30">
+                      <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
                         <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-2">
-                          <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+                          <h3 className="font-semibold text-base">
                             {t.completeYourProfile}
                           </h3>
-                          <span className="text-base font-semibold text-[#5D7B6F]">{profileCompletion.percentage}%</span>
+                          <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
                         </div>
-                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mb-3">
+                        <div className="w-full bg-amber-200 dark:bg-amber-800 rounded-full h-2 mb-3">
                           <div 
-                            className="bg-[#5D7B6F] h-2 rounded-full transition-all" 
+                            className="bg-amber-500 h-2 rounded-full transition-all" 
                             style={{ width: `${profileCompletion.percentage}%` }}
                           />
                         </div>
-                        <p className="text-base text-slate-500 dark:text-slate-400 mb-3">
+                        <p className="text-sm text-muted-foreground mb-2">
                           {t.completeProfileDesc}
                         </p>
                         {profileCompletion.incompleteFields.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-1.5">
                             {profileCompletion.incompleteFields.slice(0, 3).map((field, i) => (
-                              <span key={i} className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+                              <Badge key={i} variant="outline" className="text-xs bg-background">
                                 {field.label}
-                              </span>
+                              </Badge>
                             ))}
                             {profileCompletion.incompleteFields.length > 3 && (
-                              <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600">
+                              <Badge variant="outline" className="text-xs bg-background text-muted-foreground">
                                 +{profileCompletion.incompleteFields.length - 3} {t.more}
-                              </span>
+                              </Badge>
                             )}
                           </div>
                         )}
                       </div>
-                      <ArrowRight className="w-5 h-5 text-[#5D7B6F] flex-shrink-0" />
+                      <ArrowRight className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Quick Actions Grid - 4 columns on desktop, 2 on mobile */}
