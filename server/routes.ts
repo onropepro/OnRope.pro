@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts, founderResources, insertFounderResourceSchema, databaseCosts, insertDatabaseCostSchema } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts, founderResources, insertFounderResourceSchema, databaseCosts, insertDatabaseCostSchema, userCertifications, insertUserCertificationSchema } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -5873,6 +5873,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message || "Failed to delete document" });
     }
   });
+
+  // ==================== USER CERTIFICATIONS API ====================
+  
+  // Get all certifications for the current user
+  app.get("/api/user/certifications", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can access certifications" });
+      }
+
+      const certifications = await db.select().from(userCertifications).where(eq(userCertifications.userId, userId)).orderBy(desc(userCertifications.createdAt));
+      
+      res.json({ certifications });
+    } catch (error: any) {
+      console.error("[UserCertifications] Error fetching certifications:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch certifications" });
+    }
+  });
+
+  // Upload a new certification document
+  app.post("/api/user/certifications", requireAuth, technicianDocumentUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can upload certifications" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { description, expiryDate } = req.body;
+
+      // Upload file to object storage
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
+      const filename = `certification-${userId}-${timestamp}.${extension}`;
+      
+      const url = await objectStorageService.uploadPublicFile(filename, req.file.buffer, req.file.mimetype);
+      
+      console.log(`[UserCertifications] Uploaded certification for user ${userId}:`, url);
+
+      // Insert into database
+      const [certification] = await db.insert(userCertifications).values({
+        userId,
+        fileName: req.file.originalname,
+        fileUrl: url,
+        description: description || null,
+        expiryDate: expiryDate || null,
+      }).returning();
+
+      res.json({ 
+        message: "Certification uploaded successfully",
+        certification
+      });
+    } catch (error: any) {
+      console.error("[UserCertifications] Error uploading certification:", error);
+      res.status(500).json({ message: error.message || "Failed to upload certification" });
+    }
+  });
+
+  // Update a certification
+  app.patch("/api/user/certifications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { id } = req.params;
+      const { description, expiryDate } = req.body;
+      
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can update certifications" });
+      }
+
+      // Verify ownership
+      const [existing] = await db.select().from(userCertifications).where(and(eq(userCertifications.id, id), eq(userCertifications.userId, userId)));
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Certification not found" });
+      }
+
+      const [updated] = await db.update(userCertifications)
+        .set({
+          description: description !== undefined ? description : existing.description,
+          expiryDate: expiryDate !== undefined ? expiryDate : existing.expiryDate,
+          updatedAt: new Date(),
+        })
+        .where(eq(userCertifications.id, id))
+        .returning();
+
+      res.json({ 
+        message: "Certification updated successfully",
+        certification: updated
+      });
+    } catch (error: any) {
+      console.error("[UserCertifications] Error updating certification:", error);
+      res.status(500).json({ message: error.message || "Failed to update certification" });
+    }
+  });
+
+  // Delete a certification
+  app.delete("/api/user/certifications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { id } = req.params;
+      
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can delete certifications" });
+      }
+
+      // Verify ownership
+      const [existing] = await db.select().from(userCertifications).where(and(eq(userCertifications.id, id), eq(userCertifications.userId, userId)));
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Certification not found" });
+      }
+
+      await db.delete(userCertifications).where(eq(userCertifications.id, id));
+
+      console.log(`[UserCertifications] Deleted certification ${id} for user ${userId}`);
+
+      res.json({ message: "Certification deleted successfully" });
+    } catch (error: any) {
+      console.error("[UserCertifications] Error deleting certification:", error);
+      res.status(500).json({ message: error.message || "Failed to delete certification" });
+    }
+  });
+
 
   // Property Manager: Get all company links
   app.get("/api/property-manager/company-links", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
