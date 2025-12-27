@@ -5,7 +5,8 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { getGroundCrewNavGroups } from "@/lib/groundCrewNavigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1094,57 +1095,7 @@ export default function GroundCrewPortal() {
     }
   };
 
-  const groundCrewNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: "NAVIGATION",
-      items: [
-        {
-          id: "home",
-          label: t.tabHome || "Home",
-          icon: Home,
-          onClick: () => setActiveTab('home'),
-          isVisible: () => true,
-        },
-        {
-          id: "profile",
-          label: t.tabProfile || "Profile",
-          icon: User,
-          onClick: () => setActiveTab('profile'),
-          isVisible: () => true,
-        },
-        {
-          id: "more",
-          label: t.tabMore || "More",
-          icon: MoreHorizontal,
-          onClick: () => setActiveTab('more'),
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "employment",
-      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
-          icon: Briefcase,
-          href: "/ground-crew-job-board",
-          isVisible: () => true,
-        },
-        {
-          id: "invitations",
-          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
-          icon: Mail,
-          onClick: () => setActiveTab('invitations'),
-          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
-          badgeType: "alert",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  const groundCrewNavGroups = getGroundCrewNavGroups(language as 'en' | 'es' | 'fr', pendingInvitations.length);
 
   const startEditing = () => {
     if (user) {

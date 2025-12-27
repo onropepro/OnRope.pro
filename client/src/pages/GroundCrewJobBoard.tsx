@@ -26,11 +26,11 @@ import {
   Menu,
   LogOut
 } from "lucide-react";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { getGroundCrewNavGroups } from "@/lib/groundCrewNavigation";
 import { format } from "date-fns";
-import { Home, User as UserIcon } from "lucide-react";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
 type JobPostingWithCompany = JobPosting & { companyName?: string | null };
@@ -322,42 +322,8 @@ export default function GroundCrewJobBoard() {
     return <Badge variant={variant}>{label}</Badge>;
   };
 
-  // Navigation groups for sidebar
-  const groundCrewNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: "NAVIGATION",
-      items: [
-        {
-          id: "home",
-          label: language === 'en' ? "Home" : language === 'es' ? "Inicio" : "Accueil",
-          icon: Home,
-          href: "/ground-crew-portal",
-          isVisible: () => true,
-        },
-        {
-          id: "profile",
-          label: language === 'en' ? "Profile" : language === 'es' ? "Perfil" : "Profil",
-          icon: UserIcon,
-          href: "/ground-crew-portal?tab=profile",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "employment",
-      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
-          icon: Briefcase,
-          href: "/ground-crew-job-board",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  // Navigation groups for sidebar - use shared module for consistency
+  const groundCrewNavGroups = getGroundCrewNavGroups(language as 'en' | 'es' | 'fr');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
