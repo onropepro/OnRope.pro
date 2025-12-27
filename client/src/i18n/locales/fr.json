@@ -3019,10 +3019,10 @@
     "paymentMethod": "Mode de paiement",
     "updatePayment": "Mettre à jour le mode de paiement",
     "plans": {
-      "basic": "Base",
-      "starter": "Démarrage",
-      "premium": "Premium",
-      "enterprise": "Entreprise"
+      "basic": "OnRopePro",
+      "starter": "OnRopePro",
+      "premium": "OnRopePro",
+      "enterprise": "OnRopePro"
     },
     "features": {
       "projects": "Projets",

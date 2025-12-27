@@ -7081,13 +7081,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Validate tier
-      const validTiers = ['basic', 'starter', 'premium', 'enterprise'];
+      const validTiers = ['basic', 'starter', 'premium', 'enterprise', 'onropepro'];
       if (!validTiers.includes(tier)) {
-        return res.status(400).json({ message: "Invalid tier. Must be one of: basic, starter, premium, enterprise" });
+        return res.status(400).json({ message: "Invalid tier. Must be one of: basic, starter, premium, enterprise, onropepro" });
       }
 
       // Validate license key format (GIFT-XXXXX-XXXXX-XXXXX-[1-4])
-      const expectedTierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : '4';
+      const expectedTierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : tier === 'enterprise' ? '4' : 'P';
       const licenseKeyPattern = new RegExp(`^GIFT-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-${expectedTierSuffix}$`);
       if (!licenseKeyPattern.test(licenseKey)) {
         return res.status(400).json({ message: "Invalid license key format or tier mismatch" });

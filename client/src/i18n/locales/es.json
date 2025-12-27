@@ -3102,10 +3102,10 @@
     "paymentMethod": "Payment Method",
     "updatePayment": "Update Payment Method",
     "plans": {
-      "basic": "Basic",
-      "starter": "Starter",
-      "premium": "Premium",
-      "enterprise": "Enterprise"
+      "basic": "OnRopePro",
+      "starter": "OnRopePro",
+      "premium": "OnRopePro",
+      "enterprise": "OnRopePro"
     },
     "features": {
       "projects": "Projects",
