@@ -82,6 +82,7 @@ import {
 } from "lucide-react";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { DocumentReviews } from "@/components/DocumentReviews";
 
 type Language = 'en' | 'fr' | 'es';
 
@@ -767,6 +768,12 @@ export default function GroundCrewPortal() {
     select: (data: any) => data?.user,
   });
 
+  // Check if ground crew has pending required documents to sign (blocks portal access)
+  const { data: pendingDocsData, isLoading: pendingDocsLoading } = useQuery<{ hasPendingDocuments: boolean; pendingCount: number }>({
+    queryKey: ["/api/document-reviews/pending-check"],
+    enabled: !!user?.companyId,
+  });
+
   const { data: invitationsData } = useQuery<any>({
     queryKey: ["/api/my-invitations"],
     enabled: !!user && (user.role === 'ground_crew' || user.role === 'ground_crew_supervisor'),
@@ -1220,10 +1227,33 @@ export default function GroundCrewPortal() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || (user?.companyId && pendingDocsLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse">{t.loadingProfile}</div>
+      </div>
+    );
+  }
+
+  // Block access if there are pending documents to sign
+  if (user?.companyId && pendingDocsData?.hasPendingDocuments) {
+    return (
+      <div className="min-h-screen bg-background p-4 md:p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {language === 'en' ? 'Required Document Review' :
+               language === 'fr' ? 'Examen des documents requis' :
+               'Revisión de documentos requeridos'}
+            </h1>
+            <p className="text-muted-foreground">
+              {language === 'en' ? 'You must review and sign the following company safety documents before accessing the portal.' :
+               language === 'fr' ? 'Vous devez examiner et signer les documents de sécurité suivants avant d\'accéder au portail.' :
+               'Debe revisar y firmar los siguientes documentos de seguridad de la empresa antes de acceder al portal.'}
+            </p>
+          </div>
+          <DocumentReviews companyDocuments={[]} />
+        </div>
       </div>
     );
   }
