@@ -236,6 +236,19 @@ const translations = {
     uploadFirstAidCert: "Upload First Aid Certificate",
     replaceFirstAidCert: "Replace Certificate",
     addFirstAidCert: "Add Certificate",
+    // User Certifications
+    userCertifications: "My Certifications",
+    myCertificationsDesc: "Upload and manage your professional certifications",
+    addCertification: "Add Certification",
+    certificationDescription: "Description (optional)",
+    certificationDescriptionPlaceholder: "e.g., IRATA Level 3, Safety Training, etc.",
+    certificationExpiry: "Expiry Date (optional)",
+    uploadCertification: "Upload Certification",
+    noCertifications: "No certifications uploaded yet",
+    deleteCertification: "Delete Certification",
+    deleteCertificationConfirm: "Are you sure you want to delete this certification?",
+    certificationDeleted: "Certification deleted",
+    certificationUploaded: "Certification uploaded successfully",
     uploadCertificationCard: "Upload Certification Card",
     replaceCertificationCard: "Replace Card",
     addCertificationCard: "Add Card",
@@ -624,6 +637,19 @@ const translations = {
     uploadFirstAidCert: "Téléverser le certificat de premiers soins",
     replaceFirstAidCert: "Remplacer le certificat",
     addFirstAidCert: "Ajouter un certificat",
+    // User Certifications
+    userCertifications: "Mes Certifications",
+    myCertificationsDesc: "Téléversez et gérez vos certifications professionnelles",
+    addCertification: "Ajouter une Certification",
+    certificationDescription: "Description (optionnel)",
+    certificationDescriptionPlaceholder: "ex., IRATA Niveau 3, Formation Sécurité, etc.",
+    certificationExpiry: "Date d'expiration (optionnel)",
+    uploadCertification: "Téléverser la Certification",
+    noCertifications: "Aucune certification téléversée",
+    deleteCertification: "Supprimer la Certification",
+    deleteCertificationConfirm: "Êtes-vous sûr de vouloir supprimer cette certification ?",
+    certificationDeleted: "Certification supprimée",
+    certificationUploaded: "Certification téléversée avec succès",
     uploadCertificationCard: "Téléverser la carte de certification",
     replaceCertificationCard: "Remplacer la carte",
     addCertificationCard: "Ajouter une carte",
@@ -1144,6 +1170,19 @@ const translations = {
     uploadFirstAidCert: "Subir Certificado de Primeros Auxilios",
     replaceFirstAidCert: "Reemplazar Certificado",
     addFirstAidCert: "Agregar Certificado",
+    // User Certifications
+    userCertifications: "Mis Certificaciones",
+    myCertificationsDesc: "Sube y gestiona tus certificaciones profesionales",
+    addCertification: "Agregar Certificación",
+    certificationDescription: "Descripción (opcional)",
+    certificationDescriptionPlaceholder: "ej., IRATA Nivel 3, Capacitación de Seguridad, etc.",
+    certificationExpiry: "Fecha de Vencimiento (opcional)",
+    uploadCertification: "Subir Certificación",
+    noCertifications: "No hay certificaciones subidas",
+    deleteCertification: "Eliminar Certificación",
+    deleteCertificationConfirm: "¿Estás seguro de que quieres eliminar esta certificación?",
+    certificationDeleted: "Certificación eliminada",
+    certificationUploaded: "Certificación subida exitosamente",
     uploadCertificationCard: "Subir Tarjeta de Certificacion",
     replaceCertificationCard: "Reemplazar Tarjeta",
     addCertificationCard: "Agregar Tarjeta",
@@ -5182,6 +5221,18 @@ export default function TechnicianPortal() {
                     </div>
                   </>
                 )}
+
+                {/* User Certifications Section */}
+                <Separator />
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <FileText className="w-4 h-4" />
+                    {t.userCertifications}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">{t.myCertificationsDesc}</p>
+                  
+                  <CertificationsManager t={t} />
+                </div>
               </div>
               </TabsContent>
 
@@ -6478,6 +6529,300 @@ export default function TechnicianPortal() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+
+// CertificationsManager component for managing user certifications
+function CertificationsManager({ t }: { t: any }) {
+  const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [showUploadForm, setShowUploadForm] = useState(false);
+  const [description, setDescription] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Query for fetching certifications
+  const { data: certificationsData, isLoading, refetch } = useQuery({
+    queryKey: ['/api/user/certifications'],
+  });
+  
+  const certifications = certificationsData?.certifications || [];
+  
+  // Mutation for uploading certifications
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (description) formData.append('description', description);
+      if (expiryDate) formData.append('expiryDate', expiryDate);
+      
+      const response = await fetch('/api/user/certifications', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to upload certification');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: t.certificationUploaded });
+      refetch();
+      setShowUploadForm(false);
+      setDescription("");
+      setExpiryDate("");
+    },
+    onError: (error: Error) => {
+      toast({ 
+        title: "Error", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+    onSettled: () => {
+      setIsUploading(false);
+    }
+  });
+  
+  // Mutation for deleting certifications
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/user/certifications/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to delete certification');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: t.certificationDeleted });
+      refetch();
+    },
+    onError: (error: Error) => {
+      toast({ 
+        title: "Error", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    },
+    onSettled: () => {
+      setDeletingId(null);
+    }
+  });
+  
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      uploadMutation.mutate(file);
+    }
+  };
+  
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+  
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return null;
+    try {
+      return new Date(dateStr).toLocaleDateString();
+    } catch {
+      return dateStr;
+    }
+  };
+  
+  const isExpired = (dateStr: string | null) => {
+    if (!dateStr) return false;
+    try {
+      return new Date(dateStr) < new Date();
+    } catch {
+      return false;
+    }
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span className="text-sm">Loading certifications...</span>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-4">
+      {/* Existing certifications */}
+      {certifications.length > 0 ? (
+        <div className="space-y-3">
+          {certifications.map((cert: any) => {
+            const lowerUrl = (cert.fileUrl || '').toLowerCase();
+            const isPdf = lowerUrl.endsWith('.pdf');
+            const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i);
+            const expired = isExpired(cert.expiryDate);
+            
+            return (
+              <div key={cert.id} className="relative border rounded-lg overflow-hidden bg-muted/30">
+                <a 
+                  href={cert.fileUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block active:opacity-70 transition-opacity"
+                >
+                  {isPdf ? (
+                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                      <FileText className="w-12 h-12 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                    </div>
+                  ) : isImage ? (
+                    <img 
+                      src={cert.fileUrl} 
+                      alt={cert.description || "Certification"}
+                      className="w-full object-contain"
+                      style={{ maxHeight: '200px', minHeight: '80px' }}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                      <FileText className="w-12 h-12 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                    </div>
+                  )}
+                </a>
+                
+                {/* Certification info overlay */}
+                <div className="p-3 bg-card/90 backdrop-blur-sm border-t">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      {cert.description && (
+                        <p className="font-medium text-sm truncate">{cert.description}</p>
+                      )}
+                      {cert.expiryDate && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <Calendar className="w-3 h-3 text-muted-foreground" />
+                          <span className={`text-xs ${expired ? 'text-destructive' : 'text-muted-foreground'}`}>
+                            {expired ? `${t.expired}: ` : `${t.expiresOn} `}
+                            {formatDate(cert.expiryDate)}
+                          </span>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1 truncate">{cert.fileName}</p>
+                    </div>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="h-7 w-7 flex-shrink-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDeletingId(cert.id);
+                        deleteMutation.mutate(cert.id);
+                      }}
+                      disabled={deletingId === cert.id}
+                      data-testid={`button-delete-certification-${cert.id}`}
+                    >
+                      {deletingId === cert.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <X className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground italic">{t.noCertifications}</p>
+      )}
+      
+      {/* Upload form */}
+      {showUploadForm ? (
+        <div className="space-y-3 p-3 border rounded-lg bg-muted/20">
+          <div className="space-y-2">
+            <Label htmlFor="cert-description">{t.certificationDescription}</Label>
+            <Input
+              id="cert-description"
+              placeholder={t.certificationDescriptionPlaceholder}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              data-testid="input-certification-description"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cert-expiry">{t.certificationExpiry}</Label>
+            <Input
+              id="cert-expiry"
+              type="date"
+              value={expiryDate}
+              onChange={(e) => setExpiryDate(e.target.value)}
+              data-testid="input-certification-expiry"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleUploadClick}
+              disabled={isUploading}
+              data-testid="button-select-certification-file"
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.uploading}
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 mr-2" />
+                  {t.uploadCertification}
+                </>
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setShowUploadForm(false);
+                setDescription("");
+                setExpiryDate("");
+              }}
+              disabled={isUploading}
+              data-testid="button-cancel-certification-upload"
+            >
+              {t.cancel}
+            </Button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,.pdf"
+            className="hidden"
+            onChange={handleFileSelect}
+          />
+        </div>
+      ) : (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowUploadForm(true)}
+          data-testid="button-add-certification"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          {t.addCertification}
+        </Button>
+      )}
     </div>
   );
 }
