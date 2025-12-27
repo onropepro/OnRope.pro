@@ -62,6 +62,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatDateTime, parseLocalDate } from "@/lib/dateUtils";
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, type JobCategory } from "@shared/jobTypes";
+import type { HistoricalHours } from "@shared/schema";
 import { 
   User, 
   LogOut, 
@@ -1800,6 +1801,12 @@ export default function TechnicianPortal() {
     enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
   });
   
+  // Fetch historical hours (manual + previous) for calculating total
+  const { data: historicalHoursData } = useQuery<{ historicalHours: HistoricalHours[] }>({
+    queryKey: ["/api/my-historical-hours"],
+    enabled: !!user && (user.role === 'rope_access_tech' || user.role === 'company'),
+  });
+  
   // Fetch referral count for the technician
   const { data: referralCountData } = useQuery<{ count: number }>({
     queryKey: ["/api/my-referral-count"],
@@ -2120,8 +2127,16 @@ export default function TechnicianPortal() {
     return parseFloat(user.irataBaselineHours) || 0;
   }, [user?.irataBaselineHours]);
   
-  // Combined total = baseline + work sessions
-  const combinedTotalHours = baselineHours + workSessionHours;
+  // Calculate manual hours (countsTowardTotal: true) - for when employer doesn't use OnRopePro
+  const manualHours = useMemo(() => {
+    if (!historicalHoursData?.historicalHours) return 0;
+    return historicalHoursData.historicalHours
+      .filter((entry) => entry.countsTowardTotal === true)
+      .reduce((sum, entry) => sum + parseFloat(entry.hoursWorked || "0"), 0);
+  }, [historicalHoursData]);
+  
+  // Combined total = baseline + work sessions + manual hours (excludes previous/historical hours)
+  const combinedTotalHours = baselineHours + workSessionHours + manualHours;
 
   // Calculate profile completion - includes fields already filled during registration
   const profileCompletion = useMemo(() => {
