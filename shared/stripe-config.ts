@@ -9,19 +9,21 @@
 
 export const STRIPE_PRICE_IDS = {
   // Subscription Tiers (Recurring Monthly) - Single OnRopePro plan at $99/month
-  // Updated: 2025-12-10 - New pricing model with single tier
+  // All tier names point to the same price ID for backward compatibility
   tiers: {
     usd: {
-      basic: 'price_1SchE1BzDsOltscr7YZLP8q6',       // $99/mo - OnRopePro, unlimited projects
-      starter: 'price_1SchE1BzDsOltscr7YZLP8q6',     // $99/mo - same as basic (legacy compatibility)
-      premium: 'price_1SchE1BzDsOltscr7YZLP8q6',     // $99/mo - same as basic (legacy compatibility)
-      enterprise: 'price_1SchE1BzDsOltscr7YZLP8q6',  // $99/mo - same as basic (legacy compatibility)
+      onropepro: 'price_1SchE1BzDsOltscr7YZLP8q6',   // $99/mo - OnRopePro, unlimited projects
+      basic: 'price_1SchE1BzDsOltscr7YZLP8q6',       // Legacy alias
+      starter: 'price_1SchE1BzDsOltscr7YZLP8q6',     // Legacy alias
+      premium: 'price_1SchE1BzDsOltscr7YZLP8q6',     // Legacy alias
+      enterprise: 'price_1SchE1BzDsOltscr7YZLP8q6',  // Legacy alias
     },
     cad: {
-      basic: 'price_1SchE1BzDsOltscr8GLwkiaW',       // $99 CAD/mo - OnRopePro, unlimited projects
-      starter: 'price_1SchE1BzDsOltscr8GLwkiaW',     // $99 CAD/mo - same as basic (legacy compatibility)
-      premium: 'price_1SchE1BzDsOltscr8GLwkiaW',     // $99 CAD/mo - same as basic (legacy compatibility)
-      enterprise: 'price_1SchE1BzDsOltscr8GLwkiaW',  // $99 CAD/mo - same as basic (legacy compatibility)
+      onropepro: 'price_1SchE1BzDsOltscr8GLwkiaW',   // $99 CAD/mo - OnRopePro, unlimited projects
+      basic: 'price_1SchE1BzDsOltscr8GLwkiaW',       // Legacy alias
+      starter: 'price_1SchE1BzDsOltscr8GLwkiaW',     // Legacy alias
+      premium: 'price_1SchE1BzDsOltscr8GLwkiaW',     // Legacy alias
+      enterprise: 'price_1SchE1BzDsOltscr8GLwkiaW',  // Legacy alias
     },
   },
   
@@ -41,46 +43,35 @@ export const STRIPE_PRICE_IDS = {
   },
 } as const;
 
+// Single plan display name - use this everywhere in the UI
+export const PLAN_DISPLAY_NAME = 'OnRopePro';
+
 // Tier configuration with limits and pricing (same price for both currencies)
-// NEW PRICING MODEL: $99/month base + $34.95/seat, unlimited projects
+// SINGLE PLAN MODEL: $99/month base + $34.95/seat, unlimited projects
+// All legacy tier names (basic, starter, premium, enterprise) map to the same plan
+const BASE_TIER_CONFIG = {
+  name: PLAN_DISPLAY_NAME,
+  priceUSD: 99,
+  priceCAD: 99,
+  maxProjects: -1, // unlimited
+  maxSeats: 0,     // no included seats, add at $34.95/seat
+  priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.basic,
+  priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.basic,
+};
+
+// All tiers are identical - legacy names kept for backward compatibility with existing database values
 export const TIER_CONFIG = {
-  basic: {
-    name: 'OnRopePro',
-    priceUSD: 99,
-    priceCAD: 99,  // Same price, Stripe handles currency
-    maxProjects: -1, // unlimited
-    maxSeats: 0,     // no included seats, add at $34.95/seat
-    priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.basic,
-    priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.basic,
-  },
-  starter: {
-    name: 'OnRopePro',
-    priceUSD: 99,
-    priceCAD: 99,  // Same price, Stripe handles currency
-    maxProjects: -1, // unlimited
-    maxSeats: 0,     // no included seats
-    priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.starter,
-    priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.starter,
-  },
-  premium: {
-    name: 'OnRopePro',
-    priceUSD: 99,
-    priceCAD: 99,  // Same price, Stripe handles currency
-    maxProjects: -1, // unlimited
-    maxSeats: 0,     // no included seats
-    priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.premium,
-    priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.premium,
-  },
-  enterprise: {
-    name: 'OnRopePro',
-    priceUSD: 99,
-    priceCAD: 99,  // Same price, Stripe handles currency
-    maxProjects: -1, // unlimited
-    maxSeats: 0,     // no included seats
-    priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.enterprise,
-    priceIdCAD: STRIPE_PRICE_IDS.tiers.cad.enterprise,
-  },
+  onropepro: { ...BASE_TIER_CONFIG },
+  basic: { ...BASE_TIER_CONFIG },
+  starter: { ...BASE_TIER_CONFIG },
+  premium: { ...BASE_TIER_CONFIG },
+  enterprise: { ...BASE_TIER_CONFIG },
 } as const;
+
+// Helper to normalize any tier name to display name
+export function getTierDisplayName(tier: string | null | undefined): string {
+  return PLAN_DISPLAY_NAME;
+}
 
 // Add-on configuration with pricing (same price for both currencies)
 // NOTE: All add-ons are RECURRING to work with subscription system
