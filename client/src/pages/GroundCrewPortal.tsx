@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -659,20 +659,21 @@ export default function GroundCrewPortal() {
   
   // State for mobile sidebar
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  
+  // Use wouter's useSearch hook to track query string changes
+  const searchString = useSearch();
 
+  // Sync activeTab with URL query params whenever search string changes
   useEffect(() => {
-    const handleUrlChange = () => {
-      const tab = getTabFromUrl();
+    const params = new URLSearchParams(searchString);
+    const tab = params.get('tab');
+    if (tab === 'home' || tab === 'profile' || tab === 'invitations' || tab === 'more') {
       setActiveTab(tab);
-    };
-    
-    handleUrlChange();
-    window.addEventListener('popstate', handleUrlChange);
-    
-    return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-    };
-  }, [location]);
+    } else if (!tab && location === '/ground-crew-portal') {
+      // Default to home when no tab specified
+      setActiveTab('home');
+    }
+  }, [searchString, location]);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadType, setUploadType] = useState<string | null>(null);
