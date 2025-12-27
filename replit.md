@@ -32,7 +32,7 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 
 **Key Features and Design Decisions:**
 *   **Multi-Tenant Role-Based Access Control (RBAC):** Granular permissions for various user roles.
-*   **Comprehensive Project & Workforce Management:** Includes diverse job type management, visual selection, multiple progress tracking systems, real-time clock-in/out with GPS, IRATA certification tracking, and technician self-registration with referral system and PLUS access tier.
+*   **Comprehensive Project & Workforce Management:** Includes diverse job type management, visual selection, multiple progress tracking systems, real-time clock-in/out with GPS, IRATA certification tracking, and technician self-registration with referral system and PLUS access tier. Technician hours calculation includes: baseline + work sessions + manual hours (countsTowardTotal=true). Previous/historical hours (countsTowardTotal=false) are shown for reference only and NOT included in totals.
 *   **Client Relationship Management (CRM):** Manages client and building records, streamlining client-to-project workflows.
 *   **Advanced Scheduling & Resource Allocation:** Dual-calendar system with drag-and-drop functionality and conflict detection.
 *   **Robust Safety & Compliance:** Digitizes harness inspections, toolbox meetings, FLHA forms, incident reports, gear inventory (with shared equipment catalog), digital signatures, and AI-powered Certificate of Insurance expiry tracking.
