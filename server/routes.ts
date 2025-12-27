@@ -25239,6 +25239,26 @@ Do not include any other text, just the JSON object.`
         ? await db.select().from(quizAttempts).where(inArray(quizAttempts.employeeId, techIds))
         : [];
       
+      
+      // Fetch all certifications for visible technicians
+      const allCertifications = techIds.length > 0
+        ? await db.select().from(userCertifications).where(inArray(userCertifications.userId, techIds))
+        : [];
+      
+      // Group certifications by user ID
+      const certificationsByUser = new Map<string, any[]>();
+      for (const cert of allCertifications) {
+        if (!certificationsByUser.has(cert.userId)) {
+          certificationsByUser.set(cert.userId, []);
+        }
+        certificationsByUser.get(cert.userId)!.push({
+          id: cert.id,
+          description: cert.description,
+          fileUrl: cert.fileUrl,
+          expiryDate: cert.expiryDate,
+          createdAt: cert.createdAt,
+        });
+      }
       // Group quiz attempts by employee ID
       const quizAttemptsByEmployee = new Map<string, any[]>();
       for (const attempt of allQuizAttempts) {
@@ -25260,6 +25280,7 @@ Do not include any other text, just the JSON object.`
           safetyLabel,
           safetyColor,
           safetyBreakdown,
+          certifications: certificationsByUser.get(tech.id) || [],
         };
       });
 

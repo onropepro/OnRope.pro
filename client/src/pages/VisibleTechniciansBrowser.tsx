@@ -68,6 +68,8 @@ const translations = {
     since: "Since",
     certifications: "Certifications",
     noCertifications: "No certifications on file",
+    uploadedCertifications: "Uploaded Certifications",
+    viewDocument: "View Document",
     specialties: "Specialties",
     noSpecialties: "No specialties listed",
     resumeCV: "Resume / CV",
@@ -121,6 +123,8 @@ const translations = {
     since: "Depuis",
     certifications: "Certifications",
     noCertifications: "Aucune certification en dossier",
+    uploadedCertifications: "Certifications téléversées",
+    viewDocument: "Voir le document",
     specialties: "Spécialités",
     noSpecialties: "Aucune spécialité indiquée",
     resumeCV: "CV / Resume",
@@ -187,6 +191,13 @@ interface VisibleTechnician {
     hasValidCertification: boolean;
     yearsExperience: number;
     hasResume: boolean;
+  certifications?: Array<{
+    id: string;
+    description: string | null;
+    fileUrl: string;
+    expiryDate: string | null;
+    createdAt: string;
+  }>;
   };
 }
 
@@ -649,7 +660,36 @@ export default function VisibleTechniciansBrowser() {
                     </div>
                   )}
 
-                  {!selectedTech.irataLevel && !selectedTech.spratLevel && (
+                  
+                  {/* Uploaded Certifications */}
+                  {selectedTech.certifications && selectedTech.certifications.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">{t.uploadedCertifications}</p>
+                      {selectedTech.certifications.map((cert: any) => (
+                        <div key={cert.id} className="p-3 rounded-lg border flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{cert.description || "Certificate"}</p>
+                            {cert.expiryDate && (
+                              <p className="text-xs text-muted-foreground">
+                                {t.expires}: {formatDate(cert.expiryDate)}
+                                {isExpired(cert.expiryDate) && <Badge variant="destructive" className="ml-2">{t.expired}</Badge>}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(cert.fileUrl, "_blank")}
+                            data-testid={`button-view-cert-${cert.id}`}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            {t.viewDocument}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {!selectedTech.irataLevel && !selectedTech.spratLevel && (!selectedTech.certifications || selectedTech.certifications.length === 0) && (
                     <p className="text-sm text-muted-foreground italic">{t.noCertifications}</p>
                   )}
                 </div>
