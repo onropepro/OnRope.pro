@@ -79,8 +79,15 @@ export default function CompanyDetail() {
     },
   });
 
-  // ProtectedRoute handles auth - but we still need to prevent render before data loads
-  if (userData?.user?.role !== 'superuser') {
+  // Check if user is superuser or staff with view_companies permission
+  const isSuperuser = userData?.user?.role === 'superuser';
+  const isStaffWithPermission = userData?.user?.role === 'staff' && 
+    userData?.user?.permissions?.includes('view_companies');
+  const hasAccess = isSuperuser || isStaffWithPermission;
+
+  // Only redirect after user data has loaded and we know they don't have access
+  const isLoadingUser = userData === undefined;
+  if (!isLoadingUser && !hasAccess) {
     setLocation('/');
     return null;
   }
