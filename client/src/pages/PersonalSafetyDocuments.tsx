@@ -61,6 +61,9 @@ export default function PersonalSafetyDocuments() {
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  
+  // Mobile sidebar state for external control
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const initializeFindings = (): EquipmentFindings => {
     const initialized: EquipmentFindings = {};
@@ -374,19 +377,23 @@ export default function PersonalSafetyDocuments() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <div className="hidden lg:block">
-        <DashboardSidebar
-          currentUser={currentUser}
-          activeTab="personal-safety-docs"
-          onTabChange={() => {}}
-          variant="technician"
-          customNavigationGroups={technicianNavGroups}
-          showDashboardLink={false}
-        />
-      </div>
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
+      <DashboardSidebar
+        currentUser={currentUser}
+        activeTab="personal-safety-docs"
+        onTabChange={() => {}}
+        variant="technician"
+        customNavigationGroups={technicianNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
       
       <div className="lg:pl-60">
-        <TechnicianHeader language={language} />
+        <TechnicianHeader 
+          language={language} 
+          onMobileMenuClick={() => setMobileSidebarOpen(true)}
+        />
 
         <main className="p-4 sm:p-6 lg:p-8">
           <div className="max-w-4xl mx-auto">

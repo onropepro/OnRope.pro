@@ -46,7 +46,8 @@ import {
   Briefcase,
   FileText,
   HelpCircle,
-  User as UserIcon
+  User as UserIcon,
+  Menu
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -413,6 +414,9 @@ export default function TechnicianLoggedHours() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { i18n } = useTranslation();
+  
+  // Mobile sidebar state for external control
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   
   // Use global i18n language, not local storage
   const language: Language = i18n.language === 'fr' ? 'fr' : 'en';
@@ -1330,33 +1334,34 @@ export default function TechnicianLoggedHours() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden lg:block">
-        <DashboardSidebar
-          currentUser={user}
-          activeTab="logged-hours"
-          onTabChange={() => {}}
-          variant="technician"
-          customNavigationGroups={technicianNavGroups}
-          showDashboardLink={false}
-        />
-      </div>
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
+      <DashboardSidebar
+        currentUser={user}
+        activeTab="logged-hours"
+        onTabChange={() => {}}
+        variant="technician"
+        customNavigationGroups={technicianNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
       
       {/* Main content wrapper - offset for sidebar on desktop */}
       <div className="lg:pl-60">
         {/* Persistent Top Header Bar */}
         <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
           <div className="h-full flex items-center justify-between gap-4">
-            {/* Left Side: Back Button + Search */}
+            {/* Left Side: Hamburger menu (mobile) + Search */}
             <div className="flex items-center gap-4 flex-1 min-w-0">
+              {/* Mobile hamburger menu button */}
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setLocation("/technician-portal")}
-                data-testid="button-back-to-portal"
                 className="lg:hidden"
+                onClick={() => setMobileSidebarOpen(true)}
+                data-testid="button-mobile-menu"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <Menu className="h-5 w-5" />
               </Button>
               <div className="hidden md:flex flex-1 max-w-xl">
                 <DashboardSearch />

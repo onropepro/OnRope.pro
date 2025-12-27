@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   ArrowLeft, 
   Briefcase, 
@@ -20,9 +22,15 @@ import {
   ChevronRight,
   Loader2,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  Menu,
+  LogOut
 } from "lucide-react";
+import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { format } from "date-fns";
+import { Home, User as UserIcon } from "lucide-react";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
 type JobPostingWithCompany = JobPosting & { companyName?: string | null };
@@ -200,12 +208,32 @@ export default function GroundCrewJobBoard() {
   const { toast } = useToast();
   const { i18n } = useTranslation();
   
+  // Mobile sidebar state for external control
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  
   const language: Language = (i18n.language === 'fr' ? 'fr' : i18n.language === 'es' ? 'es' : 'en');
   const t = translations[language];
+  
+  // Header role label
+  const roleLabel = language === 'en' ? 'Ground Crew' : language === 'es' ? 'Equipo de Tierra' : 'Equipe au sol';
 
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
   const [showApplyDialog, setShowApplyDialog] = useState(false);
   const [coverMessage, setCoverMessage] = useState("");
+  
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST", credentials: "include" });
+      queryClient.clear();
+      setLocation("/");
+    } catch (error) {
+      toast({
+        title: language === 'en' ? "Logout failed" : language === 'es' ? "Error al cerrar sesion" : "Echec de la deconnexion",
+        variant: "destructive",
+      });
+    }
+  };
   const [showMyApplications, setShowMyApplications] = useState(false);
 
   const { data: userData } = useQuery<{ user: User }>({
@@ -294,38 +322,129 @@ export default function GroundCrewJobBoard() {
     return <Badge variant={variant}>{label}</Badge>;
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation("/ground-crew-portal")}
-            className="gap-1"
-            data-testid="button-back-to-portal"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {t.backToPortal}
-          </Button>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowMyApplications(!showMyApplications)}
-              data-testid="button-toggle-applications"
-            >
-              {showMyApplications ? t.activeJobs : t.viewMyApplications}
-            </Button>
-          </div>
-        </div>
-      </header>
+  // Navigation groups for sidebar
+  const groundCrewNavGroups: NavGroup[] = [
+    {
+      id: "main",
+      label: "NAVIGATION",
+      items: [
+        {
+          id: "home",
+          label: language === 'en' ? "Home" : language === 'es' ? "Inicio" : "Accueil",
+          icon: Home,
+          href: "/ground-crew-portal",
+          isVisible: () => true,
+        },
+        {
+          id: "profile",
+          label: language === 'en' ? "Profile" : language === 'es' ? "Perfil" : "Profil",
+          icon: UserIcon,
+          href: "/ground-crew-portal?tab=profile",
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: "employment",
+      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
+      items: [
+        {
+          id: "job-board",
+          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
+          icon: Briefcase,
+          href: "/ground-crew-job-board",
+          isVisible: () => true,
+        },
+      ],
+    },
+  ];
 
-      <main className="container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">{t.title}</h1>
-          <p className="text-muted-foreground">{t.subtitle}</p>
-        </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
+      <DashboardSidebar
+        currentUser={user as any}
+        activeTab="job-board"
+        onTabChange={() => {}}
+        variant="ground-crew"
+        customNavigationGroups={groundCrewNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
+      
+      {/* Main content wrapper - offset for sidebar on desktop */}
+      <div className="lg:pl-60">
+        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            {/* Left Side: Hamburger menu (mobile) + Search */}
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              {/* Mobile hamburger menu button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileSidebarOpen(true)}
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <div className="hidden md:flex flex-1 max-w-xl">
+                <DashboardSearch />
+              </div>
+            </div>
+            
+            {/* Right Side: Actions Group */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              {/* Toggle button for applications */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowMyApplications(!showMyApplications)}
+                data-testid="button-toggle-applications"
+              >
+                {showMyApplications ? t.activeJobs : t.viewMyApplications}
+              </Button>
+              
+              {/* Language Selector */}
+              <LanguageDropdown />
+              
+              {/* User Profile - Clickable to go to Portal */}
+              <button 
+                onClick={() => setLocation("/ground-crew-portal")}
+                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                data-testid="link-user-profile"
+              >
+                <Avatar className="w-8 h-8 bg-[#5D7B6F]">
+                  <AvatarFallback className="bg-[#5D7B6F] text-white text-xs font-medium">
+                    {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
+                  <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
+                </div>
+              </button>
+              
+              {/* Logout Button */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                data-testid="button-logout" 
+                onClick={handleLogout} 
+                className="text-slate-600 dark:text-slate-300"
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="px-4 sm:px-6 py-6">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold">{t.title}</h1>
+            <p className="text-muted-foreground">{t.subtitle}</p>
+          </div>
 
         {showMyApplications ? (
           <div className="space-y-4">
@@ -429,7 +548,8 @@ export default function GroundCrewJobBoard() {
             )}
           </div>
         )}
-      </main>
+        </main>
+      </div>
 
       <Dialog open={!!selectedJob} onOpenChange={(open) => !open && setSelectedJob(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

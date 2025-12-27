@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { TechnicianHeader } from "@/components/TechnicianHeader";
@@ -76,6 +77,9 @@ interface PSRData {
 export default function TechnicianPSR() {
   const { i18n } = useTranslation();
   const language = i18n.language?.substring(0, 2) || 'en';
+  
+  // Mobile sidebar state for external control
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const { data: userData } = useQuery<{ user: User }>({
     queryKey: ["/api/user"],
@@ -350,17 +354,23 @@ export default function TechnicianPSR() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
       <DashboardSidebar
         variant="technician"
         currentUser={user}
-        currentPage="psr"
+        activeTab="psr"
         customNavigationGroups={technicianNavGroups}
         showDashboardLink={false}
         hideSettingsButton={true}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
       />
 
       <div className="lg:pl-60">
-        <TechnicianHeader language={language as "en" | "es" | "fr"} />
+        <TechnicianHeader 
+          language={language as "en" | "es" | "fr"} 
+          onMobileMenuClick={() => setMobileSidebarOpen(true)}
+        />
 
         <main className="p-4 md:p-6 space-y-6">
           <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">

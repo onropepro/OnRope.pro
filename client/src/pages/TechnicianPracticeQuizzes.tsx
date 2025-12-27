@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { TechnicianHeader } from "@/components/TechnicianHeader";
@@ -9,6 +10,9 @@ import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 export default function TechnicianPracticeQuizzes() {
   const { i18n } = useTranslation();
   const language = i18n.language?.substring(0, 2) || 'en';
+  
+  // Mobile sidebar state for external control
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const { data: userData } = useQuery<{ user: User }>({
     queryKey: ["/api/user"],
@@ -51,6 +55,7 @@ export default function TechnicianPracticeQuizzes() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
       <DashboardSidebar
         currentUser={user as any}
         activeTab="practice-quizzes"
@@ -58,10 +63,15 @@ export default function TechnicianPracticeQuizzes() {
         variant="technician"
         customNavigationGroups={technicianNavGroups}
         showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
       />
 
       <div className="lg:pl-60">
-        <TechnicianHeader language={language as "en" | "es" | "fr"} />
+        <TechnicianHeader 
+          language={language as "en" | "es" | "fr"} 
+          onMobileMenuClick={() => setMobileSidebarOpen(true)}
+        />
 
         <main className="p-4 md:p-6">
           <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm p-6">
