@@ -1481,48 +1481,22 @@ export default function TechnicianLoggedHours() {
           </div>
         </div>
 
-        {/* Page Title Bar */}
-        <div className="sticky top-14 z-[90] bg-card border-b shadow-sm">
-          <div className="px-4 py-3 flex items-center justify-between gap-3 max-w-4xl mx-auto">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setLocation("/technician-portal")}
-                data-testid="button-back-to-portal-mobile"
-                className="lg:hidden"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <h1 className="font-semibold text-lg">{t.title}</h1>
-            </div>
-            {user?.hasPlusAccess ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowExportDialog(true)}
-                className="gap-2"
-                data-testid="button-export-pdf"
-              >
-                <FileDown className="w-4 h-4" />
-                <span className="hidden sm:inline">{t.exportPdf}</span>
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 opacity-70"
-                disabled
-                data-testid="button-export-pdf-locked"
-              >
-                <Lock className="w-4 h-4" />
-                <span className="hidden sm:inline">{t.plusFeature}</span>
-              </Button>
-            )}
-          </div>
-        </div>
 
         <main className="max-w-4xl mx-auto px-4 py-6 space-y-6 pb-20">
+        {/* Mobile back button */}
+        <div className="lg:hidden flex items-center gap-2 -mt-2 mb-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/technician-portal")}
+            data-testid="button-back-to-portal-mobile"
+            className="gap-1 text-muted-foreground"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {t.backToPortal}
+          </Button>
+        </div>
+        
         {/* Certification Upgrade Progress Card */}
         {(irataLevel || spratLevel) && (
           <Card>
@@ -1798,14 +1772,40 @@ export default function TechnicianLoggedHours() {
 
           <TabsContent value="work-sessions" className="mt-4">
             {sessions.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <p className="font-medium text-muted-foreground">{t.noWorkSessions}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{t.noWorkSessionsDesc}</p>
-                </CardContent>
-              </Card>
+              <div className="space-y-4">
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                    <p className="font-medium text-muted-foreground">{t.noWorkSessions}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{t.noWorkSessionsDesc}</p>
+                  </CardContent>
+                </Card>
+                <div className="flex justify-center">
+                  {user?.hasPlusAccess ? (
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowExportDialog(true)}
+                      className="gap-2"
+                      data-testid="button-export-pdf"
+                    >
+                      <FileDown className="w-4 h-4" />
+                      {t.exportPdf}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="gap-2 opacity-70"
+                      disabled
+                      data-testid="button-export-pdf-locked"
+                    >
+                      <Lock className="w-4 h-4" />
+                      {t.plusFeature}
+                    </Button>
+                  )}
+                </div>
+              </div>
             ) : (
+              <>
               <Accordion type="single" collapsible className="space-y-2">
                 {sortedProjects.map(([projectKey, project]) => (
                   <AccordionItem 
@@ -1889,6 +1889,30 @@ export default function TechnicianLoggedHours() {
                   </AccordionItem>
                 ))}
               </Accordion>
+              <div className="flex justify-center mt-4">
+                {user?.hasPlusAccess ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowExportDialog(true)}
+                    className="gap-2"
+                    data-testid="button-export-pdf"
+                  >
+                    <FileDown className="w-4 h-4" />
+                    {t.exportPdf}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    className="gap-2 opacity-70"
+                    disabled
+                    data-testid="button-export-pdf-locked"
+                  >
+                    <Lock className="w-4 h-4" />
+                    {t.plusFeature}
+                  </Button>
+                )}
+              </div>
+              </>
             )}
           </TabsContent>
 
