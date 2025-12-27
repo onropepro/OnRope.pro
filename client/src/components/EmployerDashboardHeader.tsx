@@ -18,13 +18,20 @@ import { canManageEmployees } from "@/lib/permissions";
 import { trackLogout } from "@/lib/analytics";
 
 interface EmployerDashboardHeaderProps {
-  currentUser: any;
+  currentUser?: any;
   employees?: any[];
   onNavigateToEmployees?: () => void;
+  onBackClick?: () => void;
   showSearch?: boolean;
+  showNotifications?: boolean;
+  showLanguageDropdown?: boolean;
+  showProfile?: boolean;
+  showLogout?: boolean;
   pageTitle?: string;
   pageDescription?: string;
   actionButtons?: React.ReactNode;
+  logoUrl?: string;
+  isLoading?: boolean;
 }
 
 function NotificationBell() {
@@ -301,10 +308,17 @@ export function EmployerDashboardHeader({
   currentUser,
   employees = [],
   onNavigateToEmployees,
+  onBackClick,
   showSearch = true,
+  showNotifications = true,
+  showLanguageDropdown = true,
+  showProfile = true,
+  showLogout = true,
   pageTitle,
   pageDescription,
   actionButtons,
+  logoUrl,
+  isLoading = false,
 }: EmployerDashboardHeaderProps) {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
@@ -328,6 +342,14 @@ export function EmployerDashboardHeader({
     }
   };
 
+  const handleBackClick = () => {
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      setLocation("/dashboard");
+    }
+  };
+
   return (
     <>
       <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
@@ -339,11 +361,19 @@ export function EmployerDashboardHeader({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setLocation("/dashboard")}
+                  onClick={handleBackClick}
                   data-testid="button-back-dashboard"
                 >
                   <span className="material-icons">arrow_back</span>
                 </Button>
+                {logoUrl && (
+                  <img 
+                    src={logoUrl} 
+                    alt="Company Logo" 
+                    className="h-10 w-auto object-contain"
+                    data-testid="img-company-logo"
+                  />
+                )}
                 <div>
                   <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>
                   {pageDescription && (
@@ -384,34 +414,50 @@ export function EmployerDashboardHeader({
             <InstallPWAButton />
             
             {/* Notification Bell - Company owners only */}
-            {currentUser?.role === 'company' && (
+            {showNotifications && currentUser?.role === 'company' && (
               <NotificationBell />
             )}
             
             {/* Language Selector */}
-            <LanguageDropdown />
+            {showLanguageDropdown && (
+              <LanguageDropdown />
+            )}
             
             {/* User Profile - Clickable to go to Settings */}
-            <Link 
-              href="/profile" 
-              className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
-              data-testid="link-user-profile"
-            >
-              <Avatar className="w-8 h-8 bg-[#0B64A3]">
-                <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
-                  {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="hidden lg:block">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
-                <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role}</p>
-              </div>
-            </Link>
+            {showProfile && (
+              isLoading ? (
+                <div className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 py-1 pr-2">
+                  <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse" />
+                  <div className="hidden lg:block space-y-1">
+                    <div className="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    <div className="h-3 w-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  </div>
+                </div>
+              ) : currentUser ? (
+                <Link 
+                  href="/profile" 
+                  className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                  data-testid="link-user-profile"
+                >
+                  <Avatar className="w-8 h-8 bg-[#0B64A3]">
+                    <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
+                      {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="hidden lg:block">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
+                    <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role || ''}</p>
+                  </div>
+                </Link>
+              ) : null
+            )}
             
-            {/* Logout Button */}
-            <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
-              <span className="material-icons text-xl">logout</span>
-            </Button>
+            {/* Logout Button - Only show when currentUser exists */}
+            {showLogout && currentUser && (
+              <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <span className="material-icons text-xl">logout</span>
+              </Button>
+            )}
           </div>
         </div>
       </header>

@@ -15,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  ArrowLeft, 
   Users, 
   MapPin, 
   Award,
@@ -39,7 +38,7 @@ import {
 import { format, differenceInYears } from "date-fns";
 import type { User as UserType } from "@shared/schema";
 import { JOB_TYPES } from "@shared/jobTypes";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 type Language = 'en' | 'fr';
 
@@ -335,32 +334,12 @@ export default function VisibleTechniciansBrowser() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-primary/10">
-              <Users className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold">{t.title}</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">{t.subtitle}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <LanguageDropdown />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLocation("/dashboard")}
-              className="gap-1.5"
-              data-testid="button-back-to-dashboard"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.backToDashboard}</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <EmployerDashboardHeader
+        currentUser={user}
+        pageTitle={t.title}
+        pageDescription={t.subtitle}
+        showSearch={false}
+      />
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         {/* Search and Filters */}

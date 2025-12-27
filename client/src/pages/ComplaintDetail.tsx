@@ -16,6 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { formatTimestampDate, formatTime } from "@/lib/dateUtils";
+import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 // Official Resident color from stakeholder palette
 const RESIDENT_COLOR = "#86A59C";
@@ -198,25 +199,19 @@ export default function ComplaintDetail() {
     );
   }
 
+  const handleBack = () => {
+    const dashboardPath = userData?.user?.role === "resident" ? "/resident" : "/dashboard";
+    setLocation(dashboardPath);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
-        <div className="px-4 h-16 flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="min-w-11 min-h-11" 
-            onClick={() => {
-              // Navigate back to appropriate dashboard based on user role
-              const dashboardPath = userData?.user?.role === "resident" ? "/resident" : "/dashboard";
-              setLocation(dashboardPath);
-            }}
-            data-testid="button-back"
-          >
-            <span className="material-icons">arrow_back</span>
-          </Button>
-          <h1 className="text-lg font-bold flex-1">{t('feedbackDetail.feedbackDetails', 'Feedback Details')}</h1>
+      <EmployerDashboardHeader
+        currentUser={userData?.user}
+        pageTitle={t('feedbackDetail.feedbackDetails', 'Feedback Details')}
+        showSearch={false}
+        onBackClick={handleBack}
+        actionButtons={
           <Badge 
             variant="secondary" 
             className={complaint.status === "open" 
@@ -227,8 +222,8 @@ export default function ComplaintDetail() {
           >
             {complaint.status === "open" ? t('feedbackDetail.statusOpen', 'Open') : t('feedbackDetail.statusClosed', 'Closed')}
           </Badge>
-        </div>
-      </header>
+        }
+      />
 
       <div className="p-4 max-w-2xl mx-auto space-y-4">
         {/* Complaint Info */}

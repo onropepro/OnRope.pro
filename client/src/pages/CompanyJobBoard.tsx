@@ -12,10 +12,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, ArrowLeft, Users, FileText, Eye, Mail, Award, X, Clock, Download, Send, Loader2 } from "lucide-react";
+import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, Users, FileText, Eye, Mail, Award, X, Clock, Download, Send, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 type JobPosting = {
   id: string;
@@ -144,6 +145,11 @@ export default function CompanyJobBoard() {
   const [offerMessage, setOfferMessage] = useState("");
   const [deleteApplicationId, setDeleteApplicationId] = useState<string | null>(null);
   const [showSentOffers, setShowSentOffers] = useState(false);
+
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+  });
+  const currentUser = userData?.user;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -470,27 +476,12 @@ export default function CompanyJobBoard() {
 
   return (
     <div className="min-h-screen page-gradient">
-      <header className="sticky top-0 z-[100] glass backdrop-blur-xl border-b border-border/50 shadow-premium">
-        <div className="px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between max-w-7xl mx-auto gap-2">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/dashboard")}
-              data-testid="button-back-dashboard"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold gradient-text">
-                {t("jobBoard.title", "Job Board")}
-              </h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">
-                {t("jobBoard.subtitle", "Post and manage job opportunities")}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
+      <EmployerDashboardHeader
+        currentUser={currentUser}
+        pageTitle={t("jobBoard.title", "Job Board")}
+        pageDescription={t("jobBoard.subtitle", "Post and manage job opportunities")}
+        actionButtons={
+          <>
             <Button 
               variant={showSentOffers ? "default" : "outline"}
               onClick={() => setShowSentOffers(!showSentOffers)} 
@@ -518,9 +509,9 @@ export default function CompanyJobBoard() {
               <span className="hidden sm:inline">{t("jobBoard.createJob", "Create Job Posting")}</span>
               <span className="sm:hidden">{t("jobBoard.create", "Create")}</span>
             </Button>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {/* Sent Offers Section */}

@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
 import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight } from "lucide-react";
+import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
@@ -1560,12 +1561,11 @@ export default function Inventory() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-14 flex items-center justify-between max-w-7xl mx-auto">
-          <h1 className="text-xl font-bold tracking-tight">{t('inventory.title', 'Inventory')}</h1>
-        </div>
-      </header>
+      <EmployerDashboardHeader
+        currentUser={currentUser}
+        pageTitle={t('inventory.title', 'Inventory')}
+        showSearch={false}
+      />
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

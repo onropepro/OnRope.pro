@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { hasFinancialAccess } from "@/lib/permissions";
+import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 const gearFormSchema = z.object({
   brand: z.string().optional(),
@@ -88,25 +89,12 @@ export default function GearInventory() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-16 flex items-center gap-3 max-w-7xl mx-auto">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/dashboard")}
-            data-testid="button-back"
-          >
-            <span className="material-icons text-xl">arrow_back</span>
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold tracking-tight">{t('gearInventory.title', 'Build my Kit')}</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {t('gearInventory.subtitle', 'Manage your equipment inventory')}
-            </p>
-          </div>
-        </div>
-      </header>
+      <EmployerDashboardHeader
+        currentUser={currentUser}
+        pageTitle={t('gearInventory.title', 'Build my Kit')}
+        pageDescription={t('gearInventory.subtitle', 'Manage your equipment inventory')}
+        showSearch={false}
+      />
 
       {/* Content */}
       <div className="px-4 py-6 max-w-7xl mx-auto">

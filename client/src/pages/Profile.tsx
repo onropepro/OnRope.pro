@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { COMMON_TIMEZONES } from "@/lib/timezoneUtils";
+import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -1177,41 +1178,17 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
-        <div className="px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleBack}
-              data-testid="button-back"
-            >
-              <span className="material-icons text-xl">arrow_back</span>
-            </Button>
-            {hasLogo && (
-              <img 
-                src={branding.logoUrl} 
-                alt={t('profile.companyLogo', 'Company Logo')} 
-                className="h-10 w-auto object-contain"
-                data-testid="img-company-logo"
-              />
-            )}
-            <h1 className="text-lg font-bold">{t('profile.title', 'Profile')}</h1>
-          </div>
-          <div className="flex items-center gap-2">
+      <EmployerDashboardHeader
+        currentUser={user}
+        pageTitle={t('profile.title', 'Profile')}
+        showSearch={false}
+        logoUrl={hasLogo ? branding.logoUrl : undefined}
+        actionButtons={
+          <>
             <RefreshButton />
-            <Button
-              variant="ghost"
-              size="icon"
-              data-testid="button-logout"
-              onClick={() => setShowLogoutDialog(true)}
-            >
-              <span className="material-icons text-xl">logout</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       <div className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
         {user?.role === "company" ? (
