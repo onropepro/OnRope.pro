@@ -3874,18 +3874,17 @@ export default function TechnicianPortal() {
               <Button
                 variant="outline"
                 onClick={startEditing}
-                className="w-full sm:w-auto gap-2 h-11"
+                className="gap-2"
                 data-testid="button-edit-profile"
               >
                 <Edit2 className="w-4 h-4" />
                 {t.editProfile}
               </Button>
             ) : (
-              <div className="flex gap-2 w-full sm:w-auto">
+              <div className="flex gap-2">
                 <Button
                   variant="outline"
                   onClick={() => setIsEditing(false)}
-                  className="flex-1 sm:flex-none h-11"
                   data-testid="button-cancel-edit"
                 >
                   <X className="w-4 h-4 mr-2" />
@@ -3894,7 +3893,7 @@ export default function TechnicianPortal() {
                 <Button
                   onClick={form.handleSubmit(onSubmit)}
                   disabled={updateMutation.isPending}
-                  className="flex-1 sm:flex-none gap-2 h-11"
+                  className="gap-2"
                   data-testid="button-save-profile"
                 >
                   <Save className="w-4 h-4" />
@@ -3906,14 +3905,50 @@ export default function TechnicianPortal() {
 
           <CardContent>
             <Tabs defaultValue="personal" className="w-full">
-              <div className="w-full overflow-x-auto mb-6">
-                <TabsList className="w-full justify-start">
-                  <TabsTrigger value="personal" data-testid="tab-personal">{t.profileTabPersonalInfo}</TabsTrigger>
-                  <TabsTrigger value="certifications" data-testid="tab-certifications">{t.profileTabCertifications}</TabsTrigger>
-                  <TabsTrigger value="driver" data-testid="tab-driver">{t.profileTabDriver}</TabsTrigger>
-                  <TabsTrigger value="payroll" data-testid="tab-payroll">{t.profileTabPayroll}</TabsTrigger>
-                  <TabsTrigger value="resume" data-testid="tab-resume">{t.profileTabResume}</TabsTrigger>
-                  <TabsTrigger value="documents" data-testid="tab-documents">{t.profileTabDocuments}</TabsTrigger>
+              <div className="w-full overflow-x-auto mb-6 border-b border-border">
+                <TabsList className="bg-transparent h-auto p-0 gap-0">
+                  <TabsTrigger 
+                    value="personal" 
+                    data-testid="tab-personal"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-muted-foreground data-[state=active]:text-primary"
+                  >
+                    {t.profileTabPersonalInfo}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="certifications" 
+                    data-testid="tab-certifications"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-muted-foreground data-[state=active]:text-primary"
+                  >
+                    {t.profileTabCertifications}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="driver" 
+                    data-testid="tab-driver"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-muted-foreground data-[state=active]:text-primary"
+                  >
+                    {t.profileTabDriver}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="payroll" 
+                    data-testid="tab-payroll"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-muted-foreground data-[state=active]:text-primary"
+                  >
+                    {t.profileTabPayroll}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="resume" 
+                    data-testid="tab-resume"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-muted-foreground data-[state=active]:text-primary"
+                  >
+                    {t.profileTabResume}
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="documents" 
+                    data-testid="tab-documents"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-muted-foreground data-[state=active]:text-primary"
+                  >
+                    {t.profileTabDocuments}
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
