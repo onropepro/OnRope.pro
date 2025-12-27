@@ -203,6 +203,7 @@ const translations = {
     year: "year",
     hour: "hr",
     goToWorkDashboard: "You are in Your Passport View. Go To Work Dashboard.",
+    goToWorkDashboardButton: "Go To Work Dashboard",
     accessProjects: "Access projects, clock in/out, safety forms, auto-logging, company dashboard.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
@@ -236,7 +237,7 @@ const translations = {
     helpCenter: "Help Center",
     helpCenterDesc: "Get help with using the platform",
     openHelpCenter: "Open Help Center",
-    completeYourProfile: "Complete Your Profile",
+    completeYourProfile: "Complete Your Passport Profile",
     completeProfileDesc: "Complete your profile to connect with employers instantly",
     jobBoard: "Job Board",
     browseJobs: "Browse Jobs",
@@ -367,8 +368,9 @@ const translations = {
     yourCompensation: "Votre Rémunération",
     year: "an",
     hour: "h",
-    goToWorkDashboard: "Aller au Tableau de Bord",
-    accessProjects: "Accédez aux projets, pointage, formulaires de sécurité et tableau de bord.",
+    goToWorkDashboard: "Vous êtes dans votre vue Passeport. Accéder au Tableau de Bord.",
+    goToWorkDashboardButton: "Accéder au Tableau de Bord",
+    accessProjects: "Accéder aux projets, pointage, formulaires de sécurité, journalisation automatique, tableau de bord de l'entreprise.",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Une invitation est envoyée par votre employeur et apparaîtra ici.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
     dashboardDisabledInactive: "Vous êtes actuellement inactif. Contactez votre employeur pour être réactivé.",
@@ -401,7 +403,7 @@ const translations = {
     helpCenter: "Centre d'Aide",
     helpCenterDesc: "Obtenez de l'aide pour utiliser la plateforme",
     openHelpCenter: "Ouvrir le Centre d'Aide",
-    completeYourProfile: "Complétez Votre Profil",
+    completeYourProfile: "Complétez votre Profil Passeport",
     completeProfileDesc: "Complétez votre profil pour vous connecter instantanément avec les employeurs",
     jobBoard: "Offres d'emploi",
     browseJobs: "Parcourir",
@@ -532,8 +534,9 @@ const translations = {
     yourCompensation: "Su Compensación",
     year: "año",
     hour: "hr",
-    goToWorkDashboard: "Ir al Panel de Trabajo",
-    accessProjects: "Acceda a proyectos, marcaje, formularios de seguridad y panel de trabajo.",
+    goToWorkDashboard: "Estás en tu Vista de Pasaporte. Ir al Panel de Trabajo.",
+    goToWorkDashboardButton: "Ir al Panel de Trabajo",
+    accessProjects: "Accede a proyectos, entrada/salida, formularios de seguridad, registro automático, panel de empresa.",
     dashboardDisabledNoCompany: "Necesita estar vinculado con una empresa para acceder al Panel de Trabajo. Una invitación es enviada por su empleador y aparecerá aquí.",
     dashboardDisabledTerminated: "Su empleo ha sido terminado. Acepte una nueva invitación para acceder al Panel de Trabajo.",
     dashboardDisabledInactive: "Actualmente está inactivo. Contacte a su empleador para ser reactivado.",
@@ -566,7 +569,7 @@ const translations = {
     helpCenter: "Centro de Ayuda",
     helpCenterDesc: "Obtenga ayuda para usar la plataforma",
     openHelpCenter: "Abrir Centro de Ayuda",
-    completeYourProfile: "Complete Su Perfil",
+    completeYourProfile: "Complete Su Perfil de Pasaporte",
     completeProfileDesc: "Complete su perfil para conectarse con empleadores al instante",
     jobBoard: "Bolsa de Trabajo",
     browseJobs: "Buscar Trabajos",
@@ -1310,7 +1313,7 @@ export default function GroundCrewPortal() {
                       disabled={!user.companyId || !!user.terminatedDate || !!user.suspendedAt}
                       data-testid="button-go-to-dashboard"
                     >
-                      {t.goToWorkDashboard}
+                      {t.goToWorkDashboardButton}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>

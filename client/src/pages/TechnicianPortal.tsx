@@ -308,6 +308,7 @@ const translations = {
     year: "year",
     hour: "hr",
     goToWorkDashboard: "You are in Your Passport View. Go To Work Dashboard.",
+    goToWorkDashboardButton: "Go To Work Dashboard",
     accessProjects: "Access projects, clock in/out, safety forms, auto-logging, company dashboard.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
@@ -673,8 +674,9 @@ const translations = {
     yourCompensation: "Votre rémunération",
     year: "an",
     hour: "h",
-    goToWorkDashboard: "Accéder au tableau de bord",
-    accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
+    goToWorkDashboard: "Vous êtes dans votre vue Passeport. Accéder au Tableau de Bord.",
+    goToWorkDashboardButton: "Accéder au Tableau de Bord",
+    accessProjects: "Accéder aux projets, pointage, formulaires de sécurité, journalisation automatique, tableau de bord de l'entreprise.",
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
     dashboardDisabledInactive: "Vous êtes actuellement inactif. Contactez votre employeur pour être réactivé.",
@@ -1160,8 +1162,9 @@ const translations = {
     yourCompensation: "Su Compensacion",
     year: "ano",
     hour: "hr",
-    goToWorkDashboard: "Ir al Panel de Trabajo",
-    accessProjects: "Acceda a proyectos, fiche entrada/salida y formularios de seguridad",
+    goToWorkDashboard: "Estás en tu Vista de Pasaporte. Ir al Panel de Trabajo.",
+    goToWorkDashboardButton: "Ir al Panel de Trabajo",
+    accessProjects: "Accede a proyectos, entrada/salida, formularios de seguridad, registro automático, panel de empresa.",
     dashboardDisabledNoCompany: "Necesita estar vinculado con una empresa para acceder al Panel de Trabajo.",
     dashboardDisabledTerminated: "Su empleo ha sido terminado. Acepte una nueva invitacion para acceder al Panel.",
     dashboardDisabledInactive: "Actualmente está inactivo. Contacte a su empleador para ser reactivado.",
@@ -2803,7 +2806,7 @@ export default function TechnicianPortal() {
                       disabled={!user.companyId || !!user.terminatedDate || !!user.suspendedAt}
                       data-testid="button-go-to-dashboard"
                     >
-                      {t.goToWorkDashboard}
+                      {t.goToWorkDashboardButton}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
@@ -2934,7 +2937,7 @@ export default function TechnicianPortal() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-                          {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
+                          {language === 'en' ? 'Complete Your Passport Profile' : language === 'es' ? 'Completa Tu Perfil de Pasaporte' : 'Complétez votre profil Passeport'}
                         </h3>
                         <span className="text-base font-semibold text-[#0B64A3]">{profileCompletion.percentage}%</span>
                       </div>
@@ -3728,7 +3731,7 @@ export default function TechnicianPortal() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <h3 className="font-semibold text-base">
-                          {language === 'en' ? 'Complete Your Profile' : language === 'es' ? 'Completa Tu Perfil' : 'Complétez votre profil'}
+                          {language === 'en' ? 'Complete Your Passport Profile' : language === 'es' ? 'Completa Tu Perfil de Pasaporte' : 'Complétez votre profil Passeport'}
                         </h3>
                         <span className="text-sm font-medium text-amber-600 dark:text-amber-400">{profileCompletion.percentage}%</span>
                       </div>
