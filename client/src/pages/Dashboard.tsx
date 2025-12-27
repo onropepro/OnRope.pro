@@ -1238,6 +1238,7 @@ export default function Dashboard() {
   const [clientViewMode, setClientViewMode] = useState<"cards" | "table">("cards");
   const [clientSortField, setClientSortField] = useState<"name" | "company" | "email" | "phone">("name");
   const [clientSortDirection, setClientSortDirection] = useState<"asc" | "desc">("asc");
+  const [projectsViewMode, setProjectsViewMode] = useState<"cards" | "list">("cards");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [employeeToSuspendSeat, setEmployeeToSuspendSeat] = useState<any | null>(null); // For seat removal/suspend
   const [showDropDialog, setShowDropDialog] = useState(false);
@@ -4954,38 +4955,58 @@ export default function Dashboard() {
 
               {/* Projects with Active/Past Tabs */}
               <div>
-                <div className="flex items-center justify-between mb-6 mt-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 mt-8">
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-1 bg-primary rounded-full"></div>
                     <h2 className="text-xl font-bold">{t('dashboard.projects.title', 'Projects')}</h2>
                   </div>
-                  {canViewPastProjects(currentUser) && (
-                    <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
-                      <TabsList className="bg-muted/80 p-1 h-auto">
-                        <TabsTrigger 
-                          value="active" 
-                          data-testid="tab-active-projects"
-                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
-                        >
-                          <span className="material-icons text-base">play_circle</span>
-                          {t('dashboard.projects.activeProjects', 'Active Projects')}
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="past" 
-                          data-testid="tab-past-projects"
-                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
-                        >
-                          <span className="material-icons text-base">history</span>
-                          {t('dashboard.projects.pastProjects', 'Past Projects')}
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={projectsViewMode === "cards" ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setProjectsViewMode("cards")}
+                        data-testid="button-projects-view-cards"
+                      >
+                        <span className="material-icons text-sm">grid_view</span>
+                      </Button>
+                      <Button
+                        variant={projectsViewMode === "list" ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setProjectsViewMode("list")}
+                        data-testid="button-projects-view-list"
+                      >
+                        <span className="material-icons text-sm">view_list</span>
+                      </Button>
+                    </div>
+                    {canViewPastProjects(currentUser) && (
+                      <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
+                        <TabsList className="bg-muted/80 p-1 h-auto">
+                          <TabsTrigger 
+                            value="active" 
+                            data-testid="tab-active-projects"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                          >
+                            <span className="material-icons text-base">play_circle</span>
+                            {t('dashboard.projects.activeProjects', 'Active Projects')}
+                          </TabsTrigger>
+                          <TabsTrigger 
+                            value="past" 
+                            data-testid="tab-past-projects"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                          >
+                            <span className="material-icons text-base">history</span>
+                            {t('dashboard.projects.pastProjects', 'Past Projects')}
+                          </TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    )}
+                  </div>
                 </div>
 
                 {/* Active Projects */}
                 {projectsSubTab === "active" && (
-                <div className="space-y-4">
+                <div>
                   {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
                     <Card>
                       <CardContent className="p-8 text-center text-muted-foreground">
@@ -4993,8 +5014,126 @@ export default function Dashboard() {
                         <div>{t('dashboard.projects.noActiveProjects', 'No active projects yet')}</div>
                       </CardContent>
                     </Card>
+                  ) : projectsViewMode === "list" ? (
+                    /* List View - Table format */
+                    <Card>
+                      <CardContent className="p-0">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{t('dashboard.projects.building', 'Building')}</TableHead>
+                              <TableHead>{t('dashboard.projects.strataNumber', 'Strata #')}</TableHead>
+                              <TableHead className="hidden md:table-cell">{t('dashboard.projects.jobType', 'Job Type')}</TableHead>
+                              <TableHead className="hidden lg:table-cell">{t('dashboard.projects.created', 'Created')}</TableHead>
+                              <TableHead>{t('dashboard.projects.progress', 'Progress')}</TableHead>
+                              <TableHead className="hidden xl:table-cell">{t('dashboard.projects.team', 'Team')}</TableHead>
+                              <TableHead className="text-right">{t('dashboard.projects.actions', 'Actions')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
+                              const progressType = getProgressType(project.jobType);
+                              const isHoursBased = progressType === 'hours';
+                              const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
+                              const isParkade = project.jobType === "parkade_pressure_cleaning";
+                              const isAnchorInspection = project.jobType === "anchor_inspection";
+                              
+                              let progressPercent: number;
+                              if (isHoursBased) {
+                                const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+                                const totalHoursWorked = projectSessions.reduce((sum: number, s: any) => {
+                                  const regular = parseFloat(s.regularHours) || 0;
+                                  const overtime = parseFloat(s.overtimeHours) || 0;
+                                  const doubleTime = parseFloat(s.doubleTimeHours) || 0;
+                                  return sum + regular + overtime + doubleTime;
+                                }, 0);
+                                if ((project as any).overallCompletionPercentage !== null && (project as any).overallCompletionPercentage !== undefined) {
+                                  progressPercent = (project as any).overallCompletionPercentage;
+                                } else if (project.estimatedHours && project.estimatedHours > 0) {
+                                  progressPercent = Math.min((totalHoursWorked / project.estimatedHours) * 100, 100);
+                                } else {
+                                  progressPercent = 0;
+                                }
+                              } else if (isInSuite) {
+                                const completed = project.completedDrops || 0;
+                                const total = project.floorCount || 0;
+                                progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                              } else if (isParkade) {
+                                const completed = project.completedDrops || 0;
+                                const total = project.totalStalls || project.floorCount || 0;
+                                progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                              } else if (isAnchorInspection) {
+                                const anchorSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+                                const totalAnchorsInspected = anchorSessions.reduce((sum: number, s: any) => sum + (s.anchorsInspected || 0), 0);
+                                const total = project.totalAnchors || 0;
+                                progressPercent = total > 0 ? (totalAnchorsInspected / total) * 100 : 0;
+                              } else {
+                                const completed = project.completedDrops || 0;
+                                const total = project.totalDrops || 0;
+                                progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                              }
+
+                              return (
+                                <TableRow 
+                                  key={project.id}
+                                  className="cursor-pointer"
+                                  onClick={() => setLocation(`/projects/${project.id}`)}
+                                  data-testid={`project-row-${project.id}`}
+                                >
+                                  <TableCell className="font-medium">{project.buildingName}</TableCell>
+                                  <TableCell className="text-muted-foreground">{project.strataPlanNumber}</TableCell>
+                                  <TableCell className="text-muted-foreground hidden md:table-cell">{getJobTypeLabel(t, project.jobType)}</TableCell>
+                                  <TableCell className="text-muted-foreground hidden lg:table-cell">
+                                    {project.createdAt ? formatTimestampDateShort(project.createdAt) : '-'}
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex items-center gap-2">
+                                      <Progress value={progressPercent} className="h-2 w-16" />
+                                      <span className="text-sm font-medium">{Math.round(progressPercent)}%</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="hidden xl:table-cell">
+                                    {project.assignedTechnicians && project.assignedTechnicians.length > 0 ? (
+                                      <div className="flex items-center -space-x-1">
+                                        {project.assignedTechnicians.slice(0, 3).map((tech: any) => (
+                                          <Avatar key={tech.id} className="w-6 h-6 border border-background">
+                                            {tech.photoUrl ? <AvatarImage src={tech.photoUrl} alt={tech.name} /> : null}
+                                            <AvatarFallback className="text-xs bg-muted">
+                                              {tech.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || '?'}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                        ))}
+                                        {project.assignedTechnicians.length > 3 && (
+                                          <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs border border-background">
+                                            +{project.assignedTechnicians.length - 3}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <span className="text-muted-foreground">-</span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={(e) => { e.stopPropagation(); setLocation(`/projects/${project.id}`); }}
+                                      data-testid={`button-view-project-${project.id}`}
+                                    >
+                                      <span className="material-icons text-sm">arrow_forward</span>
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
                   ) : (
-                    filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
+                    /* Cards View - Multi-column grid */
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                       const isParkade = project.jobType === "parkade_pressure_cleaning";
                       const isAnchorInspection = project.jobType === "anchor_inspection";
@@ -5073,7 +5212,7 @@ export default function Dashboard() {
                       return (
                         <Card 
                           key={project.id} 
-                          className="group relative border-l-4 border-l-primary shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer overflow-visible bg-gradient-to-br from-background to-muted/30" 
+                          className="group relative shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer" 
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >
@@ -5222,7 +5361,8 @@ export default function Dashboard() {
                           </CardContent>
                         </Card>
                       );
-                    })
+                    })}
+                    </div>
                   )}
                 </div>
                 )}
