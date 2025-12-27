@@ -2081,7 +2081,7 @@ export default function TechnicianPortal() {
       { label: getLabel('Birth Date', 'Date de naissance', 'Fecha de Nacimiento'), complete: !!user.birthday },
       { label: getLabel('First Aid', 'Premiers soins', 'Primeros Auxilios'), complete: !!user.hasFirstAid },
       { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber },
-      { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.streetAddress },
+      { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.employeeStreetAddress },
       // Employer-visible profile fields
       { label: getLabel('Specialties', 'Spécialités', 'Especialidades'), complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) },
     ];
