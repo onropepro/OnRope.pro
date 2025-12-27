@@ -305,8 +305,10 @@ const translations = {
     errorNameRequired: "Name is required",
     errorInvalidEmail: "Invalid email",
     errorPhoneRequired: "Phone is required",
+    errorInvalidPhone: "Please enter a valid phone number: (xxx) xxx-xxxx",
     errorEmergencyNameRequired: "Emergency contact name is required",
     errorEmergencyPhoneRequired: "Emergency contact phone is required",
+    errorInvalidEmergencyPhone: "Please enter a valid phone number: (xxx) xxx-xxxx",
     teamInvitations: "Team Invitations",
     pendingInvitations: "Pending Invitations",
     noInvitations: "No pending invitations",
@@ -707,8 +709,10 @@ const translations = {
     errorNameRequired: "Le nom est requis",
     errorInvalidEmail: "Courriel invalide",
     errorPhoneRequired: "Le téléphone est requis",
+    errorInvalidPhone: "Veuillez entrer un numéro valide: (xxx) xxx-xxxx",
     errorEmergencyNameRequired: "Le nom du contact d'urgence est requis",
     errorEmergencyPhoneRequired: "Le téléphone du contact d'urgence est requis",
+    errorInvalidEmergencyPhone: "Veuillez entrer un numéro valide: (xxx) xxx-xxxx",
     teamInvitations: "Invitations d'équipe",
     pendingInvitations: "Invitations en attente",
     noInvitations: "Aucune invitation en attente",
@@ -1381,15 +1385,22 @@ const translations = {
     errorNameRequired: "El nombre es requerido",
     errorInvalidEmail: "Direccion de correo invalida",
     errorPhoneRequired: "El telefono es requerido",
+    errorInvalidPhone: "Ingrese un numero valido: (xxx) xxx-xxxx",
     errorEmergencyNameRequired: "El nombre del contacto de emergencia es requerido",
     errorEmergencyPhoneRequired: "El telefono del contacto de emergencia es requerido",
+    errorInvalidEmergencyPhone: "Ingrese un numero valido: (xxx) xxx-xxxx",
   }
 };
+
+// North American phone regex - accepts (xxx) xxx-xxxx, xxx-xxx-xxxx, or 10 digits
+const phoneRegex = /^(\(\d{3}\)\s?\d{3}-\d{4}|\d{3}-\d{3}-\d{4}|\d{10})$/;
 
 const createProfileSchema = (t: typeof translations['en']) => z.object({
   name: z.string().min(1, t.errorNameRequired),
   email: z.string().email(t.errorInvalidEmail),
-  employeePhoneNumber: z.string().min(1, t.errorPhoneRequired),
+  employeePhoneNumber: z.string()
+    .min(1, t.errorPhoneRequired)
+    .regex(phoneRegex, t.errorInvalidPhone),
   smsNotificationsEnabled: z.boolean().optional(),
   employeeStreetAddress: z.string().optional(),
   employeeCity: z.string().optional(),
@@ -1397,7 +1408,9 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
   employeeCountry: z.string().optional(),
   employeePostalCode: z.string().optional(),
   emergencyContactName: z.string().min(1, t.errorEmergencyNameRequired),
-  emergencyContactPhone: z.string().min(1, t.errorEmergencyPhoneRequired),
+  emergencyContactPhone: z.string()
+    .min(1, t.errorEmergencyPhoneRequired)
+    .regex(phoneRegex, t.errorInvalidEmergencyPhone),
   emergencyContactRelationship: z.string().optional(),
   socialInsuranceNumber: z.string().optional(),
   bankTransitNumber: z.string().optional(),
