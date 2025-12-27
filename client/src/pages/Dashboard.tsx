@@ -712,7 +712,7 @@ function DeletedProjectsTab() {
                             {dayProjects.map((project: Project) => (
                               <Card 
                                 key={project.id} 
-                                className="group shadow-md hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
+                                className="group shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
                                 data-testid={`deleted-project-${project.id}`}
                               >
                                 <CardContent className="p-4">
@@ -847,7 +847,7 @@ function CompletedProjectsTab() {
                             {dayProjects.map((project: Project) => (
                               <Card 
                                 key={project.id} 
-                                className="group shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                                className="group shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
                                 data-testid={`completed-project-${project.id}`}
                                 onClick={() => setLocation(`/projects/${project.id}`)}
                               >
@@ -5205,7 +5205,7 @@ export default function Dashboard() {
                       return (
                         <Card 
                           key={project.id} 
-                          className="group relative shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer" 
+                          className="group relative shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer" 
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >
@@ -5421,7 +5421,7 @@ export default function Dashboard() {
                   {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
                     <Card 
                       key={project.id} 
-                      className="group border-l-4 border-l-success shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                      className="group border-l-4 border-l-success shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
                       data-testid={`completed-project-${project.id}`}
                       onClick={() => setLocation(`/projects/${project.id}`)}
                     >
