@@ -149,7 +149,12 @@ export function DashboardSidebar({
       if (stored) {
         setCollapsedGroups(new Set(JSON.parse(stored)));
       } else {
-        setCollapsedGroups(new Set()); // All groups expanded by default
+        // Default state: For employer variant, collapse all groups except "operations"
+        if (variant === 'employer') {
+          setCollapsedGroups(new Set(['team', 'equipment', 'safety', 'financial', 'clients']));
+        } else {
+          setCollapsedGroups(new Set()); // All groups expanded by default for other variants
+        }
       }
     } catch {
       setCollapsedGroups(new Set());
