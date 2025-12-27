@@ -1,4 +1,4 @@
-import { useEffect, createContext, ReactNode } from "react";
+import { useEffect, createContext, ReactNode, useState } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -8,6 +8,8 @@ import { usePermissionSync } from "@/hooks/use-permission-sync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AuthPortalProvider } from "@/contexts/AuthPortalContext";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 // Pages
 import Register from "@/pages/Register";
@@ -802,6 +804,35 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+function GlobalRefreshButton() {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await queryClient.invalidateQueries();
+      window.location.reload();
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 1000);
+    }
+  };
+
+  return (
+    <Button
+      size="icon"
+      variant="ghost"
+      onClick={handleRefresh}
+      disabled={isRefreshing}
+      className="fixed top-2 right-16 z-[9999]"
+      data-testid="button-global-refresh"
+      aria-label="Refresh page"
+      title="Refresh page"
+    >
+      <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+    </Button>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -814,6 +845,7 @@ function App() {
             </BrandingProvider>
           </AuthPortalProvider>
         </ErrorBoundary>
+        <GlobalRefreshButton />
       </TooltipProvider>
     </QueryClientProvider>
   );
