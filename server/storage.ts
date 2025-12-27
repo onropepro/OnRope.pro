@@ -4513,7 +4513,9 @@ export class Storage {
         and(
           eq(teamInvitations.companyId, companyId),
           eq(teamInvitations.status, "accepted"),
-          isNull(teamInvitations.ownerAcknowledgedAt)
+          isNull(teamInvitations.ownerAcknowledgedAt),
+          // Technician must still be linked to this company (not unlinked)
+          eq(users.companyId, companyId)
         )
       )
       .orderBy(desc(teamInvitations.respondedAt));
@@ -4539,7 +4541,9 @@ export class Storage {
           // Must be acknowledged (user clicked "Do it later" or proceeded to form)
           not(isNull(teamInvitations.ownerAcknowledgedAt)),
           // Technician has no hourlyRate set (onboarding not complete)
-          isNull(users.hourlyRate)
+          isNull(users.hourlyRate),
+          // Technician must still be linked to this company (not unlinked)
+          eq(users.companyId, companyId)
         )
       )
       .orderBy(desc(teamInvitations.respondedAt));
