@@ -69,6 +69,18 @@
       "signIn": "Connexion",
       "getStarted": "Commencer"
     },
+    "signIn": "Se connecter",
+    "register": "S'inscrire",
+    "unifiedLabel": "Courriel, Licence # ou # Strata",
+    "unifiedPlaceholder": "Entrez votre courriel, numéro de licence ou numéro strata",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "forgotPassword": "Mot de passe oublié?",
+    "signingIn": "Connexion en cours...",
+    "welcomeBack": "Bon retour!",
+    "signedInAs": "Connecté en tant que {{name}}",
+    "modalDescription": "Connectez-vous à votre compte ou inscrivez-vous",
+
     "hero": {
       "subtitle": "Logiciel de gestion d'entretien de bâtiments",
       "builtBy": "Créé par un technicien IRATA / SPRAT niveau 3 & Directeur des opérations",

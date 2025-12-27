@@ -69,6 +69,17 @@
       "signIn": "Iniciar Sesion",
       "getStarted": "Comenzar"
     },
+    "signIn": "Iniciar sesión",
+    "register": "Registrarse",
+    "unifiedLabel": "Correo, Licencia # o # Strata",
+    "unifiedPlaceholder": "Ingrese su correo, número de licencia o número strata",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingrese su contraseña",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "signingIn": "Iniciando sesión...",
+    "welcomeBack": "¡Bienvenido de nuevo!",
+    "signedInAs": "Conectado como {{name}}",
+    "modalDescription": "Inicie sesión en su cuenta o regístrese",
     "hero": {
       "subtitle": "Software de Gestion de Mantenimiento de Edificios",
       "builtBy": "Creado por un Tecnico IRATA Nivel 3 / SPRAT y Gerente de Operaciones",
