@@ -818,18 +818,32 @@ function GlobalRefreshButton() {
   };
 
   return (
-    <Button
-      size="icon"
-      variant="ghost"
+    <button
       onClick={handleRefresh}
       disabled={isRefreshing}
-      className="fixed top-2 right-16 z-[9999]"
+      style={{
+        position: 'fixed',
+        top: '8px',
+        right: '200px',
+        zIndex: 999999,
+        width: '40px',
+        height: '40px',
+        borderRadius: '50%',
+        backgroundColor: '#0B64A3',
+        color: 'white',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+      }}
       data-testid="button-global-refresh"
       aria-label="Refresh page"
       title="Refresh page"
     >
-      <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-    </Button>
+      <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} style={{ width: '20px', height: '20px' }} />
+    </button>
   );
 }
 
