@@ -120,6 +120,42 @@ export default function TechnicianLanding() {
           </svg>
         </div>
       </section>
+      {/* Physical Logbook Disclaimer - CRITICAL PLACEMENT AT TOP */}
+      <section className="py-8 md:py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-6 h-6 text-amber-600" />
+                <CardTitle className="text-xl">THIS DOES NOT REPLACE YOUR PHYSICAL LOGBOOK</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-base text-amber-900 dark:text-amber-100">
+                <strong>Your IRATA/SPRAT physical logbook is still required.</strong> OnRopePro is a digital assistant that gives you accurate data to transfer into your official logbook-it does not replace it.
+              </p>
+              <p className="text-base text-amber-900 dark:text-amber-100">
+                IRATA and SPRAT certification bodies require you to maintain your physical logbook. That requirement hasn't changed. What has changed is how accurate your entries can be.
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-4 mt-4">
+                <div className="bg-white dark:bg-amber-900 rounded-lg p-4">
+                  <p className="font-medium text-foreground">Before:</p>
+                  <p className="text-muted-foreground">You guess at hours and details when filling your logbook weeks later</p>
+                </div>
+                <div className="bg-white dark:bg-amber-900 rounded-lg p-4">
+                  <p className="font-medium text-foreground">After:</p>
+                  <p className="text-muted-foreground">You copy precise, timestamped data from OnRopePro into your logbook</p>
+                </div>
+              </div>
+              
+              <p className="text-base text-amber-900 dark:text-amber-100">
+                Your assessor still checks your physical book. OnRopePro just makes sure the data in that book is right.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
       {/* Problem Validation Section */}
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
@@ -780,42 +816,10 @@ export default function TechnicianLanding() {
         </div>
       </section>
       <Separator />
-      {/* Important Clarifications Section */}
+      {/* Data Control & Security Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
-          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-6 h-6 text-amber-600" />
-                <CardTitle className="text-xl">THIS DOES NOT REPLACE YOUR PHYSICAL LOGBOOK</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-base text-amber-900 dark:text-amber-100">
-                <strong>Your IRATA/SPRAT physical logbook is still required.</strong> OnRopePro is a digital assistant that gives you accurate data to transfer into your official logbook-it does not replace it.
-              </p>
-              <p className="text-base text-amber-900 dark:text-amber-100">
-                IRATA and SPRAT certification bodies require you to maintain your physical logbook. That requirement hasn't changed. What has changed is how accurate your entries can be.
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-4 mt-4">
-                <div className="bg-white dark:bg-amber-900 rounded-lg p-4">
-                  <p className="font-medium text-foreground">Before:</p>
-                  <p className="text-muted-foreground">You guess at hours and details when filling your logbook weeks later</p>
-                </div>
-                <div className="bg-white dark:bg-amber-900 rounded-lg p-4">
-                  <p className="font-medium text-foreground">After:</p>
-                  <p className="text-muted-foreground">You copy precise, timestamped data from OnRopePro into your logbook</p>
-                </div>
-              </div>
-              
-              <p className="text-base text-amber-900 dark:text-amber-100">
-                Your assessor still checks your physical book. OnRopePro just makes sure the data in that book is right.
-              </p>
-            </CardContent>
-          </Card>
-
-          <div className="grid md:grid-cols-2 gap-6 mt-8">
+          <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
