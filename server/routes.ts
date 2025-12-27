@@ -11369,7 +11369,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: inv.technician.email,
           // Phone and address
           employeePhoneNumber: inv.technician.employeePhoneNumber,
-        smsNotificationsEnabled,
+          smsNotificationsEnabled: inv.technician.smsNotificationsEnabled,
           employeeStreetAddress: inv.technician.employeeStreetAddress,
           employeeCity: inv.technician.employeeCity,
           employeeProvinceState: inv.technician.employeeProvinceState,
@@ -11546,7 +11546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: inv.technician.name,
           email: inv.technician.email,
           employeePhoneNumber: inv.technician.employeePhoneNumber,
-        smsNotificationsEnabled,
+          smsNotificationsEnabled: inv.technician.smsNotificationsEnabled,
           employeeStreetAddress: inv.technician.employeeStreetAddress,
           employeeCity: inv.technician.employeeCity,
           employeeProvinceState: inv.technician.employeeProvinceState,
