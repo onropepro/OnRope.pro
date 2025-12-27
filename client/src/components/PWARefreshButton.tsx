@@ -23,7 +23,7 @@ export function PWARefreshButton() {
       variant="outline"
       onClick={handleRefresh}
       disabled={isRefreshing}
-      className="fixed bottom-4 right-4 z-50 rounded-full shadow-lg bg-background/95 backdrop-blur-sm"
+      className="fixed bottom-6 right-6 z-[9999] rounded-full shadow-lg bg-background border-2 border-primary"
       data-testid="button-pwa-refresh"
       aria-label="Refresh page"
     >
