@@ -90,7 +90,7 @@ export function getTechnicianNavGroups(
       items: [
         {
           id: "logged-hours",
-          label: language === 'en' ? "Logged Hours" : language === 'es' ? "Horas Registradas" : "Heures enregistrées",
+          label: language === 'en' ? "My Logged Hours" : language === 'es' ? "Mis Horas Registradas" : "Mes heures enregistrées",
           icon: Clock,
           href: "/technician-logged-hours",
           isVisible: () => true,
