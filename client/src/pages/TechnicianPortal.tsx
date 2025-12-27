@@ -1602,6 +1602,7 @@ export default function TechnicianPortal() {
   const { toast } = useToast();
   const [location, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
+  const [profileInnerTab, setProfileInnerTab] = useState<string>('personal');
   const [isVerifying, setIsVerifying] = useState(false);
   const [specialtyCategory, setSpecialtyCategory] = useState<JobCategory | "">("");
   const [selectedSpecialtyJobType, setSelectedSpecialtyJobType] = useState<string>("");
@@ -2150,19 +2151,19 @@ export default function TechnicianPortal() {
     
     const profileFields = [
       // Fields typically filled during registration
-      { label: getLabel('Full Name', 'Nom complet', 'Nombre Completo'), complete: !!user.name },
-      { label: getLabel('Email', 'Courriel', 'Correo'), complete: !!user.email },
-      { label: getLabel('Phone Number', 'Numéro de téléphone', 'Teléfono'), complete: !!user.phone || !!user.employeePhoneNumber },
-      { label: getLabel('IRATA/SPRAT Cert', 'Certification IRATA/SPRAT', 'Cert. IRATA/SPRAT'), complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber },
+      { label: getLabel('Full Name', 'Nom complet', 'Nombre Completo'), complete: !!user.name, sectionId: 'personal' },
+      { label: getLabel('Email', 'Courriel', 'Correo'), complete: !!user.email, sectionId: 'personal' },
+      { label: getLabel('Phone Number', 'Numéro de téléphone', 'Teléfono'), complete: !!user.phone || !!user.employeePhoneNumber, sectionId: 'personal' },
+      { label: getLabel('IRATA/SPRAT Cert', 'Certification IRATA/SPRAT', 'Cert. IRATA/SPRAT'), complete: !!user.irataLicenseNumber || !!user.spratLicenseNumber, sectionId: 'certifications' },
       // Additional profile fields
-      { label: getLabel('Emergency Contact', 'Contact d\'urgence', 'Contacto de Emergencia'), complete: !!user.emergencyContactName && !!user.emergencyContactPhone },
-      { label: getLabel('Banking Info', 'Info bancaire', 'Info Bancaria'), complete: !!user.bankAccountNumber },
-      { label: getLabel('Birth Date', 'Date de naissance', 'Fecha de Nacimiento'), complete: !!user.birthday },
-      { label: getLabel('First Aid', 'Premiers soins', 'Primeros Auxilios'), complete: !!user.hasFirstAid },
-      { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber },
-      { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.employeeStreetAddress },
+      { label: getLabel('Emergency Contact', 'Contact d\'urgence', 'Contacto de Emergencia'), complete: !!user.emergencyContactName && !!user.emergencyContactPhone, sectionId: 'personal' },
+      { label: getLabel('Banking Info', 'Info bancaire', 'Info Bancaria'), complete: !!user.bankAccountNumber, sectionId: 'payroll' },
+      { label: getLabel('Birth Date', 'Date de naissance', 'Fecha de Nacimiento'), complete: !!user.birthday, sectionId: 'personal' },
+      { label: getLabel('First Aid', 'Premiers soins', 'Primeros Auxilios'), complete: !!user.hasFirstAid, sectionId: 'certifications' },
+      { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber, sectionId: 'driver' },
+      { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.employeeStreetAddress, sectionId: 'personal' },
       // Employer-visible profile fields
-      { label: getLabel('Specialties', 'Spécialités', 'Especialidades'), complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0) },
+      { label: getLabel('Specialties', 'Spécialités', 'Especialidades'), complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0), sectionId: 'resume' },
     ];
     
     const completedCount = profileFields.filter(f => f.complete).length;
@@ -3087,7 +3088,18 @@ export default function TechnicianPortal() {
                       {profileCompletion.incompleteFields.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
                           {profileCompletion.incompleteFields.map((field, i) => (
-                            <Badge key={i} variant="outline" className="text-xs bg-background">
+                            <Badge 
+                              key={i} 
+                              variant="outline" 
+                              className="text-xs bg-background cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveTab('profile');
+                                setProfileInnerTab(field.sectionId);
+                                setIsEditing(true);
+                              }}
+                              data-testid={`badge-incomplete-${field.sectionId}-${i}`}
+                            >
                               {field.label}
                             </Badge>
                           ))}
@@ -3911,7 +3923,16 @@ export default function TechnicianPortal() {
                       {profileCompletion.incompleteFields.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
                           {profileCompletion.incompleteFields.map((field, i) => (
-                            <Badge key={i} variant="outline" className="text-xs bg-background">
+                            <Badge 
+                              key={i} 
+                              variant="outline" 
+                              className="text-xs bg-background cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                              onClick={() => {
+                                setProfileInnerTab(field.sectionId);
+                                setIsEditing(true);
+                              }}
+                              data-testid={`badge-profile-incomplete-${field.sectionId}-${i}`}
+                            >
                               {field.label}
                             </Badge>
                           ))}
@@ -3983,7 +4004,7 @@ export default function TechnicianPortal() {
           </CardHeader>
 
           <CardContent>
-            <Tabs defaultValue="personal" className="w-full">
+            <Tabs value={profileInnerTab} onValueChange={setProfileInnerTab} className="w-full">
               <div className="w-full overflow-x-auto mb-6 border-b border-border">
                 <TabsList className="bg-transparent h-auto p-0 gap-0">
                   <TabsTrigger 
