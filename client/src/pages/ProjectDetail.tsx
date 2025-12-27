@@ -79,33 +79,6 @@ export default function ProjectDetail() {
     return () => window.removeEventListener('error', errorHandler);
   }, []);
 
-  // If there's a render error, show it
-  if (renderError) {
-    return (
-      <div className="min-h-screen bg-red-50 p-4">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">{t('projectDetail.error.detected', 'Error Detected')}</h1>
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <p className="font-bold">{t('projectDetail.error.message', 'Error Message:')}</p>
-            <p className="font-mono text-sm">{renderError.message}</p>
-          </div>
-          <div className="bg-muted p-4 rounded">
-            <p className="font-bold mb-2">{t('projectDetail.error.stackTrace', 'Stack Trace:')}</p>
-            <pre className="text-xs overflow-auto">{renderError.stack}</pre>
-          </div>
-          <button
-            onClick={() => {
-              setRenderError(null);
-              window.location.reload();
-            }}
-            className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
-          >
-            {t('projectDetail.error.reloadPage', 'Reload Page')}
-          </button>
-        </div>
-      </div>
-    );
-  }
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [uploadingAnchorCertificate, setUploadingAnchorCertificate] = useState(false);
@@ -1099,6 +1072,34 @@ export default function ProjectDetail() {
     setIsMissedUnit(false);
     setMissedUnitNumber("");
   };
+
+  // If there's a render error, show it
+  if (renderError) {
+    return (
+      <div className="min-h-screen bg-red-50 p-4">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">{t('projectDetail.error.detected', 'Error Detected')}</h1>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <p className="font-bold">{t('projectDetail.error.message', 'Error Message:')}</p>
+            <p className="font-mono text-sm">{renderError.message}</p>
+          </div>
+          <div className="bg-muted p-4 rounded">
+            <p className="font-bold mb-2">{t('projectDetail.error.stackTrace', 'Stack Trace:')}</p>
+            <pre className="text-xs overflow-auto">{renderError.stack}</pre>
+          </div>
+          <button
+            onClick={() => {
+              setRenderError(null);
+              window.location.reload();
+            }}
+            className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+          >
+            {t('projectDetail.error.reloadPage', 'Reload Page')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
