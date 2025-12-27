@@ -3758,53 +3758,6 @@ export default function TechnicianPortal() {
               </Card>
             )}
             
-            {/* Referral Code Section - Moved from header */}
-            {user?.referralCode && (
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm p-4 mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-lg bg-primary/10">
-                      <Share2 className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <button
-                        onClick={() => setShowReferralInfoDialog(true)}
-                        className="text-sm font-semibold text-slate-900 dark:text-slate-100 cursor-pointer underline decoration-dotted underline-offset-2 hover:text-primary transition-colors"
-                        data-testid="button-referral-info-profile"
-                      >
-                        {t.yourReferralCode}
-                      </button>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">{language === 'en' ? 'Share with another tech and instantly get upgraded to PLUS' : language === 'es' ? 'Comparte con otro técnico y actualízate a PLUS al instante' : 'Partagez avec un autre technicien et obtenez un accès PLUS instantané'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-lg text-primary" data-testid="profile-referral-code">
-                      {user.referralCode}
-                    </span>
-                    <Button
-                      variant={codeCopied ? "default" : "outline"}
-                      size="sm"
-                      onClick={handleCopyReferralCode}
-                      className="gap-1.5"
-                      data-testid="button-profile-copy-code"
-                    >
-                      {codeCopied ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4" />
-                          {language === 'en' ? 'Copied!' : language === 'es' ? 'Copiado!' : 'Copié!'}
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          {language === 'en' ? 'Copy' : language === 'es' ? 'Copiar' : 'Copier'}
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-            
             <Card>
               <CardHeader className="space-y-4">
                 <div className="flex items-center justify-between gap-4">
