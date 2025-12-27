@@ -41,6 +41,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, parseLocalDate } from "@/lib/dateUtils";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { 
   User, 
   LogOut, 
@@ -1665,7 +1666,24 @@ export default function GroundCrewPortal() {
                             <FormItem className="md:col-span-2">
                               <FormLabel>{t.streetAddress}</FormLabel>
                               <FormControl>
-                                <Input {...field} disabled={!isEditing} data-testid="input-address" />
+                                {isEditing ? (
+                                  <AddressAutocomplete
+                                    data-testid="input-address"
+                                    placeholder={t.streetAddress}
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    onBlur={field.onBlur}
+                                    onSelect={(address) => {
+                                      field.onChange(address.formatted);
+                                      form.setValue('employeeCity', address.city || '');
+                                      form.setValue('employeeProvinceState', address.state || '');
+                                      form.setValue('employeeCountry', address.country || '');
+                                      form.setValue('employeePostalCode', address.postcode || '');
+                                    }}
+                                  />
+                                ) : (
+                                  <Input {...field} disabled data-testid="input-address" />
+                                )}
                               </FormControl>
                             </FormItem>
                           )}
