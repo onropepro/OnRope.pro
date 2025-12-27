@@ -1423,6 +1423,23 @@ export default function TechnicianLoggedHours() {
           </div>
         </header>
 
+        {/* Important disclaimer notice - MUST BE AT TOP for maximum visibility */}
+        <div className="bg-amber-500/15 border-b-2 border-amber-500/50 px-4 py-3">
+          <div className="max-w-4xl mx-auto flex items-start gap-3">
+            <div className="p-1.5 bg-amber-500/20 rounded-full flex-shrink-0">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-amber-700 dark:text-amber-300 uppercase tracking-wide">
+                {t.importantNotice}
+              </p>
+              <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                {t.logbookDisclaimer}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Page Title Bar */}
         <div className="sticky top-14 z-[90] bg-card border-b shadow-sm">
           <div className="px-4 py-3 flex items-center justify-between gap-3 max-w-4xl mx-auto">
@@ -1465,23 +1482,6 @@ export default function TechnicianLoggedHours() {
         </div>
 
         <main className="max-w-4xl mx-auto px-4 py-6 space-y-6 pb-20">
-        {/* Important disclaimer notice - MUST BE HIGHLY VISIBLE */}
-        <div className="p-4 bg-red-500/15 border-2 border-red-500/50 rounded-lg shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-red-500/20 rounded-full flex-shrink-0">
-              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
-            </div>
-            <div>
-              <p className="text-base font-bold text-red-700 dark:text-red-300 uppercase tracking-wide mb-1">
-                {t.importantNotice}
-              </p>
-              <p className="text-base font-semibold text-red-700 dark:text-red-300">
-                {t.logbookDisclaimer}
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Certification Upgrade Progress Card */}
         {(irataLevel || spratLevel) && (
           <Card>

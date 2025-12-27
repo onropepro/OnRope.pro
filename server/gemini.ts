@@ -412,6 +412,15 @@ export async function analyzeLogbookPage(
             {
               text: `You are an expert at analyzing IRATA and SPRAT rope access logbook pages. Your task is to CAREFULLY extract EVERY work entry visible on this logbook page.
 
+CRITICAL INSTRUCTIONS FOR DATE RANGES:
+- IRATA logbooks often show DATE RANGES like "Aug 04-07" or "19-20" meaning work spanning multiple days
+- When you see "04-07" or "19-20" in a date column, this is a DATE RANGE (start day to end day)
+- Example: "Aug 19-20" means startDate=Aug 19, endDate=Aug 20 (NOT both on Aug 19!)
+- Example: "Aug 04-07" means startDate=Aug 4, endDate=Aug 7
+- Example: "Aug 24-28" means startDate=Aug 24, endDate=Aug 28
+- If dates span different months (rare), interpret accordingly
+- Single dates like "Aug 20" mean both startDate and endDate are Aug 20
+
 CRITICAL INSTRUCTIONS FOR HOURS:
 - The "Hours Worked" field is MANDATORY for each entry
 - Look for columns labeled: "Hours", "Hrs", "Time", "Duration", "Total", or similar
@@ -422,7 +431,7 @@ CRITICAL INSTRUCTIONS FOR HOURS:
 - NEVER return null for hoursWorked unless the entry is clearly incomplete
 
 For EACH entry on the page, extract:
-1. DATE(S): Start and end date in YYYY-MM-DD format. If only day/month visible, use current year (2024 or 2025).
+1. DATE RANGE: Start and end date in YYYY-MM-DD format. Pay attention to date ranges (e.g., "04-07" means 4th to 7th). If only day/month visible, use current year (2024 or 2025).
 2. HOURS WORKED: This is CRITICAL - always extract or estimate this value
 3. BUILDING/SITE: Name and address of the work location
 4. BUILDING HEIGHT: If visible (floors, meters, feet)
