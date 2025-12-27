@@ -169,6 +169,25 @@ White background, rounded-2xl (16px), shadow-md, 1px Mist border, p-6 standard. 
 **Premium Cards:**  
 White bg, rounded-3xl (24px), shadow-xl, gradient border (1px), p-8, subtle gradient overlay, inner shadow for depth.
 
+**Interactive List Cards (Dashboard Standard):**  
+For clickable cards in dashboard lists (Projects, Clients, Employees, Documents), use this standardized styling:
+
+```tsx
+<Card className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer">
+```
+
+| Property | Value | Purpose |
+|----------|-------|---------|
+| `shadow-sm` | Subtle shadow at rest | Visual separation from background |
+| `hover:shadow-md` | Enhanced shadow on hover | Depth feedback on interaction |
+| `hover:bg-muted/50` | Grey background on hover | Visual highlight for clickable cards |
+| `transition-all duration-200` | 200ms animation | Smooth micro-interaction |
+| `cursor-pointer` | Pointer cursor | Indicates clickability |
+
+**Where to apply:** All dashboard list items that navigate on click (project cards, client cards, employee cards, inspection records, meeting records, feedback cards).
+
+**Exceptions:** Cards with status-specific styling (completed projects, deleted projects) may include additional classes like `border-l-4 border-l-success` or gradient backgrounds, but MUST retain the core hover interaction classes.
+
 ## Navigation
 
 ### Top Utility Bar (h-10)

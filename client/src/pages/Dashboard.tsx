@@ -5757,7 +5757,7 @@ export default function Dashboard() {
                                   {building.complaints.map((complaint: any) => (
                                     <Card 
                                       key={complaint.id} 
-                                      className="hover-elevate cursor-pointer"
+                                      className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer"
                                       onClick={() => setLocation(`/complaints/${complaint.id}`)}
                                       data-testid={`feedback-card-${complaint.id}`}
                                     >
@@ -7219,7 +7219,7 @@ export default function Dashboard() {
                       <Card 
                         key={employee.id} 
                         data-testid={`employee-card-${employee.id}`} 
-                        className="hover-elevate cursor-pointer"
+                        className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer"
                         onClick={() => {
                           setEmployeeToView(employee);
                           setShowEmployeeDetailDialog(true);
@@ -7755,7 +7755,7 @@ export default function Dashboard() {
                     {harnessInspections.map((inspection: any) => (
                       <Card 
                         key={inspection.id} 
-                        className="hover-elevate cursor-pointer"
+                        className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer"
                         onClick={() => setSelectedInspection(inspection)}
                         data-testid={`inspection-card-${inspection.id}`}
                       >
@@ -7812,7 +7812,7 @@ export default function Dashboard() {
                     {toolboxMeetings.map((meeting: any) => (
                       <Card 
                         key={meeting.id} 
-                        className="hover-elevate cursor-pointer"
+                        className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer"
                         onClick={() => setSelectedMeeting(meeting)}
                         data-testid={`meeting-card-${meeting.id}`}
                       >
@@ -8769,7 +8769,7 @@ export default function Dashboard() {
                             .map((client) => (
                             <Card 
                               key={client.id} 
-                              className="hover-elevate cursor-pointer" 
+                              className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer" 
                               data-testid={`client-card-${client.id}`}
                               onClick={() => {
                                 setClientToView(client);
