@@ -7117,7 +7117,7 @@ export default function Dashboard() {
                                     {user?.role === "company" && employee.id !== user?.id && (
                                       <Button
                                         variant="ghost"
-                                        size="sm"
+                                        size="icon"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setEmployeeToSuspendSeat(employee);
@@ -7125,15 +7125,15 @@ export default function Dashboard() {
                                         data-testid={`button-deactivate-row-${employee.id}`}
                                         className="text-amber-600 hover:text-amber-700"
                                         disabled={userIsReadOnly}
+                                        title={t('dashboard.employees.deactivate', 'Deactivate')}
                                       >
-                                        <span className="material-icons text-sm mr-1">person_remove</span>
-                                        {t('dashboard.employees.deactivate', 'Deactivate')}
+                                        <span className="material-icons text-sm">person_remove</span>
                                       </Button>
                                     )}
                                     {employee.id !== user?.id && (
                                       <Button
                                         variant="ghost"
-                                        size="sm"
+                                        size="icon"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setEmployeeToDelete(employee.id);
@@ -7141,9 +7141,9 @@ export default function Dashboard() {
                                         data-testid={`button-unlink-employee-row-${employee.id}`}
                                         className="text-amber-600 hover:text-amber-700"
                                         disabled={userIsReadOnly}
+                                        title={t('dashboard.employees.unlink', 'Unlink')}
                                       >
-                                        <span className="material-icons text-sm mr-1">link_off</span>
-                                        {t('dashboard.employees.unlink', 'Unlink')}
+                                        <span className="material-icons text-sm">link_off</span>
                                       </Button>
                                     )}
                                   </div>
@@ -7285,7 +7285,7 @@ export default function Dashboard() {
                                   {employee.role.replace(/_/g, ' ')}
                                 </Badge>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1 flex-wrap justify-end">
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -7294,7 +7294,6 @@ export default function Dashboard() {
                                     handleEditEmployee(employee);
                                   }}
                                   data-testid={`button-edit-employee-${employee.id}`}
-                                  className="h-9 w-9"
                                   disabled={userIsReadOnly}
                                 >
                                   <span className="material-icons text-sm">edit</span>
@@ -7310,7 +7309,6 @@ export default function Dashboard() {
                                       setShowChangePasswordDialog(true);
                                     }}
                                     data-testid={`button-change-password-${employee.id}`}
-                                    className="h-9 w-9"
                                     disabled={userIsReadOnly}
                                   >
                                     <span className="material-icons text-sm">lock_reset</span>
@@ -7320,7 +7318,7 @@ export default function Dashboard() {
                                 {user?.role === "company" && employee.id !== user?.id && (
                                   <Button
                                     variant="ghost"
-                                    size="sm"
+                                    size="icon"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEmployeeToSuspendSeat(employee);
@@ -7328,16 +7326,16 @@ export default function Dashboard() {
                                     data-testid={`button-deactivate-${employee.id}`}
                                     className="text-amber-600 hover:text-amber-700"
                                     disabled={userIsReadOnly}
+                                    title={t('dashboard.employees.deactivate', 'Deactivate')}
                                   >
-                                    <span className="material-icons text-sm mr-1">person_remove</span>
-                                    {t('dashboard.employees.deactivate', 'Deactivate')}
+                                    <span className="material-icons text-sm">person_remove</span>
                                   </Button>
                                 )}
                                 {/* Unlink button - only for employees, not company owner (can't unlink yourself) */}
                                 {employee.id !== user?.id && (
                                   <Button
                                     variant="ghost"
-                                    size="sm"
+                                    size="icon"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEmployeeToDelete(employee.id);
@@ -7345,9 +7343,9 @@ export default function Dashboard() {
                                     data-testid={`button-unlink-employee-${employee.id}`}
                                     className="text-amber-600 hover:text-amber-700"
                                     disabled={userIsReadOnly}
+                                    title={t('dashboard.employees.unlink', 'Unlink')}
                                   >
-                                    <span className="material-icons text-sm mr-1">link_off</span>
-                                    {t('dashboard.employees.unlink', 'Unlink')}
+                                    <span className="material-icons text-sm">link_off</span>
                                   </Button>
                                 )}
                               </div>
