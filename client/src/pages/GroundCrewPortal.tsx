@@ -205,7 +205,7 @@ const translations = {
     hour: "hr",
     goToWorkDashboard: "You are in Your Personal Passport View.",
     goToWorkDashboardButton: "Go To Work Dashboard",
-    accessProjects: "Go To Work Dashboard to access the company dashboard. View projects, schedule, clock in/out, safety forms, auto-logging, etc.",
+    accessProjects: "Go to Work Dashboard to access the company dashboard. View projects, schedule, clock in/out, safety forms, auto-logging, etc.",
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
     dashboardDisabledInactive: "You are currently inactive. Contact your employer to be reactivated.",
