@@ -34,6 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -493,6 +494,12 @@ const translations = {
     replyPlaceholder: "Type your reply...",
     newResponse: "New Response",
     close: "Close",
+    profileTabPersonalInfo: "Personal Information",
+    profileTabCertifications: "Certifications",
+    profileTabDriver: "Driver",
+    profileTabPayroll: "Payroll Information",
+    profileTabResume: "Resume / CV",
+    profileTabDocuments: "My Submitted Documents",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -860,6 +867,12 @@ const translations = {
     replyPlaceholder: "Tapez votre réponse...",
     newResponse: "Nouvelle réponse",
     close: "Fermer",
+    profileTabPersonalInfo: "Informations personnelles",
+    profileTabCertifications: "Certifications",
+    profileTabDriver: "Conducteur",
+    profileTabPayroll: "Informations de paie",
+    profileTabResume: "CV",
+    profileTabDocuments: "Mes documents soumis",
   },
   es: {
     technicianPortal: "Portal del Tecnico",
@@ -1241,6 +1254,12 @@ const translations = {
     tabEmployer: "Vista Empleador",
     tabWork: "Trabajo",
     tabMore: "Mas",
+    profileTabPersonalInfo: "Información Personal",
+    profileTabCertifications: "Certificaciones",
+    profileTabDriver: "Conductor",
+    profileTabPayroll: "Información de Nómina",
+    profileTabResume: "Currículum",
+    profileTabDocuments: "Mis Documentos Enviados",
     employerProfileTitle: "Sea descubierto por empleadores",
     employerProfileDesc: "Cuando es visible, los empleadores que buscan tecnicos certificados pueden encontrarlo y contactarlo.",
     editEmployerProfile: "Editar",
@@ -3699,17 +3718,6 @@ export default function TechnicianPortal() {
         {/* PROFILE TAB - Personal information and certifications */}
         {activeTab === 'profile' && (
           <>
-            {/* Back to Home button */}
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab('home')}
-              className="gap-2 -mt-2 mb-2"
-              data-testid="button-back-to-home"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t.backToHome}
-            </Button>
-            
             {/* Profile Completion Widget */}
             {!profileCompletion.isComplete && (
               <Card className="mb-4 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20" data-testid="card-profile-completion">
@@ -3819,14 +3827,28 @@ export default function TechnicianPortal() {
           </CardHeader>
 
           <CardContent>
+            <Tabs defaultValue="personal" className="w-full">
+              <div className="w-full overflow-x-auto mb-6">
+                <TabsList className="w-full justify-start">
+                  <TabsTrigger value="personal" data-testid="tab-personal">{t.profileTabPersonalInfo}</TabsTrigger>
+                  <TabsTrigger value="certifications" data-testid="tab-certifications">{t.profileTabCertifications}</TabsTrigger>
+                  <TabsTrigger value="driver" data-testid="tab-driver">{t.profileTabDriver}</TabsTrigger>
+                  <TabsTrigger value="payroll" data-testid="tab-payroll">{t.profileTabPayroll}</TabsTrigger>
+                  <TabsTrigger value="resume" data-testid="tab-resume">{t.profileTabResume}</TabsTrigger>
+                  <TabsTrigger value="documents" data-testid="tab-documents">{t.profileTabDocuments}</TabsTrigger>
+                </TabsList>
+              </div>
+
             {isEditing ? (
               <Form {...form}>
                 <form className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      {t.personalInfo}
-                    </h3>
+                  {/* PERSONAL INFORMATION TAB - EDIT MODE */}
+                  <TabsContent value="personal" className="mt-0 space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="font-medium flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        {t.personalInfo}
+                      </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
@@ -4052,9 +4074,10 @@ export default function TechnicianPortal() {
                       />
                     </div>
                   </div>
+                  </TabsContent>
 
-                  <Separator />
-
+                  {/* PAYROLL INFORMATION TAB - EDIT MODE */}
+                  <TabsContent value="payroll" className="mt-0 space-y-6">
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <Building className="w-4 h-4" />
@@ -4117,9 +4140,10 @@ export default function TechnicianPortal() {
                       />
                     </div>
                   </div>
+                  </TabsContent>
 
-                  <Separator />
-
+                  {/* DRIVER TAB - EDIT MODE */}
+                  <TabsContent value="driver" className="mt-0 space-y-6">
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <CreditCard className="w-4 h-4" />
@@ -4167,9 +4191,10 @@ export default function TechnicianPortal() {
                       />
                     </div>
                   </div>
+                  </TabsContent>
 
-                  <Separator />
-
+                  {/* CERTIFICATIONS TAB - EDIT MODE */}
+                  <TabsContent value="certifications" className="mt-0 space-y-6">
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <Clock className="w-4 h-4" />
@@ -4236,9 +4261,27 @@ export default function TechnicianPortal() {
                       )}
                     />
                   </div>
+                  </TabsContent>
+
+                  {/* RESUME TAB - EDIT MODE (shows same as view mode) */}
+                  <TabsContent value="resume" className="mt-0 space-y-6">
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>{language === 'en' ? 'Resume upload is available in view mode. Click Cancel to view and upload.' : language === 'es' ? 'La carga del currículum está disponible en el modo de visualización.' : 'Le téléchargement du CV est disponible en mode affichage.'}</p>
+                    </div>
+                  </TabsContent>
+
+                  {/* DOCUMENTS TAB - EDIT MODE */}
+                  <TabsContent value="documents" className="mt-0 space-y-6">
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>{language === 'en' ? 'Submitted documents are available in view mode. Click Cancel to view.' : language === 'es' ? 'Los documentos enviados están disponibles en el modo de visualización.' : 'Les documents soumis sont disponibles en mode affichage.'}</p>
+                    </div>
+                  </TabsContent>
                 </form>
               </Form>
             ) : (
+              <>
+              {/* PERSONAL INFORMATION TAB - VIEW MODE */}
+              <TabsContent value="personal" className="mt-0 space-y-6">
               <div className="space-y-6">
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
@@ -4277,9 +4320,12 @@ export default function TechnicianPortal() {
                     )}
                   </p>
                 </div>
+              </div>
+              </TabsContent>
 
-                <Separator />
-
+              {/* CERTIFICATIONS TAB - VIEW MODE */}
+              <TabsContent value="certifications" className="mt-0 space-y-6">
+              <div className="space-y-6">
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <Award className="w-4 h-4" />
@@ -5072,9 +5118,12 @@ export default function TechnicianPortal() {
                     </div>
                   </>
                 )}
+              </div>
+              </TabsContent>
 
-                <Separator />
-
+              {/* PERSONAL INFORMATION TAB CONTINUED - Emergency Contact */}
+              <TabsContent value="personal" className="mt-0 space-y-6">
+              <div className="space-y-6">
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <Heart className="w-4 h-4" />
@@ -5086,9 +5135,12 @@ export default function TechnicianPortal() {
                     <InfoItem label="Relationship" value={user.emergencyContactRelationship} />
                   </div>
                 </div>
+              </div>
+              </TabsContent>
 
-                <Separator />
-
+              {/* PAYROLL INFORMATION TAB - VIEW MODE */}
+              <TabsContent value="payroll" className="mt-0 space-y-6">
+              <div className="space-y-6">
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <Building className="w-4 h-4" />
@@ -5127,8 +5179,12 @@ export default function TechnicianPortal() {
                     </Button>
                   )}
                 </div>
+              </div>
+              </TabsContent>
 
-                <Separator />
+              {/* DRIVER TAB - VIEW MODE */}
+              <TabsContent value="driver" className="mt-0 space-y-6">
+              <div className="space-y-6">
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <CreditCard className="w-4 h-4" />
@@ -5277,10 +5333,14 @@ export default function TechnicianPortal() {
                         </Button>
                       </div>
                 </div>
+              </div>
+              </TabsContent>
 
+              {/* PAYROLL TAB CONTINUED - Banking Documents */}
+              <TabsContent value="payroll" className="mt-0 space-y-6">
+              <div className="space-y-6">
                 {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                   <>
-                    <Separator />
                     <div className="space-y-3">
                       <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                         <ImageIcon className="w-4 h-4" />
@@ -5376,10 +5436,14 @@ export default function TechnicianPortal() {
                     </div>
                   </>
                 )}
+              </div>
+              </TabsContent>
 
+              {/* CERTIFICATIONS TAB CONTINUED - Medical Conditions and Specialties */}
+              <TabsContent value="certifications" className="mt-0 space-y-6">
+              <div className="space-y-6">
                 {user.specialMedicalConditions && (
                   <>
-                    <Separator />
                     <div className="space-y-3">
                       <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                         <AlertCircle className="w-4 h-4" />
@@ -5387,11 +5451,11 @@ export default function TechnicianPortal() {
                       </h3>
                       <p className="text-sm">{user.specialMedicalConditions}</p>
                     </div>
+                    <Separator />
                   </>
                 )}
 
                 {/* Rope Access Specialties Section */}
-                <Separator />
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <HardHat className="w-4 h-4" />
@@ -5511,9 +5575,12 @@ export default function TechnicianPortal() {
                     </div>
                   )}
                 </div>
+              </div>
+              </TabsContent>
 
-                {/* Resume / CV Section */}
-                <Separator />
+              {/* RESUME TAB - VIEW MODE */}
+              <TabsContent value="resume" className="mt-0 space-y-6">
+              <div className="space-y-6">
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <FileText className="w-4 h-4" />
@@ -5614,9 +5681,12 @@ export default function TechnicianPortal() {
                     </div>
                   )}
                 </div>
+              </div>
+              </TabsContent>
 
-                {/* My Submitted Documents Section - Documents uploaded in response to employer requests */}
-                <Separator />
+              {/* DOCUMENTS TAB - VIEW MODE */}
+              <TabsContent value="documents" className="mt-0 space-y-6">
+              <div className="space-y-6">
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <FolderOpen className="w-4 h-4" />
@@ -5630,7 +5700,10 @@ export default function TechnicianPortal() {
                   <MySubmittedDocuments language={language} />
                 </div>
               </div>
+              </TabsContent>
+              </>
             )}
+            </Tabs>
           </CardContent>
             </Card>
           </>
