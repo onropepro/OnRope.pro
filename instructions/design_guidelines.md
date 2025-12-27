@@ -30,14 +30,14 @@ These charts provide extended color variations for different use cases and acces
 - Deep Ocean: #0369A1 (hover states, depth accents)
 - Neutral Gray: #989C94 (secondary text, borders, disabled states)
 - Light Gray: #F3F3F3 (page backgrounds, light surfaces)
-- Rust Brown: #AB4521 (call-to-action buttons, emphasis)
+- Steel Blue: #2874A6 (technician branding, emphasis)
 
 **Stakeholder Colors (Audience-Specific Branding - 5 Colors):**
 - Employers/Company Owners: #0B64A3 (ocean blue - for main site, employer dashboard, cards)
 - Property Manager: #6E9075 (sage green - for PM landing pages, cards, accents)
 - Resident: #86A59C (mint green - for resident portal, feedback, cards)
 - Building Manager: #B89685 (warm taupe - for BM landing pages, cards)
-- Technician: #AB4521 (rust brown - same as CTA, for technician portal/cards)
+- Technician: #2874A6 (steel blue - for technician portal/cards)
 
 **Usage by Audience:**
 | Audience | Primary Color | Hero Gradient | Card Accents |
@@ -46,7 +46,7 @@ These charts provide extended color variations for different use cases and acces
 | Property Managers | #6E9075 | `#6E9075 → #5A7A60` | Sage Green |
 | Residents | #86A59C | `#86A59C → #6B8A80` | Mint Green |
 | Building Managers | #B89685 | `#B89685 → #9A7B6C` | Warm Taupe |
-| Technicians | #AB4521 | `#AB4521 → #8B371A` | Rust Brown |
+| Technicians | #2874A6 | `#2874A6 → #1F5F8B` | Steel Blue |
 
 **Accent Palette (Status & Feedback):**
 - Emerald: #10B981 (success, completed tasks)
@@ -98,7 +98,7 @@ The theme chart shows optimized color values for:
 - Key dark theme hex values from the chart:
   - Navy Dark → #D8DDF0 (inverted for dark bg text)
   - Ocean Blue → #5D85F4 (brighter for dark bg visibility)
-  - Rust Brown → #DE7954 (warmer for dark bg contrast)
+  - Steel Blue → #5D9FD4 (brighter for dark bg visibility)
   - Sage Green → #6F907B (maintained with slight adjustment)
 
 **Accessibility & Color Blindness:**
@@ -181,8 +181,8 @@ The top utility bar appears above the main navigation on public-facing pages. It
 | Homepage `/` | Ocean Blue | #0B64A3 |
 | Employer `/employer` | Ocean Blue | #0B64A3 |
 | Modules `/modules/*` | Ocean Blue | #0B64A3 |
-| Technician Job Board `/modules/technician-job-board` | Rust Brown | #AB4521 |
-| Technician `/technician` | Rust Brown | #AB4521 |
+| Technician Job Board `/modules/technician-job-board` | Steel Blue | #2874A6 |
+| Technician `/technician` | Steel Blue | #2874A6 |
 | Property Manager `/property-manager` | Sage Green | #6E9075 |
 | Resident `/resident` | Mint Green | #86A59C |
 | Building Manager `/building-portal` | Warm Taupe | #B89685 |
@@ -577,7 +577,7 @@ Use official brand hex colors for stakeholder-specific UI elements. These colors
 | Property Managers | #6E9075 | `bg-[#6E9075]/10` | `bg-[#6E9075]/20` | Globe or Users | `text-[#6E9075]` |
 | Residents | #86A59C | `bg-[#86A59C]/10` | `bg-[#86A59C]/20` | Home | `text-[#86A59C]` |
 | Building Managers | #B89685 | `bg-[#B89685]/10` | `bg-[#B89685]/20` | Building2 | `text-[#B89685]` |
-| Technicians | #AB4521 | `bg-[#AB4521]/10` | `bg-[#AB4521]/20` | Wrench or HardHat | `text-[#AB4521]` |
+| Technicians | #2874A6 | `bg-[#2874A6]/10` | `bg-[#2874A6]/20` | Wrench or HardHat | `text-[#2874A6]` |
 
 **Stakeholder Hero Gradients:**
 ```css
@@ -591,7 +591,7 @@ background: linear-gradient(135deg, #86A59C 0%, #6B8A80 100%);
 background: linear-gradient(135deg, #B89685 0%, #9A7B6C 100%);
 
 /* Technician Landing */
-background: linear-gradient(135deg, #AB4521 0%, #8B371A 100%);
+background: linear-gradient(135deg, #2874A6 0%, #1F5F8B 100%);
 ```
 
 **Grid Column Guidelines:**
