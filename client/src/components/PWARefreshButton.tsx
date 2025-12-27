@@ -20,14 +20,15 @@ export function PWARefreshButton() {
   return (
     <Button
       size="icon"
-      variant="outline"
+      variant="default"
       onClick={handleRefresh}
       disabled={isRefreshing}
-      className="fixed bottom-6 right-6 z-[9999] rounded-full shadow-lg bg-background border-2 border-primary"
+      className="!fixed !bottom-6 !right-6 !z-[99999] rounded-full shadow-2xl h-12 w-12"
+      style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 99999 }}
       data-testid="button-pwa-refresh"
       aria-label="Refresh page"
     >
-      <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+      <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
     </Button>
   );
 }
