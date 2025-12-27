@@ -123,6 +123,7 @@ import {
   Info
 } from "lucide-react";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
+import { DocumentReviews } from "@/components/DocumentReviews";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
@@ -1668,6 +1669,12 @@ export default function TechnicianPortal() {
 
   const user = userData?.user;
 
+  // Check if technician has pending required documents to sign (blocks portal access)
+  const { data: pendingDocsData, isLoading: pendingDocsLoading } = useQuery<{ hasPendingDocuments: boolean; pendingCount: number }>({
+    queryKey: ["/api/document-reviews/pending-check"],
+    enabled: !!user?.companyId,
+  });
+
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -2762,10 +2769,29 @@ export default function TechnicianPortal() {
     updateMutation.mutate(data);
   };
 
-  if (isLoading) {
+  if (isLoading || (user?.companyId && pendingDocsLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse">{t.loadingProfile}</div>
+      </div>
+    );
+  }
+
+  // Block access if there are pending documents to sign
+  if (user?.companyId && pendingDocsData?.hasPendingDocuments) {
+    return (
+      <div className="min-h-screen bg-background p-4 md:p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {i18nT('documents.requiredReviewTitle', 'Required Document Review')}
+            </h1>
+            <p className="text-muted-foreground">
+              {i18nT('documents.requiredReviewDesc', 'You must review and sign the following company safety documents before accessing the portal.')}
+            </p>
+          </div>
+          <DocumentReviews companyDocuments={[]} />
+        </div>
       </div>
     );
   }
