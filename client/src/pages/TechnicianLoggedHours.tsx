@@ -19,9 +19,10 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, parseLocalDate } from "@/lib/dateUtils";
 import { IRATA_TASK_TYPES, type IrataTaskLog, type HistoricalHours } from "@shared/schema";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { 
   ArrowLeft, 
   Clock, 
@@ -1358,49 +1359,8 @@ export default function TechnicianLoggedHours() {
     }
   };
 
-  // Technician navigation groups for sidebar
-  const technicianNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: language === 'fr' ? "Principal" : "Main",
-      items: [
-        {
-          id: "portal",
-          label: language === 'fr' ? "Mon Portail" : "My Portal",
-          icon: UserIcon,
-          href: "/technician-portal",
-          isVisible: () => true,
-        },
-        {
-          id: "logged-hours",
-          label: language === 'fr' ? "Mes Heures" : "My Logged Hours",
-          icon: Clock,
-          href: "/technician-logged-hours",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "resources",
-      label: language === 'fr' ? "Ressources" : "Resources",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'fr' ? "Offres d'emploi" : "Job Board",
-          icon: Briefcase,
-          href: "/technician-jobs",
-          isVisible: () => true,
-        },
-        {
-          id: "help",
-          label: language === 'fr' ? "Aide" : "Help",
-          icon: HelpCircle,
-          href: "/help",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  // Use shared technician navigation groups
+  const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es');
 
   if (logsLoading || historicalLoading) {
     return (

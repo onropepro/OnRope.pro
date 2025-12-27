@@ -1,11 +1,12 @@
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 
 // Helper to detect iOS PWA standalone mode
 const isIOSPWA = (): boolean => {
@@ -1888,19 +1889,20 @@ export default function TechnicianPortal() {
   // State for mobile sidebar
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  // Use wouter's useSearch hook to track query string changes
+  const searchString = useSearch();
+
+  // Sync activeTab with URL query params whenever search string changes
   useEffect(() => {
-    const handleUrlChange = () => {
-      const tab = getTabFromUrl();
+    const params = new URLSearchParams(searchString);
+    const tab = params.get('tab');
+    if (tab === 'home' || tab === 'profile' || tab === 'employer' || tab === 'work' || tab === 'more' || tab === 'invitations' || tab === 'visibility') {
       setActiveTab(tab);
-    };
-    
-    handleUrlChange();
-    window.addEventListener('popstate', handleUrlChange);
-    
-    return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-    };
-  }, [location]);
+    } else if (!tab && location === '/technician-portal') {
+      // Default to home when no tab specified
+      setActiveTab('home');
+    }
+  }, [searchString, location]);
   
   // State for editing employer profile specialties
   const [isEditingEmployerProfile, setIsEditingEmployerProfile] = useState(false);
@@ -1944,107 +1946,11 @@ export default function TechnicianPortal() {
   
   const totalUnreadFeedback = myFeedbackData?.requests?.reduce((sum, r) => sum + r.unreadCount, 0) ?? 0;
 
-  // Technician sidebar navigation groups for desktop
-  const technicianNavGroups: NavGroup[] = [
-    {
-      id: "main",
-      label: "NAVIGATION",
-      items: [
-        {
-          id: "home",
-          label: t.tabHome || "Home",
-          icon: Home,
-          onClick: () => setActiveTab('home'),
-          isVisible: () => true,
-        },
-        {
-          id: "profile",
-          label: t.tabProfile || "Profile",
-          icon: User,
-          onClick: () => setActiveTab('profile'),
-          isVisible: () => true,
-        },
-        {
-          id: "more",
-          label: t.tabMore || "More",
-          icon: MoreHorizontal,
-          onClick: () => setActiveTab('more'),
-          badge: totalUnreadFeedback > 0 ? totalUnreadFeedback : undefined,
-          badgeType: "info",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "employment",
-      label: language === 'en' ? "EMPLOYMENT" : language === 'es' ? "EMPLEO" : "EMPLOI",
-      items: [
-        {
-          id: "job-board",
-          label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
-          icon: Briefcase,
-          href: "/technician-job-board",
-          isVisible: () => true,
-        },
-        {
-          id: "visibility",
-          label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
-          icon: Eye,
-          onClick: () => setActiveTab('visibility'),
-          isVisible: () => true,
-        },
-        {
-          id: "invitations",
-          label: language === 'en' ? "Team Invitations" : language === 'es' ? "Invitaciones" : "Invitations",
-          icon: Mail,
-          onClick: () => setActiveTab('invitations'),
-          badge: pendingInvitations.length > 0 ? pendingInvitations.length : undefined,
-          badgeType: "alert",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "logging",
-      label: language === 'en' ? "LOGGING" : language === 'es' ? "REGISTRO" : "JOURNALISATION",
-      items: [
-        {
-          id: "logged-hours",
-          label: language === 'en' ? "Logged Hours" : language === 'es' ? "Horas Registradas" : "Heures enregistrées",
-          icon: Clock,
-          href: "/technician-logged-hours",
-          isVisible: () => true,
-        },
-      ],
-    },
-    {
-      id: "safety",
-      label: language === 'en' ? "SAFETY" : language === 'es' ? "SEGURIDAD" : "SÉCURITÉ",
-      items: [
-        {
-          id: "personal-safety-docs",
-          label: language === 'en' ? "Personal Safety Docs" : language === 'es' ? "Docs de Seguridad" : "Docs de sécurité",
-          icon: Shield,
-          href: "/personal-safety-documents",
-          isVisible: () => true,
-        },
-        {
-          id: "psr",
-          label: language === 'en' ? "Safety Rating (PSR)" : language === 'es' ? "Calificacion (PSR)" : "Cote de sécurité (PSR)",
-          icon: Award,
-          href: "/technician-psr",
-          isVisible: () => true,
-        },
-        {
-          id: "practice-quizzes",
-          label: language === 'en' ? "Practice Quizzes" : language === 'es' ? "Cuestionarios" : "Quiz de pratique",
-          icon: GraduationCap,
-          href: "/technician-practice-quizzes",
-          isVisible: () => true,
-        },
-      ],
-    },
-  ];
+  // Use shared technician navigation groups
+  const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es', {
+    pendingInvitationsCount: pendingInvitations.length,
+    unreadFeedbackCount: totalUnreadFeedback,
+  });
   
   // Mark all feedback as read when the dialog opens
   useEffect(() => {
