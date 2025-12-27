@@ -1417,6 +1417,27 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
 
 type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
 
+// Helper function to mask sensitive data - shows only last 4 characters
+const maskSensitiveData = (value: string | null | undefined): string | null => {
+  if (!value) return null;
+  const cleanValue = value.replace(/[\s-]/g, ''); // Remove spaces and dashes for counting
+  if (cleanValue.length <= 4) return value; // Don't mask if 4 or fewer chars
+  const visiblePart = value.slice(-4);
+  const maskedLength = value.length - 4;
+  return 'x'.repeat(maskedLength) + visiblePart;
+};
+
+// Helper function to mask bank account composite (transit-institution-account)
+const maskBankAccount = (transit: string | null | undefined, institution: string | null | undefined, account: string | null | undefined): string | null => {
+  if (!transit || !institution || !account) return null;
+  const fullAccount = `${transit}-${institution}-${account}`;
+  // Show only last 4 digits of the account number
+  const maskedAccount = account.length > 4 
+    ? 'x'.repeat(account.length - 4) + account.slice(-4)
+    : account;
+  return `xxx-xxx-${maskedAccount}`;
+};
+
 // Helper component to display submitted documents from document requests
 function MySubmittedDocuments({ language }: { language: Language }) {
   const { data: requestsData, isLoading } = useQuery<{ 
@@ -5290,12 +5311,10 @@ export default function TechnicianPortal() {
                     Payroll Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InfoItem label="SIN" value={user.socialInsuranceNumber || null} />
+                    <InfoItem label="SIN" value={maskSensitiveData(user.socialInsuranceNumber)} />
                     <InfoItem 
                       label="Bank Account" 
-                      value={user.bankTransitNumber && user.bankInstitutionNumber && user.bankAccountNumber 
-                        ? `${user.bankTransitNumber}-${user.bankInstitutionNumber}-${user.bankAccountNumber}` 
-                        : null} 
+                      value={maskBankAccount(user.bankTransitNumber, user.bankInstitutionNumber, user.bankAccountNumber)} 
                     />
                   </div>
                   

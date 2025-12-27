@@ -661,6 +661,15 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
 
 type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
 
+// Helper function to mask sensitive data - shows only last 4 characters
+const maskSensitiveData = (value: string | null | undefined): string => {
+  if (!value) return '';
+  if (value.length <= 4) return value;
+  const visiblePart = value.slice(-4);
+  const maskedLength = value.length - 4;
+  return 'x'.repeat(maskedLength) + visiblePart;
+};
+
 export default function GroundCrewPortal() {
   const { i18n } = useTranslation();
   const [location, setLocation] = useLocation();
@@ -1836,7 +1845,13 @@ export default function GroundCrewPortal() {
                             <FormItem>
                               <FormLabel>{t.sin}</FormLabel>
                               <FormControl>
-                                <Input {...field} disabled={!isEditing} placeholder="XXX-XXX-XXX" data-testid="input-sin" />
+                                <Input 
+                                  {...field} 
+                                  value={isEditing ? field.value : maskSensitiveData(field.value)}
+                                  disabled={!isEditing} 
+                                  placeholder="XXX-XXX-XXX" 
+                                  data-testid="input-sin" 
+                                />
                               </FormControl>
                             </FormItem>
                           )}
@@ -1850,7 +1865,13 @@ export default function GroundCrewPortal() {
                             <FormItem>
                               <FormLabel>{t.transit}</FormLabel>
                               <FormControl>
-                                <Input {...field} disabled={!isEditing} placeholder="XXXXX" data-testid="input-bank-transit" />
+                                <Input 
+                                  {...field} 
+                                  value={isEditing ? field.value : maskSensitiveData(field.value)}
+                                  disabled={!isEditing} 
+                                  placeholder="XXXXX" 
+                                  data-testid="input-bank-transit" 
+                                />
                               </FormControl>
                             </FormItem>
                           )}
@@ -1862,7 +1883,13 @@ export default function GroundCrewPortal() {
                             <FormItem>
                               <FormLabel>{t.institution}</FormLabel>
                               <FormControl>
-                                <Input {...field} disabled={!isEditing} placeholder="XXX" data-testid="input-bank-institution" />
+                                <Input 
+                                  {...field} 
+                                  value={isEditing ? field.value : maskSensitiveData(field.value)}
+                                  disabled={!isEditing} 
+                                  placeholder="XXX" 
+                                  data-testid="input-bank-institution" 
+                                />
                               </FormControl>
                             </FormItem>
                           )}
@@ -1874,7 +1901,13 @@ export default function GroundCrewPortal() {
                             <FormItem>
                               <FormLabel>{t.account}</FormLabel>
                               <FormControl>
-                                <Input {...field} disabled={!isEditing} placeholder="XXXXXXX" data-testid="input-bank-account" />
+                                <Input 
+                                  {...field} 
+                                  value={isEditing ? field.value : maskSensitiveData(field.value)}
+                                  disabled={!isEditing} 
+                                  placeholder="XXXXXXX" 
+                                  data-testid="input-bank-account" 
+                                />
                               </FormControl>
                             </FormItem>
                           )}
