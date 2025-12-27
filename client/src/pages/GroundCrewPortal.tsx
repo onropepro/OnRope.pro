@@ -1381,27 +1381,25 @@ export default function GroundCrewPortal() {
                     className="group bg-white dark:bg-slate-900 border border-green-200 dark:border-green-700 rounded-lg shadow-sm p-4 text-left"
                     data-testid="quick-action-linked-employer"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-3">
-                      <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate">{companyData.company.companyName || companyData.company.name}</p>
-                    </div>
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
                       <Badge variant="default" className="bg-green-600 text-xs">
                         <CheckCircle2 className="w-3 h-3 mr-1" />
                         {t.active}
                       </Badge>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 h-6 px-2"
-                        onClick={() => setShowLeaveConfirm(true)}
-                        data-testid="button-leave-company-home"
-                      >
-                        {t.leaveCompany}
-                      </Button>
                     </div>
+                    <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate mb-2">{companyData.company.companyName || companyData.company.name}</p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 h-6 px-2"
+                      onClick={() => setShowLeaveConfirm(true)}
+                      data-testid="button-leave-company-home"
+                    >
+                      {t.leaveCompany}
+                    </Button>
                   </div>
                 )}
                 
@@ -2058,20 +2056,18 @@ export default function GroundCrewPortal() {
               {user.companyId && !user.terminatedDate && !user.suspendedAt && companyData?.company && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 flex-wrap">
                       <Building2 className="w-5 h-5" />
                       {companyData.company.companyName || companyData.company.name}
+                      <Badge variant="default" className="bg-green-600 text-xs">
+                        <CheckCircle2 className="w-3 h-3 mr-1" />
+                        {t.active}
+                      </Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between gap-4 flex-wrap">
-                      <div>
-                        <Badge variant="default" className="bg-green-600 text-xs mb-2">
-                          <CheckCircle2 className="w-3 h-3 mr-1" />
-                          {t.active}
-                        </Badge>
-                        <p className="text-sm text-muted-foreground">{t.linkedEmployer}</p>
-                      </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">{t.linkedEmployer}</p>
                       <Button
                         variant="destructive"
                         size="sm"
