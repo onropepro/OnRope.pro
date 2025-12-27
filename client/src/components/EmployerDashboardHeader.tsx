@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "wouter";
+import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -304,6 +305,36 @@ function LicenseExpiryWarningBanner({ employees, onReviewClick }: { employees: a
   );
 }
 
+function RefreshButton() {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await queryClient.invalidateQueries();
+      window.location.reload();
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 1000);
+    }
+  };
+
+  return (
+    <Button
+      size="icon"
+      variant="ghost"
+      onClick={handleRefresh}
+      disabled={isRefreshing}
+      data-testid="button-refresh"
+      aria-label={t('common.refresh', 'Refresh')}
+      title={t('common.refresh', 'Refresh')}
+    >
+      <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+    </Button>
+  );
+}
+
 export function EmployerDashboardHeader({
   currentUser,
   employees = [],
@@ -411,6 +442,9 @@ export function EmployerDashboardHeader({
             
             {/* Install App Button */}
             <InstallPWAButton />
+            
+            {/* Refresh Button */}
+            <RefreshButton />
             
             {/* Notification Bell - Company owners only */}
             {showNotifications && currentUser?.role === 'company' && (
