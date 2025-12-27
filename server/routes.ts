@@ -19892,6 +19892,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check if employee has pending required documents to sign (for dashboard gate)
+  app.get("/api/document-reviews/pending-check", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only check for technicians and ground crew who are linked to a company
+      if (!['rope_access_tech', 'ground_crew'].includes(currentUser.role) || !currentUser.companyId) {
+        return res.json({ hasPendingDocuments: false, pendingCount: 0 });
+      }
+      
+      // Get all document reviews for this employee
+      const reviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      
+      // Count pending (unsigned) documents
+      const pendingReviews = reviews.filter(r => !r.signedAt);
+      
+      res.json({ 
+        hasPendingDocuments: pendingReviews.length > 0, 
+        pendingCount: pendingReviews.length 
+      });
+    } catch (error) {
+      console.error("Document review pending check error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get all document review signatures for company (admin view)
   app.get("/api/document-reviews", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
     try {

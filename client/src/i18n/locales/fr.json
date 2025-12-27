@@ -1046,6 +1046,8 @@
         "description": "Affectations d'équipe"
       },
       "documents": {
+    "requiredReviewTitle": "Révision de documents requise",
+    "requiredReviewDesc": "Vous devez examiner et signer les documents de sécurité de l'entreprise suivants avant d'accéder au tableau de bord.",
         "label": "Documents et formation",
         "description": "Tous les fichiers"
       },

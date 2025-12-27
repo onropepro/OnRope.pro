@@ -1,4 +1,4 @@
-import { useEffect, createContext, ReactNode } from "react";
+import { useEffect, createContext, ReactNode, useState } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -8,7 +8,7 @@ import { usePermissionSync } from "@/hooks/use-permission-sync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AuthPortalProvider } from "@/contexts/AuthPortalContext";
-import { PWARefreshButton } from "@/components/PWARefreshButton";
+import { usePWAUpdateCheck } from "@/hooks/usePWAUpdateCheck";
 
 // Pages
 import Register from "@/pages/Register";
@@ -803,7 +803,10 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
+
 function App() {
+  usePWAUpdateCheck();
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -812,7 +815,6 @@ function App() {
             <BrandingProvider>
               <Router />
               <Toaster />
-              <PWARefreshButton />
             </BrandingProvider>
           </AuthPortalProvider>
         </ErrorBoundary>

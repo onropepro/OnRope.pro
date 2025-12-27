@@ -304,6 +304,7 @@ function LicenseExpiryWarningBanner({ employees, onReviewClick }: { employees: a
   );
 }
 
+
 export function EmployerDashboardHeader({
   currentUser,
   employees = [],
@@ -411,6 +412,7 @@ export function EmployerDashboardHeader({
             
             {/* Install App Button */}
             <InstallPWAButton />
+            
             
             {/* Notification Bell - Company owners only */}
             {showNotifications && currentUser?.role === 'company' && (

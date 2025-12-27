@@ -50,6 +50,23 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 *   **Staff Accounts (Internal Platform Management):** Internal-only accounts for app management staff with 13 granular permissions (view_dashboard, view_companies, view_technicians, view_buildings, view_job_board, view_tasks, view_feature_requests, view_future_ideas, view_metrics, view_goals, view_changelog, view_founder_resources, manage_staff_accounts). Staff accounts can log in at /login using their email and access permitted sections of the SuperUser dashboard. No mention of "superuser" is visible to staff users.
 *   **Linkable Team Member Roles:** Both rope_access_tech and ground_crew roles can be searched by email, linked to companies, and sent team invitations using the unified employee workflow.
 
+## Known Technical Debt
+**TypeScript/LSP Issues (as of Dec 2024):**
+
+1. **GroundCrewPortal.tsx Type Safety Issues:**
+   - Uses `useQuery<any>` due to UserPublic type missing many portal-specific fields (technicianReferralCode, bankDocuments, driversLicenseDocuments, firstAidDocuments, etc.)
+   - Missing translation keys: `ocrSuccess`, `ocrFieldsAutofilled`, `ocrBankFieldsAutofilled` in all locale bundles
+   - Form field name mismatches: `city` vs `employeeCity`, `sin` vs `socialInsuranceNumber`, `bankTransit` vs `bankTransitNumber`
+   - Requires coordinated refactoring across: schema.ts, API serializers, forms, and i18n translations
+
+2. **shared/schema.ts Circular References:**
+   - Lines 58 and 66 have pre-existing circular reference errors on the users table
+
+3. **Object Storage Bucket:**
+   - RESIDENT_PHOTOS_BUCKET infrastructure issue remains unresolved
+
+**Resolution Approach:** Document for future cleanup sprint. Fixing requires coordinated changes across multiple systems and should not be done piecemeal.
+
 ## External Dependencies
 *   **Database:** PostgreSQL
 *   **Frontend Framework:** React 18

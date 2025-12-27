@@ -1121,6 +1121,8 @@
         "description": "Asignaciones del equipo"
       },
       "documents": {
+    "requiredReviewTitle": "Revisión de documentos requerida",
+    "requiredReviewDesc": "Debe revisar y firmar los siguientes documentos de seguridad de la empresa antes de acceder al panel de control.",
         "label": "Documentos y Capacitacion",
         "description": "Archivos de la empresa"
       },

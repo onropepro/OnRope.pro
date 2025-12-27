@@ -44,7 +44,6 @@ import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canAccessQuotes, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule, canViewPastProjects } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
-import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { SubscriptionRenewalBadge } from "@/components/SubscriptionRenewalBadge";
@@ -73,6 +72,7 @@ import { BusinessCardScanner } from "@/components/BusinessCardScanner";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardOverview } from "@/components/DashboardOverview";
+import { DocumentReviews } from "@/components/DocumentReviews";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { useSetHeaderConfig } from "@/components/DashboardLayout";
 
@@ -1242,6 +1242,8 @@ export default function Dashboard() {
   const [employeesViewMode, setEmployeesViewMode] = useState<"cards" | "list">("cards");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [employeeToSuspendSeat, setEmployeeToSuspendSeat] = useState<any | null>(null); // For seat removal/suspend
+  const [showDeactivateInfoModal, setShowDeactivateInfoModal] = useState(false); // Info modal for deactivate function
+  const [showUnlinkInfoModal, setShowUnlinkInfoModal] = useState(false); // Info modal for unlink function
   const [showDropDialog, setShowDropDialog] = useState(false);
   const [dropProject, setDropProject] = useState<any>(null);
   const [showInspectionCheckDialog, setShowInspectionCheckDialog] = useState(false);
@@ -1326,6 +1328,12 @@ export default function Dashboard() {
   // Fetch current user to get company info
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
+  });
+
+  // Check if employee has pending required documents to sign (blocks dashboard access)
+  const { data: pendingDocsData, isLoading: pendingDocsLoading } = useQuery<{ hasPendingDocuments: boolean; pendingCount: number }>({
+    queryKey: ["/api/document-reviews/pending-check"],
+    enabled: !!userData?.user && ['rope_access_tech', 'ground_crew'].includes(userData.user.role),
   });
 
   // Fetch unread feature request message count for company owners
@@ -3735,6 +3743,39 @@ export default function Dashboard() {
     showProfile: true,
     showLogout: true,
   }, []);
+
+  // Block dashboard access if employee has pending required documents to sign
+  const isTechOrGroundCrew = ['rope_access_tech', 'ground_crew'].includes(user?.role || '');
+  
+  // While checking for pending documents, show loading for technicians/ground crew
+  if (isTechOrGroundCrew && pendingDocsLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium">{t('common.loading', 'Loading...')}</div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Block access if there are pending documents to sign
+  if (pendingDocsData?.hasPendingDocuments && isTechOrGroundCrew) {
+    return (
+      <div className="min-h-screen bg-background p-4 md:p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {t('documents.requiredReviewTitle', 'Required Document Review')}
+            </h1>
+            <p className="text-muted-foreground">
+              {t('documents.requiredReviewDesc', 'You must review and sign the following company safety documents before accessing the dashboard.')}
+            </p>
+          </div>
+          <DocumentReviews companyDocuments={[]} />
+        </div>
+      </div>
+    );
+  }
 
   if (projectsLoading || employeesLoading) {
     return (
@@ -6946,6 +6987,28 @@ export default function Dashboard() {
                           {t('dashboard.employees.activeEmployees', 'Active Employees')}
                         </CardTitle>
                         <CardDescription>{t('dashboard.employees.activeEmployeesDescription', 'Team members currently active in your company')}</CardDescription>
+                        <div className="flex items-center gap-4 mt-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowDeactivateInfoModal(true)}
+                            className="text-muted-foreground h-auto py-1 px-2"
+                            data-testid="button-deactivate-info"
+                          >
+                            <span className="material-icons text-sm mr-1">info</span>
+                            {t('dashboard.employees.whatIsDeactivate', "What is 'Deactivate'?")}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowUnlinkInfoModal(true)}
+                            className="text-muted-foreground h-auto py-1 px-2"
+                            data-testid="button-unlink-info"
+                          >
+                            <span className="material-icons text-sm mr-1">info</span>
+                            {t('dashboard.employees.whatIsUnlink', "What is 'Unlink'?")}
+                          </Button>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
@@ -7053,17 +7116,17 @@ export default function Dashboard() {
                                     {user?.role === "company" && employee.id !== user?.id && (
                                       <Button
                                         variant="ghost"
-                                        size="sm"
+                                        size="icon"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setEmployeeToSuspendSeat(employee);
                                         }}
-                                        data-testid={`button-remove-seat-row-${employee.id}`}
+                                        data-testid={`button-deactivate-row-${employee.id}`}
                                         className="text-amber-600 hover:text-amber-700"
                                         disabled={userIsReadOnly}
+                                        title={t('dashboard.employees.deactivate', 'Deactivate')}
                                       >
-                                        <span className="material-icons text-sm mr-1">person_remove</span>
-                                        {t('dashboard.employees.removeSeat', 'Remove Seat')}
+                                        <span className="material-icons text-sm">person_remove</span>
                                       </Button>
                                     )}
                                     {employee.id !== user?.id && (
@@ -7077,6 +7140,7 @@ export default function Dashboard() {
                                         data-testid={`button-unlink-employee-row-${employee.id}`}
                                         className="text-amber-600 hover:text-amber-700"
                                         disabled={userIsReadOnly}
+                                        title={t('dashboard.employees.unlink', 'Unlink')}
                                       >
                                         <span className="material-icons text-sm">link_off</span>
                                       </Button>
@@ -7220,7 +7284,7 @@ export default function Dashboard() {
                                   {employee.role.replace(/_/g, ' ')}
                                 </Badge>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1 flex-wrap justify-end">
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -7229,7 +7293,6 @@ export default function Dashboard() {
                                     handleEditEmployee(employee);
                                   }}
                                   data-testid={`button-edit-employee-${employee.id}`}
-                                  className="h-9 w-9"
                                   disabled={userIsReadOnly}
                                 >
                                   <span className="material-icons text-sm">edit</span>
@@ -7245,27 +7308,26 @@ export default function Dashboard() {
                                       setShowChangePasswordDialog(true);
                                     }}
                                     data-testid={`button-change-password-${employee.id}`}
-                                    className="h-9 w-9"
                                     disabled={userIsReadOnly}
                                   >
                                     <span className="material-icons text-sm">lock_reset</span>
                                   </Button>
                                 )}
-                                {/* Remove Seat button - only for employees, not company owner */}
+                                {/* Deactivate button - only for employees, not company owner */}
                                 {user?.role === "company" && employee.id !== user?.id && (
                                   <Button
                                     variant="ghost"
-                                    size="sm"
+                                    size="icon"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEmployeeToSuspendSeat(employee);
                                     }}
-                                    data-testid={`button-remove-seat-${employee.id}`}
+                                    data-testid={`button-deactivate-${employee.id}`}
                                     className="text-amber-600 hover:text-amber-700"
                                     disabled={userIsReadOnly}
+                                    title={t('dashboard.employees.deactivate', 'Deactivate')}
                                   >
-                                    <span className="material-icons text-sm mr-1">person_remove</span>
-                                    {t('dashboard.employees.removeSeat', 'Remove Seat')}
+                                    <span className="material-icons text-sm">person_remove</span>
                                   </Button>
                                 )}
                                 {/* Unlink button - only for employees, not company owner (can't unlink yourself) */}
@@ -7278,8 +7340,9 @@ export default function Dashboard() {
                                       setEmployeeToDelete(employee.id);
                                     }}
                                     data-testid={`button-unlink-employee-${employee.id}`}
-                                    className="h-9 w-9 text-amber-600 hover:text-amber-700"
+                                    className="text-amber-600 hover:text-amber-700"
                                     disabled={userIsReadOnly}
+                                    title={t('dashboard.employees.unlink', 'Unlink')}
                                   >
                                     <span className="material-icons text-sm">link_off</span>
                                   </Button>
@@ -10630,25 +10693,25 @@ export default function Dashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Remove Seat / Make Inactive Confirmation Dialog */}
+      {/* Deactivate / Make Inactive Confirmation Dialog */}
       <AlertDialog open={employeeToSuspendSeat !== null} onOpenChange={(open) => !open && setEmployeeToSuspendSeat(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('dashboard.removeSeat.title', 'Remove Seat')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.deactivate.title', 'Deactivate Employee')}</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <span className="block">
-                {t('dashboard.removeSeat.description', 'Are you sure you want to remove the seat for')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
+                {t('dashboard.deactivate.description', 'Are you sure you want to deactivate')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
               </span>
               <span className="block text-amber-600 dark:text-amber-400">
-                {t('dashboard.removeSeat.warning', 'This will remove one seat from your subscription. The employee will become inactive but can be reactivated later.')}
+                {t('dashboard.deactivate.warning', 'This will remove one seat from your subscription. The employee will become inactive but can be reactivated later.')}
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-suspend">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-deactivate">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => employeeToSuspendSeat && suspendSeatMutation.mutate(employeeToSuspendSeat.id)}
-              data-testid="button-confirm-suspend"
+              data-testid="button-confirm-deactivate"
               className="bg-amber-600 text-white hover:bg-amber-700"
               disabled={suspendSeatMutation.isPending}
             >
@@ -10657,13 +10720,91 @@ export default function Dashboard() {
               ) : (
                 <>
                   <span className="material-icons text-sm mr-1">person_remove</span>
-                  {t('dashboard.removeSeat.confirm', 'Remove Seat')}
+                  {t('dashboard.deactivate.confirm', 'Deactivate')}
                 </>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Deactivate Info Modal */}
+      <Dialog open={showDeactivateInfoModal} onOpenChange={setShowDeactivateInfoModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-amber-600">person_remove</span>
+              {t('dashboard.deactivateInfo.title', 'About Deactivate')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-sm mb-1">{t('dashboard.deactivateInfo.whenToUse', 'When to use')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('dashboard.deactivateInfo.whenDescription', 'Use this when an employee is temporarily laid off, during slow periods, or when you need to pause their access without permanently removing them from your roster.')}
+              </p>
+            </div>
+            <div>
+              <h4 className="font-medium text-sm mb-1">{t('dashboard.deactivateInfo.whatHappens', 'What happens')}</h4>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>{t('dashboard.deactivateInfo.bullet1', 'Employee remains on your roster but becomes inactive')}</li>
+                <li>{t('dashboard.deactivateInfo.bullet2', 'They lose access to your company dashboard')}</li>
+                <li>{t('dashboard.deactivateInfo.bullet3', 'The $34.95/month payment for this seat is paused until reactivated')}</li>
+                <li>{t('dashboard.deactivateInfo.bullet4', 'You can easily reactivate them when work picks up again')}</li>
+              </ul>
+            </div>
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md p-3">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                <strong>{t('dashboard.deactivateInfo.tip', 'Tip:')}</strong> {t('dashboard.deactivateInfo.tipDescription', 'This is ideal for seasonal workers or during temporary slowdowns. The employee can be brought back with a single click.')}
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" onClick={() => setShowDeactivateInfoModal(false)} data-testid="button-close-deactivate-info">
+              {t('common.gotIt', 'Got it')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unlink Info Modal */}
+      <Dialog open={showUnlinkInfoModal} onOpenChange={setShowUnlinkInfoModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-amber-600">link_off</span>
+              {t('dashboard.unlinkInfo.title', 'About Unlink')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-sm mb-1">{t('dashboard.unlinkInfo.whenToUse', 'When to use')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('dashboard.unlinkInfo.whenDescription', 'Use this when an employee has been fired, quit, or is permanently leaving your company. This is for final separations where you do not expect them to return.')}
+              </p>
+            </div>
+            <div>
+              <h4 className="font-medium text-sm mb-1">{t('dashboard.unlinkInfo.whatHappens', 'What happens')}</h4>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>{t('dashboard.unlinkInfo.bullet1', 'Employee is completely removed from your roster')}</li>
+                <li>{t('dashboard.unlinkInfo.bullet2', 'They lose all access to your company dashboard')}</li>
+                <li>{t('dashboard.unlinkInfo.bullet3', 'The $34.95/month payment for this seat stops immediately')}</li>
+                <li>{t('dashboard.unlinkInfo.bullet4', 'If you hire them back later, a new connection will need to be established')}</li>
+              </ul>
+            </div>
+            <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
+              <p className="text-sm text-destructive dark:text-destructive">
+                <strong>{t('dashboard.unlinkInfo.note', 'Note:')}</strong> {t('dashboard.unlinkInfo.noteDescription', 'Their personal OnRopePro account and certifications remain intact. They can still work for other employers.')}
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" onClick={() => setShowUnlinkInfoModal(false)} data-testid="button-close-unlink-info">
+              {t('common.gotIt', 'Got it')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Change Password Dialog */}
       <Dialog open={showChangePasswordDialog} onOpenChange={(open) => {

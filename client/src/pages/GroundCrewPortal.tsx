@@ -1433,12 +1433,31 @@ export default function GroundCrewPortal() {
                         {profileCompletion.incompleteFields.length > 0 && (
                           <div className="flex flex-wrap gap-1.5">
                             {profileCompletion.incompleteFields.slice(0, 3).map((field, i) => (
-                              <Badge key={i} variant="outline" className="text-xs bg-background">
+                              <Badge 
+                                key={i} 
+                                variant="outline" 
+                                className="text-xs bg-background cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveTab('profile');
+                                  setIsEditing(true);
+                                }}
+                                data-testid={`badge-incomplete-${field.key}-${i}`}
+                              >
                                 {field.label}
                               </Badge>
                             ))}
                             {profileCompletion.incompleteFields.length > 3 && (
-                              <Badge variant="outline" className="text-xs bg-background text-muted-foreground">
+                              <Badge 
+                                variant="outline" 
+                                className="text-xs bg-background text-muted-foreground cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveTab('profile');
+                                  setIsEditing(true);
+                                }}
+                                data-testid="badge-incomplete-more"
+                              >
                                 +{profileCompletion.incompleteFields.length - 3} {t.more}
                               </Badge>
                             )}

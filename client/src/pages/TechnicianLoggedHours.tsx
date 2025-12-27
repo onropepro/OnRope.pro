@@ -208,8 +208,6 @@ const translations = {
     workSessionsCount: "Work Sessions",
     previousHoursCount: "Previous Hours Entries",
     filterByDate: "Filter by Date",
-    dateRange: "Date Range",
-    from: "From",
     clearFilter: "Clear Filter",
     downloadFiltered: "Download Filtered PDF",
     entriesInRange: "entries in range",
@@ -378,8 +376,6 @@ const translations = {
     workSessionsCount: "Sessions de travail",
     previousHoursCount: "Entrées d'heures précédentes",
     filterByDate: "Filtrer par date",
-    dateRange: "Plage de dates",
-    from: "Du",
     clearFilter: "Effacer le filtre",
     downloadFiltered: "Télécharger le PDF filtré",
     entriesInRange: "entrées dans la plage",
@@ -2209,7 +2205,7 @@ export default function TechnicianLoggedHours() {
                   <Filter className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
                   <p className="font-medium text-muted-foreground">{t.noEntriesMatch}</p>
                   <Button 
-                    variant="link" 
+                    variant="ghost" 
                     onClick={() => { setFilterStartDate(undefined); setFilterEndDate(undefined); }}
                     data-testid="button-clear-filter-empty"
                   >
