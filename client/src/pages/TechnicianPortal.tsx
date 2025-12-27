@@ -3846,61 +3846,61 @@ export default function TechnicianPortal() {
             
             <Card>
               <CardHeader className="space-y-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="p-2 sm:p-3 rounded-full bg-primary/10">
-                      <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
-                  <CardDescription className="flex flex-wrap items-center gap-2 mt-1">
-                    {user.irataLevel && (
-                      <Badge variant="secondary" className="gap-1">
-                        <Award className="w-3 h-3" />
-                        IRATA {user.irataLevel}
-                      </Badge>
-                    )}
-                    {user.spratLevel && (
-                      <Badge variant="secondary" className="gap-1">
-                        <Award className="w-3 h-3" />
-                        SPRAT {user.spratLevel}
-                      </Badge>
-                    )}
-                  </CardDescription>
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-full bg-primary/10">
+                    <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
+                    <CardDescription className="flex flex-wrap items-center gap-2 mt-1">
+                      {user.irataLevel && (
+                        <Badge variant="secondary" className="gap-1">
+                          <Award className="w-3 h-3" />
+                          IRATA {user.irataLevel}
+                        </Badge>
+                      )}
+                      {user.spratLevel && (
+                        <Badge variant="secondary" className="gap-1">
+                          <Award className="w-3 h-3" />
+                          SPRAT {user.spratLevel}
+                        </Badge>
+                      )}
+                    </CardDescription>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {!isEditing ? (
-              <Button
-                variant="outline"
-                onClick={startEditing}
-                className="gap-2"
-                data-testid="button-edit-profile"
-              >
-                <Edit2 className="w-4 h-4" />
-                {t.editProfile}
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditing(false)}
-                  data-testid="button-cancel-edit"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  {t.cancel}
-                </Button>
-                <Button
-                  onClick={form.handleSubmit(onSubmit)}
-                  disabled={updateMutation.isPending}
-                  className="gap-2"
-                  data-testid="button-save-profile"
-                >
-                  <Save className="w-4 h-4" />
-                  {updateMutation.isPending ? t.saving : t.saveChanges}
-                </Button>
-              </div>
-            )}
+                <div>
+                  {!isEditing ? (
+                    <Button
+                      variant="outline"
+                      onClick={startEditing}
+                      className="gap-2"
+                      data-testid="button-edit-profile"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      {t.editProfile}
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsEditing(false)}
+                        data-testid="button-cancel-edit"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        {t.cancel}
+                      </Button>
+                      <Button
+                        onClick={form.handleSubmit(onSubmit)}
+                        disabled={updateMutation.isPending}
+                        className="gap-2"
+                        data-testid="button-save-profile"
+                      >
+                        <Save className="w-4 h-4" />
+                        {updateMutation.isPending ? t.saving : t.saveChanges}
+                      </Button>
+                    </div>
+                  )}
+                </div>
           </CardHeader>
 
           <CardContent>
