@@ -290,27 +290,1177 @@ export async function calculateCompanyCSR(companyId: string, storage: any, skipH
     if (totalWorkSessionsForProject === 0) continue;
     
     let completedInspectionsForProject = 0;
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
     for (const session of projectSessions) {
       if (!session.employeeId || !session.workDate) continue;
       const dateStr = normalizeDateToString(session.workDate);
-      const hasInspection = harnessInspections.some((insp: any) =>
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
         insp.workerId === session.employeeId && 
-        normalizeDateToString(insp.inspectionDate) === dateStr &&
-        insp.overallStatus !== "not_applicable"
+        normalizeDateToString(insp.inspectionDate) === dateStr
       );
-      if (hasInspection) completedInspectionsForProject++;
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
     }
     
-    harnessRequiredInspections += totalWorkSessionsForProject;
+    harnessRequiredInspections += applicableWorkSessionsForProject;
     harnessCompletedInspections += completedInspectionsForProject;
     
-    const projectPoints = totalWorkSessionsForProject > 0 ? completedInspectionsForProject / totalWorkSessionsForProject : 0;
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
     harnessInspectionPoints += projectPoints;
     
     harnessProjectBreakdown.push({
       projectId: project.id,
       projectName: project.name,
-      workSessions: totalWorkSessionsForProject,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
+      inspections: completedInspectionsForProject,
+      points: Math.round(projectPoints * 100) / 100
+    });
+  }
+  for (const project of projects) {
+    if (project.status === 'deleted') continue;
+    const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
+    
+    if (projectSessions.length === 0) continue;
+    
+    let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
+    for (const session of projectSessions) {
+      if (!session.employeeId || !session.workDate) continue;
+      const dateStr = normalizeDateToString(session.workDate);
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
+        insp.workerId === session.employeeId && 
+        normalizeDateToString(insp.inspectionDate) === dateStr
+      );
+      
+      // Skip counting work sessions where inspection is not_applicable (e.g., ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
+    }
+    
+    harnessRequiredInspections += applicableWorkSessionsForProject;
+    harnessCompletedInspections += completedInspectionsForProject;
+    
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
+    harnessInspectionPoints += projectPoints;
+    
+    harnessProjectBreakdown.push({
+      projectId: project.id,
+      projectName: project.name,
+      workSessions: applicableWorkSessionsForProject,
       inspections: completedInspectionsForProject,
       points: Math.round(projectPoints * 100) / 100
     });
