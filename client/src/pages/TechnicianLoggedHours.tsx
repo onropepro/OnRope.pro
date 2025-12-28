@@ -231,6 +231,18 @@ const translations = {
     currentBaseline: "Current Baseline",
     newBaseline: "New Baseline Hours",
     saveBaseline: "Save Baseline",
+    ropeAccessExperience: "Rope Access Experience",
+    addExperience: "Add your experience start date",
+    setExperience: "Set Experience",
+    editExperience: "Edit Experience",
+    experienceStartDate: "Experience Start Date",
+    startedOn: "Started on",
+    yearsMonths: "{years} years, {months} months",
+    lessThanMonth: "Less than 1 month",
+    experienceSaved: "Experience Saved",
+    experienceSavedDesc: "Your rope access experience has been updated.",
+    ropeAccessSpecialties: "Specialties",
+    selectSpecialties: "Select your specialties",
   },
   fr: {
     title: "Mes heures enregistrées",
@@ -399,6 +411,18 @@ const translations = {
     currentBaseline: "Base actuelle",
     newBaseline: "Nouvelles heures de base",
     saveBaseline: "Enregistrer",
+    ropeAccessExperience: "Experience d'acces sur corde",
+    addExperience: "Ajoutez votre date de debut d'experience",
+    setExperience: "Definir l'experience",
+    editExperience: "Modifier l'experience",
+    experienceStartDate: "Date de debut d'experience",
+    startedOn: "Debut le",
+    yearsMonths: "{years} ans, {months} mois",
+    lessThanMonth: "Moins d'un mois",
+    experienceSaved: "Experience enregistree",
+    experienceSavedDesc: "Votre experience d'acces sur corde a ete mise a jour.",
+    ropeAccessSpecialties: "Specialites",
+    selectSpecialties: "Selectionnez vos specialites",
   }
 };
 
@@ -503,6 +527,10 @@ export default function TechnicianLoggedHours() {
   
   // Scan explanation dialog state
   const [showScanExplanationDialog, setShowScanExplanationDialog] = useState(false);
+  
+  // Experience editing state
+  const [showExperienceDialog, setShowExperienceDialog] = useState(false);
+  const [experienceStartDateValue, setExperienceStartDateValue] = useState("");
   
   // Date range filter state for previous hours
   const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(undefined);
@@ -789,6 +817,28 @@ export default function TechnicianLoggedHours() {
       toast({
         title: t.baselineHoursUpdated,
         description: t.baselineHoursUpdatedDesc,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t.error,
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateExperienceMutation = useMutation({
+    mutationFn: async (startDate: string) => {
+      return apiRequest("PATCH", "/api/user/profile", { ropeAccessStartDate: startDate });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setShowExperienceDialog(false);
+      setExperienceStartDateValue("");
+      toast({
+        title: t.experienceSaved,
+        description: t.experienceSavedDesc,
       });
     },
     onError: (error: Error) => {
@@ -1666,6 +1716,67 @@ export default function TechnicianLoggedHours() {
             </CardContent>
           </Card>
         )}
+
+        {/* Rope Access Experience Section */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-indigo-500/10">
+                  <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{t.ropeAccessExperience}</p>
+                  {user?.ropeAccessStartDate ? (
+                    <>
+                      <p className="text-sm text-indigo-700 dark:text-indigo-300">
+                        {(() => {
+                          const startDate = parseLocalDate(user.ropeAccessStartDate);
+                          const now = new Date();
+                          let years = now.getFullYear() - startDate.getFullYear();
+                          let months = now.getMonth() - startDate.getMonth();
+                          if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
+                            years--;
+                            months += 12;
+                          }
+                          if (now.getDate() < startDate.getDate()) {
+                            months--;
+                            if (months < 0) months += 12;
+                          }
+                          
+                          let expString = t.lessThanMonth;
+                          if (years > 0 || months > 0) {
+                            expString = t.yearsMonths
+                              .replace('{years}', years.toString())
+                              .replace('{months}', months.toString());
+                          }
+                          return expString;
+                        })()}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t.startedOn}: {formatLocalDate(user.ropeAccessStartDate)}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-base text-muted-foreground italic">{t.addExperience}</p>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setExperienceStartDateValue(user?.ropeAccessStartDate || '');
+                  setShowExperienceDialog(true);
+                }}
+                data-testid="button-edit-experience"
+              >
+                <Edit2 className="w-4 h-4 mr-2" />
+                {user?.ropeAccessStartDate ? t.editExperience : t.setExperience}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardContent className="p-4">
@@ -3170,6 +3281,72 @@ export default function TechnicianLoggedHours() {
                 </>
               ) : (
                 t.saveBaseline
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Experience Dialog */}
+      <Dialog open={showExperienceDialog} onOpenChange={setShowExperienceDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
+              {t.ropeAccessExperience}
+            </DialogTitle>
+            <DialogDescription>
+              {t.experienceStartDate}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="experience-start-date">{t.experienceStartDate}</Label>
+              <Input
+                id="experience-start-date"
+                type="date"
+                value={experienceStartDateValue}
+                onChange={(e) => setExperienceStartDateValue(e.target.value)}
+                className="text-lg"
+                data-testid="input-experience-start-date"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowExperienceDialog(false);
+                setExperienceStartDateValue("");
+              }}
+              data-testid="button-cancel-experience"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                if (!experienceStartDateValue) {
+                  toast({
+                    title: t.error,
+                    description: t.dateRequired,
+                    variant: "destructive",
+                  });
+                  return;
+                }
+                updateExperienceMutation.mutate(experienceStartDateValue);
+              }}
+              disabled={updateExperienceMutation.isPending}
+              data-testid="button-save-experience"
+            >
+              {updateExperienceMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.saving}
+                </>
+              ) : (
+                t.save
               )}
             </Button>
           </DialogFooter>

@@ -4675,63 +4675,6 @@ export default function TechnicianPortal() {
                     )}
                   </div>
                   
-                  {/* Experience Display - Always visible */}
-                  <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                        <div>
-                          <p className="font-medium text-sm">{t.ropeAccessExperience}</p>
-                          {user.ropeAccessStartDate ? (
-                            <>
-                              <p className="text-sm text-indigo-700 dark:text-indigo-300">
-                                {(() => {
-                                  const startDate = parseLocalDate(user.ropeAccessStartDate);
-                                  const now = new Date();
-                                  let years = now.getFullYear() - startDate.getFullYear();
-                                  let months = now.getMonth() - startDate.getMonth();
-                                  if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
-                                    years--;
-                                    months += 12;
-                                  }
-                                  if (now.getDate() < startDate.getDate()) {
-                                    months--;
-                                    if (months < 0) months += 12;
-                                  }
-                                  
-                                  let expString = t.lessThanMonth;
-                                  if (years > 0 || months > 0) {
-                                    expString = t.yearsMonths
-                                      .replace('{years}', years.toString())
-                                      .replace('{months}', months.toString());
-                                  }
-                                  return expString;
-                                })()}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {t.startedOn}: {formatLocalDate(user.ropeAccessStartDate)}
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-base text-muted-foreground italic">{t.addExperience}</p>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingExperience(true);
-                          setExperienceStartDateValue(user.ropeAccessStartDate || '');
-                        }}
-                        data-testid="button-edit-experience"
-                      >
-                        <Pencil className="w-4 h-4 mr-2" />
-                        {user.ropeAccessStartDate ? t.editExperience : t.setExperience}
-                      </Button>
-                    </div>
-                  </div>
-                  
                   {/* IRATA and SPRAT License Verification Sections - 2-column layout */}
                   <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {/* IRATA License Verification Section - Available to all technicians */}
@@ -5161,50 +5104,6 @@ export default function TechnicianPortal() {
                         </Button>
                       </div>
                   </div>
-                  </div>
-                  
-                  {/* My Logged Hours - After all certification verification sections */}
-                  <div className="mt-6 p-4 bg-primary/5 border-2 border-primary/30 rounded-lg">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                          <Clock className="w-6 h-6 text-primary" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="font-semibold text-base">{t.myLoggedHours}</p>
-                          <p className="text-base text-muted-foreground">{t.viewLoggedHoursDesc}</p>
-                          <p className="text-xs text-primary/80 font-medium">{t.loggedHoursFeatures}</p>
-                          {(combinedTotalHours > 0 || workSessionHours > 0) && (
-                            <div className="pt-2">
-                              <p className="text-lg font-bold text-primary" data-testid="text-total-logged-hours">
-                                {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
-                              </p>
-                              {workSessionHours > 0 && baselineHours > 0 && (
-                                <p className="text-xs text-muted-foreground">
-                                  {baselineHours.toFixed(1)} {t.baselinePlus} {workSessionHours.toFixed(1)} {t.fromSessions}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => setLocation("/technician-logged-hours")}
-                        className="gap-2 whitespace-nowrap"
-                        data-testid="button-view-logged-hours"
-                      >
-                        {t.viewLoggedHours}
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <div className="mt-4 p-3 bg-red-500/15 border border-red-500/40 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-red-700 dark:text-red-300">
-                          {t.logbookDisclaimer}
-                        </p>
-                      </div>
-                    </div>
                   </div>
                   
                 </div>
