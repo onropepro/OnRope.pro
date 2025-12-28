@@ -94,7 +94,7 @@ const profileTabsContent = (
 )}
 ```
 
-**📖 See: `instructions/portal-architecture-restructure-guide.md` for complete step-by-step instructions.**
+**📖 See: `instructions/refactor/portal-architecture-restructure-guide.md` for complete step-by-step instructions.**
 
 ---
 
@@ -678,7 +678,7 @@ const profileTabsContent = (
 | Form submission works | Save profile test | Dev |
 | No new LSP errors | LSP diagnostics | Dev |
 
-**📖 Detailed Guide**: See `instructions/portal-architecture-restructure-guide.md`
+**📖 Detailed Guide**: See `instructions/refactor/portal-architecture-restructure-guide.md`
 
 ---
 
