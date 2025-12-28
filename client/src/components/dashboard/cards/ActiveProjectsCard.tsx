@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Briefcase, ChevronRight } from "lucide-react";
+import { Link } from "wouter";
 import type { CardProps } from "../cardRegistry";
 
 export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps) {
@@ -37,10 +38,11 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
             {displayProjects.map((project: any) => {
               const progress = typeof project.progress === "number" ? project.progress : 0;
               return (
-                <div 
-                  key={project.id} 
-                  className="space-y-1"
-                  data-testid={`project-item-${project.id}`}
+                <Link
+                  key={project.id}
+                  href={`/projects/${project.id}`}
+                  className="block space-y-1 rounded-md p-2 -mx-2 hover-elevate cursor-pointer"
+                  data-testid={`link-project-${project.id}`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-base font-medium truncate">
@@ -51,7 +53,7 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
                     </span>
                   </div>
                   <Progress value={progress} className="h-2" />
-                </div>
+                </Link>
               );
             })}
             {activeProjects.length > 4 && (
