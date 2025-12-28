@@ -5238,50 +5238,6 @@ export default function TechnicianPortal() {
                   </div>
                   </div>
                   
-                  {/* My Logged Hours - After all certification verification sections */}
-                  <div className="mt-6 p-4 bg-primary/5 border-2 border-primary/30 rounded-lg">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                          <Clock className="w-6 h-6 text-primary" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="font-semibold text-base">{t.myLoggedHours}</p>
-                          <p className="text-base text-muted-foreground">{t.viewLoggedHoursDesc}</p>
-                          <p className="text-xs text-primary/80 font-medium">{t.loggedHoursFeatures}</p>
-                          {(combinedTotalHours > 0 || workSessionHours > 0) && (
-                            <div className="pt-2">
-                              <p className="text-lg font-bold text-primary" data-testid="text-total-logged-hours">
-                                {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
-                              </p>
-                              {workSessionHours > 0 && baselineHours > 0 && (
-                                <p className="text-xs text-muted-foreground">
-                                  {baselineHours.toFixed(1)} {t.baselinePlus} {workSessionHours.toFixed(1)} {t.fromSessions}
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => setLocation("/technician-logged-hours")}
-                        className="gap-2 whitespace-nowrap"
-                        data-testid="button-view-logged-hours"
-                      >
-                        {t.viewLoggedHours}
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </div>
-                    <div className="mt-4 p-3 bg-red-500/15 border border-red-500/40 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-red-700 dark:text-red-300">
-                          {t.logbookDisclaimer}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
                 </div>
 
                 {user.hasFirstAid && (
