@@ -4211,6 +4211,33 @@ export default function TechnicianPortal() {
                       />
                     </div>
                   </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h3 className="font-medium flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      {t.medicalConditions}
+                    </h3>
+                    <FormField
+                      control={form.control}
+                      name="specialMedicalConditions"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t.specialMedicalConditions}</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              {...field} 
+                              placeholder={t.medicalPlaceholder}
+                              className="min-h-[80px]"
+                              data-testid="input-medical-personal"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   </TabsContent>
 
                   {/* PAYROLL INFORMATION TAB - EDIT MODE */}
@@ -4429,6 +4456,40 @@ export default function TechnicianPortal() {
                     <InfoItem label={t.email} value={user.email} icon={<Mail className="w-4 h-4" />} />
                     <InfoItem label={t.phoneNumber} value={formatPhoneNumber(user.employeePhoneNumber)} icon={<Phone className="w-4 h-4" />} />
                     <InfoItem label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>} value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
+                  </div>
+                  
+                  {/* SMS Notifications Toggle - Interactive in view mode */}
+                  <div className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3 mt-4">
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-medium">{t.smsNotifications}</p>
+                      <p className="text-sm text-muted-foreground">{t.smsNotificationsDescription}</p>
+                    </div>
+                    <Switch
+                      checked={user.smsNotificationsEnabled ?? false}
+                      onCheckedChange={async (checked) => {
+                        // Optimistic update: immediately update the cache
+                        queryClient.setQueryData(["/api/user"], (oldData: any) => ({
+                          ...oldData,
+                          user: { ...oldData?.user, smsNotificationsEnabled: checked }
+                        }));
+                        try {
+                          await apiRequest('/api/user/profile', {
+                            method: 'PATCH',
+                            body: JSON.stringify({ smsNotificationsEnabled: checked }),
+                          });
+                          // Refetch to ensure data is in sync
+                          queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+                        } catch (error) {
+                          console.error('Failed to update SMS notifications:', error);
+                          // Revert optimistic update on error
+                          queryClient.setQueryData(["/api/user"], (oldData: any) => ({
+                            ...oldData,
+                            user: { ...oldData?.user, smsNotificationsEnabled: !checked }
+                          }));
+                        }
+                      }}
+                      data-testid="switch-sms-notifications-view"
+                    />
                   </div>
                 </div>
 
