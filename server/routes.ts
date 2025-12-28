@@ -19471,7 +19471,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         const workSessionsList = await db.select()
           .from(workSessions)
           .where(eq(workSessions.employeeId, employee.id));
-        const completedSessions = workSessionsList.filter((ws: any) => ws.clockOutTime);
+        const completedSessions = workSessionsList.filter((ws: any) => ws.endTime);
         
         const incidentReportsList = await db.select()
           .from(incidentReports)
@@ -19598,7 +19598,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         const workSessionsList = await db.select()
           .from(workSessions)
           .where(eq(workSessions.employeeId, employee.id));
-        const completedSessions = workSessionsList.filter((ws: any) => ws.clockOutTime);
+        const completedSessions = workSessionsList.filter((ws: any) => ws.endTime);
         
         const incidentReportsList = await db.select()
           .from(incidentReports)
@@ -25269,8 +25269,8 @@ Do not include any other text, just the JSON object.`
         const companyId = currentUser.companyId || connections[0]?.companyId;
         
         if (companyId) {
-          const workSessions = await storage.getWorkSessionsByEmployeeId(currentUser.id);
-          const completedSessions = workSessions.filter((ws: any) => ws.clockOutTime);
+          const workSessions = await storage.getAllWorkSessionsByEmployee(currentUser.id);
+          const completedSessions = workSessions.filter((ws: any) => ws.endTime);
           
           const incidentReportsList = await db.select()
             .from(incidentReports)
