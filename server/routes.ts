@@ -14740,6 +14740,105 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
 
+  // Generate PDF of rope access plan with all signatures (for audits)
+  app.get("/api/projects/:projectId/rope-access-plan/pdf", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const project = await storage.getProjectById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify company access
+      if (project.companyId !== currentUser.companyId && currentUser.role !== 'superuser') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      if (!project.ropeAccessPlanUrl) {
+        return res.status(400).json({ message: "No rope access plan exists for this project" });
+      }
+      
+      // Get all signatures
+      const signatures = await storage.getRopeAccessPlanSignatures(projectId);
+      
+      // Use jspdf to create PDF with signature sheet
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      
+      // Header
+      doc.setFontSize(18);
+      doc.text('Rope Access Plan Signature Sheet', 105, 20, { align: 'center' });
+      
+      doc.setFontSize(12);
+      doc.text(`Project: ${project.name}`, 20, 35);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 42);
+      doc.text(`Total Signatures: ${signatures.length}`, 20, 49);
+      
+      // Horizontal line
+      doc.line(20, 55, 190, 55);
+      
+      // Signatures table header
+      let yPos = 65;
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text('Employee Name', 20, yPos);
+      doc.text('Signed Date', 100, yPos);
+      doc.text('Signature', 150, yPos);
+      doc.setFont(undefined, 'normal');
+      
+      yPos += 10;
+      
+      // Add each signature
+      for (const sig of signatures) {
+        // Check if we need a new page
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        const employee = await storage.getUserById(sig.employeeId);
+        const employeeName = employee ? `${employee.firstName} ${employee.lastName}` : 'Unknown Employee';
+        const signedDate = sig.signedAt ? new Date(sig.signedAt).toLocaleString() : 'N/A';
+        
+        doc.text(employeeName, 20, yPos);
+        doc.text(signedDate, 100, yPos);
+        
+        // Add signature image if available
+        if (sig.signatureDataUrl && sig.signatureDataUrl.startsWith('data:image')) {
+          try {
+            doc.addImage(sig.signatureDataUrl, 'PNG', 150, yPos - 6, 30, 12);
+          } catch (imgError) {
+            doc.text('[Signature]', 150, yPos);
+          }
+        } else {
+          doc.text('[Signed]', 150, yPos);
+        }
+        
+        yPos += 15;
+      }
+      
+      // Footer
+      doc.setFontSize(8);
+      doc.text('This document certifies that all listed employees have reviewed and signed the Rope Access Plan.', 105, 290, { align: 'center' });
+      
+      // Send PDF
+      const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="rope-access-plan-signatures-${project.name.replace(/[^a-zA-Z0-9]/g, '-')}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Generate rope access plan PDF error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   
   // Start a work session
   app.post("/api/projects/:projectId/work-sessions/start", requireAuth, async (req: Request, res: Response) => {
@@ -14810,8 +14909,6 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
             }
           });
         }
-      }
-      
       }
       
       // Create new work session

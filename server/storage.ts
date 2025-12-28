@@ -2153,6 +2153,7 @@ export class Storage {
       ))
       .orderBy(desc(documentReviewSignatures.signedAt));
 
+  }
   // Rope Access Plan Signature methods
   async getRopeAccessPlanSignature(projectId: string, employeeId: string): Promise<DocumentReviewSignature | undefined> {
     const result = await db.select().from(documentReviewSignatures)
@@ -2218,8 +2219,6 @@ export class Storage {
       targetRoles: ['rope_access_tech', 'ground_crew'],
     }).returning();
     return signature;
-  }
-
   }
 
   async enrollEmployeeInDocumentReviews(companyId: string, employeeId: string, documents: { type: string; id?: string; name: string; version?: string; fileUrl?: string; targetRoles?: string[] }[]): Promise<DocumentReviewSignature[]> {
