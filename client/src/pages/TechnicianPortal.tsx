@@ -2953,17 +2953,6 @@ export default function TechnicianPortal() {
               emptyText={t.notProvided || "Not provided"}
               testId="phone"
             />
-            <EditableSwitch
-              isEditing={isEditing}
-              name="smsNotificationsEnabled"
-              label={t.smsNotifications}
-              value={isEditing ? form.watch("smsNotificationsEnabled") : user.smsNotificationsEnabled}
-              control={isEditing ? form.control : undefined}
-              helpText={t.smsNotificationsDescription}
-              enabledText={t.enabled || "Enabled"}
-              disabledText={t.disabled || "Disabled"}
-              testId="sms-notifications"
-            />
             <EditableDateField
               isEditing={isEditing}
               name="birthday"
@@ -2982,6 +2971,17 @@ export default function TechnicianPortal() {
                   return String(d);
                 }
               } : undefined}
+            />
+            <EditableSwitch
+              isEditing={isEditing}
+              name="smsNotificationsEnabled"
+              label={t.smsNotifications}
+              value={isEditing ? form.watch("smsNotificationsEnabled") : user.smsNotificationsEnabled}
+              control={isEditing ? form.control : undefined}
+              helpText={t.smsNotificationsDescription}
+              enabledText={t.enabled || "Enabled"}
+              disabledText={t.disabled || "Disabled"}
+              testId="sms-notifications"
             />
           </div>
         </div>
