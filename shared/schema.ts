@@ -2383,8 +2383,11 @@ export const documentReviewSignatures = pgTable("document_review_signatures", {
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   
+  // Project reference - for project-specific documents like rope access plans
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }),
+  
   // Document identification
-  documentType: varchar("document_type").notNull(), // health_safety_manual | company_policy | method_statement
+  documentType: varchar("document_type").notNull(), // health_safety_manual | company_policy | method_statement | rope_access_plan
   documentId: varchar("document_id"), // For method statements, the ID of the specific method statement
   documentName: varchar("document_name").notNull(), // Human-readable name for display
   
@@ -2408,6 +2411,7 @@ export const documentReviewSignatures = pgTable("document_review_signatures", {
   index("IDX_doc_review_company").on(table.companyId),
   index("IDX_doc_review_employee").on(table.employeeId),
   index("IDX_doc_review_document").on(table.documentType, table.documentId),
+  index("IDX_doc_review_project").on(table.projectId),
 ]);
 
 export const insertDocumentReviewSignatureSchema = createInsertSchema(documentReviewSignatures).omit({
