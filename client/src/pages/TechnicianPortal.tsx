@@ -3952,6 +3952,16 @@ export default function TechnicianPortal() {
                 </TabsList>
               </div>
 
+            {/* Hidden file input for document uploads - always rendered */}
+            <input
+              type="file"
+              ref={documentInputRef}
+              accept="image/*,.pdf"
+              onChange={handleDocumentUpload}
+              className="hidden"
+              data-testid="input-document-upload-global"
+            />
+
             {isEditing ? (
               <Form {...form}>
                 <form className="space-y-6">
@@ -4714,16 +4724,6 @@ export default function TechnicianPortal() {
                           onChange={handleScreenshotUpload}
                           className="hidden"
                           data-testid="input-irata-screenshot-upload"
-                        />
-                        
-                        {/* Hidden file input for document uploads */}
-                        <input
-                          type="file"
-                          ref={documentInputRef}
-                          accept="image/*,.pdf"
-                          onChange={handleDocumentUpload}
-                          className="hidden"
-                          data-testid="input-document-upload"
                         />
                         
                         <Button
