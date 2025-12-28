@@ -5567,6 +5567,176 @@ export default function TechnicianPortal() {
               </div>
               </TabsContent>
 
+              {/* PAYROLL INFORMATION TAB - VIEW MODE */}
+              <TabsContent value="payroll" className="mt-0 space-y-6">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <Building className="w-4 h-4" />
+                    {t.payrollInfo || "Payroll Information"}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <EditableField
+                      isEditing={false}
+                      name="socialInsuranceNumber"
+                      label="Social Insurance Number"
+                      value={user.socialInsuranceNumber}
+                      formatValue={(val) => maskSensitiveData(val)}
+                      emptyText="Not provided"
+                      testId="sin"
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <EditableField
+                      isEditing={false}
+                      name="bankTransitNumber"
+                      label="Transit Number"
+                      value={user.bankTransitNumber}
+                      formatValue={(val) => maskSensitiveData(val)}
+                      emptyText="Not provided"
+                      testId="bank-transit"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="bankInstitutionNumber"
+                      label="Branch Number"
+                      value={user.bankInstitutionNumber}
+                      formatValue={(val) => maskSensitiveData(val)}
+                      emptyText="Not provided"
+                      testId="bank-institution"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="bankAccountNumber"
+                      label="Account Number"
+                      value={user.bankAccountNumber}
+                      formatValue={(val) => maskSensitiveData(val)}
+                      emptyText="Not provided"
+                      testId="bank-account"
+                    />
+                  </div>
+                  
+                  {/* Upload void cheque button - shown if no banking documents exist */}
+                  {(!user.bankDocuments || user.bankDocuments.filter((u: string) => u && u.trim()).length === 0) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => triggerDocumentUpload('voidCheque')}
+                      disabled={uploadingDocType === 'voidCheque'}
+                      data-testid="button-upload-void-cheque-payroll"
+                    >
+                      {uploadingDocType === 'voidCheque' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.uploadVoidCheque}
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+
+                {/* Banking Documents Section */}
+                {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                      <ImageIcon className="w-4 h-4" />
+                      Banking Documents (Void Cheque)
+                    </h3>
+                    <div className="space-y-3">
+                      {user.bankDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                        const lowerUrl = url.toLowerCase();
+                        const isPdf = lowerUrl.endsWith('.pdf');
+                        const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                      lowerUrl.includes('image') || 
+                                      (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                        
+                        return (
+                          <div key={index} className="relative">
+                            <a 
+                              href={url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                            >
+                              {isPdf ? (
+                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                  <FileText className="w-12 h-12 text-muted-foreground" />
+                                  <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                </div>
+                              ) : isImage ? (
+                                <img 
+                                  src={url} 
+                                  alt={`Banking document ${index + 1}`}
+                                  className="w-full object-contain"
+                                  style={{ maxHeight: '300px', minHeight: '100px' }}
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.onerror = null;
+                                    target.style.display = 'none';
+                                    const parent = target.parentElement;
+                                    if (parent) {
+                                      const div = document.createElement('div');
+                                      div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                                      div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                      parent.appendChild(div);
+                                    }
+                                  }}
+                                />
+                              ) : (
+                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                  <FileText className="w-12 h-12 text-muted-foreground" />
+                                  <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                </div>
+                              )}
+                            </a>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-2 right-2 h-7 w-7"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setDeletingDocument({ type: 'bankDocuments', url });
+                              }}
+                              data-testid={`button-delete-bank-doc-${index}`}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Upload additional void cheque button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => triggerDocumentUpload('voidCheque')}
+                      disabled={uploadingDocType === 'voidCheque'}
+                      data-testid="button-upload-void-cheque"
+                    >
+                      {uploadingDocType === 'voidCheque' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.addVoidCheque}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+              </TabsContent>
+
               {/* CERTIFICATIONS TAB CONTINUED - Specialties */}
               <TabsContent value="certifications" className="mt-0 space-y-6">
               <div className="space-y-6">
