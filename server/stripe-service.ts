@@ -438,8 +438,7 @@ export async function handleWebhookEvent(
           
           // Add add-on revenue
           if (user.additionalSeatsCount) finalMrr += user.additionalSeatsCount * 19;
-          if (user.additionalProjectsCount) finalMrr += user.additionalProjectsCount * 49;
-          if (user.whitelabelBrandingActive) finalMrr += 49;
+                    if (user.whitelabelBrandingActive) finalMrr += 49;
         }
 
         // Record churn event for metrics tracking

@@ -3736,7 +3736,7 @@ export class Storage {
   async calculateLiveMrrMetrics(): Promise<{
     totalMrr: number;
     byTier: { basic: number; starter: number; premium: number; enterprise: number };
-    byAddon: { extraSeats: number; extraProjects: number; whiteLabel: number };
+    byAddon: { extraSeats: number; whiteLabel: number };
     customerCounts: { total: number; basic: number; starter: number; premium: number; enterprise: number };
   }> {
     // Get all company users with active subscriptions (have license key)
@@ -3758,12 +3758,11 @@ export class Storage {
     // Add-on pricing (monthly)
     const addonPricing = {
       extraSeats: 19,  // Per 2 seats package (additionalSeatsCount is number of packs)
-      extraProjects: 49,  // Per project (additionalProjectsCount is number of projects)
-      whiteLabel: 49,  // Flat rate
+            whiteLabel: 49,  // Flat rate
     };
 
     const byTier = { basic: 0, starter: 0, premium: 0, enterprise: 0 };
-    const byAddon = { extraSeats: 0, extraProjects: 0, whiteLabel: 0 };
+    const byAddon = { extraSeats: 0, whiteLabel: 0 };
     const customerCounts = { total: 0, basic: 0, starter: 0, premium: 0, enterprise: 0 };
 
     for (const company of companies) {
@@ -3793,11 +3792,6 @@ export class Storage {
       // additionalSeatsCount = number of seat packs purchased (each pack = 2 seats, $19/mo)
       if (company.additionalSeatsCount && company.additionalSeatsCount > 0) {
         byAddon.extraSeats += company.additionalSeatsCount * addonPricing.extraSeats;
-      }
-
-      // additionalProjectsCount = number of extra projects purchased ($49/mo each)
-      if (company.additionalProjectsCount && company.additionalProjectsCount > 0) {
-        byAddon.extraProjects += company.additionalProjectsCount * addonPricing.extraProjects;
       }
 
       // whitelabelBrandingActive = white label branding subscription ($49/mo)
@@ -3962,7 +3956,7 @@ export class Storage {
     companyName: string;
     tier: string;
     mrr: number;
-    addons: { extraSeats: boolean; extraProjects: boolean; whiteLabel: boolean };
+    addons: { extraSeats: boolean; whiteLabel: boolean };
     createdAt: Date | null;
     lastLoginAt: Date | null;
   }>> {
@@ -3999,12 +3993,6 @@ export class Storage {
         mrr += (company.additionalSeatsCount || 0) * 19;
       }
 
-      // Add-ons: additionalProjectsCount = number of extra projects ($49/mo each)
-      const hasExtraProjects = (company.additionalProjectsCount || 0) > 0;
-      if (hasExtraProjects) {
-        mrr += (company.additionalProjectsCount || 0) * 49;
-      }
-
       // Add-ons: whitelabelBrandingActive = white label branding ($49/mo)
       const hasWhiteLabel = !!company.whitelabelBrandingActive;
       if (hasWhiteLabel) {
@@ -4018,8 +4006,7 @@ export class Storage {
         mrr,
         addons: {
           extraSeats: hasExtraSeats,
-          extraProjects: hasExtraProjects,
-          whiteLabel: hasWhiteLabel,
+                    whiteLabel: hasWhiteLabel,
         },
         createdAt: company.createdAt,
         lastLoginAt: company.lastLoginAt,

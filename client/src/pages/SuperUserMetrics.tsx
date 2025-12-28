@@ -47,8 +47,7 @@ interface MetricsSummary {
   };
   byAddon: {
     extraSeats: number;
-    extraProjects: number;
-    whiteLabel: number;
+        whiteLabel: number;
   };
   customerCounts: {
     total: number;
@@ -357,13 +356,7 @@ export default function SuperUserMetrics() {
                     </div>
                     <span className="font-medium">{formatCurrency(metrics.byAddon.extraSeats)}</span>
                   </div>
-                  <div className="flex items-center justify-between py-2 border-b">
-                    <div className="flex items-center gap-2">
-                      <Briefcase className="h-4 w-4 text-purple-500" />
-                      <span>{t('superuser.metrics.extraProjects', 'Extra Projects')}</span>
-                    </div>
-                    <span className="font-medium">{formatCurrency(metrics.byAddon.extraProjects)}</span>
-                  </div>
+
                   <div className="flex items-center justify-between py-2 border-b">
                     <div className="flex items-center gap-2">
                       <Building className="h-4 w-4 text-amber-500" />
@@ -376,7 +369,7 @@ export default function SuperUserMetrics() {
                     <span className="text-green-600 dark:text-green-400">
                       {formatCurrency(
                         metrics.byAddon.extraSeats + 
-                        metrics.byAddon.extraProjects + 
+                         
                         metrics.byAddon.whiteLabel
                       )}
                     </span>
