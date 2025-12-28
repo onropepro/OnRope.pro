@@ -19920,16 +19920,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ hasPendingDocuments: false, pendingCount: 0 });
       }
       
-      // Get all document reviews for this employee
-      const reviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      const companyId = currentUser.companyId;
+      
+      // Auto-enroll: Check for required documents that the employee hasn't been enrolled for yet
+      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
+      const existingReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      const existingDocIds = new Set(existingReviews.map(r => r.documentId).filter(Boolean));
+      
+      // Get all required company documents and auto-enroll if needed
+      for (const docType of requiredDocTypes) {
+        const docs = await storage.getCompanyDocumentsByType(companyId, docType);
+        for (const doc of docs) {
+          // Check if document targets this user's role (skip if not)
+          const targetRoles = (doc.targetRoles as string[] | null) || ['rope_access_tech', 'ground_crew'];
+          if (!targetRoles.includes(currentUser.role)) {
+            continue; // Skip documents not targeting this user's role
+          }
+          
+          // If employee doesn't have a review for this document, create one
+          if (!existingDocIds.has(doc.id)) {
+            try {
+              await storage.enrollEmployeeInDocumentReviews(companyId, currentUser.id, [{
+                type: docType,
+                id: doc.id,
+                name: doc.fileName,
+                fileUrl: doc.fileUrl,
+                targetRoles: targetRoles,
+              }]);
+            } catch (enrollErr) {
+              // Ignore duplicate errors
+              console.log(`Auto-enroll skipped for ${doc.fileName}: ${enrollErr}`);
+            }
+          }
+        }
+      }
+      
+      // Now get all reviews (including newly created ones)
+      const allReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
       
       // Count pending (unsigned) documents that apply to this user's role
-      const pendingReviews = reviews.filter(r => {
+      const pendingReviews = allReviews.filter(r => {
         // Document is not signed yet
         if (r.signedAt) return false;
         
         // Check if document targets this user's role
-        // If targetRoles is null/undefined/empty, default to including all roles (backward compatibility)
         const targetRoles = r.targetRoles as string[] | null;
         if (!targetRoles || targetRoles.length === 0) {
           return true; // Legacy documents apply to everyone
