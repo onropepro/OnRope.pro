@@ -16,7 +16,6 @@ import { formatTimestampDate } from "@/lib/dateUtils";
 
 interface GiftAddonsForm {
   extraSeats: number;
-  extraProjects: number;
   whiteLabel: boolean;
 }
 
@@ -29,8 +28,7 @@ export default function CompanyDetail() {
   const [giftAddonsDialogOpen, setGiftAddonsDialogOpen] = useState(false);
   const [addonsForm, setAddonsForm] = useState<GiftAddonsForm>({
     extraSeats: 0,
-    extraProjects: 0,
-    whiteLabel: false,
+        whiteLabel: false,
   });
 
   const { data: userData } = useQuery<{ user: any }>({
@@ -65,7 +63,7 @@ export default function CompanyDetail() {
         description: data.message,
       });
       // Reset form and close dialog
-      setAddonsForm({ extraSeats: 0, extraProjects: 0, whiteLabel: false });
+      setAddonsForm({ extraSeats: 0, whiteLabel: false });
       setGiftAddonsDialogOpen(false);
       // Refresh company data
       queryClient.invalidateQueries({ queryKey: ['/api/superuser/companies', companyId] });
@@ -211,13 +209,10 @@ export default function CompanyDetail() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Add-ons</p>
                   <div className="flex flex-wrap gap-1">
-                    {(company.additionalSeatsCount > 0 || company.additionalProjectsCount > 0 || company.whitelabelBrandingActive) ? (
+                    {(company.additionalSeatsCount > 0 || company.whitelabelBrandingActive) ? (
                       <>
                         {company.additionalSeatsCount > 0 && (
                           <Badge variant="secondary" className="text-xs">+{company.additionalSeatsCount} Seats</Badge>
-                        )}
-                        {company.additionalProjectsCount > 0 && (
-                          <Badge variant="secondary" className="text-xs">+{company.additionalProjectsCount} Projects</Badge>
                         )}
                         {company.whitelabelBrandingActive && (
                           <Badge variant="secondary" className="text-xs">White Label</Badge>
@@ -511,13 +506,10 @@ export default function CompanyDetail() {
                 {company.additionalSeatsCount > 0 && (
                   <Badge variant="secondary">+{company.additionalSeatsCount} Seats</Badge>
                 )}
-                {company.additionalProjectsCount > 0 && (
-                  <Badge variant="secondary">+{company.additionalProjectsCount} Projects</Badge>
-                )}
                 {company.whitelabelBrandingActive && (
                   <Badge variant="secondary">White Label Active</Badge>
                 )}
-                {!company.additionalSeatsCount && !company.additionalProjectsCount && !company.whitelabelBrandingActive && (
+                {!company.additionalSeatsCount && !company.whitelabelBrandingActive && (
                   <p className="text-sm text-muted-foreground">No add-ons</p>
                 )}
               </div>
@@ -537,23 +529,6 @@ export default function CompanyDetail() {
               />
               <p className="text-xs text-muted-foreground">
                 {addonsForm.extraSeats > 0 ? `Will add ${addonsForm.extraSeats} seat${addonsForm.extraSeats > 1 ? 's' : ''}` : 'Enter number of seats to gift'}
-              </p>
-            </div>
-
-            {/* Extra Projects */}
-            <div className="space-y-2">
-              <Label htmlFor="extraProjects">Extra Projects</Label>
-              <Input
-                id="extraProjects"
-                type="number"
-                min={0}
-                max={100}
-                value={addonsForm.extraProjects}
-                onChange={(e) => setAddonsForm(prev => ({ ...prev, extraProjects: parseInt(e.target.value) || 0 }))}
-                data-testid="input-extra-projects"
-              />
-              <p className="text-xs text-muted-foreground">
-                {addonsForm.extraProjects > 0 ? `Will add ${addonsForm.extraProjects} project slots` : 'Enter number of extra projects to gift'}
               </p>
             </div>
 
@@ -583,7 +558,7 @@ export default function CompanyDetail() {
             <Button 
               variant="outline" 
               onClick={() => {
-                setAddonsForm({ extraSeats: 0, extraProjects: 0, whiteLabel: false });
+                setAddonsForm({ extraSeats: 0, whiteLabel: false });
                 setGiftAddonsDialogOpen(false);
               }}
               data-testid="button-cancel-gift"
@@ -592,7 +567,7 @@ export default function CompanyDetail() {
             </Button>
             <Button 
               onClick={() => giftAddonsMutation.mutate(addonsForm)}
-              disabled={giftAddonsMutation.isPending || (!addonsForm.extraSeats && !addonsForm.extraProjects && !addonsForm.whiteLabel)}
+              disabled={giftAddonsMutation.isPending || (!addonsForm.extraSeats && !addonsForm.whiteLabel)}
               data-testid="button-confirm-gift"
             >
               {giftAddonsMutation.isPending ? (

@@ -7568,20 +7568,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const companyId = req.params.id;
-      const { extraSeats, extraProjects, whiteLabel } = req.body;
+      const { extraSeats, whiteLabel } = req.body;
 
-      console.log('[Gift-Addons] Gifting add-ons to company:', { companyId, extraSeats, extraProjects, whiteLabel });
+      console.log('[Gift-Addons] Gifting add-ons to company:', { companyId, extraSeats, whiteLabel });
 
       // Validate inputs - ensure non-negative integers
       const parsedSeats = parseInt(extraSeats) || 0;
-      const parsedProjects = parseInt(extraProjects) || 0;
-      const parsedWhiteLabel = whiteLabel === true;
+            const parsedWhiteLabel = whiteLabel === true;
 
-      if (parsedSeats < 0 || parsedProjects < 0) {
+      if (parsedSeats < 0) {
         return res.status(400).json({ message: "Add-on counts cannot be negative" });
       }
 
-      if (parsedSeats === 0 && parsedProjects === 0 && !parsedWhiteLabel) {
+      if (parsedSeats === 0 && !parsedWhiteLabel) {
         return res.status(400).json({ message: "Please select at least one add-on to gift" });
       }
 
@@ -7599,11 +7598,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updates.giftedSeatsCount = (company.giftedSeatsCount || 0) + parsedSeats;
       }
       
-      if (parsedProjects > 0) {
-        updates.additionalProjectsCount = (company.additionalProjectsCount || 0) + parsedProjects;
-      }
-      
-      if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
+if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         updates.whitelabelBrandingActive = true;
       }
 
@@ -7625,7 +7620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Build descriptive message
       const giftedItems: string[] = [];
       if (parsedSeats > 0) giftedItems.push(`${parsedSeats} seat${parsedSeats > 1 ? 's' : ''}`);
-      if (parsedProjects > 0) giftedItems.push(`${parsedProjects} projects`);
+      
       if (parsedWhiteLabel && !company.whitelabelBrandingActive) giftedItems.push('white-label branding');
 
       res.json({
@@ -7636,13 +7631,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyName: updatedCompany?.companyName,
           additionalSeatsCount: updatedCompany?.additionalSeatsCount,
           giftedSeatsCount: updatedCompany?.giftedSeatsCount,
-          additionalProjectsCount: updatedCompany?.additionalProjectsCount,
-          whitelabelBrandingActive: updatedCompany?.whitelabelBrandingActive,
+                    whitelabelBrandingActive: updatedCompany?.whitelabelBrandingActive,
         },
         gifted: {
           seats: parsedSeats,
-          projects: parsedProjects,
-          whiteLabel: parsedWhiteLabel && !company.whitelabelBrandingActive,
+                    whiteLabel: parsedWhiteLabel && !company.whitelabelBrandingActive,
         },
       });
     } catch (error: any) {

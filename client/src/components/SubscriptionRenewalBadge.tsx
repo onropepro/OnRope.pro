@@ -16,8 +16,7 @@ interface SubscriptionDetails {
   cancelAtPeriodEnd: boolean;
   whitelabelBrandingActive: boolean;
   additionalSeatsCount: number;
-  additionalProjectsCount: number;
-  giftedSeatsCount: number;
+    giftedSeatsCount: number;
   trialEnd?: number | null;
 }
 
@@ -157,12 +156,7 @@ export function SubscriptionRenewalBadge({ subscriptionEndDate, subscriptionStat
                   </div>
                 )}
 
-                {subscriptionData.additionalProjectsCount > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Additional projects</span>
-                    <span className="font-medium">{subscriptionData.additionalProjectsCount}</span>
-                  </div>
-                )}
+
 
                 {subscriptionData.whitelabelBrandingActive && (
                   <div className="flex justify-between">
