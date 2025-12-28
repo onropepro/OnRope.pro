@@ -104,6 +104,8 @@ export default function ProjectDetail() {
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [showHarnessInspectionDialog, setShowHarnessInspectionDialog] = useState(false);
+  const [showNotApplicableReason, setShowNotApplicableReason] = useState(false);
+  const [notApplicableReason, setNotApplicableReason] = useState("");
   const [showLogHoursPrompt, setShowLogHoursPrompt] = useState(false);
   const [showIrataTaskDialog, setShowIrataTaskDialog] = useState(false);
   const [selectedIrataTasks, setSelectedIrataTasks] = useState<string[]>([]);
@@ -723,7 +725,7 @@ export default function ProjectDetail() {
 
   // Create "not applicable" inspection record
   const createNotApplicableInspectionMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (reason?: string) => {
       if (!currentUser) throw new Error("User not found");
       
       // Get local date in YYYY-MM-DD format using timezone-safe utility
@@ -739,7 +741,7 @@ export default function ProjectDetail() {
           inspectorName: currentUser.name || currentUser.email || "Unknown",
           overallStatus: "not_applicable",
           equipmentFindings: {},
-          comments: "Harness not applicable for this work session",
+          comments: reason || "Harness not applicable for this work session",
         }),
         credentials: "include",
       });
@@ -754,6 +756,8 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
       setShowHarnessInspectionDialog(false);
+      setShowNotApplicableReason(false);
+      setNotApplicableReason("");
       // Start work session directly without a second confirmation
       if (id) {
         startDayMutation.mutate(id);
@@ -763,6 +767,8 @@ export default function ProjectDetail() {
       console.error("Error creating not applicable inspection:", error);
       // Still proceed to start work session even if this fails
       setShowHarnessInspectionDialog(false);
+      setShowNotApplicableReason(false);
+      setNotApplicableReason("");
       if (id) {
         startDayMutation.mutate(id);
       }
@@ -2958,46 +2964,101 @@ export default function ProjectDetail() {
       </AlertDialog>
 
       {/* Harness Inspection Check Dialog */}
-      <AlertDialog open={showHarnessInspectionDialog} onOpenChange={setShowHarnessInspectionDialog}>
+      <AlertDialog open={showHarnessInspectionDialog} onOpenChange={(open) => {
+        setShowHarnessInspectionDialog(open);
+        if (!open) {
+          setShowNotApplicableReason(false);
+          setNotApplicableReason("");
+        }
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('projectDetail.dialogs.harnessInspection.title', 'Daily Harness Inspection Complete?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('projectDetail.dialogs.harnessInspection.description', 'Before starting your work session, please confirm if your daily harness inspection has been completed.')}
+              {showNotApplicableReason 
+                ? t('projectDetail.dialogs.harnessInspection.whyNotApplicable', 'Please provide a reason why harness inspection is not applicable for this work session.')
+                : t('projectDetail.dialogs.harnessInspection.description', 'Before starting your work session, please confirm if your daily harness inspection has been completed.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          
+          {/* Reason input for non-ground-crew when Not Applicable is clicked */}
+          {showNotApplicableReason && (
+            <div className="py-2">
+              <Textarea
+                value={notApplicableReason}
+                onChange={(e) => setNotApplicableReason(e.target.value)}
+                placeholder={t('projectDetail.dialogs.harnessInspection.reasonPlaceholder', 'e.g., Working from ground level only, No rope work today...')}
+                className="min-h-[80px]"
+                data-testid="input-harness-not-applicable-reason"
+              />
+            </div>
+          )}
+          
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => createNotApplicableInspectionMutation.mutate()}
-              disabled={createNotApplicableInspectionMutation.isPending}
-              data-testid="button-harness-not-applicable"
-            >
-              {createNotApplicableInspectionMutation.isPending ? t('projectDetail.dialogs.harnessInspection.recording', 'Recording...') : t('projectDetail.dialogs.harnessInspection.notApplicable', 'Not Applicable')}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                setShowHarnessInspectionDialog(false);
-                setLocation(`/harness-inspection?projectId=${id}`);
-              }}
-              data-testid="button-harness-no"
-            >
-              {t('common.no', 'No')}
-            </Button>
-            <Button
-              variant="default"
-              onClick={() => {
-                setShowHarnessInspectionDialog(false);
-                if (id) {
-                  startDayMutation.mutate(id);
-                }
-              }}
-              disabled={startDayMutation.isPending}
-              data-testid="button-harness-yes"
-            >
-              {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('common.yes', 'Yes')}
-            </Button>
+            {showNotApplicableReason ? (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowNotApplicableReason(false);
+                    setNotApplicableReason("");
+                  }}
+                  data-testid="button-harness-reason-back"
+                >
+                  {t('common.back', 'Back')}
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() => createNotApplicableInspectionMutation.mutate(notApplicableReason || "Harness not applicable for this work session")}
+                  disabled={createNotApplicableInspectionMutation.isPending || !notApplicableReason.trim()}
+                  data-testid="button-harness-reason-submit"
+                >
+                  {createNotApplicableInspectionMutation.isPending ? t('projectDetail.dialogs.harnessInspection.recording', 'Recording...') : t('common.submit', 'Submit')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    // Ground crew: directly proceed without reason
+                    if (currentUser?.role === 'ground_crew') {
+                      createNotApplicableInspectionMutation.mutate("Ground crew - harness not required");
+                    } else {
+                      // Non-ground-crew: show reason input
+                      setShowNotApplicableReason(true);
+                    }
+                  }}
+                  disabled={createNotApplicableInspectionMutation.isPending}
+                  data-testid="button-harness-not-applicable"
+                >
+                  {createNotApplicableInspectionMutation.isPending ? t('projectDetail.dialogs.harnessInspection.recording', 'Recording...') : t('projectDetail.dialogs.harnessInspection.notApplicable', 'Not Applicable')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setShowHarnessInspectionDialog(false);
+                    setLocation(`/harness-inspection?projectId=${id}`);
+                  }}
+                  data-testid="button-harness-no"
+                >
+                  {t('common.no', 'No')}
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    setShowHarnessInspectionDialog(false);
+                    if (id) {
+                      startDayMutation.mutate(id);
+                    }
+                  }}
+                  disabled={startDayMutation.isPending}
+                  data-testid="button-harness-yes"
+                >
+                  {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('common.yes', 'Yes')}
+                </Button>
+              </>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
