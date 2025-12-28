@@ -128,6 +128,7 @@ import TechnicianPortal from "@/pages/TechnicianPortal";
 import GroundCrewPortal from "@/pages/GroundCrewPortal";
 import Employer from "@/pages/Employer";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
+import TechnicianResume from "@/pages/TechnicianResume";
 import PersonalSafetyDocuments from "@/pages/PersonalSafetyDocuments";
 import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
 import GroundCrewJobBoard from "@/pages/GroundCrewJobBoard";
@@ -320,6 +321,11 @@ function Router() {
           <Route path="/technician-psr">
             <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
               <TechnicianPSR />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/technician-resume">
+            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+              <TechnicianResume />
             </ProtectedRoute>
           </Route>
           <Route path="/resident-dashboard">

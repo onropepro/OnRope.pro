@@ -9,6 +9,7 @@ import {
   Shield,
   Award,
   GraduationCap,
+  FileText,
 } from "lucide-react";
 import type { NavGroup } from "@/components/DashboardSidebar";
 
@@ -80,6 +81,13 @@ export function getTechnicianNavGroups(
           href: "/technician-portal?tab=invitations",
           badge: pendingInvitationsCount > 0 ? pendingInvitationsCount : undefined,
           badgeType: "alert" as const,
+          isVisible: () => true,
+        },
+        {
+          id: "resume",
+          label: language === 'en' ? "Resume / CV" : language === 'es' ? "Currículum" : "CV",
+          icon: FileText,
+          href: "/technician-resume",
           isVisible: () => true,
         },
       ],
