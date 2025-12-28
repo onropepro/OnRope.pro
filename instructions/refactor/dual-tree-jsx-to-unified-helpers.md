@@ -386,15 +386,43 @@ If critical issues are discovered, follow this rollback procedure:
 
 ---
 
+## MANDATORY: Pre-Helperization QA Checklist
+
+> **CRITICAL:** This checklist was added after discovering that `renderCertificationsEditableFields()` contained outdated content (Logbook Hours) instead of the correct fields (First Aid). The refactor correctly applied the pattern but preserved pre-existing content misalignment.
+
+**Before creating any helper function, verify:**
+
+### 1. Edit/View Content Parity Audit
+- [ ] **List all fields shown in VIEW mode** for the tab/section
+- [ ] **List all fields shown in EDIT mode** for the tab/section
+- [ ] **Compare the two lists** - they should contain the same domain data
+- [ ] **Document any intentional differences** (e.g., "upload buttons only in view mode")
+
+### 2. Content Currency Check
+- [ ] **Verify fields are current** - have any been moved to other pages/tabs?
+- [ ] **Check recent feature additions** - is the edit mode missing new fields?
+- [ ] **Review related changelog entries** - identify features that may have affected this tab
+
+### 3. Helper Creation Approval
+- [ ] Edit/view content parity verified
+- [ ] No outdated fields present
+- [ ] Helper will render the SAME domain content in both modes
+- [ ] Translations exist for all field labels
+
+**Failure to complete this checklist before helperization can freeze incorrect UI states.**
+
+---
+
 ## Future Considerations
 
 ### Extending to Other Portals
 When applying this pattern to other profile pages:
 
-1. **Audit existing code** for dual-tree patterns
-2. **Create component-specific helpers** if needed (e.g., EditableAddress, EditablePhone)
-3. **Test thoroughly** before and after refactoring
-4. **Update this document** with new learnings
+1. **Complete the Pre-Helperization QA Checklist above**
+2. **Audit existing code** for dual-tree patterns
+3. **Create component-specific helpers** if needed (e.g., EditableAddress, EditablePhone)
+4. **Test thoroughly** before and after refactoring
+5. **Update this document** with new learnings
 
 ### Component Evolution
 If EditableField needs new features:
