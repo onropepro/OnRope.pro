@@ -4817,8 +4817,10 @@ export default function TechnicianPortal() {
                     )}
                   </div>
                   
+                  {/* IRATA & SPRAT Verification Grid */}
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* IRATA License Verification Section - Available to all technicians */}
-                  <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
+                  <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
                       {/* Show verified status if already verified */}
                       {user.irataVerifiedAt && (
                         <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
@@ -5027,7 +5029,7 @@ export default function TechnicianPortal() {
                   </div>
 
                   {/* SPRAT License Verification Section - Available to all technicians */}
-                  <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
+                  <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
                       {/* Show verified status if already verified */}
                       {user.spratVerifiedAt && (
                         <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
@@ -5233,6 +5235,7 @@ export default function TechnicianPortal() {
                           )}
                         </Button>
                       </div>
+                  </div>
                   </div>
                   
                   {/* My Logged Hours - After all certification verification sections */}
