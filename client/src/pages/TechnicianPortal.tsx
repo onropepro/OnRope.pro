@@ -4443,6 +4443,19 @@ export default function TechnicianPortal() {
                     )}
                   </p>
                 </div>
+
+                {user.specialMedicalConditions && (
+                  <>
+                    <Separator />
+                    <div className="space-y-3">
+                      <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                        <AlertCircle className="w-4 h-4" />
+                        {t.medicalConditions}
+                      </h3>
+                      <p className="text-sm">{user.specialMedicalConditions}</p>
+                    </div>
+                  </>
+                )}
               </div>
               </TabsContent>
 
@@ -5573,22 +5586,9 @@ export default function TechnicianPortal() {
               </div>
               </TabsContent>
 
-              {/* CERTIFICATIONS TAB CONTINUED - Medical Conditions and Specialties */}
+              {/* CERTIFICATIONS TAB CONTINUED - Specialties */}
               <TabsContent value="certifications" className="mt-0 space-y-6">
               <div className="space-y-6">
-                {user.specialMedicalConditions && (
-                  <>
-                    <div className="space-y-3">
-                      <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                        <AlertCircle className="w-4 h-4" />
-                        {t.medicalConditions}
-                      </h3>
-                      <p className="text-sm">{user.specialMedicalConditions}</p>
-                    </div>
-                    <Separator />
-                  </>
-                )}
-
                 {/* Rope Access Specialties Section */}
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
