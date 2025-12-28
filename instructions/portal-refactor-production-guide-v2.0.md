@@ -295,46 +295,215 @@ const getTranslation = (key: string, fallback: string): string => {
 
 ---
 
-## 5. ROLLBACK PROCEDURES
+## 5. BACKUP & RECOVERY STRATEGY
 
-### 5.1 Rollback Triggers
+### 5.1 Fork-Based Development Workflow
+
+Since this refactoring is being performed on a **fork of the main repl**, the following safety measures apply:
+
+**Pre-Refactoring Backup Checklist**:
+| Item | Action | Verified |
+|------|--------|----------|
+| Main repl unchanged | Confirm no work happening on main | [ ] |
+| Fork created | Create fork from clean main state | [ ] |
+| Database snapshot | Export dev database schema + seed data | [ ] |
+| Translation files backup | Copy all `/client/src/lib/i18n/*.ts` files | [ ] |
+| Current portal files backup | Copy TechnicianPortal.tsx + GroundCrewPortal.tsx | [ ] |
+
+**Fork Safety Benefits**:
+- Main repl remains untouched until merge
+- Can be abandoned entirely if refactoring fails
+- Parallel development possible on main for urgent fixes
+- Easy A/B comparison between fork and main
+
+**Database Considerations**:
+- Fork uses its **own development database** (isolated from main)
+- Schema changes in fork don't affect main until merged
+- If using shared production database: **READ-ONLY testing only**
+
+### 5.2 Incremental Backup Strategy
+
+**Before Each Phase**:
+```bash
+# Create named checkpoint before each phase
+git add -A
+git commit -m "CHECKPOINT: Pre-Phase X - [Tab Name]"
+
+# Tag for easy rollback
+git tag phase-X-start
+```
+
+**After Each Phase (if successful)**:
+```bash
+git add -A
+git commit -m "PHASE X COMPLETE: [Tab Name] refactored"
+git tag phase-X-complete
+```
+
+**Rollback to Phase Start**:
+```bash
+git reset --hard phase-X-start
+```
+
+### 5.3 Rollback Triggers
 
 | Trigger | Threshold | Action |
 |---------|-----------|--------|
-| API error rate increase | >1% | Immediate rollback |
-| User-reported data loss | >0 | Immediate rollback |
+| API error rate increase | >1% | Immediate rollback to last phase tag |
+| User-reported data loss | >0 | Immediate rollback + investigation |
 | Form submission failures | >0.5% | Immediate rollback |
-| Translation missing | >0 visible | Rollback + hotfix |
+| Translation missing | >0 visible | Hotfix or rollback |
+| LSP errors introduced | >0 new | Fix before proceeding |
 
-### 5.2 Rollback Steps
+### 5.4 Rollback Steps
 
+**Within Fork (Phase-Level Rollback)**:
 ```bash
-# 1. Identify the problematic commit
-git log --oneline -10
+# 1. Identify last good phase tag
+git tag -l "phase-*"
 
-# 2. Revert to last known good state
-git revert <commit-hash>
+# 2. Reset to that tag
+git reset --hard phase-X-complete
 
-# 3. Verify no data corruption
-SELECT COUNT(*) FROM users WHERE role IN ('rope_access_tech', 'ground_crew');
-
-# 4. Restart application
+# 3. Verify application runs
 npm run dev
 
-# 5. Verify user access
-# Test login and profile view for 3 test accounts
+# 4. Verify LSP errors
+# Run LSP diagnostics - must match baseline or better
 ```
 
-### 5.3 Data Recovery
+**Abandon Fork (Full Rollback)**:
+If refactoring fails catastrophically:
+1. Stop all work on fork
+2. Main repl remains unaffected
+3. Create fresh fork from main if retry needed
+4. Document lessons learned before retry
+
+### 5.5 Merge Strategy (Fork → Main)
+
+**Only after Phase 9 KPI validation is complete**:
+
+```bash
+# In main repl, merge the refactored code
+# Option A: If main has no conflicting changes
+git fetch fork-remote
+git merge fork-remote/main --squash
+git commit -m "REFACTOR: Unified portal components (Phase 1-9 complete)"
+
+# Option B: If main has changes during refactor period
+# Cherry-pick main changes into fork first
+# Then squash-merge fork into main
+```
+
+**Pre-Merge Checklist**:
+| Item | Status |
+|------|--------|
+| All 9 phases complete with sign-off | [ ] |
+| 0 LSP errors | [ ] |
+| All translations present | [ ] |
+| API contract tests pass | [ ] |
+| 30-day defect log empty | [ ] |
+| Stakeholder approval obtained | [ ] |
+| Main repl database compatible | [ ] |
+
+### 5.6 Data Recovery
 
 If data corruption occurs:
-1. Replit provides automatic checkpoint rollback
-2. Database backup available in Neon dashboard
-3. Object storage files are immutable (documents safe)
+1. **Replit checkpoints**: Automatic rollback available via Replit UI
+2. **Database backup**: Available in Neon dashboard (point-in-time recovery)
+3. **Object storage**: Files are immutable (documents always safe)
+4. **Git history**: Full history preserved via phase tags
 
 ---
 
-## 6. FEATURE FLAG STRATEGY
+## 6. TESTING STRATEGY
+
+### 6.1 Test Environment Setup
+
+**Fork Testing Isolation**:
+| Environment | Database | Purpose |
+|-------------|----------|---------|
+| Fork dev | Fork's dev DB | All refactoring work |
+| Fork staging | Fork's dev DB (copy) | Pre-merge validation |
+| Main dev | Main's dev DB | Untouched during refactor |
+| Production | Production DB | **NEVER** touch during refactor |
+
+**Test Accounts**:
+Create dedicated test accounts for each role:
+- `test-tech@example.com` (rope_access_tech)
+- `test-ground@example.com` (ground_crew)
+- `test-admin@example.com` (staff)
+
+### 6.2 Testing Per Phase
+
+| Phase | Test Type | Coverage | Automated |
+|-------|-----------|----------|-----------|
+| 1 | Unit tests | EditableField components | YES |
+| 2-6 | Integration | Each tab's full flow | Manual |
+| 2-6 | Regression | API payload comparison | YES (snapshot) |
+| 2-6 | Visual | Screenshots EN/ES/FR | Manual |
+| 7 | Cross-portal | GroundCrew parity | Manual |
+| 8 | E2E | Full user journeys | Manual |
+| 9 | KPI | Metrics validation | Manual |
+
+### 6.3 Required Test Scripts
+
+```bash
+# Add to package.json scripts section
+"check:translations": "node scripts/check-translations.js",
+"check:field-parity": "node scripts/check-field-parity.js", 
+"test:contracts": "node scripts/test-api-contracts.js",
+"test:profile": "vitest run --dir tests/profile"
+```
+
+**Translation Check Script** (to be created in Phase 8):
+- Scans all EditableField usages
+- Extracts translation keys
+- Verifies key exists in EN, ES, FR bundles
+- Fails build if any key missing
+
+**Field Parity Check Script** (to be created in Phase 8):
+- Compares form schema fields to rendered fields
+- Ensures every editable field has view mode
+- Ensures every view field has edit mode
+
+### 6.4 Manual Test Checklist Template
+
+For each phase, complete this checklist:
+
+```markdown
+## Phase X: [Tab Name] Test Checklist
+
+### View Mode
+- [ ] All fields display correctly (EN)
+- [ ] All fields display correctly (ES)
+- [ ] All fields display correctly (FR)
+- [ ] Masked fields show correct format
+- [ ] Empty fields show "Not provided" or equivalent
+- [ ] Icons and labels correct
+
+### Edit Mode
+- [ ] All form fields populate with current values
+- [ ] Required field validation works
+- [ ] Format validation works (phone, email, etc.)
+- [ ] Save updates database correctly
+- [ ] Cancel discards changes
+- [ ] Loading state shows during save
+
+### API Verification
+- [ ] Payload shape unchanged (compare JSON)
+- [ ] Response shape unchanged
+- [ ] Error responses correct
+
+### Screenshots Captured
+- [ ] View mode EN/ES/FR
+- [ ] Edit mode EN/ES/FR
+- [ ] Error state
+```
+
+---
+
+## 7. FEATURE FLAG STRATEGY
 
 ### 6.1 Implementation
 
@@ -374,7 +543,7 @@ const useNewProfileComponents = useMemo(() => {
 
 ---
 
-## 7. COMPREHENSIVE TEST MATRIX
+## 8. COMPREHENSIVE TEST MATRIX
 
 ### 7.1 Functional Tests (Manual)
 
@@ -423,7 +592,7 @@ const useNewProfileComponents = useMemo(() => {
 
 ---
 
-## 8. IMPLEMENTATION PHASES
+## 9. IMPLEMENTATION PHASES
 
 ### Phase 1: Foundation (Days 1-2)
 
@@ -635,7 +804,7 @@ const useNewProfileComponents = useMemo(() => {
 
 ---
 
-## 9. OPERATIONAL SAFEGUARDS
+## 10. OPERATIONAL SAFEGUARDS
 
 ### 9.1 Pre-Deployment Checklist
 
@@ -699,7 +868,7 @@ npm run test:contracts      # Compares payload snapshots
 
 ---
 
-## 10. ANTI-PATTERNS TO AVOID
+## 11. ANTI-PATTERNS TO AVOID
 
 ### 10.1 During Refactoring
 
@@ -722,7 +891,7 @@ npm run test:contracts      # Compares payload snapshots
 
 ---
 
-## 11. APPROVAL GATES
+## 12. APPROVAL GATES
 
 ### 11.1 Phase Completion Approval
 
@@ -744,7 +913,7 @@ Final deployment requires:
 
 ---
 
-## 12. REFERENCES
+## 13. REFERENCES
 
 | Document | Purpose |
 |----------|---------|
