@@ -29,7 +29,8 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import SignatureCanvas from "react-signature-canvas";
 import { format } from "date-fns";
 import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { fr, enUS } from "date-fns/locale";
@@ -106,6 +107,10 @@ export default function ProjectDetail() {
   const [showHarnessInspectionDialog, setShowHarnessInspectionDialog] = useState(false);
   const [showNotApplicableReason, setShowNotApplicableReason] = useState(false);
   const [notApplicableReason, setNotApplicableReason] = useState("");
+  // Rope Access Plan Signature Modal State
+  const [showRopeAccessSignModal, setShowRopeAccessSignModal] = useState(false);
+  const [ropeAccessPlanInfo, setRopeAccessPlanInfo] = useState<{ projectId: string; projectName: string; planUrl: string } | null>(null);
+  const ropeAccessSignatureRef = useRef<SignatureCanvas>(null);
   const [showLogHoursPrompt, setShowLogHoursPrompt] = useState(false);
   const [showIrataTaskDialog, setShowIrataTaskDialog] = useState(false);
   const [selectedIrataTasks, setSelectedIrataTasks] = useState<string[]>([]);
@@ -430,13 +435,22 @@ export default function ProjectDetail() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to start work session");
+        const errorData = await response.json();
+        // Check if signature is required for rope access plan
+        if (errorData.requiresSignature && errorData.ropeAccessPlan) {
+          setRopeAccessPlanInfo(errorData.ropeAccessPlan);
+          setShowStartDayDialog(false);
+          setShowRopeAccessSignModal(true);
+          return { needsSignature: true };
+        }
+        throw new Error(errorData.message || "Failed to start work session");
       }
 
       return response.json();
     },
     onSuccess: (data) => {
+      // Don't show success if we just opened the signature modal
+      if (data?.needsSignature) return;
       setActiveSession(data.session);
       setShowStartDayDialog(false);
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
@@ -444,6 +458,38 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "work-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       toast({ title: t('projectDetail.toasts.sessionStarted', 'Work session started'), description: t('projectDetail.toasts.goodLuck', 'Good luck today!') });
+    },
+    onError: (error: Error) => {
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+
+  // Sign Rope Access Plan mutation
+  const signRopeAccessPlanMutation = useMutation({
+    mutationFn: async (signatureDataUrl: string) => {
+      if (!ropeAccessPlanInfo) throw new Error("No plan info available");
+      const response = await fetch(`/api/projects/${ropeAccessPlanInfo.projectId}/rope-access-plan/sign`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ signatureDataUrl }),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to sign rope access plan");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      setShowRopeAccessSignModal(false);
+      setRopeAccessPlanInfo(null);
+      toast({
+        title: t('projectDetail.toasts.signatureSuccess', 'Rope Access Plan Signed'),
+        description: t('projectDetail.toasts.signatureSuccessDesc', 'You can now clock in to this project.'),
+      });
+      // Automatically retry clock-in
+      startDayMutation.mutate();
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
@@ -3906,6 +3952,104 @@ export default function ProjectDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Rope Access Plan Signature Modal */}
+      <Dialog open={showRopeAccessSignModal} onOpenChange={(open) => {
+        if (!open) {
+          setShowRopeAccessSignModal(false);
+          setRopeAccessPlanInfo(null);
+        }
+      }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle data-testid="title-rope-access-sign">
+              {t('projectDetail.ropeAccessPlan.signTitle', 'Review & Sign Rope Access Plan')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('projectDetail.ropeAccessPlan.signDescription', 'You must review and sign the Rope Access Plan before starting work on this project.')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {ropeAccessPlanInfo && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-4 p-3 bg-muted rounded-md">
+                <div>
+                  <p className="font-medium">{ropeAccessPlanInfo.projectName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('projectDetail.ropeAccessPlan.reviewInstructions', 'Please review the plan carefully before signing.')}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => window.open(ropeAccessPlanInfo.planUrl, '_blank')}
+                  data-testid="button-view-rope-access-plan"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  {t('projectDetail.ropeAccessPlan.viewPlan', 'View Plan')}
+                </Button>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>{t('projectDetail.ropeAccessPlan.yourSignature', 'Your Signature')}</Label>
+                <div className="border rounded-md bg-white p-2">
+                  <SignatureCanvas
+                    ref={ropeAccessSignatureRef}
+                    canvasProps={{
+                      className: "w-full h-32",
+                      style: { width: '100%', height: '128px' }
+                    }}
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => ropeAccessSignatureRef.current?.clear()}
+                  data-testid="button-clear-signature"
+                >
+                  {t('common.clearSignature', 'Clear Signature')}
+                </Button>
+              </div>
+              
+              <p className="text-sm text-muted-foreground">
+                {t('projectDetail.ropeAccessPlan.signAcknowledgement', 'By signing, you acknowledge that you have reviewed and understood the Rope Access Plan for this project.')}
+              </p>
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRopeAccessSignModal(false);
+                setRopeAccessPlanInfo(null);
+              }}
+              data-testid="button-cancel-sign"
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={() => {
+                if (ropeAccessSignatureRef.current?.isEmpty()) {
+                  toast({
+                    title: t('projectDetail.ropeAccessPlan.signatureRequired', 'Signature Required'),
+                    description: t('projectDetail.ropeAccessPlan.pleaseSign', 'Please sign the plan before submitting.'),
+                    variant: "destructive"
+                  });
+                  return;
+                }
+                const signatureDataUrl = ropeAccessSignatureRef.current?.toDataURL();
+                signRopeAccessPlanMutation.mutate(signatureDataUrl);
+              }}
+              disabled={signRopeAccessPlanMutation.isPending}
+              data-testid="button-submit-signature"
+            >
+              {signRopeAccessPlanMutation.isPending 
+                ? t('common.submitting', 'Submitting...')
+                : t('projectDetail.ropeAccessPlan.signAndContinue', 'Sign & Continue')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* End Day Dialog with Drop Count */}
       <Dialog open={showEndDayDialog} onOpenChange={setShowEndDayDialog}>
