@@ -5810,7 +5810,13 @@
     "sendReply": "Enviar Respuesta",
     "replyPlaceholder": "Escribe tu respuesta...",
     "newResponse": "Nueva Respuesta",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "ocrSuccess": "Documento Escaneado",
+    "ocrFieldsAutofilled": "{count} campos completados automáticamente del documento",
+    "ocrBankFieldsAutofilled": "{count} campos bancarios completados automáticamente del documento",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado",
+    "loading": "Cargando..."
   },
   "buildingPortal": {
     "title": "Portal del Edificio",

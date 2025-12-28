@@ -9801,7 +9801,13 @@
     "sendReply": "Send Reply",
     "replyPlaceholder": "Type your reply...",
     "newResponse": "New Response",
-    "close": "Close"
+    "close": "Close",
+    "ocrSuccess": "Document Scanned",
+    "ocrFieldsAutofilled": "{count} fields auto-filled from document",
+    "ocrBankFieldsAutofilled": "{count} bank fields auto-filled from document",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "loading": "Loading..."
   },
   "buildingPortal": {
     "title": "Building Portal",

@@ -2289,7 +2289,13 @@
       "save": "Enregistrer",
       "cancel": "Annuler",
       "confirm": "Confirmer",
-      "close": "Fermer"
+      "close": "Fermer",
+    "ocrSuccess": "Document numérisé",
+    "ocrFieldsAutofilled": "{count} champs remplis automatiquement depuis le document",
+    "ocrBankFieldsAutofilled": "{count} champs bancaires remplis automatiquement depuis le document",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "loading": "Chargement..."
     },
     "form": {
       "selectCategory": "Sélectionner une catégorie",
@@ -2797,7 +2803,13 @@
         "noProjectsFound": "Aucun projet trouvé pour le numéro de copropriété \"{{strataNumber}}\". Veuillez vérifier que votre numéro est correct.",
         "unnamedProject": "Projet sans nom"
       },
-      "close": "Fermer"
+      "close": "Fermer",
+    "ocrSuccess": "Document numérisé",
+    "ocrFieldsAutofilled": "{count} champs remplis automatiquement depuis le document",
+    "ocrBankFieldsAutofilled": "{count} champs bancaires remplis automatiquement depuis le document",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "loading": "Chargement..."
     },
     "accountSettings": {
       "title": "Paramètres du compte",
@@ -2897,7 +2909,13 @@
         "noResponses": "Aucune réponse pour le moment",
         "anonymous": "Anonyme"
       },
-      "close": "Fermer"
+      "close": "Fermer",
+    "ocrSuccess": "Document numérisé",
+    "ocrFieldsAutofilled": "{count} champs remplis automatiquement depuis le document",
+    "ocrBankFieldsAutofilled": "{count} champs bancaires remplis automatiquement depuis le document",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "loading": "Chargement..."
     },
     "feedbackDetails": {
       "noSubject": "Sans objet",
@@ -5735,7 +5753,13 @@
     "sendReply": "Envoyer la réponse",
     "replyPlaceholder": "Tapez votre réponse...",
     "newResponse": "Nouvelle réponse",
-    "close": "Fermer"
+    "close": "Fermer",
+    "ocrSuccess": "Document numérisé",
+    "ocrFieldsAutofilled": "{count} champs remplis automatiquement depuis le document",
+    "ocrBankFieldsAutofilled": "{count} champs bancaires remplis automatiquement depuis le document",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "loading": "Chargement..."
   },
   "buildingPortal": {
     "title": "Portail de l'Immeuble",
