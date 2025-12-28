@@ -14607,6 +14607,139 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
   });
   
   // ==================== WORK SESSION ROUTES ====================
+
+  // ==================== ROPE ACCESS PLAN SIGNATURE ROUTES ====================
+  
+  // Check if employee needs to sign rope access plan for a project
+  app.get("/api/projects/:projectId/rope-access-plan/check", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const project = await storage.getProjectById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // If no rope access plan exists, no signature needed
+      if (!project.ropeAccessPlanUrl) {
+        return res.json({ 
+          needsSignature: false, 
+          hasPlan: false,
+          message: "No rope access plan uploaded for this project"
+        });
+      }
+      
+      // Check if employee already signed
+      const existingSignature = await storage.getRopeAccessPlanSignature(projectId, currentUser.id);
+      
+      if (existingSignature) {
+        return res.json({ 
+          needsSignature: false, 
+          hasPlan: true,
+          alreadySigned: true,
+          signedAt: existingSignature.signedAt
+        });
+      }
+      
+      // Plan exists but not signed
+      return res.json({ 
+        needsSignature: true, 
+        hasPlan: true,
+        planUrl: project.ropeAccessPlanUrl,
+        projectName: project.name
+      });
+    } catch (error) {
+      console.error("Check rope access plan error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Sign the rope access plan
+  app.post("/api/projects/:projectId/rope-access-plan/sign", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const { signatureDataUrl } = req.body;
+      
+      if (!signatureDataUrl) {
+        return res.status(400).json({ message: "Signature is required" });
+      }
+      
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      if (!project.ropeAccessPlanUrl) {
+        return res.status(400).json({ message: "No rope access plan exists for this project" });
+      }
+      
+      // Check if already signed
+      const existingSignature = await storage.getRopeAccessPlanSignature(projectId, currentUser.id);
+      if (existingSignature) {
+        return res.status(400).json({ message: "You have already signed this rope access plan" });
+      }
+      
+      // Create signature record
+      const signature = await storage.createRopeAccessPlanSignature({
+        companyId: project.companyId,
+        projectId: projectId,
+        employeeId: currentUser.id,
+        documentName: `Rope Access Plan - ${project.name}`,
+        fileUrl: project.ropeAccessPlanUrl,
+        signatureDataUrl: signatureDataUrl,
+      });
+      
+      res.json({ signature, message: "Rope access plan signed successfully" });
+    } catch (error) {
+      console.error("Sign rope access plan error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get all signatures for a project's rope access plan (for audits)
+  app.get("/api/projects/:projectId/rope-access-plan/signatures", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const project = await storage.getProjectById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify company access
+      if (project.companyId !== currentUser.companyId && currentUser.role !== 'superuser') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const signatures = await storage.getRopeAccessPlanSignatures(projectId);
+      
+      res.json({ 
+        signatures,
+        hasPlan: !!project.ropeAccessPlanUrl,
+        planUrl: project.ropeAccessPlanUrl,
+        projectName: project.name
+      });
+    } catch (error) {
+      console.error("Get rope access plan signatures error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   
   // Start a work session
   app.post("/api/projects/:projectId/work-sessions/start", requireAuth, async (req: Request, res: Response) => {
@@ -14661,6 +14794,24 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       const project = await storage.getProjectById(projectId);
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Check if rope access plan exists and requires signature
+      if (project.ropeAccessPlanUrl) {
+        const existingSignature = await storage.getRopeAccessPlanSignature(projectId, currentUser.id);
+        if (!existingSignature) {
+          return res.status(400).json({ 
+            message: "You must review and sign the Rope Access Plan before starting work on this project.",
+            requiresSignature: true,
+            ropeAccessPlan: {
+              projectId: projectId,
+              projectName: project.name,
+              planUrl: project.ropeAccessPlanUrl
+            }
+          });
+        }
+      }
+      
       }
       
       // Create new work session

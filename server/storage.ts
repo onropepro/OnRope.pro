@@ -2152,6 +2152,74 @@ export class Storage {
         isNotNull(documentReviewSignatures.signedAt)
       ))
       .orderBy(desc(documentReviewSignatures.signedAt));
+
+  // Rope Access Plan Signature methods
+  async getRopeAccessPlanSignature(projectId: string, employeeId: string): Promise<DocumentReviewSignature | undefined> {
+    const result = await db.select().from(documentReviewSignatures)
+      .where(and(
+        eq(documentReviewSignatures.projectId, projectId),
+        eq(documentReviewSignatures.employeeId, employeeId),
+        eq(documentReviewSignatures.documentType, 'rope_access_plan')
+      ))
+      .limit(1);
+    return result[0];
+  }
+
+  async getRopeAccessPlanSignatures(projectId: string): Promise<(DocumentReviewSignature & { employeeName: string; employeeRole: string })[]> {
+    const result = await db.select({
+      id: documentReviewSignatures.id,
+      companyId: documentReviewSignatures.companyId,
+      employeeId: documentReviewSignatures.employeeId,
+      projectId: documentReviewSignatures.projectId,
+      documentType: documentReviewSignatures.documentType,
+      documentId: documentReviewSignatures.documentId,
+      documentName: documentReviewSignatures.documentName,
+      fileUrl: documentReviewSignatures.fileUrl,
+      viewedAt: documentReviewSignatures.viewedAt,
+      signedAt: documentReviewSignatures.signedAt,
+      signatureDataUrl: documentReviewSignatures.signatureDataUrl,
+      documentVersion: documentReviewSignatures.documentVersion,
+      targetRoles: documentReviewSignatures.targetRoles,
+      createdAt: documentReviewSignatures.createdAt,
+      updatedAt: documentReviewSignatures.updatedAt,
+      employeeName: users.fullName,
+      employeeRole: users.role,
+    })
+      .from(documentReviewSignatures)
+      .innerJoin(users, eq(documentReviewSignatures.employeeId, users.id))
+      .where(and(
+        eq(documentReviewSignatures.projectId, projectId),
+        eq(documentReviewSignatures.documentType, 'rope_access_plan'),
+        isNotNull(documentReviewSignatures.signedAt)
+      ))
+      .orderBy(desc(documentReviewSignatures.signedAt));
+    return result as (DocumentReviewSignature & { employeeName: string; employeeRole: string })[];
+  }
+
+  async createRopeAccessPlanSignature(data: {
+    companyId: string;
+    projectId: string;
+    employeeId: string;
+    documentName: string;
+    fileUrl: string;
+    signatureDataUrl: string;
+  }): Promise<DocumentReviewSignature> {
+    const now = new Date();
+    const [signature] = await db.insert(documentReviewSignatures).values({
+      companyId: data.companyId,
+      projectId: data.projectId,
+      employeeId: data.employeeId,
+      documentType: 'rope_access_plan',
+      documentName: data.documentName,
+      fileUrl: data.fileUrl,
+      viewedAt: now,
+      signedAt: now,
+      signatureDataUrl: data.signatureDataUrl,
+      targetRoles: ['rope_access_tech', 'ground_crew'],
+    }).returning();
+    return signature;
+  }
+
   }
 
   async enrollEmployeeInDocumentReviews(companyId: string, employeeId: string, documents: { type: string; id?: string; name: string; version?: string; fileUrl?: string; targetRoles?: string[] }[]): Promise<DocumentReviewSignature[]> {
