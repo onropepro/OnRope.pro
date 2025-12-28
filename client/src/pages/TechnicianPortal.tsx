@@ -4397,6 +4397,42 @@ export default function TechnicianPortal() {
 
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <Heart className="w-4 h-4" />
+                    {t.emergencyContact}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <EditableField
+                      isEditing={false}
+                      name="emergencyContactName"
+                      label="Name"
+                      value={user.emergencyContactName}
+                      emptyText="Not provided"
+                      testId="emergency-name"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="emergencyContactPhone"
+                      label="Phone"
+                      value={user.emergencyContactPhone}
+                      formatValue={(val) => formatPhoneNumber(val)}
+                      emptyText="Not provided"
+                      testId="emergency-phone"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="emergencyContactRelationship"
+                      label="Relationship"
+                      value={user.emergencyContactRelationship}
+                      emptyText="Not selected"
+                      testId="emergency-relationship"
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <AlertCircle className="w-4 h-4" />
                     {t.medicalConditions}
                   </h3>
@@ -5205,46 +5241,6 @@ export default function TechnicianPortal() {
                   <p className="text-sm text-muted-foreground">{t.myCertificationsDesc}</p>
                   
                   <CertificationsManager t={t} />
-                </div>
-              </div>
-              </TabsContent>
-
-              {/* PERSONAL INFORMATION TAB CONTINUED - Emergency Contact */}
-              <TabsContent value="personal" className="mt-0 space-y-6">
-              <div className="space-y-6">
-                <Separator />
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <Heart className="w-4 h-4" />
-                    Emergency Contact
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <EditableField
-                      isEditing={false}
-                      name="emergencyContactName"
-                      label="Name"
-                      value={user.emergencyContactName}
-                      emptyText="Not provided"
-                      testId="emergency-name"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="emergencyContactPhone"
-                      label="Phone"
-                      value={user.emergencyContactPhone}
-                      formatValue={(val) => formatPhoneNumber(val)}
-                      emptyText="Not provided"
-                      testId="emergency-phone"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="emergencyContactRelationship"
-                      label="Relationship"
-                      value={user.emergencyContactRelationship}
-                      emptyText="Not selected"
-                      testId="emergency-relationship"
-                    />
-                  </div>
                 </div>
               </div>
               </TabsContent>
