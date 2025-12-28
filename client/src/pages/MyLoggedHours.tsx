@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { Calendar, Pencil } from "lucide-react";
 import i18n from "@/i18n";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
@@ -65,6 +66,10 @@ export default function MyLoggedHours() {
   const [showCertBaselineDialog, setShowCertBaselineDialog] = useState(false);
   const [certBaselineHours, setCertBaselineHours] = useState("");
   const [certBaselineDate, setCertBaselineDate] = useState("");
+  
+  // Rope Access Experience state
+  const [showExperienceDialog, setShowExperienceDialog] = useState(false);
+  const [experienceStartDate, setExperienceStartDate] = useState("");
 
   const { data: userData, refetch: refetchUser } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -151,6 +156,62 @@ export default function MyLoggedHours() {
     }
     updateCertBaselineMutation.mutate({ hours: certBaselineHours, date: certBaselineDate });
   };
+
+  // Rope Access Experience mutation
+  const updateExperienceMutation = useMutation({
+    mutationFn: async (startDate: string) => {
+      return apiRequest("PATCH", "/api/technician/profile", { 
+        name: currentUser?.name,
+        email: currentUser?.email,
+        employeePhoneNumber: currentUser?.employeePhoneNumber || "",
+        emergencyContactName: currentUser?.emergencyContactName || "",
+        emergencyContactPhone: currentUser?.emergencyContactPhone || "",
+        ropeAccessStartDate: startDate,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      refetchUser();
+      setShowExperienceDialog(false);
+      toast({ title: t('loggedHours.success', 'Success'), description: t('loggedHours.experienceUpdated', 'Experience start date updated successfully') });
+    },
+    onError: (error: Error) => {
+      toast({ title: t('loggedHours.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const openExperienceDialog = () => {
+    setExperienceStartDate(currentUser?.ropeAccessStartDate || "");
+    setShowExperienceDialog(true);
+  };
+
+  const handleSaveExperience = () => {
+    if (!experienceStartDate) {
+      toast({ title: t('loggedHours.invalidInput', 'Invalid input'), description: t('loggedHours.enterStartDate', 'Please enter a start date'), variant: "destructive" });
+      return;
+    }
+    updateExperienceMutation.mutate(experienceStartDate);
+  };
+
+  // Calculate experience duration
+  const calculateExperience = () => {
+    if (!currentUser?.ropeAccessStartDate) return null;
+    const startDate = parseLocalDate(currentUser.ropeAccessStartDate);
+    const now = new Date();
+    let years = now.getFullYear() - startDate.getFullYear();
+    let months = now.getMonth() - startDate.getMonth();
+    if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
+      years--;
+      months += 12;
+    }
+    if (now.getDate() < startDate.getDate()) {
+      months--;
+      if (months < 0) months += 12;
+    }
+    return { years, months };
+  };
+
+  const experienceDuration = calculateExperience();
 
   // Calculate upgrade progress
   const calculateUpgradeProgress = () => {
@@ -382,6 +443,45 @@ export default function MyLoggedHours() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Rope Access Experience Card */}
+        <Card className="mb-6 border-indigo-500/30 bg-indigo-500/5">
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <div>
+                  <p className="font-medium text-sm">{t('loggedHours.ropeAccessExperience', 'Rope Access Experience')}</p>
+                  {experienceDuration ? (
+                    <>
+                      <p className="text-sm text-indigo-700 dark:text-indigo-300">
+                        {experienceDuration.years > 0 || experienceDuration.months > 0 
+                          ? t('loggedHours.yearsMonths', '{years} years, {months} months')
+                              .replace('{years}', experienceDuration.years.toString())
+                              .replace('{months}', experienceDuration.months.toString())
+                          : t('loggedHours.lessThanMonth', 'Less than 1 month')}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('loggedHours.startedOn', 'Started on')}: {format(parseLocalDate(currentUser?.ropeAccessStartDate), 'PPP', { locale: getDateLocale() })}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-base text-muted-foreground italic">{t('loggedHours.addExperience', 'Add your experience start date')}</p>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={openExperienceDialog}
+                data-testid="button-edit-experience"
+              >
+                <Pencil className="w-4 h-4 mr-2" />
+                {currentUser?.ropeAccessStartDate ? t('loggedHours.editExperience', 'Edit Experience') : t('loggedHours.setExperience', 'Set Experience')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Next Level Progress Section */}
         {currentUser?.irataLevel && (
@@ -779,6 +879,63 @@ export default function MyLoggedHours() {
                 <>
                   <span className="material-icons text-sm mr-1">save</span>
                   {t('loggedHours.saveBaseline', 'Save Baseline')}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rope Access Experience Dialog */}
+      <Dialog open={showExperienceDialog} onOpenChange={setShowExperienceDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-indigo-600" />
+              {t('loggedHours.experienceTitle', 'Rope Access Experience')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('loggedHours.experienceDesc', 'Enter the date when you first started working in rope access. This helps calculate your total experience in the industry.')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <Label className="text-sm font-medium block mb-2">
+              {t('loggedHours.experienceStartDate', 'Experience Start Date')}
+            </Label>
+            <Input
+              type="date"
+              value={experienceStartDate}
+              onChange={(e) => setExperienceStartDate(e.target.value)}
+              data-testid="input-experience-start-date"
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('loggedHours.experienceStartDateNote', 'The date when you first started working in rope access')}
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowExperienceDialog(false)}
+              data-testid="button-cancel-experience"
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button 
+              onClick={handleSaveExperience}
+              disabled={updateExperienceMutation.isPending}
+              data-testid="button-save-experience"
+            >
+              {updateExperienceMutation.isPending ? (
+                <>
+                  <span className="material-icons animate-spin text-sm mr-1">refresh</span>
+                  {t('common.saving', 'Saving...')}
+                </>
+              ) : (
+                <>
+                  <span className="material-icons text-sm mr-1">save</span>
+                  {t('loggedHours.saveExperience', 'Save Experience')}
                 </>
               )}
             </Button>

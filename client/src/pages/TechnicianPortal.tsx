@@ -1730,10 +1730,6 @@ export default function TechnicianPortal() {
   // Expiration date editing state
   const [editingExpirationDate, setEditingExpirationDate] = useState<'irata' | 'sprat' | null>(null);
   const [expirationDateValue, setExpirationDateValue] = useState<string>("");
-  
-  // Experience start date editing state
-  const [editingExperience, setEditingExperience] = useState(false);
-  const [experienceStartDateValue, setExperienceStartDateValue] = useState<string>("");
 
   // Mutation for updating expiration date (uses dedicated endpoint)
   const updateExpirationDateMutation = useMutation({
@@ -1753,28 +1749,6 @@ export default function TechnicianPortal() {
       toast({
         title: t.expirationDateUpdateFailed,
         description: error.message || t.expirationDateUpdateFailed,
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Mutation for updating experience start date (uses dedicated endpoint)
-  const updateExperienceMutation = useMutation({
-    mutationFn: async (date: string) => {
-      return apiRequest("PATCH", "/api/technician/experience-date", { date });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      setEditingExperience(false);
-      setExperienceStartDateValue("");
-      toast({
-        title: t.experienceUpdated,
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: t.experienceUpdateFailed,
-        description: error.message || t.experienceUpdateFailed,
         variant: "destructive",
       });
     },
@@ -4697,7 +4671,7 @@ export default function TechnicianPortal() {
                     <Award className="w-4 h-4" />
                     {t.certifications}
                   </h3>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {user.irataLevel && (
                       <div className="p-3 bg-muted/50 rounded-lg border" data-testid="card-irata-certification">
                         <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -4841,63 +4815,6 @@ export default function TechnicianPortal() {
                     {user.irataBaselineHours && parseFloat(user.irataBaselineHours) > 0 && (
                       <InfoItem label={t.baselineHours} value={`${user.irataBaselineHours} ${t.hours}`} icon={<Clock className="w-4 h-4" />} />
                     )}
-                  </div>
-                  
-                  {/* Experience Display - Always visible */}
-                  <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                        <div>
-                          <p className="font-medium text-sm">{t.ropeAccessExperience}</p>
-                          {user.ropeAccessStartDate ? (
-                            <>
-                              <p className="text-sm text-indigo-700 dark:text-indigo-300">
-                                {(() => {
-                                  const startDate = parseLocalDate(user.ropeAccessStartDate);
-                                  const now = new Date();
-                                  let years = now.getFullYear() - startDate.getFullYear();
-                                  let months = now.getMonth() - startDate.getMonth();
-                                  if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
-                                    years--;
-                                    months += 12;
-                                  }
-                                  if (now.getDate() < startDate.getDate()) {
-                                    months--;
-                                    if (months < 0) months += 12;
-                                  }
-                                  
-                                  let expString = t.lessThanMonth;
-                                  if (years > 0 || months > 0) {
-                                    expString = t.yearsMonths
-                                      .replace('{years}', years.toString())
-                                      .replace('{months}', months.toString());
-                                  }
-                                  return expString;
-                                })()}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {t.startedOn}: {formatLocalDate(user.ropeAccessStartDate)}
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-base text-muted-foreground italic">{t.addExperience}</p>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEditingExperience(true);
-                          setExperienceStartDateValue(user.ropeAccessStartDate || '');
-                        }}
-                        data-testid="button-edit-experience"
-                      >
-                        <Pencil className="w-4 h-4 mr-2" />
-                        {user.ropeAccessStartDate ? t.editExperience : t.setExperience}
-                      </Button>
-                    </div>
                   </div>
                   
                   {/* IRATA License Verification Section - Available to all technicians */}
@@ -5695,69 +5612,6 @@ export default function TechnicianPortal() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Experience Start Date Edit Dialog */}
-      <Dialog open={editingExperience} onOpenChange={(open) => {
-        if (!open) {
-          setEditingExperience(false);
-          setExperienceStartDateValue("");
-        }
-      }}>
-        <DialogContent className="sm:max-w-md" data-testid="dialog-edit-experience">
-          <DialogHeader>
-            <DialogTitle>
-              {user?.ropeAccessStartDate ? t.editExperience : t.setExperience}
-            </DialogTitle>
-            <DialogDescription>
-              {t.whenDidYouStart}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="experience-start-date">{t.experienceStartDate}</Label>
-              <Input
-                id="experience-start-date"
-                type="date"
-                value={experienceStartDateValue}
-                onChange={(e) => setExperienceStartDateValue(e.target.value)}
-                max={new Date().toISOString().split('T')[0]}
-                data-testid="input-experience-start-date-dialog"
-              />
-              <p className="text-xs text-muted-foreground">{t.experienceStartDateHelp}</p>
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setEditingExperience(false);
-                setExperienceStartDateValue("");
-              }}
-              data-testid="button-cancel-experience"
-            >
-              {t.cancel}
-            </Button>
-            <Button
-              onClick={() => {
-                if (experienceStartDateValue) {
-                  updateExperienceMutation.mutate(experienceStartDateValue);
-                }
-              }}
-              disabled={!experienceStartDateValue || updateExperienceMutation.isPending}
-              data-testid="button-save-experience"
-            >
-              {updateExperienceMutation.isPending ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {t.saving}
-                </>
-              ) : (
-                t.saveChanges
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Expiration Date Edit Dialog */}
       <Dialog open={editingExpirationDate !== null} onOpenChange={(open) => {
