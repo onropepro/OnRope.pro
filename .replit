@@ -59,4 +59,4 @@ APP_URL = "https://app.onrope.pro"
 VITE_GEOAPIFY_API_KEY = "${GEOAPIFY_API_KEY}"
 
 [objectStorage]
-defaultBucketID = "replit-objstore-7384c998-585d-4bde-b18e-d8c9ecb92482"
+defaultBucketID = "replit-objstore-6e6b229a-26f3-44e3-8851-0347a883531e"
