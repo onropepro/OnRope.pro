@@ -1251,6 +1251,8 @@ export default function GroundCrewPortal() {
   // ============================================================================
 
   // Helper: Render Driver's License section
+  // Pattern: In view mode, use user data directly (no form.watch overhead)
+  // In edit mode, EditableField uses form.control to manage state
   const renderDriverLicenseSection = () => (
     <div>
       <h3 className="text-lg font-semibold mb-4">{t.driversLicense}</h3>
@@ -1259,7 +1261,7 @@ export default function GroundCrewPortal() {
           isEditing={isEditing}
           name="driversLicenseNumber"
           label={t.licenseNumber}
-          value={isEditing ? form.watch("driversLicenseNumber") : user.driversLicenseNumber}
+          value={user.driversLicenseNumber}
           control={isEditing ? form.control : undefined}
           placeholder="Optional"
           testId="license-number"
@@ -1268,7 +1270,7 @@ export default function GroundCrewPortal() {
           isEditing={isEditing}
           name="driversLicenseIssuedDate"
           label={t.issuedDate}
-          value={isEditing ? form.watch("driversLicenseIssuedDate") : user.driversLicenseIssuedDate}
+          value={user.driversLicenseIssuedDate}
           control={isEditing ? form.control : undefined}
           emptyText={t.notProvided || "Not set"}
           testId="license-issued"
@@ -1277,7 +1279,7 @@ export default function GroundCrewPortal() {
           isEditing={isEditing}
           name="driversLicenseExpiry"
           label={t.expiry}
-          value={isEditing ? form.watch("driversLicenseExpiry") : user.driversLicenseExpiry}
+          value={user.driversLicenseExpiry}
           control={isEditing ? form.control : undefined}
           emptyText={t.notProvided || "Not set"}
           testId="license-expiry"
@@ -1326,6 +1328,8 @@ export default function GroundCrewPortal() {
   );
 
   // Helper: Render First Aid section
+  // Pattern: In view mode, use user data directly (no form.watch overhead)
+  // In edit mode, EditableField uses form.control to manage state
   const renderFirstAidSection = () => (
     <div>
       <h3 className="text-lg font-semibold mb-4">{t.firstAid}</h3>
@@ -1334,7 +1338,7 @@ export default function GroundCrewPortal() {
           isEditing={isEditing}
           name="firstAidType"
           label={t.firstAidType}
-          value={isEditing ? form.watch("firstAidType") : user.firstAidType}
+          value={user.firstAidType}
           control={isEditing ? form.control : undefined}
           placeholder="OFA Level 1, Standard First Aid, etc."
           testId="first-aid-type"
@@ -1343,7 +1347,7 @@ export default function GroundCrewPortal() {
           isEditing={isEditing}
           name="firstAidExpiry"
           label={t.expiry}
-          value={isEditing ? form.watch("firstAidExpiry") : user.firstAidExpiry}
+          value={user.firstAidExpiry}
           control={isEditing ? form.control : undefined}
           emptyText={t.notProvided || "Not set"}
           testId="first-aid-expiry"
