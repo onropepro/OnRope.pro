@@ -64,7 +64,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatDateTime, parseLocalDate } from "@/lib/dateUtils";
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, type JobCategory } from "@shared/jobTypes";
 import type { HistoricalHours } from "@shared/schema";
-import { EditableField, EditableDateField } from "@/components/profile";
+import { EditableField, EditableDateField, EditableSwitch, EditableSelect, EditableTextarea } from "@/components/profile";
 import { 
   User, 
   LogOut, 
@@ -3973,80 +3973,50 @@ export default function TechnicianPortal() {
                         {t.personalInfo}
                       </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
+                      <EditableField
+                        isEditing={true}
                         name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.fullName}</FormLabel>
-                            <FormControl>
-                              <Input {...field} data-testid="input-name" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label={t.fullName}
+                        value={form.watch("name")}
                         control={form.control}
+                        testId="name"
+                      />
+                      <EditableField
+                        isEditing={true}
                         name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.email}</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="email" data-testid="input-email" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label={t.email}
+                        value={form.watch("email")}
                         control={form.control}
+                        type="email"
+                        testId="email"
+                      />
+                      <EditableField
+                        isEditing={true}
                         name="employeePhoneNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.phoneNumber}</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="tel" data-testid="input-phone" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label={t.phoneNumber}
+                        value={form.watch("employeePhoneNumber")}
                         control={form.control}
+                        type="tel"
+                        testId="phone"
+                      />
+                      <EditableSwitch
+                        isEditing={true}
                         name="smsNotificationsEnabled"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between gap-2 rounded-lg border p-3">
-                            <div className="space-y-0.5">
-                              <FormLabel className="text-sm font-medium">
-                                {t.smsNotifications}
-                              </FormLabel>
-                              <p className="text-sm text-muted-foreground">
-                                {t.smsNotificationsDescription}
-                              </p>
-                            </div>
-                            <FormControl>
-                              <Switch
-                                checked={field.value ?? false}
-                                onCheckedChange={field.onChange}
-                                data-testid="switch-sms-notifications"
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label={t.smsNotifications}
+                        value={form.watch("smsNotificationsEnabled")}
                         control={form.control}
+                        helpText={t.smsNotificationsDescription}
+                        enabledText={t.enabled || "Enabled"}
+                        disabledText={t.disabled || "Disabled"}
+                        testId="sms-notifications"
+                      />
+                      <EditableDateField
+                        isEditing={true}
                         name="birthday"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></FormLabel>
-                            <FormControl>
-                              <Input {...field} type="date" data-testid="input-birthday" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                        label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>}
+                        value={form.watch("birthday")}
+                        control={form.control}
+                        testId="birthday"
                       />
                     </div>
                   </div>
@@ -4156,62 +4126,45 @@ export default function TechnicianPortal() {
                       {t.emergencyContact}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
+                      <EditableField
+                        isEditing={true}
                         name="emergencyContactName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Contact Name</FormLabel>
-                            <FormControl>
-                              <Input {...field} data-testid="input-emergency-name" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label="Contact Name"
+                        value={form.watch("emergencyContactName")}
                         control={form.control}
+                        testId="emergency-name"
+                      />
+                      <EditableField
+                        isEditing={true}
                         name="emergencyContactPhone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Contact Phone</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="tel" data-testid="input-emergency-phone" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label="Contact Phone"
+                        value={form.watch("emergencyContactPhone")}
                         control={form.control}
+                        type="tel"
+                        testId="emergency-phone"
+                      />
+                      <EditableSelect
+                        isEditing={true}
                         name="emergencyContactRelationship"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.relationship}</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value || ""}>
-                              <FormControl>
-                                <SelectTrigger data-testid="select-emergency-relationship">
-                                  <SelectValue placeholder={t.relationshipPlaceholder} />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="mother">{t.relationshipOptions.mother}</SelectItem>
-                                <SelectItem value="father">{t.relationshipOptions.father}</SelectItem>
-                                <SelectItem value="spouse">{t.relationshipOptions.spouse}</SelectItem>
-                                <SelectItem value="partner">{t.relationshipOptions.partner}</SelectItem>
-                                <SelectItem value="brother">{t.relationshipOptions.brother}</SelectItem>
-                                <SelectItem value="sister">{t.relationshipOptions.sister}</SelectItem>
-                                <SelectItem value="son">{t.relationshipOptions.son}</SelectItem>
-                                <SelectItem value="daughter">{t.relationshipOptions.daughter}</SelectItem>
-                                <SelectItem value="grandparent">{t.relationshipOptions.grandparent}</SelectItem>
-                                <SelectItem value="friend">{t.relationshipOptions.friend}</SelectItem>
-                                <SelectItem value="roommate">{t.relationshipOptions.roommate}</SelectItem>
-                                <SelectItem value="other">{t.relationshipOptions.other}</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                        label={t.relationship}
+                        value={form.watch("emergencyContactRelationship")}
+                        control={form.control}
+                        placeholder={t.relationshipPlaceholder}
+                        options={[
+                          { value: "mother", label: t.relationshipOptions.mother },
+                          { value: "father", label: t.relationshipOptions.father },
+                          { value: "spouse", label: t.relationshipOptions.spouse },
+                          { value: "partner", label: t.relationshipOptions.partner },
+                          { value: "brother", label: t.relationshipOptions.brother },
+                          { value: "sister", label: t.relationshipOptions.sister },
+                          { value: "son", label: t.relationshipOptions.son },
+                          { value: "daughter", label: t.relationshipOptions.daughter },
+                          { value: "grandparent", label: t.relationshipOptions.grandparent },
+                          { value: "friend", label: t.relationshipOptions.friend },
+                          { value: "roommate", label: t.relationshipOptions.roommate },
+                          { value: "other", label: t.relationshipOptions.other },
+                        ]}
+                        testId="emergency-relationship"
                       />
                     </div>
                   </div>
@@ -4225,59 +4178,43 @@ export default function TechnicianPortal() {
                       {t.payrollInfo}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
+                      <EditableField
+                        isEditing={true}
                         name="socialInsuranceNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Social Insurance Number</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Optional" data-testid="input-sin" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                        label="Social Insurance Number"
+                        value={form.watch("socialInsuranceNumber")}
+                        control={form.control}
+                        placeholder="Optional"
+                        testId="sin"
                       />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
+                      <EditableField
+                        isEditing={true}
                         name="bankTransitNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Bank Transit #</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="5 digits" data-testid="input-bank-transit" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label="Bank Transit #"
+                        value={form.watch("bankTransitNumber")}
                         control={form.control}
+                        placeholder="5 digits"
+                        testId="bank-transit"
+                      />
+                      <EditableField
+                        isEditing={true}
                         name="bankInstitutionNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Institution #</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="3 digits" data-testid="input-bank-institution" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label="Institution #"
+                        value={form.watch("bankInstitutionNumber")}
                         control={form.control}
+                        placeholder="3 digits"
+                        testId="bank-institution"
+                      />
+                      <EditableField
+                        isEditing={true}
                         name="bankAccountNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Account #</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="7-12 digits" data-testid="input-bank-account" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                        label="Account #"
+                        value={form.watch("bankAccountNumber")}
+                        control={form.control}
+                        placeholder="7-12 digits"
+                        testId="bank-account"
                       />
                     </div>
                   </div>
@@ -4328,38 +4265,26 @@ export default function TechnicianPortal() {
                       <Clock className="w-4 h-4" />
                       Logbook Hours
                     </h3>
-                    <FormField
-                      control={form.control}
+                    <EditableField
+                      isEditing={true}
                       name="irataBaselineHours"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Baseline Logbook Hours</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" step="0.5" placeholder="e.g., 1500" data-testid="input-baseline-hours" />
-                          </FormControl>
-                          <p className="text-xs text-muted-foreground">
-                            This is a personal tracking tool only, not an official irata/SPRAT record.
-                          </p>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label="Baseline Logbook Hours"
+                      value={form.watch("irataBaselineHours")}
+                      control={form.control}
+                      type="number"
+                      placeholder="e.g., 1500"
+                      helpText="This is a personal tracking tool only, not an official irata/SPRAT record."
+                      testId="baseline-hours"
                     />
                     
-                    <FormField
-                      control={form.control}
+                    <EditableDateField
+                      isEditing={true}
                       name="ropeAccessStartDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t.experienceStartDate}</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="date" data-testid="input-experience-start-date" />
-                          </FormControl>
-                          <p className="text-xs text-muted-foreground">
-                            {t.experienceStartDateHelp}
-                          </p>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label={t.experienceStartDate}
+                      value={form.watch("ropeAccessStartDate")}
+                      control={form.control}
+                      helpText={t.experienceStartDateHelp}
+                      testId="experience-start-date"
                     />
                   </div>
 
@@ -4370,23 +4295,15 @@ export default function TechnicianPortal() {
                       <AlertCircle className="w-4 h-4" />
                       {t.medicalConditions}
                     </h3>
-                    <FormField
-                      control={form.control}
+                    <EditableTextarea
+                      isEditing={true}
                       name="specialMedicalConditions"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t.specialMedicalConditions}</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              {...field} 
-                              placeholder={t.medicalPlaceholder}
-                              className="min-h-[80px]"
-                              data-testid="input-medical"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label={t.specialMedicalConditions}
+                      value={form.watch("specialMedicalConditions")}
+                      control={form.control}
+                      placeholder={t.medicalPlaceholder}
+                      rows={4}
+                      testId="medical"
                     />
                   </div>
                   </TabsContent>
@@ -4410,9 +4327,43 @@ export default function TechnicianPortal() {
                     {t.personalInfo}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InfoItem label={t.email} value={user.email} icon={<Mail className="w-4 h-4" />} />
-                    <InfoItem label={t.phoneNumber} value={formatPhoneNumber(user.employeePhoneNumber)} icon={<Phone className="w-4 h-4" />} />
-                    <InfoItem label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>} value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
+                    <EditableField
+                      isEditing={false}
+                      name="email"
+                      label={t.email}
+                      value={user.email}
+                      icon={<Mail className="w-4 h-4" />}
+                      emptyText={t.notProvided || "Not provided"}
+                      testId="email"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="employeePhoneNumber"
+                      label={t.phoneNumber}
+                      value={user.employeePhoneNumber}
+                      formatValue={(val) => formatPhoneNumber(val)}
+                      icon={<Phone className="w-4 h-4" />}
+                      emptyText={t.notProvided || "Not provided"}
+                      testId="phone"
+                    />
+                    <EditableDateField
+                      isEditing={false}
+                      name="birthday"
+                      label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>}
+                      value={user.birthday}
+                      emptyText={t.notProvided || "Not set"}
+                      testId="birthday"
+                      formatDate={(d) => {
+                        if (!d) return "";
+                        try {
+                          if (typeof d === 'string') return formatLocalDate(d);
+                          const date = d instanceof Date ? d : new Date(d);
+                          return formatLocalDate(date.toISOString().split('T')[0]);
+                        } catch {
+                          return String(d);
+                        }
+                      }}
+                    />
                   </div>
                 </div>
 
@@ -5266,9 +5217,31 @@ export default function TechnicianPortal() {
                     Emergency Contact
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <InfoItem label="Name" value={user.emergencyContactName} />
-                    <InfoItem label="Phone" value={formatPhoneNumber(user.emergencyContactPhone)} />
-                    <InfoItem label="Relationship" value={user.emergencyContactRelationship} />
+                    <EditableField
+                      isEditing={false}
+                      name="emergencyContactName"
+                      label="Name"
+                      value={user.emergencyContactName}
+                      emptyText="Not provided"
+                      testId="emergency-name"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="emergencyContactPhone"
+                      label="Phone"
+                      value={user.emergencyContactPhone}
+                      formatValue={(val) => formatPhoneNumber(val)}
+                      emptyText="Not provided"
+                      testId="emergency-phone"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="emergencyContactRelationship"
+                      label="Relationship"
+                      value={user.emergencyContactRelationship}
+                      emptyText="Not selected"
+                      testId="emergency-relationship"
+                    />
                   </div>
                 </div>
               </div>
@@ -5283,12 +5256,44 @@ export default function TechnicianPortal() {
                     Payroll Information
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InfoItem label="SIN" value={maskSensitiveData(user.socialInsuranceNumber)} />
+                    <EditableField
+                      isEditing={false}
+                      name="socialInsuranceNumber"
+                      label="SIN"
+                      value={user.socialInsuranceNumber}
+                      formatValue={(val) => maskSensitiveData(val)}
+                      emptyText="Not provided"
+                      testId="sin"
+                    />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <InfoItem label="Transit Number" value={maskSensitiveData(user.bankTransitNumber)} />
-                    <InfoItem label="Branch Number" value={maskSensitiveData(user.bankInstitutionNumber)} />
-                    <InfoItem label="Account Number" value={maskSensitiveData(user.bankAccountNumber)} />
+                    <EditableField
+                      isEditing={false}
+                      name="bankTransitNumber"
+                      label="Transit Number"
+                      value={user.bankTransitNumber}
+                      formatValue={(val) => maskSensitiveData(val)}
+                      emptyText="Not provided"
+                      testId="bank-transit"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="bankInstitutionNumber"
+                      label="Branch Number"
+                      value={user.bankInstitutionNumber}
+                      formatValue={(val) => maskSensitiveData(val)}
+                      emptyText="Not provided"
+                      testId="bank-institution"
+                    />
+                    <EditableField
+                      isEditing={false}
+                      name="bankAccountNumber"
+                      label="Account Number"
+                      value={user.bankAccountNumber}
+                      formatValue={(val) => maskSensitiveData(val)}
+                      emptyText="Not provided"
+                      testId="bank-account"
+                    />
                   </div>
                   
                   {/* Upload void cheque button - always visible if no banking documents exist */}
@@ -5342,7 +5347,16 @@ export default function TechnicianPortal() {
                       value={user.driversLicenseIssuedDate}
                       emptyText={t.notProvided || "Not set"}
                       testId="license-issued-date"
-                      formatDate={(d) => formatLocalDate(typeof d === 'string' ? d : d.toISOString())}
+                      formatDate={(d) => {
+                        if (!d) return "";
+                        try {
+                          if (typeof d === 'string') return formatLocalDate(d);
+                          const date = d instanceof Date ? d : new Date(d);
+                          return formatLocalDate(date.toISOString().split('T')[0]);
+                        } catch {
+                          return String(d);
+                        }
+                      }}
                     />
                     <EditableDateField
                       isEditing={false}
@@ -5351,7 +5365,16 @@ export default function TechnicianPortal() {
                       value={user.driversLicenseExpiry}
                       emptyText={t.notProvided || "Not set"}
                       testId="license-expiry"
-                      formatDate={(d) => formatLocalDate(typeof d === 'string' ? d : d.toISOString())}
+                      formatDate={(d) => {
+                        if (!d) return "";
+                        try {
+                          if (typeof d === 'string') return formatLocalDate(d);
+                          const date = d instanceof Date ? d : new Date(d);
+                          return formatLocalDate(date.toISOString().split('T')[0]);
+                        } catch {
+                          return String(d);
+                        }
+                      }}
                     />
                   </div>
                       {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 && (

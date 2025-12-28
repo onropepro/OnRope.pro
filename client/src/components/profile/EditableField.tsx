@@ -18,6 +18,7 @@ interface EditableFieldProps<T extends FieldValues> {
   masked?: boolean;
   maskChar?: string;
   showLastN?: number;
+  formatValue?: (value: string) => string | null;
   emptyText?: string;
   testId?: string;
   className?: string;
@@ -45,6 +46,7 @@ export function EditableField<T extends FieldValues>({
   masked = false,
   maskChar = "x",
   showLastN = 4,
+  formatValue,
   emptyText = "Not provided",
   testId,
   className = "",
@@ -88,7 +90,13 @@ export function EditableField<T extends FieldValues>({
   let displayValue: string | null = null;
 
   if (value) {
-    displayValue = masked ? maskValue(value, showLastN, maskChar) : value;
+    if (formatValue) {
+      displayValue = formatValue(value);
+    } else if (masked) {
+      displayValue = maskValue(value, showLastN, maskChar);
+    } else {
+      displayValue = value;
+    }
   }
 
   return (
