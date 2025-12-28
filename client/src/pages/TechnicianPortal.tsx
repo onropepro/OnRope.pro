@@ -4189,53 +4189,183 @@ export default function TechnicianPortal() {
                   </div>
                   </TabsContent>
 
-                  {/* PAYROLL INFORMATION TAB - EDIT MODE */}
+                  {/* PAYROLL INFORMATION TAB - UNIFIED */}
                   <TabsContent value="payroll" className="mt-0 space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <Building className="w-4 h-4" />
-                      {t.payrollInfo}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <EditableField
-                        isEditing={true}
-                        name="socialInsuranceNumber"
-                        label="Social Insurance Number"
-                        value={form.watch("socialInsuranceNumber")}
-                        control={form.control}
-                        placeholder="Optional"
-                        testId="sin"
-                      />
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                        <Building className="w-4 h-4" />
+                        {t.payrollInfo || "Payroll Information"}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <EditableField
+                          isEditing={isEditing}
+                          name="socialInsuranceNumber"
+                          label="Social Insurance Number"
+                          value={isEditing ? form.watch("socialInsuranceNumber") : user.socialInsuranceNumber}
+                          control={isEditing ? form.control : undefined}
+                          placeholder="Optional"
+                          formatValue={(val) => maskSensitiveData(val)}
+                          emptyText="Not provided"
+                          testId="sin"
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <EditableField
+                          isEditing={isEditing}
+                          name="bankTransitNumber"
+                          label={isEditing ? "Bank Transit #" : "Transit Number"}
+                          value={isEditing ? form.watch("bankTransitNumber") : user.bankTransitNumber}
+                          control={isEditing ? form.control : undefined}
+                          placeholder="5 digits"
+                          formatValue={(val) => maskSensitiveData(val)}
+                          emptyText="Not provided"
+                          testId="bank-transit"
+                        />
+                        <EditableField
+                          isEditing={isEditing}
+                          name="bankInstitutionNumber"
+                          label={isEditing ? "Institution #" : "Branch Number"}
+                          value={isEditing ? form.watch("bankInstitutionNumber") : user.bankInstitutionNumber}
+                          control={isEditing ? form.control : undefined}
+                          placeholder="3 digits"
+                          formatValue={(val) => maskSensitiveData(val)}
+                          emptyText="Not provided"
+                          testId="bank-institution"
+                        />
+                        <EditableField
+                          isEditing={isEditing}
+                          name="bankAccountNumber"
+                          label={isEditing ? "Account #" : "Account Number"}
+                          value={isEditing ? form.watch("bankAccountNumber") : user.bankAccountNumber}
+                          control={isEditing ? form.control : undefined}
+                          placeholder="7-12 digits"
+                          formatValue={(val) => maskSensitiveData(val)}
+                          emptyText="Not provided"
+                          testId="bank-account"
+                        />
+                      </div>
+                      
+                      {/* Upload void cheque button - shown if no banking documents exist */}
+                      {!isEditing && (!user.bankDocuments || user.bankDocuments.filter((u: string) => u && u.trim()).length === 0) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('voidCheque')}
+                          disabled={uploadingDocType === 'voidCheque'}
+                          data-testid="button-upload-void-cheque-payroll"
+                        >
+                          {uploadingDocType === 'voidCheque' ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t.uploading}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              {t.uploadVoidCheque}
+                            </>
+                          )}
+                        </Button>
+                      )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <EditableField
-                        isEditing={true}
-                        name="bankTransitNumber"
-                        label="Bank Transit #"
-                        value={form.watch("bankTransitNumber")}
-                        control={form.control}
-                        placeholder="5 digits"
-                        testId="bank-transit"
-                      />
-                      <EditableField
-                        isEditing={true}
-                        name="bankInstitutionNumber"
-                        label="Institution #"
-                        value={form.watch("bankInstitutionNumber")}
-                        control={form.control}
-                        placeholder="3 digits"
-                        testId="bank-institution"
-                      />
-                      <EditableField
-                        isEditing={true}
-                        name="bankAccountNumber"
-                        label="Account #"
-                        value={form.watch("bankAccountNumber")}
-                        control={form.control}
-                        placeholder="7-12 digits"
-                        testId="bank-account"
-                      />
-                    </div>
+
+                    {/* Banking Documents Section - View mode only */}
+                    {!isEditing && user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                      <div className="space-y-3">
+                        <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                          <ImageIcon className="w-4 h-4" />
+                          Banking Documents (Void Cheque)
+                        </h3>
+                        <div className="space-y-3">
+                          {user.bankDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                            const lowerUrl = url.toLowerCase();
+                            const isPdf = lowerUrl.endsWith('.pdf');
+                            const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                          lowerUrl.includes('image') || 
+                                          (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                            
+                            return (
+                              <div key={index} className="relative">
+                                <a 
+                                  href={url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                                >
+                                  {isPdf ? (
+                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                      <FileText className="w-12 h-12 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                    </div>
+                                  ) : isImage ? (
+                                    <img 
+                                      src={url} 
+                                      alt={`Banking document ${index + 1}`}
+                                      className="w-full object-contain"
+                                      style={{ maxHeight: '300px', minHeight: '100px' }}
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.onerror = null;
+                                        target.style.display = 'none';
+                                        const parent = target.parentElement;
+                                        if (parent) {
+                                          const div = document.createElement('div');
+                                          div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                                          div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                          parent.appendChild(div);
+                                        }
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                      <FileText className="w-12 h-12 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                    </div>
+                                  )}
+                                </a>
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute top-2 right-2 h-7 w-7"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setDeletingDocument({ type: 'bankDocuments', url });
+                                  }}
+                                  data-testid={`button-delete-bank-doc-${index}`}
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        
+                        {/* Upload additional void cheque button */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('voidCheque')}
+                          disabled={uploadingDocType === 'voidCheque'}
+                          data-testid="button-upload-void-cheque"
+                        >
+                          {uploadingDocType === 'voidCheque' ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t.uploading}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 
+                                ? t.addVoidCheque 
+                                : t.uploadVoidCheque}
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   </TabsContent>
 
@@ -5255,81 +5385,6 @@ export default function TechnicianPortal() {
               </div>
               </TabsContent>
 
-              {/* PAYROLL INFORMATION TAB - VIEW MODE */}
-              <TabsContent value="payroll" className="mt-0 space-y-6">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <Building className="w-4 h-4" />
-                    Payroll Information
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <EditableField
-                      isEditing={false}
-                      name="socialInsuranceNumber"
-                      label="SIN"
-                      value={user.socialInsuranceNumber}
-                      formatValue={(val) => maskSensitiveData(val)}
-                      emptyText="Not provided"
-                      testId="sin"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <EditableField
-                      isEditing={false}
-                      name="bankTransitNumber"
-                      label="Transit Number"
-                      value={user.bankTransitNumber}
-                      formatValue={(val) => maskSensitiveData(val)}
-                      emptyText="Not provided"
-                      testId="bank-transit"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="bankInstitutionNumber"
-                      label="Branch Number"
-                      value={user.bankInstitutionNumber}
-                      formatValue={(val) => maskSensitiveData(val)}
-                      emptyText="Not provided"
-                      testId="bank-institution"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="bankAccountNumber"
-                      label="Account Number"
-                      value={user.bankAccountNumber}
-                      formatValue={(val) => maskSensitiveData(val)}
-                      emptyText="Not provided"
-                      testId="bank-account"
-                    />
-                  </div>
-                  
-                  {/* Upload void cheque button - always visible if no banking documents exist */}
-                  {(!user.bankDocuments || user.bankDocuments.filter((u: string) => u && u.trim()).length === 0) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => triggerDocumentUpload('voidCheque')}
-                      disabled={uploadingDocType === 'voidCheque'}
-                      data-testid="button-upload-void-cheque-payroll"
-                    >
-                      {uploadingDocType === 'voidCheque' ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t.uploading}
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          {t.uploadVoidCheque}
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </div>
-              </TabsContent>
-
               {/* DRIVER TAB - VIEW MODE */}
               <TabsContent value="driver" className="mt-0 space-y-6">
               <div className="space-y-6">
@@ -5509,109 +5564,6 @@ export default function TechnicianPortal() {
                         </Button>
                       </div>
                 </div>
-              </div>
-              </TabsContent>
-
-              {/* PAYROLL TAB CONTINUED - Banking Documents */}
-              <TabsContent value="payroll" className="mt-0 space-y-6">
-              <div className="space-y-6">
-                {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                  <>
-                    <div className="space-y-3">
-                      <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                        <ImageIcon className="w-4 h-4" />
-                        Banking Documents (Void Cheque)
-                      </h3>
-                      <div className="space-y-3">
-                        {user.bankDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
-                          const lowerUrl = url.toLowerCase();
-                          const isPdf = lowerUrl.endsWith('.pdf');
-                          const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
-                                        lowerUrl.includes('image') || 
-                                        (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
-                          
-                          return (
-                            <div key={index} className="relative">
-                              <a 
-                                href={url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                              >
-                                {isPdf ? (
-                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                    <FileText className="w-12 h-12 text-muted-foreground" />
-                                    <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
-                                  </div>
-                                ) : isImage ? (
-                                  <img 
-                                    src={url} 
-                                    alt={`Banking document ${index + 1}`}
-                                    className="w-full object-contain"
-                                    style={{ maxHeight: '300px', minHeight: '100px' }}
-                                    onError={(e) => {
-                                      const target = e.target as HTMLImageElement;
-                                      target.onerror = null;
-                                      target.style.display = 'none';
-                                      const parent = target.parentElement;
-                                      if (parent) {
-                                        const div = document.createElement('div');
-                                        div.className = 'flex flex-col items-center justify-center py-8 gap-2';
-                                        div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
-                                        parent.appendChild(div);
-                                      }
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                    <FileText className="w-12 h-12 text-muted-foreground" />
-                                    <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
-                                  </div>
-                                )}
-                              </a>
-                              <Button
-                                variant="destructive"
-                                size="icon"
-                                className="absolute top-2 right-2 h-7 w-7"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setDeletingDocument({ type: 'bankDocuments', url });
-                                }}
-                                data-testid={`button-delete-bank-doc-${index}`}
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      
-                      {/* Upload button for void cheque */}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => triggerDocumentUpload('voidCheque')}
-                        disabled={uploadingDocType === 'voidCheque'}
-                        data-testid="button-upload-void-cheque"
-                      >
-                        {uploadingDocType === 'voidCheque' ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            {t.uploading}
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-4 h-4 mr-2" />
-                            {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 
-                              ? t.addVoidCheque 
-                              : t.uploadVoidCheque}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </>
-                )}
               </div>
               </TabsContent>
 
