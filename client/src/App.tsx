@@ -113,6 +113,7 @@ import GroundCrewLanding from "@/pages/GroundCrewLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
+import ProfileTest from "@/pages/ProfileTest";
 import HelpCenter from "@/pages/help/HelpCenter";
 import HelpSearch from "@/pages/help/HelpSearch";
 import HelpArticle from "@/pages/help/HelpArticle";
@@ -209,6 +210,7 @@ function Router() {
           <Route path="/technician" component={TechnicianLanding} />
           <Route path="/ground-crew" component={GroundCrewLanding} />
           <Route path="/pricing" component={Pricing} />
+          <Route path="/profile-test" component={ProfileTest} />
           <Route path="/get-license" component={GetLicense} />
           <Route path="/complete-registration" component={CompleteRegistration} />
           <Route path="/link" component={ResidentLink} />
