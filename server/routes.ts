@@ -3868,7 +3868,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const filtered = cards.filter(card => {
           if (card.permission === null) return true;
           if (user.role === 'company') return true;
-          return user.permissions?.includes(card.permission.replace('can', 'view_').replace('manage', 'manage_'));
+          // Convert camelCase permission to snake_case (e.g., viewProjects -> view_projects)
+          const snakeCasePermission = card.permission.replace(/([A-Z])/g, '_$1').toLowerCase();
+          return user.permissions?.includes(snakeCasePermission);
         });
         if (filtered.length > 0) {
           filteredGrouped[category] = filtered.map(c => ({
