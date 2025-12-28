@@ -1190,6 +1190,41 @@ export class Storage {
     return result[0];
   }
 
+  // Get any active billable work session for this employee (regardless of project)
+  async getActiveWorkSessionAcrossProjects(employeeId: string): Promise<WorkSession | undefined> {
+    const result = await db.select().from(workSessions)
+      .where(
+        and(
+          eq(workSessions.employeeId, employeeId),
+          isNull(workSessions.endTime)
+        )
+      )
+      .limit(1);
+    return result[0];
+  }
+
+  // Get any active session (billable or non-billable) for this employee
+  async getAnyActiveSession(employeeId: string): Promise<{ type: 'billable' | 'non_billable', session: any, projectName?: string, description?: string } | null> {
+    // Check billable sessions first
+    const activeBillable = await this.getActiveWorkSessionAcrossProjects(employeeId);
+    if (activeBillable) {
+      let projectName: string | undefined;
+      if (activeBillable.projectId) {
+        const project = await this.getProjectById(activeBillable.projectId);
+        projectName = project?.name;
+      }
+      return { type: 'billable', session: activeBillable, projectName };
+    }
+    
+    // Check non-billable sessions
+    const activeNonBillable = await this.getActiveNonBillableSession(employeeId);
+    if (activeNonBillable) {
+      return { type: 'non_billable', session: activeNonBillable, description: activeNonBillable.description };
+    }
+    
+    return null;
+  }
+
   async getWorkSessionById(sessionId: string): Promise<WorkSession | undefined> {
     const result = await db.select().from(workSessions)
       .where(eq(workSessions.id, sessionId))

@@ -14632,11 +14632,29 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         return res.status(403).json({ message: "Access denied - you cannot work on this project" });
       }
       
-      // Check if there's already an active session for this employee on this project
-      const activeSession = await storage.getActiveWorkSession(currentUser.id, projectId);
+      // Check if there's already an active session (billable or non-billable) anywhere
+      const existingSession = await storage.getAnyActiveSession(currentUser.id);
       
-      if (activeSession) {
-        return res.status(400).json({ message: "You already have an active work session for this project" });
+      if (existingSession) {
+        if (existingSession.type === 'billable') {
+          return res.status(400).json({ 
+            message: `You already have an active work session at "${existingSession.projectName || 'another project'}". Please clock out first.`,
+            activeSession: {
+              type: 'billable',
+              projectName: existingSession.projectName,
+              startTime: existingSession.session.startTime
+            }
+          });
+        } else {
+          return res.status(400).json({ 
+            message: `You already have an active non-billable session ("${existingSession.description || 'activity'}"). Please clock out first.`,
+            activeSession: {
+              type: 'non_billable',
+              description: existingSession.description,
+              startTime: existingSession.session.startTime
+            }
+          });
+        }
       }
       
       // Get project to access company ID
@@ -15697,10 +15715,29 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Check if employee already has an active non-billable session
-      const activeSession = await storage.getActiveNonBillableSession(currentUser.id);
-      if (activeSession) {
-        return res.status(400).json({ message: "You already have an active non-billable session" });
+      // Check if there's already an active session (billable or non-billable) anywhere
+      const existingSession = await storage.getAnyActiveSession(currentUser.id);
+      
+      if (existingSession) {
+        if (existingSession.type === 'billable') {
+          return res.status(400).json({ 
+            message: `You already have an active work session at "${existingSession.projectName || 'a project'}". Please clock out first.`,
+            activeSession: {
+              type: 'billable',
+              projectName: existingSession.projectName,
+              startTime: existingSession.session.startTime
+            }
+          });
+        } else {
+          return res.status(400).json({ 
+            message: `You already have an active non-billable session ("${existingSession.description || 'activity'}"). Please clock out first.`,
+            activeSession: {
+              type: 'non_billable',
+              description: existingSession.description,
+              startTime: existingSession.session.startTime
+            }
+          });
+        }
       }
       
       // Use client's local date if provided, otherwise fall back to server date
