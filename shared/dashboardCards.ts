@@ -13,7 +13,7 @@ export interface CardDefinition {
 // Full card registry
 export const CARD_REGISTRY: CardDefinition[] = [
   // OPERATIONS
-  { id: 'proj-active', name: 'Active Projects', description: 'List with progress %', category: 'OPERATIONS', permission: 'viewProjects', size: 'single' },
+  { id: 'proj-active', name: 'Active Projects', description: 'List with progress %', category: 'OPERATIONS', permission: null, size: 'single' },
   { id: 'proj-overdue', name: 'Overdue Projects', description: 'Past due date', category: 'OPERATIONS', permission: 'viewProjects', size: 'single' },
   { id: 'time-active', name: 'Active Workers', description: 'Who\'s clocked in now', category: 'OPERATIONS', permission: 'viewWorkSessions', refreshInterval: 30000, size: 'single' },
   { id: 'time-notclocked', name: 'Not Clocked In', description: 'Scheduled but not started', category: 'OPERATIONS', permission: 'manageEmployees', size: 'single' },
@@ -60,9 +60,9 @@ export const DEFAULT_LAYOUTS: Record<string, string[]> = {
   operations_manager: ['proj-active', 'safe-csr', 'sched-today', 'time-active', 'emp-certs'],
   manager: ['proj-active', 'safe-csr', 'sched-today', 'time-active'],
   supervisor: ['proj-active', 'safe-csr', 'sched-today', 'time-active'],
-  rope_access_tech: ['time-my', 'sched-my', 'safe-csr', 'perf-my'],
-  ground_crew: ['time-my', 'sched-my', 'safe-csr', 'perf-my'],
-  ground_crew_supervisor: ['time-my', 'sched-my', 'safe-csr', 'perf-my'],
+  rope_access_tech: ['time-my', 'sched-my', 'safe-csr', 'perf-my', 'proj-active'],
+  ground_crew: ['time-my', 'sched-my', 'safe-csr', 'perf-my', 'proj-active'],
+  ground_crew_supervisor: ['time-my', 'sched-my', 'safe-csr', 'perf-my', 'proj-active'],
 };
 
 // Permission mapping for server-side filtering
