@@ -2952,15 +2952,187 @@ export default function TechnicianPortal() {
         </div>
       </div>
       
-      {/* Note about IRATA/SPRAT */}
-      <div className="p-3 bg-muted/50 rounded-lg border">
-        <p className="text-sm text-muted-foreground">
-          {language === 'en' 
-            ? 'IRATA and SPRAT certifications are managed through the verification process. Exit edit mode to access verification options.'
-            : language === 'fr'
-            ? 'Les certifications IRATA et SPRAT sont gérées via le processus de vérification. Quittez le mode édition pour accéder aux options de vérification.'
-            : 'Las certificaciones IRATA y SPRAT se gestionan a través del proceso de verificación. Salga del modo de edición para acceder a las opciones de verificación.'}
-        </p>
+      {/* IRATA/SPRAT Verification Quick Actions */}
+      <div className="space-y-4 pt-4 border-t">
+        <h3 className="font-medium flex items-center gap-2">
+          <Award className="w-4 h-4" />
+          {language === 'en' ? 'IRATA/SPRAT Verification' : language === 'fr' ? 'Vérification IRATA/SPRAT' : 'Verificación IRATA/SPRAT'}
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* IRATA Section */}
+          <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <span className="font-medium text-sm">IRATA</span>
+              {user.irataVerifiedAt && (
+                <Badge variant="default" className="bg-green-600 text-xs">
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                  {t.verified}
+                </Badge>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => openExternalLink('https://techconnect.irata.org/verify/tech')}
+                data-testid="button-open-irata-portal-edit"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                {t.openIrataPortal}
+              </Button>
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                onClick={() => screenshotInputRef.current?.click()}
+                disabled={isVerifying}
+                data-testid="button-upload-irata-screenshot-edit"
+              >
+                {isVerifying ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t.analyzingScreenshot}
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    {t.uploadVerificationScreenshot}
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => triggerDocumentUpload('irataCertificationCard')}
+                disabled={uploadingDocType === 'irataCertificationCard'}
+                data-testid="button-upload-irata-card-edit"
+              >
+                {uploadingDocType === 'irataCertificationCard' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t.uploading}
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    {t.uploadIrataCertificationCard}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+          
+          {/* SPRAT Section */}
+          <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <span className="font-medium text-sm">SPRAT</span>
+              {user.spratVerifiedAt && (
+                <Badge variant="default" className="bg-green-600 text-xs">
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                  {t.verified}
+                </Badge>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => openExternalLink('https://sprat.org/technician-verification-system/')}
+                data-testid="button-open-sprat-portal-edit"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                {t.openSpratPortal}
+              </Button>
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                onClick={() => spratScreenshotInputRef.current?.click()}
+                disabled={isVerifyingSprat}
+                data-testid="button-upload-sprat-screenshot-edit"
+              >
+                {isVerifyingSprat ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t.analyzingScreenshot}
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    {t.uploadVerificationScreenshot}
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => triggerDocumentUpload('spratCertificationCard')}
+                disabled={uploadingDocType === 'spratCertificationCard'}
+                data-testid="button-upload-sprat-card-edit"
+              >
+                {uploadingDocType === 'spratCertificationCard' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t.uploading}
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    {t.uploadSpratCertificationCard}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Verification result displays */}
+        {verificationResult && (
+          <div className={`p-3 rounded-lg border ${
+            verificationResult.success 
+              ? 'bg-green-500/10 border-green-500/30' 
+              : 'bg-destructive/10 border-destructive/30'
+          }`}>
+            <div className="flex items-start gap-2">
+              {verificationResult.success ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+              )}
+              <p className={`text-sm font-medium ${
+                verificationResult.success ? 'text-green-700 dark:text-green-400' : 'text-destructive'
+              }`}>
+                IRATA: {verificationResult.message}
+              </p>
+            </div>
+          </div>
+        )}
+        
+        {spratVerificationResult && (
+          <div className={`p-3 rounded-lg border ${
+            spratVerificationResult.success 
+              ? 'bg-green-500/10 border-green-500/30' 
+              : 'bg-destructive/10 border-destructive/30'
+          }`}>
+            <div className="flex items-start gap-2">
+              {spratVerificationResult.success ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+              )}
+              <p className={`text-sm font-medium ${
+                spratVerificationResult.success ? 'text-green-700 dark:text-green-400' : 'text-destructive'
+              }`}>
+                SPRAT: {spratVerificationResult.message}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
