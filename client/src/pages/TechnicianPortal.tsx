@@ -5287,6 +5287,20 @@ export default function TechnicianPortal() {
                     <InfoItem label="Relationship" value={user.emergencyContactRelationship} />
                   </div>
                 </div>
+                
+                {/* Medical Conditions Section */}
+                <Separator />
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <AlertCircle className="w-4 h-4" />
+                    {t.medicalConditions}
+                  </h3>
+                  {user.specialMedicalConditions ? (
+                    <p className="text-sm">{user.specialMedicalConditions}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">{t.notProvided}</p>
+                  )}
+                </div>
               </div>
               </TabsContent>
 
