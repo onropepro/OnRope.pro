@@ -285,6 +285,12 @@ const translations = {
     uploadFailed: "Upload Failed",
     selectFile: "Select a file to upload",
     uploading: "Uploading...",
+    loading: "Loading...",
+    ocrSuccess: "Document Scanned",
+    ocrFieldsAutofilled: "{count} fields auto-filled from document",
+    ocrBankFieldsAutofilled: "{count} bank fields auto-filled from document",
+    enabled: "Enabled",
+    disabled: "Disabled",
     notProvided: "Not provided",
     loadingProfile: "Loading your profile...",
     pleaseLogin: "Please log in to view your profile.",
@@ -689,6 +695,12 @@ const translations = {
     uploadFailed: "Échec du téléversement",
     selectFile: "Sélectionner un fichier à téléverser",
     uploading: "Téléversement...",
+    loading: "Chargement...",
+    ocrSuccess: "Document numérisé",
+    ocrFieldsAutofilled: "{count} champs remplis automatiquement depuis le document",
+    ocrBankFieldsAutofilled: "{count} champs bancaires remplis automatiquement depuis le document",
+    enabled: "Activé",
+    disabled: "Désactivé",
     notProvided: "Non fourni",
     loadingProfile: "Chargement de votre profil...",
     pleaseLogin: "Veuillez vous connecter pour voir votre profil.",
@@ -1060,6 +1072,13 @@ const translations = {
     orClickToUpload: "o haga clic para subir",
     supportedFormats: "Formatos soportados: PDF, DOC, DOCX (max 5MB)",
     uploading: "Subiendo...",
+    loading: "Cargando...",
+    ocrSuccess: "Documento Escaneado",
+    ocrFieldsAutofilled: "{count} campos completados automáticamente del documento",
+    ocrBankFieldsAutofilled: "{count} campos bancarios completados automáticamente del documento",
+    enabled: "Habilitado",
+    disabled: "Deshabilitado",
+    notProvided: "No proporcionado",
     resumeUploaded: "Curriculum Subido",
     resumeUploadedDesc: "Su curriculum ha sido subido exitosamente",
     resumeUploadFailed: "Error al subir el curriculum",
@@ -1220,7 +1239,6 @@ const translations = {
     documentUploadedDesc: "Su documento ha sido subido exitosamente.",
     uploadFailed: "Error al Subir",
     selectFile: "Seleccione un archivo para subir",
-    notProvided: "No proporcionado",
     loadingProfile: "Cargando su perfil...",
     pleaseLogin: "Por favor inicie sesion para ver su perfil.",
     goToLogin: "Ir a Iniciar Sesion",
@@ -6164,7 +6182,7 @@ function CertificationsManager({ t }: { t: any }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Query for fetching certifications
-  const { data: certificationsData, isLoading, refetch } = useQuery({
+  const { data: certificationsData, isLoading, refetch } = useQuery<{ certifications: any[] }>({
     queryKey: ['/api/user/certifications'],
   });
   
