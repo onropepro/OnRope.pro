@@ -4346,6 +4346,16 @@ export default function TechnicianPortal() {
                       emptyText={t.notProvided || "Not provided"}
                       testId="phone"
                     />
+                    <EditableSwitch
+                      isEditing={false}
+                      name="smsNotificationsEnabled"
+                      label={t.smsNotifications}
+                      value={user.smsNotificationsEnabled}
+                      helpText={t.smsNotificationsDescription}
+                      enabledText={t.enabled || "Enabled"}
+                      disabledText={t.disabled || "Disabled"}
+                      testId="sms-notifications"
+                    />
                     <EditableDateField
                       isEditing={false}
                       name="birthday"
