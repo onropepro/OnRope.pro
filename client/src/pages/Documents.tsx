@@ -6683,6 +6683,11 @@ export default function Documents() {
                                           <div className="flex-1 min-w-0">
                                             <div className="font-medium text-sm">{inspection.inspectorName}</div>
                                             <div className="text-xs text-muted-foreground">{inspection.manufacturer || 'Equipment inspection'}</div>
+                                            {inspection.overallStatus === 'not_applicable' && inspection.comments && (
+                                              <div className="text-xs text-amber-600 dark:text-amber-400 mt-1 italic">
+                                                Reason: {inspection.comments}
+                                              </div>
+                                            )}
                                           </div>
                                           <Badge variant={inspection.overallStatus === 'pass' ? 'default' : 'destructive'} className="text-xs">
                                             {inspection.overallStatus || 'N/A'}
