@@ -5486,18 +5486,7 @@ export default function TechnicianPortal() {
                   
                   <CertificationsManager t={t} />
                 </div>
-              </div>
-              </TabsContent>
 
-              {/* DRIVER TAB - UNIFIED (uses renderDriverTab helper) */}
-              {renderDriverTab()}
-
-              {/* PAYROLL TAB - UNIFIED (uses renderPayrollTab helper) */}
-              {renderPayrollTab()}
-
-              {/* CERTIFICATIONS TAB CONTINUED - Specialties */}
-              <TabsContent value="certifications" className="mt-0 space-y-6">
-              <div className="space-y-6">
                 {/* Rope Access Specialties Section */}
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
@@ -5619,12 +5608,22 @@ export default function TechnicianPortal() {
                   )}
                 </div>
               </div>
-              </TabsContent>
+                    )}
+                  </TabsContent>
 
-              {/* DOCUMENTS TAB - UNIFIED (uses renderDocumentsTab helper) */}
-              {renderDocumentsTab()}
-              </>
-            )}
+                  {/* DOCUMENTS TAB - UNIFIED (uses renderDocumentsTab helper) */}
+                  {renderDocumentsTab()}
+                </>
+              );
+              
+              return isEditing ? (
+                <Form {...form}>
+                  <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+                    {profileTabsContent}
+                  </form>
+                </Form>
+              ) : profileTabsContent;
+            })()}
             </Tabs>
           </CardContent>
             </Card>
