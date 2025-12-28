@@ -2879,6 +2879,315 @@ export default function TechnicianPortal() {
     </TabsContent>
   );
 
+  // Helper function to render unified Documents tab
+  const renderDocumentsTab = () => (
+    <TabsContent value="documents" className="mt-0 space-y-6">
+      {isEditing ? (
+        <div className="text-center py-8 text-muted-foreground">
+          <p>{language === 'en' ? 'Submitted documents are available in view mode. Click Cancel to view.' : language === 'es' ? 'Los documentos enviados están disponibles en el modo de visualización.' : 'Les documents soumis sont disponibles en mode affichage.'}</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+              <FolderOpen className="w-4 h-4" />
+              {language === 'en' ? 'My Submitted Documents' : 'Mes documents soumis'}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {language === 'en' 
+                ? 'Documents you have uploaded in response to employer requests'
+                : 'Documents que vous avez téléchargés en réponse aux demandes des employeurs'}
+            </p>
+            <MySubmittedDocuments language={language} />
+          </div>
+        </div>
+      )}
+    </TabsContent>
+  );
+
+  // Helper function to render unified Personal tab
+  const renderPersonalTab = () => (
+    <TabsContent value="personal" className="mt-0 space-y-6">
+      <div className={isEditing ? "space-y-4" : "space-y-6"}>
+        <div className={isEditing ? "space-y-4" : "space-y-3"}>
+          <h3 className={`font-medium flex items-center gap-2 ${!isEditing ? 'text-muted-foreground' : ''}`}>
+            <User className="w-4 h-4" />
+            {t.personalInfo}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {isEditing && (
+              <EditableField
+                isEditing={true}
+                name="name"
+                label={t.fullName}
+                value={form.watch("name")}
+                control={form.control}
+                testId="name"
+              />
+            )}
+            <EditableField
+              isEditing={isEditing}
+              name="email"
+              label={t.email}
+              value={isEditing ? form.watch("email") : user.email}
+              control={isEditing ? form.control : undefined}
+              type="email"
+              icon={!isEditing ? <Mail className="w-4 h-4" /> : undefined}
+              emptyText={t.notProvided || "Not provided"}
+              testId="email"
+            />
+            <EditableField
+              isEditing={isEditing}
+              name="employeePhoneNumber"
+              label={t.phoneNumber}
+              value={isEditing ? form.watch("employeePhoneNumber") : user.employeePhoneNumber}
+              control={isEditing ? form.control : undefined}
+              type={isEditing ? "tel" : "text"}
+              formatValue={!isEditing ? ((val) => formatPhoneNumber(val)) : undefined}
+              icon={!isEditing ? <Phone className="w-4 h-4" /> : undefined}
+              emptyText={t.notProvided || "Not provided"}
+              testId="phone"
+            />
+            <EditableSwitch
+              isEditing={isEditing}
+              name="smsNotificationsEnabled"
+              label={t.smsNotifications}
+              value={isEditing ? form.watch("smsNotificationsEnabled") : user.smsNotificationsEnabled}
+              control={isEditing ? form.control : undefined}
+              helpText={t.smsNotificationsDescription}
+              enabledText={t.enabled || "Enabled"}
+              disabledText={t.disabled || "Disabled"}
+              testId="sms-notifications"
+            />
+            <EditableDateField
+              isEditing={isEditing}
+              name="birthday"
+              label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>}
+              value={isEditing ? form.watch("birthday") : user.birthday}
+              control={isEditing ? form.control : undefined}
+              emptyText={t.notProvided || "Not set"}
+              testId="birthday"
+              formatDate={!isEditing ? (d) => {
+                if (!d) return "";
+                try {
+                  if (typeof d === 'string') return formatLocalDate(d);
+                  const date = d instanceof Date ? d : new Date(d);
+                  return formatLocalDate(date.toISOString().split('T')[0]);
+                } catch {
+                  return String(d);
+                }
+              } : undefined}
+            />
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className={isEditing ? "space-y-4" : "space-y-3"}>
+          <h3 className={`font-medium flex items-center gap-2 ${!isEditing ? 'text-muted-foreground' : ''}`}>
+            <MapPin className="w-4 h-4" />
+            {t.address}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t.addressPayrollInfo}</p>
+              </TooltipContent>
+            </Tooltip>
+          </h3>
+          
+          {isEditing ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="employeeStreetAddress"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>{t.streetAddress}</FormLabel>
+                    <FormControl>
+                      <AddressAutocomplete
+                        data-testid="input-street"
+                        placeholder={t.streetAddress}
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        onSelect={(address) => {
+                          field.onChange(address.formatted);
+                          form.setValue('employeeCity', address.city || '');
+                          form.setValue('employeeProvinceState', address.state || '');
+                          form.setValue('employeeCountry', address.country || '');
+                          form.setValue('employeePostalCode', address.postcode || '');
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="employeeCity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t.city}</FormLabel>
+                    <FormControl>
+                      <Input {...field} data-testid="input-city" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="employeeProvinceState"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t.provinceState}</FormLabel>
+                    <FormControl>
+                      <Input {...field} data-testid="input-province" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="employeeCountry"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t.country}</FormLabel>
+                    <FormControl>
+                      <Input {...field} data-testid="input-country" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="employeePostalCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t.postalCode}</FormLabel>
+                    <FormControl>
+                      <Input {...field} data-testid="input-postal" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          ) : (
+            <p className="text-base">
+              {user.employeeStreetAddress ? (
+                <>
+                  {user.employeeStreetAddress}<br />
+                  {user.employeeCity}, {user.employeeProvinceState} {user.employeePostalCode}<br />
+                  {user.employeeCountry}
+                </>
+              ) : (
+                <span className="text-muted-foreground">{t.notProvided || "Not provided"}</span>
+              )}
+            </p>
+          )}
+        </div>
+
+        <Separator />
+
+        <div className={isEditing ? "space-y-4" : "space-y-3"}>
+          <h3 className={`font-medium flex items-center gap-2 ${!isEditing ? 'text-muted-foreground' : ''}`}>
+            <Heart className="w-4 h-4" />
+            {t.emergencyContact}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <EditableField
+              isEditing={isEditing}
+              name="emergencyContactName"
+              label={isEditing ? "Contact Name" : "Name"}
+              value={isEditing ? form.watch("emergencyContactName") : user.emergencyContactName}
+              control={isEditing ? form.control : undefined}
+              emptyText="Not provided"
+              testId="emergency-name"
+            />
+            <EditableField
+              isEditing={isEditing}
+              name="emergencyContactPhone"
+              label={isEditing ? "Contact Phone" : "Phone"}
+              value={isEditing ? form.watch("emergencyContactPhone") : user.emergencyContactPhone}
+              control={isEditing ? form.control : undefined}
+              type={isEditing ? "tel" : "text"}
+              formatValue={!isEditing ? ((val) => formatPhoneNumber(val)) : undefined}
+              emptyText="Not provided"
+              testId="emergency-phone"
+            />
+            {isEditing ? (
+              <EditableSelect
+                isEditing={true}
+                name="emergencyContactRelationship"
+                label={t.relationship}
+                value={form.watch("emergencyContactRelationship")}
+                control={form.control}
+                placeholder={t.relationshipPlaceholder}
+                options={[
+                  { value: "mother", label: t.relationshipOptions.mother },
+                  { value: "father", label: t.relationshipOptions.father },
+                  { value: "spouse", label: t.relationshipOptions.spouse },
+                  { value: "partner", label: t.relationshipOptions.partner },
+                  { value: "brother", label: t.relationshipOptions.brother },
+                  { value: "sister", label: t.relationshipOptions.sister },
+                  { value: "son", label: t.relationshipOptions.son },
+                  { value: "daughter", label: t.relationshipOptions.daughter },
+                  { value: "grandparent", label: t.relationshipOptions.grandparent },
+                  { value: "friend", label: t.relationshipOptions.friend },
+                  { value: "roommate", label: t.relationshipOptions.roommate },
+                  { value: "other", label: t.relationshipOptions.other },
+                ]}
+                testId="emergency-relationship"
+              />
+            ) : (
+              <EditableField
+                isEditing={false}
+                name="emergencyContactRelationship"
+                label="Relationship"
+                value={user.emergencyContactRelationship}
+                emptyText="Not selected"
+                testId="emergency-relationship"
+              />
+            )}
+          </div>
+        </div>
+
+        <Separator />
+
+        <div className={isEditing ? "space-y-4" : "space-y-3"}>
+          <h3 className={`font-medium flex items-center gap-2 ${!isEditing ? 'text-muted-foreground' : ''}`}>
+            <AlertCircle className="w-4 h-4" />
+            {t.medicalConditions}
+          </h3>
+          {isEditing ? (
+            <EditableTextarea
+              isEditing={true}
+              name="specialMedicalConditions"
+              label={t.specialMedicalConditions}
+              value={form.watch("specialMedicalConditions")}
+              control={form.control}
+              placeholder={t.medicalPlaceholder}
+              rows={4}
+              testId="medical"
+            />
+          ) : (
+            <p className="text-sm">
+              {user.specialMedicalConditions || (
+                <span className="text-muted-foreground italic">{t.notProvided || "None"}</span>
+              )}
+            </p>
+          )}
+        </div>
+      </div>
+    </TabsContent>
+  );
+
   // Helper function to render unified Payroll tab
   const renderPayrollTab = () => (
     <TabsContent value="payroll" className="mt-0 space-y-6">
@@ -4334,229 +4643,8 @@ export default function TechnicianPortal() {
             {isEditing ? (
               <Form {...form}>
                 <form className="space-y-6">
-                  {/* PERSONAL INFORMATION TAB - EDIT MODE */}
-                  <TabsContent value="personal" className="mt-0 space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="font-medium flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        {t.personalInfo}
-                      </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <EditableField
-                        isEditing={true}
-                        name="name"
-                        label={t.fullName}
-                        value={form.watch("name")}
-                        control={form.control}
-                        testId="name"
-                      />
-                      <EditableField
-                        isEditing={true}
-                        name="email"
-                        label={t.email}
-                        value={form.watch("email")}
-                        control={form.control}
-                        type="email"
-                        testId="email"
-                      />
-                      <EditableField
-                        isEditing={true}
-                        name="employeePhoneNumber"
-                        label={t.phoneNumber}
-                        value={form.watch("employeePhoneNumber")}
-                        control={form.control}
-                        type="tel"
-                        testId="phone"
-                      />
-                      <EditableSwitch
-                        isEditing={true}
-                        name="smsNotificationsEnabled"
-                        label={t.smsNotifications}
-                        value={form.watch("smsNotificationsEnabled")}
-                        control={form.control}
-                        helpText={t.smsNotificationsDescription}
-                        enabledText={t.enabled || "Enabled"}
-                        disabledText={t.disabled || "Disabled"}
-                        testId="sms-notifications"
-                      />
-                      <EditableDateField
-                        isEditing={true}
-                        name="birthday"
-                        label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>}
-                        value={form.watch("birthday")}
-                        control={form.control}
-                        testId="birthday"
-                      />
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      {t.address}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{t.addressPayrollInfo}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="employeeStreetAddress"
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-2">
-                            <FormLabel>{t.streetAddress}</FormLabel>
-                            <FormControl>
-                              <AddressAutocomplete
-                                data-testid="input-street"
-                                placeholder={t.streetAddress}
-                                value={field.value || ""}
-                                onChange={field.onChange}
-                                onBlur={field.onBlur}
-                                onSelect={(address) => {
-                                  field.onChange(address.formatted);
-                                  form.setValue('employeeCity', address.city || '');
-                                  form.setValue('employeeProvinceState', address.state || '');
-                                  form.setValue('employeeCountry', address.country || '');
-                                  form.setValue('employeePostalCode', address.postcode || '');
-                                }}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="employeeCity"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.city}</FormLabel>
-                            <FormControl>
-                              <Input {...field} data-testid="input-city" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="employeeProvinceState"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.provinceState}</FormLabel>
-                            <FormControl>
-                              <Input {...field} data-testid="input-province" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="employeeCountry"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.country}</FormLabel>
-                            <FormControl>
-                              <Input {...field} data-testid="input-country" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="employeePostalCode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.postalCode}</FormLabel>
-                            <FormControl>
-                              <Input {...field} data-testid="input-postal" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <Heart className="w-4 h-4" />
-                      {t.emergencyContact}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <EditableField
-                        isEditing={true}
-                        name="emergencyContactName"
-                        label="Contact Name"
-                        value={form.watch("emergencyContactName")}
-                        control={form.control}
-                        testId="emergency-name"
-                      />
-                      <EditableField
-                        isEditing={true}
-                        name="emergencyContactPhone"
-                        label="Contact Phone"
-                        value={form.watch("emergencyContactPhone")}
-                        control={form.control}
-                        type="tel"
-                        testId="emergency-phone"
-                      />
-                      <EditableSelect
-                        isEditing={true}
-                        name="emergencyContactRelationship"
-                        label={t.relationship}
-                        value={form.watch("emergencyContactRelationship")}
-                        control={form.control}
-                        placeholder={t.relationshipPlaceholder}
-                        options={[
-                          { value: "mother", label: t.relationshipOptions.mother },
-                          { value: "father", label: t.relationshipOptions.father },
-                          { value: "spouse", label: t.relationshipOptions.spouse },
-                          { value: "partner", label: t.relationshipOptions.partner },
-                          { value: "brother", label: t.relationshipOptions.brother },
-                          { value: "sister", label: t.relationshipOptions.sister },
-                          { value: "son", label: t.relationshipOptions.son },
-                          { value: "daughter", label: t.relationshipOptions.daughter },
-                          { value: "grandparent", label: t.relationshipOptions.grandparent },
-                          { value: "friend", label: t.relationshipOptions.friend },
-                          { value: "roommate", label: t.relationshipOptions.roommate },
-                          { value: "other", label: t.relationshipOptions.other },
-                        ]}
-                        testId="emergency-relationship"
-                      />
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4" />
-                      {t.medicalConditions}
-                    </h3>
-                    <EditableTextarea
-                      isEditing={true}
-                      name="specialMedicalConditions"
-                      label={t.specialMedicalConditions}
-                      value={form.watch("specialMedicalConditions")}
-                      control={form.control}
-                      placeholder={t.medicalPlaceholder}
-                      rows={4}
-                      testId="medical"
-                    />
-                  </div>
-                  </TabsContent>
+                  {/* PERSONAL TAB - UNIFIED (uses renderPersonalTab helper) */}
+                  {renderPersonalTab()}
 
                   {/* PAYROLL TAB - UNIFIED (uses renderPayrollTab helper) */}
                   {renderPayrollTab()}
@@ -4595,152 +4683,14 @@ export default function TechnicianPortal() {
                   </div>
                   </TabsContent>
 
-                  {/* DOCUMENTS TAB - EDIT MODE */}
-                  <TabsContent value="documents" className="mt-0 space-y-6">
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>{language === 'en' ? 'Submitted documents are available in view mode. Click Cancel to view.' : language === 'es' ? 'Los documentos enviados están disponibles en el modo de visualización.' : 'Les documents soumis sont disponibles en mode affichage.'}</p>
-                    </div>
-                  </TabsContent>
+                  {/* DOCUMENTS TAB - UNIFIED (uses renderDocumentsTab helper) */}
+                  {renderDocumentsTab()}
                 </form>
               </Form>
             ) : (
               <>
-              {/* PERSONAL INFORMATION TAB - VIEW MODE */}
-              <TabsContent value="personal" className="mt-0 space-y-6">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <User className="w-4 h-4" />
-                    {t.personalInfo}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <EditableField
-                      isEditing={false}
-                      name="email"
-                      label={t.email}
-                      value={user.email}
-                      icon={<Mail className="w-4 h-4" />}
-                      emptyText={t.notProvided || "Not provided"}
-                      testId="email"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="employeePhoneNumber"
-                      label={t.phoneNumber}
-                      value={user.employeePhoneNumber}
-                      formatValue={(val) => formatPhoneNumber(val)}
-                      icon={<Phone className="w-4 h-4" />}
-                      emptyText={t.notProvided || "Not provided"}
-                      testId="phone"
-                    />
-                    <EditableSwitch
-                      isEditing={false}
-                      name="smsNotificationsEnabled"
-                      label={t.smsNotifications}
-                      value={user.smsNotificationsEnabled}
-                      helpText={t.smsNotificationsDescription}
-                      enabledText={t.enabled || "Enabled"}
-                      disabledText={t.disabled || "Disabled"}
-                      testId="sms-notifications"
-                    />
-                    <EditableDateField
-                      isEditing={false}
-                      name="birthday"
-                      label={<>{t.birthday} <span className="text-muted-foreground font-normal text-sm">(mm/dd/yyyy)</span></>}
-                      value={user.birthday}
-                      emptyText={t.notProvided || "Not set"}
-                      testId="birthday"
-                      formatDate={(d) => {
-                        if (!d) return "";
-                        try {
-                          if (typeof d === 'string') return formatLocalDate(d);
-                          const date = d instanceof Date ? d : new Date(d);
-                          return formatLocalDate(date.toISOString().split('T')[0]);
-                        } catch {
-                          return String(d);
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="w-4 h-4" />
-                    {t.address}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t.addressPayrollInfo}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </h3>
-                  <p className="text-base">
-                    {user.employeeStreetAddress && (
-                      <>
-                        {user.employeeStreetAddress}<br />
-                        {user.employeeCity}, {user.employeeProvinceState} {user.employeePostalCode}<br />
-                        {user.employeeCountry}
-                      </>
-                    )}
-                  </p>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <Heart className="w-4 h-4" />
-                    {t.emergencyContact}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <EditableField
-                      isEditing={false}
-                      name="emergencyContactName"
-                      label="Name"
-                      value={user.emergencyContactName}
-                      emptyText="Not provided"
-                      testId="emergency-name"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="emergencyContactPhone"
-                      label="Phone"
-                      value={user.emergencyContactPhone}
-                      formatValue={(val) => formatPhoneNumber(val)}
-                      emptyText="Not provided"
-                      testId="emergency-phone"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="emergencyContactRelationship"
-                      label="Relationship"
-                      value={user.emergencyContactRelationship}
-                      emptyText="Not selected"
-                      testId="emergency-relationship"
-                    />
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <AlertCircle className="w-4 h-4" />
-                    {t.medicalConditions}
-                  </h3>
-                  <p className="text-sm">
-                    {user.specialMedicalConditions || (
-                      <span className="text-muted-foreground italic">{t.notProvided || "None"}</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-              </TabsContent>
+              {/* PERSONAL TAB - UNIFIED (uses renderPersonalTab helper) */}
+              {renderPersonalTab()}
 
               {/* CERTIFICATIONS TAB - VIEW MODE */}
               <TabsContent value="certifications" className="mt-0 space-y-6">
@@ -5674,23 +5624,8 @@ export default function TechnicianPortal() {
               </div>
               </TabsContent>
 
-              {/* DOCUMENTS TAB - VIEW MODE */}
-              <TabsContent value="documents" className="mt-0 space-y-6">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <FolderOpen className="w-4 h-4" />
-                    {language === 'en' ? 'My Submitted Documents' : 'Mes documents soumis'}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    {language === 'en' 
-                      ? 'Documents you have uploaded in response to employer requests'
-                      : 'Documents que vous avez téléchargés en réponse aux demandes des employeurs'}
-                  </p>
-                  <MySubmittedDocuments language={language} />
-                </div>
-              </div>
-              </TabsContent>
+              {/* DOCUMENTS TAB - UNIFIED (uses renderDocumentsTab helper) */}
+              {renderDocumentsTab()}
               </>
             )}
             </Tabs>
