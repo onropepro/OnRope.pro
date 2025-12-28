@@ -64,6 +64,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatDateTime, parseLocalDate } from "@/lib/dateUtils";
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, type JobCategory } from "@shared/jobTypes";
 import type { HistoricalHours } from "@shared/schema";
+import { EditableField, EditableDateField } from "@/components/profile";
 import { 
   User, 
   LogOut, 
@@ -4280,44 +4281,31 @@ export default function TechnicianPortal() {
                       {t.driversLicense}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
+                      <EditableField
+                        isEditing={true}
                         name="driversLicenseNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>License Number</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Optional" data-testid="input-license-number" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label={t.licenseNumber}
+                        value={form.watch("driversLicenseNumber")}
                         control={form.control}
+                        placeholder="Optional"
+                        icon={<CreditCard className="w-4 h-4" />}
+                        testId="license-number"
+                      />
+                      <EditableDateField
+                        isEditing={true}
                         name="driversLicenseIssuedDate"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.issuedDate}</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="date" data-testid="input-license-issued-date" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
+                        label={t.issuedDate}
+                        value={form.watch("driversLicenseIssuedDate")}
                         control={form.control}
+                        testId="license-issued-date"
+                      />
+                      <EditableDateField
+                        isEditing={true}
                         name="driversLicenseExpiry"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t.expiry}</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="date" data-testid="input-license-expiry" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                        label={t.expiry}
+                        value={form.watch("driversLicenseExpiry")}
+                        control={form.control}
+                        testId="license-expiry"
                       />
                     </div>
                   </div>
@@ -5337,25 +5325,35 @@ export default function TechnicianPortal() {
                     <CreditCard className="w-4 h-4" />
                     {t.driversLicense}
                   </h3>
-                  {(user.driversLicenseNumber || user.driversLicenseIssuedDate || user.driversLicenseExpiry) && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {user.driversLicenseNumber && (
-                        <InfoItem label={t.licenseNumber} value={user.driversLicenseNumber} />
-                      )}
-                      {user.driversLicenseIssuedDate && (
-                        <InfoItem 
-                          label={t.issuedDate}
-                          value={formatLocalDate(user.driversLicenseIssuedDate)} 
-                        />
-                      )}
-                      {user.driversLicenseExpiry && (
-                        <InfoItem 
-                          label={t.expiry}
-                          value={formatLocalDate(user.driversLicenseExpiry)} 
-                        />
-                      )}
-                    </div>
-                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <EditableField
+                      isEditing={false}
+                      name="driversLicenseNumber"
+                      label={t.licenseNumber}
+                      value={user.driversLicenseNumber}
+                      icon={<CreditCard className="w-4 h-4" />}
+                      emptyText={t.notProvided || "Not provided"}
+                      testId="license-number"
+                    />
+                    <EditableDateField
+                      isEditing={false}
+                      name="driversLicenseIssuedDate"
+                      label={t.issuedDate}
+                      value={user.driversLicenseIssuedDate}
+                      emptyText={t.notProvided || "Not set"}
+                      testId="license-issued-date"
+                      formatDate={(d) => formatLocalDate(typeof d === 'string' ? d : d.toISOString())}
+                    />
+                    <EditableDateField
+                      isEditing={false}
+                      name="driversLicenseExpiry"
+                      label={t.expiry}
+                      value={user.driversLicenseExpiry}
+                      emptyText={t.notProvided || "Not set"}
+                      testId="license-expiry"
+                      formatDate={(d) => formatLocalDate(typeof d === 'string' ? d : d.toISOString())}
+                    />
+                  </div>
                       {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                         <div className="pt-3">
                           <p className="text-sm text-muted-foreground mb-3">Uploaded Documents</p>
