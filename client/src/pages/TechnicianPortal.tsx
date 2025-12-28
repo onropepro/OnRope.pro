@@ -122,7 +122,8 @@ import {
   File,
   GraduationCap,
   Menu,
-  Info
+  Info,
+  Trash2
 } from "lucide-react";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
@@ -2692,6 +2693,374 @@ export default function TechnicianPortal() {
     );
   }
 
+  // ============================================================================
+  // UNIFIED TAB RENDER HELPERS
+  // These helpers create unified tab content that works in both edit and view modes
+  // Pattern: isEditing controls EditableField props and conditional view-only content
+  // ============================================================================
+
+  const renderDriverTab = () => (
+    <TabsContent value="driver" className="mt-0 space-y-6">
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <h3 className={`font-medium flex items-center gap-2 ${!isEditing ? 'text-muted-foreground' : ''}`}>
+            <CreditCard className="w-4 h-4" />
+            {t.driversLicense}
+          </h3>
+          <div className={`grid grid-cols-1 ${!isEditing ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4`}>
+            <EditableField
+              isEditing={isEditing}
+              name="driversLicenseNumber"
+              label={t.licenseNumber}
+              value={isEditing ? form.watch("driversLicenseNumber") : user.driversLicenseNumber}
+              control={isEditing ? form.control : undefined}
+              placeholder="Optional"
+              icon={<CreditCard className="w-4 h-4" />}
+              emptyText={t.notProvided || "Not provided"}
+              testId="license-number"
+            />
+            <EditableDateField
+              isEditing={isEditing}
+              name="driversLicenseIssuedDate"
+              label={t.issuedDate}
+              value={isEditing ? form.watch("driversLicenseIssuedDate") : user.driversLicenseIssuedDate}
+              control={isEditing ? form.control : undefined}
+              emptyText={t.notProvided || "Not set"}
+              testId="license-issued-date"
+              formatDate={!isEditing ? (d) => {
+                if (!d) return "";
+                try {
+                  if (typeof d === 'string') return formatLocalDate(d);
+                  const date = d instanceof Date ? d : new Date(d);
+                  return formatLocalDate(date.toISOString().split('T')[0]);
+                } catch {
+                  return String(d);
+                }
+              } : undefined}
+            />
+            <EditableDateField
+              isEditing={isEditing}
+              name="driversLicenseExpiry"
+              label={t.expiry}
+              value={isEditing ? form.watch("driversLicenseExpiry") : user.driversLicenseExpiry}
+              control={isEditing ? form.control : undefined}
+              emptyText={t.notProvided || "Not set"}
+              testId="license-expiry"
+              formatDate={!isEditing ? (d) => {
+                if (!d) return "";
+                try {
+                  if (typeof d === 'string') return formatLocalDate(d);
+                  const date = d instanceof Date ? d : new Date(d);
+                  return formatLocalDate(date.toISOString().split('T')[0]);
+                } catch {
+                  return String(d);
+                }
+              } : undefined}
+            />
+          </div>
+
+          {/* Document display and upload buttons - VIEW MODE ONLY */}
+          {!isEditing && (
+            <>
+              {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                <div className="pt-3">
+                  <p className="text-sm text-muted-foreground mb-3">Uploaded Documents</p>
+                  <div className="space-y-3">
+                    {user.driversLicenseDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                      const lowerUrl = url.toLowerCase();
+                      const isPdf = lowerUrl.endsWith('.pdf');
+                      const isAbstract = lowerUrl.includes('abstract');
+                      const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                      lowerUrl.includes('image') || 
+                                      (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                      
+                      return (
+                        <div key={index} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+                          <div className="flex-shrink-0">
+                            {isPdf ? (
+                              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center">
+                                <FileText className="w-6 h-6 text-red-600 dark:text-red-400" />
+                              </div>
+                            ) : isImage ? (
+                              <img 
+                                src={url} 
+                                alt={isAbstract ? "Driver's Abstract" : "Driver's License"} 
+                                className="w-12 h-12 rounded-lg object-cover"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                                <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {isAbstract ? "Driver's Abstract" : `Driver's License ${index + 1}`}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {isPdf ? 'PDF Document' : isImage ? 'Image' : 'Document'}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => window.open(url, '_blank')}
+                              data-testid={`button-view-license-doc-${index}`}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => setDeletingDocument({ type: 'driversLicense', url })}
+                              data-testid={`button-delete-license-doc-${index}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* Upload buttons for driver's license section */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => triggerDocumentUpload('driversLicense')}
+                  disabled={uploadingDocType === 'driversLicense'}
+                  data-testid="button-upload-drivers-license"
+                >
+                  {uploadingDocType === 'driversLicense' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {t.uploading}
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 mr-2" />
+                      {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 
+                        ? t.addDriversLicense 
+                        : t.uploadDriversLicense}
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => triggerDocumentUpload('driversAbstract')}
+                  disabled={uploadingDocType === 'driversAbstract'}
+                  data-testid="button-upload-drivers-abstract"
+                >
+                  {uploadingDocType === 'driversAbstract' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {t.uploading}
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 mr-2" />
+                      {user.driversLicenseDocuments && user.driversLicenseDocuments.some((u: string) => u && u.toLowerCase().includes('abstract'))
+                        ? t.replaceDriversAbstract 
+                        : t.uploadDriversAbstract}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </TabsContent>
+  );
+
+  // Helper function to render unified Payroll tab
+  const renderPayrollTab = () => (
+    <TabsContent value="payroll" className="mt-0 space-y-6">
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+            <Building className="w-4 h-4" />
+            {t.payrollInfo || "Payroll Information"}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <EditableField
+              isEditing={isEditing}
+              name="socialInsuranceNumber"
+              label="Social Insurance Number"
+              value={isEditing ? form.watch("socialInsuranceNumber") : user.socialInsuranceNumber}
+              control={isEditing ? form.control : undefined}
+              placeholder="Optional"
+              formatValue={(val) => maskSensitiveData(val)}
+              emptyText="Not provided"
+              testId="sin"
+            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <EditableField
+              isEditing={isEditing}
+              name="bankTransitNumber"
+              label={isEditing ? "Bank Transit #" : "Transit Number"}
+              value={isEditing ? form.watch("bankTransitNumber") : user.bankTransitNumber}
+              control={isEditing ? form.control : undefined}
+              placeholder="5 digits"
+              formatValue={(val) => maskSensitiveData(val)}
+              emptyText="Not provided"
+              testId="bank-transit"
+            />
+            <EditableField
+              isEditing={isEditing}
+              name="bankInstitutionNumber"
+              label={isEditing ? "Institution #" : "Branch Number"}
+              value={isEditing ? form.watch("bankInstitutionNumber") : user.bankInstitutionNumber}
+              control={isEditing ? form.control : undefined}
+              placeholder="3 digits"
+              formatValue={(val) => maskSensitiveData(val)}
+              emptyText="Not provided"
+              testId="bank-institution"
+            />
+            <EditableField
+              isEditing={isEditing}
+              name="bankAccountNumber"
+              label={isEditing ? "Account #" : "Account Number"}
+              value={isEditing ? form.watch("bankAccountNumber") : user.bankAccountNumber}
+              control={isEditing ? form.control : undefined}
+              placeholder="7-12 digits"
+              formatValue={(val) => maskSensitiveData(val)}
+              emptyText="Not provided"
+              testId="bank-account"
+            />
+          </div>
+          
+          {/* Upload void cheque button - shown in view mode if no banking documents exist */}
+          {!isEditing && (!user.bankDocuments || user.bankDocuments.filter((u: string) => u && u.trim()).length === 0) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => triggerDocumentUpload('voidCheque')}
+              disabled={uploadingDocType === 'voidCheque'}
+              data-testid="button-upload-void-cheque-payroll"
+            >
+              {uploadingDocType === 'voidCheque' ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.uploading}
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 mr-2" />
+                  {t.uploadVoidCheque}
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+
+        {/* Banking Documents Section - View mode only */}
+        {!isEditing && user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+          <div className="space-y-3">
+            <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+              <ImageIcon className="w-4 h-4" />
+              Banking Documents (Void Cheque)
+            </h3>
+            <div className="space-y-3">
+              {user.bankDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                const lowerUrl = url.toLowerCase();
+                const isPdf = lowerUrl.endsWith('.pdf');
+                const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                              lowerUrl.includes('image') || 
+                              (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                
+                return (
+                  <div key={index} className="relative">
+                    <a 
+                      href={url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                    >
+                      {isPdf ? (
+                        <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                          <FileText className="w-12 h-12 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                        </div>
+                      ) : isImage ? (
+                        <img 
+                          src={url} 
+                          alt={`Banking document ${index + 1}`}
+                          className="w-full object-contain"
+                          style={{ maxHeight: '300px', minHeight: '100px' }}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const div = document.createElement('div');
+                              div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                              div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                              parent.appendChild(div);
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                          <FileText className="w-12 h-12 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                        </div>
+                      )}
+                    </a>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 h-7 w-7"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setDeletingDocument({ type: 'bankDocuments', url });
+                      }}
+                      data-testid={`button-delete-bank-doc-${index}`}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Upload additional void cheque button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => triggerDocumentUpload('voidCheque')}
+              disabled={uploadingDocType === 'voidCheque'}
+              data-testid="button-upload-void-cheque"
+            >
+              {uploadingDocType === 'voidCheque' ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.uploading}
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 mr-2" />
+                  {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 
+                    ? t.addVoidCheque 
+                    : t.uploadVoidCheque}
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+    </TabsContent>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
       {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
@@ -4189,223 +4558,11 @@ export default function TechnicianPortal() {
                   </div>
                   </TabsContent>
 
-                  {/* PAYROLL INFORMATION TAB - UNIFIED */}
-                  <TabsContent value="payroll" className="mt-0 space-y-6">
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                        <Building className="w-4 h-4" />
-                        {t.payrollInfo || "Payroll Information"}
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <EditableField
-                          isEditing={isEditing}
-                          name="socialInsuranceNumber"
-                          label="Social Insurance Number"
-                          value={isEditing ? form.watch("socialInsuranceNumber") : user.socialInsuranceNumber}
-                          control={isEditing ? form.control : undefined}
-                          placeholder="Optional"
-                          formatValue={(val) => maskSensitiveData(val)}
-                          emptyText="Not provided"
-                          testId="sin"
-                        />
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <EditableField
-                          isEditing={isEditing}
-                          name="bankTransitNumber"
-                          label={isEditing ? "Bank Transit #" : "Transit Number"}
-                          value={isEditing ? form.watch("bankTransitNumber") : user.bankTransitNumber}
-                          control={isEditing ? form.control : undefined}
-                          placeholder="5 digits"
-                          formatValue={(val) => maskSensitiveData(val)}
-                          emptyText="Not provided"
-                          testId="bank-transit"
-                        />
-                        <EditableField
-                          isEditing={isEditing}
-                          name="bankInstitutionNumber"
-                          label={isEditing ? "Institution #" : "Branch Number"}
-                          value={isEditing ? form.watch("bankInstitutionNumber") : user.bankInstitutionNumber}
-                          control={isEditing ? form.control : undefined}
-                          placeholder="3 digits"
-                          formatValue={(val) => maskSensitiveData(val)}
-                          emptyText="Not provided"
-                          testId="bank-institution"
-                        />
-                        <EditableField
-                          isEditing={isEditing}
-                          name="bankAccountNumber"
-                          label={isEditing ? "Account #" : "Account Number"}
-                          value={isEditing ? form.watch("bankAccountNumber") : user.bankAccountNumber}
-                          control={isEditing ? form.control : undefined}
-                          placeholder="7-12 digits"
-                          formatValue={(val) => maskSensitiveData(val)}
-                          emptyText="Not provided"
-                          testId="bank-account"
-                        />
-                      </div>
-                      
-                      {/* Upload void cheque button - shown if no banking documents exist */}
-                      {!isEditing && (!user.bankDocuments || user.bankDocuments.filter((u: string) => u && u.trim()).length === 0) && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => triggerDocumentUpload('voidCheque')}
-                          disabled={uploadingDocType === 'voidCheque'}
-                          data-testid="button-upload-void-cheque-payroll"
-                        >
-                          {uploadingDocType === 'voidCheque' ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              {t.uploading}
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="w-4 h-4 mr-2" />
-                              {t.uploadVoidCheque}
-                            </>
-                          )}
-                        </Button>
-                      )}
-                    </div>
+                  {/* PAYROLL TAB - UNIFIED (uses renderPayrollTab helper) */}
+                  {renderPayrollTab()}
 
-                    {/* Banking Documents Section - View mode only */}
-                    {!isEditing && user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                      <div className="space-y-3">
-                        <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                          <ImageIcon className="w-4 h-4" />
-                          Banking Documents (Void Cheque)
-                        </h3>
-                        <div className="space-y-3">
-                          {user.bankDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
-                            const lowerUrl = url.toLowerCase();
-                            const isPdf = lowerUrl.endsWith('.pdf');
-                            const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
-                                          lowerUrl.includes('image') || 
-                                          (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
-                            
-                            return (
-                              <div key={index} className="relative">
-                                <a 
-                                  href={url} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                                >
-                                  {isPdf ? (
-                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                      <FileText className="w-12 h-12 text-muted-foreground" />
-                                      <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
-                                    </div>
-                                  ) : isImage ? (
-                                    <img 
-                                      src={url} 
-                                      alt={`Banking document ${index + 1}`}
-                                      className="w-full object-contain"
-                                      style={{ maxHeight: '300px', minHeight: '100px' }}
-                                      onError={(e) => {
-                                        const target = e.target as HTMLImageElement;
-                                        target.onerror = null;
-                                        target.style.display = 'none';
-                                        const parent = target.parentElement;
-                                        if (parent) {
-                                          const div = document.createElement('div');
-                                          div.className = 'flex flex-col items-center justify-center py-8 gap-2';
-                                          div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
-                                          parent.appendChild(div);
-                                        }
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                      <FileText className="w-12 h-12 text-muted-foreground" />
-                                      <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
-                                    </div>
-                                  )}
-                                </a>
-                                <Button
-                                  variant="destructive"
-                                  size="icon"
-                                  className="absolute top-2 right-2 h-7 w-7"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setDeletingDocument({ type: 'bankDocuments', url });
-                                  }}
-                                  data-testid={`button-delete-bank-doc-${index}`}
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        
-                        {/* Upload additional void cheque button */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => triggerDocumentUpload('voidCheque')}
-                          disabled={uploadingDocType === 'voidCheque'}
-                          data-testid="button-upload-void-cheque"
-                        >
-                          {uploadingDocType === 'voidCheque' ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              {t.uploading}
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="w-4 h-4 mr-2" />
-                              {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 
-                                ? t.addVoidCheque 
-                                : t.uploadVoidCheque}
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  </TabsContent>
-
-                  {/* DRIVER TAB - EDIT MODE */}
-                  <TabsContent value="driver" className="mt-0 space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <CreditCard className="w-4 h-4" />
-                      {t.driversLicense}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <EditableField
-                        isEditing={true}
-                        name="driversLicenseNumber"
-                        label={t.licenseNumber}
-                        value={form.watch("driversLicenseNumber")}
-                        control={form.control}
-                        placeholder="Optional"
-                        icon={<CreditCard className="w-4 h-4" />}
-                        testId="license-number"
-                      />
-                      <EditableDateField
-                        isEditing={true}
-                        name="driversLicenseIssuedDate"
-                        label={t.issuedDate}
-                        value={form.watch("driversLicenseIssuedDate")}
-                        control={form.control}
-                        testId="license-issued-date"
-                      />
-                      <EditableDateField
-                        isEditing={true}
-                        name="driversLicenseExpiry"
-                        label={t.expiry}
-                        value={form.watch("driversLicenseExpiry")}
-                        control={form.control}
-                        testId="license-expiry"
-                      />
-                    </div>
-                  </div>
-                  </TabsContent>
+                  {/* DRIVER TAB - UNIFIED (uses renderDriverTab helper) */}
+                  {renderDriverTab()}
 
                   {/* CERTIFICATIONS TAB - EDIT MODE */}
                   <TabsContent value="certifications" className="mt-0 space-y-6">
@@ -5385,357 +5542,11 @@ export default function TechnicianPortal() {
               </div>
               </TabsContent>
 
-              {/* DRIVER TAB - VIEW MODE */}
-              <TabsContent value="driver" className="mt-0 space-y-6">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <CreditCard className="w-4 h-4" />
-                    {t.driversLicense}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <EditableField
-                      isEditing={false}
-                      name="driversLicenseNumber"
-                      label={t.licenseNumber}
-                      value={user.driversLicenseNumber}
-                      icon={<CreditCard className="w-4 h-4" />}
-                      emptyText={t.notProvided || "Not provided"}
-                      testId="license-number"
-                    />
-                    <EditableDateField
-                      isEditing={false}
-                      name="driversLicenseIssuedDate"
-                      label={t.issuedDate}
-                      value={user.driversLicenseIssuedDate}
-                      emptyText={t.notProvided || "Not set"}
-                      testId="license-issued-date"
-                      formatDate={(d) => {
-                        if (!d) return "";
-                        try {
-                          if (typeof d === 'string') return formatLocalDate(d);
-                          const date = d instanceof Date ? d : new Date(d);
-                          return formatLocalDate(date.toISOString().split('T')[0]);
-                        } catch {
-                          return String(d);
-                        }
-                      }}
-                    />
-                    <EditableDateField
-                      isEditing={false}
-                      name="driversLicenseExpiry"
-                      label={t.expiry}
-                      value={user.driversLicenseExpiry}
-                      emptyText={t.notProvided || "Not set"}
-                      testId="license-expiry"
-                      formatDate={(d) => {
-                        if (!d) return "";
-                        try {
-                          if (typeof d === 'string') return formatLocalDate(d);
-                          const date = d instanceof Date ? d : new Date(d);
-                          return formatLocalDate(date.toISOString().split('T')[0]);
-                        } catch {
-                          return String(d);
-                        }
-                      }}
-                    />
-                  </div>
-                      {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                        <div className="pt-3">
-                          <p className="text-sm text-muted-foreground mb-3">Uploaded Documents</p>
-                          <div className="space-y-3">
-                            {user.driversLicenseDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
-                              const lowerUrl = url.toLowerCase();
-                              const isPdf = lowerUrl.endsWith('.pdf');
-                              const isAbstract = lowerUrl.includes('abstract');
-                              const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
-                                            lowerUrl.includes('image') || 
-                                            (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
-                              
-                              const documentLabel = isAbstract 
-                                ? "Driver's Abstract" 
-                                : (isImage ? "License Photo" : "License Document");
-                              
-                              return (
-                                <div key={index} className="space-y-1">
-                                  <p className="text-xs font-medium text-muted-foreground">{documentLabel}</p>
-                                  <div className="relative">
-                                    <a 
-                                      href={url} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                                    >
-                                      {isPdf ? (
-                                        <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                          <FileText className="w-12 h-12 text-muted-foreground" />
-                                          <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
-                                        </div>
-                                      ) : isImage ? (
-                                        <img 
-                                          src={url} 
-                                          alt={documentLabel}
-                                          className="w-full object-contain"
-                                          style={{ maxHeight: '300px', minHeight: '100px' }}
-                                          onError={(e) => {
-                                            const target = e.target as HTMLImageElement;
-                                            target.onerror = null;
-                                            target.style.display = 'none';
-                                            const parent = target.parentElement;
-                                            if (parent) {
-                                              const div = document.createElement('div');
-                                              div.className = 'flex flex-col items-center justify-center py-8 gap-2';
-                                              div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
-                                              parent.appendChild(div);
-                                            }
-                                          }}
-                                        />
-                                      ) : (
-                                        <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                          <FileText className="w-12 h-12 text-muted-foreground" />
-                                          <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
-                                        </div>
-                                      )}
-                                    </a>
-                                    <Button
-                                      variant="destructive"
-                                      size="icon"
-                                      className="absolute top-2 right-2 h-7 w-7"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        setDeletingDocument({ type: 'driversLicenseDocuments', url });
-                                      }}
-                                      data-testid={`button-delete-drivers-license-doc-${index}`}
-                                    >
-                                      <X className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Upload buttons for driver's license section */}
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => triggerDocumentUpload('driversLicense')}
-                          disabled={uploadingDocType === 'driversLicense'}
-                          data-testid="button-upload-drivers-license"
-                        >
-                          {uploadingDocType === 'driversLicense' ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              {t.uploading}
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="w-4 h-4 mr-2" />
-                              {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 
-                                ? t.addDriversLicense 
-                                : t.uploadDriversLicense}
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => triggerDocumentUpload('driversAbstract')}
-                          disabled={uploadingDocType === 'driversAbstract'}
-                          data-testid="button-upload-drivers-abstract"
-                        >
-                          {uploadingDocType === 'driversAbstract' ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              {t.uploading}
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="w-4 h-4 mr-2" />
-                              {user.driversLicenseDocuments && user.driversLicenseDocuments.some((u: string) => u && u.toLowerCase().includes('abstract'))
-                                ? t.replaceDriversAbstract 
-                                : t.uploadDriversAbstract}
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                </div>
-              </div>
-              </TabsContent>
+              {/* DRIVER TAB - UNIFIED (uses renderDriverTab helper) */}
+              {renderDriverTab()}
 
-              {/* PAYROLL INFORMATION TAB - VIEW MODE */}
-              <TabsContent value="payroll" className="mt-0 space-y-6">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <Building className="w-4 h-4" />
-                    {t.payrollInfo || "Payroll Information"}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <EditableField
-                      isEditing={false}
-                      name="socialInsuranceNumber"
-                      label="Social Insurance Number"
-                      value={user.socialInsuranceNumber}
-                      formatValue={(val) => maskSensitiveData(val)}
-                      emptyText="Not provided"
-                      testId="sin"
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <EditableField
-                      isEditing={false}
-                      name="bankTransitNumber"
-                      label="Transit Number"
-                      value={user.bankTransitNumber}
-                      formatValue={(val) => maskSensitiveData(val)}
-                      emptyText="Not provided"
-                      testId="bank-transit"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="bankInstitutionNumber"
-                      label="Branch Number"
-                      value={user.bankInstitutionNumber}
-                      formatValue={(val) => maskSensitiveData(val)}
-                      emptyText="Not provided"
-                      testId="bank-institution"
-                    />
-                    <EditableField
-                      isEditing={false}
-                      name="bankAccountNumber"
-                      label="Account Number"
-                      value={user.bankAccountNumber}
-                      formatValue={(val) => maskSensitiveData(val)}
-                      emptyText="Not provided"
-                      testId="bank-account"
-                    />
-                  </div>
-                  
-                  {/* Upload void cheque button - shown if no banking documents exist */}
-                  {(!user.bankDocuments || user.bankDocuments.filter((u: string) => u && u.trim()).length === 0) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => triggerDocumentUpload('voidCheque')}
-                      disabled={uploadingDocType === 'voidCheque'}
-                      data-testid="button-upload-void-cheque-payroll"
-                    >
-                      {uploadingDocType === 'voidCheque' ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t.uploading}
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          {t.uploadVoidCheque}
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
-
-                {/* Banking Documents Section */}
-                {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                  <div className="space-y-3">
-                    <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                      <ImageIcon className="w-4 h-4" />
-                      Banking Documents (Void Cheque)
-                    </h3>
-                    <div className="space-y-3">
-                      {user.bankDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
-                        const lowerUrl = url.toLowerCase();
-                        const isPdf = lowerUrl.endsWith('.pdf');
-                        const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
-                                      lowerUrl.includes('image') || 
-                                      (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
-                        
-                        return (
-                          <div key={index} className="relative">
-                            <a 
-                              href={url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
-                            >
-                              {isPdf ? (
-                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                  <FileText className="w-12 h-12 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
-                                </div>
-                              ) : isImage ? (
-                                <img 
-                                  src={url} 
-                                  alt={`Banking document ${index + 1}`}
-                                  className="w-full object-contain"
-                                  style={{ maxHeight: '300px', minHeight: '100px' }}
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.onerror = null;
-                                    target.style.display = 'none';
-                                    const parent = target.parentElement;
-                                    if (parent) {
-                                      const div = document.createElement('div');
-                                      div.className = 'flex flex-col items-center justify-center py-8 gap-2';
-                                      div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
-                                      parent.appendChild(div);
-                                    }
-                                  }}
-                                />
-                              ) : (
-                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
-                                  <FileText className="w-12 h-12 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
-                                </div>
-                              )}
-                            </a>
-                            <Button
-                              variant="destructive"
-                              size="icon"
-                              className="absolute top-2 right-2 h-7 w-7"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setDeletingDocument({ type: 'bankDocuments', url });
-                              }}
-                              data-testid={`button-delete-bank-doc-${index}`}
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    
-                    {/* Upload additional void cheque button */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => triggerDocumentUpload('voidCheque')}
-                      disabled={uploadingDocType === 'voidCheque'}
-                      data-testid="button-upload-void-cheque"
-                    >
-                      {uploadingDocType === 'voidCheque' ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t.uploading}
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="w-4 h-4 mr-2" />
-                          {t.addVoidCheque}
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </div>
-              </TabsContent>
+              {/* PAYROLL TAB - UNIFIED (uses renderPayrollTab helper) */}
+              {renderPayrollTab()}
 
               {/* CERTIFICATIONS TAB CONTINUED - Specialties */}
               <TabsContent value="certifications" className="mt-0 space-y-6">
