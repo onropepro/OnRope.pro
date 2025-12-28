@@ -2119,7 +2119,7 @@ export class Storage {
       .orderBy(desc(documentReviewSignatures.signedAt));
   }
 
-  async enrollEmployeeInDocumentReviews(companyId: string, employeeId: string, documents: { type: string; id?: string; name: string; version?: string; fileUrl?: string }[]): Promise<DocumentReviewSignature[]> {
+  async enrollEmployeeInDocumentReviews(companyId: string, employeeId: string, documents: { type: string; id?: string; name: string; version?: string; fileUrl?: string; targetRoles?: string[] }[]): Promise<DocumentReviewSignature[]> {
     const results: DocumentReviewSignature[] = [];
     for (const doc of documents) {
       const existing = await this.getDocumentReviewSignature(employeeId, doc.type, doc.id);
@@ -2132,6 +2132,7 @@ export class Storage {
           documentName: doc.name,
           documentVersion: doc.version || null,
           fileUrl: doc.fileUrl || null,
+          targetRoles: doc.targetRoles || ['rope_access_tech', 'ground_crew'],
         });
         results.push(signature);
       } else {

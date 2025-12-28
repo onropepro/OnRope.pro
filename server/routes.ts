@@ -19865,6 +19865,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const docType of requiredDocTypes) {
           const docs = await storage.getCompanyDocumentsByType(companyId, docType);
           for (const doc of docs) {
+            // Check if document targets this user's role (skip if not)
+            const targetRoles = (doc.targetRoles as string[] | null) || ['rope_access_tech', 'ground_crew'];
+            if (!targetRoles.includes(currentUser.role)) {
+              continue; // Skip documents not targeting this user's role
+            }
+            
             // If employee doesn't have a review for this document, create one
             if (!existingDocIds.has(doc.id)) {
               try {
@@ -19873,6 +19879,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   id: doc.id,
                   name: doc.fileName,
                   fileUrl: doc.fileUrl,
+                  targetRoles: targetRoles, // Inherit targetRoles from the document
                 }]);
               } catch (enrollErr) {
                 // Ignore duplicate errors - another request may have created it
@@ -19884,7 +19891,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Now fetch all reviews (including newly created ones)
-      const reviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      const allReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      
+      // Filter reviews to only include those targeting this user's role
+      const reviews = allReviews.filter(r => {
+        const targetRoles = (r.targetRoles as string[] | null) || ['rope_access_tech', 'ground_crew'];
+        return targetRoles.includes(currentUser.role);
+      });
+      
       res.json({ reviews });
     } catch (error) {
       console.error("Get my document reviews error:", error);
@@ -19909,8 +19923,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all document reviews for this employee
       const reviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
       
-      // Count pending (unsigned) documents
-      const pendingReviews = reviews.filter(r => !r.signedAt);
+      // Count pending (unsigned) documents that apply to this user's role
+      const pendingReviews = reviews.filter(r => {
+        // Document is not signed yet
+        if (r.signedAt) return false;
+        
+        // Check if document targets this user's role
+        // If targetRoles is null/undefined/empty, default to including all roles (backward compatibility)
+        const targetRoles = r.targetRoles as string[] | null;
+        if (!targetRoles || targetRoles.length === 0) {
+          return true; // Legacy documents apply to everyone
+        }
+        
+        return targetRoles.includes(currentUser.role);
+      });
       
       res.json({ 
         hasPendingDocuments: pendingReviews.length > 0, 

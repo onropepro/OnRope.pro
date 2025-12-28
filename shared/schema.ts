@@ -1358,6 +1358,7 @@ export const companyDocuments = pgTable("company_documents", {
   isTemplate: boolean("is_template").default(false), // True for system-provided template procedures
   templateId: varchar("template_id"), // Unique identifier for template (e.g., 'swp_window_cleaning')
   description: text("description"), // Description for safe work procedures
+  targetRoles: text("target_roles").array().default(sql`ARRAY['rope_access_tech', 'ground_crew']::text[]`), // Which roles must sign this document (default: both)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(), // Track when document was last updated/replaced
   graceEndsAt: timestamp("grace_ends_at"), // 14-day grace period end date for SCR calculations - employees have until this date to sign new/updated documents
@@ -2397,6 +2398,9 @@ export const documentReviewSignatures = pgTable("document_review_signatures", {
   
   // Versioning - to track if document has been updated since last review
   documentVersion: varchar("document_version"), // Optional version identifier
+  
+  // Role targeting - which roles this document review applies to (inherited from companyDocuments)
+  targetRoles: text("target_roles").array().default(sql`ARRAY['rope_access_tech', 'ground_crew']::text[]`),
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
