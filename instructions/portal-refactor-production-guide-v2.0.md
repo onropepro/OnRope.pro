@@ -54,13 +54,47 @@ Line 3954:  {isEditing ? (
     isEditing={isEditing}
     name="email"
     label={t.email}
-    value={user.email}
-    control={form.control}
+    value={isEditing ? form.watch("email") : user.email}
+    control={isEditing ? form.control : undefined}
     icon={<Mail />}
   />
   {/* One component = guaranteed parity */}
 </TabsContent>
 ```
+
+### 1.4 CRITICAL: Form Wrapper Restructure Required
+
+**⚠️ IMPORTANT**: The target architecture above CANNOT be achieved by simply replacing fields with EditableField components. You must FIRST restructure the overall Form/TabsContent layout.
+
+**The Problem**: Currently, all edit-mode TabsContent blocks are inside `{isEditing ? (<Form>...</Form>) : (...)}`. If you place a unified TabsContent inside this Form block, it will ONLY render when `isEditing=true`, causing empty tabs in view mode.
+
+**The Solution**: Extract all TabsContent blocks to a single variable, then wrap that variable conditionally with Form:
+
+```tsx
+// 1. Define tabs content ONCE (outside any ternary)
+const profileTabsContent = (
+  <>
+    <TabsContent value="personal">
+      <EditableField
+        isEditing={isEditing}
+        control={isEditing ? form.control : undefined}
+        value={isEditing ? form.watch("field") : user.field}
+        ...
+      />
+    </TabsContent>
+    {/* All other tabs... */}
+  </>
+);
+
+// 2. Conditionally wrap with Form
+{isEditing ? (
+  <Form {...form}>{profileTabsContent}</Form>
+) : (
+  profileTabsContent
+)}
+```
+
+**📖 See: `instructions/portal-architecture-restructure-guide.md` for complete step-by-step instructions.**
 
 ---
 
@@ -593,6 +627,60 @@ const useNewProfileComponents = useMemo(() => {
 ---
 
 ## 9. IMPLEMENTATION PHASES
+
+### Phase 0: Layout Restructure (REQUIRED FIRST)
+
+**Objective**: Eliminate the dual-tree ternary by extracting TabsContent to a unified variable with conditional Form wrapper.
+
+**⚠️ CRITICAL**: This phase MUST be completed before any individual tab refactoring. Skipping this phase will result in recreating dual trees.
+
+**Deliverables**:
+1. Extract all TabsContent blocks to a `profileTabsContent` variable
+2. Replace the `{isEditing ? (<Form>...</Form>) : (<>...</>)}` ternary with conditional Form wrapper
+3. Verify each tab renders in both edit and view modes
+4. Verify form submission still works
+
+**Implementation Steps**:
+```tsx
+// Step 1: Before the return statement, create unified tabs variable
+const profileTabsContent = (
+  <>
+    <input type="file" ref={documentInputRef} ... className="hidden" />
+    <TabsContent value="personal">...</TabsContent>
+    <TabsContent value="certifications">...</TabsContent>
+    <TabsContent value="driver">...</TabsContent>
+    <TabsContent value="payroll">...</TabsContent>
+    <TabsContent value="documents">...</TabsContent>
+  </>
+);
+
+// Step 2: In the return, use conditional Form wrapper
+<Tabs value={profileInnerTab} onValueChange={setProfileInnerTab}>
+  <TabsList>...</TabsList>
+  {isEditing ? (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        {profileTabsContent}
+      </form>
+    </Form>
+  ) : (
+    profileTabsContent
+  )}
+</Tabs>
+```
+
+**Exit Criteria**:
+| Criteria | Evidence Required | Sign-off |
+|----------|-------------------|----------|
+| Single TabsContent per tab | `grep -c "TabsContent value=" = 5` | Dev |
+| All tabs render in view mode | Manual click test | Dev |
+| All tabs render in edit mode | Manual click test | Dev |
+| Form submission works | Save profile test | Dev |
+| No new LSP errors | LSP diagnostics | Dev |
+
+**📖 Detailed Guide**: See `instructions/portal-architecture-restructure-guide.md`
+
+---
 
 ### Phase 1: Foundation (Days 1-2)
 
