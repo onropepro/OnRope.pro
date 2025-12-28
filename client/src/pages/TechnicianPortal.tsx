@@ -4168,6 +4168,25 @@ export default function TechnicianPortal() {
                       />
                     </div>
                   </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h3 className="font-medium flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      {t.medicalConditions}
+                    </h3>
+                    <EditableTextarea
+                      isEditing={true}
+                      name="specialMedicalConditions"
+                      label={t.specialMedicalConditions}
+                      value={form.watch("specialMedicalConditions")}
+                      control={form.control}
+                      placeholder={t.medicalPlaceholder}
+                      rows={4}
+                      testId="medical"
+                    />
+                  </div>
                   </TabsContent>
 
                   {/* PAYROLL INFORMATION TAB - EDIT MODE */}
@@ -4287,25 +4306,6 @@ export default function TechnicianPortal() {
                       testId="experience-start-date"
                     />
                   </div>
-
-                  <Separator />
-
-                  <div className="space-y-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4" />
-                      {t.medicalConditions}
-                    </h3>
-                    <EditableTextarea
-                      isEditing={true}
-                      name="specialMedicalConditions"
-                      label={t.specialMedicalConditions}
-                      value={form.watch("specialMedicalConditions")}
-                      control={form.control}
-                      placeholder={t.medicalPlaceholder}
-                      rows={4}
-                      testId="medical"
-                    />
-                  </div>
                   </TabsContent>
 
                   {/* DOCUMENTS TAB - EDIT MODE */}
@@ -4393,18 +4393,19 @@ export default function TechnicianPortal() {
                   </p>
                 </div>
 
-                {user.specialMedicalConditions && (
-                  <>
-                    <Separator />
-                    <div className="space-y-3">
-                      <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                        <AlertCircle className="w-4 h-4" />
-                        {t.medicalConditions}
-                      </h3>
-                      <p className="text-sm">{user.specialMedicalConditions}</p>
-                    </div>
-                  </>
-                )}
+                <Separator />
+
+                <div className="space-y-3">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <AlertCircle className="w-4 h-4" />
+                    {t.medicalConditions}
+                  </h3>
+                  <p className="text-sm">
+                    {user.specialMedicalConditions || (
+                      <span className="text-muted-foreground italic">{t.notProvided || "None"}</span>
+                    )}
+                  </p>
+                </div>
               </div>
               </TabsContent>
 
