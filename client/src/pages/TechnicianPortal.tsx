@@ -4671,9 +4671,10 @@ export default function TechnicianPortal() {
               data-testid="input-document-upload-global"
             />
 
-            {isEditing ? (
-              <Form {...form}>
-                <form className="space-y-6">
+            {/* UNIFIED profileTabsContent - all tabs rendered once with internal isEditing conditionals */}
+            {(() => {
+              const profileTabsContent = (
+                <>
                   {/* PERSONAL TAB - UNIFIED (uses renderPersonalTab helper) */}
                   {renderPersonalTab()}
 
@@ -4683,23 +4684,14 @@ export default function TechnicianPortal() {
                   {/* DRIVER TAB - UNIFIED (uses renderDriverTab helper) */}
                   {renderDriverTab()}
 
-                  {/* CERTIFICATIONS TAB - EDIT MODE (uses renderCertificationsEditableFields helper) */}
+                  {/* CERTIFICATIONS TAB - UNIFIED with internal isEditing conditionals */}
                   <TabsContent value="certifications" className="mt-0 space-y-6">
-                    {renderCertificationsEditableFields()}
-                  </TabsContent>
-
-                  {/* DOCUMENTS TAB - UNIFIED (uses renderDocumentsTab helper) */}
-                  {renderDocumentsTab()}
-                </form>
-              </Form>
-            ) : (
-              <>
-              {/* PERSONAL TAB - UNIFIED (uses renderPersonalTab helper) */}
-              {renderPersonalTab()}
-
-              {/* CERTIFICATIONS TAB - VIEW MODE */}
-              <TabsContent value="certifications" className="mt-0 space-y-6">
-              <div className="space-y-6">
+                    {/* Editable fields - shown in edit mode */}
+                    {isEditing && renderCertificationsEditableFields()}
+                    
+                    {/* View content - shown in view mode */}
+                    {!isEditing && (
+                      <div className="space-y-6">
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <Award className="w-4 h-4" />
