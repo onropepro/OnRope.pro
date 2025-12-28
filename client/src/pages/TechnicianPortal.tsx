@@ -5212,6 +5212,7 @@ export default function TechnicianPortal() {
               {/* PERSONAL INFORMATION TAB CONTINUED - Emergency Contact */}
               <TabsContent value="personal" className="mt-0 space-y-6">
               <div className="space-y-6">
+                <Separator />
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <Heart className="w-4 h-4" />
