@@ -2879,6 +2879,37 @@ export default function TechnicianPortal() {
     </TabsContent>
   );
 
+  // Helper function to render Certifications tab editable fields (baseline hours + experience start date)
+  const renderCertificationsEditableFields = () => (
+    <div className="space-y-4">
+      <h3 className="font-medium flex items-center gap-2">
+        <Clock className="w-4 h-4" />
+        Logbook Hours
+      </h3>
+      <EditableField
+        isEditing={isEditing}
+        name="irataBaselineHours"
+        label="Baseline Logbook Hours"
+        value={isEditing ? form.watch("irataBaselineHours") : user.irataBaselineHours}
+        control={isEditing ? form.control : undefined}
+        type="number"
+        placeholder="e.g., 1500"
+        helpText="This is a personal tracking tool only, not an official irata/SPRAT record."
+        testId="baseline-hours"
+      />
+      
+      <EditableDateField
+        isEditing={isEditing}
+        name="ropeAccessStartDate"
+        label={t.experienceStartDate}
+        value={isEditing ? form.watch("ropeAccessStartDate") : user.ropeAccessStartDate}
+        control={isEditing ? form.control : undefined}
+        helpText={t.experienceStartDateHelp}
+        testId="experience-start-date"
+      />
+    </div>
+  );
+
   // Helper function to render unified Documents tab
   const renderDocumentsTab = () => (
     <TabsContent value="documents" className="mt-0 space-y-6">
@@ -4652,35 +4683,9 @@ export default function TechnicianPortal() {
                   {/* DRIVER TAB - UNIFIED (uses renderDriverTab helper) */}
                   {renderDriverTab()}
 
-                  {/* CERTIFICATIONS TAB - EDIT MODE */}
+                  {/* CERTIFICATIONS TAB - EDIT MODE (uses renderCertificationsEditableFields helper) */}
                   <TabsContent value="certifications" className="mt-0 space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      Logbook Hours
-                    </h3>
-                    <EditableField
-                      isEditing={true}
-                      name="irataBaselineHours"
-                      label="Baseline Logbook Hours"
-                      value={form.watch("irataBaselineHours")}
-                      control={form.control}
-                      type="number"
-                      placeholder="e.g., 1500"
-                      helpText="This is a personal tracking tool only, not an official irata/SPRAT record."
-                      testId="baseline-hours"
-                    />
-                    
-                    <EditableDateField
-                      isEditing={true}
-                      name="ropeAccessStartDate"
-                      label={t.experienceStartDate}
-                      value={form.watch("ropeAccessStartDate")}
-                      control={form.control}
-                      helpText={t.experienceStartDateHelp}
-                      testId="experience-start-date"
-                    />
-                  </div>
+                    {renderCertificationsEditableFields()}
                   </TabsContent>
 
                   {/* DOCUMENTS TAB - UNIFIED (uses renderDocumentsTab helper) */}
