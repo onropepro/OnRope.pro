@@ -42,6 +42,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, parseLocalDate } from "@/lib/dateUtils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { EditableField, EditableDateField } from "@/components/profile";
 import { 
   User, 
   LogOut, 
@@ -1243,6 +1244,153 @@ export default function GroundCrewPortal() {
     );
   }
 
+  // ============================================================================
+  // UNIFIED SECTION RENDER HELPERS
+  // These helpers create unified section content that works in both edit and view modes
+  // Pattern: isEditing controls EditableField props and conditional view-only content
+  // ============================================================================
+
+  // Helper: Render Driver's License section
+  const renderDriverLicenseSection = () => (
+    <div>
+      <h3 className="text-lg font-semibold mb-4">{t.driversLicense}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <EditableField
+          isEditing={isEditing}
+          name="driversLicenseNumber"
+          label={t.licenseNumber}
+          value={isEditing ? form.watch("driversLicenseNumber") : user.driversLicenseNumber}
+          control={isEditing ? form.control : undefined}
+          placeholder="Optional"
+          testId="license-number"
+        />
+        <EditableDateField
+          isEditing={isEditing}
+          name="driversLicenseIssuedDate"
+          label={t.issuedDate}
+          value={isEditing ? form.watch("driversLicenseIssuedDate") : user.driversLicenseIssuedDate}
+          control={isEditing ? form.control : undefined}
+          emptyText={t.notProvided || "Not set"}
+          testId="license-issued"
+        />
+        <EditableDateField
+          isEditing={isEditing}
+          name="driversLicenseExpiry"
+          label={t.expiry}
+          value={isEditing ? form.watch("driversLicenseExpiry") : user.driversLicenseExpiry}
+          control={isEditing ? form.control : undefined}
+          emptyText={t.notProvided || "Not set"}
+          testId="license-expiry"
+        />
+      </div>
+      <div className="mt-4">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => triggerDocumentUpload('driversLicense')}
+          disabled={uploadingDocType === 'driversLicense'}
+          data-testid="button-upload-drivers-license"
+        >
+          {uploadingDocType === 'driversLicense' ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4 mr-2" />
+          )}
+          {t.uploadDriversLicense || "Upload License"}
+        </Button>
+        {user?.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
+          <div className="mt-2 space-y-2">
+            {user.driversLicenseDocuments.map((url: string, index: number) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  {t.driversLicense || "Driver License"} #{index + 1}
+                </a>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDeletingDocument({ documentType: 'driversLicenseDocuments', documentUrl: url })}
+                  className="h-6 w-6 p-0"
+                  data-testid={`button-delete-license-doc-${index}`}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // Helper: Render First Aid section
+  const renderFirstAidSection = () => (
+    <div>
+      <h3 className="text-lg font-semibold mb-4">{t.firstAid}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <EditableField
+          isEditing={isEditing}
+          name="firstAidType"
+          label={t.firstAidType}
+          value={isEditing ? form.watch("firstAidType") : user.firstAidType}
+          control={isEditing ? form.control : undefined}
+          placeholder="OFA Level 1, Standard First Aid, etc."
+          testId="first-aid-type"
+        />
+        <EditableDateField
+          isEditing={isEditing}
+          name="firstAidExpiry"
+          label={t.expiry}
+          value={isEditing ? form.watch("firstAidExpiry") : user.firstAidExpiry}
+          control={isEditing ? form.control : undefined}
+          emptyText={t.notProvided || "Not set"}
+          testId="first-aid-expiry"
+        />
+      </div>
+      <div className="mt-4">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => triggerDocumentUpload('firstAidCertificate')}
+          disabled={uploadingDocType === 'firstAidCertificate'}
+          data-testid="button-upload-first-aid"
+        >
+          {uploadingDocType === 'firstAidCertificate' ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4 mr-2" />
+          )}
+          {t.uploadFirstAidCert || "Upload First Aid Certificate"}
+        </Button>
+        {user?.firstAidDocuments && user.firstAidDocuments.length > 0 && (
+          <div className="mt-2 space-y-2">
+            {user.firstAidDocuments.map((url: string, index: number) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  {t.firstAidCertificate || "First Aid Certificate"} #{index + 1}
+                </a>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDeletingDocument({ documentType: 'firstAidDocuments', documentUrl: url })}
+                  className="h-6 w-6 p-0"
+                  data-testid={`button-delete-first-aid-doc-${index}`}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
       {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
@@ -1997,157 +2145,13 @@ export default function GroundCrewPortal() {
 
                     <Separator />
 
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4">{t.driversLicense}</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="driversLicenseNumber"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t.licenseNumber}</FormLabel>
-                              <FormControl>
-                                <Input {...field} disabled={!isEditing} data-testid="input-license-number" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="driversLicenseIssuedDate"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t.issuedDate}</FormLabel>
-                              <FormControl>
-                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-license-issued" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="driversLicenseExpiry"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t.expiry}</FormLabel>
-                              <FormControl>
-                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-license-expiry" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="mt-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => triggerDocumentUpload('driversLicense')}
-                          disabled={uploadingDocType === 'driversLicense'}
-                          data-testid="button-upload-drivers-license"
-                        >
-                          {uploadingDocType === 'driversLicense' ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          ) : (
-                            <Upload className="w-4 h-4 mr-2" />
-                          )}
-                          {t.uploadDriversLicense || "Upload License"}
-                        </Button>
-                        {user?.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
-                          <div className="mt-2 space-y-2">
-                            {user.driversLicenseDocuments.map((url: string, index: number) => (
-                              <div key={index} className="flex items-center gap-2 text-sm">
-                                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                                  {t.driversLicense || "Driver License"} #{index + 1}
-                                </a>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setDeletingDocument({ documentType: 'driversLicenseDocuments', documentUrl: url })}
-                                  className="h-6 w-6 p-0"
-                                  data-testid={`button-delete-license-doc-${index}`}
-                                >
-                                  <X className="w-3 h-3" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    {/* DRIVER LICENSE SECTION - UNIFIED (uses renderDriverLicenseSection helper) */}
+                    {renderDriverLicenseSection()}
 
                     <Separator />
 
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4">{t.firstAid}</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="firstAidType"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t.firstAidType}</FormLabel>
-                              <FormControl>
-                                <Input {...field} disabled={!isEditing} placeholder="OFA Level 1, Standard First Aid, etc." data-testid="input-first-aid-type" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="firstAidExpiry"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t.expiry}</FormLabel>
-                              <FormControl>
-                                <Input {...field} type="date" disabled={!isEditing} data-testid="input-first-aid-expiry" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <div className="mt-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => triggerDocumentUpload('firstAidCertificate')}
-                          disabled={uploadingDocType === 'firstAidCertificate'}
-                          data-testid="button-upload-first-aid"
-                        >
-                          {uploadingDocType === 'firstAidCertificate' ? (
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          ) : (
-                            <Upload className="w-4 h-4 mr-2" />
-                          )}
-                          {t.uploadFirstAidCert || "Upload First Aid Certificate"}
-                        </Button>
-                        {user?.firstAidDocuments && user.firstAidDocuments.length > 0 && (
-                          <div className="mt-2 space-y-2">
-                            {user.firstAidDocuments.map((url: string, index: number) => (
-                              <div key={index} className="flex items-center gap-2 text-sm">
-                                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                                  {t.firstAidCertificate || "First Aid Certificate"} #{index + 1}
-                                </a>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setDeletingDocument({ documentType: 'firstAidDocuments', documentUrl: url })}
-                                  className="h-6 w-6 p-0"
-                                  data-testid={`button-delete-first-aid-doc-${index}`}
-                                >
-                                  <X className="w-3 h-3" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    {/* FIRST AID SECTION - UNIFIED (uses renderFirstAidSection helper) */}
+                    {renderFirstAidSection()}
                   </form>
                 </Form>
               </CardContent>
