@@ -1396,6 +1396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bankInstitutionNumber,
         bankAccountNumber,
         driversLicenseNumber,
+        driversLicenseIssuedDate,
         driversLicenseExpiry,
         birthday,
         specialMedicalConditions,
@@ -5251,6 +5252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bankInstitutionNumber,
         bankAccountNumber,
         driversLicenseNumber,
+        driversLicenseIssuedDate,
         driversLicenseExpiry,
         birthday,
         specialMedicalConditions,
@@ -5302,6 +5304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (employeePostalCode !== undefined) updateData.employeePostalCode = employeePostalCode || null;
       if (emergencyContactRelationship !== undefined) updateData.emergencyContactRelationship = emergencyContactRelationship || null;
       if (birthday !== undefined) updateData.birthday = birthday || null;
+      if (driversLicenseIssuedDate !== undefined) updateData.driversLicenseIssuedDate = driversLicenseIssuedDate || null;
       if (driversLicenseExpiry !== undefined) updateData.driversLicenseExpiry = driversLicenseExpiry || null;
       if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
       if (irataHoursAtLastUpgrade !== undefined) updateData.irataHoursAtLastUpgrade = irataHoursAtLastUpgrade || null;
