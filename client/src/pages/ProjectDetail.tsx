@@ -372,6 +372,17 @@ export default function ProjectDetail() {
   // Check if user is management using centralized permission helper
   const isManagement = checkIsManagement(currentUser);
 
+  // Rope access plan signatures (for managers)
+  const { data: ropeAccessSignaturesData } = useQuery<{ signatures: any[]; hasPlan: boolean; planUrl: string | null; projectName: string }>({
+    queryKey: [`/api/projects/${id}/rope-access-plan/signatures`],
+    queryFn: async () => {
+      const response = await fetch(`/api/projects/${id}/rope-access-plan/signatures`, { credentials: "include" });
+      if (!response.ok) return { signatures: [], hasPlan: false, planUrl: null, projectName: "" };
+      return response.json();
+    },
+    enabled: !!id && isManagement,
+  });
+
   // Helper function to get current GPS location
   const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> => {
     return new Promise((resolve, reject) => {
@@ -488,6 +499,8 @@ export default function ProjectDetail() {
         title: t('projectDetail.toasts.signatureSuccess', 'Rope Access Plan Signed'),
         description: t('projectDetail.toasts.signatureSuccessDesc', 'You can now clock in to this project.'),
       });
+      // Invalidate signatures query so managers see updated list
+      queryClient.invalidateQueries({ queryKey: [`/api/projects/${id}/rope-access-plan/signatures`] });
       // Automatically retry clock-in
       startDayMutation.mutate();
     },
@@ -2267,6 +2280,46 @@ export default function ProjectDetail() {
                       }
                     }}
                   />
+
+                  {/* Signatures Section - for management only */}
+                  {ropeAccessSignaturesData?.hasPlan && isManagement && (
+                    <div className="mt-4 space-y-3">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          {t('projectDetail.ropeAccessPlan.signatures', 'Signatures')} ({ropeAccessSignaturesData?.signatures?.length || 0})
+                        </h4>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(`/api/projects/${id}/rope-access-plan/pdf`, '_blank')}
+                          data-testid="button-download-signatures-pdf"
+                          disabled={!ropeAccessSignaturesData?.signatures?.length}
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          {t('projectDetail.ropeAccessPlan.downloadPdf', 'Download Audit PDF')}
+                        </Button>
+                      </div>
+                      {ropeAccessSignaturesData?.signatures?.length ? (
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                          {ropeAccessSignaturesData.signatures.map((sig: any) => (
+                            <div key={sig.id} className="flex items-center justify-between gap-2 p-2 bg-muted/50 rounded-md text-sm">
+                              <div className="flex items-center gap-2">
+                                <span className="material-icons text-sm text-green-600">check_circle</span>
+                                <span>{sig.employeeName || 'Employee'}</span>
+                              </div>
+                              <span className="text-muted-foreground text-xs">
+                                {sig.signedAt ? format(new Date(sig.signedAt), 'MMM d, yyyy HH:mm') : 'N/A'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          {t('projectDetail.ropeAccessPlan.noSignatures', 'No signatures yet.')}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <Separator />

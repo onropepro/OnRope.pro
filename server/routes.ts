@@ -14728,8 +14728,19 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       
       const signatures = await storage.getRopeAccessPlanSignatures(projectId);
       
+      // Add employee names to signatures
+      const signaturesWithNames = await Promise.all(
+        signatures.map(async (sig: any) => {
+          const employee = await storage.getUserById(sig.employeeId);
+          return {
+            ...sig,
+            employeeName: employee ? `${employee.firstName} ${employee.lastName}` : 'Unknown Employee'
+          };
+        })
+      );
+      
       res.json({ 
-        signatures,
+        signatures: signaturesWithNames,
         hasPlan: !!project.ropeAccessPlanUrl,
         planUrl: project.ropeAccessPlanUrl,
         projectName: project.name
