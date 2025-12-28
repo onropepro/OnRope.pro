@@ -2871,34 +2871,97 @@ export default function TechnicianPortal() {
     </TabsContent>
   );
 
-  // Helper function to render Certifications tab editable fields (baseline hours + experience start date)
+  // Helper function to render Certifications tab editable fields (First Aid certification)
   const renderCertificationsEditableFields = () => (
-    <div className="space-y-4">
-      <h3 className="font-medium flex items-center gap-2">
-        <Clock className="w-4 h-4" />
-        Logbook Hours
-      </h3>
-      <EditableField
-        isEditing={isEditing}
-        name="irataBaselineHours"
-        label="Baseline Logbook Hours"
-        value={isEditing ? form.watch("irataBaselineHours") : user.irataBaselineHours}
-        control={isEditing ? form.control : undefined}
-        type="number"
-        placeholder="e.g., 1500"
-        helpText="This is a personal tracking tool only, not an official irata/SPRAT record."
-        testId="baseline-hours"
-      />
+    <div className="space-y-6">
+      {/* First Aid Certification Section */}
+      <div className="space-y-4">
+        <h3 className="font-medium flex items-center gap-2">
+          <Shield className="w-4 h-4" />
+          {t.firstAid}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <EditableField
+            isEditing={isEditing}
+            name="firstAidType"
+            label={t.firstAidType}
+            value={isEditing ? form.watch("firstAidType") : user.firstAidType}
+            control={isEditing ? form.control : undefined}
+            placeholder="OFA Level 1, Standard First Aid, etc."
+            testId="first-aid-type"
+          />
+          <EditableDateField
+            isEditing={isEditing}
+            name="firstAidExpiry"
+            label={t.expiry}
+            value={isEditing ? form.watch("firstAidExpiry") : user.firstAidExpiry}
+            control={isEditing ? form.control : undefined}
+            emptyText={t.notProvided || "Not set"}
+            testId="first-aid-expiry"
+          />
+        </div>
+        
+        {/* First Aid Certificate Upload */}
+        <div className="pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => triggerDocumentUpload('firstAidCertificate')}
+            disabled={uploadingDocType === 'firstAidCertificate'}
+            data-testid="button-upload-first-aid-edit"
+          >
+            {uploadingDocType === 'firstAidCertificate' ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                {t.uploading}
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4 mr-2" />
+                {user.firstAidDocuments && user.firstAidDocuments.filter((u: string) => u && u.trim()).length > 0 
+                  ? t.addFirstAidCert || "Add Certificate"
+                  : t.uploadFirstAidCert || "Upload Certificate"}
+              </>
+            )}
+          </Button>
+          
+          {/* Show existing First Aid documents */}
+          {user.firstAidDocuments && user.firstAidDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+            <div className="mt-3 space-y-2">
+              {user.firstAidDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => (
+                <div key={index} className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    {t.firstAidCertificate} #{index + 1}
+                  </a>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDeletingDocument({ type: 'firstAidDocuments', url })}
+                    className="h-6 w-6 p-0"
+                    data-testid={`button-delete-first-aid-doc-edit-${index}`}
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
       
-      <EditableDateField
-        isEditing={isEditing}
-        name="ropeAccessStartDate"
-        label={t.experienceStartDate}
-        value={isEditing ? form.watch("ropeAccessStartDate") : user.ropeAccessStartDate}
-        control={isEditing ? form.control : undefined}
-        helpText={t.experienceStartDateHelp}
-        testId="experience-start-date"
-      />
+      {/* Note about IRATA/SPRAT */}
+      <div className="p-3 bg-muted/50 rounded-lg border">
+        <p className="text-sm text-muted-foreground">
+          {language === 'en' 
+            ? 'IRATA and SPRAT certifications are managed through the verification process. Exit edit mode to access verification options.'
+            : language === 'fr'
+            ? 'Les certifications IRATA et SPRAT sont gérées via le processus de vérification. Quittez le mode édition pour accéder aux options de vérification.'
+            : 'Las certificaciones IRATA y SPRAT se gestionan a través del proceso de verificación. Salga del modo de edición para acceder a las opciones de verificación.'}
+        </p>
+      </div>
     </div>
   );
 
