@@ -796,7 +796,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   {/* Referral Code Input */}
                   <div className="mb-8">
-                    <Label className="text-sm mb-2 block">{t('techReg.referral.inputLabel', 'Enter referral code (optional)')}</Label>
                     <Input
                       placeholder={t('techReg.referral.inputPlaceholder', 'Enter referral code (optional)')}
                       value={data.referralCodeInput}
