@@ -4151,13 +4151,10 @@ export default function TechnicianPortal() {
                     </h3>
                     <div className="flex items-start gap-4">
                       <Avatar className="w-20 h-20 border-2 border-primary/20">
-                        {user.profilePhotoUrl ? (
-                          <AvatarImage src={user.profilePhotoUrl} alt={user.name || ""} />
-                        ) : (
-                          <AvatarFallback className="text-2xl bg-primary/10 text-primary">
-                            {user.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "?"}
-                          </AvatarFallback>
-                        )}
+                        <AvatarImage src={user.photoUrl || undefined} alt={user.name || ""} />
+                        <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                          {user.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase() || "?"}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
