@@ -13171,7 +13171,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       };
 
       // Get existing client emails for duplicate check
-      const existingClients = await storage.getClientsByCompanyId(companyId);
+      const existingClients = await storage.getClientsByCompany(companyId);
       const existingEmails = new Set(existingClients.map(c => c.email?.toLowerCase()).filter(Boolean));
 
       const results = {
