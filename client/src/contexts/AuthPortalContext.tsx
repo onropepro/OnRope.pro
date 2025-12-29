@@ -199,7 +199,7 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
   const handleEmployerRegister = () => {
     setIsOpen(false);
     setTimeout(() => {
-      setLocation("/pricing");
+      setShowEmployerRegistration(true);
     }, 50);
   };
 
@@ -446,13 +446,21 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
       />
       
       {showResidentSignup && (
-        <ResidentSlidingSignup 
-          onClose={() => setShowResidentSignup(false)}
-          onShowSignIn={() => {
-            setShowResidentSignup(false);
-            openLogin();
-          }}
-        />
+        <Dialog open={showResidentSignup} onOpenChange={(open) => !open && setShowResidentSignup(false)}>
+          <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden border-0 bg-transparent shadow-none">
+            <VisuallyHidden>
+              <DialogTitle>Resident Registration</DialogTitle>
+              <DialogDescription>Create your resident account</DialogDescription>
+            </VisuallyHidden>
+            <ResidentSlidingSignup 
+              onClose={() => setShowResidentSignup(false)}
+              onShowSignIn={() => {
+                setShowResidentSignup(false);
+                openLogin();
+              }}
+            />
+          </DialogContent>
+        </Dialog>
       )}
     </AuthPortalContext.Provider>
   );
