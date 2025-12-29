@@ -10,6 +10,7 @@ import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
+import * as XLSX from "xlsx";
 import * as stripeService from "./stripe-service";
 import Stripe from "stripe";
 import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
@@ -13106,6 +13107,167 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
   
+
+  // Excel import for clients
+  const clientExcelUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+    fileFilter: (req, file, cb) => {
+      const validTypes = [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/vnd.ms-excel', // .xls
+        'application/octet-stream', // fallback for some browsers
+      ];
+      const validExtensions = ['.xlsx', '.xls'];
+      const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
+      if (validTypes.includes(file.mimetype) || validExtensions.includes(ext)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only Excel files (.xlsx, .xls) are allowed'));
+      }
+    },
+  });
+
+  app.post("/api/clients/import-excel", requireAuth, requireRole("company"), clientExcelUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.id;
+
+      // Parse Excel file
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: '' });
+
+      if (rows.length === 0) {
+        return res.status(400).json({ message: "Excel file is empty or has no data rows" });
+      }
+
+      // Map column names (case-insensitive, flexible naming)
+      const findColumn = (row: Record<string, any>, possibleNames: string[]): string | null => {
+        for (const key of Object.keys(row)) {
+          const normalizedKey = key.toLowerCase().trim().replace(/[_\s-]+/g, '');
+          for (const name of possibleNames) {
+            const normalizedName = name.toLowerCase().trim().replace(/[_\s-]+/g, '');
+            if (normalizedKey === normalizedName || normalizedKey.includes(normalizedName)) {
+              return key;
+            }
+          }
+        }
+        return null;
+      };
+
+      // Get existing client emails for duplicate check
+      const existingClients = await storage.getClientsByCompanyId(companyId);
+      const existingEmails = new Set(existingClients.map(c => c.email?.toLowerCase()).filter(Boolean));
+
+      const results = {
+        success: [] as Array<{ row: number; firstName: string; lastName: string; email: string }>,
+        skipped: [] as Array<{ row: number; reason: string; data?: Record<string, any> }>,
+      };
+
+      const emailsInFile = new Set<string>();
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const rowNum = i + 2; // Excel rows are 1-indexed, plus header row
+
+        // Find column mappings
+        const firstNameCol = findColumn(row, ['firstname', 'first name', 'first', 'given name', 'prenom']);
+        const lastNameCol = findColumn(row, ['lastname', 'last name', 'last', 'surname', 'family name', 'nom']);
+        const companyCol = findColumn(row, ['company', 'property management company', 'property management', 'pm company', 'organization', 'entreprise']);
+        const emailCol = findColumn(row, ['email', 'email address', 'e-mail', 'courriel']);
+        const phoneCol = findColumn(row, ['phone', 'phone number', 'telephone', 'tel', 'mobile']);
+        const addressCol = findColumn(row, ['address', 'street address', 'adresse']);
+        const billingAddressCol = findColumn(row, ['billing address', 'billing', 'adresse de facturation']);
+
+        // Extract values
+        const firstName = firstNameCol ? String(row[firstNameCol]).trim() : '';
+        const lastName = lastNameCol ? String(row[lastNameCol]).trim() : '';
+        const company = companyCol ? String(row[companyCol]).trim() : '';
+        const email = emailCol ? String(row[emailCol]).trim().toLowerCase() : '';
+        const phoneNumber = phoneCol ? String(row[phoneCol]).trim() : '';
+        const address = addressCol ? String(row[addressCol]).trim() : '';
+        const billingAddress = billingAddressCol ? String(row[billingAddressCol]).trim() : '';
+
+        // Validate required fields
+        if (!firstName) {
+          results.skipped.push({ row: rowNum, reason: 'Missing first name', data: { firstName, lastName, email } });
+          continue;
+        }
+        if (!lastName) {
+          results.skipped.push({ row: rowNum, reason: 'Missing last name', data: { firstName, lastName, email } });
+          continue;
+        }
+        if (!company) {
+          results.skipped.push({ row: rowNum, reason: 'Missing property management company', data: { firstName, lastName, email } });
+          continue;
+        }
+        if (!email) {
+          results.skipped.push({ row: rowNum, reason: 'Missing email', data: { firstName, lastName, email } });
+          continue;
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          results.skipped.push({ row: rowNum, reason: 'Invalid email format', data: { firstName, lastName, email } });
+          continue;
+        }
+
+        // Check for duplicates in file
+        if (emailsInFile.has(email)) {
+          results.skipped.push({ row: rowNum, reason: 'Duplicate email in file', data: { firstName, lastName, email } });
+          continue;
+        }
+
+        // Check for existing clients
+        if (existingEmails.has(email)) {
+          results.skipped.push({ row: rowNum, reason: 'Client with this email already exists', data: { firstName, lastName, email } });
+          continue;
+        }
+
+        // Create client
+        try {
+          await storage.createClient({
+            companyId,
+            firstName,
+            lastName,
+            company,
+            email,
+            phoneNumber: phoneNumber || undefined,
+            address: address || undefined,
+            billingAddress: billingAddress || undefined,
+          });
+
+          emailsInFile.add(email);
+          existingEmails.add(email);
+          results.success.push({ row: rowNum, firstName, lastName, email });
+        } catch (error) {
+          console.error(`Error creating client from row ${rowNum}:`, error);
+          results.skipped.push({ row: rowNum, reason: 'Failed to create client', data: { firstName, lastName, email } });
+        }
+      }
+
+      res.json({
+        message: `Import complete: ${results.success.length} clients created, ${results.skipped.length} rows skipped`,
+        imported: results.success.length,
+        skipped: results.skipped.length,
+        details: results,
+      });
+    } catch (error) {
+      console.error("Error importing clients from Excel:", error);
+      res.status(500).json({ message: "Failed to import clients from Excel" });
+    }
+  });
   app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
