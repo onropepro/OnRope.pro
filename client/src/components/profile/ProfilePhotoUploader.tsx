@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
-import { Camera, HardHat, Loader2, X } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
+import { Camera, HardHat, Loader2, ZoomIn, ZoomOut } from "lucide-react";
+import Cropper from "react-easy-crop";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,13 +10,72 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 
 interface ProfilePhotoUploaderProps {
   photoUrl: string | null;
   userName: string;
   onPhotoUploaded?: (url: string) => void;
+}
+
+interface CroppedAreaPixels {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+async function getCroppedImg(
+  imageSrc: string,
+  pixelCrop: CroppedAreaPixels
+): Promise<Blob> {
+  const image = await createImage(imageSrc);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("No 2d context");
+  }
+
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
+
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  );
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Canvas is empty"));
+        }
+      },
+      "image/jpeg",
+      0.9
+    );
+  });
+}
+
+function createImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", (error) => reject(error));
+    image.setAttribute("crossOrigin", "anonymous");
+    image.src = url;
+  });
 }
 
 export function ProfilePhotoUploader({
@@ -25,8 +85,10 @@ export function ProfilePhotoUploader({
 }: ProfilePhotoUploaderProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CroppedAreaPixels | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -38,6 +100,13 @@ export function ProfilePhotoUploader({
       .toUpperCase()
       .slice(0, 2);
   };
+
+  const onCropComplete = useCallback(
+    (_croppedArea: any, croppedAreaPixels: CroppedAreaPixels) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    []
+  );
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -61,21 +130,24 @@ export function ProfilePhotoUploader({
       return;
     }
 
-    setSelectedFile(file);
     const reader = new FileReader();
     reader.onload = (e) => {
-      setPreviewUrl(e.target?.result as string);
+      setImageSrc(e.target?.result as string);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
     };
     reader.readAsDataURL(file);
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!imageSrc || !croppedAreaPixels) return;
 
     setIsUploading(true);
     try {
+      const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+      
       const formData = new FormData();
-      formData.append("photo", selectedFile);
+      formData.append("photo", croppedBlob, "profile-photo.jpg");
 
       const response = await fetch("/api/technician/profile-photo", {
         method: "POST",
@@ -96,8 +168,7 @@ export function ProfilePhotoUploader({
       });
 
       setIsDialogOpen(false);
-      setPreviewUrl(null);
-      setSelectedFile(null);
+      resetDialog();
       
       if (onPhotoUploaded) {
         onPhotoUploaded(data.photoUrl);
@@ -116,7 +187,10 @@ export function ProfilePhotoUploader({
   const handleDeletePhoto = async () => {
     setIsUploading(true);
     try {
-      const response = await apiRequest("DELETE", "/api/technician/profile-photo");
+      const response = await fetch("/api/technician/profile-photo", {
+        method: "DELETE",
+        credentials: "include",
+      });
       
       if (!response.ok) {
         const error = await response.json();
@@ -145,8 +219,10 @@ export function ProfilePhotoUploader({
   };
 
   const resetDialog = () => {
-    setPreviewUrl(null);
-    setSelectedFile(null);
+    setImageSrc(null);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -186,30 +262,61 @@ export function ProfilePhotoUploader({
           <DialogHeader>
             <DialogTitle>Update profile picture</DialogTitle>
             <DialogDescription>
-              Upload a new photo or remove your current one
+              {imageSrc
+                ? "Drag to reposition, use slider to zoom"
+                : "Upload a new photo or remove your current one"}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
-            <div className="flex flex-col items-center gap-4">
-              <Avatar className="w-32 h-32">
-                <AvatarImage
-                  src={previewUrl || photoUrl || undefined}
-                  alt={userName}
-                />
-                <AvatarFallback className="bg-primary/10 text-2xl">
-                  {photoUrl || previewUrl ? (
-                    getInitials(userName)
-                  ) : (
-                    <HardHat className="w-12 h-12 text-primary" />
-                  )}
-                </AvatarFallback>
-              </Avatar>
+          <div className="space-y-4">
+            {imageSrc ? (
+              <>
+                <div className="relative w-full h-64 bg-muted rounded-lg overflow-hidden">
+                  <Cropper
+                    image={imageSrc}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    cropShape="round"
+                    showGrid={false}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </div>
+                
+                <div className="flex items-center gap-3 px-2">
+                  <ZoomOut className="w-4 h-4 text-muted-foreground" />
+                  <Slider
+                    value={[zoom]}
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    onValueChange={(value) => setZoom(value[0])}
+                    className="flex-1"
+                    data-testid="slider-zoom"
+                  />
+                  <ZoomIn className="w-4 h-4 text-muted-foreground" />
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-4 py-4">
+                <Avatar className="w-32 h-32">
+                  <AvatarImage src={photoUrl || undefined} alt={userName} />
+                  <AvatarFallback className="bg-primary/10 text-2xl">
+                    {photoUrl ? (
+                      getInitials(userName)
+                    ) : (
+                      <HardHat className="w-12 h-12 text-primary" />
+                    )}
+                  </AvatarFallback>
+                </Avatar>
 
-              <p className="text-sm text-muted-foreground text-center">
-                PNG, JPG, GIF or WebP (max 5MB)
-              </p>
-            </div>
+                <p className="text-sm text-muted-foreground text-center">
+                  PNG, JPG, GIF or WebP (max 5MB)
+                </p>
+              </div>
+            )}
 
             <input
               ref={fileInputRef}
@@ -221,49 +328,63 @@ export function ProfilePhotoUploader({
             />
 
             <div className="flex flex-col gap-2">
-              <Button
-                variant="default"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                data-testid="button-select-photo"
-              >
-                {selectedFile ? "Change photo" : "Upload new picture"}
-              </Button>
+              {imageSrc ? (
+                <>
+                  <Button
+                    variant="default"
+                    onClick={handleUpload}
+                    disabled={isUploading}
+                    data-testid="button-save-photo"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      "Save"
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      resetDialog();
+                    }}
+                    disabled={isUploading}
+                    data-testid="button-cancel-crop"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="default"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    data-testid="button-select-photo"
+                  >
+                    Upload new picture
+                  </Button>
 
-              {selectedFile && (
-                <Button
-                  variant="default"
-                  onClick={handleUpload}
-                  disabled={isUploading}
-                  data-testid="button-save-photo"
-                >
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Uploading...
-                    </>
-                  ) : (
-                    "Save"
+                  {photoUrl && (
+                    <Button
+                      variant="destructive"
+                      onClick={handleDeletePhoto}
+                      disabled={isUploading}
+                      data-testid="button-delete-photo"
+                    >
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Removing...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </Button>
                   )}
-                </Button>
-              )}
-
-              {photoUrl && !selectedFile && (
-                <Button
-                  variant="destructive"
-                  onClick={handleDeletePhoto}
-                  disabled={isUploading}
-                  data-testid="button-delete-photo"
-                >
-                  {isUploading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Removing...
-                    </>
-                  ) : (
-                    "Delete"
-                  )}
-                </Button>
+                </>
               )}
             </div>
           </div>
