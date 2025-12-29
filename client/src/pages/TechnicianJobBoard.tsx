@@ -43,7 +43,9 @@ import {
   Trash2,
   Menu,
   LogOut,
-  Crown
+  Crown,
+  LayoutGrid,
+  List
 } from "lucide-react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
@@ -379,6 +381,7 @@ export default function TechnicianJobBoard() {
 
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
   const [showConfirmVisibility, setShowConfirmVisibility] = useState(false);
+  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
   
   // Logout handler
   const handleLogout = async () => {
@@ -1028,13 +1031,35 @@ export default function TechnicianJobBoard() {
 
         {/* Job Listings */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-primary" />
-            {t.activeJobs}
-            {jobs.length > 0 && (
-              <Badge variant="secondary">{jobs.length}</Badge>
-            )}
-          </h2>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-primary" />
+              {t.activeJobs}
+              {jobs.length > 0 && (
+                <Badge variant="secondary">{jobs.length}</Badge>
+              )}
+            </h2>
+            
+            {/* View Toggle */}
+            <div className="flex items-center gap-1">
+              <Button
+                variant={viewMode === "cards" ? "default" : "outline"}
+                size="icon"
+                onClick={() => setViewMode("cards")}
+                data-testid="button-jobs-view-cards"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "outline"}
+                size="icon"
+                onClick={() => setViewMode("list")}
+                data-testid="button-jobs-view-list"
+              >
+                <List className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
 
           {jobsLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -1050,23 +1075,29 @@ export default function TechnicianJobBoard() {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
+            <div className={viewMode === "cards" 
+              ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" 
+              : "grid gap-4"
+            }>
               {jobs.map((job) => (
                 <Card 
                   key={job.id} 
-                  className="hover-elevate cursor-pointer transition-all"
+                  className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer flex flex-col"
                   onClick={() => setSelectedJob(job)}
                   data-testid={`card-job-${job.id}`}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <CardContent className="p-4 flex-1">
+                    <div className={viewMode === "cards" 
+                      ? "flex flex-col h-full" 
+                      : "flex flex-col sm:flex-row sm:items-start justify-between gap-3"
+                    }>
                       <div className="flex-1 space-y-2">
                         <div className="flex items-start gap-3">
-                          <div className="p-2 rounded-lg bg-primary/10">
+                          <div className="p-2 rounded-lg bg-primary/10 shrink-0">
                             <Building className="w-5 h-5 text-primary" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-lg" data-testid={`text-job-title-${job.id}`}>
+                            <h3 className="font-semibold text-base" data-testid={`text-job-title-${job.id}`}>
                               {job.title}
                             </h3>
                             <p className="text-sm text-muted-foreground">
@@ -1104,12 +1135,12 @@ export default function TechnicianJobBoard() {
                             <Award className="w-4 h-4 text-amber-500" />
                             {job.requiredIrataLevel && (
                               <Badge variant="outline" className="border-amber-500 text-amber-600">
-                                IRATA {job.requiredIrataLevel}
+                                IRATA Level {job.requiredIrataLevel}
                               </Badge>
                             )}
                             {job.requiredSpratLevel && (
                               <Badge variant="outline" className="border-purple-500 text-purple-600">
-                                SPRAT {job.requiredSpratLevel}
+                                SPRAT Level {job.requiredSpratLevel}
                               </Badge>
                             )}
                           </div>
@@ -1119,7 +1150,7 @@ export default function TechnicianJobBoard() {
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className="shrink-0"
+                        className={viewMode === "cards" ? "self-end mt-auto" : "shrink-0"}
                         data-testid={`button-view-job-${job.id}`}
                       >
                         <ChevronRight className="w-5 h-5" />
