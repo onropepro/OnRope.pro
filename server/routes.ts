@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts, founderResources, insertFounderResourceSchema, databaseCosts, insertDatabaseCostSchema, userCertifications, insertUserCertificationSchema } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts, founderResources, insertFounderResourceSchema, databaseCosts, insertDatabaseCostSchema, userCertifications, insertUserCertificationSchema, csrRatingHistory } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -24442,9 +24442,29 @@ Do not include any other text, just the JSON object.`
         .where(and(...conditions))
         .orderBy(desc(jobPostings.createdAt));
 
+      // Get CSR ratings for all companies that have job postings
+      const companyIds = [...new Set(activeJobs.map(item => item.job.companyId).filter(Boolean))];
+      const csrMap = new Map<string, number>();
+      
+      for (const companyId of companyIds) {
+        if (companyId) {
+          const [latestCsr] = await db.select({
+            newScore: csrRatingHistory.newScore,
+          }).from(csrRatingHistory)
+            .where(eq(csrRatingHistory.companyId, companyId))
+            .orderBy(desc(csrRatingHistory.createdAt))
+            .limit(1);
+          
+          if (latestCsr) {
+            csrMap.set(companyId, latestCsr.newScore);
+          }
+        }
+      }
+
       const jobsWithCompany = activeJobs.map(item => ({
         ...item.job,
         companyName: item.job.isPlatformPost ? "OnRopePro Platform" : (item.companyName || "Unknown Company"),
+        companyCsr: item.job.companyId ? csrMap.get(item.job.companyId) ?? null : null,
       }));
 
       res.json({ jobPostings: jobsWithCompany });

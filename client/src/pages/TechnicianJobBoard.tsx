@@ -51,7 +51,7 @@ import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
-type JobPostingWithCompany = JobPosting & { companyName?: string | null };
+type JobPostingWithCompany = JobPosting & { companyName?: string | null; companyCsr?: number | null };
 type ApplicationWithJob = JobApplication & { jobPosting: JobPostingWithCompany | null };
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
@@ -1069,6 +1069,9 @@ export default function TechnicianJobBoard() {
                             <h3 className="font-semibold text-lg" data-testid={`text-job-title-${job.id}`}>
                               {job.title}
                             </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {(job as JobPostingWithCompany).companyName || "Unknown Company"}
+                            </p>
                             <p className="text-sm text-muted-foreground line-clamp-2">
                               {job.description}
                             </p>
@@ -1148,6 +1151,27 @@ export default function TechnicianJobBoard() {
 
           {selectedJob && (
             <div className="space-y-6">
+              {/* Company Info Section */}
+              <div className="flex items-center justify-between gap-3 p-3 bg-muted/50 rounded-md">
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-muted-foreground">business</span>
+                  <span className="font-medium">{(selectedJob as JobPostingWithCompany).companyName || "Unknown Company"}</span>
+                </div>
+                {(selectedJob as JobPostingWithCompany).companyCsr != null && (
+                  <Badge 
+                    variant="outline" 
+                    className={`${
+                      (selectedJob as JobPostingWithCompany).companyCsr! >= 90 ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700' :
+                      (selectedJob as JobPostingWithCompany).companyCsr! >= 70 ? 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700' :
+                      (selectedJob as JobPostingWithCompany).companyCsr! >= 50 ? 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700' :
+                      'bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700'
+                    }`}
+                  >
+                    CSR: {Math.round((selectedJob as JobPostingWithCompany).companyCsr!)}%
+                  </Badge>
+                )}
+              </div>
+
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary">{getJobTypeBadge(selectedJob.jobType)}</Badge>
                 {selectedJob.employmentType && (
