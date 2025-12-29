@@ -31,10 +31,11 @@ export default function ResidentLink() {
     const user = (userData as any).user;
 
     if (!user) {
-      // Not logged in - redirect to register page
+      // Not logged in - store code and redirect to home where they can sign up
       // Store code in sessionStorage so we can use it after they register/login
       sessionStorage.setItem('pendingResidentCode', code);
-      setLocation('/register');
+      // Redirect to home page - user can use Sign Up button there
+      setLocation('/?signup=true');
       return;
     }
 

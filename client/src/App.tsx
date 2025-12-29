@@ -11,7 +11,6 @@ import { AuthPortalProvider } from "@/contexts/AuthPortalContext";
 import { usePWAUpdateCheck } from "@/hooks/usePWAUpdateCheck";
 
 // Pages
-import Register from "@/pages/Register";
 import Login from "@/pages/Login";
 import GetLicense from "@/pages/GetLicense";
 import CompleteRegistration from "@/pages/CompleteRegistration";
@@ -170,7 +169,6 @@ function Router() {
   // Public routes that should show the footer
   const publicRoutes = [
     "/",
-    "/register",
     "/login",
     "/employer",
     "/resident",
@@ -200,7 +198,7 @@ function Router() {
       <main className="flex-1">
         <Switch>
           <Route path="/" component={HomePage} />
-          <Route path="/register" component={Register} />
+          <Route path="/register">{() => { window.location.replace('/?signup=true'); return null; }}</Route>
           <Route path="/login" component={Login} />
           <Route path="/employer" component={Employer} />
           <Route path="/resident" component={ResidentLanding} />
@@ -584,8 +582,8 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["/api/user"],
   });
   
-  // NEVER apply branding on login/register/license pages
-  const isPublicPage = location === '/' || location === '/login' || location === '/register' || location === '/link' || location === '/get-license' || location === '/complete-registration' || location.startsWith('/complete-registration?');
+  // NEVER apply branding on login/license pages
+  const isPublicPage = location === '/' || location === '/login' || location === '/link' || location === '/get-license' || location === '/complete-registration' || location.startsWith('/complete-registration?');
   
   // Only apply branding if user is authenticated AND not on public pages
   const isAuthenticated = !!userData?.user && !isPublicPage;

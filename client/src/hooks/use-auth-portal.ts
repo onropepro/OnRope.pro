@@ -1,7 +1,7 @@
 import { useAuthPortalContext } from "@/contexts/AuthPortalContext";
 
 export function useAuthPortal() {
-  const { openLogin, closePortal, isOpen } = useAuthPortalContext();
+  const { openLogin, openRegister, closePortal, isOpen } = useAuthPortalContext();
   
-  return { openLogin, closePortal, isOpen };
+  return { openLogin, openRegister, closePortal, isOpen };
 }

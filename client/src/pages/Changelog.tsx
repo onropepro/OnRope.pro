@@ -422,7 +422,6 @@ const pagesData: PageCategory[] = [
       { name: "Technician Landing", path: "/technician", description: "Technician signup and PLUS upgrade page", roles: ["Public"] },
       { name: "Employer Landing", path: "/employer", description: "Employer/company information page", roles: ["Public"] },
       { name: "Login", path: "/login", description: "User authentication", roles: ["Public"] },
-      { name: "Register", path: "/register", description: "New company registration", roles: ["Public"] },
       { name: "Get License", path: "/get-license", description: "Subscription pricing", roles: ["Public"] },
       { name: "Resident/PM Linking", path: "/link", description: "Link account with company code", roles: ["Public"] },
     ]

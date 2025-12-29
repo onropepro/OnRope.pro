@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
 import { Mail, KeyRound, ArrowRight, Loader2, HardHat, Building2 } from "lucide-react";
@@ -26,6 +27,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function Login() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { openRegister } = useAuthPortal();
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginMethod, setLoginMethod] = useState<"email" | "license">("email");
@@ -159,10 +161,8 @@ export default function Login() {
             <span className="text-sm text-muted-foreground hidden sm:inline">
               {t('login.noAccount', "Don't have an account?")}
             </span>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/register">
-                {t('login.signUp', 'Sign Up')}
-              </Link>
+            <Button variant="outline" size="sm" onClick={openRegister}>
+              {t('login.signUp', 'Sign Up')}
             </Button>
           </div>
         </div>
@@ -328,9 +328,14 @@ export default function Login() {
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-muted-foreground">
               {t('login.newToOnRopePro', 'New to OnRopePro?')}{' '}
-              <Link href="/register" className="text-primary font-medium hover:underline" data-testid="link-create-account">
+              <button 
+                type="button"
+                onClick={openRegister} 
+                className="text-primary font-medium hover:underline" 
+                data-testid="link-create-account"
+              >
                 {t('login.createAccount', 'Create an account')}
-              </Link>
+              </button>
             </p>
             <p className="text-sm text-muted-foreground">
               <Link href="/" className="text-primary font-medium hover:underline" data-testid="link-learn-more">

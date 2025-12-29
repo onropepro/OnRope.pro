@@ -41,7 +41,7 @@ const needsDarkText = (color: string): boolean => {
 export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propStakeholderColor }: PublicHeaderProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
-  const { openLogin } = useAuthPortal();
+  const { openLogin, openRegister } = useAuthPortal();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
   const [showTechnicianMenu, setShowTechnicianMenu] = useState(false);
   const [showPropertyManagerMenu, setShowPropertyManagerMenu] = useState(false);
@@ -827,7 +827,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                 variant="default"
                 size="sm"
                 className="border-0 text-xs font-semibold px-6 text-white bg-[#AB4521] hover:bg-[#8a3719]"
-                onClick={() => setLocation("/register")}
+                onClick={openRegister}
                 data-testid="nav-sign-up"
               >
                 {t('login.header.signUp', 'Sign Up')}

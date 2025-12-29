@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "wouter";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,7 @@ const GROUND_CREW_GRADIENT = "linear-gradient(135deg, #5D7B6F 0%, #4A6359 100%)"
 
 export default function GroundCrewLanding() {
   const { t } = useTranslation();
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
 
   const benefits = [
@@ -117,11 +118,9 @@ export default function GroundCrewLanding() {
                 size="lg" 
                 variant="outline" 
                 className="border-white/40 text-white hover:bg-white/10"
-                asChild
+                onClick={openLogin}
               >
-                <Link href="/login">
-                  {t('groundCrewLanding.hero.login', 'Already have an account?')}
-                </Link>
+                {t('groundCrewLanding.hero.login', 'Already have an account?')}
               </Button>
             </div>
           </div>

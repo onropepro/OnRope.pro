@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -29,6 +29,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 interface AuthPortalContextType {
   isOpen: boolean;
   openLogin: () => void;
+  openRegister: () => void;
   closePortal: () => void;
 }
 
@@ -49,7 +50,7 @@ interface AuthPortalProviderProps {
 export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const [locationPath, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"signin" | "register">("signin");
@@ -73,6 +74,29 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
     setActiveTab("signin");
     setIsOpen(true);
   }, [form]);
+
+  const openRegister = useCallback(() => {
+    form.reset();
+    setActiveTab("register");
+    setIsOpen(true);
+  }, [form]);
+  
+  // Auto-open register modal when URL has signup=true query param
+  // Watch locationPath to detect SPA navigations
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('signup') === 'true') {
+      openRegister();
+      // Clean up the URL by removing only the signup param, preserving others
+      const url = new URL(window.location.href);
+      url.searchParams.delete('signup');
+      // Preserve remaining query params if any
+      const newUrl = url.searchParams.toString() 
+        ? `${url.pathname}?${url.searchParams.toString()}`
+        : url.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [openRegister, locationPath]);
 
   const closePortal = useCallback(() => {
     setIsOpen(false);
@@ -178,7 +202,7 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
   };
 
   return (
-    <AuthPortalContext.Provider value={{ isOpen, openLogin, closePortal }}>
+    <AuthPortalContext.Provider value={{ isOpen, openLogin, openRegister, closePortal }}>
       {children}
       
       <Dialog open={isOpen} onOpenChange={(open) => !open && closePortal()}>
