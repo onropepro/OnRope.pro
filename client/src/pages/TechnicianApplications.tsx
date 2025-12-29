@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { 
-  ArrowLeft, 
   MapPin, 
   Clock,
   DollarSign,
@@ -111,7 +110,8 @@ const translations = {
     tenPlus: "10+ years",
     activeOffers: "Active Offers",
     pendingApplications: "Pending Applications",
-    pastApplications: "Past Applications",
+    declinedOffers: "Declined Offers",
+    closedApplications: "Closed Applications",
   },
   fr: {
     title: "Mes Candidatures et Offres",
@@ -184,7 +184,8 @@ const translations = {
     tenPlus: "10+ ans",
     activeOffers: "Offres Actives",
     pendingApplications: "Candidatures en Cours",
-    pastApplications: "Candidatures Passees",
+    declinedOffers: "Offres Refusees",
+    closedApplications: "Candidatures Fermees",
   }
 };
 
@@ -312,8 +313,9 @@ export default function TechnicianApplications() {
   const pendingApplications = myApplications.filter(app => 
     app.status === "applied" || app.status === "reviewing" || app.status === "interviewed"
   );
-  const pastApplications = myApplications.filter(app => 
-    app.status === "hired" || app.status === "rejected" || app.status === "refused" || app.status === "withdrawn"
+  const declinedOffers = myApplications.filter(app => app.status === "refused");
+  const closedApplications = myApplications.filter(app => 
+    app.status === "hired" || app.status === "rejected" || app.status === "withdrawn"
   );
 
   const statusStyles: Record<string, string> = {
@@ -469,16 +471,6 @@ export default function TechnicianApplications() {
 
         <main className="p-4 sm:p-6 max-w-5xl mx-auto">
           <div className="mb-6">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation("/technician-portal")}
-              className="gap-1 text-muted-foreground mb-4"
-              data-testid="button-back-portal"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t.backToPortal}
-            </Button>
             <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
               <FileText className="w-7 h-7 text-primary" />
               {t.title}
@@ -539,14 +531,26 @@ export default function TechnicianApplications() {
                 </div>
               )}
 
-              {pastApplications.length > 0 && (
+              {declinedOffers.length > 0 && (
                 <div className="space-y-4">
                   <h2 className="text-lg font-semibold flex items-center gap-2 text-muted-foreground">
-                    <Badge variant="outline">{pastApplications.length}</Badge>
-                    {t.pastApplications}
+                    <Badge variant="outline" className="bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800">{declinedOffers.length}</Badge>
+                    {t.declinedOffers}
                   </h2>
                   <div className="grid gap-3">
-                    {pastApplications.map(renderApplicationCard)}
+                    {declinedOffers.map(renderApplicationCard)}
+                  </div>
+                </div>
+              )}
+
+              {closedApplications.length > 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-lg font-semibold flex items-center gap-2 text-muted-foreground">
+                    <Badge variant="outline">{closedApplications.length}</Badge>
+                    {t.closedApplications}
+                  </h2>
+                  <div className="grid gap-3">
+                    {closedApplications.map(renderApplicationCard)}
                   </div>
                 </div>
               )}
