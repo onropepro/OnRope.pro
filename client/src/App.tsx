@@ -135,6 +135,7 @@ import GroundCrewJobBoard from "@/pages/GroundCrewJobBoard";
 import TechnicianPracticeQuizzes from "@/pages/TechnicianPracticeQuizzes";
 import TechnicianPSR from "@/pages/TechnicianPSR";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
+import JobPostingForm from "@/pages/JobPostingForm";
 import VisibleTechniciansBrowser from "@/pages/VisibleTechniciansBrowser";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -356,6 +357,16 @@ function Router() {
           <Route path="/job-board">
             <WithDashboardLayout allowedRoles={["company"]}>
               <CompanyJobBoard />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/job-board/new">
+            <WithDashboardLayout allowedRoles={["company"]}>
+              <JobPostingForm />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/job-board/:id/edit">
+            <WithDashboardLayout allowedRoles={["company"]}>
+              <JobPostingForm />
             </WithDashboardLayout>
           </Route>
           <Route path="/talent-browser">
