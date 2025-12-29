@@ -10,6 +10,7 @@ import {
   Award,
   GraduationCap,
   FileText,
+  ClipboardList,
 } from "lucide-react";
 import type { NavGroup } from "@/components/DashboardSidebar";
 
@@ -65,6 +66,13 @@ export function getTechnicianNavGroups(
           label: language === 'en' ? "Job Board" : language === 'es' ? "Bolsa de Trabajo" : "Offres d'emploi",
           icon: Briefcase,
           href: "/technician-job-board",
+          isVisible: () => true,
+        },
+        {
+          id: "applications",
+          label: language === 'en' ? "Applications & Offers" : language === 'es' ? "Solicitudes y Ofertas" : "Candidatures et Offres",
+          icon: ClipboardList,
+          href: "/technician-applications",
           isVisible: () => true,
         },
         {
