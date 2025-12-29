@@ -19,14 +19,14 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col flex-1 min-h-0">
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <TrendingUp className="w-5 h-5" style={{ color: accentColor }} />
             My Performance
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pt-0 pb-4 flex-1 min-h-0">
+        <CardContent className="px-4 pt-0 flex-1 min-h-0">
           <div className="animate-pulse h-20 bg-muted rounded" />
         </CardContent>
       </div>
@@ -36,14 +36,14 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
   const hasData = perfData && (perfData.completedJobs > 0 || perfData.hoursThisMonth > 0);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1 min-h-0">
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <TrendingUp className="w-5 h-5" style={{ color: accentColor }} />
           My Performance
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pt-0 pb-4 flex-1 min-h-0 overflow-y-auto">
+      <CardContent className="px-4 pt-0 flex-1 min-h-0 overflow-y-auto">
         <div className="flex flex-col">
           {hasData ? (
             <div className="space-y-3">

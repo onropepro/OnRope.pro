@@ -31,14 +31,14 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col flex-1 min-h-0">
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Clock className="w-5 h-5" style={{ color: accentColor }} />
             My Time Today
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4 flex-1 min-h-0">
+        <CardContent className="px-4 flex-1 min-h-0">
           <div className="animate-pulse h-20 bg-muted rounded" />
         </CardContent>
       </div>
@@ -48,7 +48,7 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
   const isClockedIn = timeData?.isClockedIn || false;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1 min-h-0">
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -77,7 +77,7 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
+      <CardContent className="px-4 flex-1 min-h-0 overflow-auto">
         <div className="space-y-3">
           {isClockedIn && timeData?.currentSessionStart && (
             <div className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">

@@ -97,14 +97,14 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
 
   if (!hasAccess) {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col flex-1 min-h-0">
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
             Safety Rating
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pt-0 pb-4 flex-1 min-h-0 flex items-center justify-center">
+        <CardContent className="px-4 pt-0 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
       </div>
@@ -113,14 +113,14 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col flex-1 min-h-0">
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
             Safety Rating
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pt-0 pb-4 flex-1 min-h-0">
+        <CardContent className="px-4 pt-0 flex-1 min-h-0">
           <div className="animate-pulse h-16 bg-muted rounded" />
         </CardContent>
       </div>
@@ -131,14 +131,14 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
   const wssColors = getColorScheme(wssScore);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1 min-h-0">
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
           Safety Ratings
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pt-0 pb-4 flex-1 min-h-0 overflow-y-auto">
+      <CardContent className="px-4 pt-0 flex-1 min-h-0 overflow-y-auto">
         <div className="flex flex-col gap-3">
           {/* CSR Section (clickable) */}
           <div 
