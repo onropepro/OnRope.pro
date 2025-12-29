@@ -12,10 +12,13 @@ export function CarabinerIcon(props: LucideProps) {
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M17 6a5 5 0 0 0-5-5 5 5 0 0 0-5 5v10a5 5 0 0 0 5 5 5 5 0 0 0 5-5V6Z" />
-      <path d="M17 16V6a5 5 0 0 1-5 5" />
-      <line x1="19" y1="8" x2="22" y2="8" />
-      <line x1="19" y1="12" x2="22" y2="12" />
+      {/* D-shaped carabiner body */}
+      <path d="M7 5a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4V5Z" />
+      {/* Gate - the spring-loaded opening mechanism */}
+      <path d="M17 6v6" />
+      <path d="M17 6c1.5 0 2 1 2 2v2c0 1-0.5 2-2 2" />
+      {/* Gate hinge indicator */}
+      <circle cx="17" cy="6" r="0.5" fill="currentColor" />
     </svg>
   );
 }
