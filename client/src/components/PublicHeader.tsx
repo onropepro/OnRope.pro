@@ -739,7 +739,10 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                 onClick={() => setLocation("/property-manager")}
                 data-testid="nav-property-manager"
               >
-                {t('navigation.propertyManager', 'Property Manager')}
+                <span className="flex flex-col items-center leading-tight">
+                  <span>Property</span>
+                  <span className="text-xs text-muted-foreground font-normal">Manager</span>
+                </span>
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showPropertyManagerMenu && (
@@ -784,23 +787,38 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               )}
             </div>
             
-            {/* Other nav items (excluding employer, technician, and property-manager since they're handled above) */}
-            {navItems.filter(item => item.id !== "employer" && item.id !== "technician" && item.id !== "property-manager").map((item) => (
-              <Button
-                key={item.id}
-                variant="ghost"
-                className={`text-sm font-medium ${activeNav === item.id ? "text-primary" : ""}`}
-                onClick={() => setLocation(item.href)}
-                onMouseEnter={() => {
-                  setShowModulesMenu(false);
-                  setShowTechnicianMenu(false);
-                  setShowPropertyManagerMenu(false);
-                }}
-                data-testid={`nav-${item.id}`}
-              >
-                {item.label}
-              </Button>
-            ))}
+            {/* Resident - single line button */}
+            <Button
+              variant="ghost"
+              className={`text-sm font-medium ${activeNav === "resident" ? "text-primary" : ""}`}
+              onClick={() => setLocation("/resident")}
+              onMouseEnter={() => {
+                setShowModulesMenu(false);
+                setShowTechnicianMenu(false);
+                setShowPropertyManagerMenu(false);
+              }}
+              data-testid="nav-resident"
+            >
+              {t('navigation.resident', 'Resident')}
+            </Button>
+            
+            {/* Building Manager - two line button */}
+            <Button
+              variant="ghost"
+              className={`text-sm font-medium ${activeNav === "building-manager" ? "text-primary" : ""}`}
+              onClick={() => setLocation("/building-portal")}
+              onMouseEnter={() => {
+                setShowModulesMenu(false);
+                setShowTechnicianMenu(false);
+                setShowPropertyManagerMenu(false);
+              }}
+              data-testid="nav-building-manager"
+            >
+              <span className="flex flex-col items-center leading-tight">
+                <span>Building</span>
+                <span className="text-xs text-muted-foreground font-normal">Manager</span>
+              </span>
+            </Button>
 
             {/* Sign In - Button Style */}
             <div className="pl-2">
