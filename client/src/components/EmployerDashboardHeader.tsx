@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -455,6 +455,7 @@ export function EmployerDashboardHeader({
                   data-testid="link-user-profile"
                 >
                   <Avatar className="w-8 h-8 bg-[#0B64A3]">
+                    <AvatarImage src={currentUser?.photoUrl || undefined} alt={currentUser?.fullName || 'User'} />
                     <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
                       {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                     </AvatarFallback>
