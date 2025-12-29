@@ -730,8 +730,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
               {/* Referral Screen (Optional Step 4) */}
               {step === "referral" && (
-                <div className="max-w-lg mx-auto">
-                  <div className="mb-6">
+                <div className="h-full flex flex-col justify-center max-w-lg mx-auto">
+                  <div className="mb-9">
                     <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Pay-It-Forward Referral Code System')}</h2>
                     <div className="text-muted-foreground mt-3 space-y-2">
                       <p className="text-sm">
