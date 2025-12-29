@@ -142,8 +142,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
         title: "Registration Complete!",
         description: "Your account has been created successfully.",
       });
-      // Show employer info page before success
-      setStep("employer");
+      // Move to referral step after account creation
+      setStep("referral");
     },
     onError: (error: Error) => {
       setError(error.message);
@@ -226,12 +226,13 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       }
     } else if (step === "certification") {
       if (validateCertification()) {
-        setStep("referral");
+        handleSubmit();
       }
     } else if (step === "referral") {
-      handleSubmit();
+      setStep("employer");
     } else if (step === "employer") {
-      setStep("success");
+      onOpenChange(false);
+      setLocation("/technician-passport");
     }
   };
 
@@ -749,10 +750,20 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <Button 
                       className="flex-1 gap-2 bg-[#5C7A84]"
                       onClick={handleContinue}
-                      data-testid="button-continue-to-referral"
+                      disabled={registrationMutation.isPending}
+                      data-testid="button-create-account"
                     >
-                      {t('techReg.buttons.continue', 'Continue')}
-                      <ArrowRight className="w-4 h-4" />
+                      {registrationMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          {t('techReg.buttons.creatingAccount', 'Creating Account...')}
+                        </>
+                      ) : (
+                        <>
+                          {t('techReg.buttons.createAccount', 'Create Account')}
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -761,6 +772,16 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {/* Referral Screen (Optional Step 4) */}
               {step === "referral" && (
                 <div className="h-full flex flex-col justify-center max-w-lg mx-auto">
+                  {/* Account Created Confirmation */}
+                  <div className="mb-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <p className="font-semibold text-green-800 dark:text-green-300">{t('techReg.referral.accountCreated', 'Your Account Has Been Created')}</p>
+                    </div>
+                  </div>
+
                   <div className="mb-9">
                     <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Pay-It-Forward Referral Code System')}</h2>
                     <div className="text-muted-foreground mt-3 space-y-2">
@@ -792,27 +813,13 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   )}
 
                   <div className="flex gap-3 mt-6">
-                    <Button variant="outline" onClick={handleBack} className="gap-2">
-                      <ArrowLeft className="w-4 h-4" />
-                      {t('techReg.buttons.back', 'Back')}
-                    </Button>
                     <Button 
                       className="flex-1 gap-2 bg-[#5C7A84]"
                       onClick={handleContinue}
-                      disabled={registrationMutation.isPending}
-                      data-testid="button-create-account"
+                      data-testid="button-continue-referral"
                     >
-                      {registrationMutation.isPending ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          {t('techReg.buttons.creatingAccount', 'Creating Account...')}
-                        </>
-                      ) : (
-                        <>
-                          {t('techReg.buttons.createAccount', 'Create Account')}
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
+                      {t('techReg.buttons.continueToPassport', 'Continue to My Passport')}
+                      <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -850,9 +857,9 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <Button 
                     className="w-full gap-2 bg-[#5C7A84]"
                     onClick={handleContinue}
-                    data-testid="button-continue-to-success"
+                    data-testid="button-continue-to-passport"
                   >
-                    {t('techReg.buttons.continueToPortal', 'Continue to My Portal')}
+                    {t('techReg.buttons.continueToPassport', 'Continue to My Passport')}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
