@@ -22239,6 +22239,43 @@ Do not include any other text, just the JSON object.`
         }
       }
       
+      
+      // Save building/strata info to CRM client's lmsNumbers if clientId is set
+      if (fullQuote!.clientId && fullQuote!.strataPlanNumber) {
+        try {
+          const crmClient = await storage.getClientById(fullQuote!.clientId);
+          if (crmClient) {
+            const existingBuildings = (crmClient.lmsNumbers as any[]) || [];
+            
+            // Check if this strata/building already exists
+            const existingBuildingIndex = existingBuildings.findIndex(
+              (b: any) => b.number === fullQuote!.strataPlanNumber
+            );
+            
+            if (existingBuildingIndex === -1) {
+              // Add the new building from the quote
+              const newBuilding = {
+                number: fullQuote!.strataPlanNumber,
+                buildingName: fullQuote!.buildingName || '',
+                address: fullQuote!.buildingAddress || '',
+                stories: fullQuote!.floorCount || null,
+                units: null,
+                parkingStalls: null
+              };
+              
+              await db.update(clients)
+                .set({ lmsNumbers: [...existingBuildings, newBuilding] })
+                .where(eq(clients.id, crmClient.id));
+              
+              console.log(`[Quote] Added building ${fullQuote!.buildingName} (${fullQuote!.strataPlanNumber}) to CRM client ${crmClient.firstName} ${crmClient.lastName}`);
+            } else {
+              console.log(`[Quote] Building ${fullQuote!.strataPlanNumber} already exists in CRM client record`);
+            }
+          }
+        } catch (clientUpdateError: any) {
+          console.warn(`[Quote] Could not update CRM client lmsNumbers: ${clientUpdateError?.message}`);
+        }
+      }
       res.json({ quote: fullQuote, sms: smsResult });
     } catch (error) {
       if (error instanceof z.ZodError) {
