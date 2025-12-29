@@ -5421,6 +5421,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technician: Upload profile photo
+  // Uses Object Storage to save the photo and updates the photoUrl in the database
+  const profilePhotoUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB max
+    },
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'));
+      }
+    },
+  });
+
+  app.post("/api/technician/profile-photo", requireAuth, profilePhotoUpload.single('photo'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Allow technicians and ground crew to upload their own photo
+      const allowedRoles = ['rope_access_tech', 'ground_crew', 'operations_manager', 'office_admin', 'safety_officer'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can update their profile photo" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No photo file provided" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      
+      // Generate unique filename with user ID and timestamp
+      const fileExtension = req.file.originalname.split('.').pop() || 'jpg';
+      const fileName = `profile-photos/${userId}_${Date.now()}.${fileExtension}`;
+      
+      // Upload to object storage
+      const photoUrl = await objectStorageService.uploadPublicFile(
+        fileName,
+        req.file.buffer,
+        req.file.mimetype
+      );
+
+      // Update user's photoUrl in database
+      await storage.updateUser(userId, { photoUrl });
+
+      console.log(`[Profile-Photo] Photo uploaded for user ${userId}: ${photoUrl}`);
+
+      res.json({ success: true, photoUrl });
+    } catch (error: any) {
+      console.error("[Profile-Photo] Error uploading photo:", error);
+      res.status(500).json({ message: error.message || "Failed to upload profile photo" });
+    }
+  });
+
+  app.delete("/api/technician/profile-photo", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Allow technicians and ground crew to delete their own photo
+      const allowedRoles = ['rope_access_tech', 'ground_crew', 'operations_manager', 'office_admin', 'safety_officer'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can delete their profile photo" });
+      }
+
+      // Set photoUrl to null in database
+      await storage.updateUser(userId, { photoUrl: null });
+
+      console.log(`[Profile-Photo] Photo deleted for user ${userId}`);
+
+      res.json({ success: true, message: "Profile photo deleted" });
+    } catch (error: any) {
+      console.error("[Profile-Photo] Error deleting photo:", error);
+      res.status(500).json({ message: error.message || "Failed to delete profile photo" });
+    }
+  });
+
   // Technician: Update experience start date only
   // This is a simpler endpoint that only updates the rope access start date
   app.patch("/api/technician/experience-date", requireAuth, async (req: Request, res: Response) => {
