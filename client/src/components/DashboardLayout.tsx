@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { useContext, ReactNode } from "react";
+import { useContext, ReactNode, useState } from "react";
 import { BrandingContext } from "@/App";
 import { DashboardSidebar, type NavGroup, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";
 import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
+import { TechnicianDashboardHeader } from "@/components/TechnicianDashboardHeader";
 import { useHeaderConfig, HeaderConfigProvider } from "@/contexts/HeaderConfigContext";
 import type { User } from "@/lib/permissions";
 
@@ -125,6 +126,13 @@ function DashboardLayoutInner({
   const resolvedActiveTab = externalActiveTab ?? getActiveTab();
   const resolvedTabChange = externalTabChange ?? handleTabChange;
 
+  // Mobile sidebar state - controlled by DashboardLayout for all variants
+  const [mobileOpen, setMobileOpen] = useState(false);
+  
+  // All non-employer variants use the unified TechnicianDashboardHeader
+  // This provides consistent navigation across technician, ground-crew, property-manager, resident, and building-manager dashboards
+  const usesUnifiedHeader = variant !== "employer";
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <DashboardSidebar
@@ -142,6 +150,8 @@ function DashboardLayoutInner({
         showDashboardLink={showDashboardLink}
         dashboardLinkLabel={dashboardLinkLabel}
         headerContent={headerContent}
+        mobileOpen={mobileOpen}
+        onMobileOpenChange={setMobileOpen}
       />
       
       <main className="lg:pl-60 min-h-screen flex flex-col">
@@ -159,6 +169,13 @@ function DashboardLayoutInner({
             showLanguageDropdown={headerConfig?.showLanguageDropdown ?? true}
             showProfile={headerConfig?.showProfile ?? true}
             showLogout={headerConfig?.showLogout ?? true}
+            onMobileMenuClick={() => setMobileOpen(true)}
+          />
+        )}
+        {usesUnifiedHeader && (
+          <TechnicianDashboardHeader
+            currentUser={currentUser}
+            onMobileMenuClick={() => setMobileOpen(true)}
           />
         )}
         <div className="flex-1">

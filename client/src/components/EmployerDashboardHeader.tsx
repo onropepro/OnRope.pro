@@ -22,6 +22,7 @@ interface EmployerDashboardHeaderProps {
   employees?: any[];
   onNavigateToEmployees?: () => void;
   onBackClick?: () => void;
+  onMobileMenuClick?: () => void;
   showSearch?: boolean;
   showNotifications?: boolean;
   showLanguageDropdown?: boolean;
@@ -310,6 +311,7 @@ export function EmployerDashboardHeader({
   employees = [],
   onNavigateToEmployees,
   onBackClick,
+  onMobileMenuClick,
   showSearch = true,
   showNotifications = true,
   showLanguageDropdown = true,
@@ -356,8 +358,20 @@ export function EmployerDashboardHeader({
     <>
       <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
         <div className="h-full flex items-center justify-between gap-4">
-          {/* Left Side: Back button (if provided) + Page Title + Search */}
+          {/* Left Side: Mobile menu + Back button (if provided) + Page Title + Search */}
           <div className="flex items-center gap-4 flex-1 min-w-0">
+            {/* Mobile sidebar toggle - only visible on mobile when callback is provided */}
+            {onMobileMenuClick && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onMobileMenuClick}
+                className="lg:hidden text-slate-600 dark:text-slate-300"
+                data-testid="button-sidebar-toggle"
+              >
+                <span className="material-icons">menu</span>
+              </Button>
+            )}
             {/* Back button - only shown if onBackClick is explicitly provided */}
             {onBackClick && (
               <Button
