@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, Users, FileText, Eye, Mail, Award, X, Clock, Download, Send, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
@@ -145,6 +146,7 @@ export default function CompanyJobBoard() {
   const [offerMessage, setOfferMessage] = useState("");
   const [deleteApplicationId, setDeleteApplicationId] = useState<string | null>(null);
   const [showSentOffers, setShowSentOffers] = useState(false);
+  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -477,14 +479,36 @@ export default function CompanyJobBoard() {
   useSetHeaderConfig({}, []);
   return (
     <div className="min-h-screen page-gradient">
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <main className="px-4 md:px-6 py-6 space-y-6">
         {/* Page Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">{t("jobBoard.title", "Job Board")}</h1>
-            <p className="text-muted-foreground">{t("jobBoard.subtitle", "Post and manage job opportunities")}</p>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-1 bg-primary rounded-full"></div>
+            <div>
+              <h1 className="text-xl font-bold">{t("jobBoard.title", "Job Board")}</h1>
+              <p className="text-sm text-muted-foreground">{t("jobBoard.subtitle", "Post and manage job opportunities")}</p>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-1 mr-2">
+              <Button
+                variant={viewMode === "cards" ? "default" : "outline"}
+                size="icon"
+                onClick={() => setViewMode("cards")}
+                data-testid="button-jobs-view-cards"
+              >
+                <span className="material-icons text-sm">grid_view</span>
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "outline"}
+                size="icon"
+                onClick={() => setViewMode("list")}
+                data-testid="button-jobs-view-list"
+              >
+                <span className="material-icons text-sm">view_list</span>
+              </Button>
+            </div>
             <Button 
               variant={showSentOffers ? "default" : "outline"}
               onClick={() => setShowSentOffers(!showSentOffers)} 
@@ -642,47 +666,111 @@ export default function CompanyJobBoard() {
               </Button>
             </CardContent>
           </Card>
+        ) : viewMode === "list" ? (
+          /* List View - Table format */
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("jobBoard.table.title", "Title")}</TableHead>
+                    <TableHead>{t("jobBoard.table.type", "Type")}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t("jobBoard.table.location", "Location")}</TableHead>
+                    <TableHead className="hidden lg:table-cell">{t("jobBoard.table.salary", "Salary")}</TableHead>
+                    <TableHead>{t("jobBoard.table.status", "Status")}</TableHead>
+                    <TableHead className="hidden xl:table-cell">{t("jobBoard.table.applications", "Applications")}</TableHead>
+                    <TableHead className="text-right">{t("jobBoard.table.actions", "Actions")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {jobPostings.map((job) => (
+                    <TableRow 
+                      key={job.id}
+                      className="cursor-pointer"
+                      onClick={() => setViewingApplicationsFor(job)}
+                      data-testid={`row-job-${job.id}`}
+                    >
+                      <TableCell>
+                        <div className="font-medium">{job.title}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {POSITION_TYPES.find(pt => pt.value === job.positionType)?.label || job.positionType}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {JOB_TYPES.find(jt => jt.value === job.jobType)?.label || job.jobType}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground hidden md:table-cell">
+                        {job.location || (job.isRemote ? t("jobBoard.remote", "Remote") : "-")}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground hidden lg:table-cell">
+                        {formatSalary(job) || "-"}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(job.status)}</TableCell>
+                      <TableCell className="hidden xl:table-cell">
+                        <Badge variant="secondary">{getApplicationCount(job.id)}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => { e.stopPropagation(); handleToggleStatus(job); }}
+                            title={job.status === "active" ? t("jobBoard.pause", "Pause") : t("jobBoard.resume", "Resume")}
+                            data-testid={`button-toggle-status-${job.id}`}
+                          >
+                            {job.status === "active" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => { e.stopPropagation(); openEditDialog(job); }}
+                            data-testid={`button-edit-job-${job.id}`}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(job.id); }}
+                            className="text-destructive hover:text-destructive"
+                            data-testid={`button-delete-job-${job.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         ) : (
-          <div className="grid gap-4">
+          /* Cards View - Multi-column grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {jobPostings.map((job) => (
-              <Card key={job.id} data-testid={`card-job-${job.id}`}>
+              <Card 
+                key={job.id} 
+                className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer flex flex-col"
+                onClick={() => setViewingApplicationsFor(job)}
+                data-testid={`card-job-${job.id}`}
+              >
                 <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start justify-between gap-2">
                     <div className="space-y-1 min-w-0 flex-1">
+                      <CardTitle className="text-base truncate">{job.title}</CardTitle>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <CardTitle className="text-base sm:text-lg truncate">{job.title}</CardTitle>
                         {getStatusBadge(job.status)}
                         <Badge variant={job.positionType === "ground_crew" ? "secondary" : "default"} className="text-xs">
                           {POSITION_TYPES.find(pt => pt.value === job.positionType)?.label || job.positionType}
                         </Badge>
                       </div>
-                      <CardDescription className="flex items-center gap-3 flex-wrap text-xs sm:text-sm">
-                        {job.location && (
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            {job.location}
-                          </span>
-                        )}
-                        {job.isRemote && (
-                          <Badge variant="outline" className="text-xs">{t("jobBoard.remote", "Remote")}</Badge>
-                        )}
-                        <span className="flex items-center gap-1">
-                          <Briefcase className="w-3 h-3" />
-                          {JOB_TYPES.find(t => t.value === job.jobType)?.label || job.jobType}
-                        </span>
-                        {formatSalary(job) && (
-                          <span className="flex items-center gap-1">
-                            <DollarSign className="w-3 h-3" />
-                            {formatSalary(job)}
-                          </span>
-                        )}
-                      </CardDescription>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
+                    <div className="flex items-center gap-0.5 flex-shrink-0">
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleToggleStatus(job)}
+                        onClick={(e) => { e.stopPropagation(); handleToggleStatus(job); }}
                         title={job.status === "active" ? t("jobBoard.pause", "Pause") : t("jobBoard.resume", "Resume")}
                         data-testid={`button-toggle-status-${job.id}`}
                       >
@@ -691,7 +779,7 @@ export default function CompanyJobBoard() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => openEditDialog(job)}
+                        onClick={(e) => { e.stopPropagation(); openEditDialog(job); }}
                         data-testid={`button-edit-job-${job.id}`}
                       >
                         <Edit className="w-4 h-4" />
@@ -699,7 +787,7 @@ export default function CompanyJobBoard() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setDeleteConfirmId(job.id)}
+                        onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(job.id); }}
                         className="text-destructive hover:text-destructive"
                         data-testid={`button-delete-job-${job.id}`}
                       >
@@ -708,40 +796,51 @@ export default function CompanyJobBoard() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0">
+                <CardContent className="pt-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground mb-2">
+                    {job.location && (
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {job.location}
+                      </span>
+                    )}
+                    {job.isRemote && (
+                      <Badge variant="outline" className="text-xs">{t("jobBoard.remote", "Remote")}</Badge>
+                    )}
+                    <span className="flex items-center gap-1">
+                      <Briefcase className="w-3 h-3" />
+                      {JOB_TYPES.find(jt => jt.value === job.jobType)?.label || job.jobType}
+                    </span>
+                  </div>
+                  {formatSalary(job) && (
+                    <div className="flex items-center gap-1 text-sm font-medium text-primary mb-2">
+                      <DollarSign className="w-3 h-3" />
+                      {formatSalary(job)}
+                    </div>
+                  )}
                   <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
-                  <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground flex-wrap">
+                  <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground flex-wrap">
                     {job.requiredIrataLevel && (
                       <span>IRATA: {job.requiredIrataLevel}</span>
                     )}
                     {job.requiredSpratLevel && (
                       <span>SPRAT: {job.requiredSpratLevel}</span>
                     )}
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {t("jobBoard.posted", "Posted")} {format(new Date(job.createdAt), "MMM d, yyyy")}
-                    </span>
-                    {job.expiresAt && (
-                      <span>{t("jobBoard.expires", "Expires")} {format(new Date(job.expiresAt), "MMM d, yyyy")}</span>
-                    )}
                   </div>
                 </CardContent>
-                <CardFooter className="pt-0 border-t mt-3">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="gap-2"
-                    onClick={() => setViewingApplicationsFor(job)}
-                    data-testid={`button-view-applications-${job.id}`}
-                  >
-                    <FileText className="w-4 h-4" />
-                    {t("jobBoard.viewApplications", "View Applications")}
-                    {getApplicationCount(job.id) > 0 && (
-                      <Badge variant="secondary" className="ml-1">
-                        {getApplicationCount(job.id)}
+                <CardFooter className="pt-0 border-t mt-auto">
+                  <div className="flex items-center justify-between w-full text-xs text-muted-foreground pt-3">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {format(new Date(job.createdAt), "MMM d, yyyy")}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="gap-1">
+                        <FileText className="w-3 h-3" />
+                        {getApplicationCount(job.id)} {t("jobBoard.applicants", "applicants")}
                       </Badge>
-                    )}
-                  </Button>
+                    </div>
+                  </div>
                 </CardFooter>
               </Card>
             ))}
