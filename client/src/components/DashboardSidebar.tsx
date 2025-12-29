@@ -560,7 +560,16 @@ export function DashboardSidebar({
             )}
             style={isDashboardActive ? { backgroundColor: getBrandColor() } : undefined}
           >
-            <LayoutDashboard className="h-4 w-4 shrink-0" />
+            {variant === "technician" && (currentUser as any)?.photoUrl ? (
+              <Avatar className="h-4 w-4 shrink-0">
+                <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
+                <AvatarFallback className="text-[8px]">
+                  {((currentUser as any).name || "U").charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <LayoutDashboard className="h-4 w-4 shrink-0" />
+            )}
             <span>{resolvedDashboardLabel}</span>
           </button>
         </div>
