@@ -86,6 +86,12 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 29, 2025",
+    title: "Enhanced Client Import with CSV Support",
+    description: "Client import now supports both Excel (.xlsx, .xls) and CSV file formats. Added flexible column detection with case-insensitive matching, auto-splitting combined 'Name' columns into first/last name fields, and all import fields are now optional for partial data uploads. Quote page features searchable client selector with type-to-filter functionality and auto-fills Property Manager recipient when client is selected",
+    type: "feature"
+  },
+  {
     date: "December 21, 2025",
     title: "Server-Side Quiz Translation System",
     description: "Implemented full multilingual support for certification and safety quizzes. French and Spanish translations for 6 quizzes (IRATA Level 1 A/B, SWP Window Cleaning, FLHA Assessment, Harness Inspection) served via API with automatic English fallback. Server-side architecture keeps client bundles lean while supporting 420+ translated questions",

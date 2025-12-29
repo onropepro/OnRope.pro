@@ -18,6 +18,10 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { insertQuoteSchema, type QuoteWithServices, type QuoteHistory } from "@shared/schema";
 import { 
@@ -341,6 +345,7 @@ export default function Quotes() {
   
   // Client & Property selection for autofill
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [clientPopoverOpen, setClientPopoverOpen] = useState(false);
   const [selectedPropertyIndex, setSelectedPropertyIndex] = useState<number | null>(null);
   
   // Property Manager selection for quote recipient
@@ -582,8 +587,8 @@ export default function Quotes() {
         floorCount: buildingInfo.floorCount,
         strataManagerName: buildingInfo.strataManagerName,
         strataManagerAddress: buildingInfo.strataManagerAddress,
-        clientId: selectedClientId, // Save client reference for project conversion
-        recipientPropertyManagerId: selectedPmId, // Manually selected PM to send quote to
+        clientId: selectedPmId || selectedClientId, // Use selected recipient client, fallback to quick-fill client
+        recipientPropertyManagerId: null, // Now using clientId for recipient instead
         status: "open",
         services, // Include services array
         totalAmount: String(subtotal),
@@ -1084,6 +1089,7 @@ export default function Quotes() {
 
     setServiceBeingConfigured(serviceId);
     setCreateStep("configure");
+    window.scrollTo(0, 0);
   };
 
   const handleServiceFormSubmit = (data: ServiceFormData) => {
@@ -3462,7 +3468,10 @@ export default function Quotes() {
         <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
-            onClick={() => setCreateStep("services")}
+            onClick={() => {
+              setCreateStep("services");
+              window.scrollTo(0, 0);
+            }}
             className="mb-6"
             data-testid="button-back-to-services"
           >
@@ -3495,43 +3504,66 @@ export default function Quotes() {
                     
                     <div className="space-y-2">
                       <Label>Select Client</Label>
-                      <Select
-                        value={selectedClientId || ""}
-                        onValueChange={(value) => {
-                          const client = clients.find((c: any) => c.id === value);
-                          setSelectedClientId(value);
-                          setSelectedPropertyIndex(null);
-                          if (client) {
-                            buildingForm.setValue('strataManagerName', `${client.firstName} ${client.lastName}`);
-                            buildingForm.setValue('strataManagerAddress', client.address || '');
-                            buildingForm.setValue('buildingName', '');
-                            buildingForm.setValue('strataPlanNumber', '');
-                            buildingForm.setValue('buildingAddress', '');
-                            buildingForm.setValue('floorCount', undefined);
-                            
-                            // Auto-select PM recipient if client email matches a linked PM
-                            const matchingPM = linkedPMs.find((pm) => pm.email === client.email);
-                            if (matchingPM) {
-                              setSelectedPmId(matchingPM.id);
-                            }
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="h-12" data-testid="select-client">
-                          <SelectValue placeholder="Select a client..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {clients.length === 0 ? (
-                            <div className="p-2 text-sm text-muted-foreground">No clients found. Add clients first.</div>
-                          ) : (
-                            clients.map((client: any) => (
-                              <SelectItem key={client.id} value={client.id}>
-                                {client.firstName} {client.lastName} {client.company ? `- ${client.company}` : ''}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                      <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={clientPopoverOpen}
+                            className="w-full h-12 justify-between"
+                            data-testid="select-client"
+                          >
+                            {selectedClientId
+                              ? (() => {
+                                  const client = clients.find((c: any) => c.id === selectedClientId);
+                                  return client ? `${client.firstName || ''} ${client.lastName || ''} ${client.company ? `- ${client.company}` : ''}`.trim() : "Select a client...";
+                                })()
+                              : "Select a client..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search clients..." />
+                            <CommandList>
+                              <CommandEmpty>No clients found.</CommandEmpty>
+                              <CommandGroup>
+                                {clients.map((client: any) => (
+                                  <CommandItem
+                                    key={client.id}
+                                    value={`${client.firstName || ''} ${client.lastName || ''} ${client.email || ''} ${client.company || ''}`}
+                                    onSelect={() => {
+                                      setSelectedClientId(client.id);
+                                      setSelectedPropertyIndex(null);
+                                      setClientPopoverOpen(false);
+                                      buildingForm.setValue('strataManagerName', `${client.firstName || ''} ${client.lastName || ''}`.trim());
+                                      buildingForm.setValue('strataManagerAddress', client.address || '');
+                                      buildingForm.setValue('buildingName', '');
+                                      buildingForm.setValue('strataPlanNumber', '');
+                                      buildingForm.setValue('buildingAddress', '');
+                                      buildingForm.setValue('floorCount', undefined);
+                                      
+                                      // Auto-select this client as the quote recipient
+                                      setSelectedPmId(client.id);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        selectedClientId === client.id ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                    <div className="flex flex-col">
+                                      <span>{client.firstName || ''} {client.lastName || ''} {client.company ? `- ${client.company}` : ''}</span>
+                                      {client.email && <span className="text-xs text-muted-foreground">{client.email}</span>}
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     
                     {/* Property Selector - only show if client has properties */}
@@ -3600,8 +3632,8 @@ export default function Quotes() {
 
                   <Separator />
                   
-                  {/* Property Manager Selection for Quote Recipient */}
-                  {linkedPMs.length > 0 && (
+                  {/* Send Quote to Client - uses clients from CRM */}
+                  {clients.length > 0 && (
                     <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
                       <div className="flex items-center gap-2 mb-2">
                         <Send className="w-5 h-5 text-primary" />
@@ -3622,15 +3654,15 @@ export default function Quotes() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="none">
-                              <span className="text-muted-foreground">{t('quotes.noPMSelected', 'No property manager (auto-match by strata)')}</span>
+                              <span className="text-muted-foreground">{t('quotes.noPMSelected', 'No recipient selected')}</span>
                             </SelectItem>
-                            {linkedPMs.map((pm) => (
-                              <SelectItem key={pm.id} value={pm.id}>
+                            {clients.map((client: any) => (
+                              <SelectItem key={client.id} value={client.id}>
                                 <div className="flex flex-col">
-                                  <span className="font-medium">{pm.name}</span>
+                                  <span className="font-medium">{client.firstName} {client.lastName}</span>
                                   <span className="text-xs text-muted-foreground">
-                                    {pm.company}{pm.strataNumber ? ` - ${pm.strataNumber}` : ''}
-                                    {pm.smsOptIn && pm.phone ? ' (SMS enabled)' : ''}
+                                    {client.company || ''}{client.phoneNumber ? ` - ${client.phoneNumber}` : ''}
+                                    {client.phoneNumber ? ' (SMS enabled)' : ' (No phone)'}
                                   </span>
                                 </div>
                               </SelectItem>
@@ -4079,7 +4111,10 @@ export default function Quotes() {
                   )}
                 </div>
                 <Button
-                  onClick={() => setCreateStep("building")}
+                  onClick={() => {
+                    setCreateStep("building");
+                    window.scrollTo(0, 0);
+                  }}
                   disabled={!canFinalize}
                   className="w-full bg-primary hover:bg-primary/90 h-12"
                   data-testid="button-next-to-building"
@@ -4109,6 +4144,7 @@ export default function Quotes() {
             onClick={() => {
               setServiceBeingConfigured(null);
               setCreateStep("services");
+              window.scrollTo(0, 0);
             }}
             className="mb-6"
             data-testid="button-back-to-service-selection"
