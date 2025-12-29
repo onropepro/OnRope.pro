@@ -787,21 +787,6 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               )}
             </div>
             
-            {/* Resident - single line button */}
-            <Button
-              variant="ghost"
-              className={`text-sm font-medium ${activeNav === "resident" ? "text-primary" : ""}`}
-              onClick={() => setLocation("/resident")}
-              onMouseEnter={() => {
-                setShowModulesMenu(false);
-                setShowTechnicianMenu(false);
-                setShowPropertyManagerMenu(false);
-              }}
-              data-testid="nav-resident"
-            >
-              {t('navigation.resident', 'Resident')}
-            </Button>
-            
             {/* Building Manager - two line button */}
             <Button
               variant="ghost"
@@ -818,6 +803,21 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                 <span>Building</span>
                 <span className="text-xs text-muted-foreground font-normal">Manager</span>
               </span>
+            </Button>
+            
+            {/* Resident - single line button */}
+            <Button
+              variant="ghost"
+              className={`text-sm font-medium ${activeNav === "resident" ? "text-primary" : ""}`}
+              onClick={() => setLocation("/resident")}
+              onMouseEnter={() => {
+                setShowModulesMenu(false);
+                setShowTechnicianMenu(false);
+                setShowPropertyManagerMenu(false);
+              }}
+              data-testid="nav-resident"
+            >
+              {t('navigation.resident', 'Resident')}
             </Button>
 
             {/* Sign In - Button Style */}
