@@ -104,7 +104,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
             Safety Rating
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
+        <CardContent className="px-4 pt-0 pb-3 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
       </div>
@@ -120,7 +120,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
             Safety Rating
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pb-4 flex-1 min-h-0">
+        <CardContent className="px-4 pt-0 pb-3 flex-1 min-h-0">
           <div className="animate-pulse h-16 bg-muted rounded" />
         </CardContent>
       </div>
@@ -138,7 +138,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
           Safety Ratings
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col gap-2">
+      <CardContent className="px-4 pt-0 pb-3 flex-1 min-h-0 flex flex-col gap-2">
         {/* CSR Section (clickable) */}
         <div 
           className={`rounded-lg p-3 w-full ${colors.bg} cursor-pointer hover-elevate`}
