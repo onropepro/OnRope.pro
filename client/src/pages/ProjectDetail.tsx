@@ -1325,62 +1325,9 @@ export default function ProjectDetail() {
     { name: t('projectDetail.progress.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
-  // State for mobile tab navigation
-  const [activeTab, setActiveTab] = useState<string>("overview");
-
   return (
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
-      <div className="max-w-6xl mx-auto p-4">
-        {/* Mobile Tab Navigation - Sticky at top */}
-        <div className="lg:hidden sticky top-0 z-40 bg-background/95 backdrop-blur-sm -mx-4 px-4 py-2 mb-4 border-b">
-          <div className="flex gap-1 overflow-x-auto">
-            <Button
-              variant={activeTab === "overview" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setActiveTab("overview")}
-              className="whitespace-nowrap"
-              data-testid="tab-overview"
-            >
-              <span className="material-icons text-sm mr-1">trending_up</span>
-              {t('projectDetail.tabs.overview', 'Overview')}
-            </Button>
-            <Button
-              variant={activeTab === "safety" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setActiveTab("safety")}
-              className="whitespace-nowrap"
-              data-testid="tab-safety"
-            >
-              <span className="material-icons text-sm mr-1">security</span>
-              {t('projectDetail.tabs.safety', 'Safety')}
-            </Button>
-            <Button
-              variant={activeTab === "documents" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setActiveTab("documents")}
-              className="whitespace-nowrap"
-              data-testid="tab-documents"
-            >
-              <span className="material-icons text-sm mr-1">folder</span>
-              {t('projectDetail.tabs.documents', 'Documents')}
-            </Button>
-            <Button
-              variant={activeTab === "feedback" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setActiveTab("feedback")}
-              className="whitespace-nowrap"
-              data-testid="tab-feedback"
-            >
-              <span className="material-icons text-sm mr-1">chat</span>
-              {t('projectDetail.tabs.feedback', 'Feedback')}
-            </Button>
-          </div>
-        </div>
-
-        {/* Tab Content - Single Column Layout */}
-        <div className="space-y-6">
-            {/* OVERVIEW TAB CONTENT - Progress Card (always visible on desktop, tab-controlled on mobile) */}
-            <div className={`${activeTab !== "overview" ? "hidden lg:block" : ""}`}>
+      <div className="max-w-2xl mx-auto p-4 space-y-6">
         {/* Progress Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
@@ -1632,11 +1579,8 @@ export default function ProjectDetail() {
             })()}
           </CardContent>
         </Card>
-        </div>
-        {/* END Overview Tab Content */}
 
-        {/* SAFETY TAB - Building Instructions (visible on safety tab or always on desktop) */}
-        <div className={`${activeTab === "safety" ? "" : "hidden lg:block"}`}>
+        {/* Building Instructions Section - Prominent styling */}
         {buildingData?.building && (
           <Card className="glass-card border-2 border-primary/30 shadow-premium bg-primary/5">
             <Collapsible open={buildingInstructionsOpen} onOpenChange={setBuildingInstructionsOpen}>
@@ -1907,11 +1851,7 @@ export default function ProjectDetail() {
             </div>
           </CardContent>
         </Card>
-        </div>
-        {/* END Safety Tab Content */}
 
-        {/* OVERVIEW TAB - Analytics (visible on overview tab or always on desktop) */}
-        <div className={`${activeTab === "overview" ? "" : "hidden lg:block"}`}>
         {/* Analytics - Target Performance & Work Session History */}
         {(isManagement || canViewWorkHistory) && (
           <Card className="glass-card border-0 shadow-premium">
@@ -2257,11 +2197,7 @@ export default function ProjectDetail() {
             </CardContent>
           </Card>
         )}
-        </div>
-        {/* END Overview Tab - Analytics */}
 
-        {/* DOCUMENTS TAB - Project Documents and Photos (visible on documents tab or always on desktop) */}
-        <div className={`${activeTab === "documents" ? "" : "hidden lg:block"}`}>
         {/* Project Documents and Photos - Collapsible Combined Card */}
         <Card className="glass-card border-0 shadow-premium">
           <Collapsible open={documentsExpanded} onOpenChange={setDocumentsExpanded}>
@@ -2832,11 +2768,7 @@ export default function ProjectDetail() {
             </CollapsibleContent>
           </Collapsible>
         </Card>
-        </div>
-        {/* END Documents Tab */}
 
-        {/* FEEDBACK TAB - Resident Feedback and Job Comments (visible on feedback tab or always on desktop) */}
-        <div className={`${activeTab === "feedback" ? "" : "hidden lg:block"}`}>
         {/* Resident Feedback Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
@@ -2974,11 +2906,7 @@ export default function ProjectDetail() {
               )}
           </CardContent>
         </Card>
-        </div>
-        {/* END Feedback Tab */}
 
-        {/* OVERVIEW TAB - Management sections (visible on overview tab or always on desktop) */}
-        <div className={`${activeTab === "overview" ? "" : "hidden lg:block"}`}>
         {/* Work Notices - Management Only */}
         {isManagement && project && (
           <Card className="glass-card border-0 shadow-premium">
@@ -3109,8 +3037,6 @@ export default function ProjectDetail() {
             </CardContent>
           </Card>
         )}
-        </div>
-        {/* END Overview Tab - Management Sections */}
 
       </div>
 
