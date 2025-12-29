@@ -331,9 +331,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
           {/* Left Panel - Rust Brown sidebar (Technician color) */}
           <div className="hidden lg:flex lg:w-[320px] bg-[#5C7A84] text-white p-8 flex-col">
             <div className="mb-8">
-              <HardHat className="w-10 h-10 mb-4" />
-              <h2 className="text-xl font-bold mb-2">{t('techReg.sidebar.title', 'Your Urban Rope Access Work Passport')}</h2>
-              <p className="text-white/80 text-sm">{t('techReg.sidebar.subtitle', 'Your hours. Your proof. Forever.')}</p>
+              <div className="flex items-center gap-3 mb-2">
+                <HardHat className="w-10 h-10" />
+                <h2 className="text-xl font-bold">{t('techReg.sidebar.title', 'Create Your Profile')}</h2>
+              </div>
+              <p className="text-white/80 text-sm">{t('techReg.sidebar.subtitle', 'Join thousands of rope access technicians')}</p>
             </div>
             
             {/* Progress Steps */}
