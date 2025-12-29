@@ -610,6 +610,8 @@ export function DashboardSidebar({
                   {group.items.map((item) => {
                     const Icon = item.icon;
                     const isActive = isActiveItem(item);
+                    // Special styling for "home" item to match Dashboard Primary Link styling
+                    const isHomeItem = item.id === "home";
 
                     return (
                       <button
@@ -618,10 +620,13 @@ export function DashboardSidebar({
                         data-testid={`sidebar-nav-${item.id}`}
                         className={cn(
                           "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
-                          isActive 
-                            ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
-                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                          isHomeItem && isActive
+                            ? "text-white shadow-sm"
+                            : isActive 
+                              ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                              : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                         )}
+                        style={isHomeItem && isActive ? { backgroundColor: getBrandColor() } : undefined}
                       >
                         {item.useProfilePhoto && (currentUser as any)?.photoUrl ? (
                           <Avatar className="h-4 w-4 shrink-0">
