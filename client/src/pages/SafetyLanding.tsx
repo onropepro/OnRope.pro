@@ -95,7 +95,7 @@ export default function SafetyLanding() {
             <CardContent className="p-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-[#95ADB6]">{t('safetyManifesto.stats.measured')}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-[#5C7A84]">{t('safetyManifesto.stats.measured')}</div>
                   <div className="text-base text-muted-foreground mt-1">{t('safetyManifesto.stats.measuredDesc')}</div>
                 </div>
                 <div className="text-center">
@@ -164,10 +164,10 @@ export default function SafetyLanding() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* PSR Card */}
             <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1" style={{backgroundColor: '#95ADB6'}}></div>
+              <div className="absolute top-0 left-0 right-0 h-1" style={{backgroundColor: '#5C7A84'}}></div>
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style={{backgroundColor: 'rgba(171, 69, 33, 0.1)'}}>
-                  <UserCheck className="w-6 h-6" style={{color: '#95ADB6'}} />
+                  <UserCheck className="w-6 h-6" style={{color: '#5C7A84'}} />
                 </div>
                 <CardTitle className="text-xl">{t('safetyManifesto.scores.psr.title')}</CardTitle>
               </CardHeader>
@@ -263,10 +263,10 @@ export default function SafetyLanding() {
 
           <div className="space-y-6">
             {/* Stage 1 */}
-            <Card className="border-l-4 border-l-[#95ADB6] border-t-0 border-r-0 border-b-0 rounded-none bg-slate-50 dark:bg-slate-900">
+            <Card className="border-l-4 border-l-[#5C7A84] border-t-0 border-r-0 border-b-0 rounded-none bg-slate-50 dark:bg-slate-900">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shrink-0" style={{backgroundColor: '#95ADB6'}}>1</div>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shrink-0" style={{backgroundColor: '#5C7A84'}}>1</div>
                   <div>
                     <h3 className="text-lg font-semibold mb-2">{t('safetyManifesto.flywheel.stage1.title')}</h3>
                     <p className="text-base text-muted-foreground">
@@ -355,10 +355,10 @@ export default function SafetyLanding() {
           <div className="grid md:grid-cols-3 gap-6">
             {/* For Technicians */}
             <Card className="relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1" style={{backgroundColor: '#95ADB6'}}></div>
+              <div className="absolute top-0 left-0 right-0 h-1" style={{backgroundColor: '#5C7A84'}}></div>
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style={{backgroundColor: 'rgba(171, 69, 33, 0.1)'}}>
-                  <HardHat className="w-6 h-6" style={{color: '#95ADB6'}} />
+                  <HardHat className="w-6 h-6" style={{color: '#5C7A84'}} />
                 </div>
                 <CardTitle className="text-lg">{t('safetyManifesto.stakeholders.technicians.title')}</CardTitle>
               </CardHeader>
@@ -480,7 +480,7 @@ export default function SafetyLanding() {
               </p>
               <div className="space-y-3 py-4">
                 <div className="flex items-start gap-3">
-                  <Target className="w-5 h-5 mt-0.5 text-[#95ADB6]" />
+                  <Target className="w-5 h-5 mt-0.5 text-[#5C7A84]" />
                   <p className="text-base"><strong>{t('safetyManifesto.whyMatters.psrPoint')}</strong> {t('safetyManifesto.whyMatters.psrPointDesc')}</p>
                 </div>
                 <div className="flex items-start gap-3">

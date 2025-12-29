@@ -78,13 +78,13 @@ export default function PSRGuide() {
             The Personal Safety Rating (PSR) is your portable professional safety identity. Unlike company metrics that stay with employers, your PSR follows you throughout your career, proving your commitment to safety with data, not words. Every harness inspection, every quiz passed, every document signed builds your permanent professional safety record.
           </p>
           
-          <Card className="bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20 border-[#95ADB6]/30">
+          <Card className="bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20 border-[#5C7A84]/30">
             <CardContent className="pt-4">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-[#95ADB6] mt-0.5" />
+                <Info className="w-5 h-5 text-[#5C7A84] mt-0.5" />
                 <div>
-                  <p className="font-semibold text-[#95ADB6] dark:text-[#DE7954]">Your Score Belongs to You</p>
-                  <p className="text-base text-[#95ADB6]/90 dark:text-[#DE7954]/90">
+                  <p className="font-semibold text-[#5C7A84] dark:text-[#DE7954]">Your Score Belongs to You</p>
+                  <p className="text-base text-[#5C7A84]/90 dark:text-[#DE7954]/90">
                     PSR is tied to YOUR technician account, not your employer. When you change companies, your entire safety history comes with you. The new employer sees your PSR on day one.
                   </p>
                 </div>
@@ -141,10 +141,10 @@ export default function PSRGuide() {
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <Card className="border-[#95ADB6]/30 dark:border-[#95ADB6]/50">
+            <Card className="border-[#5C7A84]/30 dark:border-[#5C7A84]/50">
               <CardContent className="p-4 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20">
-                  <Shield className="w-4 h-4 text-[#95ADB6]" />
+                <div className="p-2 rounded-lg bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20">
+                  <Shield className="w-4 h-4 text-[#5C7A84]" />
                 </div>
                 <div>
                   <p className="font-medium">Portable Safety Identity</p>
@@ -153,10 +153,10 @@ export default function PSRGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#95ADB6]/30 dark:border-[#95ADB6]/50">
+            <Card className="border-[#5C7A84]/30 dark:border-[#5C7A84]/50">
               <CardContent className="p-4 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20">
-                  <CircleDot className="w-4 h-4 text-[#95ADB6]" />
+                <div className="p-2 rounded-lg bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20">
+                  <CircleDot className="w-4 h-4 text-[#5C7A84]" />
                 </div>
                 <div>
                   <p className="font-medium">Four-Component Scoring</p>
@@ -165,10 +165,10 @@ export default function PSRGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#95ADB6]/30 dark:border-[#95ADB6]/50">
+            <Card className="border-[#5C7A84]/30 dark:border-[#5C7A84]/50">
               <CardContent className="p-4 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20">
-                  <TrendingUp className="w-4 h-4 text-[#95ADB6]" />
+                <div className="p-2 rounded-lg bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20">
+                  <TrendingUp className="w-4 h-4 text-[#5C7A84]" />
                 </div>
                 <div>
                   <p className="font-medium">Career Capital Builder</p>
@@ -177,10 +177,10 @@ export default function PSRGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#95ADB6]/30 dark:border-[#95ADB6]/50">
+            <Card className="border-[#5C7A84]/30 dark:border-[#5C7A84]/50">
               <CardContent className="p-4 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20">
-                  <Eye className="w-4 h-4 text-[#95ADB6]" />
+                <div className="p-2 rounded-lg bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20">
+                  <Eye className="w-4 h-4 text-[#5C7A84]" />
                 </div>
                 <div>
                   <p className="font-medium">Employer Visibility</p>
@@ -189,10 +189,10 @@ export default function PSRGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#95ADB6]/30 dark:border-[#95ADB6]/50">
+            <Card className="border-[#5C7A84]/30 dark:border-[#5C7A84]/50">
               <CardContent className="p-4 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20">
-                  <GraduationCap className="w-4 h-4 text-[#95ADB6]" />
+                <div className="p-2 rounded-lg bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20">
+                  <GraduationCap className="w-4 h-4 text-[#5C7A84]" />
                 </div>
                 <div>
                   <p className="font-medium">Dynamic Quiz System</p>
@@ -201,10 +201,10 @@ export default function PSRGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#95ADB6]/30 dark:border-[#95ADB6]/50">
+            <Card className="border-[#5C7A84]/30 dark:border-[#5C7A84]/50">
               <CardContent className="p-4 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20">
-                  <RefreshCw className="w-4 h-4 text-[#95ADB6]" />
+                <div className="p-2 rounded-lg bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20">
+                  <RefreshCw className="w-4 h-4 text-[#5C7A84]" />
                 </div>
                 <div>
                   <p className="font-medium">Real-Time Updates</p>
@@ -213,10 +213,10 @@ export default function PSRGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#95ADB6]/30 dark:border-[#95ADB6]/50">
+            <Card className="border-[#5C7A84]/30 dark:border-[#5C7A84]/50">
               <CardContent className="p-4 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20">
-                  <Clock className="w-4 h-4 text-[#95ADB6]" />
+                <div className="p-2 rounded-lg bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20">
+                  <Clock className="w-4 h-4 text-[#5C7A84]" />
                 </div>
                 <div>
                   <p className="font-medium">Lifetime Aggregation</p>
@@ -225,10 +225,10 @@ export default function PSRGuide() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#95ADB6]/30 dark:border-[#95ADB6]/50">
+            <Card className="border-[#5C7A84]/30 dark:border-[#5C7A84]/50">
               <CardContent className="p-4 flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20">
-                  <Users className="w-4 h-4 text-[#95ADB6]" />
+                <div className="p-2 rounded-lg bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20">
+                  <Users className="w-4 h-4 text-[#5C7A84]" />
                 </div>
                 <div>
                   <p className="font-medium">Workforce Safety Score (WSS)</p>
@@ -451,24 +451,24 @@ export default function PSRGuide() {
             <Card>
               <CardContent className="p-4">
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <Wrench className="w-4 h-4 text-[#95ADB6]" />
+                  <Wrench className="w-4 h-4 text-[#5C7A84]" />
                   PSR (Personal Safety Rating)
                 </h3>
                 <ul className="space-y-2 text-base text-muted-foreground">
                   <li className="flex items-start gap-2">
-                    <span className="text-[#95ADB6]">-</span>
+                    <span className="text-[#5C7A84]">-</span>
                     <span>Belongs to individual technician</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-[#95ADB6]">-</span>
+                    <span className="text-[#5C7A84]">-</span>
                     <span>Follows you between employers</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-[#95ADB6]">-</span>
+                    <span className="text-[#5C7A84]">-</span>
                     <span>Employers see during hiring</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-[#95ADB6]">-</span>
+                    <span className="text-[#5C7A84]">-</span>
                     <span>Personal inspections, quizzes, incidents</span>
                   </li>
                 </ul>
@@ -701,7 +701,7 @@ export default function PSRGuide() {
           {/* For Technicians */}
           <div className="space-y-3">
             <div className="flex items-center gap-3 pb-2 border-b">
-              <Wrench className="w-5 h-5 text-[#95ADB6]" />
+              <Wrench className="w-5 h-5 text-[#5C7A84]" />
               <h3 className="text-lg font-semibold">For Rope Access Technicians</h3>
             </div>
 

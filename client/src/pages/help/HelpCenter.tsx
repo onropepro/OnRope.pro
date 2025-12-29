@@ -46,7 +46,7 @@ const stakeholderCards = [
     description: 'Track your time, certifications, and career',
     href: '/help/for-technicians',
     icon: HardHat,
-    color: '#95ADB6',
+    color: '#5C7A84',
   },
   {
     id: 'building-manager',

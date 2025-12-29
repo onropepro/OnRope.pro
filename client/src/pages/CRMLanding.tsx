@@ -315,10 +315,10 @@ export default function CRMLanding() {
 
             {/* For Technicians */}
             <Card className="overflow-hidden">
-              <CardHeader className="bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20 border-b">
+              <CardHeader className="bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20 border-b">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#95ADB6]/20 dark:bg-[#95ADB6]/30 flex items-center justify-center">
-                    <Wrench className="w-5 h-5 text-[#95ADB6]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#5C7A84]/20 dark:bg-[#5C7A84]/30 flex items-center justify-center">
+                    <Wrench className="w-5 h-5 text-[#5C7A84]" />
                   </div>
                   <CardTitle className="text-xl">For Technicians</CardTitle>
                 </div>
