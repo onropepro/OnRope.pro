@@ -732,94 +732,27 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               {step === "referral" && (
                 <div className="max-w-lg mx-auto">
                   <div className="mb-6">
-                                        <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Referral Code')}</h2>
-                    <p className="text-muted-foreground mt-1">{t('techReg.referral.subtitle', 'Got a referral code from a friend?')}</p>
+                    <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Pay-It-Forward Referral Code System')}</h2>
+                    <div className="text-muted-foreground mt-3 space-y-2">
+                      <p className="text-sm">
+                        <span className="font-medium">1 -</span> {t('techReg.referral.step1', "Got a referral code from a friend? Enter it and they'll get upgraded to a PLUS account for free.")}
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium">2 -</span> {t('techReg.referral.step2', 'Once your account has been created, share your referral code to get upgraded to PLUS for free.')}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Referral Code Input */}
                   <div className="mb-8">
                     <Label className="text-sm mb-2 block">{t('techReg.referral.inputLabel', 'Enter referral code (optional)')}</Label>
                     <Input
-                      placeholder={t('techReg.referral.inputPlaceholder', 'Enter referral code')}
+                      placeholder={t('techReg.referral.inputPlaceholder', 'Enter referral code (optional)')}
                       value={data.referralCodeInput}
                       onChange={(e) => setData({ ...data, referralCodeInput: e.target.value.toUpperCase() })}
                       className="text-center tracking-widest text-lg"
                       data-testid="input-referral-code"
                     />
-                  </div>
-
-                  {/* PLUS benefits section - locked/grayed with animated checkmarks */}
-                  <div className="mb-8">
-                    <div className="flex items-center gap-2 mb-2">
-                      <motion.div
-                        initial={{ rotate: 0 }}
-                        animate={{ rotate: [0, -15, 0] }}
-                        transition={{ 
-                          delay: 0.3,
-                          duration: 0.4,
-                          ease: "easeOut"
-                        }}
-                      >
-                        <motion.div
-                          initial={{ opacity: 1 }}
-                          animate={{ opacity: 0 }}
-                          transition={{ delay: 0.7, duration: 0.2 }}
-                          className="absolute"
-                        >
-                          <Lock className="w-4 h-4 text-amber-500" />
-                        </motion.div>
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.7, duration: 0.3, type: "spring" }}
-                        >
-                          <LockOpen className="w-4 h-4 text-green-500" />
-                        </motion.div>
-                      </motion.div>
-                      <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                        {t('techReg.plusSection.header', 'Unlock PLUS for free by referring 1 other tech:')}
-                      </p>
-                    </div>
-                    <div className="space-y-1.5">
-                      {plusBenefits.map((benefit, i) => (
-                        <motion.div 
-                          key={i} 
-                          className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/30 border border-dashed border-muted-foreground/20"
-                          initial={{ opacity: 0.7 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: i * 0.1 }}
-                        >
-                          <motion.div 
-                            className="w-5 h-5 rounded-full border-2 border-green-500/50 flex items-center justify-center shrink-0 bg-green-50 dark:bg-green-900/20"
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ 
-                              delay: 0.5 + i * 0.15,
-                              type: "spring",
-                              stiffness: 300,
-                              damping: 20
-                            }}
-                          >
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ 
-                                delay: 0.6 + i * 0.15,
-                                type: "spring",
-                                stiffness: 400,
-                                damping: 15
-                              }}
-                            >
-                              <Check className="w-3 h-3 text-green-500" />
-                            </motion.div>
-                          </motion.div>
-                          <span className="text-sm text-muted-foreground">{benefit}</span>
-                        </motion.div>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 text-center">
-                      {t('techReg.plusSection.hint', 'Refer one tech after signup to unlock instantly')}
-                    </p>
                   </div>
 
                   {error && (
