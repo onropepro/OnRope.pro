@@ -43,48 +43,50 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
           My Performance
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pt-0 pb-4 flex-1 min-h-0 overflow-auto">
-        {hasData ? (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-muted/50 p-3 rounded-lg">
-                <p className="text-sm text-muted-foreground">Jobs This Month</p>
-                <p className="text-xl font-bold" data-testid="text-my-jobs">
-                  {perfData!.completedJobs}
-                </p>
+      <CardContent className="px-4 pt-0 pb-6 flex-1 min-h-0">
+        <div className="h-full overflow-auto">
+          {hasData ? (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <p className="text-sm text-muted-foreground">Jobs This Month</p>
+                  <p className="text-xl font-bold" data-testid="text-my-jobs">
+                    {perfData!.completedJobs}
+                  </p>
+                </div>
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <p className="text-sm text-muted-foreground">Hours Logged</p>
+                  <p className="text-xl font-bold" data-testid="text-my-hours">
+                    {perfData!.hoursThisMonth.toFixed(1)}h
+                  </p>
+                </div>
               </div>
-              <div className="bg-muted/50 p-3 rounded-lg">
-                <p className="text-sm text-muted-foreground">Hours Logged</p>
-                <p className="text-xl font-bold" data-testid="text-my-hours">
-                  {perfData!.hoursThisMonth.toFixed(1)}h
+              {perfData!.avgHoursPerJob > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Avg {perfData!.avgHoursPerJob.toFixed(1)}h per job
                 </p>
-              </div>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-between"
+                onClick={() => onRouteNavigate("/timesheets")}
+                data-testid="button-view-my-performance"
+              >
+                View Details
+                <ChevronRight className="w-4 h-4" />
+              </Button>
             </div>
-            {perfData!.avgHoursPerJob > 0 && (
-              <p className="text-sm text-muted-foreground">
-                Avg {perfData!.avgHoursPerJob.toFixed(1)}h per job
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-center">
+              <BarChart3 className="w-10 h-10 text-muted-foreground/50 mb-2" />
+              <p className="text-base text-muted-foreground">No activity this month</p>
+              <p className="text-sm text-muted-foreground/70">
+                Complete work sessions to see your stats
               </p>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-between"
-              onClick={() => onRouteNavigate("/timesheets")}
-              data-testid="button-view-my-performance"
-            >
-              View Details
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        ) : (
-          <div className="h-full flex flex-col items-center justify-center text-center">
-            <BarChart3 className="w-10 h-10 text-muted-foreground/50 mb-2" />
-            <p className="text-base text-muted-foreground">No activity this month</p>
-            <p className="text-sm text-muted-foreground/70">
-              Complete work sessions to see your stats
-            </p>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </CardContent>
     </div>
   );
