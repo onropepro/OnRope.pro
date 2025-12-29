@@ -77,6 +77,28 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 - Consistent view/edit behavior across all profile fields
 - Performance-optimized helpers (use direct user data in view mode, avoid form.watch() overhead)
 
+## Job Board Location Filtering (Dec 2024)
+
+**Structured Location Fields Implementation:**
+- Job postings now support structured location data: `jobCountry`, `jobProvinceState`, `jobCity`
+- Legacy `location` field is auto-populated with display string for backward compatibility
+- `JobLocationPicker` component provides cascading Country → Province → City dropdowns
+- Supports major rope access markets: Canada, US, UK, Australia, UAE, Norway
+
+**Key Files:**
+- `client/src/components/JobLocationPicker.tsx` - Reusable cascading location picker
+- `client/src/lib/job-board-constants.ts` - Country/province data, JobPostingFormData type
+- `client/src/pages/JobPostingForm.tsx` - Job creation/editing form using LocationPicker
+- `client/src/pages/CompanyJobBoard.tsx` - Company view with `formatJobLocation` helper
+- `client/src/pages/TechnicianJobBoard.tsx` - Technician view with location filters
+- `scripts/backfill-job-locations.ts` - Script to migrate existing location data
+
+**Design Decisions:**
+- Cascading dropdowns (not AddressAutocomplete) since job postings only need city/province/country
+- Form submission generates display string from structured fields AND persists structured data
+- Display logic: Use structured fields if available, fall back to legacy `location` field
+- Technician Job Board dynamically builds filter dropdowns from structured location fields in database
+
 ## Known Technical Debt
 **TypeScript/LSP Issues (as of Dec 2024):**
 
