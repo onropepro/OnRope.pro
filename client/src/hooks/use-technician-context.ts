@@ -28,7 +28,6 @@ export interface TechnicianUser {
   emergencyContactPhone: string | null;
   emergencyContactRelationship: string | null;
   ropeAccessStartDate: string | null;
-  ropeAccessSpecialties: string[] | null;
   irataBaselineHours: string | null;
   isVisibleToEmployers: boolean | null;
   [key: string]: unknown;

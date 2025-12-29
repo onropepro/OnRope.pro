@@ -25415,40 +25415,6 @@ Do not include any other text, just the JSON object.`
     }
   });
 
-  // Update technician specialties
-  app.post("/api/technician/specialties", requireAuth, async (req: Request, res: Response) => {
-    try {
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Technicians and company owners (who often also work as techs) can update their specialties
-      const ALLOWED_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "company"];
-      if (!ALLOWED_ROLES.includes(currentUser.role)) {
-        return res.status(403).json({ message: "Only technicians and company owners can update specialties" });
-      }
-
-      const { specialties } = req.body;
-      
-      if (!Array.isArray(specialties)) {
-        return res.status(400).json({ message: "Specialties must be an array" });
-      }
-
-      const [updatedUser] = await db.update(users)
-        .set({ ropeAccessSpecialties: specialties })
-        .where(eq(users.id, currentUser.id))
-        .returning();
-
-      res.json({ 
-        ropeAccessSpecialties: updatedUser.ropeAccessSpecialties,
-      });
-    } catch (error) {
-      console.error("Update technician specialties error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
   // Update technician expected salary
   app.patch("/api/technician/expected-salary", requireAuth, async (req: Request, res: Response) => {
     try {

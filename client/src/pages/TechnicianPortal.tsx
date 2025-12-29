@@ -272,13 +272,6 @@ const translations = {
     resume: "Resume / CV",
     uploadResume: "Upload Resume / CV",
     addResume: "Add Another Resume",
-    specialties: "Rope Access Specialties",
-    specialtiesDesc: "Select the job types you specialize in",
-    noSpecialties: "No specialties selected",
-    addSpecialty: "Add Specialty",
-    removeSpecialty: "Remove",
-    selectCategory: "Select Category",
-    selectJobType: "Select Job Type",
     resumeUploaded: "Resume Uploaded",
     documentUploaded: "Document Uploaded",
     documentUploadedDesc: "Your document has been uploaded successfully.",
@@ -521,8 +514,6 @@ const translations = {
     visibilityOffDesc: "Toggle on to appear in employer searches and get job opportunities.",
     makeVisible: "Make Visible",
     makeHidden: "Hide Profile",
-    yourSpecialties: "Your Specialties",
-    addYourFirstSpecialty: "Add your first specialty to appear in employer searches",
     backToHome: "Back to Home",
     quickActions: "Quick Actions",
     myFeedbackDesc: "View your submitted feedback and responses from OnRopePro",
@@ -931,8 +922,6 @@ const translations = {
     visibilityOffDesc: "Activez pour apparaître dans les recherches et recevoir des opportunités.",
     makeVisible: "Rendre visible",
     makeHidden: "Cacher le profil",
-    yourSpecialties: "Vos spécialités",
-    addYourFirstSpecialty: "Ajoutez votre première spécialité pour apparaître dans les recherches",
     backToHome: "Retour à l'accueil",
     quickActions: "Actions rapides",
     myFeedbackDesc: "Consultez vos commentaires soumis et les réponses de OnRopePro",
@@ -1386,8 +1375,6 @@ const translations = {
     visibilityOffDesc: "Activa para aparecer en busquedas y recibir oportunidades de trabajo.",
     makeVisible: "Hacer Visible",
     makeHidden: "Ocultar Perfil",
-    yourSpecialties: "Sus Especialidades",
-    addYourFirstSpecialty: "Agregue su primera especialidad para aparecer en las busquedas",
     backToHome: "Volver al Inicio",
     quickActions: "Acciones Rapidas",
     myFeedbackDesc: "Vea sus comentarios enviados y las respuestas de OnRopePro",
@@ -1456,7 +1443,6 @@ const createProfileSchema = (t: typeof translations['en']) => z.object({
   firstAidExpiry: z.string().optional(),
   irataBaselineHours: z.string().optional(),
   ropeAccessStartDate: z.string().optional(),
-  ropeAccessSpecialties: z.array(z.string()).optional(),
 });
 
 type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
@@ -1625,8 +1611,6 @@ export default function TechnicianPortal() {
   const [isEditing, setIsEditing] = useState(false);
   const [profileInnerTab, setProfileInnerTab] = useState<string>('personal');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [specialtyCategory, setSpecialtyCategory] = useState<JobCategory | "">("");
-  const [selectedSpecialtyJobType, setSelectedSpecialtyJobType] = useState<string>("");
   
   // Use central i18n system
   const { t: i18nT, i18n } = useTranslation();
@@ -1717,7 +1701,6 @@ export default function TechnicianPortal() {
       firstAidExpiry: "",
       irataBaselineHours: "",
       ropeAccessStartDate: "",
-      ropeAccessSpecialties: [],
     },
   });
 
@@ -2063,7 +2046,6 @@ export default function TechnicianPortal() {
       { label: getLabel('Driver\'s License', 'Permis de conduire', 'Licencia de Conducir'), complete: !!user.driversLicenseNumber, sectionId: 'driver' },
       { label: getLabel('Address', 'Adresse', 'Dirección'), complete: !!user.employeeStreetAddress, sectionId: 'personal' },
       // Employer-visible profile fields
-      { label: getLabel('Specialties', 'Spécialités', 'Especialidades'), complete: !!(user.ropeAccessSpecialties && user.ropeAccessSpecialties.length > 0), sectionId: 'resume' },
     ];
     
     const completedCount = profileFields.filter(f => f.complete).length;
@@ -2652,7 +2634,6 @@ export default function TechnicianPortal() {
         firstAidExpiry: user.firstAidExpiry || "",
         irataBaselineHours: user.irataBaselineHours || "",
         ropeAccessStartDate: user.ropeAccessStartDate || "",
-        ropeAccessSpecialties: user.ropeAccessSpecialties || [],
       });
     }
     setIsEditing(true);
@@ -4261,161 +4242,6 @@ export default function TechnicianPortal() {
                     </div>
                   </div>
 
-                  {/* Specialties Section - Editable */}
-                  <div className="pt-6 border-t">
-                    <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-4 flex items-center gap-2">
-                      <HardHat className="w-4 h-4" />
-                      {t.yourSpecialties}
-                    </h3>
-                    
-                    {isEditingEmployerProfile ? (
-                      <div className="space-y-4">
-                        {/* Current specialties with remove button */}
-                        <div className="flex flex-wrap gap-2">
-                          {(user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
-                            const jobType = JOB_TYPES.find(jt => jt.value === specialty);
-                            return (
-                              <Badge 
-                                key={specialty} 
-                                variant="secondary"
-                                className="gap-1 pr-1"
-                                data-testid={`badge-specialty-${index}`}
-                              >
-                                <HardHat className="w-3 h-3" />
-                                {jobType?.label || specialty}
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-5 w-5 ml-1 no-default-hover-elevate no-default-active-elevate"
-                                  onClick={async () => {
-                                    const updated = (user.ropeAccessSpecialties || []).filter((s: string) => s !== specialty);
-                                    try {
-                                      const response = await fetch("/api/technician/specialties", {
-                                        method: "POST",
-                                        headers: { "Content-Type": "application/json" },
-                                        credentials: "include",
-                                        body: JSON.stringify({ specialties: updated }),
-                                      });
-                                      if (!response.ok) throw new Error("Failed to update");
-                                      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-                                    } catch (error) {
-                                      toast({ title: "Error", description: "Failed to remove specialty", variant: "destructive" });
-                                    }
-                                  }}
-                                  data-testid={`button-remove-specialty-${index}`}
-                                >
-                                  <X className="w-3 h-3" />
-                                </Button>
-                              </Badge>
-                            );
-                          })}
-                          {(user.ropeAccessSpecialties || []).length === 0 && (
-                            <p className="text-base text-muted-foreground italic">{t.addYourFirstSpecialty}</p>
-                          )}
-                        </div>
-
-                        {/* Add new specialty */}
-                        <div className="flex flex-wrap gap-2 items-end">
-                          <div className="flex-1 min-w-[120px]">
-                            <Label className="text-xs">{t.selectCategory}</Label>
-                            <select
-                              className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
-                              value={specialtyCategory}
-                              onChange={(e) => {
-                                setSpecialtyCategory(e.target.value as "" | "building_maintenance");
-                                setSelectedSpecialtyJobType("");
-                              }}
-                              data-testid="select-specialty-category"
-                            >
-                              <option value="">{t.selectCategory}</option>
-                              {JOB_CATEGORIES.map(cat => (
-                                <option key={cat.value} value={cat.value}>{cat.label}</option>
-                              ))}
-                            </select>
-                          </div>
-                          {specialtyCategory && (
-                            <div className="flex-1 min-w-[150px]">
-                              <Label className="text-xs">{t.selectJobType}</Label>
-                              <select
-                                className="w-full mt-1 px-3 py-2 border rounded-md bg-background text-sm"
-                                value={selectedSpecialtyJobType}
-                                onChange={(e) => setSelectedSpecialtyJobType(e.target.value)}
-                                data-testid="select-specialty-job-type"
-                              >
-                                <option value="">{t.selectJobType}</option>
-                                {getJobTypesByCategory(specialtyCategory)
-                                  .filter(jt => !jt.value.endsWith('_other') && !(user.ropeAccessSpecialties || []).includes(jt.value))
-                                  .map(jt => (
-                                    <option key={jt.value} value={jt.value}>{jt.label}</option>
-                                  ))}
-                              </select>
-                            </div>
-                          )}
-                          <Button
-                            size="sm"
-                            disabled={!selectedSpecialtyJobType}
-                            onClick={async () => {
-                              if (selectedSpecialtyJobType) {
-                                const current = user.ropeAccessSpecialties || [];
-                                if (!current.includes(selectedSpecialtyJobType)) {
-                                  try {
-                                    const response = await fetch("/api/technician/specialties", {
-                                      method: "POST",
-                                      headers: { "Content-Type": "application/json" },
-                                      credentials: "include",
-                                      body: JSON.stringify({ specialties: [...current, selectedSpecialtyJobType] }),
-                                    });
-                                    if (!response.ok) throw new Error("Failed to update");
-                                    queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-                                  } catch (error) {
-                                    toast({ title: "Error", description: "Failed to add specialty", variant: "destructive" });
-                                  }
-                                }
-                                setSelectedSpecialtyJobType("");
-                              }
-                            }}
-                            data-testid="button-add-specialty"
-                          >
-                            <Plus className="w-4 h-4 mr-1" />
-                            {t.addSpecialty}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {(user.ropeAccessSpecialties || []).length > 0 ? (
-                          (user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
-                            const jobType = JOB_TYPES.find(jt => jt.value === specialty);
-                            return (
-                              <Badge 
-                                key={specialty} 
-                                variant="secondary"
-                                className="gap-1"
-                                data-testid={`badge-specialty-view-${index}`}
-                              >
-                                <HardHat className="w-3 h-3" />
-                                {jobType?.label || specialty}
-                              </Badge>
-                            );
-                          })
-                        ) : (
-                          <div className="text-center w-full py-4">
-                            <p className="text-base text-muted-foreground italic mb-2">{t.addYourFirstSpecialty}</p>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setIsEditingEmployerProfile(true)}
-                              data-testid="button-add-first-specialty"
-                            >
-                              <Plus className="w-4 h-4 mr-1" />
-                              {t.addSpecialty}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
                   {/* Resumes Section */}
                   {user.resumeDocuments && user.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                     <div className="pt-6 border-t">
@@ -5616,126 +5442,6 @@ export default function TechnicianPortal() {
                   <CertificationsManager t={t} />
                 </div>
 
-                {/* Rope Access Specialties Section */}
-                <div className="space-y-3">
-                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
-                    <HardHat className="w-4 h-4" />
-                    {t.specialties}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">{t.specialtiesDesc}</p>
-                  
-                  {isEditing ? (
-                    <div className="space-y-3">
-                      {/* Current specialties with remove button */}
-                      <div className="flex flex-wrap gap-2">
-                        {(form.watch("ropeAccessSpecialties") || []).map((specialty: string, index: number) => {
-                          const jobType = JOB_TYPES.find(jt => jt.value === specialty);
-                          return (
-                            <Badge 
-                              key={specialty} 
-                              variant="secondary"
-                              className="gap-1 pr-1"
-                              data-testid={`badge-specialty-${index}`}
-                            >
-                              <HardHat className="w-3 h-3" />
-                              {jobType?.label || specialty}
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-5 w-5 ml-1 no-default-hover-elevate no-default-active-elevate"
-                                onClick={() => {
-                                  const current = form.getValues("ropeAccessSpecialties") || [];
-                                  form.setValue("ropeAccessSpecialties", current.filter((s: string) => s !== specialty));
-                                }}
-                                data-testid={`button-remove-specialty-${index}`}
-                              >
-                                <X className="w-3 h-3" />
-                              </Button>
-                            </Badge>
-                          );
-                        })}
-                        {(form.watch("ropeAccessSpecialties") || []).length === 0 && (
-                          <p className="text-base text-muted-foreground italic">{t.noSpecialties}</p>
-                        )}
-                      </div>
-                      
-                      {/* Add specialty selector */}
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <select
-                          id="specialty-category"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          data-testid="select-specialty-category"
-                          value={specialtyCategory}
-                          onChange={(e) => {
-                            setSpecialtyCategory(e.target.value as JobCategory | "");
-                            setSelectedSpecialtyJobType("");
-                          }}
-                        >
-                          <option value="">{t.selectCategory}</option>
-                          {JOB_CATEGORIES.map(cat => (
-                            <option key={cat.value} value={cat.value}>{cat.label}</option>
-                          ))}
-                        </select>
-                        <select
-                          id="specialty-job-type"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          data-testid="select-specialty-job-type"
-                          value={selectedSpecialtyJobType}
-                          onChange={(e) => setSelectedSpecialtyJobType(e.target.value)}
-                          disabled={!specialtyCategory}
-                        >
-                          <option value="">{t.selectJobType}</option>
-                          {specialtyCategory && getJobTypesByCategory(specialtyCategory)
-                            .filter(jt => !jt.value.endsWith('_other') && !(form.watch("ropeAccessSpecialties") || []).includes(jt.value))
-                            .map(jt => (
-                              <option key={jt.value} value={jt.value}>{jt.label}</option>
-                            ))}
-                        </select>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="h-10 whitespace-nowrap"
-                          disabled={!selectedSpecialtyJobType}
-                          onClick={() => {
-                            if (selectedSpecialtyJobType) {
-                              const current = form.getValues("ropeAccessSpecialties") || [];
-                              if (!current.includes(selectedSpecialtyJobType)) {
-                                form.setValue("ropeAccessSpecialties", [...current, selectedSpecialtyJobType]);
-                              }
-                              setSelectedSpecialtyJobType("");
-                            }
-                          }}
-                          data-testid="button-add-specialty"
-                        >
-                          <Plus className="w-4 h-4 mr-1" />
-                          {t.addSpecialty}
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {(user.ropeAccessSpecialties || []).length > 0 ? (
-                        (user.ropeAccessSpecialties || []).map((specialty: string, index: number) => {
-                          const jobType = JOB_TYPES.find(jt => jt.value === specialty);
-                          return (
-                            <Badge 
-                              key={specialty} 
-                              variant="secondary"
-                              className="gap-1"
-                              data-testid={`badge-specialty-display-${index}`}
-                            >
-                              <HardHat className="w-3 h-3" />
-                              {jobType?.label || specialty}
-                            </Badge>
-                          );
-                        })
-                      ) : (
-                        <p className="text-base text-muted-foreground italic">{t.noSpecialties}</p>
-                      )}
-                    </div>
-                  )}
-                </div>
               </div>
                     )}
                   </TabsContent>
