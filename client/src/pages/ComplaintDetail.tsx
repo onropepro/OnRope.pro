@@ -178,28 +178,8 @@ export default function ComplaintDetail() {
     toggleStatusMutation.mutate(newStatus);
   };
 
-  const handleBack = () => {
-    const dashboardPath = userData?.user?.role === "resident" ? "/resident" : "/dashboard";
-    setLocation(dashboardPath);
-  };
-
-  useSetHeaderConfig({
-    pageTitle: t('feedbackDetail.feedbackDetails', 'Feedback Details'),
-    onBackClick: handleBack,
-    showSearch: false,
-    actionButtons: complaint ? (
-      <Badge 
-        variant="secondary" 
-        className={complaint.status === "open" 
-          ? "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20" 
-          : "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
-        }
-        data-testid="badge-status"
-      >
-        {complaint.status === "open" ? t('feedbackDetail.statusOpen', 'Open') : t('feedbackDetail.statusClosed', 'Closed')}
-      </Badge>
-    ) : null,
-  }, [t, complaint?.status, handleBack]);
+  // Use default header config to show consistent unified header with search bar
+  useSetHeaderConfig({}, []);
 
   if (isLoading) {
     return (

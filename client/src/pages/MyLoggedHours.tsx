@@ -312,6 +312,10 @@ export default function MyLoggedHours() {
   const sortedProjects = Object.entries(groupedByProject)
     .sort(([, a], [, b]) => b.totalHours - a.totalHours);
 
+  // Use default header config to show consistent unified header with search bar
+  // Must be called before any conditional returns to maintain hook order
+  useSetHeaderConfig({}, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -321,41 +325,6 @@ export default function MyLoggedHours() {
       </div>
     );
   }
-
-  // Configure unified header with back button and user info
-  const handleBackClick = useCallback(() => {
-    setLocation('/dashboard');
-  }, [setLocation]);
-
-  const userInfoBadges = useMemo(() => (
-    <div className="flex flex-col items-start sm:items-end gap-1">
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="material-icons text-sm text-muted-foreground hidden sm:inline">person</span>
-        <span className="font-semibold text-sm sm:text-base truncate max-w-[150px] sm:max-w-none" data-testid="text-employee-name">{currentUser?.name}</span>
-        {currentUser?.irataLevel && (
-          <Badge variant="outline" className="flex items-center gap-1 text-xs">
-            <span className="material-icons text-xs">verified</span>
-            {t('loggedHours.level', 'Level')} {currentUser.irataLevel}
-          </Badge>
-        )}
-      </div>
-      {currentUser?.irataLicenseNumber && (
-        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
-          <span className="material-icons text-xs">badge</span>
-          <span>{t('loggedHours.license', 'License')}:</span>
-          <span className="font-medium text-foreground" data-testid="text-irata-license">{currentUser.irataLicenseNumber}</span>
-        </div>
-      )}
-    </div>
-  ), [currentUser?.name, currentUser?.irataLevel, currentUser?.irataLicenseNumber, t]);
-
-  useSetHeaderConfig({
-    pageTitle: t('loggedHours.title', 'My Logged Hours'),
-    pageDescription: t('loggedHours.subtitle', 'IRATA Logbook'),
-    onBackClick: handleBackClick,
-    actionButtons: userInfoBadges,
-    showSearch: false,
-  }, [t, handleBackClick, userInfoBadges]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
