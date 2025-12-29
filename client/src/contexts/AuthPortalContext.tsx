@@ -182,23 +182,32 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
   };
 
   const handleTechnicianRegister = () => {
-    closePortal();
-    setShowTechnicianRegistration(true);
+    setIsOpen(false);
+    // Use setTimeout to ensure the portal dialog fully closes before opening the new one
+    setTimeout(() => {
+      setShowTechnicianRegistration(true);
+    }, 50);
   };
 
   const handlePropertyManagerRegister = () => {
-    closePortal();
-    setShowPropertyManagerRegistration(true);
+    setIsOpen(false);
+    setTimeout(() => {
+      setShowPropertyManagerRegistration(true);
+    }, 50);
   };
 
   const handleEmployerRegister = () => {
-    closePortal();
-    setLocation("/pricing");
+    setIsOpen(false);
+    setTimeout(() => {
+      setLocation("/pricing");
+    }, 50);
   };
 
   const handleResidentRegister = () => {
-    closePortal();
-    setShowResidentSignup(true);
+    setIsOpen(false);
+    setTimeout(() => {
+      setShowResidentSignup(true);
+    }, 50);
   };
 
   return (
