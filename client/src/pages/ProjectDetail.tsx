@@ -1327,8 +1327,56 @@ export default function ProjectDetail() {
 
   return (
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
-      <div className="max-w-2xl mx-auto p-4 space-y-6">
-        {/* Progress Card */}
+      <div className="max-w-6xl mx-auto p-4 space-y-6">
+        {/* Sticky Project Header */}
+        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 -mx-4 px-4 py-3 border-b">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                <span className="material-icons text-primary">apartment</span>
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
+                <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant={project.status === 'completed' ? 'default' : project.status === 'in_progress' ? 'secondary' : 'outline'}>
+                {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
+                 project.status === 'in_progress' ? t('projectDetail.status.inProgress', 'In Progress') : 
+                 t('projectDetail.status.pending', 'Pending')}
+              </Badge>
+              <Badge variant="outline" className="gap-1">
+                <span className="material-icons text-xs">trending_up</span>
+                {progressPercent}%
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Page-level Tabs for Section Organization */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="overview" className="gap-2" data-testid="tab-overview">
+              <span className="material-icons text-sm hidden sm:inline">dashboard</span>
+              {t('projectDetail.tabs.overview', 'Overview')}
+            </TabsTrigger>
+            <TabsTrigger value="files" className="gap-2" data-testid="tab-files">
+              <span className="material-icons text-sm hidden sm:inline">folder</span>
+              {t('projectDetail.tabs.files', 'Files')}
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="gap-2" data-testid="tab-activity">
+              <span className="material-icons text-sm hidden sm:inline">forum</span>
+              {t('projectDetail.tabs.activity', 'Activity')}
+            </TabsTrigger>
+          </TabsList>
+
+          {/* OVERVIEW TAB: Progress + Quick Actions + Building Instructions */}
+          <TabsContent value="overview" className="space-y-6 mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column: Progress */}
+              <div className="space-y-6">
+                {/* Progress Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
             <CardTitle className="text-base">{t('projectDetail.progress.title', 'Progress')}</CardTitle>
@@ -1579,6 +1627,70 @@ export default function ProjectDetail() {
             })()}
           </CardContent>
         </Card>
+              </div>
+
+              {/* Right Column: Quick Actions + Building Instructions */}
+              <div className="space-y-6">
+                {/* Quick Actions - Safety Forms accessible to all employees */}
+                <Card className="glass-card border-0 shadow-premium">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <span className="material-icons text-primary">bolt</span>
+                      {t('projectDetail.quickActions.title', 'Quick Actions')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        variant="outline"
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setLocation(`/harness-inspection?projectId=${id}`)}
+                        data-testid="button-harness-inspection"
+                      >
+                        <span className="material-icons text-2xl text-amber-600">security</span>
+                        <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.harnessInspection', 'Harness Inspection')}</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setLocation(`/toolbox-meeting?projectId=${id}`)}
+                        data-testid="button-toolbox-meeting"
+                      >
+                        <span className="material-icons text-2xl text-blue-600">groups</span>
+                        <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.toolboxMeeting', 'Toolbox Meeting')}</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setLocation(`/flha-form?projectId=${id}`)}
+                        data-testid="button-flha"
+                      >
+                        <span className="material-icons text-2xl text-green-600">assignment</span>
+                        <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.flha', 'FLHA Form')}</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setLocation(`/incident-report?projectId=${id}`)}
+                        data-testid="button-incident-report"
+                      >
+                        <span className="material-icons text-2xl text-red-600">report_problem</span>
+                        <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.incidentReport', 'Incident Report')}</span>
+                      </Button>
+                      {isManagement && (
+                        <Button
+                          variant="outline"
+                          className="h-auto py-4 flex flex-col items-center gap-2"
+                          onClick={() => setShowQuickNoticeForm(true)}
+                          data-testid="button-create-notice"
+                        >
+                          <span className="material-icons text-2xl text-purple-600">campaign</span>
+                          <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.createNotice', 'Create Notice')}</span>
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
         {/* Building Instructions Section - Prominent styling */}
         {buildingData?.building && (
@@ -1790,68 +1902,14 @@ export default function ProjectDetail() {
             </Collapsible>
           </Card>
         )}
-
-        {/* Quick Actions - Safety Forms accessible to all employees */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <span className="material-icons text-primary">bolt</span>
-              {t('projectDetail.quickActions.title', 'Quick Actions')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/harness-inspection?projectId=${id}`)}
-                data-testid="button-harness-inspection"
-              >
-                <span className="material-icons text-2xl text-amber-600">security</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.harnessInspection', 'Harness Inspection')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/toolbox-meeting?projectId=${id}`)}
-                data-testid="button-toolbox-meeting"
-              >
-                <span className="material-icons text-2xl text-blue-600">groups</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.toolboxMeeting', 'Toolbox Meeting')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/flha-form?projectId=${id}`)}
-                data-testid="button-flha"
-              >
-                <span className="material-icons text-2xl text-green-600">assignment</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.flha', 'FLHA Form')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/incident-report?projectId=${id}`)}
-                data-testid="button-incident-report"
-              >
-                <span className="material-icons text-2xl text-red-600">report_problem</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.incidentReport', 'Incident Report')}</span>
-              </Button>
-              {isManagement && (
-                <Button
-                  variant="outline"
-                  className="h-auto py-4 flex flex-col items-center gap-2"
-                  onClick={() => setShowQuickNoticeForm(true)}
-                  data-testid="button-create-notice"
-                >
-                  <span className="material-icons text-2xl text-purple-600">campaign</span>
-                  <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.createNotice', 'Create Notice')}</span>
-                </Button>
-              )}
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
 
+          {/* ACTIVITY TAB: Analytics + Feedback + Comments */}
+          <TabsContent value="activity" className="space-y-6 mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-6">
         {/* Analytics - Target Performance & Work Session History */}
         {(isManagement || canViewWorkHistory) && (
           <Card className="glass-card border-0 shadow-premium">
@@ -2197,8 +2255,152 @@ export default function ProjectDetail() {
             </CardContent>
           </Card>
         )}
+              </div>
 
-        {/* Project Documents and Photos - Collapsible Combined Card */}
+              {/* Right Column: Resident Feedback + Job Comments */}
+              <div className="space-y-6">
+                {/* Resident Feedback Card - Activity Tab */}
+                <Card className="glass-card border-0 shadow-premium">
+                  <CardHeader>
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <CardTitle className="text-base">{t('projectDetail.feedback.title', 'Resident Feedback')}</CardTitle>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {complaintMetricsData?.metrics?.averageResolutionMs && (
+                          <Badge variant="outline" className="text-xs gap-1" data-testid="badge-avg-resolution-time">
+                            <span className="material-icons text-sm">schedule</span>
+                            {t('projectDetail.feedback.avgResolution', 'Avg')}: {formatDurationMs(complaintMetricsData.metrics.averageResolutionMs)}
+                          </Badge>
+                        )}
+                        <Badge variant="secondary" className="text-xs">
+                          {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.item', 'item') : t('projectDetail.feedback.itemsPlural', 'items')}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {complaints.length === 0 ? (
+                      <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
+                        {t('projectDetail.feedback.noFeedback', 'No feedback received yet')}
+                      </div>
+                    ) : (
+                      <div className="space-y-2 max-h-96 overflow-y-auto">
+                        {complaints.map((complaint: any) => {
+                          const status = complaint.status;
+                          const isViewed = complaint.viewedAt !== null;
+                          
+                          let statusBadge;
+                          if (status === 'closed') {
+                            statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">{t('projectDetail.feedback.closed', 'Closed')}</Badge>;
+                          } else if (isViewed) {
+                            statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">{t('projectDetail.feedback.viewed', 'Viewed')}</Badge>;
+                          } else {
+                            statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">{t('projectDetail.feedback.new', 'New')}</Badge>;
+                          }
+                          
+                          return (
+                            <Card 
+                              key={complaint.id}
+                              className="hover-elevate cursor-pointer"
+                              onClick={() => setLocation(`/complaints/${complaint.id}`)}
+                              data-testid={`activity-feedback-card-${complaint.id}`}
+                            >
+                              <CardContent className="p-3">
+                                <div className="flex items-start justify-between gap-2 mb-2">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-sm font-medium">{complaint.residentName}</div>
+                                    <div className="text-xs text-muted-foreground">{t('projectDetail.documents.unit', 'Unit')} {complaint.unitNumber}</div>
+                                  </div>
+                                  {statusBadge}
+                                </div>
+                                <p className="text-sm line-clamp-2 mb-2">{complaint.message}</p>
+                                {complaint.photoUrl && (
+                                  <div className="mb-2">
+                                    <img 
+                                      src={complaint.photoUrl} 
+                                      alt="Feedback photo" 
+                                      className="w-full max-w-xs rounded-lg border"
+                                    />
+                                  </div>
+                                )}
+                                <div className="text-xs text-muted-foreground">
+                                  {formatTimestampDate(complaint.createdAt)}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Job Comments Card - Activity Tab */}
+                <Card className="glass-card border-0 shadow-premium">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">{t('projectDetail.comments.title', 'Job Comments')}</CardTitle>
+                      <Badge variant="secondary" className="text-xs">
+                        {jobComments.length} {jobComments.length === 1 ? t('projectDetail.comments.comment', 'comment') : t('projectDetail.comments.commentsPlural', 'comments')}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Comment Form */}
+                    <div className="space-y-2">
+                      <Textarea
+                        placeholder={t('projectDetail.comments.placeholder', 'Add a comment about this project...')}
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        className="min-h-20"
+                        data-testid="activity-input-job-comment"
+                      />
+                      <Button
+                        onClick={() => {
+                          if (newComment.trim()) {
+                            createCommentMutation.mutate(newComment.trim());
+                          }
+                        }}
+                        disabled={!newComment.trim() || createCommentMutation.isPending}
+                        className="w-full h-12"
+                        data-testid="activity-button-post-comment"
+                      >
+                        {createCommentMutation.isPending ? t('projectDetail.comments.posting', 'Posting...') : t('projectDetail.comments.postComment', 'Post Comment')}
+                      </Button>
+                    </div>
+
+                    {/* Comments List */}
+                    {jobComments.length === 0 ? (
+                      <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
+                        {t('projectDetail.comments.noComments', 'No comments yet. Be the first to comment!')}
+                      </div>
+                    ) : (
+                      <div className="space-y-2 max-h-96 overflow-y-auto">
+                        {jobComments.map((comment: any) => (
+                          <Card key={comment.id} className="border">
+                            <CardContent className="p-3">
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium">{comment.userName}</div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {format(new Date(comment.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                                  </div>
+                                </div>
+                              </div>
+                              <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* FILES TAB: Documents & Photos */}
+          <TabsContent value="files" className="space-y-6 mt-0">
+            {/* Project Documents and Photos - Collapsible Combined Card */}
         <Card className="glass-card border-0 shadow-premium">
           <Collapsible open={documentsExpanded} onOpenChange={setDocumentsExpanded}>
             <CardHeader className="pb-0">
@@ -2768,144 +2970,8 @@ export default function ProjectDetail() {
             </CollapsibleContent>
           </Collapsible>
         </Card>
-
-        {/* Resident Feedback Card */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <CardTitle className="text-base">{t('projectDetail.feedback.title', 'Resident Feedback')}</CardTitle>
-              <div className="flex items-center gap-2 flex-wrap">
-                {complaintMetricsData?.metrics?.averageResolutionMs && (
-                  <Badge variant="outline" className="text-xs gap-1" data-testid="badge-avg-resolution-time">
-                    <span className="material-icons text-sm">schedule</span>
-                    {t('projectDetail.feedback.avgResolution', 'Avg')}: {formatDurationMs(complaintMetricsData.metrics.averageResolutionMs)}
-                  </Badge>
-                )}
-                <Badge variant="secondary" className="text-xs">
-                  {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.item', 'item') : t('projectDetail.feedback.itemsPlural', 'items')}
-                </Badge>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-              
-              {complaints.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
-                  {t('projectDetail.feedback.noFeedback', 'No feedback received yet')}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {complaints.map((complaint: any) => {
-                    const status = complaint.status;
-                    const isViewed = complaint.viewedAt !== null;
-                    
-                    let statusBadge;
-                    if (status === 'closed') {
-                      statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">{t('projectDetail.feedback.closed', 'Closed')}</Badge>;
-                    } else if (isViewed) {
-                      statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">{t('projectDetail.feedback.viewed', 'Viewed')}</Badge>;
-                    } else {
-                      statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">{t('projectDetail.feedback.new', 'New')}</Badge>;
-                    }
-                    
-                    return (
-                      <Card 
-                        key={complaint.id}
-                        className="hover-elevate cursor-pointer"
-                        onClick={() => setLocation(`/complaints/${complaint.id}`)}
-                        data-testid={`feedback-card-${complaint.id}`}
-                      >
-                        <CardContent className="p-3">
-                          <div className="flex items-start justify-between gap-2 mb-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium">{complaint.residentName}</div>
-                              <div className="text-xs text-muted-foreground">{t('projectDetail.documents.unit', 'Unit')} {complaint.unitNumber}</div>
-                            </div>
-                            {statusBadge}
-                          </div>
-                          <p className="text-sm line-clamp-2 mb-2">{complaint.message}</p>
-                          {complaint.photoUrl && (
-                            <div className="mb-2">
-                              <img 
-                                src={complaint.photoUrl} 
-                                alt="Feedback photo" 
-                                className="w-full max-w-xs rounded-lg border"
-                              />
-                            </div>
-                          )}
-                          <div className="text-xs text-muted-foreground">
-                            {formatTimestampDate(complaint.createdAt)}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              )}
-          </CardContent>
-        </Card>
-
-        {/* Job Comments Card */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">{t('projectDetail.comments.title', 'Job Comments')}</CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                {jobComments.length} {jobComments.length === 1 ? t('projectDetail.comments.comment', 'comment') : t('projectDetail.comments.commentsPlural', 'comments')}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-
-              {/* Comment Form */}
-              <div className="space-y-2">
-                <Textarea
-                  placeholder={t('projectDetail.comments.placeholder', 'Add a comment about this project...')}
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-20"
-                  data-testid="input-job-comment"
-                />
-                <Button
-                  onClick={() => {
-                    if (newComment.trim()) {
-                      createCommentMutation.mutate(newComment.trim());
-                    }
-                  }}
-                  disabled={!newComment.trim() || createCommentMutation.isPending}
-                  className="w-full h-12"
-                  data-testid="button-post-comment"
-                >
-                  {createCommentMutation.isPending ? t('projectDetail.comments.posting', 'Posting...') : t('projectDetail.comments.postComment', 'Post Comment')}
-                </Button>
-              </div>
-
-              {/* Comments List */}
-              {jobComments.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
-                  {t('projectDetail.comments.noComments', 'No comments yet. Be the first to comment!')}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {jobComments.map((comment: any) => (
-                    <Card key={comment.id} className="border">
-                      <CardContent className="p-3">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium">{comment.userName}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {format(new Date(comment.createdAt), "MMM d, yyyy 'at' h:mm a")}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-          </CardContent>
-        </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Work Notices - Management Only */}
         {isManagement && project && (
