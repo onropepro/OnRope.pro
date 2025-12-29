@@ -93,7 +93,6 @@ export default function ProjectDetail() {
   const [isMissedStall, setIsMissedStall] = useState(false);
   const [missedStallNumber, setMissedStallNumber] = useState("");
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
-  const [documentsExpanded, setDocumentsExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -1328,35 +1327,35 @@ export default function ProjectDetail() {
   return (
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
       <div className="max-w-6xl mx-auto p-4 space-y-6">
-        {/* Sticky Project Header */}
-        <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 -mx-4 px-4 py-3 border-b">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-                <span className="material-icons text-primary">apartment</span>
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
-                <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
-              </div>
+        {/* Project Info Header */}
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+              <span className="material-icons text-primary">apartment</span>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant={project.status === 'completed' ? 'default' : project.status === 'in_progress' ? 'secondary' : 'outline'}>
-                {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
-                 project.status === 'in_progress' ? t('projectDetail.status.inProgress', 'In Progress') : 
-                 t('projectDetail.status.pending', 'Pending')}
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <span className="material-icons text-xs">trending_up</span>
-                {progressPercent}%
-              </Badge>
+            <div className="min-w-0">
+              <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
+              <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
             </div>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant={project.status === 'completed' ? 'default' : project.status === 'in_progress' ? 'secondary' : 'outline'}>
+              {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
+               project.status === 'in_progress' ? t('projectDetail.status.inProgress', 'In Progress') : 
+               t('projectDetail.status.pending', 'Pending')}
+            </Badge>
+            <Badge variant="outline" className="gap-1">
+              <span className="material-icons text-xs">trending_up</span>
+              {progressPercent}%
+            </Badge>
           </div>
         </div>
 
         {/* Page-level Tabs for Section Organization */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          {/* Sticky Tab Navigation */}
+          <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 -mx-4 px-4 py-2">
+            <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview" className="gap-2" data-testid="tab-overview">
               <span className="material-icons text-sm hidden sm:inline">dashboard</span>
               {t('projectDetail.tabs.overview', 'Overview')}
@@ -1369,7 +1368,8 @@ export default function ProjectDetail() {
               <span className="material-icons text-sm hidden sm:inline">forum</span>
               {t('projectDetail.tabs.activity', 'Activity')}
             </TabsTrigger>
-          </TabsList>
+            </TabsList>
+          </div>
 
           {/* OVERVIEW TAB: Progress + Quick Actions + Building Instructions */}
           <TabsContent value="overview" className="space-y-6 mt-0">
@@ -1902,14 +1902,7 @@ export default function ProjectDetail() {
             </Collapsible>
           </Card>
         )}
-              </div>
-            </div>
-          </TabsContent>
 
-          {/* ACTIVITY TAB: Analytics + Feedback + Comments */}
-          <TabsContent value="activity" className="space-y-6 mt-0">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-6">
         {/* Analytics - Target Performance & Work Session History */}
         {(isManagement || canViewWorkHistory) && (
           <Card className="glass-card border-0 shadow-premium">
@@ -2256,176 +2249,166 @@ export default function ProjectDetail() {
           </Card>
         )}
               </div>
+            </div>
+          </TabsContent>
 
-              {/* Right Column: Resident Feedback + Job Comments */}
-              <div className="space-y-6">
-                {/* Resident Feedback Card - Activity Tab */}
-                <Card className="glass-card border-0 shadow-premium">
-                  <CardHeader>
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <CardTitle className="text-base">{t('projectDetail.feedback.title', 'Resident Feedback')}</CardTitle>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {complaintMetricsData?.metrics?.averageResolutionMs && (
-                          <Badge variant="outline" className="text-xs gap-1" data-testid="badge-avg-resolution-time">
-                            <span className="material-icons text-sm">schedule</span>
-                            {t('projectDetail.feedback.avgResolution', 'Avg')}: {formatDurationMs(complaintMetricsData.metrics.averageResolutionMs)}
-                          </Badge>
-                        )}
-                        <Badge variant="secondary" className="text-xs">
-                          {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.item', 'item') : t('projectDetail.feedback.itemsPlural', 'items')}
+          {/* ACTIVITY TAB: Resident Feedback + Job Comments - 2 Column Grid */}
+          <TabsContent value="activity" className="space-y-6 mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column: Resident Feedback */}
+              <Card className="glass-card border-0 shadow-premium">
+                <CardHeader>
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <CardTitle className="text-base">{t('projectDetail.feedback.title', 'Resident Feedback')}</CardTitle>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {complaintMetricsData?.metrics?.averageResolutionMs && (
+                        <Badge variant="outline" className="text-xs gap-1" data-testid="badge-avg-resolution-time">
+                          <span className="material-icons text-sm">schedule</span>
+                          {t('projectDetail.feedback.avgResolution', 'Avg')}: {formatDurationMs(complaintMetricsData.metrics.averageResolutionMs)}
                         </Badge>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {complaints.length === 0 ? (
-                      <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
-                        {t('projectDetail.feedback.noFeedback', 'No feedback received yet')}
-                      </div>
-                    ) : (
-                      <div className="space-y-2 max-h-96 overflow-y-auto">
-                        {complaints.map((complaint: any) => {
-                          const status = complaint.status;
-                          const isViewed = complaint.viewedAt !== null;
-                          
-                          let statusBadge;
-                          if (status === 'closed') {
-                            statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">{t('projectDetail.feedback.closed', 'Closed')}</Badge>;
-                          } else if (isViewed) {
-                            statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">{t('projectDetail.feedback.viewed', 'Viewed')}</Badge>;
-                          } else {
-                            statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">{t('projectDetail.feedback.new', 'New')}</Badge>;
-                          }
-                          
-                          return (
-                            <Card 
-                              key={complaint.id}
-                              className="hover-elevate cursor-pointer"
-                              onClick={() => setLocation(`/complaints/${complaint.id}`)}
-                              data-testid={`activity-feedback-card-${complaint.id}`}
-                            >
-                              <CardContent className="p-3">
-                                <div className="flex items-start justify-between gap-2 mb-2">
-                                  <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-medium">{complaint.residentName}</div>
-                                    <div className="text-xs text-muted-foreground">{t('projectDetail.documents.unit', 'Unit')} {complaint.unitNumber}</div>
-                                  </div>
-                                  {statusBadge}
-                                </div>
-                                <p className="text-sm line-clamp-2 mb-2">{complaint.message}</p>
-                                {complaint.photoUrl && (
-                                  <div className="mb-2">
-                                    <img 
-                                      src={complaint.photoUrl} 
-                                      alt="Feedback photo" 
-                                      className="w-full max-w-xs rounded-lg border"
-                                    />
-                                  </div>
-                                )}
-                                <div className="text-xs text-muted-foreground">
-                                  {formatTimestampDate(complaint.createdAt)}
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Job Comments Card - Activity Tab */}
-                <Card className="glass-card border-0 shadow-premium">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-base">{t('projectDetail.comments.title', 'Job Comments')}</CardTitle>
+                      )}
                       <Badge variant="secondary" className="text-xs">
-                        {jobComments.length} {jobComments.length === 1 ? t('projectDetail.comments.comment', 'comment') : t('projectDetail.comments.commentsPlural', 'comments')}
+                        {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.item', 'item') : t('projectDetail.feedback.itemsPlural', 'items')}
                       </Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {/* Comment Form */}
-                    <div className="space-y-2">
-                      <Textarea
-                        placeholder={t('projectDetail.comments.placeholder', 'Add a comment about this project...')}
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        className="min-h-20"
-                        data-testid="activity-input-job-comment"
-                      />
-                      <Button
-                        onClick={() => {
-                          if (newComment.trim()) {
-                            createCommentMutation.mutate(newComment.trim());
-                          }
-                        }}
-                        disabled={!newComment.trim() || createCommentMutation.isPending}
-                        className="w-full h-12"
-                        data-testid="activity-button-post-comment"
-                      >
-                        {createCommentMutation.isPending ? t('projectDetail.comments.posting', 'Posting...') : t('projectDetail.comments.postComment', 'Post Comment')}
-                      </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {complaints.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
+                      {t('projectDetail.feedback.noFeedback', 'No feedback received yet')}
                     </div>
-
-                    {/* Comments List */}
-                    {jobComments.length === 0 ? (
-                      <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
-                        {t('projectDetail.comments.noComments', 'No comments yet. Be the first to comment!')}
-                      </div>
-                    ) : (
-                      <div className="space-y-2 max-h-96 overflow-y-auto">
-                        {jobComments.map((comment: any) => (
-                          <Card key={comment.id} className="border">
+                  ) : (
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {complaints.map((complaint: any) => {
+                        const status = complaint.status;
+                        const isViewed = complaint.viewedAt !== null;
+                        
+                        let statusBadge;
+                        if (status === 'closed') {
+                          statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">{t('projectDetail.feedback.closed', 'Closed')}</Badge>;
+                        } else if (isViewed) {
+                          statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">{t('projectDetail.feedback.viewed', 'Viewed')}</Badge>;
+                        } else {
+                          statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">{t('projectDetail.feedback.new', 'New')}</Badge>;
+                        }
+                        
+                        return (
+                          <Card 
+                            key={complaint.id}
+                            className="hover-elevate cursor-pointer"
+                            onClick={() => setLocation(`/complaints/${complaint.id}`)}
+                            data-testid={`activity-feedback-card-${complaint.id}`}
+                          >
                             <CardContent className="p-3">
                               <div className="flex items-start justify-between gap-2 mb-2">
                                 <div className="flex-1 min-w-0">
-                                  <div className="text-sm font-medium">{comment.userName}</div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {format(new Date(comment.createdAt), "MMM d, yyyy 'at' h:mm a")}
-                                  </div>
+                                  <div className="text-sm font-medium">{complaint.residentName}</div>
+                                  <div className="text-xs text-muted-foreground">{t('projectDetail.documents.unit', 'Unit')} {complaint.unitNumber}</div>
                                 </div>
+                                {statusBadge}
                               </div>
-                              <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
+                              <p className="text-sm line-clamp-2 mb-2">{complaint.message}</p>
+                              {complaint.photoUrl && (
+                                <div className="mb-2">
+                                  <img 
+                                    src={complaint.photoUrl} 
+                                    alt="Feedback photo" 
+                                    className="w-full max-w-xs rounded-lg border"
+                                  />
+                                </div>
+                              )}
+                              <div className="text-xs text-muted-foreground">
+                                {formatTimestampDate(complaint.createdAt)}
+                              </div>
                             </CardContent>
                           </Card>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Right Column: Job Comments */}
+              <Card className="glass-card border-0 shadow-premium">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">{t('projectDetail.comments.title', 'Job Comments')}</CardTitle>
+                    <Badge variant="secondary" className="text-xs">
+                      {jobComments.length} {jobComments.length === 1 ? t('projectDetail.comments.comment', 'comment') : t('projectDetail.comments.commentsPlural', 'comments')}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Comment Form */}
+                  <div className="space-y-2">
+                    <Textarea
+                      placeholder={t('projectDetail.comments.placeholder', 'Add a comment about this project...')}
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="min-h-20"
+                      data-testid="activity-input-job-comment"
+                    />
+                    <Button
+                      onClick={() => {
+                        if (newComment.trim()) {
+                          createCommentMutation.mutate(newComment.trim());
+                        }
+                      }}
+                      disabled={!newComment.trim() || createCommentMutation.isPending}
+                      className="w-full h-12"
+                      data-testid="activity-button-post-comment"
+                    >
+                      {createCommentMutation.isPending ? t('projectDetail.comments.posting', 'Posting...') : t('projectDetail.comments.postComment', 'Post Comment')}
+                    </Button>
+                  </div>
+
+                  {/* Comments List */}
+                  {jobComments.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
+                      {t('projectDetail.comments.noComments', 'No comments yet. Be the first to comment!')}
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {jobComments.map((comment: any) => (
+                        <Card key={comment.id} className="border">
+                          <CardContent className="p-3">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium">{comment.userName}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {format(new Date(comment.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
           {/* FILES TAB: Documents & Photos */}
           <TabsContent value="files" className="space-y-6 mt-0">
-            {/* Project Documents and Photos - Collapsible Combined Card */}
-        <Card className="glass-card border-0 shadow-premium">
-          <Collapsible open={documentsExpanded} onOpenChange={setDocumentsExpanded}>
-            <CardHeader className="pb-0">
-              <CollapsibleTrigger asChild>
-                <button
-                  className="w-full flex items-center justify-between hover-elevate active-elevate-2 rounded-md p-2 -m-2"
-                  data-testid="button-toggle-documents"
-                >
+            {/* Project Documents and Photos Card */}
+            <Card className="glass-card border-0 shadow-premium">
+              <CardHeader>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
                     <span className="material-icons text-primary">folder</span>
                     <CardTitle className="text-base">{t('projectDetail.documents.title', 'Project Documents & Photos')}</CardTitle>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {photos.length + toolboxMeetings.length + flhaForms.length} {t('projectDetail.documents.items', 'items')}
-                    </Badge>
-                    <span className={`material-icons text-muted-foreground transition-transform duration-200 ${documentsExpanded ? 'rotate-180' : ''}`}>
-                      expand_more
-                    </span>
-                  </div>
-                </button>
-              </CollapsibleTrigger>
-            </CardHeader>
-            <CollapsibleContent>
-              <CardContent className="space-y-6 pt-4">
+                  <Badge variant="secondary" className="text-xs">
+                    {photos.length + toolboxMeetings.length + flhaForms.length} {t('projectDetail.documents.items', 'items')}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
             
             {/* Rope Access Plan Section - Only visible to users with safety document permission */}
             {canViewSafetyDocuments(currentUser) && (
@@ -2965,11 +2948,9 @@ export default function ProjectDetail() {
                   )}
                 </div>
               )}
-            </div>
+              </div>
               </CardContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </Card>
+            </Card>
           </TabsContent>
         </Tabs>
 
