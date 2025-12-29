@@ -1137,18 +1137,10 @@ export default function ProjectDetail() {
     setMissedUnitNumber("");
   };
 
-  // Configure unified header with back button and project name
-  // These hooks must be called unconditionally before any early returns
-  const handleBackClick = useCallback(() => {
-    setLocation("/dashboard?tab=projects");
-  }, [setLocation]);
-
+  // Configure unified header - hide search since project has its own layout
   useSetHeaderConfig({
-    pageTitle: project?.buildingName || t('projectDetail.title', 'Project'),
-    pageDescription: project?.buildingAddress ? `${project.strataPlanNumber} - ${project.jobType.replace(/_/g, ' ')}` : undefined,
-    onBackClick: handleBackClick,
     showSearch: false,
-  }, [project?.buildingName, project?.buildingAddress, project?.strataPlanNumber, project?.jobType, handleBackClick, t]);
+  }, []);
 
   // If there's a render error, show it
   if (renderError) {
