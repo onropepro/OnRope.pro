@@ -13156,6 +13156,10 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         return res.status(400).json({ message: "Excel file is empty or has no data rows" });
       }
 
+      // Log column names for debugging
+      const columnNames = Object.keys(rows[0]);
+      console.log('[Excel Import] Detected columns:', columnNames);
+
       // Map column names (case-insensitive, flexible naming)
       const findColumn = (row: Record<string, any>, possibleNames: string[]): string | null => {
         for (const key of Object.keys(row)) {
@@ -13169,6 +13173,20 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         }
         return null;
       };
+
+      // Detect column mappings once from first row
+      const firstRow = rows[0];
+      const cols = {
+        firstName: findColumn(firstRow, ['firstname', 'first name', 'first', 'given name', 'prenom']),
+        lastName: findColumn(firstRow, ['lastname', 'last name', 'last', 'surname', 'family name', 'nom']),
+        fullName: findColumn(firstRow, ['name', 'full name', 'contact name', 'client name', 'nom complet']),
+        company: findColumn(firstRow, ['company', 'property management company', 'property management', 'pm company', 'organization', 'entreprise', 'strata', 'building']),
+        email: findColumn(firstRow, ['email', 'email address', 'e-mail', 'courriel', 'mail']),
+        phone: findColumn(firstRow, ['phone', 'phone number', 'telephone', 'tel', 'mobile', 'cell', 'contact number']),
+        address: findColumn(firstRow, ['address', 'street address', 'adresse', 'location']),
+        billingAddress: findColumn(firstRow, ['billing address', 'billing', 'adresse de facturation']),
+      };
+      console.log('[Excel Import] Column mappings:', cols);
 
       // Get existing client emails for duplicate check
       const existingClients = await storage.getClientsByCompany(companyId);
@@ -13185,23 +13203,28 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         const row = rows[i];
         const rowNum = i + 2; // Excel rows are 1-indexed, plus header row
 
-        // Find column mappings
-        const firstNameCol = findColumn(row, ['firstname', 'first name', 'first', 'given name', 'prenom']);
-        const lastNameCol = findColumn(row, ['lastname', 'last name', 'last', 'surname', 'family name', 'nom']);
-        const companyCol = findColumn(row, ['company', 'property management company', 'property management', 'pm company', 'organization', 'entreprise']);
-        const emailCol = findColumn(row, ['email', 'email address', 'e-mail', 'courriel']);
-        const phoneCol = findColumn(row, ['phone', 'phone number', 'telephone', 'tel', 'mobile']);
-        const addressCol = findColumn(row, ['address', 'street address', 'adresse']);
-        const billingAddressCol = findColumn(row, ['billing address', 'billing', 'adresse de facturation']);
+        // Extract values using pre-detected column mappings
+        let firstName = cols.firstName ? String(row[cols.firstName]).trim() : '';
+        let lastName = cols.lastName ? String(row[cols.lastName]).trim() : '';
+        
+        // If no separate first/last name columns, try to split full name
+        if (!firstName && !lastName && cols.fullName) {
+          const fullName = String(row[cols.fullName]).trim();
+          const nameParts = fullName.split(/\s+/);
+          if (nameParts.length >= 2) {
+            firstName = nameParts[0];
+            lastName = nameParts.slice(1).join(' ');
+          } else if (nameParts.length === 1) {
+            firstName = nameParts[0];
+          }
+        }
+        
+        const company = cols.company ? String(row[cols.company]).trim() : '';
+        const email = cols.email ? String(row[cols.email]).trim().toLowerCase() : '';
+        const phoneNumber = cols.phone ? String(row[cols.phone]).trim() : '';
+        const address = cols.address ? String(row[cols.address]).trim() : '';
+        const billingAddress = cols.billingAddress ? String(row[cols.billingAddress]).trim() : '';
 
-        // Extract values
-        const firstName = firstNameCol ? String(row[firstNameCol]).trim() : '';
-        const lastName = lastNameCol ? String(row[lastNameCol]).trim() : '';
-        const company = companyCol ? String(row[companyCol]).trim() : '';
-        const email = emailCol ? String(row[emailCol]).trim().toLowerCase() : '';
-        const phoneNumber = phoneCol ? String(row[phoneCol]).trim() : '';
-        const address = addressCol ? String(row[addressCol]).trim() : '';
-        const billingAddress = billingAddressCol ? String(row[billingAddressCol]).trim() : '';
         // Skip completely empty rows (no useful data at all)
         if (!firstName && !lastName && !company && !email && !phoneNumber && !address) {
           results.skipped.push({ row: rowNum, reason: 'Empty row - no data found', data: { firstName, lastName, email } });
