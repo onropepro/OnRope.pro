@@ -22207,6 +22207,38 @@ Do not include any other text, just the JSON object.`
         console.error("[Quote] Auto-link property manager error (non-blocking):", pmError?.message || pmError);
       }
       
+      // If no SMS sent yet, try sending to the selected client from CRM
+      if (!smsResult.sent && fullQuote!.clientId) {
+        try {
+          const recipientClient = await storage.getClientById(fullQuote!.clientId);
+          if (recipientClient?.phoneNumber) {
+            const company = await storage.getUserById(companyId);
+            const companyName = company?.companyName || 'Rope Access Company';
+            const serviceTypes = fullQuote!.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
+            
+            const smsResponse = await sendQuoteNotificationSMS(
+              recipientClient.phoneNumber,
+              fullQuote!.buildingName,
+              companyName,
+              serviceTypes,
+              fullQuote!.strataPlanNumber
+            );
+            
+            if (smsResponse.success) {
+              console.log(`[SMS] Quote notification sent to client ${recipientClient.firstName} ${recipientClient.lastName} at ${recipientClient.phoneNumber}, SID: ${smsResponse.messageId}`);
+              smsResult = { sent: true };
+            } else {
+              console.warn(`[SMS] Failed to send quote notification to client: ${smsResponse.error}`);
+              smsResult = { sent: false, error: smsResponse.error };
+            }
+          } else {
+            console.log(`[SMS] Skipped - client ${recipientClient?.firstName} ${recipientClient?.lastName} has no phone number`);
+          }
+        } catch (clientSmsError: any) {
+          console.error("[SMS] Client notification error (non-blocking):", clientSmsError?.message || clientSmsError);
+        }
+      }
+      
       res.json({ quote: fullQuote, sms: smsResult });
     } catch (error) {
       if (error instanceof z.ZodError) {
