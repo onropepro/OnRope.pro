@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Separator } from "@/components/ui/separator";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import {
   ArrowRight,
   Search,
@@ -31,6 +32,7 @@ const TECHNICIAN_GRADIENT_END = "#1F5F8B";
 
 export default function TechnicianJobBoardLanding() {
   const [faqOpen, setFaqOpen] = useState<string[]>([]);
+  const { openLogin } = useAuthPortal();
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -63,6 +65,15 @@ export default function TechnicianJobBoardLanding() {
                   Create Your Free Account
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white/40 text-white hover:bg-white/10" 
+                onClick={openLogin}
+                data-testid="button-hero-login"
+              >
+                Sign In
               </Button>
             </div>
             
