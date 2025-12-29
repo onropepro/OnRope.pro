@@ -661,6 +661,17 @@ export function DashboardSidebar({
       {/* Footer - Settings and Help */}
       <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
         <div className="space-y-0.5">
+          {/* Go to My Passport - shown in Work Dashboard for technicians */}
+          {variant !== "technician" && (currentUser?.role === 'rope_access_tech' || currentUser?.role === 'ground_crew') && (
+            <button
+              onClick={() => { setLocation("/technician-portal"); setIsOpen(false); }}
+              data-testid="sidebar-nav-my-passport"
+              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <UserIcon className="h-4 w-4 shrink-0" />
+              <span>{t("dashboard.sidebar.myPassport", "Go to My Passport")}</span>
+            </button>
+          )}
           {/* Settings button - hidden for technician variant (they have Profile in main nav) */}
           {variant !== "technician" && (
             <button

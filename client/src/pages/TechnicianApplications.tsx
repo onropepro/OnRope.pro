@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { format } from "date-fns";
 import type { JobPosting, JobApplication } from "@shared/schema";
 
@@ -430,7 +431,8 @@ export default function TechnicianApplications() {
         companyName={user?.name || "Technician"}
         currentUser={user}
         onTabChange={() => {}}
-        activeTab=""
+        activeTab="applications"
+        customNavigationGroups={getTechnicianNavGroups(language)}
         mobileOpen={isMobileMenuOpen}
         onMobileOpenChange={setIsMobileMenuOpen}
       />
