@@ -3539,10 +3539,13 @@ export default function Quotes() {
                                       buildingForm.setValue('buildingAddress', '');
                                       buildingForm.setValue('floorCount', undefined);
                                       
-                                      const matchingPM = linkedPMs.find((pm) => pm.email === client.email);
-                                      if (matchingPM) {
-                                        setSelectedPmId(matchingPM.id);
-                                      }
+                                      // Auto-select PM recipient: match by email first, then by name
+                                      const clientFullName = `${client.firstName || ''} ${client.lastName || ''}`.trim().toLowerCase();
+                                      const matchingPM = linkedPMs.find((pm) => 
+                                        (client.email && pm.email && pm.email.toLowerCase() === client.email.toLowerCase()) ||
+                                        (pm.name && pm.name.toLowerCase() === clientFullName)
+                                      );
+                                      setSelectedPmId(matchingPM ? matchingPM.id : null);
                                     }}
                                   >
                                     <Check
