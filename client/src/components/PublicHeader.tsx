@@ -197,6 +197,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               size="sm" 
               stakeholderColor={stakeholderColor}
               useDarkText={useDarkText}
+              showLabel={false}
             />
           </div>
           
@@ -820,8 +821,17 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               {t('navigation.resident', 'Resident')}
             </Button>
 
-            {/* Sign In - Button Style */}
-            <div className="pl-2">
+            {/* Sign Up and Sign In Buttons */}
+            <div className="pl-2 flex items-center gap-2">
+              <Button
+                variant="default"
+                size="sm"
+                className="border-0 text-xs font-semibold px-6 text-white bg-[#AB4521] hover:bg-[#8a3719]"
+                onClick={() => setLocation("/register")}
+                data-testid="nav-sign-up"
+              >
+                {t('login.header.signUp', 'Sign Up')}
+              </Button>
               <Button
                 variant="default"
                 size="sm"

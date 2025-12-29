@@ -97,7 +97,6 @@ export function InstallPWAButton({ stakeholderColor, useDarkText = false, classN
         data-testid="button-install-app"
       >
         <Download className="h-4 w-4" />
-        <span className="hidden sm:inline">Install App</span>
       </Button>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
