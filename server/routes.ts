@@ -13197,44 +13197,32 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         const phoneNumber = phoneCol ? String(row[phoneCol]).trim() : '';
         const address = addressCol ? String(row[addressCol]).trim() : '';
         const billingAddress = billingAddressCol ? String(row[billingAddressCol]).trim() : '';
-
-        // Validate required fields
-        if (!firstName) {
-          results.skipped.push({ row: rowNum, reason: 'Missing first name', data: { firstName, lastName, email } });
-          continue;
-        }
-        if (!lastName) {
-          results.skipped.push({ row: rowNum, reason: 'Missing last name', data: { firstName, lastName, email } });
-          continue;
-        }
-        if (!company) {
-          results.skipped.push({ row: rowNum, reason: 'Missing property management company', data: { firstName, lastName, email } });
-          continue;
-        }
-        if (!email) {
-          results.skipped.push({ row: rowNum, reason: 'Missing email', data: { firstName, lastName, email } });
+        // Skip completely empty rows (no useful data at all)
+        if (!firstName && !lastName && !company && !email && !phoneNumber && !address) {
+          results.skipped.push({ row: rowNum, reason: 'Empty row - no data found', data: { firstName, lastName, email } });
           continue;
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          results.skipped.push({ row: rowNum, reason: 'Invalid email format', data: { firstName, lastName, email } });
-          continue;
-        }
+        // Validate email format only if email is provided
+        if (email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Invalid email format', data: { firstName, lastName, email } });
+            continue;
+          }
 
-        // Check for duplicates in file
-        if (emailsInFile.has(email)) {
-          results.skipped.push({ row: rowNum, reason: 'Duplicate email in file', data: { firstName, lastName, email } });
-          continue;
-        }
+          // Check for duplicates in file (only if email provided)
+          if (emailsInFile.has(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Duplicate email in file', data: { firstName, lastName, email } });
+            continue;
+          }
 
-        // Check for existing clients
-        if (existingEmails.has(email)) {
-          results.skipped.push({ row: rowNum, reason: 'Client with this email already exists', data: { firstName, lastName, email } });
-          continue;
+          // Check for existing clients (only if email provided)
+          if (existingEmails.has(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Client with this email already exists', data: { firstName, lastName, email } });
+            continue;
+          }
         }
-
         // Create client
         try {
           await storage.createClient({

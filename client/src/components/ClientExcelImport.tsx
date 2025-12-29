@@ -188,20 +188,16 @@ export function ClientExcelImport({ disabled, onImportComplete }: ClientExcelImp
               </Card>
 
               <div className="bg-muted/50 rounded-lg p-4">
-                <h4 className="font-medium mb-2">Required Columns:</h4>
+                <h4 className="font-medium mb-2">Supported Columns:</h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">Required</Badge>
-                    First Name, Last Name, Property Management Company, Email
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">Optional</Badge>
-                    Phone, Address, Billing Address
+                    First Name, Last Name, Property Management Company, Email, Phone, Address, Billing Address
                   </li>
                 </ul>
                 <p className="text-xs text-muted-foreground mt-3">
+                  All columns are optional - you can edit client details later.
                   Column names are flexible (e.g., "First Name", "firstname", "First" all work).
-                  Rows missing required fields will be skipped.
+                  Empty rows will be skipped.
                 </p>
               </div>
 
