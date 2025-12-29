@@ -491,7 +491,12 @@ export function DashboardSidebar({
 
   const displayCompanyName = companyName || "My Company";
   const isDashboardActive = activeTab === "home" || activeTab === "" || !activeTab;
-  const resolvedDashboardLabel = dashboardLinkLabel || t("dashboard.sidebar.dashboard", "Dashboard");
+  // Work dashboard variants that should show "Work Dashboard" instead of "Dashboard"
+  const workDashboardVariants: DashboardVariant[] = ["employer", "building-manager", "property-manager"];
+  const isWorkDashboard = workDashboardVariants.includes(variant);
+  const resolvedDashboardLabel = dashboardLinkLabel || (isWorkDashboard 
+    ? t("dashboard.sidebar.workDashboard", "Work Dashboard")
+    : t("dashboard.sidebar.dashboard", "Dashboard"));
 
   // Get brand color - use CSS variable when white label is active, otherwise use Deep Blue
   const getBrandColor = () => {
