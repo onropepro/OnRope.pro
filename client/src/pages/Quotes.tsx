@@ -18,6 +18,10 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { insertQuoteSchema, type QuoteWithServices, type QuoteHistory } from "@shared/schema";
 import { 
@@ -341,6 +345,7 @@ export default function Quotes() {
   
   // Client & Property selection for autofill
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [clientPopoverOpen, setClientPopoverOpen] = useState(false);
   const [selectedPropertyIndex, setSelectedPropertyIndex] = useState<number | null>(null);
   
   // Property Manager selection for quote recipient
@@ -3495,43 +3500,68 @@ export default function Quotes() {
                     
                     <div className="space-y-2">
                       <Label>Select Client</Label>
-                      <Select
-                        value={selectedClientId || ""}
-                        onValueChange={(value) => {
-                          const client = clients.find((c: any) => c.id === value);
-                          setSelectedClientId(value);
-                          setSelectedPropertyIndex(null);
-                          if (client) {
-                            buildingForm.setValue('strataManagerName', `${client.firstName} ${client.lastName}`);
-                            buildingForm.setValue('strataManagerAddress', client.address || '');
-                            buildingForm.setValue('buildingName', '');
-                            buildingForm.setValue('strataPlanNumber', '');
-                            buildingForm.setValue('buildingAddress', '');
-                            buildingForm.setValue('floorCount', undefined);
-                            
-                            // Auto-select PM recipient if client email matches a linked PM
-                            const matchingPM = linkedPMs.find((pm) => pm.email === client.email);
-                            if (matchingPM) {
-                              setSelectedPmId(matchingPM.id);
-                            }
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="h-12" data-testid="select-client">
-                          <SelectValue placeholder="Select a client..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {clients.length === 0 ? (
-                            <div className="p-2 text-sm text-muted-foreground">No clients found. Add clients first.</div>
-                          ) : (
-                            clients.map((client: any) => (
-                              <SelectItem key={client.id} value={client.id}>
-                                {client.firstName} {client.lastName} {client.company ? `- ${client.company}` : ''}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
+                      <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={clientPopoverOpen}
+                            className="w-full h-12 justify-between"
+                            data-testid="select-client"
+                          >
+                            {selectedClientId
+                              ? (() => {
+                                  const client = clients.find((c: any) => c.id === selectedClientId);
+                                  return client ? `${client.firstName || ''} ${client.lastName || ''} ${client.company ? `- ${client.company}` : ''}`.trim() : "Select a client...";
+                                })()
+                              : "Select a client..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search clients..." />
+                            <CommandList>
+                              <CommandEmpty>No clients found.</CommandEmpty>
+                              <CommandGroup>
+                                {clients.map((client: any) => (
+                                  <CommandItem
+                                    key={client.id}
+                                    value={`${client.firstName || ''} ${client.lastName || ''} ${client.email || ''} ${client.company || ''}`}
+                                    onSelect={() => {
+                                      setSelectedClientId(client.id);
+                                      setSelectedPropertyIndex(null);
+                                      setClientPopoverOpen(false);
+                                      buildingForm.setValue('strataManagerName', `${client.firstName || ''} ${client.lastName || ''}`.trim());
+                                      buildingForm.setValue('strataManagerAddress', client.address || '');
+                                      buildingForm.setValue('buildingName', '');
+                                      buildingForm.setValue('strataPlanNumber', '');
+                                      buildingForm.setValue('buildingAddress', '');
+                                      buildingForm.setValue('floorCount', undefined);
+                                      
+                                      const matchingPM = linkedPMs.find((pm) => pm.email === client.email);
+                                      if (matchingPM) {
+                                        setSelectedPmId(matchingPM.id);
+                                      }
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        selectedClientId === client.id ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                    <div className="flex flex-col">
+                                      <span>{client.firstName || ''} {client.lastName || ''} {client.company ? `- ${client.company}` : ''}</span>
+                                      {client.email && <span className="text-xs text-muted-foreground">{client.email}</span>}
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     
                     {/* Property Selector - only show if client has properties */}
