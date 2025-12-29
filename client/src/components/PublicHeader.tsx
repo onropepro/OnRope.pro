@@ -46,12 +46,14 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
   const [showTechnicianMenu, setShowTechnicianMenu] = useState(false);
   const [showPropertyManagerMenu, setShowPropertyManagerMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [utilityMenuOpen, setUtilityMenuOpen] = useState(false);
   const [mobileModulesExpanded, setMobileModulesExpanded] = useState(false);
   const [mobileTechnicianExpanded, setMobileTechnicianExpanded] = useState(false);
   const [mobilePropertyManagerExpanded, setMobilePropertyManagerExpanded] = useState(false);
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const technicianMenuRef = useRef<HTMLDivElement>(null);
   const propertyManagerMenuRef = useRef<HTMLDivElement>(null);
+  const utilityMenuRef = useRef<HTMLDivElement>(null);
   
   // Determine stakeholder color based on current path
   // This color is used for BOTH the hero gradient AND the top utility bar
@@ -128,13 +130,16 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
       if (propertyManagerMenuRef.current && !propertyManagerMenuRef.current.contains(e.target as Node)) {
         setShowPropertyManagerMenu(false);
       }
+      if (utilityMenuRef.current && !utilityMenuRef.current.contains(e.target as Node)) {
+        setUtilityMenuOpen(false);
+      }
     };
     
-    if (showModulesMenu || showTechnicianMenu || showPropertyManagerMenu) {
+    if (showModulesMenu || showTechnicianMenu || showPropertyManagerMenu || utilityMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [showModulesMenu, showTechnicianMenu, showPropertyManagerMenu]);
+  }, [showModulesMenu, showTechnicianMenu, showPropertyManagerMenu, utilityMenuOpen]);
 
   const navItems = [
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
@@ -151,8 +156,9 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
         className={`border-b ${borderColorClass}`}
         style={{ backgroundColor: stakeholderColor }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-start sm:justify-end overflow-x-auto">
-          <div className="flex items-center gap-1 sm:gap-2 w-max">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-between sm:justify-end items-center">
+          {/* Primary links - always visible */}
+          <div className="flex items-center gap-1 sm:gap-2">
             <Button 
               variant="ghost"
               size="sm"
@@ -165,12 +171,13 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
             <Button 
               variant="ghost"
               size="sm"
-              className={`hidden sm:inline-flex ${textColorClass} ${hoverBgClass}`}
+              className={`${textColorClass} ${hoverBgClass}`}
               onClick={() => setLocation("/pricing")}
               data-testid="link-pricing-header"
             >
               {t('login.header.pricing', 'Pricing')}
             </Button>
+            {/* Desktop-only: Help */}
             <Button 
               variant="ghost"
               size="sm"
@@ -180,6 +187,10 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
             >
               {t('navigation.help', 'Help')}
             </Button>
+          </div>
+          
+          {/* Desktop-only: Install App and Language selector */}
+          <div className="hidden sm:flex items-center gap-1 sm:gap-2">
             <InstallPWAButton stakeholderColor={stakeholderColor} useDarkText={useDarkText} />
             <LanguageDropdown 
               variant="ghost" 
@@ -187,6 +198,52 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               stakeholderColor={stakeholderColor}
               useDarkText={useDarkText}
             />
+          </div>
+          
+          {/* Mobile-only: Hamburger menu for Help, Install App, Language */}
+          <div className="relative sm:hidden" ref={utilityMenuRef}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`${textColorClass} ${hoverBgClass}`}
+              onClick={() => setUtilityMenuOpen(!utilityMenuOpen)}
+              data-testid="button-utility-menu-toggle"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            
+            {utilityMenuOpen && (
+              <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-md shadow-lg py-1 min-w-[160px] z-50">
+                <button
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover-elevate text-left"
+                  onClick={() => {
+                    setLocation("/help");
+                    setUtilityMenuOpen(false);
+                  }}
+                  data-testid="button-help-mobile"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  {t('navigation.help', 'Help')}
+                </button>
+                <div className="px-4 py-2">
+                  <InstallPWAButton 
+                    stakeholderColor={stakeholderColor} 
+                    useDarkText={false}
+                    className="w-full justify-start text-foreground"
+                    showAsMenuItem
+                  />
+                </div>
+                <div className="px-4 py-2">
+                  <LanguageDropdown 
+                    variant="ghost" 
+                    size="sm" 
+                    stakeholderColor={undefined}
+                    useDarkText={false}
+                    className="w-full justify-start"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
