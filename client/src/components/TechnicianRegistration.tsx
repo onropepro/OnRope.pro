@@ -365,7 +365,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
             {/* PLUS ACCOUNT Benefits (muted) */}
             <div className="mt-auto">
-              <p className="text-xs uppercase tracking-wider mb-2 bg-[transparent] text-[#ffffff]">{t('techReg.sidebar.plusAccount', 'PLUS Account - Refer 1 tech to unlock')}</p>
+              <p className="text-xs uppercase tracking-wider mb-2 text-[#ffffff]">{t('techReg.sidebar.plusAccount', 'Refer 1 tech to upgrade to a PLUS Account for free')}</p>
               <div className="space-y-2">
                 {plusBenefits.map((benefit, i) => (
                   <div key={i} className="flex items-start gap-2 text-sm opacity-60">
