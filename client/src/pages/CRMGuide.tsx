@@ -227,10 +227,10 @@ export default function CRMGuide() {
 
           {/* Technicians - 1 Problem */}
           <Card className="overflow-hidden">
-            <CardHeader className="bg-[#2874A6]/10 dark:bg-[#2874A6]/20 border-b">
+            <CardHeader className="bg-[#95ADB6]/10 dark:bg-[#95ADB6]/20 border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#2874A6]/20 dark:bg-[#2874A6]/30 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-[#2874A6]" />
+                <div className="w-10 h-10 rounded-lg bg-[#95ADB6]/20 dark:bg-[#95ADB6]/30 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-[#95ADB6]" />
                 </div>
                 <CardTitle className="text-xl">For Technicians</CardTitle>
               </div>

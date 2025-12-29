@@ -74,7 +74,7 @@ export type DashboardVariant = "employer" | "technician" | "property-manager" | 
 
 export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
   employer: "#0B64A3",
-  technician: "#2874A6",
+  technician: "#95ADB6",
   "property-manager": "#6E9075",
   resident: "#86A59C",
   "building-manager": "#B89685",

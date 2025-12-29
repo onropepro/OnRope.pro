@@ -27,8 +27,8 @@ import {
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
-const TECHNICIAN_COLOR = "#2874A6";
-const TECHNICIAN_GRADIENT_END = "#1F5F8B";
+const TECHNICIAN_COLOR = "#95ADB6";
+const TECHNICIAN_GRADIENT_END = "#7A9BA5";
 
 export default function TechnicianJobBoardLanding() {
   const [faqOpen, setFaqOpen] = useState<string[]>([]);
@@ -120,7 +120,7 @@ export default function TechnicianJobBoardLanding() {
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <Search className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Search className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Browse All Jobs</p>
                       <p className="text-sm text-muted-foreground">Filter by city, job type, and certification level. Every listing is rope access building maintenance. No oil rigs. No pipe fitting.</p>
@@ -128,7 +128,7 @@ export default function TechnicianJobBoardLanding() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Zap className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Zap className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Apply in 30 Seconds</p>
                       <p className="text-sm text-muted-foreground">Your profile, resume, and certifications auto-attach. One tap application. No retyping the same information 15 times.</p>
@@ -136,7 +136,7 @@ export default function TechnicianJobBoardLanding() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Clock className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Track Application Status</p>
                       <p className="text-sm text-muted-foreground">See when employers view your application. Know where you stand without chasing follow-ups.</p>
@@ -144,7 +144,7 @@ export default function TechnicianJobBoardLanding() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Globe className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Globe className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Portable Profile</p>
                       <p className="text-sm text-muted-foreground">Your IRATA/SPRAT certification number becomes your permanent identifier. Your professional history follows you, not your employer.</p>
@@ -152,7 +152,7 @@ export default function TechnicianJobBoardLanding() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <DollarSign className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <DollarSign className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Set Your Expected Pay Rate</p>
                       <p className="text-sm text-muted-foreground">Tell employers what you're worth before they reach out. No wasted interviews with companies that can't meet your number.</p>
@@ -171,8 +171,8 @@ export default function TechnicianJobBoardLanding() {
             </Card>
             
             {/* PLUS Tier */}
-            <Card className="border-2 border-[#2874A6] relative overflow-hidden" data-testid="card-plus-tier">
-              <div className="absolute top-0 right-0 bg-[#2874A6] text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
+            <Card className="border-2 border-[#95ADB6] relative overflow-hidden" data-testid="card-plus-tier">
+              <div className="absolute top-0 right-0 bg-[#95ADB6] text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
                 Free During Launch
               </div>
               <CardHeader className="pb-4">
@@ -188,7 +188,7 @@ export default function TechnicianJobBoardLanding() {
                 
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <ToggleLeft className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <ToggleLeft className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Profile Visibility Toggle</p>
                       <p className="text-sm text-muted-foreground">Make your profile visible to every hiring company on the platform. Get found instead of hunting.</p>
@@ -196,7 +196,7 @@ export default function TechnicianJobBoardLanding() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Send className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Send className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Direct Job Offers</p>
                       <p className="text-sm text-muted-foreground">Employers send offers directly to your portal. Accept or decline with one tap. No phone tag.</p>
@@ -204,7 +204,7 @@ export default function TechnicianJobBoardLanding() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Shield className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Shield className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Individual Safety Rating Display</p>
                       <p className="text-sm text-muted-foreground">Your ISR shows on your profile. Employers see documented proof of your safety track record.</p>
@@ -212,7 +212,7 @@ export default function TechnicianJobBoardLanding() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Users className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Multi-Employer Management</p>
                       <p className="text-sm text-muted-foreground">Work for 2, 3, 4 companies? Manage all your connections from one dashboard. Your hours, your records, one place.</p>
@@ -220,7 +220,7 @@ export default function TechnicianJobBoardLanding() {
                   </div>
                   
                   <div className="flex items-start gap-3">
-                    <Bell className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Bell className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium text-foreground">Certification Tracking</p>
                       <p className="text-sm text-muted-foreground">Never miss a renewal. Automatic reminders before your IRATA or SPRAT expires.</p>
@@ -234,8 +234,8 @@ export default function TechnicianJobBoardLanding() {
                   <p className="text-sm text-muted-foreground">
                     <strong className="text-foreground">Who It's For:</strong> Techs actively looking for work, building their reputation, or managing multiple employers.
                   </p>
-                  <div className="bg-[#2874A6]/10 border border-[#2874A6]/30 rounded-lg p-3">
-                    <p className="text-sm font-medium text-[#2874A6]">
+                  <div className="bg-[#95ADB6]/10 border border-[#95ADB6]/30 rounded-lg p-3">
+                    <p className="text-sm font-medium text-[#95ADB6]">
                       Upgrade to PLUS free during our technician launch. No credit card. No time limit on this offer for early adopters.
                     </p>
                   </div>
@@ -245,7 +245,7 @@ export default function TechnicianJobBoardLanding() {
           </div>
           
           <div className="text-center mt-8">
-            <Button size="lg" className="bg-[#2874A6] hover:bg-[#1F5F8B] text-white" asChild data-testid="button-tier-get-plus">
+            <Button size="lg" className="bg-[#95ADB6] hover:bg-[#7A9BA5] text-white" asChild data-testid="button-tier-get-plus">
               <Link href="/technician?register=true&plus=true">
                 Get PLUS Free
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -277,7 +277,7 @@ export default function TechnicianJobBoardLanding() {
                 <p className="text-muted-foreground">
                   You spend 30 minutes scrolling through irrelevant listings to find 2-3 that might be building maintenance. Half of those turn out to be posted by staffing agencies that don't understand the industry.
                 </p>
-                <div className="bg-[#2874A6]/5 border border-[#2874A6]/20 rounded-lg p-4">
+                <div className="bg-[#95ADB6]/5 border border-[#95ADB6]/20 rounded-lg p-4">
                   <p className="text-foreground">
                     <strong>OnRopePro's Job Board</strong> is a closed ecosystem. Every job is rope access building maintenance. Filter by city, job type, and certification level. Every listing is verified. Every employer is real.
                   </p>
@@ -294,7 +294,7 @@ export default function TechnicianJobBoardLanding() {
                 <p className="text-muted-foreground">
                   You're employed but casually browsing. Maybe testing the market. You don't want to flip your LinkedIn to "Open to Work" and have it get back to your crew lead.
                 </p>
-                <div className="bg-[#2874A6]/5 border border-[#2874A6]/20 rounded-lg p-4">
+                <div className="bg-[#95ADB6]/5 border border-[#95ADB6]/20 rounded-lg p-4">
                   <p className="text-foreground">
                     <strong>Profile visibility is a toggle.</strong> Turn it on when actively looking. Turn it off when you're not. Browse and apply to jobs with your profile hidden. Only reveal yourself when you're ready.
                   </p>
@@ -311,7 +311,7 @@ export default function TechnicianJobBoardLanding() {
                 <p className="text-muted-foreground">
                   Black hole applications. No acknowledgment. No timeline. Just silence.
                 </p>
-                <div className="bg-[#2874A6]/5 border border-[#2874A6]/20 rounded-lg p-4">
+                <div className="bg-[#95ADB6]/5 border border-[#95ADB6]/20 rounded-lg p-4">
                   <p className="text-foreground">
                     <strong>OnRopePro shows application status in real time.</strong> Submitted. Viewed. Under consideration. Offer sent. You always know where you stand.
                   </p>
@@ -328,7 +328,7 @@ export default function TechnicianJobBoardLanding() {
                 <p className="text-muted-foreground">
                   Three hours of paperwork just to start working. New void cheque. New tax forms. New copies of your certifications.
                 </p>
-                <div className="bg-[#2874A6]/5 border border-[#2874A6]/20 rounded-lg p-4">
+                <div className="bg-[#95ADB6]/5 border border-[#95ADB6]/20 rounded-lg p-4">
                   <p className="text-foreground">
                     <strong>Your OnRopePro profile is portable.</strong> When an employer already on the platform hires you, onboarding takes 10 seconds. They enter your rate and permissions. Everything else is already there.
                   </p>
@@ -345,7 +345,7 @@ export default function TechnicianJobBoardLanding() {
                 <p className="text-muted-foreground">
                   Is this a real operation? Do they pay on time? Are their guys happy?
                 </p>
-                <div className="bg-[#2874A6]/5 border border-[#2874A6]/20 rounded-lg p-4">
+                <div className="bg-[#95ADB6]/5 border border-[#95ADB6]/20 rounded-lg p-4">
                   <p className="text-foreground">
                     <strong>Every employer on OnRopePro is verified</strong> as a rope access building maintenance company. You can see company information before you apply. No mystery postings. No bait-and-switch.
                   </p>
@@ -369,7 +369,7 @@ export default function TechnicianJobBoardLanding() {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-[#2874A6] text-white flex items-center justify-center mx-auto text-2xl font-bold">
+              <div className="w-16 h-16 rounded-full bg-[#95ADB6] text-white flex items-center justify-center mx-auto text-2xl font-bold">
                 1
               </div>
               <h3 className="text-xl font-semibold">Create Your Account</h3>
@@ -379,7 +379,7 @@ export default function TechnicianJobBoardLanding() {
             </div>
             
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-[#2874A6] text-white flex items-center justify-center mx-auto text-2xl font-bold">
+              <div className="w-16 h-16 rounded-full bg-[#95ADB6] text-white flex items-center justify-center mx-auto text-2xl font-bold">
                 2
               </div>
               <h3 className="text-xl font-semibold">Complete Your Profile</h3>
@@ -389,7 +389,7 @@ export default function TechnicianJobBoardLanding() {
             </div>
             
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-[#2874A6] text-white flex items-center justify-center mx-auto text-2xl font-bold">
+              <div className="w-16 h-16 rounded-full bg-[#95ADB6] text-white flex items-center justify-center mx-auto text-2xl font-bold">
                 3
               </div>
               <h3 className="text-xl font-semibold">Browse and Apply (or Get Found)</h3>
@@ -400,7 +400,7 @@ export default function TechnicianJobBoardLanding() {
           </div>
           
           <div className="text-center mt-12">
-            <Button size="lg" className="bg-[#2874A6] hover:bg-[#1F5F8B] text-white" asChild data-testid="button-how-create-account">
+            <Button size="lg" className="bg-[#95ADB6] hover:bg-[#7A9BA5] text-white" asChild data-testid="button-how-create-account">
               <Link href="/technician?register=true">
                 Create Your Free Account Now
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -427,7 +427,7 @@ export default function TechnicianJobBoardLanding() {
                 <thead>
                   <tr className="border-b bg-slate-50 dark:bg-slate-900">
                     <th className="text-left p-4 font-semibold"></th>
-                    <th className="text-center p-4 font-semibold text-[#2874A6]">OnRopePro</th>
+                    <th className="text-center p-4 font-semibold text-[#95ADB6]">OnRopePro</th>
                     <th className="text-center p-4 font-semibold text-muted-foreground">Indeed/LinkedIn/Craigslist</th>
                   </tr>
                 </thead>
@@ -542,13 +542,13 @@ export default function TechnicianJobBoardLanding() {
             </div>
           </Card>
           
-          <Card className="mt-8 border-2 border-[#2874A6]/30 bg-[#2874A6]/5">
+          <Card className="mt-8 border-2 border-[#95ADB6]/30 bg-[#95ADB6]/5">
             <CardContent className="p-6 text-center">
               <h3 className="text-xl font-semibold text-foreground mb-2">The Network Effect</h3>
               <p className="text-muted-foreground">
                 More techs on the platform = more employers posting jobs = more opportunities for you.
               </p>
-              <p className="text-[#2874A6] font-medium mt-2">
+              <p className="text-[#95ADB6] font-medium mt-2">
                 You're not just signing up. You're building the only job board that actually understands rope access.
               </p>
             </CardContent>
@@ -571,8 +571,8 @@ export default function TechnicianJobBoardLanding() {
             {/* Career Climbers */}
             <Card className="border bg-white dark:bg-slate-950">
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-[#2874A6]/10 flex items-center justify-center mb-3">
-                  <TrendingUp className="w-6 h-6 text-[#2874A6]" />
+                <div className="w-12 h-12 rounded-lg bg-[#95ADB6]/10 flex items-center justify-center mb-3">
+                  <TrendingUp className="w-6 h-6 text-[#95ADB6]" />
                 </div>
                 <CardTitle className="text-xl">Career Climbers</CardTitle>
                 <p className="text-sm text-muted-foreground">L1/L2 Working Toward L3</p>
@@ -587,8 +587,8 @@ export default function TechnicianJobBoardLanding() {
             {/* Multi-Employer Hustlers */}
             <Card className="border bg-white dark:bg-slate-950">
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-[#2874A6]/10 flex items-center justify-center mb-3">
-                  <Users className="w-6 h-6 text-[#2874A6]" />
+                <div className="w-12 h-12 rounded-lg bg-[#95ADB6]/10 flex items-center justify-center mb-3">
+                  <Users className="w-6 h-6 text-[#95ADB6]" />
                 </div>
                 <CardTitle className="text-xl">Multi-Employer Hustlers</CardTitle>
                 <p className="text-sm text-muted-foreground">Managing 2-4 Companies</p>
@@ -603,8 +603,8 @@ export default function TechnicianJobBoardLanding() {
             {/* Freedom Seekers */}
             <Card className="border bg-white dark:bg-slate-950">
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-[#2874A6]/10 flex items-center justify-center mb-3">
-                  <Globe className="w-6 h-6 text-[#2874A6]" />
+                <div className="w-12 h-12 rounded-lg bg-[#95ADB6]/10 flex items-center justify-center mb-3">
+                  <Globe className="w-6 h-6 text-[#95ADB6]" />
                 </div>
                 <CardTitle className="text-xl">Freedom Seekers</CardTitle>
                 <p className="text-sm text-muted-foreground">Moving City to City</p>

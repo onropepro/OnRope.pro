@@ -331,17 +331,17 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
                 <button 
                   type="button"
                   onClick={handleTechnicianRegister}
-                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-muted/50 hover:bg-muted hover:border-[#2874A6]/30 transition-all group"
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-muted/50 hover:bg-muted hover:border-[#95ADB6]/30 transition-all group"
                   data-testid="button-register-technician"
                 >
-                  <div className="w-11 h-11 rounded-full bg-[#2874A6]/10 flex items-center justify-center flex-shrink-0">
-                    <HardHat className="w-5 h-5 text-[#2874A6]" />
+                  <div className="w-11 h-11 rounded-full bg-[#95ADB6]/10 flex items-center justify-center flex-shrink-0">
+                    <HardHat className="w-5 h-5 text-[#95ADB6]" />
                   </div>
                   <div className="text-left flex-1">
                     <div className="font-semibold text-foreground">{t('login.technicianAccount', 'Technician')}</div>
                     <div className="text-sm text-muted-foreground">{t('login.technicianDesc', 'Rope access professional')}</div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[#2874A6] transition-colors" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[#95ADB6] transition-colors" />
                 </button>
 
                 <button 

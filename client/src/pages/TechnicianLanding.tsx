@@ -41,8 +41,8 @@ import {
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
-const TECHNICIAN_COLOR = "#2874A6";
-const TECHNICIAN_GRADIENT_END = "#1F5F8B";
+const TECHNICIAN_COLOR = "#95ADB6";
+const TECHNICIAN_GRADIENT_END = "#7A9BA5";
 
 export default function TechnicianLanding() {
   const { t } = useTranslation();
@@ -180,7 +180,7 @@ export default function TechnicianLanding() {
             </p>
           </div>
           
-          <Card className="mt-8 border-2 border-[#2874A6]/30 bg-[#2874A6]/5">
+          <Card className="mt-8 border-2 border-[#95ADB6]/30 bg-[#95ADB6]/5">
             <CardContent className="p-6 text-center">
               <p className="text-xl font-semibold text-foreground">
                 The industry average: 15-20% of logged hours are estimates, not records.
@@ -214,12 +214,12 @@ export default function TechnicianLanding() {
             </p>
           </div>
           
-          <Card className="mt-8 border-2 border-[#2874A6] bg-white dark:bg-slate-950">
+          <Card className="mt-8 border-2 border-[#95ADB6] bg-white dark:bg-slate-950">
             <CardContent className="p-6 text-center">
               <p className="text-xl font-semibold text-foreground">
                 {t('technicianLanding.valueProposition.cta')}
               </p>
-              <p className="text-lg text-[#2874A6] font-medium mt-2">
+              <p className="text-lg text-[#95ADB6] font-medium mt-2">
                 {t('technicianLanding.valueProposition.ctaHighlight')}
               </p>
             </CardContent>
@@ -302,7 +302,7 @@ export default function TechnicianLanding() {
                   </div>
                 </div>
                 <div className="pt-4 border-t">
-                  <p className="text-center font-medium text-[#2874A6]">
+                  <p className="text-center font-medium text-[#95ADB6]">
                     This is yours. Forever. No strings.
                   </p>
                 </div>
@@ -310,16 +310,16 @@ export default function TechnicianLanding() {
             </Card>
 
             {/* PLUS Account Card */}
-            <Card className="overflow-hidden border-2 border-[#2874A6]">
-              <CardHeader className="bg-[#2874A6]/10 border-b border-[#2874A6]/20">
+            <Card className="overflow-hidden border-2 border-[#95ADB6]">
+              <CardHeader className="bg-[#95ADB6]/10 border-b border-[#95ADB6]/20">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#2874A6]/20 flex items-center justify-center">
-                    <Star className="w-5 h-5 text-[#2874A6]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#95ADB6]/20 flex items-center justify-center">
+                    <Star className="w-5 h-5 text-[#95ADB6]" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <CardTitle className="text-xl">{t('technicianLanding.freeVsPlus.plusAccount.title')}</CardTitle>
-                      <Badge className="bg-[#2874A6] text-white">PRO</Badge>
+                      <Badge className="bg-[#95ADB6] text-white">PRO</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">{t('technicianLanding.freeVsPlus.plusAccount.orFree')}</p>
                   </div>
@@ -329,35 +329,35 @@ export default function TechnicianLanding() {
                 <p className="text-sm text-muted-foreground italic">Everything in Free, plus...</p>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <Bell className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Bell className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Certification Expiry Alerts</p>
                       <p className="text-sm text-muted-foreground">60-day yellow warning, 30-day red alert. Never miss a renewal.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Users className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Multi-Employer Connections</p>
                       <p className="text-sm text-muted-foreground">Work your main job Monday-Thursday, pick up side gigs Friday-Sunday.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Search className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Search className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Job Board Access</p>
                       <p className="text-sm text-muted-foreground">See and apply to urban rope tech positions posted by companies on the platform</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Eye className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <Eye className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Enhanced Profile Visibility</p>
                       <p className="text-sm text-muted-foreground">Employers searching for techs see your profile first</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <BarChart3 className="w-5 h-5 text-[#2874A6] mt-0.5 shrink-0" />
+                    <BarChart3 className="w-5 h-5 text-[#95ADB6] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Level Progression Tracking</p>
                       <p className="text-sm text-muted-foreground">Visual display of hours toward your next IRATA level (L1 to L2 to L3)</p>
@@ -412,11 +412,11 @@ export default function TechnicianLanding() {
             </Card>
 
             {/* With Employer on OnRopePro */}
-            <Card className="overflow-hidden border-2 border-[#2874A6]">
-              <CardHeader className="bg-[#2874A6]/10 border-b border-[#2874A6]/20">
+            <Card className="overflow-hidden border-2 border-[#95ADB6]">
+              <CardHeader className="bg-[#95ADB6]/10 border-b border-[#95ADB6]/20">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#2874A6]/20 flex items-center justify-center">
-                    <Zap className="w-5 h-5 text-[#2874A6]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#95ADB6]/20 flex items-center justify-center">
+                    <Zap className="w-5 h-5 text-[#95ADB6]" />
                   </div>
                   <div>
                     <CardTitle className="text-lg">WITH employer on OnRopePro</CardTitle>
@@ -438,11 +438,11 @@ export default function TechnicianLanding() {
           </div>
 
           {/* The Math */}
-          <Card className="border-2 border-[#2874A6]/30 bg-[#2874A6]/5">
-            <CardHeader className="border-b border-[#2874A6]/20">
+          <Card className="border-2 border-[#95ADB6]/30 bg-[#95ADB6]/5">
+            <CardHeader className="border-b border-[#95ADB6]/20">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#2874A6]/20 flex items-center justify-center">
-                  <Calculator className="w-5 h-5 text-[#2874A6]" />
+                <div className="w-10 h-10 rounded-lg bg-[#95ADB6]/20 flex items-center justify-center">
+                  <Calculator className="w-5 h-5 text-[#95ADB6]" />
                 </div>
                 <CardTitle className="text-xl">The Math</CardTitle>
               </div>
@@ -458,7 +458,7 @@ export default function TechnicianLanding() {
                   <p className="text-muted-foreground">0 minutes. It just happens.</p>
                 </div>
               </div>
-              <p className="text-lg font-semibold text-[#2874A6] text-center pt-4 border-t">
+              <p className="text-lg font-semibold text-[#95ADB6] text-center pt-4 border-t">
                 At $50/hour, that's $1,000-2,000 worth of your time back every year.
               </p>
             </CardContent>
@@ -491,11 +491,11 @@ export default function TechnicianLanding() {
             </p>
           </div>
           
-          <Card className="border-2 border-[#2874A6]/30">
+          <Card className="border-2 border-[#95ADB6]/30">
             <CardHeader className="border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#2874A6]/10 flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-[#2874A6]" />
+                <div className="w-10 h-10 rounded-lg bg-[#95ADB6]/10 flex items-center justify-center">
+                  <Camera className="w-5 h-5 text-[#95ADB6]" />
                 </div>
                 <CardTitle className="text-xl">Here's how it works:</CardTitle>
               </div>
@@ -503,23 +503,23 @@ export default function TechnicianLanding() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#2874A6] text-white flex items-center justify-center shrink-0 font-bold">1</div>
+                  <div className="w-8 h-8 rounded-full bg-[#95ADB6] text-white flex items-center justify-center shrink-0 font-bold">1</div>
                   <p className="text-base text-muted-foreground pt-1">Open the app</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#2874A6] text-white flex items-center justify-center shrink-0 font-bold">2</div>
+                  <div className="w-8 h-8 rounded-full bg-[#95ADB6] text-white flex items-center justify-center shrink-0 font-bold">2</div>
                   <p className="text-base text-muted-foreground pt-1">Photograph your logbook pages</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#2874A6] text-white flex items-center justify-center shrink-0 font-bold">3</div>
+                  <div className="w-8 h-8 rounded-full bg-[#95ADB6] text-white flex items-center justify-center shrink-0 font-bold">3</div>
                   <p className="text-base text-muted-foreground pt-1">The app reads your handwriting and extracts the data</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#2874A6] text-white flex items-center justify-center shrink-0 font-bold">4</div>
+                  <div className="w-8 h-8 rounded-full bg-[#95ADB6] text-white flex items-center justify-center shrink-0 font-bold">4</div>
                   <p className="text-base text-muted-foreground pt-1">Review the import, confirm accuracy</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#2874A6] text-white flex items-center justify-center shrink-0 font-bold">5</div>
+                  <div className="w-8 h-8 rounded-full bg-[#95ADB6] text-white flex items-center justify-center shrink-0 font-bold">5</div>
                   <p className="text-base text-muted-foreground pt-1">Your historical hours are now in your digital profile</p>
                 </div>
               </div>
@@ -592,7 +592,7 @@ export default function TechnicianLanding() {
               
               <div className="flex justify-center">
                 <Button 
-                  className="bg-[#2874A6] hover:bg-[#1F5F8B] text-white" 
+                  className="bg-[#95ADB6] hover:bg-[#7A9BA5] text-white" 
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-career-climbers-cta"
                 >
@@ -656,7 +656,7 @@ export default function TechnicianLanding() {
               
               <div className="flex flex-wrap justify-center gap-4">
                 <Button 
-                  className="bg-[#2874A6] hover:bg-[#1F5F8B] text-white" 
+                  className="bg-[#95ADB6] hover:bg-[#7A9BA5] text-white" 
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-hustlers-cta"
                 >
@@ -728,7 +728,7 @@ export default function TechnicianLanding() {
               
               <div className="flex justify-center">
                 <Button 
-                  className="bg-[#2874A6] hover:bg-[#1F5F8B] text-white" 
+                  className="bg-[#95ADB6] hover:bg-[#7A9BA5] text-white" 
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-freedom-seekers-cta"
                 >
@@ -752,7 +752,7 @@ export default function TechnicianLanding() {
           <div className="space-y-8">
             {/* Step 1 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#2874A6] text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#95ADB6] text-white flex items-center justify-center font-bold text-lg">
                 1
               </div>
               <div className="space-y-2">
@@ -765,7 +765,7 @@ export default function TechnicianLanding() {
 
             {/* Step 2 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#2874A6] text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#95ADB6] text-white flex items-center justify-center font-bold text-lg">
                 2
               </div>
               <div className="space-y-2">
@@ -778,7 +778,7 @@ export default function TechnicianLanding() {
 
             {/* Step 3 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#2874A6] text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#95ADB6] text-white flex items-center justify-center font-bold text-lg">
                 3
               </div>
               <div className="space-y-2">
@@ -791,7 +791,7 @@ export default function TechnicianLanding() {
 
             {/* Step 4 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#2874A6] text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#95ADB6] text-white flex items-center justify-center font-bold text-lg">
                 4
               </div>
               <div className="space-y-2">
@@ -808,7 +808,7 @@ export default function TechnicianLanding() {
               <p className="text-base text-muted-foreground">
                 <strong className="text-foreground">Note:</strong> Your account works even without an employer on the platform. You can store certifications, track history manually, and access the job board (PLUS). But when your employer also uses OnRopePro? Everything supercharges-automatic hour tracking, instant onboarding, seamless documentation.
               </p>
-              <p className="text-base font-medium text-[#2874A6] mt-3">
+              <p className="text-base font-medium text-[#95ADB6] mt-3">
                 Tell your boss to check it out. You both win.
               </p>
             </CardContent>
@@ -823,7 +823,7 @@ export default function TechnicianLanding() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-[#2874A6]" />
+                  <Lock className="w-5 h-5 text-[#95ADB6]" />
                   <CardTitle className="text-lg">Your data. Your control.</CardTitle>
                 </div>
               </CardHeader>
@@ -850,7 +850,7 @@ export default function TechnicianLanding() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-[#2874A6]" />
+                  <Shield className="w-5 h-5 text-[#95ADB6]" />
                   <CardTitle className="text-lg">Security</CardTitle>
                 </div>
               </CardHeader>
@@ -927,7 +927,7 @@ export default function TechnicianLanding() {
             </h2>
           </div>
           
-          <Card className="border-2 border-[#2874A6]">
+          <Card className="border-2 border-[#95ADB6]">
             <CardContent className="p-8 space-y-6">
               <p className="text-lg text-center text-muted-foreground">
                 PLUS accounts are free. Not "free trial." Not "free for 30 days." <strong className="text-foreground">Actually free.</strong>
@@ -937,21 +937,21 @@ export default function TechnicianLanding() {
                 <h3 className="font-semibold text-xl text-center">How it works:</h3>
                 <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#2874A6] text-white flex items-center justify-center font-bold">1</div>
+                    <div className="w-8 h-8 rounded-full bg-[#95ADB6] text-white flex items-center justify-center font-bold">1</div>
                     <span className="text-base">Create your free account</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#2874A6] text-white flex items-center justify-center font-bold">2</div>
+                    <div className="w-8 h-8 rounded-full bg-[#95ADB6] text-white flex items-center justify-center font-bold">2</div>
                     <span className="text-base">Refer one other rope tech</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#2874A6] text-white flex items-center justify-center font-bold">3</div>
+                    <div className="w-8 h-8 rounded-full bg-[#95ADB6] text-white flex items-center justify-center font-bold">3</div>
                     <span className="text-base">You get upgraded automatically</span>
                   </div>
                 </div>
               </div>
               
-              <p className="text-center font-medium text-[#2874A6]">
+              <p className="text-center font-medium text-[#95ADB6]">
                 That's it. One referral. Lifetime PLUS access for you.
               </p>
               

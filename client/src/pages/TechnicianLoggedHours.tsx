@@ -1530,8 +1530,8 @@ export default function TechnicianLoggedHours() {
                 className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
                 data-testid="link-user-profile"
               >
-                <Avatar className="w-8 h-8 bg-[#2874A6]">
-                  <AvatarFallback className="bg-[#2874A6] text-white text-xs font-medium">
+                <Avatar className="w-8 h-8 bg-[#95ADB6]">
+                  <AvatarFallback className="bg-[#95ADB6] text-white text-xs font-medium">
                     {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                   </AvatarFallback>
                 </Avatar>
