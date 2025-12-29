@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 type RegistrationStep = "welcome" | "accountDetails" | "certification" | "referral" | "employer" | "success";
-type CertificationType = "irata" | "sprat" | "both" | "trainee" | null;
+type CertificationType = "irata" | "sprat" | "both" | null;
 
 interface TechnicianData {
   referralCodeInput: string;
@@ -564,7 +564,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       { value: "irata", label: "IRATA" },
                       { value: "sprat", label: "SPRAT" },
                       { value: "both", label: t('techReg.certification.both', 'Both') },
-                      { value: "trainee", label: t('techReg.certification.trainee', 'Trainee') },
                     ].map((cert) => (
                       <button
                         key={cert.value}
@@ -669,7 +668,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   )}
 
                   {/* Certification Card Upload */}
-                  {data.certification && data.certification !== "trainee" && (
+                  {data.certification && (
                     <div className="mb-4">
                       <Label className="mb-2 block">{t('techReg.certification.uploadCardLabel', 'Upload Certification Card (optional)')}</Label>
                       <input
