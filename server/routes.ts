@@ -1574,6 +1574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Contact info
         employeePhoneNumber: phone,
+        smsNotificationsEnabled: true,
         emergencyContactName,
         emergencyContactPhone,
         emergencyContactRelationship: emergencyContactRelationship || null,
@@ -1733,6 +1734,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Contact info
         employeePhoneNumber: phone,
+        smsNotificationsEnabled: true,
         emergencyContactName,
         emergencyContactPhone,
         emergencyContactRelationship: emergencyContactRelationship || null,
