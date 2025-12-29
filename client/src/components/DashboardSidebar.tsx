@@ -260,32 +260,6 @@ export function DashboardSidebar({
 
   const navigationGroups: NavGroup[] = [
     {
-      id: "my-account",
-      label: t("dashboard.sidebar.myAccount", "MY ACCOUNT"),
-      items: [
-        {
-          id: "my-passport",
-          label: t("dashboard.sidebar.myPassport", "My Passport"),
-          icon: UserIcon,
-          href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
-            ? "/ground-crew-portal?tab=home" 
-            : "/technician-portal?tab=home",
-          isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
-        },
-        {
-          id: "invitations",
-          label: t("dashboard.sidebar.invitations", "Invitations"),
-          icon: Mail,
-          href: currentUser?.role === 'ground_crew' || currentUser?.role === 'ground_crew_supervisor' 
-            ? "/ground-crew-portal?tab=invitations" 
-            : "/technician-portal?tab=invitations",
-          badge: pendingInvitationsCount > 0 ? pendingInvitationsCount : undefined,
-          badgeType: pendingInvitationsCount > 0 ? "alert" : undefined,
-          isVisible: (user) => user?.role === 'rope_access_tech' || user?.role === 'ground_crew' || user?.role === 'ground_crew_supervisor',
-        },
-      ],
-    },
-    {
       id: "operations",
       label: t("dashboard.categories.operations", "OPERATIONS"),
       items: [
