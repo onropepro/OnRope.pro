@@ -24532,6 +24532,7 @@ Do not include any other text, just the JSON object.`
       const activeJobs = await db.select({
         job: jobPostings,
         companyName: users.companyName,
+        companyLogoUrl: users.companyLogoUrl,
       }).from(jobPostings)
         .leftJoin(users, eq(jobPostings.companyId, users.id))
         .where(and(...conditions))
@@ -24560,6 +24561,7 @@ Do not include any other text, just the JSON object.`
         ...item.job,
         companyName: item.job.isPlatformPost ? "OnRopePro Platform" : (item.companyName || "Unknown Company"),
         companyCsr: item.job.companyId ? csrMap.get(item.job.companyId) ?? null : null,
+        companyLogoUrl: item.job.isPlatformPost ? null : (item.companyLogoUrl || null),
       }));
 
       res.json({ jobPostings: jobsWithCompany });
