@@ -34,7 +34,7 @@ export function getTechnicianNavGroups(
       items: [
         {
           id: "home",
-          label: language === 'en' ? "Home" : language === 'es' ? "Inicio" : "Accueil",
+          label: language === 'en' ? "My Passport Dashboard" : language === 'es' ? "Mi Panel de Pasaporte" : "Mon Tableau de Bord Passeport",
           icon: Home,
           href: "/technician-portal",
           isVisible: () => true,
