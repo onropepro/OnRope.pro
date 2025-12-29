@@ -840,15 +840,15 @@ export default function TechnicianJobBoard() {
                     refused: t.statusRefused,
                   }[app.status] || app.status;
 
-                  const statusVariant = {
-                    applied: "secondary" as const,
-                    reviewing: "secondary" as const,
-                    interviewed: "secondary" as const,
-                    offered: "default" as const,
-                    hired: "default" as const,
-                    rejected: "destructive" as const,
-                    refused: "outline" as const,
-                  }[app.status] || "secondary" as const;
+                  const statusStyles: Record<string, string> = {
+                    applied: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700",
+                    reviewing: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+                    interviewed: "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800",
+                    offered: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
+                    hired: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-green-200 dark:border-green-800",
+                    rejected: "bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-800",
+                    refused: "bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+                  };
 
                   return (
                     <Card 
@@ -876,7 +876,7 @@ export default function TechnicianJobBoard() {
                               </h3>
                             </div>
                             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                              {!isOffer && <Badge variant={statusVariant}>{statusLabel}</Badge>}
+                              {!isOffer && <Badge variant="outline" className={statusStyles[app.status] || statusStyles.applied}>{statusLabel}</Badge>}
                               {app.jobPosting?.location && (
                                 <span className="flex items-center gap-1">
                                   <MapPin className="w-3 h-3" />
