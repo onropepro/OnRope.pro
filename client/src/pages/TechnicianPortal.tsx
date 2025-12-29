@@ -3689,6 +3689,7 @@ export default function TechnicianPortal() {
                 data-testid="link-user-profile"
               >
                 <Avatar className="w-8 h-8 bg-[#5C7A84]">
+                  <AvatarImage src={user?.photoUrl || undefined} alt={user?.name || "Profile"} />
                   <AvatarFallback className="bg-[#5C7A84] text-white text-xs font-medium">
                     {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
                   </AvatarFallback>
