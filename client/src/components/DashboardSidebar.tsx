@@ -46,6 +46,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { SidebarCustomizeDialog } from "./SidebarCustomizeDialog";
+import { useTechnicianContext } from "@/hooks/use-technician-context";
 
 interface SidebarPreferencesResponse {
   preferences: Record<string, { itemId: string; position: number }[]>;
@@ -131,6 +132,10 @@ export function DashboardSidebar({
   const [location, setLocation] = useLocation();
   const [internalOpen, setInternalOpen] = useState(false);
   const [customizeDialogOpen, setCustomizeDialogOpen] = useState(false);
+  
+  // Technician context for checking active employer connections
+  const technicianContext = useTechnicianContext();
+  const hasActiveEmployerConnection = variant === "technician" && technicianContext.activeConnectionsCount > 0;
   
   // Collapsible group state - tracks which groups are expanded
   // Initialize with empty Set, will be populated by effect based on variant
@@ -665,6 +670,17 @@ export function DashboardSidebar({
             >
               <Settings className="h-4 w-4 shrink-0" />
               <span>{t("dashboard.sidebar.settings", "Settings")}</span>
+            </button>
+          )}
+          {/* Go to Work Dashboard - shown only for technicians with active company connections */}
+          {hasActiveEmployerConnection && (
+            <button
+              onClick={() => { setLocation("/dashboard"); setIsOpen(false); }}
+              data-testid="sidebar-nav-work-dashboard"
+              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <Briefcase className="h-4 w-4 shrink-0" />
+              <span>{t("dashboard.sidebar.workDashboard", "Go to Work Dashboard")}</span>
             </button>
           )}
           <button
