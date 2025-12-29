@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { JOB_TYPES, POSITION_TYPES } from "@/lib/job-board-constants";
 
 type JobPosting = {
   id: string;
@@ -461,7 +462,7 @@ export default function CompanyJobBoard() {
               <p className="text-muted-foreground text-center mb-4 max-w-md">
                 {t("jobBoard.noPostingsDesc", "Create your first job posting to start attracting qualified rope access technicians.")}
               </p>
-              <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
+              <Button onClick={() => setLocation("/job-board/new")} className="gap-2">
                 <Plus className="w-4 h-4" />
                 {t("jobBoard.createFirst", "Create First Job")}
               </Button>
@@ -1063,7 +1064,7 @@ export default function CompanyJobBoard() {
               <p className="text-sm text-muted-foreground mb-4">{t("jobBoard.createJobFirst", "Create a job posting first to send offers")}</p>
               <Button onClick={() => {
                 setShowJobOfferDialog(false);
-                setIsCreateOpen(true);
+                setLocation("/job-board/new");
               }} data-testid="button-create-job-from-offer">
                 {t("jobBoard.createJob", "Create Job")}
               </Button>
