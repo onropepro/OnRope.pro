@@ -33,7 +33,7 @@ import { getGroundCrewNavGroups } from "@/lib/groundCrewNavigation";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
-type JobPostingWithCompany = JobPosting & { companyName?: string | null };
+type JobPostingWithCompany = JobPosting & { companyName?: string | null; companyCsr?: number | null };
 type ApplicationWithJob = JobApplication & { jobPosting: JobPostingWithCompany | null };
 
 type Language = 'en' | 'fr' | 'es';
@@ -523,9 +523,22 @@ export default function GroundCrewJobBoard() {
             <>
               <DialogHeader>
                 <DialogTitle>{selectedJob.title}</DialogTitle>
-                <DialogDescription className="flex items-center gap-2">
+                <DialogDescription className="flex items-center gap-2 flex-wrap">
                   <Building className="w-4 h-4" />
                   {(selectedJob as JobPostingWithCompany).companyName || "Unknown Company"}
+                  {(selectedJob as JobPostingWithCompany).companyCsr != null && (
+                    <Badge 
+                      variant="outline" 
+                      className={`${
+                        (selectedJob as JobPostingWithCompany).companyCsr! >= 90 ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700' :
+                        (selectedJob as JobPostingWithCompany).companyCsr! >= 75 ? 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700' :
+                        (selectedJob as JobPostingWithCompany).companyCsr! >= 50 ? 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700' :
+                        'bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700'
+                      }`}
+                    >
+                      CSR: {Math.round((selectedJob as JobPostingWithCompany).companyCsr!)}%
+                    </Badge>
+                  )}
                 </DialogDescription>
               </DialogHeader>
               

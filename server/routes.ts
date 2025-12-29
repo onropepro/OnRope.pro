@@ -24442,9 +24442,29 @@ Do not include any other text, just the JSON object.`
         .where(and(...conditions))
         .orderBy(desc(jobPostings.createdAt));
 
+      // Get CSR ratings for all companies that have job postings
+      const companyIds = [...new Set(activeJobs.map(item => item.job.companyId).filter(Boolean))];
+      const csrMap = new Map<string, number>();
+      
+      for (const companyId of companyIds) {
+        if (companyId) {
+          const [latestCsr] = await db.select({
+            newScore: csrRatingHistory.newScore,
+          }).from(csrRatingHistory)
+            .where(eq(csrRatingHistory.companyId, companyId))
+            .orderBy(desc(csrRatingHistory.createdAt))
+            .limit(1);
+          
+          if (latestCsr) {
+            csrMap.set(companyId, latestCsr.newScore);
+          }
+        }
+      }
+
       const jobsWithCompany = activeJobs.map(item => ({
         ...item.job,
         companyName: item.job.isPlatformPost ? "OnRopePro Platform" : (item.companyName || "Unknown Company"),
+        companyCsr: item.job.companyId ? csrMap.get(item.job.companyId) ?? null : null,
       }));
 
       res.json({ jobPostings: jobsWithCompany });
