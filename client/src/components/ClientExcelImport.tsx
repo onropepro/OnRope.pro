@@ -122,7 +122,7 @@ export function ClientExcelImport({ disabled, onImportComplete }: ClientExcelImp
           data-testid="button-import-excel"
         >
           <FileSpreadsheet className="h-5 w-5" />
-          Import from Excel
+          Import Clients
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" data-testid="dialog-import-excel">
@@ -158,7 +158,7 @@ export function ClientExcelImport({ disabled, onImportComplete }: ClientExcelImp
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept=".xlsx,.xls"
+                      accept=".xlsx,.xls,.csv"
                       onChange={handleFileSelect}
                       className="hidden"
                       data-testid="input-excel-file"

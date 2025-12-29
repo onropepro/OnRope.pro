@@ -5749,7 +5749,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type is required" });
       }
 
-      const validTypes = ['voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard', 'resume'];
+      const validTypes = [
+        'voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard', 'resume'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -5819,7 +5820,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type and URL are required" });
       }
 
-      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments', 'irataDocuments', 'spratDocuments', 'resumeDocuments'];
+      const validTypes = [
+        'bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments', 'irataDocuments', 'spratDocuments', 'resumeDocuments'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -5888,7 +5890,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type is required" });
       }
 
-      const validTypes = ['voidCheque', 'driversLicense', 'firstAidCertificate'];
+      const validTypes = [
+        'voidCheque', 'driversLicense', 'firstAidCertificate'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -5949,7 +5952,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type and URL are required" });
       }
 
-      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments'];
+      const validTypes = [
+        'bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -13114,16 +13118,17 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
     fileFilter: (req, file, cb) => {
       const validTypes = [
+        'text/csv', // .csv
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
         'application/vnd.ms-excel', // .xls
         'application/octet-stream', // fallback for some browsers
       ];
-      const validExtensions = ['.xlsx', '.xls'];
+      const validExtensions = ['.xlsx', '.xls', '.csv'];
       const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
       if (validTypes.includes(file.mimetype) || validExtensions.includes(ext)) {
         cb(null, true);
       } else {
-        cb(new Error('Only Excel files (.xlsx, .xls) are allowed'));
+        cb(new Error('Only Excel or CSV files (.xlsx, .xls, .csv) are allowed'));
       }
     },
   });
