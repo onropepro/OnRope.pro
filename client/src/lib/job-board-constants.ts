@@ -55,6 +55,9 @@ export type JobPostingFormData = {
   description: string;
   requirements: string;
   location: string;
+  jobCountry: string;
+  jobProvinceState: string;
+  jobCity: string;
   isRemote: boolean;
   jobType: string;
   employmentType: string;
@@ -76,6 +79,9 @@ export const DEFAULT_JOB_POSTING_FORM: JobPostingFormData = {
   description: "",
   requirements: "",
   location: "",
+  jobCountry: "",
+  jobProvinceState: "",
+  jobCity: "",
   isRemote: false,
   jobType: "full_time",
   employmentType: "permanent",

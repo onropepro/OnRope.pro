@@ -24,6 +24,7 @@ import {
   DEFAULT_JOB_POSTING_FORM,
   type JobPostingFormData,
 } from "@/lib/job-board-constants";
+import { JobLocationPicker, formatJobLocation } from "@/components/JobLocationPicker";
 
 type JobPosting = {
   id: string;
@@ -33,6 +34,9 @@ type JobPosting = {
   description: string;
   requirements: string | null;
   location: string | null;
+  jobCountry: string | null;
+  jobProvinceState: string | null;
+  jobCity: string | null;
   isRemote: boolean | null;
   jobType: string;
   employmentType: string | null;
@@ -79,6 +83,9 @@ export default function JobPostingForm() {
         description: job.description,
         requirements: job.requirements || "",
         location: job.location || "",
+        jobCountry: job.jobCountry || "",
+        jobProvinceState: job.jobProvinceState || "",
+        jobCity: job.jobCity || "",
         isRemote: job.isRemote || false,
         jobType: job.jobType,
         employmentType: job.employmentType || "permanent",
@@ -131,11 +138,16 @@ export default function JobPostingForm() {
       return;
     }
 
+    const displayLocation = formatJobLocation(formData.jobCountry, formData.jobProvinceState, formData.jobCity);
+
     const payload = {
       title: formData.title,
       description: formData.description,
       requirements: formData.requirements || null,
-      location: formData.location || null,
+      location: displayLocation || formData.location || null,
+      jobCountry: formData.jobCountry || null,
+      jobProvinceState: formData.jobProvinceState || null,
+      jobCity: formData.jobCity || null,
       isRemote: formData.isRemote,
       jobType: formData.jobType,
       employmentType: formData.employmentType || null,
@@ -237,28 +249,31 @@ export default function JobPostingForm() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="location">{t("jobBoard.form.location", "Location")}</Label>
-                <Input
-                  id="location"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder={t("jobBoard.form.locPlaceholder", "e.g., Vancouver, BC")}
-                  data-testid="input-job-location"
-                />
-              </div>
-              <div className="space-y-2 flex items-end pb-2">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="isRemote"
-                    checked={formData.isRemote}
-                    onCheckedChange={(checked) => setFormData({ ...formData, isRemote: checked })}
-                    data-testid="switch-remote"
-                  />
-                  <Label htmlFor="isRemote">{t("jobBoard.form.remote", "Remote position")}</Label>
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label>{t("jobBoard.form.location", "Location")}</Label>
+              <JobLocationPicker
+                value={{
+                  jobCountry: formData.jobCountry,
+                  jobProvinceState: formData.jobProvinceState,
+                  jobCity: formData.jobCity,
+                }}
+                onChange={(loc) => setFormData({
+                  ...formData,
+                  jobCountry: loc.jobCountry,
+                  jobProvinceState: loc.jobProvinceState,
+                  jobCity: loc.jobCity,
+                })}
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Switch
+                id="isRemote"
+                checked={formData.isRemote}
+                onCheckedChange={(checked) => setFormData({ ...formData, isRemote: checked })}
+                data-testid="switch-remote"
+              />
+              <Label htmlFor="isRemote">{t("jobBoard.form.remote", "Remote position")}</Label>
             </div>
 
             <div className="space-y-2">

@@ -26,6 +26,9 @@ type JobPosting = {
   description: string;
   requirements: string | null;
   location: string | null;
+  jobCountry: string | null;
+  jobProvinceState: string | null;
+  jobCity: string | null;
   isRemote: boolean | null;
   jobType: string;
   employmentType: string | null;
@@ -44,6 +47,20 @@ type JobPosting = {
   updatedAt: string;
   expiresAt: string | null;
 };
+
+function formatJobLocation(job: JobPosting, remoteLabel: string = "Remote"): string {
+  if (job.jobCity || job.jobProvinceState || job.jobCountry) {
+    const parts = [job.jobCity, job.jobProvinceState, job.jobCountry].filter(Boolean);
+    return parts.join(", ");
+  }
+  if (job.location) {
+    return job.location;
+  }
+  if (job.isRemote) {
+    return remoteLabel;
+  }
+  return "-";
+}
 
 type ResumeDocument = { name: string; url: string } | string;
 
@@ -502,7 +519,7 @@ export default function CompanyJobBoard() {
                         {JOB_TYPES.find(jt => jt.value === job.jobType)?.label || job.jobType}
                       </TableCell>
                       <TableCell className="text-muted-foreground hidden md:table-cell">
-                        {job.location || (job.isRemote ? t("jobBoard.remote", "Remote") : "-")}
+                        {formatJobLocation(job, t("jobBoard.remote", "Remote"))}
                       </TableCell>
                       <TableCell className="text-muted-foreground hidden lg:table-cell">
                         {formatSalary(job) || "-"}
@@ -600,10 +617,10 @@ export default function CompanyJobBoard() {
                 </CardHeader>
                 <CardContent className="pt-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap text-xs text-muted-foreground mb-2">
-                    {job.location && (
+                    {(job.jobCity || job.jobProvinceState || job.jobCountry || job.location) && (
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3 h-3" />
-                        {job.location}
+                        {formatJobLocation(job, t("jobBoard.remote", "Remote"))}
                       </span>
                     )}
                     {job.isRemote && (
@@ -1082,8 +1099,8 @@ export default function CompanyJobBoard() {
                       <SelectItem key={job.id} value={job.id}>
                         <div className="flex items-center gap-2">
                           <span>{job.title}</span>
-                          {job.location && (
-                            <span className="text-xs text-muted-foreground">- {job.location}</span>
+                          {(job.jobCity || job.jobProvinceState || job.jobCountry || job.location) && (
+                            <span className="text-xs text-muted-foreground">- {formatJobLocation(job, t("jobBoard.remote", "Remote"))}</span>
                           )}
                         </div>
                       </SelectItem>
