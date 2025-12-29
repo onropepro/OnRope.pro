@@ -7747,6 +7747,63 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
 
+  // SuperUser: Toggle platform verification (grants free access)
+  app.post("/api/superuser/companies/:id/toggle-verification", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only allow superuser to access this endpoint
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. Only superuser can toggle verification." });
+      }
+
+      const companyId = req.params.id;
+      const { verified } = req.body;
+
+      console.log('[Platform-Verification] Toggling verification for company:', { companyId, verified });
+
+      // Fetch the company
+      const company = await storage.getUserById(companyId);
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Update the company verification status
+      const updates: any = {
+        isPlatformVerified: verified === true,
+      };
+
+      // If verifying, also set subscription to active to ensure full access
+      if (verified === true) {
+        updates.subscriptionStatus = 'active';
+        updates.subscriptionTier = 'basic'; // Set a tier for proper UI display
+      }
+
+      await db.update(users)
+        .set(updates)
+        .where(eq(users.id, companyId));
+
+      // Fetch updated company to confirm changes
+      const updatedCompany = await storage.getUserById(companyId);
+
+      console.log('[Platform-Verification] Verification toggled successfully:', { companyId, verified });
+
+      res.json({
+        success: true,
+        message: verified 
+          ? `${company.companyName} is now platform-verified with free access` 
+          : `Platform verification removed from ${company.companyName}`,
+        company: {
+          id: updatedCompany?.id,
+          companyName: updatedCompany?.companyName,
+          isPlatformVerified: updatedCompany?.isPlatformVerified,
+          subscriptionStatus: updatedCompany?.subscriptionStatus,
+        },
+      });
+    } catch (error: any) {
+      console.error('[Platform-Verification] Error:', error);
+      res.status(500).json({ message: error.message || "Failed to toggle verification" });
+    }
+  });
+
   /**
    * SuperUser: Remove legacy $19 seat items from a company's Stripe subscription
    * POST /api/superuser/companies/:id/remove-legacy-seats

@@ -49,6 +49,16 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
     let maxProjects = 0;
     let maxSeats = 0;
 
+    // Check if company is platform-verified (SuperUser granted free access)
+    if (user.isPlatformVerified) {
+      console.log(`[Subscription] Company ${user.id} is platform-verified - unlimited access granted`);
+      return {
+        exceeded: false,
+        limits: { maxProjects: -1, maxSeats: -1 },
+        usage: { currentProjects: 0, currentEmployees: 0 },
+      };
+    }
+
     // Check if company is in trial period - unlimited seats during trial
     // Still count actual usage for accurate telemetry/dashboards
     const isTrialing = user.subscriptionStatus === 'trialing';

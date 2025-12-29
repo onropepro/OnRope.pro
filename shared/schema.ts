@@ -185,6 +185,9 @@ export const users = pgTable("users", {
   whitelabelBrandingActive: boolean("whitelabel_branding_active").default(false), // Whether white-label branding is active
   whitelabelPendingBilling: boolean("whitelabel_pending_billing").default(false), // Whether white-label was activated during trial and needs to be billed when trial ends
   
+  // Platform-verified company (SuperUser granted free access)
+  isPlatformVerified: boolean("is_platform_verified").default(false), // When true, company has full access without paying
+  
   // Resident linking code (company role only)
   residentCode: varchar("resident_code", { length: 10 }).unique(), // 10-character code for residents to link to company - UNIQUE (~50 bits entropy)
   
