@@ -1089,6 +1089,7 @@ export default function Quotes() {
 
     setServiceBeingConfigured(serviceId);
     setCreateStep("configure");
+    window.scrollTo(0, 0);
   };
 
   const handleServiceFormSubmit = (data: ServiceFormData) => {
@@ -3467,7 +3468,10 @@ export default function Quotes() {
         <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
-            onClick={() => setCreateStep("services")}
+            onClick={() => {
+              setCreateStep("services");
+              window.scrollTo(0, 0);
+            }}
             className="mb-6"
             data-testid="button-back-to-services"
           >
@@ -4112,7 +4116,10 @@ export default function Quotes() {
                   )}
                 </div>
                 <Button
-                  onClick={() => setCreateStep("building")}
+                  onClick={() => {
+                    setCreateStep("building");
+                    window.scrollTo(0, 0);
+                  }}
                   disabled={!canFinalize}
                   className="w-full bg-primary hover:bg-primary/90 h-12"
                   data-testid="button-next-to-building"
@@ -4142,6 +4149,7 @@ export default function Quotes() {
             onClick={() => {
               setServiceBeingConfigured(null);
               setCreateStep("services");
+              window.scrollTo(0, 0);
             }}
             className="mb-6"
             data-testid="button-back-to-service-selection"
