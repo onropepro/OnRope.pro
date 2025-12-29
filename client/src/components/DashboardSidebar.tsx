@@ -47,6 +47,7 @@ import { useQuery } from "@tanstack/react-query";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { SidebarCustomizeDialog } from "./SidebarCustomizeDialog";
 import { useTechnicianContext } from "@/hooks/use-technician-context";
+import { CarabinerIcon } from "./icons/CarabinerIcon";
 
 interface SidebarPreferencesResponse {
   preferences: Record<string, { itemId: string; position: number }[]>;
@@ -568,7 +569,7 @@ export function DashboardSidebar({
                 </AvatarFallback>
               </Avatar>
             ) : (
-              <LayoutDashboard className="h-4 w-4 shrink-0" />
+              <CarabinerIcon className="h-4 w-4 shrink-0" />
             )}
             <span>{resolvedDashboardLabel}</span>
           </button>
@@ -688,7 +689,7 @@ export function DashboardSidebar({
               data-testid="sidebar-nav-work-dashboard"
               className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              <Briefcase className="h-4 w-4 shrink-0" />
+              <CarabinerIcon className="h-4 w-4 shrink-0" />
               <span>{t("dashboard.sidebar.workDashboard", "Go to Work Dashboard")}</span>
             </button>
           )}
