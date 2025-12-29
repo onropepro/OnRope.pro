@@ -54,7 +54,7 @@ import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
-type JobPostingWithCompany = JobPosting & { companyName?: string | null; companyCsr?: number | null };
+type JobPostingWithCompany = JobPosting & { companyName?: string | null; companyCsr?: number | null; companyLogoUrl?: string | null };
 type ApplicationWithJob = JobApplication & { jobPosting: JobPostingWithCompany | null };
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
@@ -997,9 +997,20 @@ export default function TechnicianJobBoard() {
                     <div className="flex flex-col h-full">
                       <div className="flex-1 space-y-2">
                         <div className="flex items-start gap-3">
-                          <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-                            <Building className="w-5 h-5 text-primary" />
-                          </div>
+                          {(job as JobPostingWithCompany).companyLogoUrl ? (
+                            <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden bg-muted flex items-center justify-center">
+                              <img 
+                                src={(job as JobPostingWithCompany).companyLogoUrl!} 
+                                alt={(job as JobPostingWithCompany).companyName || "Company"} 
+                                className="w-full h-full object-contain"
+                                data-testid={`img-company-logo-${job.id}`}
+                              />
+                            </div>
+                          ) : (
+                            <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                              <Building className="w-5 h-5 text-primary" />
+                            </div>
+                          )}
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-base" data-testid={`text-job-title-${job.id}`}>
                               {job.title}

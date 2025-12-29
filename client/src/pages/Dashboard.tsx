@@ -69,6 +69,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
 import { BusinessCardScanner } from "@/components/BusinessCardScanner";
+import { ClientExcelImport } from "@/components/ClientExcelImport";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardOverview } from "@/components/DashboardOverview";
@@ -8264,6 +8265,14 @@ export default function Dashboard() {
                   </Button>
                 )}
                 
+                {/* Excel Import Button */}
+                {currentUser?.role === "company" && (
+                  <ClientExcelImport
+                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                    onImportComplete={() => queryClient.invalidateQueries({ queryKey: ["/api/clients"] })}
+                  />
+                )}
+
                 {/* Search Property Manager Button */}
                 {(currentUser?.role === "company" || currentUser?.role === "employee") && (
                   <Button 

@@ -10,6 +10,7 @@ import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
+import * as XLSX from "xlsx";
 import * as stripeService from "./stripe-service";
 import Stripe from "stripe";
 import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
@@ -5748,7 +5749,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type is required" });
       }
 
-      const validTypes = ['voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard', 'resume'];
+      const validTypes = [
+        'voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard', 'resume'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -5818,7 +5820,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type and URL are required" });
       }
 
-      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments', 'irataDocuments', 'spratDocuments', 'resumeDocuments'];
+      const validTypes = [
+        'bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments', 'irataDocuments', 'spratDocuments', 'resumeDocuments'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -5887,7 +5890,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type is required" });
       }
 
-      const validTypes = ['voidCheque', 'driversLicense', 'firstAidCertificate'];
+      const validTypes = [
+        'voidCheque', 'driversLicense', 'firstAidCertificate'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -5948,7 +5952,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type and URL are required" });
       }
 
-      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments'];
+      const validTypes = [
+        'bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -13106,6 +13111,179 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
   
+
+  // Excel import for clients
+  const clientExcelUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+    fileFilter: (req, file, cb) => {
+      const validTypes = [
+        'text/csv', // .csv
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/vnd.ms-excel', // .xls
+        'application/octet-stream', // fallback for some browsers
+      ];
+      const validExtensions = ['.xlsx', '.xls', '.csv'];
+      const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
+      if (validTypes.includes(file.mimetype) || validExtensions.includes(ext)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only Excel or CSV files (.xlsx, .xls, .csv) are allowed'));
+      }
+    },
+  });
+
+  app.post("/api/clients/import-excel", requireAuth, requireRole("company"), clientExcelUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.id;
+
+      // Parse Excel file
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: '' });
+
+      if (rows.length === 0) {
+        return res.status(400).json({ message: "Excel file is empty or has no data rows" });
+      }
+
+      // Log column names for debugging
+      const columnNames = Object.keys(rows[0]);
+      console.log('[Excel Import] Detected columns:', columnNames);
+
+      // Map column names (case-insensitive, flexible naming)
+      const findColumn = (row: Record<string, any>, possibleNames: string[]): string | null => {
+        for (const key of Object.keys(row)) {
+          const normalizedKey = key.toLowerCase().trim().replace(/[_\s-]+/g, '');
+          for (const name of possibleNames) {
+            const normalizedName = name.toLowerCase().trim().replace(/[_\s-]+/g, '');
+            if (normalizedKey === normalizedName || normalizedKey.includes(normalizedName)) {
+              return key;
+            }
+          }
+        }
+        return null;
+      };
+
+      // Detect column mappings once from first row
+      const firstRow = rows[0];
+      const cols = {
+        firstName: findColumn(firstRow, ['firstname', 'first name', 'first', 'given name', 'prenom']),
+        lastName: findColumn(firstRow, ['lastname', 'last name', 'last', 'surname', 'family name', 'nom']),
+        fullName: findColumn(firstRow, ['name', 'full name', 'contact name', 'client name', 'nom complet']),
+        company: findColumn(firstRow, ['company', 'property management company', 'property management', 'pm company', 'organization', 'entreprise', 'strata', 'building']),
+        email: findColumn(firstRow, ['email', 'email address', 'e-mail', 'courriel', 'mail']),
+        phone: findColumn(firstRow, ['phone', 'phone number', 'telephone', 'tel', 'mobile', 'cell', 'contact number']),
+        address: findColumn(firstRow, ['address', 'street address', 'adresse', 'location']),
+        billingAddress: findColumn(firstRow, ['billing address', 'billing', 'adresse de facturation']),
+      };
+      console.log('[Excel Import] Column mappings:', cols);
+
+      // Get existing client emails for duplicate check
+      const existingClients = await storage.getClientsByCompany(companyId);
+      const existingEmails = new Set(existingClients.map(c => c.email?.toLowerCase()).filter(Boolean));
+
+      const results = {
+        success: [] as Array<{ row: number; firstName: string; lastName: string; email: string }>,
+        skipped: [] as Array<{ row: number; reason: string; data?: Record<string, any> }>,
+      };
+
+      const emailsInFile = new Set<string>();
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const rowNum = i + 2; // Excel rows are 1-indexed, plus header row
+
+        // Extract values using pre-detected column mappings
+        let firstName = cols.firstName ? String(row[cols.firstName]).trim() : '';
+        let lastName = cols.lastName ? String(row[cols.lastName]).trim() : '';
+        
+        // If no separate first/last name columns, try to split full name
+        if (!firstName && !lastName && cols.fullName) {
+          const fullName = String(row[cols.fullName]).trim();
+          const nameParts = fullName.split(/\s+/);
+          if (nameParts.length >= 2) {
+            firstName = nameParts[0];
+            lastName = nameParts.slice(1).join(' ');
+          } else if (nameParts.length === 1) {
+            firstName = nameParts[0];
+          }
+        }
+        
+        const company = cols.company ? String(row[cols.company]).trim() : '';
+        const email = cols.email ? String(row[cols.email]).trim().toLowerCase() : '';
+        const phoneNumber = cols.phone ? String(row[cols.phone]).trim() : '';
+        const address = cols.address ? String(row[cols.address]).trim() : '';
+        const billingAddress = cols.billingAddress ? String(row[cols.billingAddress]).trim() : '';
+
+        // Skip completely empty rows (no useful data at all)
+        if (!firstName && !lastName && !company && !email && !phoneNumber && !address) {
+          results.skipped.push({ row: rowNum, reason: 'Empty row - no data found', data: { firstName, lastName, email } });
+          continue;
+        }
+
+        // Validate email format only if email is provided
+        if (email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Invalid email format', data: { firstName, lastName, email } });
+            continue;
+          }
+
+          // Check for duplicates in file (only if email provided)
+          if (emailsInFile.has(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Duplicate email in file', data: { firstName, lastName, email } });
+            continue;
+          }
+
+          // Check for existing clients (only if email provided)
+          if (existingEmails.has(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Client with this email already exists', data: { firstName, lastName, email } });
+            continue;
+          }
+        }
+        // Create client
+        try {
+          await storage.createClient({
+            companyId,
+            firstName,
+            lastName,
+            company,
+            email,
+            phoneNumber: phoneNumber || undefined,
+            address: address || undefined,
+            billingAddress: billingAddress || undefined,
+          });
+
+          emailsInFile.add(email);
+          existingEmails.add(email);
+          results.success.push({ row: rowNum, firstName, lastName, email });
+        } catch (error) {
+          console.error(`Error creating client from row ${rowNum}:`, error);
+          results.skipped.push({ row: rowNum, reason: 'Failed to create client', data: { firstName, lastName, email } });
+        }
+      }
+
+      res.json({
+        message: `Import complete: ${results.success.length} clients created, ${results.skipped.length} rows skipped`,
+        imported: results.success.length,
+        skipped: results.skipped.length,
+        details: results,
+      });
+    } catch (error) {
+      console.error("Error importing clients from Excel:", error);
+      res.status(500).json({ message: "Failed to import clients from Excel" });
+    }
+  });
   app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
@@ -24532,6 +24710,7 @@ Do not include any other text, just the JSON object.`
       const activeJobs = await db.select({
         job: jobPostings,
         companyName: users.companyName,
+        companyLogoUrl: users.brandingLogoUrl,
       }).from(jobPostings)
         .leftJoin(users, eq(jobPostings.companyId, users.id))
         .where(and(...conditions))
@@ -24560,6 +24739,7 @@ Do not include any other text, just the JSON object.`
         ...item.job,
         companyName: item.job.isPlatformPost ? "OnRopePro Platform" : (item.companyName || "Unknown Company"),
         companyCsr: item.job.companyId ? csrMap.get(item.job.companyId) ?? null : null,
+        companyLogoUrl: item.job.isPlatformPost ? null : (item.companyLogoUrl || null),
       }));
 
       res.json({ jobPostings: jobsWithCompany });
