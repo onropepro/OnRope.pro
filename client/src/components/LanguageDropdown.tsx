@@ -53,11 +53,9 @@ export function LanguageDropdown({
         >
           <Globe className="w-4 h-4" />
           {showLabel && !iconOnly && (
-            <>
-              <span className="ml-1">{displayName}</span>
-              <ChevronDown className="w-3 h-3 ml-1" />
-            </>
+            <span className="ml-1">{displayName}</span>
           )}
+          <ChevronDown className="w-3 h-3 ml-1" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align} className="z-[200]" sideOffset={5}>
