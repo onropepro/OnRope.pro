@@ -587,8 +587,8 @@ export default function Quotes() {
         floorCount: buildingInfo.floorCount,
         strataManagerName: buildingInfo.strataManagerName,
         strataManagerAddress: buildingInfo.strataManagerAddress,
-        clientId: selectedClientId, // Save client reference for project conversion
-        recipientPropertyManagerId: selectedPmId, // Manually selected PM to send quote to
+        clientId: selectedPmId || selectedClientId, // Use selected recipient client, fallback to quick-fill client
+        recipientPropertyManagerId: null, // Now using clientId for recipient instead
         status: "open",
         services, // Include services array
         totalAmount: String(subtotal),
