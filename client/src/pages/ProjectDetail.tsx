@@ -1143,48 +1143,12 @@ export default function ProjectDetail() {
     setLocation("/dashboard?tab=projects");
   }, [setLocation]);
 
-  const headerActionButtons = useMemo(() => {
-    if (!project) return null;
-    return (
-      <>
-        {!activeSession && project.status === "active" && (
-          <Button
-            onClick={() => {
-              if (hasHarnessInspectionToday) {
-                setShowStartDayDialog(true);
-              } else {
-                setShowHarnessInspectionDialog(true);
-              }
-            }}
-            className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
-            data-testid="button-start-day"
-          >
-            <span className="material-icons mr-2 text-base">play_circle</span>
-            {t('projectDetail.workSession.startSession', 'Start Work Session')}
-          </Button>
-        )}
-        {activeSession && (
-          <Button
-            onClick={() => setShowEndDayDialog(true)}
-            variant="destructive"
-            className="h-10"
-            data-testid="button-end-day"
-          >
-            <span className="material-icons mr-2 text-base">stop_circle</span>
-            {t('projectDetail.workSession.endSession', 'End Day')}
-          </Button>
-        )}
-      </>
-    );
-  }, [activeSession, project, hasHarnessInspectionToday, t]);
-
   useSetHeaderConfig({
     pageTitle: project?.buildingName || t('projectDetail.title', 'Project'),
     pageDescription: project?.buildingAddress ? `${project.strataPlanNumber} - ${project.jobType.replace(/_/g, ' ')}` : undefined,
     onBackClick: handleBackClick,
-    actionButtons: headerActionButtons,
     showSearch: false,
-  }, [project?.buildingName, project?.buildingAddress, project?.strataPlanNumber, project?.jobType, handleBackClick, headerActionButtons, t]);
+  }, [project?.buildingName, project?.buildingAddress, project?.strataPlanNumber, project?.jobType, handleBackClick, t]);
 
   // If there's a render error, show it
   if (renderError) {
@@ -1328,24 +1292,55 @@ export default function ProjectDetail() {
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
       <div className="max-w-6xl mx-auto p-4 space-y-6">
         {/* Project Info Header */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-            <span className="material-icons text-primary">apartment</span>
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
-            <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
-            <div className="flex items-center gap-2 mt-1.5">
-              <Badge variant={project.status === 'completed' ? 'default' : project.status === 'in_progress' ? 'secondary' : 'outline'}>
-                {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
-                 project.status === 'in_progress' ? t('projectDetail.status.inProgress', 'In Progress') : 
-                 t('projectDetail.status.pending', 'Pending')}
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <span className="material-icons text-xs">trending_up</span>
-                {progressPercent}%
-              </Badge>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+              <span className="material-icons text-primary">apartment</span>
             </div>
+            <div className="min-w-0">
+              <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
+              <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
+              <div className="flex items-center gap-2 mt-1.5">
+                <Badge variant={project.status === 'completed' ? 'default' : project.status === 'in_progress' ? 'secondary' : 'outline'}>
+                  {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
+                   project.status === 'in_progress' ? t('projectDetail.status.inProgress', 'In Progress') : 
+                   t('projectDetail.status.pending', 'Pending')}
+                </Badge>
+                <Badge variant="outline" className="gap-1">
+                  <span className="material-icons text-xs">trending_up</span>
+                  {progressPercent}%
+                </Badge>
+              </div>
+            </div>
+          </div>
+          {/* Work Session Buttons */}
+          <div className="flex items-center gap-2 shrink-0">
+            {!activeSession && project.status === "active" && (
+              <Button
+                onClick={() => {
+                  if (hasHarnessInspectionToday) {
+                    setShowStartDayDialog(true);
+                  } else {
+                    setShowHarnessInspectionDialog(true);
+                  }
+                }}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                data-testid="button-start-day"
+              >
+                <span className="material-icons mr-2 text-base">play_circle</span>
+                {t('projectDetail.workSession.startSession', 'Start Work Session')}
+              </Button>
+            )}
+            {activeSession && (
+              <Button
+                onClick={() => setShowEndDayDialog(true)}
+                variant="destructive"
+                data-testid="button-end-day"
+              >
+                <span className="material-icons mr-2 text-base">stop_circle</span>
+                {t('projectDetail.workSession.endSession', 'End Day')}
+              </Button>
+            )}
           </div>
         </div>
 
