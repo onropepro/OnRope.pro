@@ -17,6 +17,30 @@ import { formatTimestampDateShort } from "@/lib/dateUtils";
 import { canManageEmployees } from "@/lib/permissions";
 import { trackLogout } from "@/lib/analytics";
 
+function getRoleDisplayName(role: string | undefined): string {
+  if (!role) return '';
+  const roleMap: Record<string, string> = {
+    company: 'Admin',
+    rope_access_tech: 'Technician',
+    ground_crew: 'Ground Crew',
+    ground_crew_supervisor: 'Ground Crew Supervisor',
+    operations_manager: 'Operations Manager',
+    office_admin: 'Office Admin',
+    safety_officer: 'Safety Officer',
+    project_manager: 'Project Manager',
+    estimator: 'Estimator',
+    accountant: 'Accountant',
+    foreman: 'Foreman',
+    supervisor: 'Supervisor',
+    superuser: 'Super User',
+    staff: 'Staff',
+    resident: 'Resident',
+    property_manager: 'Property Manager',
+    building_manager: 'Building Manager',
+  };
+  return roleMap[role] || role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
 interface EmployerDashboardHeaderProps {
   currentUser?: any;
   employees?: any[];
@@ -462,7 +486,7 @@ export function EmployerDashboardHeader({
                   </Avatar>
                   <div className="hidden lg:block">
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
-                    <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role || ''}</p>
+                    <p className="text-xs text-slate-400 leading-tight">{getRoleDisplayName(currentUser?.role)}</p>
                   </div>
                 </Link>
               ) : null
