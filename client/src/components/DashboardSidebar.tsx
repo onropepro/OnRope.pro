@@ -677,7 +677,7 @@ export function DashboardSidebar({
             <button
               onClick={() => { setLocation("/dashboard"); setIsOpen(false); }}
               data-testid="sidebar-nav-work-dashboard"
-              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               <Briefcase className="h-4 w-4 shrink-0" />
               <span>{t("dashboard.sidebar.workDashboard", "Go to Work Dashboard")}</span>
