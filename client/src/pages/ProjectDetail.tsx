@@ -1328,26 +1328,24 @@ export default function ProjectDetail() {
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
       <div className="max-w-6xl mx-auto p-4 space-y-6">
         {/* Project Info Header */}
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2 rounded-lg bg-primary/10 shrink-0">
-              <span className="material-icons text-primary">apartment</span>
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
-              <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+            <span className="material-icons text-primary">apartment</span>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant={project.status === 'completed' ? 'default' : project.status === 'in_progress' ? 'secondary' : 'outline'}>
-              {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
-               project.status === 'in_progress' ? t('projectDetail.status.inProgress', 'In Progress') : 
-               t('projectDetail.status.pending', 'Pending')}
-            </Badge>
-            <Badge variant="outline" className="gap-1">
-              <span className="material-icons text-xs">trending_up</span>
-              {progressPercent}%
-            </Badge>
+          <div className="min-w-0">
+            <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
+            <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
+            <div className="flex items-center gap-2 mt-1.5">
+              <Badge variant={project.status === 'completed' ? 'default' : project.status === 'in_progress' ? 'secondary' : 'outline'}>
+                {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
+                 project.status === 'in_progress' ? t('projectDetail.status.inProgress', 'In Progress') : 
+                 t('projectDetail.status.pending', 'Pending')}
+              </Badge>
+              <Badge variant="outline" className="gap-1">
+                <span className="material-icons text-xs">trending_up</span>
+                {progressPercent}%
+              </Badge>
+            </div>
           </div>
         </div>
 
