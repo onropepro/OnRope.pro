@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -62,6 +62,7 @@ export interface NavItem {
   onClick?: () => void;
   badge?: number;
   badgeType?: "alert" | "info";
+  useProfilePhoto?: boolean;
   isVisible: (user: User | null | undefined) => boolean;
 }
 
@@ -633,7 +634,16 @@ export function DashboardSidebar({
                             : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                         )}
                       >
-                        <Icon className="h-4 w-4 shrink-0" />
+                        {item.useProfilePhoto && (currentUser as any)?.photoUrl ? (
+                          <Avatar className="h-4 w-4 shrink-0">
+                            <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
+                            <AvatarFallback className="text-[8px]">
+                              {((currentUser as any).name || "U").charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <Icon className="h-4 w-4 shrink-0" />
+                        )}
                         <span className="flex-1 text-left truncate">{item.label}</span>
                         {item.badge !== undefined && item.badge > 0 && (
                           <span
