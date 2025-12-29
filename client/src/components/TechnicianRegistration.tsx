@@ -232,7 +232,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       setStep("employer");
     } else if (step === "employer") {
       onOpenChange(false);
-      setLocation("/technician-passport");
+      setLocation("/modules/technician-passport");
     }
   };
 
