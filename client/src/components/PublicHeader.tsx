@@ -301,7 +301,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                   className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 pointer-events-none"
                 >
                   <div 
-                    className="bg-card border border-border rounded-xl shadow-xl p-5 w-[1100px] max-w-[calc(100vw-2rem)] pointer-events-auto"
+                    className="bg-card border border-border rounded-xl shadow-xl p-5 w-[1100px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-120px)] overflow-y-auto pointer-events-auto"
                     onMouseEnter={() => setShowModulesMenu(true)}
                     onMouseLeave={() => setShowModulesMenu(false)}
                   >
