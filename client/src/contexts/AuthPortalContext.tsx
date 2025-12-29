@@ -17,7 +17,7 @@ import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
-import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
+import { ResidentRegistration } from "@/components/ResidentRegistration";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email, license number, or strata number is required"),
@@ -445,23 +445,10 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
         onOpenChange={(open) => setShowEmployerRegistration(open)} 
       />
       
-      {showResidentSignup && (
-        <Dialog open={showResidentSignup} onOpenChange={(open) => !open && setShowResidentSignup(false)}>
-          <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden border-0 bg-transparent shadow-none">
-            <VisuallyHidden>
-              <DialogTitle>Resident Registration</DialogTitle>
-              <DialogDescription>Create your resident account</DialogDescription>
-            </VisuallyHidden>
-            <ResidentSlidingSignup 
-              onClose={() => setShowResidentSignup(false)}
-              onShowSignIn={() => {
-                setShowResidentSignup(false);
-                openLogin();
-              }}
-            />
-          </DialogContent>
-        </Dialog>
-      )}
+      <ResidentRegistration 
+        open={showResidentSignup} 
+        onOpenChange={(open) => setShowResidentSignup(open)} 
+      />
     </AuthPortalContext.Provider>
   );
 }
