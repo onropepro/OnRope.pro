@@ -785,7 +785,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   <div className="mb-9">
                     <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Pay-It-Forward Referral Code System')}</h2>
                     <div className="text-muted-foreground mt-3 space-y-2">
-                      <p className="text-sm">
+                      <p className="text-[16px]">
                         <span className="font-medium">1 -</span> {t('techReg.referral.step1', "Got a referral code from a friend? Enter it and they'll get upgraded to a PLUS account for free.")}
                       </p>
                       <p className="text-[16px]">
