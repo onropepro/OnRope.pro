@@ -6,6 +6,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -1074,11 +1075,79 @@ export default function TechnicianJobBoard() {
                 <p className="text-muted-foreground mt-1">{t.noJobsDesc}</p>
               </CardContent>
             </Card>
+          ) : viewMode === "list" ? (
+            /* List View - Table format */
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{language === 'en' ? 'Title' : 'Titre'}</TableHead>
+                      <TableHead>{language === 'en' ? 'Company' : 'Entreprise'}</TableHead>
+                      <TableHead className="hidden md:table-cell">{language === 'en' ? 'Location' : 'Emplacement'}</TableHead>
+                      <TableHead className="hidden lg:table-cell">{language === 'en' ? 'Salary' : 'Salaire'}</TableHead>
+                      <TableHead className="hidden xl:table-cell">{language === 'en' ? 'Certification' : 'Certification'}</TableHead>
+                      <TableHead className="text-right">{language === 'en' ? 'Actions' : 'Actions'}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {jobs.map((job) => (
+                      <TableRow 
+                        key={job.id}
+                        className="cursor-pointer"
+                        onClick={() => setSelectedJob(job)}
+                        data-testid={`row-job-${job.id}`}
+                      >
+                        <TableCell>
+                          <div className="font-medium" data-testid={`text-job-title-${job.id}`}>{job.title}</div>
+                          <div className="text-xs text-muted-foreground line-clamp-1">
+                            {job.description}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {(job as JobPostingWithCompany).companyName || "Unknown Company"}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground hidden md:table-cell">
+                          {job.location || (job.isRemote ? t.remote : "-")}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground hidden lg:table-cell">
+                          {(job.salaryMin || job.salaryMax) 
+                            ? formatSalary(job.salaryMin, job.salaryMax, job.salaryPeriod) 
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="hidden xl:table-cell">
+                          <div className="flex flex-wrap gap-1">
+                            {job.requiredIrataLevel && (
+                              <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">
+                                IRATA {job.requiredIrataLevel}
+                              </Badge>
+                            )}
+                            {job.requiredSpratLevel && (
+                              <Badge variant="outline" className="border-purple-500 text-purple-600 text-xs">
+                                SPRAT {job.requiredSpratLevel}
+                              </Badge>
+                            )}
+                            {!job.requiredIrataLevel && !job.requiredSpratLevel && "-"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            data-testid={`button-view-job-${job.id}`}
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           ) : (
-            <div className={viewMode === "cards" 
-              ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" 
-              : "grid gap-4"
-            }>
+            /* Cards View - Multi-column grid */
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {jobs.map((job) => (
                 <Card 
                   key={job.id} 
@@ -1087,10 +1156,7 @@ export default function TechnicianJobBoard() {
                   data-testid={`card-job-${job.id}`}
                 >
                   <CardContent className="p-4 flex-1">
-                    <div className={viewMode === "cards" 
-                      ? "flex flex-col h-full" 
-                      : "flex flex-col sm:flex-row sm:items-start justify-between gap-3"
-                    }>
+                    <div className="flex flex-col h-full">
                       <div className="flex-1 space-y-2">
                         <div className="flex items-start gap-3">
                           <div className="p-2 rounded-lg bg-primary/10 shrink-0">
@@ -1150,7 +1216,7 @@ export default function TechnicianJobBoard() {
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className={viewMode === "cards" ? "self-end mt-auto" : "shrink-0"}
+                        className="self-end mt-auto"
                         data-testid={`button-view-job-${job.id}`}
                       >
                         <ChevronRight className="w-5 h-5" />
