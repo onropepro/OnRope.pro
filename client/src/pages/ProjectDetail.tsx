@@ -32,7 +32,6 @@ import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { format } from "date-fns";
-import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { parseLocalDate, formatTimestampDate, getTodayString, formatDurationMs } from "@/lib/dateUtils";
@@ -1137,10 +1136,6 @@ export default function ProjectDetail() {
     setMissedUnitNumber("");
   };
 
-  // Configure unified header - hide search since project has its own layout
-  useSetHeaderConfig({
-    showSearch: false,
-  }, []);
 
   // If there's a render error, show it
   if (renderError) {

@@ -1559,10 +1559,8 @@ export default function Inventory() {
     return Math.round((compliantWorkDays / totalWorkDays) * 100);
   }, [inspectionFilter, inspectionDays, allSessions, harnessInspections]);
 
-  useSetHeaderConfig({
-    pageTitle: t('inventory.title', 'Inventory'),
-    showSearch: false,
-  }, [t]);
+  // Use default header config to show consistent unified header with search bar
+  useSetHeaderConfig({}, []);
 
   return (
     <div className="min-h-screen bg-background pb-20">
