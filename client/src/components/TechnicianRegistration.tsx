@@ -304,9 +304,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   // PLUS benefits (unlocked by referring one tech)
   const plusBenefits = [
-    t('techReg.plusBenefits.expiryAlerts', 'Certification expiry alerts (60 + 30 day warnings)'),
+    t('techReg.plusBenefits.jobBoard', 'Rope Access Job Board'),
+    t('techReg.plusBenefits.jobOffers', 'Employers Can Send Job Offers'),
+    t('techReg.plusBenefits.expiryAlerts', '30-day certification expiry alerts'),
     t('techReg.plusBenefits.multiEmployers', 'Work for multiple employers simultaneously'),
-    t('techReg.plusBenefits.jobBoard', 'Job Board access — see who\'s hiring'),
     t('techReg.plusBenefits.taskLogging', 'Enhanced task logging'),
     t('techReg.plusBenefits.analytics', 'Work history analytics'),
   ];
@@ -374,7 +375,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   </div>
                 ))}
               </div>
-              <p className="text-white/50 text-xs mt-3 italic">{t('techReg.sidebar.referFooter', 'Refer one tech → instant upgrade')}</p>
             </div>
           </div>
 
