@@ -73,6 +73,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     certificationCardFile: null,
   });
   const [error, setError] = useState("");
+  const [animatedBenefitIndex, setAnimatedBenefitIndex] = useState(-1);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const resetForm = () => {
@@ -105,6 +106,20 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     resetForm();
     onOpenChange(false);
   };
+
+  // Staggered animation for PLUS benefits list
+  useEffect(() => {
+    if (open) {
+      setAnimatedBenefitIndex(-1);
+      const delays = [800, 1400, 2000, 2600, 3200, 3800];
+      const timers = delays.map((delay, index) => 
+        setTimeout(() => setAnimatedBenefitIndex(index), delay)
+      );
+      return () => timers.forEach(timer => clearTimeout(timer));
+    } else {
+      setAnimatedBenefitIndex(-1);
+    }
+  }, [open]);
 
   const registrationMutation = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -366,16 +381,29 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               </div>
             </div>
 
-            {/* PLUS ACCOUNT Benefits (muted) */}
+            {/* PLUS ACCOUNT Benefits (animated) */}
             <div className="mt-auto">
               <p className="text-xs uppercase tracking-wider mb-2 text-[#ffffff]">{t('techReg.sidebar.plusAccount', 'Refer 1 tech to upgrade to a PLUS Account for free')}</p>
               <div className="space-y-2">
-                {plusBenefits.map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm opacity-60">
-                    <div className="w-4 h-4 rounded-full border border-white/40 shrink-0 mt-0.5" />
-                    <span className="text-white/70">{benefit}</span>
-                  </div>
-                ))}
+                {plusBenefits.map((benefit, i) => {
+                  const isActive = i <= animatedBenefitIndex;
+                  return (
+                    <div key={i} className="flex items-start gap-2 text-sm">
+                      <div className={`w-4 h-4 rounded-full shrink-0 mt-0.5 flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-white border-white' : 'border border-white/40'}`}>
+                        {isActive && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <Check className="w-2.5 h-2.5 text-[#5C7A84]" />
+                          </motion.div>
+                        )}
+                      </div>
+                      <span className={`transition-colors duration-300 ${isActive ? 'text-[#ffffff]' : 'text-white/70 opacity-60'}`}>{benefit}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
