@@ -531,8 +531,8 @@ export default function GroundCrewJobBoard() {
                       variant="outline" 
                       className={`${
                         (selectedJob as JobPostingWithCompany).companyCsr! >= 90 ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700' :
-                        (selectedJob as JobPostingWithCompany).companyCsr! >= 75 ? 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700' :
-                        (selectedJob as JobPostingWithCompany).companyCsr! >= 50 ? 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700' :
+                        (selectedJob as JobPostingWithCompany).companyCsr! >= 70 ? 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700' :
+                        (selectedJob as JobPostingWithCompany).companyCsr! >= 50 ? 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700' :
                         'bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700'
                       }`}
                     >
