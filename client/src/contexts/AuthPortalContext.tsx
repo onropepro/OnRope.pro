@@ -193,7 +193,7 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
 
   const handleEmployerRegister = () => {
     closePortal();
-    setShowEmployerRegistration(true);
+    setLocation("/pricing");
   };
 
   const handleResidentRegister = () => {
