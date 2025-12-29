@@ -43,7 +43,7 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
           My Performance
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pt-0 pb-3 flex-1 min-h-0 overflow-auto">
+      <CardContent className="px-4 pt-0 pb-4 flex-1 min-h-0 overflow-auto">
         {hasData ? (
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
