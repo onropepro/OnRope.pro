@@ -24532,7 +24532,7 @@ Do not include any other text, just the JSON object.`
       const activeJobs = await db.select({
         job: jobPostings,
         companyName: users.companyName,
-        companyLogoUrl: users.companyLogoUrl,
+        companyLogoUrl: users.brandingLogoUrl,
       }).from(jobPostings)
         .leftJoin(users, eq(jobPostings.companyId, users.id))
         .where(and(...conditions))
