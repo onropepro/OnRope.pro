@@ -723,7 +723,7 @@ export function DashboardSidebar({
       {/* Mobile Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-[90] lg:hidden"
           onClick={() => setIsOpen(false)}
           data-testid="sidebar-overlay"
         />
@@ -732,7 +732,7 @@ export function DashboardSidebar({
       {/* Sidebar - Fixed on desktop, slide-in on mobile */}
       <aside 
         className={cn(
-          "fixed h-full left-0 top-0 z-40 w-60 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-700/80 flex flex-col transition-transform duration-200",
+          "fixed h-full left-0 top-0 z-[95] w-60 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-700/80 flex flex-col transition-transform duration-200",
           "lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}

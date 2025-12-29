@@ -169,13 +169,13 @@ function DashboardLayoutInner({
             showLanguageDropdown={headerConfig?.showLanguageDropdown ?? true}
             showProfile={headerConfig?.showProfile ?? true}
             showLogout={headerConfig?.showLogout ?? true}
-            onMobileMenuClick={() => setMobileOpen(true)}
+            onMobileMenuClick={() => setMobileOpen(prev => !prev)}
           />
         )}
         {usesUnifiedHeader && (
           <TechnicianDashboardHeader
             currentUser={currentUser}
-            onMobileMenuClick={() => setMobileOpen(true)}
+            onMobileMenuClick={() => setMobileOpen(prev => !prev)}
           />
         )}
         <div className="flex-1">
