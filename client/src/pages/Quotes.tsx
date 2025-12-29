@@ -3543,13 +3543,8 @@ export default function Quotes() {
                                       buildingForm.setValue('buildingAddress', '');
                                       buildingForm.setValue('floorCount', undefined);
                                       
-                                      // Auto-select PM recipient: match by email first, then by name
-                                      const clientFullName = `${client.firstName || ''} ${client.lastName || ''}`.trim().toLowerCase();
-                                      const matchingPM = linkedPMs.find((pm) => 
-                                        (client.email && pm.email && pm.email.toLowerCase() === client.email.toLowerCase()) ||
-                                        (pm.name && pm.name.toLowerCase() === clientFullName)
-                                      );
-                                      setSelectedPmId(matchingPM ? matchingPM.id : null);
+                                      // Auto-select this client as the quote recipient
+                                      setSelectedPmId(client.id);
                                     }}
                                   >
                                     <Check
@@ -3637,8 +3632,8 @@ export default function Quotes() {
 
                   <Separator />
                   
-                  {/* Property Manager Selection for Quote Recipient */}
-                  {linkedPMs.length > 0 && (
+                  {/* Send Quote to Client - uses clients from CRM */}
+                  {clients.length > 0 && (
                     <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
                       <div className="flex items-center gap-2 mb-2">
                         <Send className="w-5 h-5 text-primary" />
@@ -3659,15 +3654,15 @@ export default function Quotes() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="none">
-                              <span className="text-muted-foreground">{t('quotes.noPMSelected', 'No property manager (auto-match by strata)')}</span>
+                              <span className="text-muted-foreground">{t('quotes.noPMSelected', 'No recipient selected')}</span>
                             </SelectItem>
-                            {linkedPMs.map((pm) => (
-                              <SelectItem key={pm.id} value={pm.id}>
+                            {clients.map((client: any) => (
+                              <SelectItem key={client.id} value={client.id}>
                                 <div className="flex flex-col">
-                                  <span className="font-medium">{pm.name}</span>
+                                  <span className="font-medium">{client.firstName} {client.lastName}</span>
                                   <span className="text-xs text-muted-foreground">
-                                    {pm.company}{pm.strataNumber ? ` - ${pm.strataNumber}` : ''}
-                                    {pm.smsOptIn && pm.phone ? ' (SMS enabled)' : ''}
+                                    {client.company || ''}{client.phoneNumber ? ` - ${client.phoneNumber}` : ''}
+                                    {client.phoneNumber ? ' (SMS enabled)' : ' (No phone)'}
                                   </span>
                                 </div>
                               </SelectItem>
