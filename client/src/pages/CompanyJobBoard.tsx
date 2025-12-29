@@ -474,45 +474,47 @@ export default function CompanyJobBoard() {
     return null;
   };
 
-  useSetHeaderConfig({
-    pageTitle: t("jobBoard.title", "Job Board"),
-    pageDescription: t("jobBoard.subtitle", "Post and manage job opportunities"),
-    actionButtons: (
-      <>
-        <Button 
-          variant={showSentOffers ? "default" : "outline"}
-          onClick={() => setShowSentOffers(!showSentOffers)} 
-          className="gap-2" 
-          data-testid="button-sent-offers"
-        >
-          <Send className="w-4 h-4" />
-          <span className="hidden sm:inline">{t("jobBoard.sentOffers", "Sent Offers")}</span>
-          {refusedOffers.length > 0 && (
-            <Badge variant="destructive" className="ml-1">{refusedOffers.length}</Badge>
-          )}
-        </Button>
-        <Button 
-          variant="outline" 
-          onClick={() => setLocation("/talent-browser")} 
-          className="gap-2" 
-          data-testid="button-browse-talent"
-        >
-          <Users className="w-4 h-4" />
-          <span className="hidden sm:inline">{t("jobBoard.browseTalent", "Browse Talent")}</span>
-          <span className="sm:hidden">{t("jobBoard.talent", "Talent")}</span>
-        </Button>
-        <Button onClick={() => setIsCreateOpen(true)} className="gap-2" data-testid="button-create-job">
-          <Plus className="w-4 h-4" />
-          <span className="hidden sm:inline">{t("jobBoard.createJob", "Create Job Posting")}</span>
-          <span className="sm:hidden">{t("jobBoard.create", "Create")}</span>
-        </Button>
-      </>
-    ),
-  }, [t, showSentOffers, refusedOffers.length, setLocation, setIsCreateOpen, setShowSentOffers]);
-
+  useSetHeaderConfig({}, []);
   return (
     <div className="min-h-screen page-gradient">
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Page Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">{t("jobBoard.title", "Job Board")}</h1>
+            <p className="text-muted-foreground">{t("jobBoard.subtitle", "Post and manage job opportunities")}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button 
+              variant={showSentOffers ? "default" : "outline"}
+              onClick={() => setShowSentOffers(!showSentOffers)} 
+              className="gap-2" 
+              data-testid="button-sent-offers"
+            >
+              <Send className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("jobBoard.sentOffers", "Sent Offers")}</span>
+              {refusedOffers.length > 0 && (
+                <Badge variant="destructive" className="ml-1">{refusedOffers.length}</Badge>
+              )}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setLocation("/talent-browser")} 
+              className="gap-2" 
+              data-testid="button-browse-talent"
+            >
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("jobBoard.browseTalent", "Browse Talent")}</span>
+              <span className="sm:hidden">{t("jobBoard.talent", "Talent")}</span>
+            </Button>
+            <Button onClick={() => setIsCreateOpen(true)} className="gap-2" data-testid="button-create-job">
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("jobBoard.createJob", "Create Job Posting")}</span>
+              <span className="sm:hidden">{t("jobBoard.create", "Create")}</span>
+            </Button>
+          </div>
+        </div>
+
         {/* Sent Offers Section */}
         {showSentOffers && (
           <Card className="border-primary/30">
