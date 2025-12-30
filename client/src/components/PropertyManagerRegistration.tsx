@@ -518,7 +518,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                     style={{backgroundColor: SAGE_GREEN}}
                     onClick={() => {
                       handleClose();
-                      setLocation("/property-manager");
+                      setLocation("/pm-dashboard");
                     }}
                     data-testid="button-go-to-dashboard"
                   >
