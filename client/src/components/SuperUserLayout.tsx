@@ -3,6 +3,7 @@ import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { UnifiedDashboardHeader } from "@/components/UnifiedDashboardHeader";
 import {
   Sidebar,
   SidebarContent,
@@ -398,31 +399,18 @@ export default function SuperUserLayout({ children, title }: SuperUserLayoutProp
           <SidebarContents />
         </Sidebar>
         <div className="flex flex-col flex-1 min-w-0">
-          <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3">
-            <div className="flex items-center gap-3">
-              <SidebarTrigger data-testid="button-sidebar-toggle" />
-              {title && (
-                <h1 className="text-lg font-semibold truncate">{title}</h1>
-              )}
-            </div>
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => window.location.reload()}
-                data-testid="button-refresh-page"
-                title="Refresh page"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-              {userData?.user && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="material-icons text-base">person</span>
-                  <span className="hidden sm:inline">{userData.user.email}</span>
-                </div>
-              )}
-            </div>
-          </header>
+          <UnifiedDashboardHeader
+            variant="superuser"
+            currentUser={userData?.user}
+            customMenuTrigger={<SidebarTrigger data-testid="button-sidebar-toggle" />}
+            pageTitle={title}
+            showSearch={true}
+            showNotifications={true}
+            showLanguageDropdown={true}
+            showInstallPWA={true}
+            showProfile={true}
+            showLogout={false}
+          />
           <main className="flex-1 overflow-y-auto">
             {children}
           </main>
