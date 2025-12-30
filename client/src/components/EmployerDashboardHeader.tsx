@@ -273,7 +273,7 @@ export function EmployerDashboardHeader({
             {/* Page Title - shown independently of back button */}
             {pageTitle && (
               <div className="flex-shrink-0">
-                <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>
+                <h1 className="text-2xl font-semibold text-foreground">{pageTitle}</h1>
                 {pageDescription && (
                   <p className="text-sm text-muted-foreground">{pageDescription}</p>
                 )}
