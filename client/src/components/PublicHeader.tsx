@@ -1100,8 +1100,8 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
             {/* Sign Up and Sign In Buttons - Mobile */}
             <div className="pt-4 mt-4 border-t border-border grid grid-cols-2 gap-3">
               <Button
-                variant="outline"
-                className="w-full font-semibold border-[#B89685] text-[#B89685] hover:bg-[#B89685]/10"
+                variant="default"
+                className="w-full font-semibold text-white bg-[#AB4521] hover:bg-[#8d391b]"
                 onClick={() => {
                   openRegister();
                   setMobileMenuOpen(false);
