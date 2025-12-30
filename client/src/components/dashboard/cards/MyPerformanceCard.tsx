@@ -19,14 +19,14 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
 
   if (isLoading) {
     return (
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col h-full">
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <TrendingUp className="w-5 h-5" style={{ color: accentColor }} />
             My Performance
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pt-0 flex-1 min-h-0">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse h-20 bg-muted rounded" />
         </CardContent>
       </div>
@@ -36,57 +36,55 @@ export function MyPerformanceCard({ currentUser, onRouteNavigate, branding }: Ca
   const hasData = perfData && (perfData.completedJobs > 0 || perfData.hoursThisMonth > 0);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
+    <div className="flex flex-col h-full">
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <TrendingUp className="w-5 h-5" style={{ color: accentColor }} />
           My Performance
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pt-0 flex-1 min-h-0 overflow-y-auto">
-        <div className="flex flex-col">
-          {hasData ? (
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Jobs This Month</p>
-                  <p className="text-xl font-bold" data-testid="text-my-jobs">
-                    {perfData!.completedJobs}
-                  </p>
-                </div>
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="text-sm text-muted-foreground">Hours Logged</p>
-                  <p className="text-xl font-bold" data-testid="text-my-hours">
-                    {perfData!.hoursThisMonth.toFixed(1)}h
-                  </p>
-                </div>
-              </div>
-              {perfData!.avgHoursPerJob > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  Avg {perfData!.avgHoursPerJob.toFixed(1)}h per job
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
+        {hasData ? (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <p className="text-sm text-muted-foreground">Jobs This Month</p>
+                <p className="text-xl font-bold" data-testid="text-my-jobs">
+                  {perfData!.completedJobs}
                 </p>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-between"
-                onClick={() => onRouteNavigate("/timesheets")}
-                data-testid="button-view-my-performance"
-              >
-                View Details
-                <ChevronRight className="w-4 h-4" />
-              </Button>
+              </div>
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <p className="text-sm text-muted-foreground">Hours Logged</p>
+                <p className="text-xl font-bold" data-testid="text-my-hours">
+                  {perfData!.hoursThisMonth.toFixed(1)}h
+                </p>
+              </div>
             </div>
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center">
-              <BarChart3 className="w-10 h-10 text-muted-foreground/50 mb-2" />
-              <p className="text-base text-muted-foreground">No activity this month</p>
-              <p className="text-sm text-muted-foreground/70">
-                Complete work sessions to see your stats
+            {perfData!.avgHoursPerJob > 0 && (
+              <p className="text-sm text-muted-foreground">
+                Avg {perfData!.avgHoursPerJob.toFixed(1)}h per job
               </p>
-            </div>
-          )}
-        </div>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-between"
+              onClick={() => onRouteNavigate("/timesheets")}
+              data-testid="button-view-my-performance"
+            >
+              View Details
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center text-center">
+            <BarChart3 className="w-10 h-10 text-muted-foreground/50 mb-2" />
+            <p className="text-base text-muted-foreground">No activity this month</p>
+            <p className="text-sm text-muted-foreground/70">
+              Complete work sessions to see your stats
+            </p>
+          </div>
+        )}
       </CardContent>
     </div>
   );

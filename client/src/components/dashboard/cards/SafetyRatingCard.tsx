@@ -97,14 +97,14 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
 
   if (!hasAccess) {
     return (
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col h-full">
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
             Safety Rating
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pt-0 flex-1 min-h-0 flex items-center justify-center">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
           <p className="text-base text-muted-foreground">No access</p>
         </CardContent>
       </div>
@@ -113,14 +113,14 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col h-full">
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
             Safety Rating
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-4 pt-0 flex-1 min-h-0">
+        <CardContent className="px-4 pb-4 flex-1 min-h-0">
           <div className="animate-pulse h-16 bg-muted rounded" />
         </CardContent>
       </div>
@@ -131,72 +131,70 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
   const wssColors = getColorScheme(wssScore);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
+    <div className="flex flex-col h-full">
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
           Safety Ratings
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pt-0 flex-1 min-h-0 overflow-y-auto">
-        <div className="flex flex-col gap-3">
-          {/* CSR Section (clickable) */}
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col gap-2">
+        {/* CSR Section (clickable) */}
+        <div 
+          className={`rounded-lg p-3 w-full ${colors.bg} cursor-pointer hover-elevate`}
+          onClick={() => setShowCSRDialog(true)}
+          data-testid="button-csr-details"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <p className={`text-xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
+                  {Math.round(rating)}%
+                </p>
+                <p className="text-xs text-muted-foreground">Company Safety</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <Badge className={colors.badge}>
+                {rating >= 70 ? (
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                ) : (
+                  <TrendingDown className="w-3 h-3 mr-1" />
+                )}
+                {rating >= 90 ? "Excellent" : rating >= 70 ? "Good" : rating >= 50 ? "Warning" : "Critical"}
+              </Badge>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </div>
+          </div>
+        </div>
+        
+        {/* WSS Section - Educational metric (clickable) */}
+        {!wssLoading && wssData && (
           <div 
-            className={`rounded-lg p-3 w-full ${colors.bg} cursor-pointer hover-elevate`}
-            onClick={() => setShowCSRDialog(true)}
-            data-testid="button-csr-details"
+            className={`rounded-lg p-2 w-full ${wssColors.bg} border border-dashed border-muted-foreground/30 cursor-pointer hover-elevate`}
+            onClick={() => setShowWSSDialog(true)}
+            data-testid="button-wss-details"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+                <Users className="w-4 h-4 text-muted-foreground" />
                 <div>
-                  <p className={`text-xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
-                    {Math.round(rating)}%
+                  <p className={`text-lg font-semibold ${wssColors.text}`} data-testid="text-wss-value">
+                    {wssScore}%
                   </p>
-                  <p className="text-xs text-muted-foreground">Company Safety</p>
+                  <p className="text-xs text-muted-foreground">Workforce Safety</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Badge className={colors.badge}>
-                  {rating >= 70 ? (
-                    <TrendingUp className="w-3 h-3 mr-1" />
-                  ) : (
-                    <TrendingDown className="w-3 h-3 mr-1" />
-                  )}
-                  {rating >= 90 ? "Excellent" : rating >= 70 ? "Good" : rating >= 50 ? "Warning" : "Critical"}
+                <Badge variant="outline" className="text-xs">
+                  {wssData.employeeCount} emp
                 </Badge>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
             </div>
           </div>
-          
-          {/* WSS Section - Educational metric (clickable) */}
-          {!wssLoading && wssData && (
-            <div 
-              className={`rounded-lg p-2 w-full ${wssColors.bg} border border-dashed border-muted-foreground/30 cursor-pointer hover-elevate`}
-              onClick={() => setShowWSSDialog(true)}
-              data-testid="button-wss-details"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className={`text-lg font-semibold ${wssColors.text}`} data-testid="text-wss-value">
-                      {wssScore}%
-                    </p>
-                    <p className="text-xs text-muted-foreground">Workforce Safety</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Badge variant="outline" className="text-xs">
-                    {wssData.employeeCount} emp
-                  </Badge>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </CardContent>
       
       {/* CSR Details Dialog */}
