@@ -3692,15 +3692,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required registration data in session" });
       }
 
-      // Check email uniqueness (in case of race condition)
+      // Check if account already exists (may have been created from a different checkout session)
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
+        // If the existing user was created from a registration flow (has licenseKey),
+        // treat this as "already processed" rather than an error
+        if (existingUser.role === 'company' && existingUser.licenseKey) {
+          console.log(`[Registration] Account already exists for ${email}, treating as already processed`);
+          
+          // Auto-login the user since they successfully completed checkout
+          req.session.userId = existingUser.id;
+          req.session.userRole = existingUser.role;
+          
+          return res.json({
+            flow: 'embedded',
+            success: true,
+            alreadyProcessed: true,
+            companyName: existingUser.companyName,
+            email: existingUser.email,
+            trialEnd: null,
+            message: 'Registration already completed',
+          });
+        }
         return res.status(400).json({ message: "An account with this email already exists" });
       }
 
       // Check company name uniqueness
       const existingCompanyByName = await storage.getUserByCompanyName(companyName);
       if (existingCompanyByName) {
+        // Same check - if same email, likely same registration
+        if (existingCompanyByName.email === email) {
+          console.log(`[Registration] Company ${companyName} already exists for ${email}, treating as already processed`);
+          
+          req.session.userId = existingCompanyByName.id;
+          req.session.userRole = existingCompanyByName.role;
+          
+          return res.json({
+            flow: 'embedded',
+            success: true,
+            alreadyProcessed: true,
+            companyName: existingCompanyByName.companyName,
+            email: existingCompanyByName.email,
+            trialEnd: null,
+            message: 'Registration already completed',
+          });
+        }
         return res.status(400).json({ message: "A company with this name already exists" });
       }
 
