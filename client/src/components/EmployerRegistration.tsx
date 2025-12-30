@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { 
   PRICING, 
-  ANNUAL_DISCOUNT_PERCENT, 
   TRIAL_PERIOD_DAYS,
   type BillingFrequency 
 } from "@shared/stripe-config";
@@ -187,16 +186,14 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   ];
 
   const trialBenefits = [
-    `${TRIAL_PERIOD_DAYS}-day free trial`,
     "Full access to all features",
     "Cancel anytime with data export",
     "Priority support during trial",
+    "No charge until trial ends",
   ];
 
   const monthlyPrice = PRICING.base.monthly;
-  const annualPrice = PRICING.base.annual;
   const monthlySeatPrice = PRICING.seat.monthly;
-  const annualSeatPrice = PRICING.seat.annual;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -252,65 +249,18 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
               {/* Welcome Screen */}
               {step === "welcome" && (
                 <div className="h-full flex flex-col justify-center max-w-md mx-auto">
-                  <div className="text-center mb-4">
+                  <div className="text-center mb-6">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0B64A3]/10 border border-[#0B64A3]/20 mb-3">
                       <Building2 className="w-4 h-4 text-[#0B64A3]" />
                       <span className="text-xs font-medium text-[#0B64A3] text-center leading-tight">
                         For Rope Access Company Owners
                       </span>
                     </div>
-                    <h1 className="text-2xl font-bold mb-1">Start Your Free Trial</h1>
-                    <p className="text-sm text-muted-foreground">{TRIAL_PERIOD_DAYS} days of full access.</p>
+                    <h1 className="text-3xl font-bold mb-2">{TRIAL_PERIOD_DAYS} Days Free</h1>
+                    <p className="text-muted-foreground">Full access to all features. No commitment.</p>
                   </div>
 
-                  {/* Pricing Display with Billing Frequency Toggle */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      <button
-                        onClick={() => setData({ ...data, billingFrequency: "monthly" })}
-                        className={`px-4 py-2 text-sm font-medium rounded-l-lg transition-colors ${
-                          data.billingFrequency === "monthly"
-                            ? "bg-[#0B64A3] text-white"
-                            : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                        data-testid="button-billing-monthly"
-                      >
-                        Monthly
-                      </button>
-                      <button
-                        onClick={() => setData({ ...data, billingFrequency: "annual" })}
-                        className={`px-4 py-2 text-sm font-medium rounded-r-lg transition-colors ${
-                          data.billingFrequency === "annual"
-                            ? "bg-[#0B64A3] text-white"
-                            : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                        data-testid="button-billing-annual"
-                      >
-                        Annual
-                        <span className="ml-1 text-xs text-green-400">(Save {ANNUAL_DISCOUNT_PERCENT}%)</span>
-                      </button>
-                    </div>
-                    
-                    <div className="bg-muted/50 rounded-lg p-4 text-center">
-                      <div className="text-3xl font-bold text-foreground">
-                        ${data.billingFrequency === "monthly" ? monthlyPrice : annualPrice}
-                        <span className="text-base font-normal text-muted-foreground">
-                          /{data.billingFrequency === "monthly" ? "month" : "year"}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        + ${data.billingFrequency === "monthly" ? monthlySeatPrice : annualSeatPrice}/seat
-                        <span className="text-xs"> (add team members as needed)</span>
-                      </p>
-                      {data.billingFrequency === "annual" && (
-                        <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                          You save ${(monthlyPrice * 12) - annualPrice}/year on base plan
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Benefits section */}
+                  {/* Benefits section - now first */}
                   <div className="space-y-1.5 mb-4">
                     {welcomeBenefits.map((benefit, i) => (
                       <div key={i} className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/50">
@@ -339,13 +289,22 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
                   </div>
 
+                  {/* Pricing - now secondary, below features */}
+                  <div className="text-center text-sm text-muted-foreground mb-4 py-3 border-t border-b border-border/50">
+                    <p>
+                      After trial: <span className="font-medium text-foreground">${monthlyPrice}/month</span>
+                      {" "}+ ${monthlySeatPrice}/seat
+                    </p>
+                    <p className="text-xs mt-1">Cancel anytime during trial. Annual plans available later.</p>
+                  </div>
+
                   <Button 
                     size="lg" 
                     className="w-full gap-2 rounded-full bg-[#0B64A3] hover:bg-[#0B64A3]/90"
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
-                    Get Started
+                    Start Free Trial
                     <ArrowRight className="w-5 h-5" />
                   </Button>
 
@@ -499,15 +458,14 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     <h3 className="font-medium mb-3">Order Summary</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span>OnRopePro Base Plan</span>
+                        <span>OnRopePro Base Plan (Monthly)</span>
                         <span className="font-medium">
-                          ${data.billingFrequency === "monthly" ? monthlyPrice : annualPrice}
-                          /{data.billingFrequency === "monthly" ? "mo" : "yr"}
+                          ${monthlyPrice}/mo
                         </span>
                       </div>
                       <div className="flex justify-between text-muted-foreground">
-                        <span>Billing</span>
-                        <span className="capitalize">{data.billingFrequency}</span>
+                        <span>Billing Cycle</span>
+                        <span>Monthly</span>
                       </div>
                       <div className="border-t pt-2 mt-2">
                         <div className="flex justify-between text-green-600 dark:text-green-400">
