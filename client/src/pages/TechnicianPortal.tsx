@@ -3942,19 +3942,28 @@ export default function TechnicianPortal() {
               {/* Linked Employer Card - Show when employed and not suspended */}
               {user && user.companyId && !user.terminatedDate && !user.suspendedAt && companyData?.company && (
                 <div 
-                  className="group bg-white dark:bg-slate-900 border border-green-200 dark:border-green-700 rounded-lg shadow-sm p-4 text-left"
+                  className="group bg-white dark:bg-slate-900 border border-green-200 dark:border-green-700 rounded-lg shadow-sm p-4 text-left flex flex-col h-full"
                   data-testid="quick-action-linked-employer"
                 >
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                      <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    </div>
+                    {companyData.company.companyLogoUrl ? (
+                      <img 
+                        src={companyData.company.companyLogoUrl} 
+                        alt={companyData.company.companyName || companyData.company.name}
+                        className="w-10 h-10 rounded-lg object-contain flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                    )}
                     <Badge variant="default" className="bg-green-600 text-xs">
                       <CheckCircle2 className="w-3 h-3 mr-1" />
                       {t.active}
                     </Badge>
                   </div>
                   <p className="font-semibold text-base text-slate-900 dark:text-slate-100 truncate mb-2">{companyData.company.companyName || companyData.company.name}</p>
+                  <div className="flex-1" />
                   <div className="flex justify-end">
                     <Button
                       variant="ghost"
