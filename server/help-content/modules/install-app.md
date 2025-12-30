@@ -1,6 +1,6 @@
 # How To Install the App
 
-OnRopePro is a Progressive Web App (PWA), which means you can install it directly on your device for quick access without going through an app store. Once installed, OnRopePro works just like a native app with its own icon on your home screen.
+OnRopePro is a Progressive Web App (PWA) that you can install directly on your device for quick access. Once installed, it works like a native app with its own icon on your home screen.
 
 ## Why Install the App?
 
