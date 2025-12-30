@@ -29,6 +29,9 @@ interface WorkSession {
   projectName?: string;
   startTime: string;
   endTime?: string;
+  regularHours?: number;
+  overtimeHours?: number;
+  doubleTimeHours?: number;
   dailyDropTarget?: number;
   dropsCompleted?: number;
   dropsCompletedNorth?: number;
@@ -133,15 +136,29 @@ export default function Performance() {
     { name: t('performance.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
-  const calculateHours = (sessions: any[], startDate: Date, endDate: Date) => {
+  const calculateBillableHours = (sessions: WorkSession[], startDate: Date, endDate: Date) => {
     return sessions
-      .filter((s: any) => {
+      .filter((s: WorkSession) => {
         const sessionDate = new Date(s.startTime);
         return sessionDate >= startDate && sessionDate <= endDate && s.endTime;
       })
-      .reduce((sum: number, s: any) => {
+      .reduce((sum: number, s: WorkSession) => {
+        const regular = parseFloat(String(s.regularHours)) || 0;
+        const overtime = parseFloat(String(s.overtimeHours)) || 0;
+        const doubleTime = parseFloat(String(s.doubleTimeHours)) || 0;
+        return sum + regular + overtime + doubleTime;
+      }, 0);
+  };
+
+  const calculateNonBillableHours = (sessions: NonBillableSession[], startDate: Date, endDate: Date) => {
+    return sessions
+      .filter((s: NonBillableSession) => {
+        const sessionDate = new Date(s.startTime);
+        return sessionDate >= startDate && sessionDate <= endDate && s.endTime;
+      })
+      .reduce((sum: number, s: NonBillableSession) => {
         const start = new Date(s.startTime);
-        const end = new Date(s.endTime);
+        const end = new Date(s.endTime!);
         return sum + (end.getTime() - start.getTime()) / (1000 * 60 * 60);
       }, 0);
   };
@@ -152,10 +169,10 @@ export default function Performance() {
   const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const dayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
-  const monthBillable = calculateHours(allWorkSessions, monthStart, monthEnd);
-  const monthNonBillable = calculateHours(allNonBillableSessions, monthStart, monthEnd);
-  const dayBillable = calculateHours(allWorkSessions, dayStart, dayEnd);
-  const dayNonBillable = calculateHours(allNonBillableSessions, dayStart, dayEnd);
+  const monthBillable = calculateBillableHours(allWorkSessions, monthStart, monthEnd);
+  const monthNonBillable = calculateNonBillableHours(allNonBillableSessions, monthStart, monthEnd);
+  const dayBillable = calculateBillableHours(allWorkSessions, dayStart, dayEnd);
+  const dayNonBillable = calculateNonBillableHours(allNonBillableSessions, dayStart, dayEnd);
 
   const billablePercentage = (monthBillable + monthNonBillable) > 0
     ? ((monthBillable / (monthBillable + monthNonBillable)) * 100).toFixed(0)
