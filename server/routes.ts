@@ -4877,32 +4877,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      const daysRemaining = Math.max(0, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
 
+      // Get work sessions in this period (inclusive bounds)
+      const sessions = await db.select()
+        .from(workSessions)
+        .where(and(
+          eq(workSessions.companyId, companyId),
+          gte(workSessions.startTime, startDate),
+          lte(workSessions.startTime, endDate)
+        ));
 
+      let totalHours = 0;
+      let employeeIds = new Set();
+      let totalCost = 0;
+      
+      for (const session of sessions) {
+        if (session.startTime && session.endTime) {
+          const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+          totalHours += hours;
+          if (session.employeeId) {
+            employeeIds.add(session.employeeId);
+          }
+        }
+      }
 
+      // Simple cost estimate (can be enhanced with actual employee rates)
+      totalCost = totalHours * 35; // Default hourly rate estimate
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      res.json({
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        totalHours: Math.round(totalHours * 10) / 10,
+        totalCost: Math.round(totalCost),
+        employeeCount: employeeIds.size,
+      });
+    } catch (error) {
+      console.error('[Dashboard] Get current pay period error:', error);
       res.status(500).json({ message: error.message || "Failed to get pay period" });
     }
   });

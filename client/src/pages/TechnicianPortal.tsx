@@ -1885,6 +1885,21 @@ export default function TechnicianPortal() {
   // State for editing employer profile specialties
   const [isEditingEmployerProfile, setIsEditingEmployerProfile] = useState(false);
   
+  // State for expected salary editing
+  const [expectedSalaryMin, setExpectedSalaryMin] = useState<string>("");
+  const [expectedSalaryMax, setExpectedSalaryMax] = useState<string>("");
+  const [expectedSalaryPeriod, setExpectedSalaryPeriod] = useState<string>("hourly");
+  const [isSavingSalary, setIsSavingSalary] = useState(false);
+  
+  // Initialize salary state from user data
+  useEffect(() => {
+    if (user) {
+      setExpectedSalaryMin(user.expectedSalaryMin?.toString() || "");
+      setExpectedSalaryMax(user.expectedSalaryMax?.toString() || "");
+      setExpectedSalaryPeriod(user.expectedSalaryPeriod || "hourly");
+    }
+  }, [user?.expectedSalaryMin, user?.expectedSalaryMax, user?.expectedSalaryPeriod]);
+  
   // Feedback state
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [feedbackTitle, setFeedbackTitle] = useState("");
@@ -4154,6 +4169,137 @@ export default function TechnicianPortal() {
                     }}
                     data-testid="switch-employer-visibility"
                   />
+                </div>
+
+                {/* Expected Salary Section */}
+                <div className="rounded-lg border p-4 mb-6">
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <DollarSign className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{language === 'en' ? 'Expected Salary' : 'Salaire attendu'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {language === 'en' ? 'Visible to potential employers' : 'Visible pour les employeurs potentiels'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {isEditingEmployerProfile ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>{language === 'en' ? 'Minimum' : 'Minimum'}</Label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={expectedSalaryMin}
+                              onChange={(e) => setExpectedSalaryMin(e.target.value)}
+                              className="pl-9"
+                              data-testid="input-salary-min"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>{language === 'en' ? 'Maximum' : 'Maximum'}</Label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={expectedSalaryMax}
+                              onChange={(e) => setExpectedSalaryMax(e.target.value)}
+                              className="pl-9"
+                              data-testid="input-salary-max"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>{language === 'en' ? 'Period' : 'Période'}</Label>
+                          <Select value={expectedSalaryPeriod} onValueChange={setExpectedSalaryPeriod}>
+                            <SelectTrigger data-testid="select-salary-period">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="hourly">{language === 'en' ? 'Per Hour' : 'Par heure'}</SelectItem>
+                              <SelectItem value="daily">{language === 'en' ? 'Per Day' : 'Par jour'}</SelectItem>
+                              <SelectItem value="weekly">{language === 'en' ? 'Per Week' : 'Par semaine'}</SelectItem>
+                              <SelectItem value="monthly">{language === 'en' ? 'Per Month' : 'Par mois'}</SelectItem>
+                              <SelectItem value="annually">{language === 'en' ? 'Per Year' : 'Par an'}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={async () => {
+                          setIsSavingSalary(true);
+                          try {
+                            const response = await fetch("/api/technician/expected-salary", {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              credentials: "include",
+                              body: JSON.stringify({
+                                minSalary: expectedSalaryMin ? parseFloat(expectedSalaryMin) : null,
+                                maxSalary: expectedSalaryMax ? parseFloat(expectedSalaryMax) : null,
+                                salaryPeriod: expectedSalaryPeriod,
+                              }),
+                            });
+                            if (!response.ok) throw new Error("Failed to update salary");
+                            queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                            toast({
+                              title: language === 'en' ? "Salary Updated" : "Salaire mis à jour",
+                              description: language === 'en' ? "Your expected salary has been saved" : "Votre salaire attendu a été enregistré",
+                            });
+                            setIsEditingEmployerProfile(false);
+                          } catch (error) {
+                            toast({ title: "Error", description: "Failed to update salary", variant: "destructive" });
+                          } finally {
+                            setIsSavingSalary(false);
+                          }
+                        }}
+                        disabled={isSavingSalary}
+                        data-testid="button-save-salary"
+                      >
+                        {isSavingSalary ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Save className="w-4 h-4 mr-2" />
+                        )}
+                        {language === 'en' ? 'Save Salary' : 'Enregistrer'}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-sm">
+                      {user.expectedSalaryMin || user.expectedSalaryMax ? (
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-lg">
+                            {user.expectedSalaryMin && user.expectedSalaryMax ? (
+                              `$${Number(user.expectedSalaryMin).toLocaleString()} - $${Number(user.expectedSalaryMax).toLocaleString()}`
+                            ) : user.expectedSalaryMin ? (
+                              `$${Number(user.expectedSalaryMin).toLocaleString()}+`
+                            ) : (
+                              `Up to $${Number(user.expectedSalaryMax).toLocaleString()}`
+                            )}
+                          </span>
+                          <Badge variant="secondary">
+                            {user.expectedSalaryPeriod === 'hourly' && (language === 'en' ? '/hour' : '/heure')}
+                            {user.expectedSalaryPeriod === 'daily' && (language === 'en' ? '/day' : '/jour')}
+                            {user.expectedSalaryPeriod === 'weekly' && (language === 'en' ? '/week' : '/semaine')}
+                            {user.expectedSalaryPeriod === 'monthly' && (language === 'en' ? '/month' : '/mois')}
+                            {user.expectedSalaryPeriod === 'annually' && (language === 'en' ? '/year' : '/an')}
+                          </Badge>
+                        </div>
+                      ) : (
+                        <p className="text-muted-foreground italic">
+                          {language === 'en' ? 'No salary expectation set. Click Edit to add.' : 'Aucun salaire attendu défini. Cliquez sur Modifier pour ajouter.'}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Profile Info Section */}
