@@ -33,6 +33,7 @@ import ActiveWorkers from "@/pages/ActiveWorkers";
 import NonBillableHours from "@/pages/NonBillableHours";
 import Inventory from "@/pages/Inventory";
 import HoursAnalytics from "@/pages/HoursAnalytics";
+import Performance from "@/pages/Performance";
 import ScheduleRouter from "@/pages/ScheduleRouter";
 import Weather from "@/pages/Weather";
 import SuperUser from "@/pages/SuperUser";
@@ -466,6 +467,11 @@ function Router() {
           <Route path="/hours-analytics">
             <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
               <HoursAnalytics />
+            </WithDashboardLayout>
+          </Route>
+          <Route path="/performance">
+            <WithDashboardLayout allowedRoles={["company", "operations_manager", "supervisor"]}>
+              <Performance />
             </WithDashboardLayout>
           </Route>
           <Route path="/schedule">

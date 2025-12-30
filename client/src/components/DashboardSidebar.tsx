@@ -32,6 +32,7 @@ import {
   SlidersHorizontal,
   User as UserIcon,
   Mail,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -41,6 +42,7 @@ import {
   canManageEmployees,
   canAccessQuotes,
   hasPermission,
+  canViewPerformance,
 } from "@/lib/permissions";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -159,7 +161,7 @@ export function DashboardSidebar({
       } else {
         // Default state: For employer variant, collapse all groups except "operations"
         if (variant === 'employer') {
-          setCollapsedGroups(new Set(['team', 'equipment', 'safety', 'financial', 'clients']));
+          setCollapsedGroups(new Set(['team', 'equipment', 'safety', 'financial', 'clients', 'analytics']));
         } else {
           setCollapsedGroups(new Set()); // All groups expanded by default for other variants
         }
@@ -415,6 +417,19 @@ export function DashboardSidebar({
           icon: Building,
           href: "/dashboard?tab=clients",
           isVisible: (user) => hasPermission(user, 'view_clients'),
+        },
+      ],
+    },
+    {
+      id: "analytics",
+      label: t("dashboard.categories.analytics", "ANALYTICS"),
+      items: [
+        {
+          id: "performance",
+          label: t("dashboard.sidebar.performance", "Performance"),
+          icon: BarChart3,
+          href: "/performance",
+          isVisible: (user) => canViewPerformance(user),
         },
       ],
     },
