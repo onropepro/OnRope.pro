@@ -3608,7 +3608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         ],
         ui_mode: 'embedded',
-        return_url: `${baseUrl}/complete-registration?session_id={CHECKOUT_SESSION_ID}`,
+        redirect_on_completion: 'never',
         metadata: {
           registrationType: 'employer',
           companyName,
@@ -3804,8 +3804,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[Registration] Created company: ${newCompany.companyName} (${newCompany.id})`);
 
-      // Store license key record for tracking and idempotency
-      await db.insert(licenseKeys).values({
+      // Get trial end date from subscription (needed for response)
+      const trialEnd = subscription && typeof subscription !== 'string' ? subscription.trial_end : null;
+
+      // Run independent operations in parallel for faster registration
+      // 1. License key record insertion (for tracking/idempotency)
+      // 2. Payroll config + period generation
+      // 3. Session save for auto-login
+      const licenseKeyPromise = db.insert(licenseKeys).values({
         licenseKey,
         stripeSessionId: sessionId,
         stripeCustomerId,
@@ -3817,30 +3823,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         usedAt: new Date(),
       });
 
-      // Create default payroll config and generate periods
-      try {
-        await storage.createPayPeriodConfig({
-          companyId: newCompany.id,
-          periodType: 'semi-monthly',
-          firstPayDay: 15,
-          secondPayDay: 30,
-        });
-        await storage.generatePayPeriods(newCompany.id, 6);
-      } catch (error) {
-        console.error('[Registration] Error creating default payroll config:', error);
-        // Don't fail registration if payroll setup fails
-      }
+      const payrollPromise = (async () => {
+        try {
+          await storage.createPayPeriodConfig({
+            companyId: newCompany.id,
+            periodType: 'semi-monthly',
+            firstPayDay: 15,
+            secondPayDay: 30,
+          });
+          await storage.generatePayPeriods(newCompany.id, 6);
+        } catch (error) {
+          console.error('[Registration] Error creating default payroll config:', error);
+        }
+      })();
 
-      console.log(`[Registration] Registration completed for ${companyName}`);
-
-      // Get trial end date from subscription
-      const trialEnd = subscription && typeof subscription !== 'string' ? subscription.trial_end : null;
-
-      // Create session for auto-login
-      req.session.userId = newCompany.id;
-      req.session.role = newCompany.role;
-      
-      await new Promise<void>((resolve, reject) => {
+      const sessionPromise = new Promise<void>((resolve, reject) => {
+        req.session.userId = newCompany.id;
+        req.session.role = newCompany.role;
         req.session.save((err) => {
           if (err) {
             console.error('[Registration] Session save error:', err);
@@ -3851,6 +3850,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         });
       });
+
+      // Wait for all parallel operations to complete
+      await Promise.all([licenseKeyPromise, payrollPromise, sessionPromise]);
+
+      console.log(`[Registration] Registration completed for ${companyName}`);
 
       res.json({
         flow: 'embedded',

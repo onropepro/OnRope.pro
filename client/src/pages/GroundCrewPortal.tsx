@@ -82,6 +82,7 @@ import {
   Info,
 } from "lucide-react";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { NotificationBell } from "@/components/NotificationBell";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 
 type Language = 'en' | 'fr' | 'es';
@@ -1442,7 +1443,11 @@ export default function GroundCrewPortal() {
                 </Button>
               )}
               
-              <LanguageDropdown />
+              {/* Notifications */}
+              <NotificationBell />
+              
+              {/* Language Selector */}
+              <LanguageDropdown iconOnly />
               
               <button 
                 onClick={() => setActiveTab('profile')}

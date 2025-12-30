@@ -1,7 +1,9 @@
 # Subscription & Stripe System - Single Source of Truth (SSOT)
-**Version**: 1.0  
+**Version**: 1.1  
 **Last Updated**: December 30, 2024  
 **Status**: ACTIVE - FOUNDATIONAL DOCUMENT
+
+> **v1.1 Changes**: Updated registration flow documentation to reflect processing screen with progress indicators, parallel backend operations, and correct API endpoints.
 
 ## Overview
 
@@ -181,7 +183,17 @@ const session = await stripe.checkout.sessions.create({
 │  ├── Trial notice: "30-day free trial, cancel anytime"           │
 │  └── "Start Free Trial" button                                   │
 │                                                                   │
-│  Step 4: Success                                                 │
+│  Step 4: Processing (Account Setup)                              │
+│  ├── "Setting up your account" with animated progress bar        │
+│  ├── Step-by-step status messages:                               │
+│  │   - "Verifying payment..."                                    │
+│  │   - "Creating your account..."                                │
+│  │   - "Setting up your dashboard..."                            │
+│  │   - "Configuring permissions..."                              │
+│  │   - "Finalizing your workspace..."                            │
+│  └── Helpful tips displayed during wait                          │
+│                                                                   │
+│  Step 5: Success                                                 │
 │  ├── "Account Created!"                                          │
 │  ├── Auto-login initiated                                        │
 │  └── Redirect to dashboard                                       │
@@ -200,55 +212,80 @@ const session = await stripe.checkout.sessions.create({
        │ 1. User fills      │                    │                    │
        │    account info    │                    │                    │
        │                    │                    │                    │
-       │ 2. POST /api/stripe/create-registration-session              │
+       │ 2. POST /api/stripe/create-registration-checkout             │
+       │    (password hash  │                    │                    │
+       │     in metadata)   │                    │                    │
        │───────────────────>│                    │                    │
        │                    │                    │                    │
-       │                    │ 3. Create Setup   │                    │
-       │                    │    Intent         │                    │
+       │                    │ 3. Create Checkout│                    │
+       │                    │    Session w/     │                    │
+       │                    │    user metadata  │                    │
        │                    │───────────────────>│                    │
        │                    │                    │                    │
        │                    │ 4. Return client  │                    │
-       │                    │    secret         │                    │
+       │                    │    secret + ID    │                    │
        │                    │<───────────────────│                    │
        │                    │                    │                    │
        │ 5. Render Stripe  │                    │                    │
-       │    Payment Element │                    │                    │
+       │    Embedded        │                    │                    │
+       │    Checkout        │                    │                    │
        │<───────────────────│                    │                    │
        │                    │                    │                    │
-       │ 6. User enters    │                    │                    │
-       │    card + billing │                    │                    │
+       │ 6. User completes │                    │                    │
+       │    payment form   │                    │                    │
        │                    │                    │                    │
-       │ 7. Submit Payment │                    │                    │
-       │───────────────────────────────────────>│                    │
-       │                    │                    │                    │
-       │ 8. Card validated │                    │                    │
+       │ 7. Stripe confirms│                    │                    │
+       │    payment        │                    │                    │
        │<───────────────────────────────────────│                    │
        │                    │                    │                    │
-       │ 9. POST /api/register-with-payment                          │
+       │ 8. Show Processing│                    │                    │
+       │    Screen w/      │                    │                    │
+       │    progress bar   │                    │                    │
+       │                    │                    │                    │
+       │ 9. GET /api/stripe/complete-registration/:sessionId          │
        │───────────────────>│                    │                    │
        │                    │                    │                    │
-       │                    │ 10. Create        │                    │
-       │                    │     Customer      │                    │
+       │                    │ 10. Verify session│                    │
+       │                    │    & get metadata │                    │
        │                    │───────────────────>│                    │
        │                    │                    │                    │
-       │                    │ 11. Create        │                    │
-       │                    │     Subscription  │                    │
-       │                    │     (trial)       │                    │
-       │                    │───────────────────>│                    │
-       │                    │                    │                    │
-       │                    │ 12. Create User   │                    │
+       │                    │ 11. Create User   │                    │
        │                    │─────────────────────────────────────────>│
        │                    │                    │                    │
-       │                    │ 13. Create        │                    │
-       │                    │    Session        │                    │
+       │                    │ 12. PARALLEL:     │                    │
+       │                    │   - License key   │                    │
+       │                    │   - Payroll setup │                    │
+       │                    │   - Session login │                    │
+       │                    │─────────────────────────────────────────>│
+       │                    │                    │                    │
+       │ 13. Return success│                    │                    │
+       │    + session      │                    │                    │
        │<───────────────────│                    │                    │
        │                    │                    │                    │
-       │ 14. Redirect to   │                    │                    │
+       │ 14. Show Success  │                    │                    │
+       │     Screen        │                    │                    │
+       │                    │                    │                    │
+       │ 15. Redirect to   │                    │                    │
        │     Dashboard     │                    │                    │
        │                    │                    │                    │
 ```
 
 ### 3.3 Key Implementation Points
+
+**Processing Screen (UX Optimization):**
+- Shown immediately when Stripe payment completes (eliminates blank screen)
+- Animated progress bar with step-by-step status messages
+- Steps displayed: Verifying payment, Creating account, Setting up dashboard, 
+  Configuring permissions, Finalizing workspace
+- Helpful tips shown during wait (payment confirmed, trial activated, etc.)
+- Progress interval managed via useRef with cleanup in finally block
+
+**Backend Performance (Parallel Operations):**
+- After company creation, these operations run in parallel via Promise.all:
+  1. License key record insertion
+  2. Payroll config + pay period generation  
+  3. Session save for auto-login
+- Reduces overall API response time significantly
 
 **License Key Handling:**
 - License keys are generated internally and stored in the database
@@ -261,9 +298,12 @@ const session = await stripe.checkout.sessions.create({
 - Network errors: "Unable to process payment. Please try again."
 - Duplicate email: "An account with this email already exists."
 - All errors recoverable - user can retry without losing entered data
+- If API fails, user returns to payment step with error toast
+- Progress interval properly cleaned up on error to prevent memory leaks
 
 **Security:**
 - All sensitive card data handled by Stripe (PCI compliance)
+- Password hashed with bcrypt before storing in Stripe session metadata
 - HTTPS only
 - CSRF protection on all API endpoints
 - Rate limiting on registration endpoints

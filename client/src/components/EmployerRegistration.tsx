@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import {
 } from "@shared/stripe-config";
 import { RegistrationEmbeddedCheckout } from "./RegistrationEmbeddedCheckout";
 
-type RegistrationStep = "welcome" | "companyDetails" | "payment" | "success";
+type RegistrationStep = "welcome" | "companyDetails" | "payment" | "processing" | "success";
 
 interface EmployerData {
   companyName: string;
@@ -37,6 +38,19 @@ interface EmployerRegistrationProps {
 
 const EMPLOYER_COLOR = "#0B64A3";
 
+interface ProcessingStatus {
+  step: number;
+  message: string;
+}
+
+const PROCESSING_STEPS = [
+  "Verifying payment...",
+  "Creating your company account...",
+  "Setting up your dashboard...",
+  "Configuring permissions...",
+  "Finalizing setup...",
+];
+
 export function EmployerRegistration({ open, onOpenChange }: EmployerRegistrationProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -44,6 +58,19 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   const [step, setStep] = useState<RegistrationStep>("welcome");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>({ step: 0, message: PROCESSING_STEPS[0] });
+  const [registrationResult, setRegistrationResult] = useState<{ companyName: string; trialEnd: number | null } | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    };
+  }, []);
   const [data, setData] = useState<EmployerData>({
     companyName: "",
     ownerName: "",
@@ -55,6 +82,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   const [error, setError] = useState("");
 
   const resetForm = () => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
     setStep("welcome");
     setData({
       companyName: "",
@@ -65,6 +96,65 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
       billingFrequency: "monthly",
     });
     setError("");
+    setSessionId(null);
+    setProcessingStatus({ step: 0, message: PROCESSING_STEPS[0] });
+    setRegistrationResult(null);
+  };
+
+  const completeRegistration = async (checkoutSessionId: string) => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+
+    try {
+      setStep("processing");
+      setProcessingStatus({ step: 0, message: PROCESSING_STEPS[0] });
+
+      progressIntervalRef.current = setInterval(() => {
+        setProcessingStatus(prev => {
+          const nextStep = Math.min(prev.step + 1, PROCESSING_STEPS.length - 1);
+          return { step: nextStep, message: PROCESSING_STEPS[nextStep] };
+        });
+      }, 2500);
+
+      const response = await fetch(`/api/stripe/complete-registration/${checkoutSessionId}`, {
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setRegistrationResult({
+          companyName: result.companyName || data.companyName,
+          trialEnd: result.trialEnd,
+        });
+        setStep("success");
+        
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+        
+        toast({
+          title: "Registration Complete!",
+          description: "Your company account has been created successfully.",
+        });
+      } else {
+        throw new Error(result.message || "Registration failed");
+      }
+    } catch (err: any) {
+      console.error("[Registration] Error completing registration:", err);
+      setError(err.message || "Failed to complete registration");
+      setStep("payment");
+      toast({
+        title: "Registration Error",
+        description: err.message || "Failed to complete registration. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    }
   };
 
   const handleClose = () => {
@@ -164,6 +254,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   const getStepNumber = () => {
     if (step === "companyDetails") return 1;
     if (step === "payment") return 2;
+    if (step === "processing") return 3;
     if (step === "success") return 3;
     return 0;
   };
@@ -491,7 +582,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       email={data.email}
                       password={data.password}
                       billingFrequency={data.billingFrequency}
-                      onComplete={() => setStep("success")}
+                      onComplete={(checkoutSessionId) => {
+                        setSessionId(checkoutSessionId);
+                        completeRegistration(checkoutSessionId);
+                      }}
                       onError={(errorMsg) => setError(errorMsg)}
                     />
                   </div>
@@ -503,6 +597,54 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                 </div>
               )}
 
+              {/* Processing Step - Shows immediately when Stripe checkout completes */}
+              {step === "processing" && (
+                <div className="h-full flex flex-col justify-center items-center max-w-md mx-auto text-center py-8">
+                  <div className="relative mb-6">
+                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                    </div>
+                  </div>
+                  
+                  <h2 className="text-xl font-bold mb-2">Setting up your account...</h2>
+                  <p className="text-muted-foreground mb-6">
+                    Just a moment while we finalize everything.
+                  </p>
+
+                  {/* Progress indicator */}
+                  <div className="w-full space-y-4 mb-6">
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary transition-all duration-500 ease-out"
+                        style={{ width: `${((processingStatus.step + 1) / PROCESSING_STEPS.length) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground animate-pulse">
+                      {processingStatus.message}
+                    </p>
+                  </div>
+
+                  {/* Helpful tips while waiting */}
+                  <div className="w-full bg-muted/50 rounded-lg p-4 text-left">
+                    <h3 className="font-medium text-sm mb-2">While you wait...</h3>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 text-green-500" />
+                        Your payment has been confirmed
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 text-green-500" />
+                        {TRIAL_PERIOD_DAYS}-day free trial activated
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Creating your workspace
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
               {/* Success Step */}
               {step === "success" && (
                 <div className="h-full flex flex-col justify-center items-center max-w-md mx-auto text-center">
@@ -511,7 +653,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-2">Welcome to OnRopePro!</h2>
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-muted-foreground mb-2">
+                    Your account for {registrationResult?.companyName || data.companyName} is ready.
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-6">
                     Your {TRIAL_PERIOD_DAYS}-day free trial has started. You're ready to start managing your rope access business.
                   </p>
 
@@ -520,7 +665,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       className="w-full bg-[#0B64A3] hover:bg-[#0B64A3]/90"
                       onClick={() => {
                         handleClose();
-                        setLocation("/dashboard");
+                        setLocation("/employer");
                       }}
                       data-testid="button-go-to-dashboard"
                     >

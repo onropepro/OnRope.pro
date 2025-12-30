@@ -127,6 +127,7 @@ import {
 } from "lucide-react";
 import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentRequests";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { NotificationBell } from "@/components/NotificationBell";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ActiveSessionBadge } from "@/components/ActiveSessionBadge";
@@ -3676,8 +3677,11 @@ export default function TechnicianPortal() {
                 </Button>
               )}
               
+              {/* Notifications */}
+              <NotificationBell />
+              
               {/* Language Selector */}
-              <LanguageDropdown />
+              <LanguageDropdown iconOnly />
               
               {/* User Profile - Clickable to go to Profile tab */}
               <button 

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   EmbeddedCheckoutProvider,
@@ -16,7 +16,7 @@ interface RegistrationCheckoutProps {
   email: string;
   password: string;
   billingFrequency: BillingFrequency;
-  onComplete?: () => void;
+  onComplete?: (sessionId: string) => void;
   onError?: (error: string) => void;
 }
 
@@ -31,6 +31,7 @@ export function RegistrationEmbeddedCheckout({
 }: RegistrationCheckoutProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const sessionIdRef = useRef<string | null>(null);
 
   const fetchClientSecret = useCallback(async () => {
     try {
@@ -51,6 +52,7 @@ export function RegistrationEmbeddedCheckout({
         throw new Error(data.message || "Failed to create checkout session");
       }
 
+      sessionIdRef.current = data.sessionId;
       setLoading(false);
       return data.clientSecret;
     } catch (err: any) {
@@ -67,8 +69,8 @@ export function RegistrationEmbeddedCheckout({
   const options = {
     fetchClientSecret,
     onComplete: () => {
-      if (onComplete) {
-        onComplete();
+      if (onComplete && sessionIdRef.current) {
+        onComplete(sessionIdRef.current);
       }
     },
   };
