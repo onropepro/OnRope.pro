@@ -1,6 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,11 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { formatDateTime } from "@/lib/dateUtils";
-import { useSetHeaderConfig } from "@/components/DashboardLayout";
 
 export default function NonBillableHours() {
   const { t } = useTranslation();
-  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [description, setDescription] = useState("");
   
@@ -32,19 +29,6 @@ export default function NonBillableHours() {
   });
 
   const activeSession = activeSessionData?.session;
-
-  // Back navigation handler
-  const handleBackClick = useCallback(() => {
-    setLocation("/dashboard");
-  }, [setLocation]);
-
-  // Configure header through DashboardLayout
-  useSetHeaderConfig({
-    pageTitle: t('nonBillable.title', 'Non-Billable Hours'),
-    pageDescription: t('nonBillable.subtitle', 'Track errands, training, and other non-project work'),
-    onBackClick: handleBackClick,
-    showSearch: false,
-  }, [t, handleBackClick]);
 
   // Start new non-billable work session
   const startSessionMutation = useMutation({
@@ -130,6 +114,16 @@ export default function NonBillableHours() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Page Header */}
+      <div className="space-y-1">
+        <h2 className="text-2xl font-semibold text-foreground">
+          {t('nonBillable.title', 'Non-Billable Hours')}
+        </h2>
+        <p className="text-muted-foreground">
+          {t('nonBillable.subtitle', 'Track errands, training, and other non-project work')}
+        </p>
+      </div>
+
       {/* Active Session Card */}
       {activeSession ? (
         <Card className="shadow-sm hover:shadow-md transition-shadow">
@@ -215,7 +209,7 @@ export default function NonBillableHours() {
               <span className="material-icons text-primary mt-0.5">info</span>
               <div>
                 <p className="font-medium mb-1">{t('nonBillable.aboutTitle', 'About Non-Billable Hours')}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   {t('nonBillable.aboutDescription', "These hours are included in payroll but don't count toward project performance analytics. Use this for any work that isn't directly tied to a specific project.")}
                 </p>
               </div>
@@ -225,7 +219,7 @@ export default function NonBillableHours() {
               <span className="material-icons text-primary mt-0.5">schedule</span>
               <div>
                 <p className="font-medium mb-1">{t('nonBillable.timeTrackingTitle', 'Time Tracking')}</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   {t('nonBillable.timeTrackingDescription', "Your session time is tracked automatically from start to finish. Remember to end your session when you're done.")}
                 </p>
               </div>
