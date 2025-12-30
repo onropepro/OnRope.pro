@@ -1945,15 +1945,12 @@ export default function ProjectDetail() {
                 {canViewFinancialData && project.estimatedHours && (
                   <TabsContent value="budget" className="mt-4">
                     {(() => {
-                      // Calculate total hours worked from completed sessions
+                      // Calculate total hours worked from pre-calculated hours fields (matches Dashboard calculation)
                       const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
-                        if (session.startTime && session.endTime) {
-                          const start = new Date(session.startTime);
-                          const end = new Date(session.endTime);
-                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                          return sum + hours;
-                        }
-                        return sum;
+                        const regular = parseFloat(session.regularHours) || 0;
+                        const overtime = parseFloat(session.overtimeHours) || 0;
+                        const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                        return sum + regular + overtime + doubleTime;
                       }, 0);
                       
                       const estimatedHours = project.estimatedHours || 0;
@@ -1961,22 +1958,23 @@ export default function ProjectDetail() {
                       const isOverBudget = totalHoursWorked > estimatedHours;
                       const hoursOver = isOverBudget ? totalHoursWorked - estimatedHours : 0;
                       
-                      // Calculate total labor cost and overage cost
+                      // Calculate total labor cost and overage cost using pre-calculated hours
                       let totalLaborCost = 0;
                       let cumulativeHours = 0;
                       let overageCost = 0;
                       
                       completedSessions.forEach((session: any) => {
-                        if (session.startTime && session.endTime && session.techHourlyRate) {
-                          const start = new Date(session.startTime);
-                          const end = new Date(session.endTime);
-                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                        const regular = parseFloat(session.regularHours) || 0;
+                        const overtime = parseFloat(session.overtimeHours) || 0;
+                        const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                        const hours = regular + overtime + doubleTime;
+                        
+                        if (hours > 0 && session.techHourlyRate) {
                           const cost = hours * parseFloat(session.techHourlyRate);
                           totalLaborCost += cost;
                           
                           // Track overage cost (hours beyond estimated hours)
                           if (isOverBudget) {
-                            const previousCumulative = cumulativeHours;
                             cumulativeHours += hours;
                             
                             if (cumulativeHours > estimatedHours) {
