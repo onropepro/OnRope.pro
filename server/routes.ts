@@ -4877,32 +4877,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      const daysRemaining = Math.max(0, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
 
-      // Get work sessions in this period (inclusive bounds)
-      const sessions = await db.select()
-        .from(workSessions)
-        .where(and(
-          eq(workSessions.companyId, companyId),
-          gte(workSessions.startTime, startDate),
-          lte(workSessions.startTime, endDate)
-        ));
 
-      let totalHours = 0;
-      for (const session of sessions) {
-        if (session.startTime && session.endTime) {
-          totalHours += (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
-        }
-      }
 
-      res.json({
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
-        daysRemaining,
-        totalHours: Math.round(totalHours * 10) / 10,
-      });
-    } catch (error: any) {
-      console.error('[Dashboard] Get current pay period error:', error);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       res.status(500).json({ message: error.message || "Failed to get pay period" });
     }
   });
