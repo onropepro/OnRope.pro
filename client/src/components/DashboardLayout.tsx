@@ -168,9 +168,9 @@ function DashboardLayoutInner({
           showProfile={headerConfig?.showProfile ?? true}
           showLogout={headerConfig?.showLogout ?? true}
           onMobileMenuClick={() => setMobileOpen(prev => !prev)}
-          brandingLogoUrl={whitelabelActive ? brandingData?.logoUrl || undefined : undefined}
-          brandingColor={whitelabelActive && brandingData?.colors?.[0] ? brandingData.colors[0] : undefined}
-          brandingCompanyName={whitelabelActive ? brandingData?.companyName : undefined}
+          brandingLogoUrl={undefined}
+          brandingColor={undefined}
+          brandingCompanyName={undefined}
         />
         <div className="flex-1">
           {children}

@@ -333,7 +333,7 @@ export function UnifiedDashboardHeader({
   const useDropdownProfile = useInlineActions === undefined 
     ? (!isEmployer && !isSuperUser) 
     : !useInlineActions;
-  const useIconOnlyLanguage = !isEmployer;
+  const useIconOnlyLanguage = true;
   
   const resolvedProfileClick = customProfileClick || handleProfileClick;
   const resolvedLogout = customLogout || handleLogout;
