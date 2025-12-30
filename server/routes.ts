@@ -4848,9 +4848,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let startDate: Date;
       let endDate: Date;
       
-      if (config) {
+      if (config && config.periodStartDate) {
         // Calculate based on config
         const periodStart = new Date(config.periodStartDate);
+        // Validate the date is valid
+        if (isNaN(periodStart.getTime())) {
+          // Fall back to semi-monthly if config date is invalid
+          const dayOfMonth = today.getDate();
+          if (dayOfMonth <= 15) {
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            endDate = new Date(today.getFullYear(), today.getMonth(), 15, 23, 59, 59, 999);
+          } else {
+            startDate = new Date(today.getFullYear(), today.getMonth(), 16);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+          }
+        } else {
         const periodLength = config.periodType === 'weekly' ? 7 : 
                            config.periodType === 'biweekly' ? 14 : 
                            config.periodType === 'semi_monthly' ? 15 : 30;
@@ -4865,6 +4877,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + periodLength - 1);
         endDate.setHours(23, 59, 59, 999); // Include full final day
+        }
       } else {
         // Default to biweekly
         const dayOfMonth = today.getDate();
