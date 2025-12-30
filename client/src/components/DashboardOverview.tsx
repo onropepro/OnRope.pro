@@ -326,15 +326,49 @@ export function DashboardOverview({
     },
   ];
 
-  const displayProjects: ActiveProject[] = activeProjects.slice(0, 3).map((project: any) => ({
-    id: project.id,
-    name: project.name || project.buildingName || "Untitled Project",
-    client: project.clientName || project.client || "Unknown Client",
-    teamCount: project.assignedEmployees?.length || 0,
-    dueDate: project.endDate ? format(new Date(project.endDate), "MMM d") : "TBD",
-    progress: typeof project.progress === 'number' ? project.progress : 0,
-    status: project.status || "active",
-  }));
+  const displayProjects: ActiveProject[] = activeProjects.slice(0, 3).map((project: any) => {
+    // Calculate progress based on project type
+    let progress = 0;
+    const jobType = project.jobType || '';
+    
+    // Hours-based jobs (NDT, Rock Scaling, etc.)
+    const hourBasedJobs = ['ndt_inspection', 'rock_scaling', 'concrete_repair', 'sign_installation', 'overhead_protection', 'general_repairs'];
+    if (hourBasedJobs.includes(jobType)) {
+      const estimatedHours = project.estimatedHours || 0;
+      const hoursWorked = project.hoursWorked || 0;
+      progress = estimatedHours > 0 ? Math.min(100, (hoursWorked / estimatedHours) * 100) : 0;
+    } else if (jobType === 'in_suite_dryer_vent_cleaning') {
+      // Suite-based
+      const totalSuites = project.totalSuites || 0;
+      const suitesCompleted = project.suitesCompleted || 0;
+      progress = totalSuites > 0 ? (suitesCompleted / totalSuites) * 100 : 0;
+    } else if (jobType === 'parkade_pressure_cleaning') {
+      // Stall-based
+      const totalStalls = project.totalStalls || 0;
+      const stallsCompleted = project.stallsCompleted || 0;
+      progress = totalStalls > 0 ? (stallsCompleted / totalStalls) * 100 : 0;
+    } else if (jobType === 'anchor_inspection') {
+      // Anchor-based
+      const totalAnchors = project.totalAnchors || 0;
+      const anchorsInspected = project.totalAnchorsInspected || 0;
+      progress = totalAnchors > 0 ? (anchorsInspected / totalAnchors) * 100 : 0;
+    } else {
+      // Drop-based (window cleaning, building wash, etc.)
+      const totalDrops = project.totalDrops || 0;
+      const completedDrops = project.completedDrops || 0;
+      progress = totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
+    }
+    
+    return {
+      id: project.id,
+      name: project.name || project.buildingName || "Untitled Project",
+      client: project.clientName || project.client || "Unknown Client",
+      teamCount: project.assignedEmployees?.length || 0,
+      dueDate: project.endDate ? format(new Date(project.endDate), "MMM d") : "TBD",
+      progress: Math.round(progress),
+      status: project.status || "active",
+    };
+  });
 
   const todaySchedule: ScheduleItem[] = todayScheduleData?.scheduleItems || [];
 
