@@ -219,7 +219,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
                   {getStepNumber() > 2 ? <Check className="w-4 h-4" /> : "2"}
                 </div>
-                <span className="text-sm font-medium">Payment Setup</span>
+                <span className="text-sm font-medium">Billing Details</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
@@ -423,9 +423,13 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       onClick={handleContinue}
                       data-testid="button-continue"
                     >
-                      Continue to Payment
-                      <CreditCard className="w-4 h-4 ml-2" />
+                      Continue
+                      <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      <Lock className="w-3 h-3 inline mr-1" />
+                      You won't be charged during your {TRIAL_PERIOD_DAYS}-day trial
+                    </p>
                   </div>
                 </div>
               )}
@@ -442,7 +446,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     Back
                   </button>
 
-                  <h2 className="text-xl font-bold mb-1">Payment Setup</h2>
+                  <h2 className="text-xl font-bold mb-1">Billing Details</h2>
                   <p className="text-sm text-muted-foreground mb-6">
                     Enter your billing details to start your {TRIAL_PERIOD_DAYS}-day free trial
                   </p>
