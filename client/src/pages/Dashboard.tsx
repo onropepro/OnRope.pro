@@ -370,10 +370,10 @@ const dropLogSchema = z.object({
 });
 
 const endDaySchema = z.object({
-  dropsNorth: z.string().default("0"),
-  dropsEast: z.string().default("0"),
-  dropsSouth: z.string().default("0"),
-  dropsWest: z.string().default("0"),
+  dropsNorth: z.string().default(""),
+  dropsEast: z.string().default(""),
+  dropsSouth: z.string().default(""),
+  dropsWest: z.string().default(""),
   shortfallReason: z.string().optional(),
   logRopeAccessHours: z.boolean().default(false),
   ropeAccessTaskHours: z.string().default(""),
@@ -1959,10 +1959,10 @@ export default function Dashboard() {
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
     defaultValues: {
-      dropsNorth: "0",
-      dropsEast: "0",
-      dropsSouth: "0",
-      dropsWest: "0",
+      dropsNorth: "",
+      dropsEast: "",
+      dropsSouth: "",
+      dropsWest: "",
       shortfallReason: "",
       ropeAccessTaskHours: "",
     },
@@ -3293,10 +3293,10 @@ export default function Dashboard() {
     } else {
       // Reset to defaults for drop-based projects
       endDayForm.reset({
-        dropsNorth: "0",
-        dropsEast: "0",
-        dropsSouth: "0",
-        dropsWest: "0",
+        dropsNorth: "",
+        dropsEast: "",
+        dropsSouth: "",
+        dropsWest: "",
         shortfallReason: "",
         logRopeAccessHours: false,
         ropeAccessTaskHours: "",
