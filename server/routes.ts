@@ -4892,38 +4892,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const daysRemaining = Math.max(0, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
 
-      // Get work sessions in this period (inclusive bounds)
-      const sessions = await db.select()
-        .from(workSessions)
-        .where(and(
-          eq(workSessions.companyId, companyId),
-          gte(workSessions.startTime, startDate),
-          lte(workSessions.startTime, endDate)
-        ));
+      // Use existing payroll calculation (same data as payroll page)
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
+      const hoursSummary = await storage.getEmployeeHoursForPayPeriod(companyId, startDateStr, endDateStr);
 
+      // Aggregate the results
       let totalHours = 0;
-      let employeeIds = new Set();
       let totalCost = 0;
-      
-      for (const session of sessions) {
-        if (session.startTime && session.endTime) {
-          const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
-          totalHours += hours;
-          if (session.employeeId) {
-            employeeIds.add(session.employeeId);
-          }
-        }
-      }
+      const employeeCount = hoursSummary.length;
 
-      // Simple cost estimate (can be enhanced with actual employee rates)
-      totalCost = totalHours * 35; // Default hourly rate estimate
+      for (const emp of hoursSummary) {
+        totalHours += emp.totalHours || 0;
+        totalCost += emp.grossPay || 0;
+      }
 
       res.json({
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
         totalHours: Math.round(totalHours * 10) / 10,
         totalCost: Math.round(totalCost),
-        employeeCount: employeeIds.size,
+        employeeCount,
       });
     } catch (error) {
       console.error('[Dashboard] Get current pay period error:', error);
