@@ -517,7 +517,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       Continue
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
-                    <p className="text-xs text-muted-foreground text-center mt-2">
+                    <p className="text-xs text-center mt-2 text-[#f50000]">
                       <Lock className="w-3 h-3 inline mr-1" />
                       You won't be charged during your {TRIAL_PERIOD_DAYS}-day trial
                     </p>
