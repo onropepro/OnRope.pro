@@ -16351,6 +16351,39 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
   
+  // Get current user's active work session (if any)
+  app.get("/api/my-active-session", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get any active session (billable or non-billable) for this user
+      const activeSession = await storage.getAnyActiveSession(currentUser.id);
+      
+      if (!activeSession) {
+        return res.json({ hasActiveSession: false, session: null });
+      }
+      
+      // Enrich with additional info
+      const sessionData = {
+        hasActiveSession: true,
+        type: activeSession.type,
+        sessionId: activeSession.session.id,
+        startTime: activeSession.session.startTime,
+        projectName: activeSession.projectName || null,
+        description: activeSession.description || null,
+      };
+      
+      res.json(sessionData);
+    } catch (error) {
+      console.error("Get my active session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get all completed work sessions for the current user (across all projects)
   app.get("/api/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
     try {
