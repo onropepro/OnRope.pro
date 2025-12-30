@@ -4212,7 +4212,7 @@ export default function TechnicianPortal() {
                           <div>
                             <p className="text-xs text-muted-foreground">IRATA</p>
                             <p className="font-medium" data-testid="text-employer-profile-irata">
-                              Level {user.irataLevel || "?"} - {user.irataLicenseNumber}
+                              {user.irataLevel || "?"} - {user.irataLicenseNumber}
                             </p>
                           </div>
                           <Badge variant="secondary">IRATA</Badge>
@@ -4223,7 +4223,7 @@ export default function TechnicianPortal() {
                           <div>
                             <p className="text-xs text-muted-foreground">SPRAT</p>
                             <p className="font-medium" data-testid="text-employer-profile-sprat">
-                              Level {user.spratLevel || "?"} - {user.spratLicenseNumber}
+                              {user.spratLevel || "?"} - {user.spratLicenseNumber}
                             </p>
                           </div>
                           <Badge variant="secondary">SPRAT</Badge>
