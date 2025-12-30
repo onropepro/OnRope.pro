@@ -343,6 +343,37 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
                       t('login.signIn', 'Sign In')
                     )}
                   </Button>
+
+                  {/* Quick Login Buttons for Testing */}
+                  <div className="pt-3 border-t mt-3">
+                    <p className="text-xs text-muted-foreground text-center mb-2">Quick Login (Testing)</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          form.setValue("identifier", "tester@tester.com");
+                          form.setValue("password", "tester123");
+                        }}
+                        data-testid="button-quick-login-tester"
+                      >
+                        Tester
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          form.setValue("identifier", "166459");
+                          form.setValue("password", "Mhlqt419!");
+                        }}
+                        data-testid="button-quick-login-tech"
+                      >
+                        Tech
+                      </Button>
+                    </div>
+                  </div>
                 </form>
               </Form>
             )}
