@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,13 +15,12 @@ import {
 } from "lucide-react";
 import { 
   PRICING, 
-  ANNUAL_DISCOUNT_PERCENT, 
   TRIAL_PERIOD_DAYS,
   type BillingFrequency 
 } from "@shared/stripe-config";
 import { RegistrationEmbeddedCheckout } from "./RegistrationEmbeddedCheckout";
 
-type RegistrationStep = "welcome" | "companyDetails" | "payment" | "success";
+type RegistrationStep = "welcome" | "companyDetails" | "payment" | "processing" | "success";
 
 interface EmployerData {
   companyName: string;
@@ -38,6 +38,19 @@ interface EmployerRegistrationProps {
 
 const EMPLOYER_COLOR = "#0B64A3";
 
+interface ProcessingStatus {
+  step: number;
+  message: string;
+}
+
+const PROCESSING_STEPS = [
+  "Verifying payment...",
+  "Creating your company account...",
+  "Setting up your dashboard...",
+  "Configuring permissions...",
+  "Finalizing setup...",
+];
+
 export function EmployerRegistration({ open, onOpenChange }: EmployerRegistrationProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -45,6 +58,19 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   const [step, setStep] = useState<RegistrationStep>("welcome");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>({ step: 0, message: PROCESSING_STEPS[0] });
+  const [registrationResult, setRegistrationResult] = useState<{ companyName: string; trialEnd: number | null } | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    };
+  }, []);
   const [data, setData] = useState<EmployerData>({
     companyName: "",
     ownerName: "",
@@ -56,6 +82,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   const [error, setError] = useState("");
 
   const resetForm = () => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
     setStep("welcome");
     setData({
       companyName: "",
@@ -66,6 +96,65 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
       billingFrequency: "monthly",
     });
     setError("");
+    setSessionId(null);
+    setProcessingStatus({ step: 0, message: PROCESSING_STEPS[0] });
+    setRegistrationResult(null);
+  };
+
+  const completeRegistration = async (checkoutSessionId: string) => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+
+    try {
+      setStep("processing");
+      setProcessingStatus({ step: 0, message: PROCESSING_STEPS[0] });
+
+      progressIntervalRef.current = setInterval(() => {
+        setProcessingStatus(prev => {
+          const nextStep = Math.min(prev.step + 1, PROCESSING_STEPS.length - 1);
+          return { step: nextStep, message: PROCESSING_STEPS[nextStep] };
+        });
+      }, 2500);
+
+      const response = await fetch(`/api/stripe/complete-registration/${checkoutSessionId}`, {
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setRegistrationResult({
+          companyName: result.companyName || data.companyName,
+          trialEnd: result.trialEnd,
+        });
+        setStep("success");
+        
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+        
+        toast({
+          title: "Registration Complete!",
+          description: "Your company account has been created successfully.",
+        });
+      } else {
+        throw new Error(result.message || "Registration failed");
+      }
+    } catch (err: any) {
+      console.error("[Registration] Error completing registration:", err);
+      setError(err.message || "Failed to complete registration");
+      setStep("payment");
+      toast({
+        title: "Registration Error",
+        description: err.message || "Failed to complete registration. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    }
   };
 
   const handleClose = () => {
@@ -165,6 +254,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   const getStepNumber = () => {
     if (step === "companyDetails") return 1;
     if (step === "payment") return 2;
+    if (step === "processing") return 3;
     if (step === "success") return 3;
     return 0;
   };
@@ -187,16 +277,14 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   ];
 
   const trialBenefits = [
-    `${TRIAL_PERIOD_DAYS}-day free trial`,
     "Full access to all features",
     "Cancel anytime with data export",
     "Priority support during trial",
+    "No charge until trial ends",
   ];
 
   const monthlyPrice = PRICING.base.monthly;
-  const annualPrice = PRICING.base.annual;
   const monthlySeatPrice = PRICING.seat.monthly;
-  const annualSeatPrice = PRICING.seat.annual;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -222,7 +310,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
                   {getStepNumber() > 2 ? <Check className="w-4 h-4" /> : "2"}
                 </div>
-                <span className="text-sm font-medium">Payment Setup</span>
+                <span className="text-sm font-medium">Billing Details</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
@@ -252,65 +340,18 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
               {/* Welcome Screen */}
               {step === "welcome" && (
                 <div className="h-full flex flex-col justify-center max-w-md mx-auto">
-                  <div className="text-center mb-4">
+                  <div className="text-center mb-6">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0B64A3]/10 border border-[#0B64A3]/20 mb-3">
                       <Building2 className="w-4 h-4 text-[#0B64A3]" />
                       <span className="text-xs font-medium text-[#0B64A3] text-center leading-tight">
                         For Rope Access Company Owners
                       </span>
                     </div>
-                    <h1 className="text-2xl font-bold mb-1">Start Your Free Trial</h1>
-                    <p className="text-sm text-muted-foreground">{TRIAL_PERIOD_DAYS} days of full access.</p>
+                    <h1 className="text-3xl font-bold mb-2">{TRIAL_PERIOD_DAYS} Days Free</h1>
+                    <p className="text-muted-foreground">Full access to all features. No commitment.</p>
                   </div>
 
-                  {/* Pricing Display with Billing Frequency Toggle */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      <button
-                        onClick={() => setData({ ...data, billingFrequency: "monthly" })}
-                        className={`px-4 py-2 text-sm font-medium rounded-l-lg transition-colors ${
-                          data.billingFrequency === "monthly"
-                            ? "bg-[#0B64A3] text-white"
-                            : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                        data-testid="button-billing-monthly"
-                      >
-                        Monthly
-                      </button>
-                      <button
-                        onClick={() => setData({ ...data, billingFrequency: "annual" })}
-                        className={`px-4 py-2 text-sm font-medium rounded-r-lg transition-colors ${
-                          data.billingFrequency === "annual"
-                            ? "bg-[#0B64A3] text-white"
-                            : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                        data-testid="button-billing-annual"
-                      >
-                        Annual
-                        <span className="ml-1 text-xs text-green-400">(Save {ANNUAL_DISCOUNT_PERCENT}%)</span>
-                      </button>
-                    </div>
-                    
-                    <div className="bg-muted/50 rounded-lg p-4 text-center">
-                      <div className="text-3xl font-bold text-foreground">
-                        ${data.billingFrequency === "monthly" ? monthlyPrice : annualPrice}
-                        <span className="text-base font-normal text-muted-foreground">
-                          /{data.billingFrequency === "monthly" ? "month" : "year"}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        + ${data.billingFrequency === "monthly" ? monthlySeatPrice : annualSeatPrice}/seat
-                        <span className="text-xs"> (add team members as needed)</span>
-                      </p>
-                      {data.billingFrequency === "annual" && (
-                        <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                          You save ${(monthlyPrice * 12) - annualPrice}/year on base plan
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Benefits section */}
+                  {/* Benefits section - now first */}
                   <div className="space-y-1.5 mb-4">
                     {welcomeBenefits.map((benefit, i) => (
                       <div key={i} className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/50">
@@ -339,13 +380,22 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
                   </div>
 
+                  {/* Pricing - now secondary, below features */}
+                  <div className="text-center text-sm text-muted-foreground mb-4 py-3 border-t border-b border-border/50">
+                    <p>
+                      After trial: <span className="font-medium text-foreground">${monthlyPrice}/month</span>
+                      {" "}+ ${monthlySeatPrice}/seat
+                    </p>
+                    <p className="text-xs mt-1">Cancel anytime during trial. Annual plans available later.</p>
+                  </div>
+
                   <Button 
                     size="lg" 
                     className="w-full gap-2 rounded-full bg-[#0B64A3] hover:bg-[#0B64A3]/90"
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
-                    Get Started
+                    Start Free Trial
                     <ArrowRight className="w-5 h-5" />
                   </Button>
 
@@ -464,9 +514,13 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       onClick={handleContinue}
                       data-testid="button-continue"
                     >
-                      Continue to Payment
-                      <CreditCard className="w-4 h-4 ml-2" />
+                      Continue
+                      <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      <Lock className="w-3 h-3 inline mr-1" />
+                      You won't be charged during your {TRIAL_PERIOD_DAYS}-day trial
+                    </p>
                   </div>
                 </div>
               )}
@@ -483,7 +537,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     Back
                   </button>
 
-                  <h2 className="text-xl font-bold mb-1">Payment Setup</h2>
+                  <h2 className="text-xl font-bold mb-1">Billing Details</h2>
                   <p className="text-sm text-muted-foreground mb-6">
                     Enter your billing details to start your {TRIAL_PERIOD_DAYS}-day free trial
                   </p>
@@ -499,15 +553,14 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     <h3 className="font-medium mb-3">Order Summary</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span>OnRopePro Base Plan</span>
+                        <span>OnRopePro Base Plan (Monthly)</span>
                         <span className="font-medium">
-                          ${data.billingFrequency === "monthly" ? monthlyPrice : annualPrice}
-                          /{data.billingFrequency === "monthly" ? "mo" : "yr"}
+                          ${monthlyPrice}/mo
                         </span>
                       </div>
                       <div className="flex justify-between text-muted-foreground">
-                        <span>Billing</span>
-                        <span className="capitalize">{data.billingFrequency}</span>
+                        <span>Billing Cycle</span>
+                        <span>Monthly</span>
                       </div>
                       <div className="border-t pt-2 mt-2">
                         <div className="flex justify-between text-green-600 dark:text-green-400">
@@ -529,7 +582,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       email={data.email}
                       password={data.password}
                       billingFrequency={data.billingFrequency}
-                      onComplete={() => setStep("success")}
+                      onComplete={(checkoutSessionId) => {
+                        setSessionId(checkoutSessionId);
+                        completeRegistration(checkoutSessionId);
+                      }}
                       onError={(errorMsg) => setError(errorMsg)}
                     />
                   </div>
@@ -541,6 +597,54 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                 </div>
               )}
 
+              {/* Processing Step - Shows immediately when Stripe checkout completes */}
+              {step === "processing" && (
+                <div className="h-full flex flex-col justify-center items-center max-w-md mx-auto text-center py-8">
+                  <div className="relative mb-6">
+                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                    </div>
+                  </div>
+                  
+                  <h2 className="text-xl font-bold mb-2">Setting up your account...</h2>
+                  <p className="text-muted-foreground mb-6">
+                    Just a moment while we finalize everything.
+                  </p>
+
+                  {/* Progress indicator */}
+                  <div className="w-full space-y-4 mb-6">
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary transition-all duration-500 ease-out"
+                        style={{ width: `${((processingStatus.step + 1) / PROCESSING_STEPS.length) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground animate-pulse">
+                      {processingStatus.message}
+                    </p>
+                  </div>
+
+                  {/* Helpful tips while waiting */}
+                  <div className="w-full bg-muted/50 rounded-lg p-4 text-left">
+                    <h3 className="font-medium text-sm mb-2">While you wait...</h3>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 text-green-500" />
+                        Your payment has been confirmed
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 text-green-500" />
+                        {TRIAL_PERIOD_DAYS}-day free trial activated
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Creating your workspace
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
               {/* Success Step */}
               {step === "success" && (
                 <div className="h-full flex flex-col justify-center items-center max-w-md mx-auto text-center">
@@ -549,7 +653,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-2">Welcome to OnRopePro!</h2>
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-muted-foreground mb-2">
+                    Your account for {registrationResult?.companyName || data.companyName} is ready.
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-6">
                     Your {TRIAL_PERIOD_DAYS}-day free trial has started. You're ready to start managing your rope access business.
                   </p>
 
