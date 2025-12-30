@@ -4248,15 +4248,22 @@ export default function TechnicianPortal() {
                                 salaryPeriod: expectedSalaryPeriod,
                               }),
                             });
-                            if (!response.ok) throw new Error("Failed to update salary");
-                            queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                            if (!response.ok) {
+                              const errorData = await response.json().catch(() => ({}));
+                              throw new Error(errorData.message || "Failed to update salary");
+                            }
+                            await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
                             toast({
                               title: language === 'en' ? "Salary Updated" : "Salaire mis à jour",
                               description: language === 'en' ? "Your expected salary has been saved" : "Votre salaire attendu a été enregistré",
                             });
-                            setIsEditingEmployerProfile(false);
-                          } catch (error) {
-                            toast({ title: "Error", description: "Failed to update salary", variant: "destructive" });
+                            // Don't close edit mode - let user continue editing if needed
+                          } catch (error: any) {
+                            toast({ 
+                              title: language === 'en' ? "Error" : "Erreur", 
+                              description: error.message || (language === 'en' ? "Failed to update salary" : "Échec de la mise à jour du salaire"), 
+                              variant: "destructive" 
+                            });
                           } finally {
                             setIsSavingSalary(false);
                           }
@@ -4269,7 +4276,7 @@ export default function TechnicianPortal() {
                         ) : (
                           <Save className="w-4 h-4 mr-2" />
                         )}
-                        {language === 'en' ? 'Save Salary' : 'Enregistrer'}
+                        {language === 'en' ? 'Save Salary' : 'Enregistrer le salaire'}
                       </Button>
                     </div>
                   ) : (
