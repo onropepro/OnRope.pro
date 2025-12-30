@@ -6,6 +6,7 @@ interface ActiveSessionData {
   sessionId?: string;
   startTime?: string;
   projectName?: string | null;
+  buildingName?: string | null;
   description?: string | null;
 }
 

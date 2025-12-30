@@ -16385,6 +16385,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         sessionId: activeSession.session.id,
         startTime: activeSession.session.startTime,
         projectName: activeSession.projectName || null,
+        buildingName: activeSession.buildingName || null,
         description: activeSession.description || null,
       };
       
