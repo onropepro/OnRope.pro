@@ -1128,15 +1128,74 @@
       "residents": {
         "label": "Residentes",
         "description": "Residentes del edificio"
+      },
+      "payPeriod": {
+        "label": "Período de pago",
+        "currentPayPeriod": "Período de pago actual",
+        "totalHours": "Horas totales",
+        "estLaborCost": "Costo de mano de obra estimado",
+        "employeesWithHours": "empleados con horas",
+        "viewPayroll": "Ver nómina",
+        "noData": "No hay datos de nómina disponibles"
+      },
+      "todaysHours": {
+        "label": "Horas de hoy",
+        "companyWideTotal": "Total de la empresa",
+        "activeNow": "Activo ahora",
+        "sessions": "Sesiones",
+        "viewLoggedHours": "Ver horas registradas",
+        "noHoursLogged": "No hay horas registradas hoy",
+        "workSessionsWillAppear": "Las sesiones de trabajo aparecerán aquí"
+      },
+      "newFeedback": {
+        "label": "Nuevos comentarios",
+        "unreadItems": "Elementos no leídos",
+        "viewAll": "Ver todo",
+        "noNewFeedback": "Sin comentarios nuevos",
+        "allCaughtUp": "Estás al día"
+      },
+      "activeProjects": {
+        "label": "Proyectos activos",
+        "inProgress": "En progreso",
+        "viewAll": "Ver todo"
+      },
+      "todaySchedule": {
+        "label": "Horario de hoy",
+        "jobs": "trabajos",
+        "viewSchedule": "Ver calendario"
+      },
+      "safetyRating": {
+        "label": "Calificaciones de seguridad",
+        "companySafety": "Seguridad de la empresa",
+        "workforceSafety": "Seguridad de los trabajadores",
+        "emp": "emp."
       }
+    },
+    "sidebar": {
+      "dashboard": "Panel",
+      "workDashboard": "Panel de trabajo",
+      "weather": "Clima",
+      "offSite": "Fuera del sitio",
+      "certifications": "Certificaciones",
+      "inspections": "Inspecciones",
+      "gearManagement": "Gestión de equipos",
+      "training": "Capacitación",
+      "performance": "Rendimiento",
+      "myPassport": "Mi Pasaporte",
+      "settings": "Configuración",
+      "help": "Centro de ayuda",
+      "customize": "Personalizar",
+      "equipment": "EQUIPOS"
     },
     "categories": {
       "all": "Todos",
-      "operations": "Operaciones",
-      "safety": "Seguridad",
-      "financial": "Financiero",
-      "team": "Equipo",
-      "communication": "Comunicacion"
+      "operations": "OPERACIONES",
+      "team": "EQUIPO",
+      "safety": "SEGURIDAD",
+      "financial": "FINANZAS",
+      "financialClients": "FINANZAS/CLIENTES",
+      "analytics": "ANÁLISIS",
+      "communication": "Comunicación"
     },
     "backToDashboard": "Volver al Panel",
     "rearrangeCards": "Reorganizar Tarjetas",

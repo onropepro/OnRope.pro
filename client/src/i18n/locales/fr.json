@@ -1052,7 +1052,85 @@
       "residents": {
         "label": "Résidents",
         "description": "Résidents de l'immeuble"
+      },
+      "jobBoard": {
+        "label": "Tableau d'emplois",
+        "description": "Emplois et talents"
+      },
+      "payPeriod": {
+        "label": "Période de paie",
+        "currentPayPeriod": "Période de paie actuelle",
+        "totalHours": "Heures totales",
+        "estLaborCost": "Coût de main-d'œuvre estimé",
+        "employeesWithHours": "employés avec heures",
+        "viewPayroll": "Voir la paie",
+        "noData": "Aucune donnée de paie disponible"
+      },
+      "todaysHours": {
+        "label": "Heures d'aujourd'hui",
+        "companyWideTotal": "Total de l'entreprise",
+        "activeNow": "Actif maintenant",
+        "sessions": "Sessions",
+        "viewLoggedHours": "Voir les heures enregistrées",
+        "noHoursLogged": "Aucune heure enregistrée aujourd'hui",
+        "workSessionsWillAppear": "Les sessions de travail apparaîtront ici"
+      },
+      "newFeedback": {
+        "label": "Nouveaux commentaires",
+        "unreadItems": "Éléments non lus",
+        "viewAll": "Voir tout",
+        "noNewFeedback": "Aucun nouveau commentaire",
+        "allCaughtUp": "Vous êtes à jour"
+      },
+      "activeProjects": {
+        "label": "Projets actifs",
+        "inProgress": "En cours",
+        "viewAll": "Voir tout"
+      },
+      "todaySchedule": {
+        "label": "Horaire d'aujourd'hui",
+        "jobs": "emplois",
+        "viewSchedule": "Voir le calendrier"
+      },
+      "safetyRating": {
+        "label": "Cotes de sécurité",
+        "companySafety": "Sécurité de l'entreprise",
+        "workforceSafety": "Sécurité des travailleurs",
+        "emp": "emp."
+      },
+      "myProfile": {
+        "label": "Mon Profil",
+        "description": "Heures et certifications"
+      },
+      "myAccount": {
+        "label": "Mon Compte"
       }
+    },
+    "sidebar": {
+      "dashboard": "Tableau de bord",
+      "workDashboard": "Tableau de travail",
+      "weather": "Météo",
+      "offSite": "Hors site",
+      "certifications": "Certifications",
+      "inspections": "Inspections",
+      "gearManagement": "Gestion de l'équipement",
+      "training": "Formation",
+      "performance": "Performance",
+      "myPassport": "Mon Passeport",
+      "settings": "Paramètres",
+      "help": "Centre d'aide",
+      "customize": "Personnaliser",
+      "equipment": "ÉQUIPEMENT"
+    },
+    "categories": {
+      "all": "Tous",
+      "operations": "OPÉRATIONS",
+      "team": "ÉQUIPE",
+      "safety": "SÉCURITÉ",
+      "financial": "FINANCES",
+      "financialClients": "FINANCES/CLIENTS",
+      "analytics": "ANALYSES",
+      "communication": "Communication"
     },
     "backToDashboard": "Retour au tableau de bord",
     "rearrangeCards": "Réorganiser les cartes",
