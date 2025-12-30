@@ -105,8 +105,8 @@ export default function CompleteRegistration() {
             : t('completeRegistration.accountCreated', 'Your account has been created!'),
         });
 
-        // Auto-redirect to dashboard after 3 seconds
-        setTimeout(() => setLocation('/employer'), 3000);
+        // Auto-redirect to employer dashboard after 5 seconds (longer to let welcome message sink in)
+        setTimeout(() => setLocation('/employer'), 5000);
         return;
       }
 
@@ -256,12 +256,21 @@ export default function CompleteRegistration() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="pt-6 space-y-4">
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-            <Skeleton className="h-32 w-full" />
+        <Card className="w-full max-w-lg">
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center space-y-6">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <span className="material-icons text-3xl text-primary animate-spin">sync</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold mb-2">
+                  {t('completeRegistration.settingUp', 'Setting up your account...')}
+                </h2>
+                <p className="text-muted-foreground text-sm">
+                  {t('completeRegistration.justAMoment', 'Just a moment while we finalize everything.')}
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
