@@ -129,6 +129,7 @@ import { TechnicianDocumentRequests } from "@/components/TechnicianDocumentReque
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { ActiveSessionBadge } from "@/components/ActiveSessionBadge";
 
 type Language = 'en' | 'fr' | 'es';
 
@@ -3664,6 +3665,9 @@ export default function TechnicianPortal() {
                   </TooltipContent>
                 </Tooltip>
               )}
+              
+              {/* Active Session Badge - Shows when user has an active work session */}
+              <ActiveSessionBadge />
               
               {/* Return to Dashboard button - Only show for company owners */}
               {user.role === 'company' && (
