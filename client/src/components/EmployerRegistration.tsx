@@ -517,7 +517,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       Continue
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
-                    <p className="text-xs text-muted-foreground text-center mt-2">
+                    <p className="text-xs text-center mt-2 text-[#ff0000]">
                       <Lock className="w-3 h-3 inline mr-1" />
                       You won't be charged during your {TRIAL_PERIOD_DAYS}-day trial
                     </p>
@@ -665,7 +665,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       className="w-full bg-[#0B64A3] hover:bg-[#0B64A3]/90"
                       onClick={() => {
                         handleClose();
-                        setLocation("/employer");
+                        setLocation("/dashboard");
                       }}
                       data-testid="button-go-to-dashboard"
                     >
