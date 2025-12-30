@@ -3662,25 +3662,6 @@ export default function TechnicianPortal() {
             
             {/* Right Side: Actions Group */}
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              {/* PLUS Badge - Technicians with PLUS access */}
-              {user.role === 'rope_access_tech' && user.hasPlusAccess && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge 
-                      variant="default" 
-                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-xs px-2 py-0.5 font-bold border-0 cursor-help" 
-                      data-testid="badge-pro"
-                    >
-                      <Crown className="w-3 h-3 mr-1 fill-current" />
-                      {t.proBadge}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{t.proBadgeTooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-              
               {/* Active Session Badge - Shows when user has an active work session */}
               <ActiveSessionBadge />
               
@@ -3714,7 +3695,19 @@ export default function TechnicianPortal() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden lg:block">
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
+                    {user.role === 'rope_access_tech' && user.hasPlusAccess && (
+                      <Badge 
+                        variant="default" 
+                        className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 font-bold border-0 h-4" 
+                        data-testid="badge-pro"
+                      >
+                        <Crown className="w-2.5 h-2.5 mr-0.5 fill-current" />
+                        PLUS
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-xs text-slate-400 leading-tight">{language === 'en' ? 'Technician' : language === 'es' ? 'Tecnico' : 'Technicien'}</p>
                 </div>
               </button>
