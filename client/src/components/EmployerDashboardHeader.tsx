@@ -217,10 +217,13 @@ export function EmployerDashboardHeader({
     try {
       trackLogout();
       await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-      // Redirect employers to main landing page
-      window.location.href = '/';
+      // Clear query cache to prevent stale data
+      const { queryClient } = await import('@/lib/queryClient');
+      queryClient.clear();
+      // Use router navigation (instant) instead of full page reload
+      setLocation('/');
     } catch (error) {
-      window.location.href = '/';
+      setLocation('/');
     }
   };
 
@@ -273,7 +276,7 @@ export function EmployerDashboardHeader({
             {/* Page Title - shown independently of back button */}
             {pageTitle && (
               <div className="flex-shrink-0">
-                <h1 className="text-lg font-semibold text-foreground">{pageTitle}</h1>
+                <h1 className="text-2xl font-semibold text-foreground">{pageTitle}</h1>
                 {pageDescription && (
                   <p className="text-sm text-muted-foreground">{pageDescription}</p>
                 )}
