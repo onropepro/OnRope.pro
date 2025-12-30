@@ -110,7 +110,7 @@ export default function CompleteRegistration() {
         queryClient.invalidateQueries({ queryKey: ["/api/user"] });
 
         // Auto-redirect to employer dashboard after 5 seconds (longer to let welcome message sink in)
-        setTimeout(() => setLocation('/employer'), 5000);
+        setTimeout(() => setLocation('/dashboard'), 5000);
         return;
       }
 
