@@ -1,9 +1,9 @@
 # Subscription & Stripe System - Single Source of Truth (SSOT)
-**Version**: 1.1  
+**Version**: 1.2  
 **Last Updated**: December 30, 2024  
 **Status**: ACTIVE - FOUNDATIONAL DOCUMENT
 
-> **v1.1 Changes**: Updated registration flow documentation to reflect processing screen with progress indicators, parallel backend operations, and correct API endpoints.
+> **v1.2 Changes**: Added critical `redirect_on_completion: 'never'` config documentation. Updated flow to redirect to /dashboard after registration. Documented processing screen, parallel backend operations, and correct API endpoints.
 
 ## Overview
 
@@ -274,6 +274,9 @@ const session = await stripe.checkout.sessions.create({
 
 **Processing Screen (UX Optimization):**
 - Shown immediately when Stripe payment completes (eliminates blank screen)
+- **Critical config**: Stripe session uses `redirect_on_completion: 'never'` so the embedded checkout 
+  triggers `onComplete` callback instead of redirecting to a return URL
+- Modal stays mounted throughout API call, preventing white screen
 - Animated progress bar with step-by-step status messages
 - Steps displayed: Verifying payment, Creating account, Setting up dashboard, 
   Configuring permissions, Finalizing workspace
