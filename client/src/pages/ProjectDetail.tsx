@@ -1568,7 +1568,7 @@ export default function ProjectDetail() {
                         })()
                       : "N/A"}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">{t('projectDetail.progress.remaining', 'Days Remaining')}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('projectDetail.progress.daysRemaining', 'Est. Days Left')}</div>
                 </div>
               </div>
             )}
