@@ -3662,9 +3662,6 @@ export default function TechnicianPortal() {
             
             {/* Right Side: Actions Group */}
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              {/* Active Session Badge - Shows when user has an active work session */}
-              <ActiveSessionBadge />
-              
               {/* Return to Dashboard button - Only show for company owners */}
               {user.role === 'company' && (
                 <Button
@@ -3725,6 +3722,9 @@ export default function TechnicianPortal() {
             </div>
           </div>
         </header>
+
+      {/* Active Work Session Banner - Shows in darker grey area below header */}
+      <ActiveSessionBadge />
 
       {/* Certification Expiry Warning Banner - Shows when cert expires within 30 days (PLUS feature) */}
       {(() => {
