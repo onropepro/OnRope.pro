@@ -3240,15 +3240,15 @@ export default function Dashboard() {
       });
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
-      // Use hard navigation for instant redirect (avoids React Query refetch delays)
+      // Use router navigation (instant) instead of full page reload
       // Redirect to role-appropriate landing pages
       if (userRole === 'rope_access_tech') {
-        window.location.href = "/technician";
+        setLocation("/technician");
       } else if (userRole === 'ground_crew' || userRole === 'ground_crew_supervisor') {
-        window.location.href = "/ground-crew";
+        setLocation("/ground-crew");
       } else {
         // Employers/company owners go to main landing page
-        window.location.href = "/";
+        setLocation("/");
       }
     } catch (error) {
       toast({ title: t('dashboard.toast.error', 'Error'), description: t('dashboard.toast.logoutFailed', 'Failed to logout'), variant: "destructive" });

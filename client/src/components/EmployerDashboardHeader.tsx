@@ -217,10 +217,13 @@ export function EmployerDashboardHeader({
     try {
       trackLogout();
       await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-      // Redirect employers to main landing page
-      window.location.href = '/';
+      // Clear query cache to prevent stale data
+      const { queryClient } = await import('@/lib/queryClient');
+      queryClient.clear();
+      // Use router navigation (instant) instead of full page reload
+      setLocation('/');
     } catch (error) {
-      window.location.href = '/';
+      setLocation('/');
     }
   };
 
