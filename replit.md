@@ -99,6 +99,41 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 - Display logic: Use structured fields if available, fall back to legacy `location` field
 - Technician Job Board dynamically builds filter dropdowns from structured location fields in database
 
+## Embedded Stripe Registration (Dec 2024)
+
+**New Employer Registration Flow:**
+- 3-step registration: Welcome → Account Details → Payment
+- Embedded Stripe checkout integrated directly in registration modal
+- License keys generated server-side only (never exposed to users)
+- Billing address from Stripe becomes company address (eliminates redundant form step)
+- 30-day free trial with credit card required upfront
+
+**New Pricing Model (Sandbox - requires Live mode setup for production):**
+- Base: $99/month or $990/year (17% discount)
+- Seats: $34.95/seat ($29.95 for 30+ employees)
+- White Label: $49 add-on
+- Currencies: USD and CAD (auto-detected from billing country)
+
+**Key Files:**
+- `shared/stripe-config.ts` - 16 sandbox price IDs, currency/frequency helpers
+- `client/src/components/RegistrationEmbeddedCheckout.tsx` - Stripe embedded checkout wrapper
+- `client/src/components/EmployerRegistration.tsx` - Redesigned 3-step registration flow
+- `client/src/pages/CompleteRegistration.tsx` - Handles both embedded and legacy flows
+
+**API Endpoints:**
+- `POST /api/stripe/create-registration-checkout` - Creates embedded checkout session with user data in metadata
+- `GET /api/stripe/complete-registration/:sessionId` - Completes registration from session metadata
+
+**Security Notes:**
+- Password is bcrypt-hashed before storing in Stripe metadata
+- Idempotency enforced via licenseKeys table (prevents duplicate companies)
+- Legacy flow preserved for backward compatibility
+
+**Remaining Work:**
+- Recreate price IDs in Stripe Live mode before production launch
+- Update ManageSubscription.tsx and SubscriptionManagement.tsx for new pricing
+- Configure Stripe Tax when CRA account is ready
+
 ## Known Technical Debt
 **TypeScript/LSP Issues (as of Dec 2024):**
 
