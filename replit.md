@@ -27,6 +27,7 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 *   **Knowledge Base & Help Center (/help):** RAG-powered, AI chat assistant with semantic search using Gemini embeddings, 19 module guides, and stakeholder-specific navigation.
 *   **Stakeholder Landing Pages:** Public-facing, branded landing pages for Technicians, Residents, Property Managers, and Building Managers.
 *   **Unified Dashboard Layout System:** Variant-based DashboardSidebar and DashboardLayout components supporting 6 stakeholder types with role-specific brand colors.
+*   **Unified Dashboard Header:** UnifiedDashboardHeader.tsx is the single source of truth for dashboard headers, supporting 8 role variants (employer, technician, ground-crew, resident, property-manager, building-manager, superuser, csr). Uses runtime type validation via getSafeVariant(). TechnicianPortal and GroundCrewPortal use useInlineActions with custom handlers for tab-based navigation. ResidentDashboard and PropertyManagerDashboard are intentional exceptions with custom headers showing project/vendor context.
 *   **Customizable Sidebar Menu Ordering:** Users can personalize sidebar navigation by reordering menu items.
 *   **Staff Accounts (Internal Platform Management):** Internal-only accounts for app management staff with granular permissions.
 *   **Linkable Team Member Roles:** Rope access tech and ground crew roles can be searched by email, linked to companies, and sent team invitations.
