@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
+import { NotificationBell } from "@/components/NotificationBell";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { Menu, MoreVertical, LogOut, Crown } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -106,6 +107,12 @@ export function TechnicianDashboardHeader({
             </Tooltip>
           )}
           
+          <InstallPWAButton />
+          
+          <NotificationBell />
+          
+          <LanguageDropdown iconOnly />
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -134,16 +141,6 @@ export function TechnicianDashboardHeader({
                   <span className="text-xs text-muted-foreground">{t("technician.profile", "Profile")}</span>
                 </div>
               </DropdownMenuItem>
-              
-              <DropdownMenuSeparator />
-              
-              <div className="px-2 py-1.5">
-                <InstallPWAButton showAsMenuItem />
-              </div>
-              
-              <div className="px-2 py-1.5">
-                <LanguageDropdown variant="ghost" showLabel={true} />
-              </div>
               
               <DropdownMenuSeparator />
               
