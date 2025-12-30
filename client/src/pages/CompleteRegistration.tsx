@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trackSignUp, trackSubscriptionPurchase } from "@/lib/analytics";
 import { formatTimestampDate } from "@/lib/dateUtils";
+import { queryClient } from "@/lib/queryClient";
 
 interface SessionData {
   licenseKey: string;
@@ -104,6 +105,9 @@ export default function CompleteRegistration() {
             ? t('completeRegistration.alreadyComplete', 'Your registration was already completed.')
             : t('completeRegistration.accountCreated', 'Your account has been created!'),
         });
+
+        // Invalidate user query cache so Dashboard picks up the new logged-in state
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
 
         // Auto-redirect to employer dashboard after 5 seconds (longer to let welcome message sink in)
         setTimeout(() => setLocation('/employer'), 5000);
