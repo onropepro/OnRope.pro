@@ -1229,10 +1229,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid email format" });
       }
 
-      // Validate password length
-      if (password.length < 6) {
-        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      // Validate password strength using shared validation
+      const passwordValidation = validatePasswordStrength(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.message });
       }
+
+      // Normalize strata plan number and trim unit number for consistent lookups
+      const normalizedStrata = normalizeStrataPlan(strataPlanNumber);
+      const trimmedUnit = unitNumber.trim();
 
       // Check if email already exists
       const existingUser = await storage.getUserByEmail(email);
@@ -1246,8 +1251,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(
           and(
             eq(users.role, 'resident'),
-            eq(users.strataPlanNumber, strataPlanNumber),
-            eq(users.unitNumber, unitNumber)
+            eq(users.strataPlanNumber, normalizedStrata),
+            eq(users.unitNumber, trimmedUnit)
           )
         )
         .limit(1);
@@ -1273,16 +1278,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: email.toLowerCase(),
         passwordHash: hashedPassword,
         role: 'resident',
-        strataPlanNumber,
-        unitNumber,
-        parkingStallNumber: parkingStallNumber || null,
+        strataPlanNumber: normalizedStrata,
+        unitNumber: trimmedUnit,
+        parkingStallNumber: parkingStallNumber?.trim() || null,
         employeePhoneNumber: phone || null,
       }).returning();
 
       // Log the user in
       req.session.userId = newUser.id;
       req.session.role = 'resident';
-      req.session.strataPlanNumber = strataPlanNumber;
+      req.session.strataPlanNumber = normalizedStrata;
 
       await new Promise<void>((resolve, reject) => {
         req.session.save((err) => {
