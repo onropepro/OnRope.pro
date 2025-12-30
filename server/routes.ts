@@ -3608,7 +3608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           },
         ],
         ui_mode: 'embedded',
-        return_url: `${baseUrl}/complete-registration?session_id={CHECKOUT_SESSION_ID}`,
+        redirect_on_completion: 'never',
         metadata: {
           registrationType: 'employer',
           companyName,
