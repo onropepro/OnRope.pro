@@ -4904,7 +4904,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       for (const emp of hoursSummary) {
         totalHours += emp.totalHours || 0;
-        totalCost += emp.grossPay || 0;
+        totalCost += emp.totalPay || 0;
       }
 
       res.json({
