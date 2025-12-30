@@ -161,7 +161,7 @@ export function DashboardSidebar({
       } else {
         // Default state: For employer variant, collapse all groups except "operations"
         if (variant === 'employer') {
-          setCollapsedGroups(new Set(['team', 'equipment', 'safety', 'financial', 'clients', 'analytics']));
+          setCollapsedGroups(new Set(['team', 'equipment', 'safety', 'financial', 'analytics']));
         } else {
           setCollapsedGroups(new Set()); // All groups expanded by default for other variants
         }
@@ -387,7 +387,7 @@ export function DashboardSidebar({
     },
     {
       id: "financial",
-      label: t("dashboard.categories.financial", "FINANCIAL"),
+      label: t("dashboard.categories.financialClients", "FINANCIAL/CLIENTS"),
       items: [
         {
           id: "payroll",
@@ -405,12 +405,6 @@ export function DashboardSidebar({
           badgeType: alertCounts.quoteNotifications ? "alert" : undefined,
           isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
         },
-      ],
-    },
-    {
-      id: "clients",
-      label: t("dashboard.categories.clients", "CLIENTS"),
-      items: [
         {
           id: "clients",
           label: t("dashboard.cards.clients.label", "Clients"),
