@@ -59,7 +59,7 @@ export default function Performance() {
   const hasPermission = canViewPerformance(user);
 
   const { data: workSessionsData, isLoading: isLoadingWork } = useQuery<{ sessions: WorkSession[] }>({
-    queryKey: ["/api/work-sessions"],
+    queryKey: ["/api/all-work-sessions"],
     enabled: hasPermission,
   });
 
