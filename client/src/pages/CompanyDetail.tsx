@@ -77,6 +77,27 @@ export default function CompanyDetail() {
     },
   });
 
+  const toggleVerificationMutation = useMutation({
+    mutationFn: async (verified: boolean) => {
+      const response = await apiRequest('POST', `/api/superuser/companies/${companyId}/toggle-verification`, { verified });
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: data.company?.isPlatformVerified ? "Company Verified" : "Verification Removed",
+        description: data.message,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/superuser/companies', companyId] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to toggle verification",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Check if user is superuser or staff with view_companies permission
   const isSuperuser = userData?.user?.role === 'superuser';
   const isStaffWithPermission = userData?.user?.role === 'staff' && 
@@ -142,7 +163,12 @@ export default function CompanyDetail() {
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-4xl font-bold gradient-text">{company.companyName || "Unnamed Company"}</h1>
-                {company.subscriptionStatus === 'active' || company.subscriptionStatus === 'trialing' ? (
+                {company.isPlatformVerified ? (
+                  <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20" data-testid="badge-platform-verified">
+                    <span className="material-icons text-sm mr-1">verified</span>
+                    Platform Verified
+                  </Badge>
+                ) : company.subscriptionStatus === 'active' || company.subscriptionStatus === 'trialing' ? (
                   <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20" data-testid="badge-verified">
                     <span className="material-icons text-sm mr-1">verified</span>
                     {company.subscriptionStatus === 'trialing' ? 'Trial' : 'Verified'}
@@ -159,13 +185,30 @@ export default function CompanyDetail() {
               </p>
             </div>
           </div>
-          <Button 
-            onClick={() => setGiftAddonsDialogOpen(true)}
-            data-testid="button-gift-addons"
-          >
-            <span className="material-icons mr-2">card_giftcard</span>
-            Gift Add-ons
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {isSuperuser && (
+              <Button 
+                variant={company.isPlatformVerified ? "outline" : "default"}
+                onClick={() => toggleVerificationMutation.mutate(!company.isPlatformVerified)}
+                disabled={toggleVerificationMutation.isPending}
+                data-testid="button-toggle-verification"
+              >
+                {toggleVerificationMutation.isPending ? (
+                  <span className="material-icons animate-spin mr-2">autorenew</span>
+                ) : (
+                  <span className="material-icons mr-2">{company.isPlatformVerified ? 'remove_done' : 'verified'}</span>
+                )}
+                {company.isPlatformVerified ? 'Remove Verification' : 'Verify & Grant Free Access'}
+              </Button>
+            )}
+            <Button 
+              onClick={() => setGiftAddonsDialogOpen(true)}
+              data-testid="button-gift-addons"
+            >
+              <span className="material-icons mr-2">card_giftcard</span>
+              Gift Add-ons
+            </Button>
+          </div>
         </div>
 
         {/* Company Info Card */}

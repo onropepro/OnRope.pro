@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatTimestampDate } from "@/lib/dateUtils";
 import { RemoveSeatsDialog } from "@/components/RemoveSeatsDialog";
+import { PRICING, VOLUME_DISCOUNT_THRESHOLD } from "@shared/stripe-config";
 
 type TierName = 'basic' | 'starter' | 'premium' | 'enterprise';
 
@@ -295,7 +296,10 @@ export default function ManageSubscription() {
                 <div>
                   <h3 className="font-medium">{tierName}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Unlimited projects, add seats at $34.95/month each
+                    Unlimited projects, add seats at ${PRICING.seat.monthly}/month each
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Volume discount: ${PRICING.volumeSeat.monthly}/month for {VOLUME_DISCOUNT_THRESHOLD}+ employees
                   </p>
                 </div>
               </div>

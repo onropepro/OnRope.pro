@@ -23,16 +23,28 @@ interface SessionData {
   trialEnd: number | null;
 }
 
+interface EmbeddedRegistrationData {
+  flow: 'embedded';
+  success: boolean;
+  alreadyProcessed?: boolean;
+  companyName: string;
+  email?: string;
+  trialEnd: number | null;
+  message: string;
+}
+
 export default function CompleteRegistration() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
+  const [embeddedData, setEmbeddedData] = useState<EmbeddedRegistrationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
+  const [flowType, setFlowType] = useState<'embedded' | 'legacy' | null>(null);
 
-  // Form state
+  // Form state (for legacy flow only)
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,7 +56,7 @@ export default function CompleteRegistration() {
     const sessionId = params.get('session_id');
 
     if (!sessionId) {
-      setLoading(false); // Stop loading state
+      setLoading(false);
       toast({
         title: t('completeRegistration.missingSessionTitle', 'Missing Session ID'),
         description: t('completeRegistration.missingSessionDesc', 'No checkout session found. Redirecting to license purchase...'),
@@ -54,12 +66,68 @@ export default function CompleteRegistration() {
       return;
     }
 
-    // Fetch session data
-    fetchSessionData(sessionId);
+    // Try the new embedded registration flow first
+    tryEmbeddedRegistration(sessionId);
   }, [toast, setLocation]);
 
+  // Try the new embedded registration endpoint first
+  const tryEmbeddedRegistration = async (sessionId: string) => {
+    try {
+      console.log('[CompleteRegistration] Trying embedded registration flow...');
+      const response = await fetch(`/api/stripe/complete-registration/${sessionId}`, {
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.flow === 'embedded' && data.success) {
+        // New embedded flow succeeded - account created automatically
+        console.log('[CompleteRegistration] Embedded registration successful:', data);
+        setEmbeddedData(data);
+        setFlowType('embedded');
+        setLoading(false);
+
+        // Track analytics
+        trackSignUp('embedded');
+        trackSubscriptionPurchase({
+          planTier: 'base',
+          planPrice: 0,
+          currency: 'USD',
+          billingPeriod: 'monthly',
+          transactionId: sessionId,
+        });
+
+        // Show success toast
+        toast({
+          title: t('completeRegistration.successTitle', 'Success!'),
+          description: data.alreadyProcessed 
+            ? t('completeRegistration.alreadyComplete', 'Your registration was already completed.')
+            : t('completeRegistration.accountCreated', 'Your account has been created!'),
+        });
+
+        // Auto-redirect to dashboard after 3 seconds
+        setTimeout(() => setLocation('/employer'), 3000);
+        return;
+      }
+
+      // If not an embedded checkout, fall back to legacy flow
+      console.log('[CompleteRegistration] Not an embedded checkout, trying legacy flow...');
+      await fetchSessionData(sessionId);
+    } catch (error: any) {
+      console.log('[CompleteRegistration] Embedded flow failed, trying legacy:', error.message);
+      // Fall back to legacy flow on any error
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+      if (sessionId) {
+        await fetchSessionData(sessionId);
+      }
+    }
+  };
+
+  // Legacy flow: fetch session data for manual registration
   const fetchSessionData = async (sessionId: string) => {
     try {
+      setFlowType('legacy');
       const response = await fetch(`/api/stripe/checkout-session/${sessionId}`, {
         credentials: 'include',
       });
@@ -200,6 +268,81 @@ export default function CompleteRegistration() {
     );
   }
 
+  // Embedded flow success view
+  if (flowType === 'embedded' && embeddedData) {
+    const trialEndDate = embeddedData.trialEnd 
+      ? formatTimestampDate(new Date(embeddedData.trialEnd * 1000)) 
+      : null;
+
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-lg">
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center space-y-6">
+              <div className="h-20 w-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto">
+                <span className="material-icons text-4xl text-green-600 dark:text-green-400">check_circle</span>
+              </div>
+              
+              <div>
+                <h2 className="text-2xl font-bold mb-2">
+                  {t('completeRegistration.welcomeTitle', 'Welcome to OnRopePro!')}
+                </h2>
+                <p className="text-muted-foreground">
+                  {t('completeRegistration.accountReady', 'Your account for {{companyName}} is ready.', { companyName: embeddedData.companyName })}
+                </p>
+              </div>
+
+              {trialEndDate && (
+                <div className="bg-muted/50 rounded-lg p-4 text-sm">
+                  <p className="text-muted-foreground">
+                    {t('completeRegistration.trialInfo', 'Your 30-day free trial has started. You won\'t be charged until {{date}}.', { date: trialEndDate })}
+                  </p>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <Button 
+                  className="w-full"
+                  onClick={() => setLocation('/employer')}
+                  data-testid="button-go-to-dashboard"
+                >
+                  <span className="material-icons mr-2">dashboard</span>
+                  {t('completeRegistration.goToDashboard', 'Go to Dashboard')}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  {t('completeRegistration.autoRedirect', 'Redirecting automatically in a few seconds...')}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Legacy flow: no session data
+  if (flowType === 'legacy' && !sessionData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <span className="material-icons text-6xl text-destructive">error</span>
+              <h2 className="text-2xl font-bold">{t('completeRegistration.sessionNotFound', 'Session Not Found')}</h2>
+              <p className="text-muted-foreground">
+                {t('completeRegistration.sessionNotFoundDesc', 'Unable to retrieve checkout session. Please contact support.')}
+              </p>
+              <Button onClick={() => setLocation('/get-license')}>
+                {t('completeRegistration.backToLicensePurchase', 'Back to License Purchase')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Legacy flow requires sessionData
   if (!sessionData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">

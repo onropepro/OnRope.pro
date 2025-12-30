@@ -17,7 +17,7 @@ import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { PropertyManagerRegistration } from "@/components/PropertyManagerRegistration";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
-import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
+import { ResidentRegistration } from "@/components/ResidentRegistration";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email, license number, or strata number is required"),
@@ -182,23 +182,32 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
   };
 
   const handleTechnicianRegister = () => {
-    closePortal();
-    setShowTechnicianRegistration(true);
+    setIsOpen(false);
+    // Use setTimeout to ensure the portal dialog fully closes before opening the new one
+    setTimeout(() => {
+      setShowTechnicianRegistration(true);
+    }, 50);
   };
 
   const handlePropertyManagerRegister = () => {
-    closePortal();
-    setShowPropertyManagerRegistration(true);
+    setIsOpen(false);
+    setTimeout(() => {
+      setShowPropertyManagerRegistration(true);
+    }, 50);
   };
 
   const handleEmployerRegister = () => {
-    closePortal();
-    setShowEmployerRegistration(true);
+    setIsOpen(false);
+    setTimeout(() => {
+      setShowEmployerRegistration(true);
+    }, 50);
   };
 
   const handleResidentRegister = () => {
-    closePortal();
-    setShowResidentSignup(true);
+    setIsOpen(false);
+    setTimeout(() => {
+      setShowResidentSignup(true);
+    }, 50);
   };
 
   return (
@@ -436,15 +445,10 @@ export function AuthPortalProvider({ children }: AuthPortalProviderProps) {
         onOpenChange={(open) => setShowEmployerRegistration(open)} 
       />
       
-      {showResidentSignup && (
-        <ResidentSlidingSignup 
-          onClose={() => setShowResidentSignup(false)}
-          onShowSignIn={() => {
-            setShowResidentSignup(false);
-            openLogin();
-          }}
-        />
-      )}
+      <ResidentRegistration 
+        open={showResidentSignup} 
+        onOpenChange={(open) => setShowResidentSignup(open)} 
+      />
     </AuthPortalContext.Provider>
   );
 }

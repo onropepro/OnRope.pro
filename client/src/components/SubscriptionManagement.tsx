@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { trackCheckoutStart, trackAddOnPurchase } from "@/lib/analytics";
+import { PRICING, VOLUME_DISCOUNT_THRESHOLD } from "@shared/stripe-config";
 import { PurchaseSeatsDialog } from "@/components/PurchaseSeatsDialog";
 import { 
   CreditCard, 
@@ -50,7 +51,7 @@ const TIER_INFO = {
     icon: Briefcase,
     features: [
       'Unlimited projects',
-      'Add seats at $34.95/month each',
+      'Add seats at $34.95/month (volume: $29.95 for 30+ employees)',
       'Employee management',
       'Advanced scheduling',
       'GPS time tracking',

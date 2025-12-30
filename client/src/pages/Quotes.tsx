@@ -2002,6 +2002,32 @@ export default function Quotes() {
                   <p className="font-medium text-foreground">{selectedQuote.floorCount} floors</p>
                 </div>
               </div>
+              
+              {/* Client/Recipient Information */}
+              {(selectedQuote as any).clientId && (() => {
+                const client = clients.find((c: any) => c.id === (selectedQuote as any).clientId);
+                if (client) {
+                  return (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <p className="text-sm text-muted-foreground mb-2">Quote Recipient</p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Users className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">{client.firstName} {client.lastName}</p>
+                          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                            {client.company && <span>{client.company}</span>}
+                            {client.email && <span>{client.email}</span>}
+                            {client.phoneNumber && <span>{client.phoneNumber}</span>}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </CardHeader>
           </Card>
 

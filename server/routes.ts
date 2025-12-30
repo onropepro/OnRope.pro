@@ -13,7 +13,17 @@ import { ObjectStorageService } from "./objectStorage";
 import * as XLSX from "xlsx";
 import * as stripeService from "./stripe-service";
 import Stripe from "stripe";
-import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
+import { 
+  type TierName, 
+  type Currency, 
+  type BillingFrequency,
+  TIER_CONFIG, 
+  ADDON_CONFIG,
+  STRIPE_PRICE_IDS,
+  TRIAL_PERIOD_DAYS,
+  getBasePriceId,
+  detectCurrencyFromCountry
+} from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
 import { getDefaultElevation, usesPercentageProgress } from "@shared/jobTypes";
@@ -3331,7 +3341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only company accounts can purchase subscriptions" });
       }
 
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3339,6 +3349,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      }
+
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
       }
 
       // Get or create Stripe customer
@@ -3349,9 +3363,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateUser(user.id, { stripeCustomerId: customerId });
       }
 
-      // Get price ID for selected tier and currency
-      const tierConfig = TIER_CONFIG[tier as TierName];
-      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+      // Get price ID using the new billing frequency-aware function
+      const priceId = getBasePriceId(billingFrequency, currency);
 
       // Construct base URL from request (works in both dev and production)
       const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
@@ -3396,7 +3409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only company accounts can purchase subscriptions" });
       }
 
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3404,6 +3417,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
       }
 
       // Get or create Stripe customer
@@ -3467,7 +3483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/stripe/create-embedded-license-checkout", async (req: Request, res: Response) => {
     try {
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3477,9 +3493,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
       }
 
-      // Get price ID for selected tier and currency
-      const tierConfig = TIER_CONFIG[tier as TierName];
-      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
+
+      // Get price ID using the new billing frequency-aware function
+      const priceId = getBasePriceId(billingFrequency, currency);
 
       // Construct base URL from request
       const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
@@ -3501,6 +3520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: {
           tier,
           currency,
+          billingFrequency,
           newCustomer: 'true',
         },
         subscription_data: {
@@ -3508,6 +3528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           metadata: {
             tier,
             currency,
+            billingFrequency,
           },
         },
         allow_promotion_codes: true,
@@ -3523,13 +3544,304 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
+   * Create Stripe embedded checkout for NEW employer registration
+   * POST /api/stripe/create-registration-checkout
+   * No authentication required - this is for new employer signups
+   * 
+   * New flow: Accepts account details + billing frequency, creates checkout session
+   * Billing address collected by Stripe will be used as company address
+   * License key generated server-side, never shown to user
+   */
+  app.post("/api/stripe/create-registration-checkout", async (req: Request, res: Response) => {
+    try {
+      const { 
+        companyName, 
+        ownerName, 
+        email, 
+        password,
+        billingFrequency = 'monthly' 
+      } = req.body;
+
+      // Validate required fields
+      if (!companyName || !ownerName || !email || !password) {
+        return res.status(400).json({ message: "Company name, owner name, email, and password are required" });
+      }
+
+      // Validate email format
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // Check if email already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "An account with this email already exists" });
+      }
+
+      // Validate billing frequency
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
+
+      // Default to USD - will be updated based on billing country after checkout
+      const currency: Currency = 'usd';
+      
+      // Get base price ID for the selected frequency (defaults to USD, will be updated by Stripe based on billing country)
+      const priceId = getBasePriceId(billingFrequency as BillingFrequency, currency);
+
+      // Construct base URL from request
+      const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
+      const host = req.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
+      // Hash the password before storing in metadata
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      // Create embedded checkout session with user data in metadata
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        ui_mode: 'embedded',
+        return_url: `${baseUrl}/complete-registration?session_id={CHECKOUT_SESSION_ID}`,
+        metadata: {
+          registrationType: 'employer',
+          companyName,
+          ownerName,
+          email,
+          passwordHash,
+          billingFrequency,
+          newCustomer: 'true',
+        },
+        subscription_data: {
+          trial_period_days: TRIAL_PERIOD_DAYS,
+          metadata: {
+            billingFrequency,
+            companyName,
+          },
+        },
+        allow_promotion_codes: true,
+        billing_address_collection: 'required',
+        customer_email: email,
+      });
+
+      console.log(`[Stripe] Registration checkout session created: ${session.id} for ${companyName}`);
+      res.json({ clientSecret: session.client_secret, sessionId: session.id });
+    } catch (error: any) {
+      console.error('[Stripe] Create registration checkout error:', error);
+      res.status(500).json({ message: error.message || "Failed to create registration checkout" });
+    }
+  });
+
+  /**
+   * Complete employer registration after embedded checkout
+   * GET /api/stripe/complete-registration/:sessionId
+   * 
+   * New flow: Validates completed checkout session, creates company account
+   * using data stored in session metadata. Billing address becomes company address.
+   * License key stored on company record, never exposed to user.
+   */
+  app.get("/api/stripe/complete-registration/:sessionId", async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      console.log(`[Registration] Processing registration for session: ${sessionId}`);
+
+      // Check if we already processed this session (idempotency via licenseKeys table)
+      const existingLicenseForSession = await db.query.licenseKeys.findFirst({
+        where: eq(licenseKeys.stripeSessionId, sessionId),
+      });
+
+      if (existingLicenseForSession) {
+        // Session already processed, find the associated company
+        const existingCompany = await db.query.users.findFirst({
+          where: eq(users.stripeCustomerId, existingLicenseForSession.stripeCustomerId),
+        });
+        
+        console.log(`[Registration] Session ${sessionId} already processed for company: ${existingCompany?.companyName}`);
+        return res.json({
+          flow: 'embedded',
+          success: true,
+          alreadyProcessed: true,
+          companyName: existingCompany?.companyName,
+          message: 'Registration already completed',
+        });
+      }
+
+      // Retrieve the session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['subscription', 'customer'],
+      });
+
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+
+      // Verify session is completed
+      if (session.status !== 'complete') {
+        return res.status(400).json({ message: `Checkout not completed. Status: ${session.status}` });
+      }
+
+      // Verify this is a registration checkout
+      const registrationType = session.metadata?.registrationType;
+      if (registrationType !== 'employer') {
+        return res.status(400).json({ message: "Invalid registration type. Use the legacy flow for license purchases." });
+      }
+
+      // Extract registration data from metadata
+      const companyName = session.metadata?.companyName;
+      const ownerName = session.metadata?.ownerName;
+      const email = session.metadata?.email;
+      const passwordHash = session.metadata?.passwordHash;
+      const billingFrequency = session.metadata?.billingFrequency || 'monthly';
+
+      if (!companyName || !ownerName || !email || !passwordHash) {
+        return res.status(400).json({ message: "Missing required registration data in session" });
+      }
+
+      // Check email uniqueness (in case of race condition)
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "An account with this email already exists" });
+      }
+
+      // Check company name uniqueness
+      const existingCompanyByName = await storage.getUserByCompanyName(companyName);
+      if (existingCompanyByName) {
+        return res.status(400).json({ message: "A company with this name already exists" });
+      }
+
+      // Get Stripe customer and subscription data
+      const stripeCustomerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+      const subscription = session.subscription as Stripe.Subscription;
+      const stripeSubscriptionId = typeof subscription === 'string' ? subscription : subscription?.id;
+
+      if (!stripeCustomerId || !stripeSubscriptionId) {
+        return res.status(400).json({ message: "Missing customer or subscription data" });
+      }
+
+      // Get billing address from session (if available)
+      const billingDetails = session.customer_details;
+      const address = billingDetails?.address;
+      
+      // Determine currency from billing country
+      const billingCountry = address?.country?.toUpperCase();
+      const currency = billingCountry === 'CA' ? 'cad' : 'usd';
+
+      // Generate license key server-side (never exposed to user)
+      const licenseKey = `ORP-${generateRandomSegment()}-${generateRandomSegment()}-${generateRandomSegment()}-B`;
+
+      // Generate unique codes for resident and property manager linking
+      const residentCode = await generateResidentCode();
+      const propertyManagerCode = await generatePropertyManagerCode();
+
+      // Create company account (role='company')
+      const [newCompany] = await db.insert(users).values({
+        email,
+        passwordHash, // Already hashed during checkout creation
+        role: 'company',
+        companyName,
+        name: ownerName,
+        // Stripe fields
+        stripeCustomerId,
+        stripeSubscriptionId,
+        licenseKey,
+        subscriptionTier: 'base',
+        subscriptionStatus: 'trialing',
+        // Address from Stripe billing
+        streetAddress: address?.line1 ? `${address.line1}${address.line2 ? ', ' + address.line2 : ''}` : null,
+        city: address?.city || null,
+        province: address?.state || null,
+        country: address?.country || null,
+        zipCode: address?.postal_code || null,
+        // Codes for linking
+        residentCode,
+        propertyManagerCode,
+        // Defaults
+        active: true,
+        onboardingComplete: false,
+      }).returning();
+
+      console.log(`[Registration] Created company: ${newCompany.companyName} (${newCompany.id})`);
+
+      // Store license key record for tracking and idempotency
+      await db.insert(licenseKeys).values({
+        licenseKey,
+        stripeSessionId: sessionId,
+        stripeCustomerId,
+        stripeSubscriptionId,
+        tier: 'base',
+        currency,
+        used: true,
+        usedBy: newCompany.id,
+        usedAt: new Date(),
+      });
+
+      // Create default payroll config and generate periods
+      try {
+        await storage.createPayPeriodConfig({
+          companyId: newCompany.id,
+          periodType: 'semi-monthly',
+          firstPayDay: 15,
+          secondPayDay: 30,
+        });
+        await storage.generatePayPeriods(newCompany.id, 6);
+      } catch (error) {
+        console.error('[Registration] Error creating default payroll config:', error);
+        // Don't fail registration if payroll setup fails
+      }
+
+      console.log(`[Registration] Registration completed for ${companyName}`);
+
+      // Get trial end date from subscription
+      const trialEnd = subscription && typeof subscription !== 'string' ? subscription.trial_end : null;
+
+      // Create session for auto-login
+      req.session.userId = newCompany.id;
+      req.session.role = newCompany.role;
+      
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            console.error('[Registration] Session save error:', err);
+            reject(err);
+          } else {
+            console.log(`[Registration] Session created for ${newCompany.email}`);
+            resolve();
+          }
+        });
+      });
+
+      res.json({
+        flow: 'embedded',
+        success: true,
+        companyName: newCompany.companyName,
+        email: newCompany.email,
+        trialEnd,
+        message: 'Registration completed successfully',
+      });
+
+    } catch (error: any) {
+      console.error('[Registration] Complete registration error:', error);
+      res.status(500).json({ 
+        message: error.message || "Failed to complete registration",
+        details: error.message 
+      });
+    }
+  });
+
+  /**
    * Create Stripe checkout session for NEW customers (license purchase)
    * POST /api/stripe/create-license-checkout
    * No authentication required - this is for new customers
    */
   app.post("/api/stripe/create-license-checkout", async (req: Request, res: Response) => {
     try {
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3537,6 +3849,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
       }
 
       // Get price ID for selected tier and currency
@@ -7744,6 +8059,63 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     } catch (error: any) {
       console.error('[Gift-Addons] Error:', error);
       res.status(500).json({ message: error.message || "Failed to gift add-ons" });
+    }
+  });
+
+  // SuperUser: Toggle platform verification (grants free access)
+  app.post("/api/superuser/companies/:id/toggle-verification", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only allow superuser to access this endpoint
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. Only superuser can toggle verification." });
+      }
+
+      const companyId = req.params.id;
+      const { verified } = req.body;
+
+      console.log('[Platform-Verification] Toggling verification for company:', { companyId, verified });
+
+      // Fetch the company
+      const company = await storage.getUserById(companyId);
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Update the company verification status
+      const updates: any = {
+        isPlatformVerified: verified === true,
+      };
+
+      // If verifying, also set subscription to active to ensure full access
+      if (verified === true) {
+        updates.subscriptionStatus = 'active';
+        updates.subscriptionTier = 'basic'; // Set a tier for proper UI display
+      }
+
+      await db.update(users)
+        .set(updates)
+        .where(eq(users.id, companyId));
+
+      // Fetch updated company to confirm changes
+      const updatedCompany = await storage.getUserById(companyId);
+
+      console.log('[Platform-Verification] Verification toggled successfully:', { companyId, verified });
+
+      res.json({
+        success: true,
+        message: verified 
+          ? `${company.companyName} is now platform-verified with free access` 
+          : `Platform verification removed from ${company.companyName}`,
+        company: {
+          id: updatedCompany?.id,
+          companyName: updatedCompany?.companyName,
+          isPlatformVerified: updatedCompany?.isPlatformVerified,
+          subscriptionStatus: updatedCompany?.subscriptionStatus,
+        },
+      });
+    } catch (error: any) {
+      console.error('[Platform-Verification] Error:', error);
+      res.status(500).json({ message: error.message || "Failed to toggle verification" });
     }
   });
 
@@ -22240,6 +22612,43 @@ Do not include any other text, just the JSON object.`
         }
       }
       
+      
+      // Save building/strata info to CRM client's lmsNumbers if clientId is set
+      if (fullQuote!.clientId && fullQuote!.strataPlanNumber) {
+        try {
+          const crmClient = await storage.getClientById(fullQuote!.clientId);
+          if (crmClient) {
+            const existingBuildings = (crmClient.lmsNumbers as any[]) || [];
+            
+            // Check if this strata/building already exists
+            const existingBuildingIndex = existingBuildings.findIndex(
+              (b: any) => b.number === fullQuote!.strataPlanNumber
+            );
+            
+            if (existingBuildingIndex === -1) {
+              // Add the new building from the quote
+              const newBuilding = {
+                number: fullQuote!.strataPlanNumber,
+                buildingName: fullQuote!.buildingName || '',
+                address: fullQuote!.buildingAddress || '',
+                stories: fullQuote!.floorCount || null,
+                units: null,
+                parkingStalls: null
+              };
+              
+              await db.update(clients)
+                .set({ lmsNumbers: [...existingBuildings, newBuilding] })
+                .where(eq(clients.id, crmClient.id));
+              
+              console.log(`[Quote] Added building ${fullQuote!.buildingName} (${fullQuote!.strataPlanNumber}) to CRM client ${crmClient.firstName} ${crmClient.lastName}`);
+            } else {
+              console.log(`[Quote] Building ${fullQuote!.strataPlanNumber} already exists in CRM client record`);
+            }
+          }
+        } catch (clientUpdateError: any) {
+          console.warn(`[Quote] Could not update CRM client lmsNumbers: ${clientUpdateError?.message}`);
+        }
+      }
       res.json({ quote: fullQuote, sms: smsResult });
     } catch (error) {
       if (error instanceof z.ZodError) {
