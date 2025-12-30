@@ -9945,6 +9945,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
           id: company.id,
           companyName: company.companyName,
           residentCode: company.residentCode,
+          companyLogoUrl: company.brandingLogoUrl || null,
         }
       });
     } catch (error) {
