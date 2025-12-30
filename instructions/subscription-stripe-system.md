@@ -1,6 +1,6 @@
 # Subscription & Stripe System - Single Source of Truth (SSOT)
 **Version**: 1.0  
-**Last Updated**: December 29, 2024  
+**Last Updated**: December 30, 2024  
 **Status**: ACTIVE - FOUNDATIONAL DOCUMENT
 
 ## Overview
@@ -13,19 +13,36 @@ This document defines the complete subscription and payment system architecture 
 
 ### 1.1 Pricing Structure (Simplified - No Tiers)
 
+#### Monthly Billing
 | Component | Price | Billing |
 |-----------|-------|---------|
 | **Base Platform** | $99/month | Recurring |
 | **Employee Seat** | $34.95/month/seat | Recurring, prorated |
+| **Volume Seat (30+ employees)** | $29.95/month/seat | Recurring, prorated |
 | **White Label Branding** | $49/month | Recurring, optional |
+
+#### Annual Billing (17% Discount)
+| Component | Price | Savings |
+|-----------|-------|---------|
+| **Base Platform** | $990/year | Save $198/year |
+| **Employee Seat** | $349/year/seat | Save ~$70/year per seat |
+| **Volume Seat (30+ employees)** | $299/year/seat | Save ~$60/year per seat |
+| **White Label Branding** | $490/year | Save $98/year |
 
 **Key Points:**
 - Single plan for all customers ("OnRopePro")
 - No tier differentiation (basic/starter/premium/enterprise are legacy aliases)
 - Unlimited projects included in base price
-- Employee seats are purchased individually at $34.95/month each
+- Employee seats are purchased individually
+- **Volume discount**: $29.95/month (or $299/year) per seat for 30+ employees
+- **Annual discount**: 17% off when paying yearly
 - All prices apply equally to USD and CAD (Stripe handles currency display)
 - Applicable taxes (Provincial/State) calculated automatically by Stripe Tax
+
+**Important - Sandbox vs Live Mode:**
+- Current price IDs are in Stripe **Sandbox/Test** mode only
+- Before production launch, recreate all 16 price IDs in Stripe **Live** mode
+- See `shared/stripe-config.ts` for all price IDs
 
 ### 1.2 Free Trial
 
