@@ -40,12 +40,12 @@ export default function ForTechnicians() {
     {
       icon: Clock,
       title: 'Time Tracking',
-      description: 'Clock in/out with GPS, track billable hours, view your timesheet',
+      description: 'Clock in/out with GPS, log manual hours when employer doesn\'t use OnRopePro, track your total',
     },
     {
       icon: Award,
       title: 'IRATA/SPRAT Logging',
-      description: 'Log work hours for certification progression and renewals',
+      description: 'Track hours for certification progression - manual hours count toward totals, previous hours are reference only',
     },
     {
       icon: FileText,
@@ -62,7 +62,7 @@ export default function ForTechnicians() {
   return (
     <div className="min-h-screen bg-background">
       <PublicHeader activeNav="technician" />
-      <div className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #AB4521 0%, #8B371A 100%)'}}>
+      <div className="relative text-white pb-[120px]" style={{backgroundImage: 'linear-gradient(135deg, #5C7A84 0%, #1F5F8B 100%)'}}>
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTAtMThjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bTE4IDBjMC0yLjIwOS0xLjc5MS00LTQtNHMtNCAxLjc5MS00IDQgMS43OTEgNCA0IDQgNC0xLjc5MSA0LTR6bS0xOCAxOGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMTggMGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHptMC0xOGMwLTIuMjA5LTEuNzkxLTQtNC00cy00IDEuNzkxLTQgNCAxLjc5MSA0IDQgNCA0LTEuNzkxIDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="flex items-center gap-4 mb-6 flex-wrap">
@@ -92,7 +92,7 @@ export default function ForTechnicians() {
             <HelpSearchBar 
               size="large" 
               placeholder="Ask about time tracking, IRATA logging, safety docs..."
-              stakeholderColor="#AB4521"
+              stakeholderColor="#5C7A84"
             />
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function ForTechnicians() {
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-col gap-3">
-                  <div className="w-10 h-10 bg-[#AB4521]/10 dark:bg-[#AB4521]/20 rounded-lg flex items-center justify-center text-[#AB4521]">
+                  <div className="w-10 h-10 bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20 rounded-lg flex items-center justify-center text-[#5C7A84]">
                     <feature.icon className="h-5 w-5" />
                   </div>
                   <div>

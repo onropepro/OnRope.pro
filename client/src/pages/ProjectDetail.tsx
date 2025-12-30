@@ -29,7 +29,8 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import SignatureCanvas from "react-signature-canvas";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
@@ -78,33 +79,6 @@ export default function ProjectDetail() {
     return () => window.removeEventListener('error', errorHandler);
   }, []);
 
-  // If there's a render error, show it
-  if (renderError) {
-    return (
-      <div className="min-h-screen bg-red-50 p-4">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">{t('projectDetail.error.detected', 'Error Detected')}</h1>
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <p className="font-bold">{t('projectDetail.error.message', 'Error Message:')}</p>
-            <p className="font-mono text-sm">{renderError.message}</p>
-          </div>
-          <div className="bg-muted p-4 rounded">
-            <p className="font-bold mb-2">{t('projectDetail.error.stackTrace', 'Stack Trace:')}</p>
-            <pre className="text-xs overflow-auto">{renderError.stack}</pre>
-          </div>
-          <button
-            onClick={() => {
-              setRenderError(null);
-              window.location.reload();
-            }}
-            className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
-          >
-            {t('projectDetail.error.reloadPage', 'Reload Page')}
-          </button>
-        </div>
-      </div>
-    );
-  }
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [uploadingAnchorCertificate, setUploadingAnchorCertificate] = useState(false);
@@ -118,7 +92,6 @@ export default function ProjectDetail() {
   const [isMissedStall, setIsMissedStall] = useState(false);
   const [missedStallNumber, setMissedStallNumber] = useState("");
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
-  const [documentsExpanded, setDocumentsExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -130,6 +103,12 @@ export default function ProjectDetail() {
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [showHarnessInspectionDialog, setShowHarnessInspectionDialog] = useState(false);
+  const [showNotApplicableReason, setShowNotApplicableReason] = useState(false);
+  const [notApplicableReason, setNotApplicableReason] = useState("");
+  // Rope Access Plan Signature Modal State
+  const [showRopeAccessSignModal, setShowRopeAccessSignModal] = useState(false);
+  const [ropeAccessPlanInfo, setRopeAccessPlanInfo] = useState<{ projectId: string; projectName: string; planUrl: string } | null>(null);
+  const ropeAccessSignatureRef = useRef<SignatureCanvas>(null);
   const [showLogHoursPrompt, setShowLogHoursPrompt] = useState(false);
   const [showIrataTaskDialog, setShowIrataTaskDialog] = useState(false);
   const [selectedIrataTasks, setSelectedIrataTasks] = useState<string[]>([]);
@@ -391,6 +370,17 @@ export default function ProjectDetail() {
   // Check if user is management using centralized permission helper
   const isManagement = checkIsManagement(currentUser);
 
+  // Rope access plan signatures (for managers)
+  const { data: ropeAccessSignaturesData } = useQuery<{ signatures: any[]; hasPlan: boolean; planUrl: string | null; projectName: string }>({
+    queryKey: [`/api/projects/${id}/rope-access-plan/signatures`],
+    queryFn: async () => {
+      const response = await fetch(`/api/projects/${id}/rope-access-plan/signatures`, { credentials: "include" });
+      if (!response.ok) return { signatures: [], hasPlan: false, planUrl: null, projectName: "" };
+      return response.json();
+    },
+    enabled: !!id && isManagement,
+  });
+
   // Helper function to get current GPS location
   const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> => {
     return new Promise((resolve, reject) => {
@@ -454,13 +444,22 @@ export default function ProjectDetail() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to start work session");
+        const errorData = await response.json();
+        // Check if signature is required for rope access plan
+        if (errorData.requiresSignature && errorData.ropeAccessPlan) {
+          setRopeAccessPlanInfo(errorData.ropeAccessPlan);
+          setShowStartDayDialog(false);
+          setShowRopeAccessSignModal(true);
+          return { needsSignature: true };
+        }
+        throw new Error(errorData.message || "Failed to start work session");
       }
 
       return response.json();
     },
     onSuccess: (data) => {
+      // Don't show success if we just opened the signature modal
+      if (data?.needsSignature) return;
       setActiveSession(data.session);
       setShowStartDayDialog(false);
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
@@ -468,6 +467,40 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "work-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       toast({ title: t('projectDetail.toasts.sessionStarted', 'Work session started'), description: t('projectDetail.toasts.goodLuck', 'Good luck today!') });
+    },
+    onError: (error: Error) => {
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+
+  // Sign Rope Access Plan mutation
+  const signRopeAccessPlanMutation = useMutation({
+    mutationFn: async (signatureDataUrl: string) => {
+      if (!ropeAccessPlanInfo) throw new Error("No plan info available");
+      const response = await fetch(`/api/projects/${ropeAccessPlanInfo.projectId}/rope-access-plan/sign`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ signatureDataUrl }),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to sign rope access plan");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      setShowRopeAccessSignModal(false);
+      setRopeAccessPlanInfo(null);
+      toast({
+        title: t('projectDetail.toasts.signatureSuccess', 'Rope Access Plan Signed'),
+        description: t('projectDetail.toasts.signatureSuccessDesc', 'You can now clock in to this project.'),
+      });
+      // Invalidate signatures query so managers see updated list
+      queryClient.invalidateQueries({ queryKey: [`/api/projects/${id}/rope-access-plan/signatures`] });
+      // Automatically retry clock-in
+      startDayMutation.mutate();
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
@@ -544,7 +577,7 @@ export default function ProjectDetail() {
       const endTime = new Date(session.endTime);
       const hoursWorked = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
       
-      // Store session data for irata task logging
+      // Store session data for IRATA task logging
       setEndedSessionData({
         sessionId: session.id,
         hoursWorked: parseFloat(hoursWorked.toFixed(2)),
@@ -588,7 +621,7 @@ export default function ProjectDetail() {
     },
   });
 
-  // irata Task Log mutation
+  // IRATA Task Log mutation
   const saveIrataTaskLogMutation = useMutation({
     mutationFn: async (data: { 
       workSessionId: string; 
@@ -605,14 +638,14 @@ export default function ProjectDetail() {
       setIrataTaskNotes("");
       setRopeAccessTaskHours("");
       setEndedSessionData(null);
-      toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.irataTasksLogged', 'irata tasks logged successfully') });
+      toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.irataTasksLogged', 'IRATA tasks logged successfully') });
     },
     onError: (error: Error) => {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
-  // Handle irata task log submission
+  // Handle IRATA task log submission
   const handleSaveIrataTasks = () => {
     if (!endedSessionData || selectedIrataTasks.length === 0) {
       toast({ title: t('projectDetail.toasts.error', 'Error'), description: t('projectDetail.dialogs.irataTask.selectTasks', 'Select Tasks Performed'), variant: "destructive" });
@@ -656,7 +689,7 @@ export default function ProjectDetail() {
     toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
   };
 
-  // Skip irata task logging
+  // Skip IRATA task logging
   const handleSkipIrataTasks = () => {
     setShowIrataTaskDialog(false);
     setSelectedIrataTasks([]);
@@ -738,7 +771,7 @@ export default function ProjectDetail() {
     updateProgressMutation.mutate({ skip: true });
   };
 
-  // Toggle irata task selection
+  // Toggle IRATA task selection
   const toggleIrataTask = (taskId: string) => {
     setSelectedIrataTasks(prev => 
       prev.includes(taskId) 
@@ -749,7 +782,7 @@ export default function ProjectDetail() {
 
   // Create "not applicable" inspection record
   const createNotApplicableInspectionMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (reason?: string) => {
       if (!currentUser) throw new Error("User not found");
       
       // Get local date in YYYY-MM-DD format using timezone-safe utility
@@ -765,7 +798,7 @@ export default function ProjectDetail() {
           inspectorName: currentUser.name || currentUser.email || "Unknown",
           overallStatus: "not_applicable",
           equipmentFindings: {},
-          comments: "Harness not applicable for this work session",
+          comments: reason || "Harness not applicable for this work session",
         }),
         credentials: "include",
       });
@@ -780,6 +813,8 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
       setShowHarnessInspectionDialog(false);
+      setShowNotApplicableReason(false);
+      setNotApplicableReason("");
       // Start work session directly without a second confirmation
       if (id) {
         startDayMutation.mutate(id);
@@ -789,6 +824,8 @@ export default function ProjectDetail() {
       console.error("Error creating not applicable inspection:", error);
       // Still proceed to start work session even if this fails
       setShowHarnessInspectionDialog(false);
+      setShowNotApplicableReason(false);
+      setNotApplicableReason("");
       if (id) {
         startDayMutation.mutate(id);
       }
@@ -1099,6 +1136,35 @@ export default function ProjectDetail() {
     setMissedUnitNumber("");
   };
 
+
+  // If there's a render error, show it
+  if (renderError) {
+    return (
+      <div className="min-h-screen bg-red-50 p-4">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">{t('projectDetail.error.detected', 'Error Detected')}</h1>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <p className="font-bold">{t('projectDetail.error.message', 'Error Message:')}</p>
+            <p className="font-mono text-sm">{renderError.message}</p>
+          </div>
+          <div className="bg-muted p-4 rounded">
+            <p className="font-bold mb-2">{t('projectDetail.error.stackTrace', 'Stack Trace:')}</p>
+            <pre className="text-xs overflow-auto">{renderError.stack}</pre>
+          </div>
+          <button
+            onClick={() => {
+              setRenderError(null);
+              window.location.reload();
+            }}
+            className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
+          >
+            {t('projectDetail.error.reloadPage', 'Reload Page')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen page-gradient p-4">
@@ -1211,65 +1277,51 @@ export default function ProjectDetail() {
 
   return (
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b shadow-sm">
-        <div className="max-w-2xl mx-auto p-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => setLocation("/dashboard?tab=projects")}
-              className="h-12 gap-2"
-              data-testid="button-back"
-            >
-              <span className="material-icons">arrow_back</span>
-              {t('common.back', 'Back')}
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold">{project.buildingName}</h1>
-              {project.buildingAddress && (
-                <p className="text-xs text-muted-foreground mt-0.5">{project.buildingAddress}</p>
-              )}
-              <div className="flex items-center gap-2 mt-1">
-                <p className="text-xs text-muted-foreground">
-                  {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
-                </p>
-                {project.companyResidentCode && (
-                  <>
-                    <span className="text-muted-foreground/50">•</span>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-muted-foreground">Code:</span>
-                      <Badge variant="outline" className="font-mono text-xs" data-testid="badge-resident-code">
-                        {project.companyResidentCode}
-                      </Badge>
-                    </div>
-                  </>
-                )}
+      <div className="max-w-6xl mx-auto p-4 space-y-6">
+        {/* Project Info Header */}
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+              <span className="material-icons text-primary">apartment</span>
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
+              <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
+              <div className="flex items-center gap-2 mt-1.5">
+                <Badge variant={project.status === 'completed' ? 'default' : project.status === 'active' ? 'secondary' : 'outline'}>
+                  {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
+                   project.status === 'active' ? t('projectDetail.status.inProgress', 'In Progress') : 
+                   t('projectDetail.status.pending', 'Pending')}
+                </Badge>
+                <Badge variant="outline" className="gap-1">
+                  <span className="material-icons text-xs">trending_up</span>
+                  {progressPercent}%
+                </Badge>
               </div>
             </div>
-            {/* Start Work Session Button - Available to all users when no active session exists */}
+          </div>
+          {/* Work Session Buttons */}
+          <div className="flex items-center gap-2 shrink-0">
             {!activeSession && project.status === "active" && (
               <Button
                 onClick={() => {
-                  // If user already did harness inspection today, skip the dialog
                   if (hasHarnessInspectionToday) {
                     setShowStartDayDialog(true);
                   } else {
                     setShowHarnessInspectionDialog(true);
                   }
                 }}
-                className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
                 data-testid="button-start-day"
               >
                 <span className="material-icons mr-2 text-base">play_circle</span>
                 {t('projectDetail.workSession.startSession', 'Start Work Session')}
               </Button>
             )}
-            {/* End Day Button - Shown when there IS an active session */}
             {activeSession && (
               <Button
                 onClick={() => setShowEndDayDialog(true)}
                 variant="destructive"
-                className="h-10"
                 data-testid="button-end-day"
               >
                 <span className="material-icons mr-2 text-base">stop_circle</span>
@@ -1278,10 +1330,33 @@ export default function ProjectDetail() {
             )}
           </div>
         </div>
-      </div>
 
-      <div className="max-w-2xl mx-auto p-4 space-y-6">
-        {/* Progress Card */}
+        {/* Page-level Tabs for Section Organization */}
+        <Tabs defaultValue="overview" className="w-full">
+          {/* Sticky Tab Navigation */}
+          <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 -mx-4 px-4 py-2">
+            <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview" className="gap-2" data-testid="tab-overview">
+              <span className="material-icons text-sm hidden sm:inline">dashboard</span>
+              {t('projectDetail.tabs.overview', 'Overview')}
+            </TabsTrigger>
+            <TabsTrigger value="files" className="gap-2" data-testid="tab-files">
+              <span className="material-icons text-sm hidden sm:inline">folder</span>
+              {t('projectDetail.tabs.files', 'Files')}
+            </TabsTrigger>
+            <TabsTrigger value="activity" className="gap-2" data-testid="tab-activity">
+              <span className="material-icons text-sm hidden sm:inline">forum</span>
+              {t('projectDetail.tabs.activity', 'Activity')}
+            </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* OVERVIEW TAB: Progress + Quick Actions + Building Instructions */}
+          <TabsContent value="overview" className="space-y-6 mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column: Progress */}
+              <div className="space-y-6">
+                {/* Progress Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
             <CardTitle className="text-base">{t('projectDetail.progress.title', 'Progress')}</CardTitle>
@@ -1460,27 +1535,15 @@ export default function ProjectDetail() {
               </>
             )}
 
-            {/* Stats - Hide for hours-based projects since they don't have daily targets */}
+            {/* Stats - Show drops remaining, est days, and hours/budget for financial users */}
             {!isPercentageBased && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold">
-                    {project.jobType === "in_suite_dryer_vent_cleaning" 
-                      ? project.suitesPerDay 
-                      : project.jobType === "parkade_pressure_cleaning" 
-                      ? project.stallsPerDay 
-                      : project.dailyDropTarget}
-                  </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {project.jobType === "in_suite_dryer_vent_cleaning" 
-                      ? t('projectDetail.progress.unitsPerDay', 'Expected Suites/Day') 
-                      : project.jobType === "parkade_pressure_cleaning" 
-                      ? t('projectDetail.progress.stallsPerDay', 'Expected Stalls/Day') 
-                      : t('projectDetail.progress.dailyTarget', 'Daily Target')}
-                  </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="text-center p-2 bg-muted/50 rounded-lg">
+                  <div className="text-lg font-bold">{totalDrops - completedDrops}</div>
+                  <div className="text-xs text-muted-foreground">{t('projectDetail.progress.dropsRemaining', 'Drops Left')}</div>
                 </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold">
+                <div className="text-center p-2 bg-muted/50 rounded-lg">
+                  <div className="text-lg font-bold">
                     {completedDrops > 0 
                       ? (() => {
                           const dailyTarget = project.jobType === "in_suite_dryer_vent_cleaning" 
@@ -1493,8 +1556,41 @@ export default function ProjectDetail() {
                         })()
                       : "N/A"}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">{t('projectDetail.progress.remaining', 'Days Remaining')}</div>
+                  <div className="text-xs text-muted-foreground">{t('projectDetail.progress.daysRemaining', 'Est. Days Left')}</div>
                 </div>
+                {canViewFinancialData && project.estimatedHours && (
+                  <>
+                    <div className="text-center p-2 bg-muted/50 rounded-lg">
+                      <div className="text-lg font-bold text-primary">
+                        {(() => {
+                          const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
+                            const regular = parseFloat(session.regularHours) || 0;
+                            const overtime = parseFloat(session.overtimeHours) || 0;
+                            const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                            return sum + regular + overtime + doubleTime;
+                          }, 0);
+                          return totalHoursWorked.toFixed(1);
+                        })()}h
+                      </div>
+                      <div className="text-xs text-muted-foreground">{t('projectDetail.progress.hoursWorked', 'Hours Worked')}</div>
+                    </div>
+                    <div className="text-center p-2 bg-muted/50 rounded-lg">
+                      <div className="text-lg font-bold">
+                        {(() => {
+                          const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
+                            const regular = parseFloat(session.regularHours) || 0;
+                            const overtime = parseFloat(session.overtimeHours) || 0;
+                            const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                            return sum + regular + overtime + doubleTime;
+                          }, 0);
+                          const hoursRemaining = Math.max(0, project.estimatedHours - totalHoursWorked);
+                          return hoursRemaining.toFixed(1);
+                        })()}h
+                      </div>
+                      <div className="text-xs text-muted-foreground">{t('projectDetail.progress.hoursRemaining', 'Hours Left')}</div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -1532,6 +1628,70 @@ export default function ProjectDetail() {
             })()}
           </CardContent>
         </Card>
+              </div>
+
+              {/* Right Column: Quick Actions + Building Instructions */}
+              <div className="space-y-6">
+                {/* Quick Actions - Safety Forms accessible to all employees */}
+                <Card className="glass-card border-0 shadow-premium">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <span className="material-icons text-primary">bolt</span>
+                      {t('projectDetail.quickActions.title', 'Quick Actions')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        variant="outline"
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setLocation(`/harness-inspection?projectId=${id}`)}
+                        data-testid="button-harness-inspection"
+                      >
+                        <span className="material-icons text-2xl text-amber-600">security</span>
+                        <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.harnessInspection', 'Harness Inspection')}</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setLocation(`/toolbox-meeting?projectId=${id}`)}
+                        data-testid="button-toolbox-meeting"
+                      >
+                        <span className="material-icons text-2xl text-blue-600">groups</span>
+                        <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.toolboxMeeting', 'Toolbox Meeting')}</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setLocation(`/flha-form?projectId=${id}`)}
+                        data-testid="button-flha"
+                      >
+                        <span className="material-icons text-2xl text-green-600">assignment</span>
+                        <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.flha', 'FLHA Form')}</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-auto py-4 flex flex-col items-center gap-2"
+                        onClick={() => setLocation(`/incident-report?projectId=${id}`)}
+                        data-testid="button-incident-report"
+                      >
+                        <span className="material-icons text-2xl text-red-600">report_problem</span>
+                        <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.incidentReport', 'Incident Report')}</span>
+                      </Button>
+                      {isManagement && (
+                        <Button
+                          variant="outline"
+                          className="h-auto py-4 flex flex-col items-center gap-2"
+                          onClick={() => setShowQuickNoticeForm(true)}
+                          data-testid="button-create-notice"
+                        >
+                          <span className="material-icons text-2xl text-purple-600">campaign</span>
+                          <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.createNotice', 'Create Notice')}</span>
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
         {/* Building Instructions Section - Prominent styling */}
         {buildingData?.building && (
@@ -1744,67 +1904,6 @@ export default function ProjectDetail() {
           </Card>
         )}
 
-        {/* Quick Actions - Safety Forms accessible to all employees */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <span className="material-icons text-primary">bolt</span>
-              {t('projectDetail.quickActions.title', 'Quick Actions')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/harness-inspection?projectId=${id}`)}
-                data-testid="button-harness-inspection"
-              >
-                <span className="material-icons text-2xl text-amber-600">security</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.harnessInspection', 'Harness Inspection')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/toolbox-meeting?projectId=${id}`)}
-                data-testid="button-toolbox-meeting"
-              >
-                <span className="material-icons text-2xl text-blue-600">groups</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.toolboxMeeting', 'Toolbox Meeting')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/flha-form?projectId=${id}`)}
-                data-testid="button-flha"
-              >
-                <span className="material-icons text-2xl text-green-600">assignment</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.flha', 'FLHA Form')}</span>
-              </Button>
-              <Button
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation(`/incident-report?projectId=${id}`)}
-                data-testid="button-incident-report"
-              >
-                <span className="material-icons text-2xl text-red-600">report_problem</span>
-                <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.incidentReport', 'Incident Report')}</span>
-              </Button>
-              {isManagement && (
-                <Button
-                  variant="outline"
-                  className="h-auto py-4 flex flex-col items-center gap-2"
-                  onClick={() => setShowQuickNoticeForm(true)}
-                  data-testid="button-create-notice"
-                >
-                  <span className="material-icons text-2xl text-purple-600">campaign</span>
-                  <span className="text-xs font-medium text-center">{t('projectDetail.quickActions.createNotice', 'Create Notice')}</span>
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Analytics - Target Performance & Work Session History */}
         {(isManagement || canViewWorkHistory) && (
           <Card className="glass-card border-0 shadow-premium">
@@ -1867,15 +1966,12 @@ export default function ProjectDetail() {
                 {canViewFinancialData && project.estimatedHours && (
                   <TabsContent value="budget" className="mt-4">
                     {(() => {
-                      // Calculate total hours worked from completed sessions
+                      // Calculate total hours worked from pre-calculated hours fields (matches Dashboard calculation)
                       const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
-                        if (session.startTime && session.endTime) {
-                          const start = new Date(session.startTime);
-                          const end = new Date(session.endTime);
-                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                          return sum + hours;
-                        }
-                        return sum;
+                        const regular = parseFloat(session.regularHours) || 0;
+                        const overtime = parseFloat(session.overtimeHours) || 0;
+                        const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                        return sum + regular + overtime + doubleTime;
                       }, 0);
                       
                       const estimatedHours = project.estimatedHours || 0;
@@ -1883,22 +1979,23 @@ export default function ProjectDetail() {
                       const isOverBudget = totalHoursWorked > estimatedHours;
                       const hoursOver = isOverBudget ? totalHoursWorked - estimatedHours : 0;
                       
-                      // Calculate total labor cost and overage cost
+                      // Calculate total labor cost and overage cost using pre-calculated hours
                       let totalLaborCost = 0;
                       let cumulativeHours = 0;
                       let overageCost = 0;
                       
                       completedSessions.forEach((session: any) => {
-                        if (session.startTime && session.endTime && session.techHourlyRate) {
-                          const start = new Date(session.startTime);
-                          const end = new Date(session.endTime);
-                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                        const regular = parseFloat(session.regularHours) || 0;
+                        const overtime = parseFloat(session.overtimeHours) || 0;
+                        const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                        const hours = regular + overtime + doubleTime;
+                        
+                        if (hours > 0 && session.techHourlyRate) {
                           const cost = hours * parseFloat(session.techHourlyRate);
                           totalLaborCost += cost;
                           
                           // Track overage cost (hours beyond estimated hours)
                           if (isOverBudget) {
-                            const previousCumulative = cumulativeHours;
                             cumulativeHours += hours;
                             
                             if (cumulativeHours > estimatedHours) {
@@ -2150,33 +2247,167 @@ export default function ProjectDetail() {
             </CardContent>
           </Card>
         )}
+              </div>
+            </div>
+          </TabsContent>
 
-        {/* Project Documents and Photos - Collapsible Combined Card */}
-        <Card className="glass-card border-0 shadow-premium">
-          <Collapsible open={documentsExpanded} onOpenChange={setDocumentsExpanded}>
-            <CardHeader className="pb-0">
-              <CollapsibleTrigger asChild>
-                <button
-                  className="w-full flex items-center justify-between hover-elevate active-elevate-2 rounded-md p-2 -m-2"
-                  data-testid="button-toggle-documents"
-                >
+          {/* ACTIVITY TAB: Resident Feedback + Job Comments - 2 Column Grid */}
+          <TabsContent value="activity" className="space-y-6 mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left Column: Resident Feedback */}
+              <Card className="glass-card border-0 shadow-premium">
+                <CardHeader>
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <CardTitle className="text-base">{t('projectDetail.feedback.title', 'Resident Feedback')}</CardTitle>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {complaintMetricsData?.metrics?.averageResolutionMs && (
+                        <Badge variant="outline" className="text-xs gap-1" data-testid="badge-avg-resolution-time">
+                          <span className="material-icons text-sm">schedule</span>
+                          {t('projectDetail.feedback.avgResolution', 'Avg')}: {formatDurationMs(complaintMetricsData.metrics.averageResolutionMs)}
+                        </Badge>
+                      )}
+                      <Badge variant="secondary" className="text-xs">
+                        {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.item', 'item') : t('projectDetail.feedback.itemsPlural', 'items')}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {complaints.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
+                      {t('projectDetail.feedback.noFeedback', 'No feedback received yet')}
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {complaints.map((complaint: any) => {
+                        const status = complaint.status;
+                        const isViewed = complaint.viewedAt !== null;
+                        
+                        let statusBadge;
+                        if (status === 'closed') {
+                          statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">{t('projectDetail.feedback.closed', 'Closed')}</Badge>;
+                        } else if (isViewed) {
+                          statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">{t('projectDetail.feedback.viewed', 'Viewed')}</Badge>;
+                        } else {
+                          statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">{t('projectDetail.feedback.new', 'New')}</Badge>;
+                        }
+                        
+                        return (
+                          <Card 
+                            key={complaint.id}
+                            className="hover-elevate cursor-pointer"
+                            onClick={() => setLocation(`/complaints/${complaint.id}`)}
+                            data-testid={`activity-feedback-card-${complaint.id}`}
+                          >
+                            <CardContent className="p-3">
+                              <div className="flex items-start justify-between gap-2 mb-2">
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium">{complaint.residentName}</div>
+                                  <div className="text-xs text-muted-foreground">{t('projectDetail.documents.unit', 'Unit')} {complaint.unitNumber}</div>
+                                </div>
+                                {statusBadge}
+                              </div>
+                              <p className="text-sm line-clamp-2 mb-2">{complaint.message}</p>
+                              {complaint.photoUrl && (
+                                <div className="mb-2">
+                                  <img 
+                                    src={complaint.photoUrl} 
+                                    alt="Feedback photo" 
+                                    className="w-full max-w-xs rounded-lg border"
+                                  />
+                                </div>
+                              )}
+                              <div className="text-xs text-muted-foreground">
+                                {formatTimestampDate(complaint.createdAt)}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Right Column: Job Comments */}
+              <Card className="glass-card border-0 shadow-premium">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">{t('projectDetail.comments.title', 'Job Comments')}</CardTitle>
+                    <Badge variant="secondary" className="text-xs">
+                      {jobComments.length} {jobComments.length === 1 ? t('projectDetail.comments.comment', 'comment') : t('projectDetail.comments.commentsPlural', 'comments')}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Comment Form */}
+                  <div className="space-y-2">
+                    <Textarea
+                      placeholder={t('projectDetail.comments.placeholder', 'Add a comment about this project...')}
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="min-h-20"
+                      data-testid="activity-input-job-comment"
+                    />
+                    <Button
+                      onClick={() => {
+                        if (newComment.trim()) {
+                          createCommentMutation.mutate(newComment.trim());
+                        }
+                      }}
+                      disabled={!newComment.trim() || createCommentMutation.isPending}
+                      className="w-full h-12"
+                      data-testid="activity-button-post-comment"
+                    >
+                      {createCommentMutation.isPending ? t('projectDetail.comments.posting', 'Posting...') : t('projectDetail.comments.postComment', 'Post Comment')}
+                    </Button>
+                  </div>
+
+                  {/* Comments List */}
+                  {jobComments.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
+                      {t('projectDetail.comments.noComments', 'No comments yet. Be the first to comment!')}
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {jobComments.map((comment: any) => (
+                        <Card key={comment.id} className="border">
+                          <CardContent className="p-3">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium">{comment.userName}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {format(new Date(comment.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* FILES TAB: Documents & Photos */}
+          <TabsContent value="files" className="space-y-6 mt-0">
+            {/* Project Documents and Photos Card */}
+            <Card className="glass-card border-0 shadow-premium">
+              <CardHeader>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
                     <span className="material-icons text-primary">folder</span>
                     <CardTitle className="text-base">{t('projectDetail.documents.title', 'Project Documents & Photos')}</CardTitle>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {photos.length + toolboxMeetings.length + flhaForms.length} {t('projectDetail.documents.items', 'items')}
-                    </Badge>
-                    <span className={`material-icons text-muted-foreground transition-transform duration-200 ${documentsExpanded ? 'rotate-180' : ''}`}>
-                      expand_more
-                    </span>
-                  </div>
-                </button>
-              </CollapsibleTrigger>
-            </CardHeader>
-            <CollapsibleContent>
-              <CardContent className="space-y-6 pt-4">
+                  <Badge variant="secondary" className="text-xs">
+                    {photos.length + toolboxMeetings.length + flhaForms.length} {t('projectDetail.documents.items', 'items')}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
             
             {/* Rope Access Plan Section - Only visible to users with safety document permission */}
             {canViewSafetyDocuments(currentUser) && (
@@ -2233,6 +2464,46 @@ export default function ProjectDetail() {
                       }
                     }}
                   />
+
+                  {/* Signatures Section - for management only */}
+                  {ropeAccessSignaturesData?.hasPlan && isManagement && (
+                    <div className="mt-4 space-y-3">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          {t('projectDetail.ropeAccessPlan.signatures', 'Signatures')} ({ropeAccessSignaturesData?.signatures?.length || 0})
+                        </h4>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(`/api/projects/${id}/rope-access-plan/pdf`, '_blank')}
+                          data-testid="button-download-signatures-pdf"
+                          disabled={!ropeAccessSignaturesData?.signatures?.length}
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          {t('projectDetail.ropeAccessPlan.downloadPdf', 'Download Audit PDF')}
+                        </Button>
+                      </div>
+                      {ropeAccessSignaturesData?.signatures?.length ? (
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                          {ropeAccessSignaturesData.signatures.map((sig: any) => (
+                            <div key={sig.id} className="flex items-center justify-between gap-2 p-2 bg-muted/50 rounded-md text-sm">
+                              <div className="flex items-center gap-2">
+                                <span className="material-icons text-sm text-green-600">check_circle</span>
+                                <span>{sig.employeeName || 'Employee'}</span>
+                              </div>
+                              <span className="text-muted-foreground text-xs">
+                                {sig.signedAt ? format(new Date(sig.signedAt), 'MMM d, yyyy HH:mm') : 'N/A'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          {t('projectDetail.ropeAccessPlan.noSignatures', 'No signatures yet.')}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <Separator />
@@ -2676,149 +2947,11 @@ export default function ProjectDetail() {
                   )}
                 </div>
               )}
-            </div>
+              </div>
               </CardContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </Card>
-
-        {/* Resident Feedback Card */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <CardTitle className="text-base">{t('projectDetail.feedback.title', 'Resident Feedback')}</CardTitle>
-              <div className="flex items-center gap-2 flex-wrap">
-                {complaintMetricsData?.metrics?.averageResolutionMs && (
-                  <Badge variant="outline" className="text-xs gap-1" data-testid="badge-avg-resolution-time">
-                    <span className="material-icons text-sm">schedule</span>
-                    {t('projectDetail.feedback.avgResolution', 'Avg')}: {formatDurationMs(complaintMetricsData.metrics.averageResolutionMs)}
-                  </Badge>
-                )}
-                <Badge variant="secondary" className="text-xs">
-                  {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.item', 'item') : t('projectDetail.feedback.itemsPlural', 'items')}
-                </Badge>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-              
-              {complaints.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
-                  {t('projectDetail.feedback.noFeedback', 'No feedback received yet')}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {complaints.map((complaint: any) => {
-                    const status = complaint.status;
-                    const isViewed = complaint.viewedAt !== null;
-                    
-                    let statusBadge;
-                    if (status === 'closed') {
-                      statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">{t('projectDetail.feedback.closed', 'Closed')}</Badge>;
-                    } else if (isViewed) {
-                      statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">{t('projectDetail.feedback.viewed', 'Viewed')}</Badge>;
-                    } else {
-                      statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">{t('projectDetail.feedback.new', 'New')}</Badge>;
-                    }
-                    
-                    return (
-                      <Card 
-                        key={complaint.id}
-                        className="hover-elevate cursor-pointer"
-                        onClick={() => setLocation(`/complaints/${complaint.id}`)}
-                        data-testid={`feedback-card-${complaint.id}`}
-                      >
-                        <CardContent className="p-3">
-                          <div className="flex items-start justify-between gap-2 mb-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium">{complaint.residentName}</div>
-                              <div className="text-xs text-muted-foreground">{t('projectDetail.documents.unit', 'Unit')} {complaint.unitNumber}</div>
-                            </div>
-                            {statusBadge}
-                          </div>
-                          <p className="text-sm line-clamp-2 mb-2">{complaint.message}</p>
-                          {complaint.photoUrl && (
-                            <div className="mb-2">
-                              <img 
-                                src={complaint.photoUrl} 
-                                alt="Feedback photo" 
-                                className="w-full max-w-xs rounded-lg border"
-                              />
-                            </div>
-                          )}
-                          <div className="text-xs text-muted-foreground">
-                            {formatTimestampDate(complaint.createdAt)}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              )}
-          </CardContent>
-        </Card>
-
-        {/* Job Comments Card */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">{t('projectDetail.comments.title', 'Job Comments')}</CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                {jobComments.length} {jobComments.length === 1 ? t('projectDetail.comments.comment', 'comment') : t('projectDetail.comments.commentsPlural', 'comments')}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-
-              {/* Comment Form */}
-              <div className="space-y-2">
-                <Textarea
-                  placeholder={t('projectDetail.comments.placeholder', 'Add a comment about this project...')}
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="min-h-20"
-                  data-testid="input-job-comment"
-                />
-                <Button
-                  onClick={() => {
-                    if (newComment.trim()) {
-                      createCommentMutation.mutate(newComment.trim());
-                    }
-                  }}
-                  disabled={!newComment.trim() || createCommentMutation.isPending}
-                  className="w-full h-12"
-                  data-testid="button-post-comment"
-                >
-                  {createCommentMutation.isPending ? t('projectDetail.comments.posting', 'Posting...') : t('projectDetail.comments.postComment', 'Post Comment')}
-                </Button>
-              </div>
-
-              {/* Comments List */}
-              {jobComments.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
-                  {t('projectDetail.comments.noComments', 'No comments yet. Be the first to comment!')}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {jobComments.map((comment: any) => (
-                    <Card key={comment.id} className="border">
-                      <CardContent className="p-3">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium">{comment.userName}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {format(new Date(comment.createdAt), "MMM d, yyyy 'at' h:mm a")}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-          </CardContent>
-        </Card>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Work Notices - Management Only */}
         {isManagement && project && (
@@ -2976,46 +3109,101 @@ export default function ProjectDetail() {
       </AlertDialog>
 
       {/* Harness Inspection Check Dialog */}
-      <AlertDialog open={showHarnessInspectionDialog} onOpenChange={setShowHarnessInspectionDialog}>
+      <AlertDialog open={showHarnessInspectionDialog} onOpenChange={(open) => {
+        setShowHarnessInspectionDialog(open);
+        if (!open) {
+          setShowNotApplicableReason(false);
+          setNotApplicableReason("");
+        }
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('projectDetail.dialogs.harnessInspection.title', 'Daily Harness Inspection Complete?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('projectDetail.dialogs.harnessInspection.description', 'Before starting your work session, please confirm if your daily harness inspection has been completed.')}
+              {showNotApplicableReason 
+                ? t('projectDetail.dialogs.harnessInspection.whyNotApplicable', 'Please provide a reason why harness inspection is not applicable for this work session.')
+                : t('projectDetail.dialogs.harnessInspection.description', 'Before starting your work session, please confirm if your daily harness inspection has been completed.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          
+          {/* Reason input for non-ground-crew when Not Applicable is clicked */}
+          {showNotApplicableReason && (
+            <div className="py-2">
+              <Textarea
+                value={notApplicableReason}
+                onChange={(e) => setNotApplicableReason(e.target.value)}
+                placeholder={t('projectDetail.dialogs.harnessInspection.reasonPlaceholder', 'e.g., Working from ground level only, No rope work today...')}
+                className="min-h-[80px]"
+                data-testid="input-harness-not-applicable-reason"
+              />
+            </div>
+          )}
+          
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => createNotApplicableInspectionMutation.mutate()}
-              disabled={createNotApplicableInspectionMutation.isPending}
-              data-testid="button-harness-not-applicable"
-            >
-              {createNotApplicableInspectionMutation.isPending ? t('projectDetail.dialogs.harnessInspection.recording', 'Recording...') : t('projectDetail.dialogs.harnessInspection.notApplicable', 'Not Applicable')}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                setShowHarnessInspectionDialog(false);
-                setLocation(`/harness-inspection?projectId=${id}`);
-              }}
-              data-testid="button-harness-no"
-            >
-              {t('common.no', 'No')}
-            </Button>
-            <Button
-              variant="default"
-              onClick={() => {
-                setShowHarnessInspectionDialog(false);
-                if (id) {
-                  startDayMutation.mutate(id);
-                }
-              }}
-              disabled={startDayMutation.isPending}
-              data-testid="button-harness-yes"
-            >
-              {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('common.yes', 'Yes')}
-            </Button>
+            {showNotApplicableReason ? (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowNotApplicableReason(false);
+                    setNotApplicableReason("");
+                  }}
+                  data-testid="button-harness-reason-back"
+                >
+                  {t('common.back', 'Back')}
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() => createNotApplicableInspectionMutation.mutate(notApplicableReason || "Harness not applicable for this work session")}
+                  disabled={createNotApplicableInspectionMutation.isPending || !notApplicableReason.trim()}
+                  data-testid="button-harness-reason-submit"
+                >
+                  {createNotApplicableInspectionMutation.isPending ? t('projectDetail.dialogs.harnessInspection.recording', 'Recording...') : t('common.submit', 'Submit')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    // Ground crew: directly proceed without reason
+                    if (currentUser?.role === 'ground_crew') {
+                      createNotApplicableInspectionMutation.mutate("Ground crew - harness not required");
+                    } else {
+                      // Non-ground-crew: show reason input
+                      setShowNotApplicableReason(true);
+                    }
+                  }}
+                  disabled={createNotApplicableInspectionMutation.isPending}
+                  data-testid="button-harness-not-applicable"
+                >
+                  {createNotApplicableInspectionMutation.isPending ? t('projectDetail.dialogs.harnessInspection.recording', 'Recording...') : t('projectDetail.dialogs.harnessInspection.notApplicable', 'Not Applicable')}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setShowHarnessInspectionDialog(false);
+                    setLocation(`/harness-inspection?projectId=${id}`);
+                  }}
+                  data-testid="button-harness-no"
+                >
+                  {t('common.no', 'No')}
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    setShowHarnessInspectionDialog(false);
+                    if (id) {
+                      startDayMutation.mutate(id);
+                    }
+                  }}
+                  disabled={startDayMutation.isPending}
+                  data-testid="button-harness-yes"
+                >
+                  {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('common.yes', 'Yes')}
+                </Button>
+              </>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -3711,7 +3899,7 @@ export default function ProjectDetail() {
                   <p id="height-conversion" className="text-sm text-muted-foreground font-medium mt-1"></p>
                   <p className="text-xs text-muted-foreground mt-1">
                     <span className="font-medium text-foreground">{t('projectDetail.dialogs.editProject.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
-                    {t('projectDetail.dialogs.editProject.buildingHeightExplain', 'Building height is required for irata logbook entries to track work at height for certification.')}
+                    {t('projectDetail.dialogs.editProject.buildingHeightExplain', 'Building height is required for IRATA logbook entries to track work at height for certification.')}
                   </p>
                   {project.floorCount && project.floorCount > 0 && (
                     <p className="text-xs text-muted-foreground">
@@ -3863,6 +4051,104 @@ export default function ProjectDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Rope Access Plan Signature Modal */}
+      <Dialog open={showRopeAccessSignModal} onOpenChange={(open) => {
+        if (!open) {
+          setShowRopeAccessSignModal(false);
+          setRopeAccessPlanInfo(null);
+        }
+      }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle data-testid="title-rope-access-sign">
+              {t('projectDetail.ropeAccessPlan.signTitle', 'Review & Sign Rope Access Plan')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('projectDetail.ropeAccessPlan.signDescription', 'You must review and sign the Rope Access Plan before starting work on this project.')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {ropeAccessPlanInfo && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-4 p-3 bg-muted rounded-md">
+                <div>
+                  <p className="font-medium">{ropeAccessPlanInfo.projectName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('projectDetail.ropeAccessPlan.reviewInstructions', 'Please review the plan carefully before signing.')}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => window.open(ropeAccessPlanInfo.planUrl, '_blank')}
+                  data-testid="button-view-rope-access-plan"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  {t('projectDetail.ropeAccessPlan.viewPlan', 'View Plan')}
+                </Button>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>{t('projectDetail.ropeAccessPlan.yourSignature', 'Your Signature')}</Label>
+                <div className="border rounded-md bg-white p-2">
+                  <SignatureCanvas
+                    ref={ropeAccessSignatureRef}
+                    canvasProps={{
+                      className: "w-full h-32",
+                      style: { width: '100%', height: '128px' }
+                    }}
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => ropeAccessSignatureRef.current?.clear()}
+                  data-testid="button-clear-signature"
+                >
+                  {t('common.clearSignature', 'Clear Signature')}
+                </Button>
+              </div>
+              
+              <p className="text-sm text-muted-foreground">
+                {t('projectDetail.ropeAccessPlan.signAcknowledgement', 'By signing, you acknowledge that you have reviewed and understood the Rope Access Plan for this project.')}
+              </p>
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2 flex-wrap">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRopeAccessSignModal(false);
+                setRopeAccessPlanInfo(null);
+              }}
+              data-testid="button-cancel-sign"
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={() => {
+                if (ropeAccessSignatureRef.current?.isEmpty()) {
+                  toast({
+                    title: t('projectDetail.ropeAccessPlan.signatureRequired', 'Signature Required'),
+                    description: t('projectDetail.ropeAccessPlan.pleaseSign', 'Please sign the plan before submitting.'),
+                    variant: "destructive"
+                  });
+                  return;
+                }
+                const signatureDataUrl = ropeAccessSignatureRef.current?.toDataURL();
+                signRopeAccessPlanMutation.mutate(signatureDataUrl);
+              }}
+              disabled={signRopeAccessPlanMutation.isPending}
+              data-testid="button-submit-signature"
+            >
+              {signRopeAccessPlanMutation.isPending 
+                ? t('common.submitting', 'Submitting...')
+                : t('projectDetail.ropeAccessPlan.signAndContinue', 'Sign & Continue')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* End Day Dialog with Drop Count */}
       <Dialog open={showEndDayDialog} onOpenChange={setShowEndDayDialog}>
@@ -4225,7 +4511,7 @@ export default function ProjectDetail() {
               {t('projectDetail.dialogs.logHoursPrompt.title', 'Log Your Hours?')}
             </DialogTitle>
             <DialogDescription>
-              {t('projectDetail.dialogs.logHoursPrompt.description', 'Would you like to log the tasks you performed during this work session? This helps fill your irata logbook for certification tracking.')}
+              {t('projectDetail.dialogs.logHoursPrompt.description', 'Would you like to log the tasks you performed during this work session? This helps fill your IRATA logbook for certification tracking.')}
             </DialogDescription>
           </DialogHeader>
 
@@ -4274,7 +4560,7 @@ export default function ProjectDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* irata Task Selection Dialog */}
+      {/* IRATA Task Selection Dialog */}
       <Dialog open={showIrataTaskDialog} onOpenChange={(open) => {
         if (!open) handleSkipIrataTasks();
       }}>
@@ -4282,10 +4568,10 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons text-primary">assignment</span>
-              {t('projectDetail.dialogs.irataTask.title', 'Log Your irata Tasks')}
+              {t('projectDetail.dialogs.irataTask.title', 'Log Your IRATA Tasks')}
             </DialogTitle>
             <DialogDescription>
-              {t('projectDetail.dialogs.irataTask.description', 'Select all the rope access tasks you performed during this session at {{buildingName}}. This helps track your irata logbook hours for certification progression.', { buildingName: endedSessionData?.buildingName || t('projectDetail.dialogs.irataTask.thisBuilding', 'this building') })}
+              {t('projectDetail.dialogs.irataTask.description', 'Select all the rope access tasks you performed during this session at {{buildingName}}. This helps track your IRATA logbook hours for certification progression.', { buildingName: endedSessionData?.buildingName || t('projectDetail.dialogs.irataTask.thisBuilding', 'this building') })}
             </DialogDescription>
           </DialogHeader>
 

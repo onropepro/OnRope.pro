@@ -69,6 +69,17 @@
       "signIn": "Iniciar Sesion",
       "getStarted": "Comenzar"
     },
+    "signIn": "Iniciar sesión",
+    "register": "Registrarse",
+    "unifiedLabel": "Correo, Licencia # o # Strata",
+    "unifiedPlaceholder": "Ingrese su correo, número de licencia o número strata",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingrese su contraseña",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "signingIn": "Iniciando sesión...",
+    "welcomeBack": "¡Bienvenido de nuevo!",
+    "signedInAs": "Conectado como {{name}}",
+    "modalDescription": "Inicie sesión en su cuenta o regístrese",
     "hero": {
       "subtitle": "Software de Gestion de Mantenimiento de Edificios",
       "builtBy": "Creado por un Tecnico IRATA Nivel 3 / SPRAT y Gerente de Operaciones",
@@ -436,7 +447,6 @@
       "title": "Verifica Tu Certificacion",
       "subtitle": "Selecciona tu tipo de certificacion",
       "both": "Ambos",
-      "trainee": "Aprendiz",
       "irataDetails": "Detalles IRATA",
       "spratDetails": "Detalles SPRAT",
       "level": "Nivel",
@@ -475,7 +485,7 @@
     "language": "Idioma",
     "help": "Ayuda",
     "employer": "Empleador",
-    "technician": "Tecnico",
+    "technician": "Tecnico de Acceso con Cuerdas / Equipo de Tierra",
     "propertyManager": "Administrador de Propiedades",
     "resident": "Residente",
     "buildingManager": "Gerente del Edificio",
@@ -1110,21 +1120,82 @@
         "description": "Asignaciones del equipo"
       },
       "documents": {
+    "requiredReviewTitle": "Revisión de documentos requerida",
+    "requiredReviewDesc": "Debe revisar y firmar los siguientes documentos de seguridad de la empresa antes de acceder al panel de control.",
         "label": "Documentos y Capacitacion",
         "description": "Archivos de la empresa"
       },
       "residents": {
         "label": "Residentes",
         "description": "Residentes del edificio"
+      },
+      "payPeriod": {
+        "label": "Período de pago",
+        "currentPayPeriod": "Período de pago actual",
+        "totalHours": "Horas totales",
+        "estLaborCost": "Costo de mano de obra estimado",
+        "employeesWithHours": "empleados con horas",
+        "viewPayroll": "Ver nómina",
+        "noData": "No hay datos de nómina disponibles"
+      },
+      "todaysHours": {
+        "label": "Horas de hoy",
+        "companyWideTotal": "Total de la empresa",
+        "activeNow": "Activo ahora",
+        "sessions": "Sesiones",
+        "viewLoggedHours": "Ver horas registradas",
+        "noHoursLogged": "No hay horas registradas hoy",
+        "workSessionsWillAppear": "Las sesiones de trabajo aparecerán aquí"
+      },
+      "newFeedback": {
+        "label": "Nuevos comentarios",
+        "unreadItems": "Elementos no leídos",
+        "viewAll": "Ver todo",
+        "noNewFeedback": "Sin comentarios nuevos",
+        "allCaughtUp": "Estás al día"
+      },
+      "activeProjects": {
+        "label": "Proyectos activos",
+        "inProgress": "En progreso",
+        "viewAll": "Ver todo"
+      },
+      "todaySchedule": {
+        "label": "Horario de hoy",
+        "jobs": "trabajos",
+        "viewSchedule": "Ver calendario"
+      },
+      "safetyRating": {
+        "label": "Calificaciones de seguridad",
+        "companySafety": "Seguridad de la empresa",
+        "workforceSafety": "Seguridad de los trabajadores",
+        "emp": "emp."
       }
+    },
+    "sidebar": {
+      "dashboard": "Panel",
+      "workDashboard": "Panel de trabajo",
+      "weather": "Clima",
+      "offSite": "Fuera del sitio",
+      "certifications": "Certificaciones",
+      "inspections": "Inspecciones",
+      "gearManagement": "Gestión de equipos",
+      "training": "Capacitación",
+      "performance": "Rendimiento",
+      "myPassport": "Mi Pasaporte",
+      "settings": "Configuración",
+      "help": "Centro de ayuda",
+      "customize": "Personalizar",
+      "equipment": "EQUIPOS"
     },
     "categories": {
       "all": "Todos",
-      "operations": "Operaciones",
-      "safety": "Seguridad",
-      "financial": "Financiero",
-      "team": "Equipo",
-      "communication": "Comunicacion"
+      "operations": "OPERACIONES",
+      "team": "EQUIPO",
+      "safety": "SEGURIDAD",
+      "financial": "FINANZAS",
+      "financialClients": "FINANZAS/CLIENTES",
+      "analytics": "ANÁLISIS",
+      "communication": "Comunicación"
     },
     "backToDashboard": "Volver al Panel",
     "rearrangeCards": "Reorganizar Tarjetas",
@@ -2598,7 +2669,7 @@
     "gearItem": "Gear Item"
   },
   "quotes": {
-    "title": "Quotes & CRM",
+    "title": "Quote/Pipeline",
     "pageTitle": "Service Quotes",
     "pageSubtitle": "Create and manage service quotes for buildings",
     "newQuote": "New Quote",
@@ -3091,10 +3162,10 @@
     "paymentMethod": "Payment Method",
     "updatePayment": "Update Payment Method",
     "plans": {
-      "basic": "Basic",
-      "starter": "Starter",
-      "premium": "Premium",
-      "enterprise": "Enterprise"
+      "basic": "OnRopePro",
+      "starter": "OnRopePro",
+      "premium": "OnRopePro",
+      "enterprise": "OnRopePro"
     },
     "features": {
       "projects": "Projects",
@@ -5534,10 +5605,10 @@
     "uploadVoidCheque": "Subir Cheque Nulo",
     "replaceVoidCheque": "Reemplazar Cheque Nulo",
     "addVoidCheque": "Agregar Otro Cheque Nulo",
-    "uploadDriversLicense": "Subir Licencia de Conducir",
+    "uploadDriversLicense": "Subir Licencia",
     "replaceDriversLicense": "Reemplazar Licencia",
     "addDriversLicense": "Agregar Foto de Licencia",
-    "uploadDriversAbstract": "Subir Abstracto de Conductor",
+    "uploadDriversAbstract": "Subir Abstracto",
     "replaceDriversAbstract": "Reemplazar Abstracto",
     "addDriversAbstract": "Agregar Abstracto",
     "uploadFirstAidCert": "Subir Certificado de Primeros Auxilios",
@@ -5630,8 +5701,8 @@
     "yourCompensation": "Tu Compensacion",
     "year": "ano",
     "hour": "hr",
-    "goToWorkDashboard": "Ir al Panel de Trabajo",
-    "accessProjects": "Accede a proyectos, entrada/salida y formularios de seguridad. Debe estar vinculado a una empresa.",
+    "goToWorkDashboard": "Estás en tu Vista de Pasaporte. Ir al Panel de Trabajo.",
+    "accessProjects": "Accede a proyectos, entrada/salida, formularios de seguridad, registro automático, panel de empresa.",
     "dashboardDisabledNoCompany": "Necesitas estar vinculado con una empresa para acceder al Panel de Trabajo. Acepta una invitacion abajo para comenzar.",
     "dashboardDisabledTerminated": "Tu empleo ha sido terminado. Acepta una nueva invitacion para acceder al Panel de Trabajo.",
     "selectEmployer": "Seleccionar Empleador",
@@ -5686,7 +5757,7 @@
     "confirmDeletePreviousHours": "Estas seguro de que quieres eliminar esta entrada de horas anteriores?",
     "deleteConfirm": "Eliminar",
     "cancelDelete": "Cancelar",
-    "logbookDisclaimer": "Esta es una herramienta de seguimiento personal unicamente. Aun debes registrar todas las horas en tu bitacora oficial irata/SPRAT - este registro digital no la reemplaza.",
+    "logbookDisclaimer": "Esta es una herramienta de seguimiento personal unicamente. Aun debes registrar todas las horas en tu bitacora oficial IRATA/SPRAT - este registro digital no la reemplaza.",
     "jobBoardDesc": "Explora oportunidades y haz tu perfil visible para empleadores",
     "browseJobs": "Explorar Trabajos",
     "yourReferralCode": "Tu Codigo de Referido",
@@ -5797,7 +5868,13 @@
     "sendReply": "Enviar Respuesta",
     "replyPlaceholder": "Escribe tu respuesta...",
     "newResponse": "Nueva Respuesta",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "ocrSuccess": "Documento Escaneado",
+    "ocrFieldsAutofilled": "{count} campos completados automáticamente del documento",
+    "ocrBankFieldsAutofilled": "{count} campos bancarios completados automáticamente del documento",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado",
+    "loading": "Cargando..."
   },
   "buildingPortal": {
     "title": "Portal del Edificio",
@@ -9928,7 +10005,7 @@
       },
       "disclaimer": {
         "title": "Importante: Responsabilidad de cumplimiento de seguridad",
-        "text": "OnRopePro ayuda a documentar procedimientos de seguridad, pero tu sigues siendo completamente responsable de la seguridad laboral y el cumplimiento regulatorio. Este software no reemplaza a profesionales de seguridad calificados, entrenamiento irata/SPRAT, inspecciones de equipo por inspectores certificados, o el cumplimiento de todas las regulaciones OSHA/WorkSafeBC aplicables."
+        "text": "OnRopePro ayuda a documentar procedimientos de seguridad, pero tu sigues siendo completamente responsable de la seguridad laboral y el cumplimiento regulatorio. Este software no reemplaza a profesionales de seguridad calificados, entrenamiento IRATA/SPRAT, inspecciones de equipo por inspectores certificados, o el cumplimiento de todas las regulaciones OSHA/WorkSafeBC aplicables."
       },
       "benefits": {
         "title": "Quien se beneficia de este modulo",
@@ -13635,6 +13712,168 @@
       "tagline": "Software de gestión para acceso con cuerdas",
       "privacyPolicy": "Política de privacidad",
       "termsOfService": "Términos de servicio"
+    }
+  },
+  "safetyManifesto": {
+    "hero": {
+      "badge": "Elevando los estándares para toda una industria",
+      "title": "La seguridad se mide",
+      "titleHighlight": "o se inventa.",
+      "description1": "El PSR mide las prácticas de seguridad de los técnicos.",
+      "description2": "El CSR mide la cultura de seguridad de las empresas.",
+      "description3": "Cuando ambos son visibles, toda la industria se vuelve más segura.",
+      "ctaButton": "Comienza a construir tu historial de seguridad",
+      "signInButton": "Iniciar sesión",
+      "freeNote": "Gratis para técnicos. Siempre. 14 días de prueba para empresas."
+    },
+    "stats": {
+      "measured": "Medido",
+      "measuredDesc": "O no sucedió",
+      "portable": "Portátil",
+      "portableDesc": "Te sigue a todas partes",
+      "visible": "Visible",
+      "visibleDesc": "Para todos los que importan",
+      "permanent": "Permanente",
+      "permanentDesc": "No se puede falsificar"
+    },
+    "problem": {
+      "title": "Teatro de seguridad vs Cultura de seguridad",
+      "intro": "La mayoría de las empresas de acceso con cuerdas hablan de seguridad. Algunas tienen carpetas llenas de procedimientos acumulando polvo en la oficina. Unas pocas realmente los siguen.",
+      "p1": "El problema es que nadie puede notar la diferencia. Un técnico que entrevista en dos empresas escucha el mismo discurso: \"Tomamos la seguridad en serio.\" Una empresa hace inspecciones diarias de arnés, celebra reuniones de seguridad reales y se asegura de que todos entiendan los procedimientos. La otra te da el equipo y dice \"no te caigas.\"",
+      "p2": "Un administrador de propiedades que evalúa ofertas ve las mismas afirmaciones de seguridad en cada propuesta. Todos tienen un \"programa de seguridad integral.\" Nadie puede probarlo. El precio se convierte en el único diferenciador.",
+      "p3": "Este sistema no protege a nadie.",
+      "solution": "OnRopePro cambia la ecuación haciendo que la seguridad sea medible, portátil y visible. No declaraciones de seguridad. Acciones de seguridad. Documentadas, con marca de tiempo, agregadas en puntuaciones que siguen a técnicos y empresas a donde quiera que vayan."
+    },
+    "scores": {
+      "title": "Dos puntuaciones que lo cambian todo",
+      "subtitle": "Cuando estas puntuaciones importan, el comportamiento cambia.",
+      "subtitle2": "Cuando el comportamiento cambia, la gente realmente llega a casa segura.",
+      "psr": {
+        "title": "PSR: Calificación de Seguridad Personal",
+        "description": "Tu historial de seguridad individual, agregado de cada empleador para el que has trabajado en OnRopePro.",
+        "item1": "Con qué frecuencia completas las inspecciones de arnés",
+        "item2": "Qué tan rápido acusas recibo de los documentos de seguridad",
+        "item3": "Tu tasa de cumplimiento a lo largo del tiempo, no solo hoy",
+        "footer": "Tu PSR es portátil. Te pertenece a ti, no a tu empleador. Cuando solicitas un nuevo trabajo, los empleadores ven tu calificación de seguridad antes de contratarte."
+      },
+      "csr": {
+        "title": "CSR: Calificación de Seguridad de la Empresa",
+        "description": "La cultura de seguridad de tu empresa, calculada a partir de datos operativos en cuatro categorías.",
+        "item1": "Documentación básica (25%)",
+        "item2": "Documentación del proyecto (25%)",
+        "item3": "Inspecciones de arnés (25%)",
+        "item4": "Acuse de recibo de documentos (5%)",
+        "footer": "El CSR es visible para los administradores de propiedades. Cuando comparan ofertas, comparan 86% contra 43%. Insignia verde contra insignia roja."
+      }
+    },
+    "flywheel": {
+      "title": "OnRopePro le da valor a la seguridad",
+      "subtitle": "Un ciclo auto-reforzante donde todos ganan al priorizar la seguridad.",
+      "intro1": "La seguridad siempre ha sido teórica. Las empresas dicen las palabras correctas. Los técnicos asienten. Nadie mide nada. Nada cambia.",
+      "intro2": "Estamos haciendo la seguridad práctica. Medible. Intercambiable. Cuando el PSR de un técnico afecta sus perspectivas laborales, se preocupa por sus inspecciones. Cuando el CSR de una empresa afecta sus contratos, invierte en su cultura. Cuando los administradores de propiedades eligen proveedores por puntuación de seguridad, el mercado recompensa el comportamiento correcto.",
+      "intro3": "Esto no es software de cumplimiento. Es infraestructura que hace que la seguridad valga algo. Toda la industria se eleva porque los incentivos finalmente se alinean.",
+      "stage1": {
+        "title": "Los técnicos comienzan a preocuparse por su puntuación",
+        "description": "Cuando el PSR te sigue a todas partes, empiezas a prestar atención. ¿Esa inspección de arnés que solías omitir cuando estabas \"apurado\"? Afecta tu puntuación. De repente, la seguridad no es algo de lo que el jefe te molesta. Es tu reputación profesional. Es capital de carrera."
+      },
+      "stage2": {
+        "title": "Los empleadores contratan basándose en el PSR",
+        "description": "Un técnico solicita con un PSR del 92%. Otro solicita con un PSR del 58%. Mismas certificaciones. Experiencia similar. ¿En quién confías para la reputación de tu empresa? Los empleadores comienzan a filtrar candidatos con alto PSR. El mensaje se difunde: si quieres los buenos trabajos, mantén tu calificación."
+      },
+      "stage3": {
+        "title": "Los técnicos con alto PSR elevan los estándares de la empresa",
+        "description": "Cuando contratas personas que toman la seguridad en serio, la cultura de tu empresa cambia. Hacen sus inspecciones sin que se les recuerde. Firman documentos rápidamente. Se hacen responsables mutuamente. Tu CSR sube porque tu equipo realmente está haciendo el trabajo."
+      },
+      "stage4": {
+        "title": "Los administradores de propiedades eligen proveedores con alto CSR",
+        "description": "Dos ofertas sobre la mesa. Precios similares. Un proveedor muestra 91% de CSR. El otro muestra 52% de CSR. El administrador de propiedades tiene preocupaciones de responsabilidad. La junta hace preguntas. El proveedor con alto CSR gana. No porque habló mejor. Porque demostró que es mejor."
+      },
+      "stage5": {
+        "title": "La presión del mercado obliga a mejorar la industria",
+        "description": "Las empresas que pierden ofertas ante competidores con alto CSR tienen una opción: mejorar o seguir perdiendo. Los vaqueros que reducen precios mientras cortan esquinas se encuentran excluidos de los contratos de calidad.",
+        "conclusion": "El estándar de la industria sube. No por regulación. Porque los incentivos se alinearon."
+      }
+    },
+    "stakeholders": {
+      "title": "Lo que esto significa para ti",
+      "technicians": {
+        "title": "Para técnicos",
+        "item1": "Mayor PSR = Mejores oportunidades",
+        "item2": "Tu historial de seguridad te protege en incidentes",
+        "item3": "Evalúa a los empleadores antes de comprometerte",
+        "quote": "\"¿Preferirías trabajar para una empresa con un CSR de 40 o de 95? Tu vida está en juego.\"",
+        "learnMore": "Más información"
+      },
+      "employers": {
+        "title": "Para propietarios de empresas",
+        "item1": "Gana contratos que solías perder",
+        "item2": "Atrae mejores técnicos",
+        "item3": "Protegido cuando WorkSafe aparece",
+        "quote": "\"Sé que todos mis empleados han leído este documento porque lo firmaron.\"",
+        "learnMore": "Más información"
+      },
+      "propertyManagers": {
+        "title": "Para administradores de propiedades",
+        "item1": "Compara proveedores objetivamente",
+        "item2": "Documenta la debida diligencia",
+        "item3": "Exposición a responsabilidad reducida",
+        "quote": "\"Tienen un CSR del 92%. Su documentación está completa y actualizada.\"",
+        "learnMore": "Más información"
+      }
+    },
+    "whyMatters": {
+      "title": "Por qué esto importa más allá de los negocios",
+      "subtitle": "El verdadero objetivo: que la gente llegue a casa segura.",
+      "p1": "El acceso con cuerdas es un trabajo peligroso. Las caídas matan. Las fallas del equipo matan. Los procedimientos omitidos matan.",
+      "p2": "La industria habla de seguridad porque todos conocen los riesgos. Pero hablar no es suficiente. Los sistemas que hacen cumplir la seguridad son los que realmente protegen a las personas.",
+      "psrPoint": "El PSR hace que los técnicos se preocupen",
+      "psrPointDesc": "por sus propias prácticas de seguridad porque esas prácticas ahora afectan sus carreras.",
+      "csrPoint": "El CSR hace que las empresas se preocupen",
+      "csrPointDesc": "por su cultura de seguridad porque esa cultura ahora afecta sus ingresos.",
+      "pmPoint": "El comportamiento de los administradores de propiedades",
+      "pmPointDesc": "hace que el mercado recompense la seguridad porque los proveedores con alto CSR ganan contratos.",
+      "conclusion1": "Cuando los incentivos se alinean con la seguridad, la seguridad sucede.",
+      "conclusion2": "No como una ocurrencia tardía.",
+      "conclusion3": "Como el fundamento de cómo opera la industria."
+    },
+    "faqs": {
+      "title": "Preguntas frecuentes",
+      "newPsr": {
+        "question": "¿Qué pasa si nunca he usado OnRopePro antes? ¿Empiezo con un PSR de cero?",
+        "answer": "Los nuevos técnicos comienzan a construir su PSR desde su primera inspección. No hay penalización por ser nuevo. Tu puntuación refleja tu historial real en la plataforma."
+      },
+      "fakeInspection": {
+        "question": "¿Puedo falsificar una inspección de arnés solo para mantener mi puntuación?",
+        "answer": "No. El sistema requiere que pases por cada categoría de equipo. Los artículos fallidos retiran automáticamente el equipo del inventario. El proceso toma 30 segundos cuando se hace honestamente. Falsificarlo tomaría más tiempo y crearía problemas de gestión de equipos."
+      },
+      "psrEmployer": {
+        "question": "¿Qué pasa con mi PSR si mi empleador tiene un CSR bajo?",
+        "answer": "Tu PSR es independiente. Rastrea tu cumplimiento individual, no la puntuación general de tu empleador. Un técnico disciplinado que trabaja para una empresa desorganizada aún construye un PSR sólido a través de sus propias acciones."
+      },
+      "newCompany": {
+        "question": "Somos una empresa nueva. ¿No estaremos en desventaja con un historial corto?",
+        "answer": "Las nuevas empresas pueden alcanzar el 100% de CSR inmediatamente subiendo documentos básicos y manteniendo el cumplimiento diario. El historial importa para superar fallas ocasionales, pero las nuevas empresas con prácticas disciplinadas construyen rápidamente puntuaciones competitivas."
+      },
+      "pmSeePsr": {
+        "question": "¿Los administradores de propiedades ven las calificaciones individuales de los técnicos?",
+        "answer": "No. Los administradores de propiedades solo ven el CSR de la empresa. El PSR individual es visible para los empleadores durante la contratación, no para partes externas."
+      },
+      "disagreeCsr": {
+        "question": "¿Qué pasa si no estoy de acuerdo con el cálculo de mi CSR?",
+        "answer": "El panel de control muestra exactamente dónde estás perdiendo puntos. Si la documentación muestra 85% pero crees que estás al 100%, puedes ver exactamente qué documentos faltan firmas. El sistema no oculta su lógica."
+      },
+      "surveillance": {
+        "question": "Esto parece vigilancia. ¿Lo es?",
+        "answer": "Es responsabilidad. De la misma manera que las horas de vuelo y certificaciones de un piloto se rastrean, tus acciones de seguridad profesional se rastrean. Esto te protege cuando las cosas salen mal. Construye tu reputación cuando las cosas salen bien. Tus datos te pertenecen y viajan contigo."
+      }
+    },
+    "cta": {
+      "title": "Comienza a construir tu historial de seguridad hoy",
+      "description": "Tus prácticas de seguridad se miden o se inventan. Empieza a medir.",
+      "getStarted": "Comenzar gratis",
+      "learnCsr": "Más información sobre CSR",
+      "learnPsr": "Más información sobre PSR",
+      "freeNote": "Gratis para técnicos. Siempre. 14 días de prueba para empresas. No se requiere tarjeta de crédito."
     }
   }
 }

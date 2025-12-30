@@ -46,7 +46,7 @@ const stakeholderCards = [
     description: 'Track your time, certifications, and career',
     href: '/help/for-technicians',
     icon: HardHat,
-    color: '#AB4521',
+    color: '#5C7A84',
   },
   {
     id: 'building-manager',
@@ -130,6 +130,7 @@ const moduleIcons: Record<string, React.ReactNode> = {
   'property-manager-interface': <Building2 className="h-5 w-5" />,
   'white-label-branding': <Palette className="h-5 w-5" />,
   'analytics-reporting': <BarChart3 className="h-5 w-5" />,
+  'personal-safety-rating': <HardHat className="h-5 w-5" />,
 };
 
 export default function HelpCenter() {
@@ -272,6 +273,11 @@ export default function HelpCenter() {
               title="ROI Calculator" 
               description="Calculate your potential savings with OnRopePro"
               href="/help/tools/roi-calculator"
+            />
+            <TopicCard 
+              title="Dashboard Customization" 
+              description="Personalize your dashboard with widgets and layouts"
+              href="/help/modules/dashboard-customization"
             />
           </div>
         </section>

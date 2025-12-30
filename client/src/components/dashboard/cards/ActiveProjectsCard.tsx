@@ -3,7 +3,45 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Briefcase, ChevronRight } from "lucide-react";
+import { Link } from "wouter";
 import type { CardProps } from "../cardRegistry";
+
+// Helper function to calculate project progress based on job type
+function calculateProjectProgress(project: any): number {
+  const jobType = project.jobType || '';
+  
+  // Hours-based jobs (NDT, Rock Scaling, etc.)
+  const hourBasedJobs = ['ndt_inspection', 'rock_scaling', 'concrete_repair', 'sign_installation', 'overhead_protection', 'general_repairs', 'general_pressure_washing', 'ground_window_cleaning'];
+  if (hourBasedJobs.includes(jobType)) {
+    // Check for overallCompletionPercentage first
+    if (project.overallCompletionPercentage !== null && project.overallCompletionPercentage !== undefined) {
+      return project.overallCompletionPercentage;
+    }
+    const estimatedHours = project.estimatedHours || 0;
+    const hoursWorked = project.hoursWorked || 0;
+    return estimatedHours > 0 ? Math.min(100, (hoursWorked / estimatedHours) * 100) : 0;
+  } else if (jobType === 'in_suite_dryer_vent_cleaning') {
+    // Suite-based - uses completedDrops for suites completed
+    const totalSuites = project.totalSuites || project.floorCount || 0;
+    const suitesCompleted = project.completedDrops || 0;
+    return totalSuites > 0 ? (suitesCompleted / totalSuites) * 100 : 0;
+  } else if (jobType === 'parkade_pressure_cleaning') {
+    // Stall-based
+    const totalStalls = project.totalStalls || project.floorCount || 0;
+    const stallsCompleted = project.completedDrops || 0;
+    return totalStalls > 0 ? (stallsCompleted / totalStalls) * 100 : 0;
+  } else if (jobType === 'anchor_inspection') {
+    // Anchor-based
+    const totalAnchors = project.totalAnchors || 0;
+    const anchorsInspected = project.totalAnchorsInspected || 0;
+    return totalAnchors > 0 ? (anchorsInspected / totalAnchors) * 100 : 0;
+  } else {
+    // Drop-based (window cleaning, building wash, etc.)
+    const totalDrops = project.totalDrops || 0;
+    const completedDrops = project.completedDrops || 0;
+    return totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
+  }
+}
 
 export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps) {
   const accentColor = branding?.primaryColor || "#0B64A3";
@@ -35,12 +73,13 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
         ) : (
           <div className="space-y-3">
             {displayProjects.map((project: any) => {
-              const progress = typeof project.progress === "number" ? project.progress : 0;
+              const progress = calculateProjectProgress(project);
               return (
-                <div 
-                  key={project.id} 
-                  className="space-y-1"
-                  data-testid={`project-item-${project.id}`}
+                <Link
+                  key={project.id}
+                  href={`/projects/${project.id}`}
+                  className="block space-y-1 rounded-md p-2 -mx-2 hover-elevate cursor-pointer"
+                  data-testid={`link-project-${project.id}`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-base font-medium truncate">
@@ -51,7 +90,7 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
                     </span>
                   </div>
                   <Progress value={progress} className="h-2" />
-                </div>
+                </Link>
               );
             })}
             {activeProjects.length > 4 && (

@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarRange, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { format, addDays, startOfWeek } from "date-fns";
+import { format, addDays, startOfWeek, parseISO } from "date-fns";
 import { canViewSchedule } from "@/lib/permissions";
 import type { CardProps } from "../cardRegistry";
 
@@ -18,7 +18,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
   const hasAccess = canViewSchedule(currentUser) || currentUser?.role === "company";
   const accentColor = branding?.primaryColor || "#0B64A3";
 
-  const { data: weekData, isLoading } = useQuery<{ days: WeekDay[] }>({
+  const { data: weekData, isLoading } = useQuery<{ days: WeekDay[]; uniqueJobCount: number }>({
     queryKey: ["/api/schedule/week-summary"],
     enabled: hasAccess,
   });
@@ -68,7 +68,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
     };
   });
 
-  const totalJobs = days.reduce((sum, d) => sum + d.jobCount, 0);
+  const totalJobs = weekData?.uniqueJobCount ?? 0;
 
   return (
     <div className="flex flex-col h-full">
@@ -85,22 +85,30 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
       </CardHeader>
       <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col justify-between">
         <div className="grid grid-cols-7 gap-1 mb-3">
-          {days.map((day) => (
-            <div 
-              key={day.date}
-              className={`text-center p-2 rounded-lg ${
-                day.isToday 
-                  ? "bg-primary text-primary-foreground" 
-                  : day.jobCount > 0 
-                    ? "bg-muted" 
-                    : "bg-muted/30"
-              }`}
-              data-testid={`week-day-${day.date}`}
-            >
-              <p className="text-xs font-medium">{day.dayName}</p>
-              <p className={`text-lg font-bold ${day.isToday ? "" : "text-muted-foreground"}`}>{day.jobCount}</p>
-            </div>
-          ))}
+          {days.map((day) => {
+            const dayOfMonth = format(parseISO(day.date), "d");
+            return (
+              <div 
+                key={day.date}
+                className={`text-center p-2 rounded-lg ${
+                  day.isToday 
+                    ? "bg-primary text-primary-foreground" 
+                    : day.jobCount > 0 
+                      ? "bg-muted" 
+                      : "bg-muted/30"
+                }`}
+                data-testid={`week-day-${day.date}`}
+              >
+                <p className="text-xs font-medium">{day.dayName}</p>
+                <p className={`text-lg font-bold ${day.isToday ? "" : ""}`}>{dayOfMonth}</p>
+                {day.jobCount > 0 && (
+                  <p className={`text-[10px] ${day.isToday ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                    {day.jobCount} job{day.jobCount !== 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
         <Button
           variant="ghost"

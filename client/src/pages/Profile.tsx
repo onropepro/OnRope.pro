@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -14,13 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { RefreshButton } from "@/components/RefreshButton";
 import { SubscriptionManagement } from "@/components/SubscriptionManagement";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { COMMON_TIMEZONES } from "@/lib/timezoneUtils";
 
 const profileSchema = z.object({
@@ -39,6 +40,7 @@ const profileSchema = z.object({
   zipCode: z.string().optional(),
   employeePhoneNumber: z.string().optional(),
   timezone: z.string().optional(),
+  smsNotificationsEnabled: z.boolean().optional(),
 });
 
 const passwordSchema = z.object({
@@ -235,7 +237,7 @@ function LanguagePreferenceCard() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <Button
               variant={currentLanguage === 'en' ? 'default' : 'outline'}
               className="h-14 flex flex-col items-center justify-center gap-1"
@@ -255,6 +257,16 @@ function LanguagePreferenceCard() {
             >
               <span className="text-lg">Français</span>
               <span className="text-xs opacity-70">French</span>
+            </Button>
+            <Button
+              variant={currentLanguage === 'es' ? 'default' : 'outline'}
+              className="h-14 flex flex-col items-center justify-center gap-1"
+              onClick={() => handleLanguageChange('es')}
+              disabled={isUpdating}
+              data-testid="button-language-spanish"
+            >
+              <span className="text-lg">Español</span>
+              <span className="text-xs opacity-70">Spanish</span>
             </Button>
           </div>
           {isUpdating && (
@@ -973,6 +985,7 @@ export default function Profile() {
       zipCode: user?.zipCode || "",
       employeePhoneNumber: user?.employeePhoneNumber || "",
       timezone: user?.timezone || "America/Vancouver",
+      smsNotificationsEnabled: user?.smsNotificationsEnabled ?? true,
     },
   });
 
@@ -1162,44 +1175,12 @@ export default function Profile() {
   const branding = brandingData || {};
   const hasLogo = !!(branding.subscriptionActive && branding.logoUrl);
 
+  useSetHeaderConfig({
+    pageTitle: t('profile.title', 'Profile'),
+  }, [t]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
-        <div className="px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleBack}
-              data-testid="button-back"
-            >
-              <span className="material-icons text-xl">arrow_back</span>
-            </Button>
-            {hasLogo && (
-              <img 
-                src={branding.logoUrl} 
-                alt={t('profile.companyLogo', 'Company Logo')} 
-                className="h-10 w-auto object-contain"
-                data-testid="img-company-logo"
-              />
-            )}
-            <h1 className="text-lg font-bold">{t('profile.title', 'Profile')}</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <RefreshButton />
-            <Button
-              variant="ghost"
-              size="icon"
-              data-testid="button-logout"
-              onClick={() => setShowLogoutDialog(true)}
-            >
-              <span className="material-icons text-xl">logout</span>
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <div className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
         {user?.role === "company" ? (
           <Tabs defaultValue="profile" className="w-full">
@@ -1539,6 +1520,32 @@ export default function Profile() {
 
                       <FormField
                         control={profileForm.control}
+                        name="smsNotificationsEnabled"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base">
+                                {t('profile.smsNotifications', 'SMS Notifications')}
+                              </FormLabel>
+                              <p className="text-sm text-muted-foreground">
+                                {t('profile.smsNotificationsDescription', 'Receive text messages when employees accept team invitations')}
+                              </p>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                data-testid="switch-sms-notifications"
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={profileForm.control}
                         name="hourlyRate"
                         render={({ field }) => (
                           <FormItem>
@@ -1611,7 +1618,7 @@ export default function Profile() {
 
                 {user?.techLevel && (
                   <div className="pt-2">
-                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'irata Level')}</div>
+                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'IRATA Level')}</div>
                     <div className="text-sm font-medium">{user.techLevel}</div>
                   </div>
                 )}
@@ -2272,7 +2279,7 @@ export default function Profile() {
 
                 {user?.techLevel && (
                   <div className="pt-2">
-                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'irata Level')}</div>
+                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'IRATA Level')}</div>
                     <div className="text-sm font-medium">{user.techLevel}</div>
                   </div>
                 )}
@@ -2375,8 +2382,8 @@ export default function Profile() {
 
         <Separator />
 
-        {/* My Logged Hours - irata Logbook */}
-        {user?.role !== 'resident' && (
+        {/* My Logged Hours - IRATA Logbook (only for rope access technicians, not ground crew) */}
+        {user?.role === 'rope_access_tech' && (
           <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={() => setLocation("/my-logged-hours")} data-testid="card-my-logged-hours">
             <CardHeader>
               <div className="flex items-center gap-4">
@@ -2385,7 +2392,7 @@ export default function Profile() {
                 </div>
                 <div className="flex-1">
                   <CardTitle className="text-lg">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</CardTitle>
-                  <CardDescription>{t('dashboard.cards.myLoggedHours.description', 'irata logbook')}</CardDescription>
+                  <CardDescription>{t('dashboard.cards.myLoggedHours.description', 'IRATA logbook')}</CardDescription>
                 </div>
                 <span className="material-icons text-muted-foreground">chevron_right</span>
               </div>

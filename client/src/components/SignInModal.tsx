@@ -82,7 +82,30 @@ export function SignInModal({
         description: `Logged in as ${user.name || user.companyName}`,
       });
       
-      setLocation("/dashboard");
+      // Role-based redirect
+      switch (user.role) {
+        case "resident":
+          setLocation("/resident-dashboard");
+          break;
+        case "property_manager":
+          setLocation("/property-manager");
+          break;
+        case "superuser":
+          setLocation("/superuser");
+          break;
+        case "building_manager":
+          setLocation("/building-portal");
+          break;
+        case "rope_access_tech":
+          setLocation("/technician-portal");
+          break;
+        case "ground_crew":
+        case "ground_crew_supervisor":
+          setLocation("/ground-crew-portal");
+          break;
+        default:
+          setLocation("/dashboard");
+      }
     } catch (error) {
       form.setError("identifier", { message: "An error occurred. Please try again." });
     }

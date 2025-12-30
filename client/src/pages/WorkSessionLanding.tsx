@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState } from "react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SignInModal } from "@/components/SignInModal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import { useTranslation } from "react-i18next";
@@ -41,7 +41,7 @@ import {
 
 export default function WorkSessionLanding() {
   const { t } = useTranslation();
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
   
   return (
@@ -76,12 +76,10 @@ export default function WorkSessionLanding() {
                 {t('modules.workSessions.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+              <Button size="lg" variant="outline" className="border-white/40 text-white" onClick={openLogin} data-testid="button-hero-signin">
                 Sign In
               </Button>
             </div>
-            
-            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
             
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["work-session-time-tracking"]} 

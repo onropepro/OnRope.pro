@@ -385,7 +385,6 @@
       "title": "Verify Your Certification",
       "subtitle": "Select your certification type",
       "both": "Both",
-      "trainee": "Trainee",
       "irataDetails": "IRATA Details",
       "spratDetails": "SPRAT Details",
       "level": "Level",
@@ -447,7 +446,7 @@
     "changelog": "Changelog",
     "safetyRating": "Safety Rating",
     "employer": "Employer",
-    "technician": "Technician",
+    "technician": "Rope Access Technician / Ground Crew",
     "resident": "Resident",
     "buildingManager": "Building Manager",
     "modules": {
@@ -1026,7 +1025,7 @@
         "description": "Employee hours"
       },
       "quotes": {
-        "label": "Quotes & CRM",
+        "label": "Quote/Pipeline",
         "description": "Service quotes"
       },
       "schedule": {
@@ -1034,6 +1033,8 @@
         "description": "Team assignments"
       },
       "documents": {
+    "requiredReviewTitle": "Required Document Review",
+    "requiredReviewDesc": "You must review and sign the following company safety documents before accessing the dashboard.",
         "label": "Documents and Training",
         "description": "All company files"
       },
@@ -1367,7 +1368,7 @@
       "salaryDescription": "Annual salary amount",
       "personalDetails": "Personal Details (Optional)",
       "startDate": "Start Date",
-      "birthday": "Birthday",
+      "birthday": "Birth Date",
       "socialInsuranceNumber": "Social Insurance Number",
       "driversLicenseNumber": "Driver's License Number",
       "driversLicenseProvince": "Driver's License Province/State",
@@ -2514,7 +2515,7 @@
     "gearItem": "Gear Item"
   },
   "quotes": {
-    "title": "Quotes & CRM",
+    "title": "Quote/Pipeline",
     "pageTitle": "Service Quotes",
     "pageSubtitle": "Create and manage service quotes for buildings",
     "newQuote": "New Quote",
@@ -3007,10 +3008,10 @@
     "paymentMethod": "Payment Method",
     "updatePayment": "Update Payment Method",
     "plans": {
-      "basic": "Basic",
-      "starter": "Starter",
-      "premium": "Premium",
-      "enterprise": "Enterprise"
+      "basic": "OnRopePro",
+      "starter": "OnRopePro",
+      "premium": "OnRopePro",
+      "enterprise": "OnRopePro"
     },
     "features": {
       "projects": "Projects",
@@ -6137,7 +6138,7 @@
         },
         "audit": {
           "title": "Audit-Ready PDFs in Four Clicks",
-          "description": "When the irata auditor calls, you don't panic. You search and export.",
+          "description": "When the IRATA auditor calls, you don't panic. You search and export.",
           "bullet1": "Search by date, technician, or serial number",
           "bullet2": "Professional PDFs with embedded signatures",
           "bullet3": "Same PDFs for insurance and property managers",
@@ -6170,7 +6171,7 @@
         },
         "liability": {
           "title": "For the operator worried about liability",
-          "p1": "Rope access work is dangerous. Everyone knows it. That's why irata and SPRAT exist. That's why inspections are mandatory.",
+          "p1": "Rope access work is dangerous. Everyone knows it. That's why IRATA and SPRAT exist. That's why inspections are mandatory.",
           "p2": "But mandatory and documented are not the same thing.",
           "p3": "If a harness fails and someone gets hurt, the investigation starts with one question: can you prove you inspected it? Can you prove you trained your people? Can you prove you discussed the specific hazards of this specific job?",
           "p4": "With paper forms, you're hoping the right pieces of paper exist and can be found. With digital records, you know exactly what exists because you can search for it."
@@ -6193,7 +6194,7 @@
         },
         "auditPdfs": {
           "title": "Audit-Ready PDFs",
-          "description": "Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or irata audits."
+          "description": "Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or IRATA audits."
         },
         "automaticFlagging": {
           "title": "Automatic Flagging",
@@ -6240,7 +6241,7 @@
         },
         "auditPrep": {
           "title": "Audit Preparation: Days to Minutes",
-          "description": "The scramble before an irata audit used to take days. Now it takes minutes. Search. Export. Done."
+          "description": "The scramble before an IRATA audit used to take days. Now it takes minutes. Search. Export. Done."
         },
         "liability": {
           "title": "Liability Protection",
@@ -6266,7 +6267,7 @@
         },
         "q2": {
           "question": "We're too small to need software.",
-          "answer": "The smaller you are, the more every audit matters. One failed irata audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software."
+          "answer": "The smaller you are, the more every audit matters. One failed IRATA audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software."
         },
         "q3": {
           "question": "Paper has worked fine so far.",
@@ -6287,7 +6288,7 @@
       },
       "disclaimer": {
         "title": "Important: Safety Compliance Responsibility",
-        "text": "OnRopePro helps document safety procedures, but you remain fully responsible for workplace safety and regulatory compliance. This software does not replace qualified safety professionals, irata/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations."
+        "text": "OnRopePro helps document safety procedures, but you remain fully responsible for workplace safety and regulatory compliance. This software does not replace qualified safety professionals, IRATA/SPRAT training, equipment inspections by certified inspectors, or adherence to all applicable OSHA/WorkSafeBC regulations."
       }
     },
     "projects": {
@@ -9469,7 +9470,7 @@
     "fullName": "Full Name",
     "email": "Email",
     "phoneNumber": "Phone Number",
-    "birthday": "Birthday",
+    "birthday": "Birth Date",
     "address": "Address",
     "streetAddress": "Street Address",
     "city": "City",
@@ -9503,11 +9504,11 @@
     "verifyLicenseValidity": "Verify Your License Validity",
     "verificationExplanation": "Employers require verified certification status to ensure compliance with safety regulations and insurance requirements. Verifying your license helps your employer confirm you",
     "howItWorks": "How it works:",
-    "step1": "Click \\",
+    "step1": "Click \"Open IRATA Portal\" to open the verification page",
     "step2": "Enter your last name and license number",
     "step3": "Take a screenshot of the verification result",
-    "step4": "Come back here and click \\",
-    "openIrataPortal": "Open irata Portal",
+    "step4": "Come back here and click \"Upload Verification Screenshot\"",
+    "openIrataPortal": "Open IRATA Portal",
     "uploadVerificationScreenshot": "Upload Verification Screenshot",
     "analyzingScreenshot": "Analyzing Screenshot...",
     "name": "Name",
@@ -9536,10 +9537,10 @@
     "uploadVoidCheque": "Upload Void Cheque",
     "replaceVoidCheque": "Replace Void Cheque",
     "addVoidCheque": "Add Another Void Cheque",
-    "uploadDriversLicense": "Upload Driver",
+    "uploadDriversLicense": "Upload License",
     "replaceDriversLicense": "Replace License",
     "addDriversLicense": "Add License Photo",
-    "uploadDriversAbstract": "Upload Driver",
+    "uploadDriversAbstract": "Upload Abstract",
     "replaceDriversAbstract": "Replace Abstract",
     "addDriversAbstract": "Add Abstract",
     "uploadFirstAidCert": "Upload First Aid Certificate",
@@ -9548,9 +9549,9 @@
     "uploadCertificationCard": "Upload Certification Card",
     "replaceCertificationCard": "Replace Card",
     "addCertificationCard": "Add Card",
-    "uploadIrataCertificationCard": "Upload irata Card",
+    "uploadIrataCertificationCard": "Upload IRATA Card",
     "uploadSpratCertificationCard": "Upload SPRAT Card",
-    "irataCertificationCard": "irata Certification Card",
+    "irataCertificationCard": "IRATA Certification Card",
     "spratCertificationCard": "SPRAT Certification Card",
     "experience": "Experience",
     "ropeAccessExperience": "Rope Access Experience",
@@ -9561,7 +9562,7 @@
     "startedOn": "Started on",
     "notSet": "Not set",
     "resume": "Resume / CV",
-    "uploadResume": "Upload Resume",
+    "uploadResume": "Upload Resume / CV",
     "addResume": "Add Another Resume",
     "specialties": "Rope Access Specialties",
     "specialtiesDesc": "Select the job types you specialize in",
@@ -9586,7 +9587,7 @@
     "invalidFile": "Invalid file",
     "uploadImageFile": "Please upload an image file (screenshot)",
     "verificationSuccessful": "Verification Successful",
-    "irataVerified": "Your irata license has been verified!",
+    "irataVerified": "Your IRATA license has been verified!",
     "spratVerified": "Your SPRAT license has been verified!",
     "verificationIssue": "Verification Issue",
     "couldNotVerify": "Could not verify license from screenshot",
@@ -9632,9 +9633,9 @@
     "yourCompensation": "Your Compensation",
     "year": "year",
     "hour": "hr",
-    "goToWorkDashboard": "Go to Work Dashboard",
-    "accessProjects": "Access projects, clock in/out, and safety forms. Must be linked to a company.",
-    "dashboardDisabledNoCompany": "You need to be linked with a company to access the Work Dashboard. Accept an invitation below to get started.",
+    "goToWorkDashboard": "You are in Your Personal Passport View.",
+    "accessProjects": "Go to Work Dashboard to access the company dashboard. View projects, schedule, clock in/out, safety forms, auto-logging, etc.",
+    "dashboardDisabledNoCompany": "You need to be linked with a company to access the Work Dashboard. An invitation is sent by your employer and will appear here. Accept the invitation to get started.",
     "dashboardDisabledTerminated": "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
     "selectEmployer": "Select Employer",
     "selectEmployerDesc": "Choose which employer",
@@ -9688,7 +9689,7 @@
     "confirmDeletePreviousHours": "Are you sure you want to delete this previous hours entry?",
     "deleteConfirm": "Delete",
     "cancelDelete": "Cancel",
-    "logbookDisclaimer": "This is a personal tracking tool only. You must still record all hours in your official irata/SPRAT logbook - this digital log does not replace it.",
+    "logbookDisclaimer": "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
     "jobBoardDesc": "Browse opportunities and make your profile visible to employers",
     "browseJobs": "Browse Jobs",
     "yourReferralCode": "Your Referral Code",
@@ -9799,7 +9800,13 @@
     "sendReply": "Send Reply",
     "replyPlaceholder": "Type your reply...",
     "newResponse": "New Response",
-    "close": "Close"
+    "close": "Close",
+    "ocrSuccess": "Document Scanned",
+    "ocrFieldsAutofilled": "{count} fields auto-filled from document",
+    "ocrBankFieldsAutofilled": "{count} bank fields auto-filled from document",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "loading": "Loading..."
   },
   "buildingPortal": {
     "title": "Building Portal",
@@ -12555,7 +12562,7 @@
     },
     "socialProof": {
       "title": "Built by Rope Access. For Rope Access.",
-      "description": "OnRopePro was created by a Level 3 IRATA technician and operations manager who got tired of running a rope access company with spreadsheets, WhatsApp, and good intentions. Every feature exists because we needed it ourselves."
+      "description": "OnRopePro was created by a Level 3 rope access technician and former operations manager who got tired of running a rope access company with spreadsheets, WhatsApp, and good intentions. Every feature exists because we needed it ourselves."
     },
     "problem": {
       "title": "The Problem With How You're Running Things Now",
@@ -12600,7 +12607,7 @@
       }
     },
     "modules": {
-      "title": "18 Modules. One Platform. All Connected. All Included.",
+      "title": "19 Modules. One Platform. All Connected. All Included.",
       "subtitle": "Everything you need to run a profitable rope access company, from first quote to final payment and every drop inbetween.",
       "categories": {
         "all": "All Modules",
@@ -12636,8 +12643,12 @@
           "desc": "Digital forms, PDF plans, and audit-ready documentation"
         },
         "companySafetyRating": {
-          "name": "Safety Rating",
+          "name": "Company Safety Rating",
           "desc": "Real-time company safety score based on inspections and compliance"
+        },
+        "personalSafetyRating": {
+          "name": "Personal Safety Rating",
+          "desc": "Portable technician safety score that follows you across employers"
         },
         "irataSpratLogging": {
           "name": "IRATA/SPRAT Logging",
@@ -12729,7 +12740,7 @@
       "title": "Why Companies Like Yours Trust OnRopePro",
       "builtBy": {
         "title": "Built by Rope Access",
-        "description": "Created by a Level 3 IRATA technician. Every feature designed for how rope access companies actually work, not adapted from generic field service software."
+        "description": "Created by a Level 3 rope access technician. Every feature designed for how rope access companies actually work, not adapted from generic field service software."
       },
       "dataControl": {
         "title": "Your Data, Your Control",
@@ -13429,6 +13440,168 @@
       "tagline": "Management Software for Rope Access",
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service"
+    }
+  },
+  "safetyManifesto": {
+    "hero": {
+      "badge": "Raising the Bar for an Entire Industry",
+      "title": "Safety Is Either Measured",
+      "titleHighlight": "or It's Made Up.",
+      "description1": "PSR measures technician safety practices.",
+      "description2": "CSR measures company safety culture.",
+      "description3": "When both are visible, the entire industry gets safer.",
+      "ctaButton": "Start Building Your Safety Record",
+      "signInButton": "Sign In",
+      "freeNote": "Free for technicians. Always. 14-day trial for companies."
+    },
+    "stats": {
+      "measured": "Measured",
+      "measuredDesc": "Or it didn't happen",
+      "portable": "Portable",
+      "portableDesc": "Follows you everywhere",
+      "visible": "Visible",
+      "visibleDesc": "To everyone who matters",
+      "permanent": "Permanent",
+      "permanentDesc": "Can't be faked"
+    },
+    "problem": {
+      "title": "Safety Theater vs. Safety Culture",
+      "intro": "Most rope access companies talk about safety. Some have binders full of procedures sitting in the office. A few actually follow them.",
+      "p1": "The problem is nobody can tell the difference. A technician interviewing at two companies hears the same pitch: \"We take safety seriously.\" One company does daily harness inspections, holds real toolbox meetings, and makes sure everyone understands the procedures. The other company hands you gear and says \"don't fall.\"",
+      "p2": "A property manager evaluating bids sees the same safety claims in every proposal. Everyone has a \"comprehensive safety program.\" Nobody can prove it. Price becomes the only differentiator.",
+      "p3": "This system protects nobody.",
+      "solution": "OnRopePro changes the equation by making safety measurable, portable, and visible. Not safety claims. Safety actions. Documented, timestamped, aggregated into scores that follow technicians and companies everywhere they go."
+    },
+    "scores": {
+      "title": "Two Scores That Change Everything",
+      "subtitle": "When these scores matter, behavior changes.",
+      "subtitle2": "When behavior changes, people actually go home safe.",
+      "psr": {
+        "title": "PSR: Personal Safety Rating",
+        "description": "Your individual safety record, aggregated across every employer you've ever worked for on OnRopePro.",
+        "item1": "How often you complete harness inspections",
+        "item2": "How quickly you acknowledge safety documents",
+        "item3": "Your compliance rate over time, not just today",
+        "footer": "Your PSR is portable. It belongs to you, not your employer. When you apply for a new job, employers see your safety rating before they hire you."
+      },
+      "csr": {
+        "title": "CSR: Company Safety Rating",
+        "description": "Your company's safety culture, calculated from operational data across four categories.",
+        "item1": "Core Documentation (25%)",
+        "item2": "Project Documentation (25%)",
+        "item3": "Harness Inspections (25%)",
+        "item4": "Document Acknowledgment (5%)",
+        "footer": "CSR is visible to property managers. When they compare bids, they're comparing 86% versus 43%. Green badge versus red badge."
+      }
+    },
+    "flywheel": {
+      "title": "OnRopePro Is Giving Safety a Value",
+      "subtitle": "A self-reinforcing cycle where everyone wins by prioritizing safety.",
+      "intro1": "Safety has always been theoretical. Companies say the right words. Techs nod along. Nobody measures anything. Nothing changes.",
+      "intro2": "We're making safety practical. Measurable. Tradeable. When a technician's PSR affects their job prospects, they care about their inspections. When a company's CSR affects their contract wins, they invest in their culture. When property managers choose vendors by safety score, the market rewards the right behavior.",
+      "intro3": "This isn't compliance software. This is infrastructure that makes safety worth something. The entire industry rises because the incentives finally align.",
+      "stage1": {
+        "title": "Technicians Start Caring About Their Score",
+        "description": "When PSR follows you everywhere, you start paying attention. That harness inspection you used to skip when you were \"in a hurry\"? It affects your score. Suddenly, safety isn't something the boss nags you about. It's your professional reputation. It's career capital."
+      },
+      "stage2": {
+        "title": "Employers Hire Based on PSR",
+        "description": "A technician applies with a 92% PSR. Another applies with a 58% PSR. Same certifications. Similar experience. Which one do you trust with your company's reputation? Employers start filtering for high-PSR candidates. The message spreads: if you want the good jobs, maintain your rating."
+      },
+      "stage3": {
+        "title": "High-PSR Techs Raise Company Standards",
+        "description": "When you hire people who take safety seriously, your company culture shifts. They do their inspections without being reminded. They sign documents promptly. They hold each other accountable. Your CSR rises because your team is actually doing the work."
+      },
+      "stage4": {
+        "title": "Property Managers Choose High-CSR Vendors",
+        "description": "Two bids on the table. Similar pricing. One vendor shows 91% CSR. The other shows 52% CSR. The property manager has liability concerns. The board asks questions. The high-CSR vendor wins. Not because they talked better. Because they proved they're better."
+      },
+      "stage5": {
+        "title": "Market Pressure Forces Industry Improvement",
+        "description": "Companies losing bids to high-CSR competitors have a choice: improve or keep losing. The cowboys who undercut on price while cutting corners find themselves locked out of quality contracts.",
+        "conclusion": "The industry standard rises. Not because of regulation. Because the incentives aligned."
+      }
+    },
+    "stakeholders": {
+      "title": "What This Means For You",
+      "technicians": {
+        "title": "For Technicians",
+        "item1": "Higher PSR = Better opportunities",
+        "item2": "Your safety record protects you in incidents",
+        "item3": "Evaluate employers before you commit",
+        "quote": "\"Would you rather work for a company with a 40 CSR or a 95 CSR? Your life is on the line.\"",
+        "learnMore": "Learn More"
+      },
+      "employers": {
+        "title": "For Company Owners",
+        "item1": "Win contracts you used to lose",
+        "item2": "Attract better technicians",
+        "item3": "Protected when WorkSafe shows up",
+        "quote": "\"I know all my people have read this document because they've signed it.\"",
+        "learnMore": "Learn More"
+      },
+      "propertyManagers": {
+        "title": "For Property Managers",
+        "item1": "Compare vendors objectively",
+        "item2": "Document due diligence",
+        "item3": "Reduced liability exposure",
+        "quote": "\"They have a 92% CSR. Their documentation is complete and current.\"",
+        "learnMore": "Learn More"
+      }
+    },
+    "whyMatters": {
+      "title": "Why This Matters Beyond Business",
+      "subtitle": "The real goal: people going home safe.",
+      "p1": "Rope access is dangerous work. Falls kill. Equipment failures kill. Skipped procedures kill.",
+      "p2": "The industry talks about safety because everyone knows the stakes. But talking isn't enough. Systems that enforce safety are what actually protect people.",
+      "psrPoint": "PSR makes technicians care",
+      "psrPointDesc": "about their own safety practices because those practices now affect their careers.",
+      "csrPoint": "CSR makes companies care",
+      "csrPointDesc": "about their safety culture because that culture now affects their revenue.",
+      "pmPoint": "Property manager behavior",
+      "pmPointDesc": "makes the market reward safety because vendors with high CSR win contracts.",
+      "conclusion1": "When incentives align with safety, safety happens.",
+      "conclusion2": "Not as an afterthought.",
+      "conclusion3": "As the foundation of how the industry operates."
+    },
+    "faqs": {
+      "title": "Frequently Asked Questions",
+      "newPsr": {
+        "question": "What if I've never used OnRopePro before? Do I start with a zero PSR?",
+        "answer": "New technicians start building their PSR from their first inspection. There's no penalty for being new. Your score reflects your actual history on the platform."
+      },
+      "fakeInspection": {
+        "question": "Can I fake a harness inspection just to keep my score up?",
+        "answer": "No. The system requires you to step through each equipment category. Failed items automatically retire in inventory. The process takes 30 seconds when done honestly. Gaming it would take longer and create equipment management problems."
+      },
+      "psrEmployer": {
+        "question": "What happens to my PSR if my employer has a low CSR?",
+        "answer": "Your PSR is independent. It tracks your individual compliance, not your employer's overall score. A disciplined tech working for a disorganized company still builds strong PSR through their own actions."
+      },
+      "newCompany": {
+        "question": "We're a new company. Won't we be at a disadvantage with a short history?",
+        "answer": "New companies can reach 100% CSR immediately by uploading core documents and maintaining daily compliance. History matters for weathering occasional lapses, but new companies with disciplined practices quickly build competitive scores."
+      },
+      "pmSeePsr": {
+        "question": "Do property managers see individual technician ratings?",
+        "answer": "No. Property managers see company CSR only. Individual PSR is visible to employers during hiring, not to external parties."
+      },
+      "disagreeCsr": {
+        "question": "What if I disagree with my CSR calculation?",
+        "answer": "The dashboard shows exactly where you're losing points. If documentation shows 85% but you believe you're at 100%, you can see exactly which documents are missing signatures. The system doesn't hide its logic."
+      },
+      "surveillance": {
+        "question": "This seems like surveillance. Is it?",
+        "answer": "It's accountability. The same way a pilot's flight hours and certifications are tracked, your professional safety actions are tracked. This protects you when things go wrong. It builds your reputation when things go right. Your data belongs to you and travels with you."
+      }
+    },
+    "cta": {
+      "title": "Start Building Your Safety Record Today",
+      "description": "Your safety practices are either measured or they're made up. Start measuring.",
+      "getStarted": "Get Started Free",
+      "learnCsr": "Learn About CSR",
+      "learnPsr": "Learn About PSR",
+      "freeNote": "Free for technicians. Always. 14-day trial for companies. No credit card required."
     }
   }
 }

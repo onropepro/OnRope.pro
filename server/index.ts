@@ -49,6 +49,7 @@ declare module 'express-session' {
     role: string;
     buildingId?: string;
     strataPlanNumber?: string;
+    staffPermissions?: string[];
   }
 }
 

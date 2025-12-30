@@ -13,12 +13,13 @@ export interface CardDefinition {
 // Full card registry
 export const CARD_REGISTRY: CardDefinition[] = [
   // OPERATIONS
-  { id: 'proj-active', name: 'Active Projects', description: 'List with progress %', category: 'OPERATIONS', permission: 'viewProjects', size: 'single' },
+  { id: 'proj-active', name: 'Active Projects', description: 'List with progress %', category: 'OPERATIONS', permission: null, size: 'single' },
   { id: 'proj-overdue', name: 'Overdue Projects', description: 'Past due date', category: 'OPERATIONS', permission: 'viewProjects', size: 'single' },
   { id: 'time-active', name: 'Active Workers', description: 'Who\'s clocked in now', category: 'OPERATIONS', permission: 'viewWorkSessions', refreshInterval: 30000, size: 'single' },
   { id: 'time-notclocked', name: 'Not Clocked In', description: 'Scheduled but not started', category: 'OPERATIONS', permission: 'manageEmployees', size: 'single' },
   { id: 'time-today', name: 'Today\'s Hours', description: 'Company-wide total', category: 'OPERATIONS', permission: 'viewWorkSessions', size: 'single' },
   { id: 'time-my', name: 'My Time Today', description: 'Current user\'s status', category: 'OPERATIONS', permission: null, size: 'single' },
+  { id: 'ops-weather', name: 'Weather', description: 'Wind & conditions', category: 'OPERATIONS', permission: null, refreshInterval: 300000, size: 'single' },
 
   // FINANCIAL
   { id: 'pay-period', name: 'Pay Period Summary', description: 'Dates, hours, cost', category: 'FINANCIAL', permission: 'canAccessFinancials', size: 'single' },
@@ -59,9 +60,9 @@ export const DEFAULT_LAYOUTS: Record<string, string[]> = {
   operations_manager: ['proj-active', 'safe-csr', 'sched-today', 'time-active', 'emp-certs'],
   manager: ['proj-active', 'safe-csr', 'sched-today', 'time-active'],
   supervisor: ['proj-active', 'safe-csr', 'sched-today', 'time-active'],
-  rope_access_tech: ['time-my', 'sched-my', 'safe-csr', 'perf-my'],
-  ground_crew: ['time-my', 'sched-my', 'safe-csr', 'perf-my'],
-  ground_crew_supervisor: ['time-my', 'sched-my', 'safe-csr', 'perf-my'],
+  rope_access_tech: ['time-my', 'sched-my', 'safe-csr', 'perf-my', 'proj-active'],
+  ground_crew: ['time-my', 'sched-my', 'safe-csr', 'perf-my', 'proj-active'],
+  ground_crew_supervisor: ['time-my', 'sched-my', 'safe-csr', 'perf-my', 'proj-active'],
 };
 
 // Permission mapping for server-side filtering

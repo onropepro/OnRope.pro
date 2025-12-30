@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SignInModal } from "@/components/SignInModal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
@@ -49,7 +49,7 @@ export default function WhiteLabelBrandingLanding() {
   
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
   const [expandedFaqs, setExpandedFaqs] = useState<string[]>([]);
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
 
   const allProblemIds = ["employer-1", "employer-2", "employer-3", "employer-4", "employer-5", "ops-1", "ops-2", "tech-1", "tech-2", "bm-1", "bm-2", "resident-1"];
@@ -113,13 +113,11 @@ export default function WhiteLabelBrandingLanding() {
                 {t('modules.whiteLabel.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-hero-signin">
                 Sign In
               </Button>
             </div>
             
-            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
-
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["white-label-branding"]} 
               className="mt-8 bg-white/5 rounded-lg mx-auto max-w-2xl [&_span]:text-blue-100 [&_svg]:text-blue-200"

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatTimestampDate } from "@/lib/dateUtils";
 import { RemoveSeatsDialog } from "@/components/RemoveSeatsDialog";
+import { PRICING, VOLUME_DISCOUNT_THRESHOLD } from "@shared/stripe-config";
 
 type TierName = 'basic' | 'starter' | 'premium' | 'enterprise';
 
@@ -38,8 +39,7 @@ interface SubscriptionDetails {
   whitelabelBrandingActive?: boolean;
   additionalSeatsCount: number;
   giftedSeatsCount: number;
-  additionalProjectsCount: number;
-  currency: 'usd' | 'cad';
+    currency: 'usd' | 'cad';
 }
 
 const TIER_NAMES: Record<string, string> = {
@@ -66,13 +66,11 @@ const TIER_LIMITS: Record<string, { projects: number; seats: number }> = {
 export default function ManageSubscription() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [cancelTarget, setCancelTarget] = useState<'subscription' | 'whitelabel' | 'seats' | 'projects' | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<'subscription' | 'whitelabel' | 'seats' | null>(null);
   const [cancelSeatPackNumber, setCancelSeatPackNumber] = useState<number>(0);
-  const [cancelProjectNumber, setCancelProjectNumber] = useState<number>(0);
-  const [showAddSeatsDialog, setShowAddSeatsDialog] = useState(false);
+    const [showAddSeatsDialog, setShowAddSeatsDialog] = useState(false);
   const [showRemoveSeatsDialog, setShowRemoveSeatsDialog] = useState(false);
-  const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
-  const [showAddBrandingDialog, setShowAddBrandingDialog] = useState(false);
+    const [showAddBrandingDialog, setShowAddBrandingDialog] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"],
@@ -149,28 +147,6 @@ export default function ManageSubscription() {
     },
   });
 
-  const cancelProjectsMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/stripe/remove-addon-projects");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
-      toast({
-        title: "Extra Projects Cancelled",
-        description: "Your extra projects have been cancelled and will be removed at the end of your billing period.",
-      });
-      setCancelTarget(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
   const addSeatsMutation = useMutation({
     mutationFn: async () => {
       return await apiRequest("POST", "/api/stripe/add-addon-seats");
@@ -183,28 +159,6 @@ export default function ManageSubscription() {
         description: "2 additional team seats have been added to your subscription.",
       });
       setShowAddSeatsDialog(false);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const addProjectMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", "/api/stripe/add-addon-projects");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
-      toast({
-        title: "Extra Project Added",
-        description: "1 additional project has been added to your subscription.",
-      });
-      setShowAddProjectDialog(false);
     },
     onError: (error: Error) => {
       toast({
@@ -342,7 +296,10 @@ export default function ManageSubscription() {
                 <div>
                   <h3 className="font-medium">{tierName}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Unlimited projects, add seats at $34.95/month each
+                    Unlimited projects, add seats at ${PRICING.seat.monthly}/month each
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Volume discount: ${PRICING.volumeSeat.monthly}/month for {VOLUME_DISCOUNT_THRESHOLD}+ employees
                   </p>
                 </div>
               </div>
@@ -354,8 +311,7 @@ export default function ManageSubscription() {
             {/* Active Add-ons in Current Plan */}
             {(subscriptionData.whitelabelBrandingActive || 
               subscriptionData.additionalSeatsCount > 0 || 
-              (subscriptionData.giftedSeatsCount || 0) > 0 ||
-              subscriptionData.additionalProjectsCount > 0) && (
+              (subscriptionData.giftedSeatsCount || 0) > 0) && (
               <>
                 <div className="text-sm font-medium text-muted-foreground">Active Add-ons:</div>
                 
@@ -426,25 +382,7 @@ export default function ManageSubscription() {
                   </div>
                 )}
 
-                {/* Extra Projects Summary */}
-                {subscriptionData.additionalProjectsCount > 0 && (
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-md">
-                        <CreditCard className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium">Extra Projects</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {subscriptionData.additionalProjectsCount} additional project{subscriptionData.additionalProjectsCount > 1 ? 's' : ''}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">{currencySymbol}{subscriptionData.additionalProjectsCount * 49}/month</p>
-                    </div>
-                  </div>
-                )}
+
               </>
             )}
 
@@ -555,47 +493,12 @@ export default function ManageSubscription() {
               </>
             )}
 
-            {/* Extra Projects - Display each project individually */}
-            {subscriptionData.additionalProjectsCount > 0 && (
-              <>
-                {Array.from({ length: subscriptionData.additionalProjectsCount }).map((_, index) => (
-                  <div key={`project-${index}`}>
-                    <div className="flex items-center justify-between p-4 border rounded-md">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-md">
-                          <CreditCard className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium">Extra Project {index + 1}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {currencySymbol}49/month
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setCancelProjectNumber(index + 1);
-                          setCancelTarget('projects');
-                        }}
-                        data-testid={`button-cancel-projects-${index + 1}`}
-                      >
-                        <XCircle className="w-4 h-4 mr-2" />
-                        Cancel
-                      </Button>
-                    </div>
-                    {index < subscriptionData.additionalProjectsCount - 1 && <Separator />}
-                  </div>
-                ))}
-                <Separator />
-              </>
-            )}
+
 
             {!subscriptionData.whitelabelBrandingActive && 
              subscriptionData.additionalSeatsCount === 0 &&
              (subscriptionData.giftedSeatsCount || 0) === 0 &&
-             subscriptionData.additionalProjectsCount === 0 && (
+              (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">No active add-ons</p>
               </div>
@@ -752,34 +655,7 @@ export default function ManageSubscription() {
         </DialogContent>
       </Dialog>
 
-      {/* Cancel Extra Projects Dialog */}
-      <Dialog open={cancelTarget === 'projects'} onOpenChange={(open) => !open && setCancelTarget(null)}>
-        <DialogContent data-testid="dialog-cancel-projects">
-          <DialogHeader>
-            <DialogTitle>Cancel Extra Project {cancelProjectNumber}</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to cancel this extra project? Extra Project {cancelProjectNumber} will remain active until {renewalDate}.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setCancelTarget(null)}
-              data-testid="button-cancel-projects-no"
-            >
-              Keep Add-on
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => cancelProjectsMutation.mutate()}
-              disabled={cancelProjectsMutation.isPending}
-              data-testid="button-cancel-projects-yes"
-            >
-              {cancelProjectsMutation.isPending ? "Cancelling..." : "Yes, Cancel"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
 
       {/* Add Extra Seats Dialog */}
       <Dialog open={showAddSeatsDialog} onOpenChange={setShowAddSeatsDialog}>
@@ -810,34 +686,7 @@ export default function ManageSubscription() {
         </DialogContent>
       </Dialog>
 
-      {/* Add Extra Project Dialog */}
-      <Dialog open={showAddProjectDialog} onOpenChange={setShowAddProjectDialog}>
-        <DialogContent data-testid="dialog-add-project">
-          <DialogHeader>
-            <DialogTitle>Add Extra Project</DialogTitle>
-            <DialogDescription>
-              Add 1 additional active project to your subscription for {currencySymbol}49/month.
-              This will be prorated for your current billing period.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setShowAddProjectDialog(false)}
-              data-testid="button-add-project-cancel"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => addProjectMutation.mutate()}
-              disabled={addProjectMutation.isPending}
-              data-testid="button-add-project-confirm"
-            >
-              {addProjectMutation.isPending ? "Adding..." : "Add Project"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
 
       {/* Add White Label Branding Dialog */}
       <Dialog open={showAddBrandingDialog} onOpenChange={setShowAddBrandingDialog}>

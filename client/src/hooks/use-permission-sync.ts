@@ -53,13 +53,26 @@ export function usePermissionSync(isAuthenticated: boolean) {
           } else if (data.type === 'user:terminated') {
             toast({
               title: "Session Ended",
-              description: "Your account access has been revoked. You will be redirected to sign in.",
+              description: "Your account access has been revoked. You will be redirected to the login page.",
               variant: "destructive",
             });
             setTimeout(() => {
               queryClient.clear();
-              setLocation('/');
+              setLocation('/login');
             }, 2000);
+          } else if (data.type === 'quote:created') {
+            // Property manager received a new quote
+            const quote = data.quote;
+            toast({
+              title: "New Quote Received",
+              description: `You have a new quote for ${quote.buildingName || 'your building'} from ${quote.companyName || 'a vendor'}`,
+            });
+            // Invalidate quotes query to refresh the list
+            queryClient.invalidateQueries({ queryKey: ['/api/property-managers/me/quotes'] });
+          } else if (data.type === 'historical-hours:updated') {
+            // Historical hours were added/deleted on another device - sync silently
+            queryClient.invalidateQueries({ queryKey: ['/api/my-historical-hours'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/my-irata-task-logs'] });
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);

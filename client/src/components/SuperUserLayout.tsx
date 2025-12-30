@@ -101,6 +101,11 @@ const menuGroups: MenuGroup[] = [
     label: "MANAGEMENT",
     items: [
       {
+        title: "Staff Accounts",
+        icon: "manage_accounts",
+        path: "/superuser/staff-accounts",
+      },
+      {
         title: "Technician Database",
         icon: "engineering",
         path: "/superuser/technicians",
@@ -212,7 +217,7 @@ function SidebarContents() {
   const handleLogout = async () => {
     await fetch("/api/logout", { method: "POST", credentials: "include" });
     queryClient.clear();
-    setLocation("/");
+    setLocation("/login");
   };
 
   return (

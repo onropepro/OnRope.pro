@@ -20,6 +20,7 @@ interface EmbeddedCheckoutDialogProps {
   onOpenChange: (open: boolean) => void;
   tier: string;
   currency?: string;
+  billingFrequency?: 'monthly' | 'annual';
   isNewCustomer?: boolean;
   onComplete?: () => void;
 }
@@ -29,6 +30,7 @@ export function EmbeddedCheckoutDialog({
   onOpenChange,
   tier,
   currency = "usd",
+  billingFrequency = "monthly",
   isNewCustomer = false,
   onComplete,
 }: EmbeddedCheckoutDialogProps) {
@@ -41,7 +43,7 @@ export function EmbeddedCheckoutDialog({
         ? "/api/stripe/create-embedded-license-checkout"
         : "/api/stripe/create-embedded-checkout";
 
-      const response = await apiRequest("POST", endpoint, { tier, currency });
+      const response = await apiRequest("POST", endpoint, { tier, currency, billingFrequency });
       const data = await response.json();
 
       if (!data.clientSecret) {
@@ -53,7 +55,7 @@ export function EmbeddedCheckoutDialog({
       setError(err.message || "Failed to initialize checkout");
       throw err;
     }
-  }, [tier, currency, isNewCustomer]);
+  }, [tier, currency, billingFrequency, isNewCustomer]);
 
   const options = {
     fetchClientSecret,
@@ -91,6 +93,7 @@ export function EmbeddedCheckoutDialog({
 interface InlineEmbeddedCheckoutProps {
   tier: string;
   currency?: string;
+  billingFrequency?: 'monthly' | 'annual';
   isNewCustomer?: boolean;
   onComplete?: () => void;
 }
@@ -98,6 +101,7 @@ interface InlineEmbeddedCheckoutProps {
 export function InlineEmbeddedCheckout({
   tier,
   currency = "usd",
+  billingFrequency = "monthly",
   isNewCustomer = false,
   onComplete,
 }: InlineEmbeddedCheckoutProps) {
@@ -112,7 +116,7 @@ export function InlineEmbeddedCheckout({
         ? "/api/stripe/create-embedded-license-checkout"
         : "/api/stripe/create-embedded-checkout";
 
-      const response = await apiRequest("POST", endpoint, { tier, currency });
+      const response = await apiRequest("POST", endpoint, { tier, currency, billingFrequency });
       const data = await response.json();
 
       if (!data.clientSecret) {
@@ -126,7 +130,7 @@ export function InlineEmbeddedCheckout({
       setLoading(false);
       throw err;
     }
-  }, [tier, currency, isNewCustomer]);
+  }, [tier, currency, billingFrequency, isNewCustomer]);
 
   const options = {
     fetchClientSecret,

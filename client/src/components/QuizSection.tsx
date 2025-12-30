@@ -183,8 +183,8 @@ export function QuizSection() {
     
     const getSafetyBadgeColor = (category?: string) => {
       switch (category) {
-        case 'swp': return 'bg-green-600 text-white';
-        case 'flha': return 'bg-amber-600 text-white';
+        case 'swp': return 'bg-emerald-600 text-white';
+        case 'flha': return 'bg-amber-500 text-white';
         case 'harness': return 'bg-purple-600 text-white';
         default: return 'bg-teal-600 text-white';
       }
@@ -202,21 +202,21 @@ export function QuizSection() {
     return (
       <div
         key={quiz.id}
-        className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate"
+        className="flex items-center gap-4 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:shadow-md transition-shadow"
         data-testid={`quiz-card-${quiz.id}`}
       >
-        <div className={`p-3 rounded-xl ${isCertQuiz ? (quiz.certification === 'irata' ? 'bg-blue-500/10' : 'bg-orange-500/10') : isSafetyQuiz ? 'bg-teal-500/10' : 'bg-primary/10'}`}>
+        <div className={`p-3 rounded-lg ${isCertQuiz ? (quiz.certification === 'irata' ? 'bg-blue-50 dark:bg-blue-900/30' : 'bg-orange-50 dark:bg-orange-900/30') : isSafetyQuiz ? 'bg-emerald-50 dark:bg-emerald-900/30' : 'bg-slate-100 dark:bg-slate-800'}`}>
           {isCertQuiz ? (
-            <GraduationCap className={`h-6 w-6 ${quiz.certification === 'irata' ? 'text-blue-600' : 'text-orange-600'}`} />
+            <GraduationCap className={`h-5 w-5 ${quiz.certification === 'irata' ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`} />
           ) : isSafetyQuiz ? (
-            <ShieldCheck className="h-6 w-6 text-teal-600" />
+            <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
           ) : (
-            <ClipboardList className="h-6 w-6 text-primary" />
+            <ClipboardList className="h-5 w-5 text-slate-600 dark:text-slate-400" />
           )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold">{getQuizTitle(quiz)}</span>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">{getQuizTitle(quiz)}</span>
             {isCertQuiz && quiz.certification && quiz.level && (
               <Badge className={certBadgeColor}>
                 {quiz.certification.toUpperCase()} L{quiz.level}
@@ -228,11 +228,11 @@ export function QuizSection() {
               </Badge>
             )}
           </div>
-          <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+          <div className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2 flex-wrap">
             <span>{quiz.questionCount} {t('quiz.questions', 'questions')}</span>
             {quiz.attemptCount > 0 && (
               <>
-                <span className="text-muted-foreground/50">|</span>
+                <span className="text-slate-300 dark:text-slate-600">|</span>
                 <span>{quiz.attemptCount} {t('quiz.attempts', 'attempts')}</span>
               </>
             )}
@@ -240,7 +240,7 @@ export function QuizSection() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {quiz.hasPassed ? (
-            <Badge variant="default" className="bg-green-600 text-white">
+            <Badge variant="default" className="bg-emerald-600 text-white">
               <CheckCircle2 className="h-3 w-3 mr-1" />
               {t('quiz.completed', 'Completed')}
             </Badge>
@@ -248,9 +248,10 @@ export function QuizSection() {
             <Button
               size="sm"
               onClick={() => handleStartQuiz(quiz)}
+              className="bg-[#0B64A3] hover:bg-[#0B64A3]/90 text-white"
               data-testid={`start-quiz-${quiz.id}`}
             >
-              {quiz.attemptCount > 0 ? t('quiz.retry', 'Retry') : t('quiz.startQuiz', 'Start Quiz')}
+              {quiz.attemptCount > 0 ? t('quiz.retry', 'Retry') : t('quiz.start', 'Start')}
               <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           )}
@@ -261,42 +262,42 @@ export function QuizSection() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-primary" />
-            {t('quiz.safetyQuizzes', 'Safety Quizzes')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="h-5 w-5 text-emerald-600" />
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t('quiz.safetyQuizzes', 'Safety Quizzes')}</h3>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="p-4 sm:p-5">
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (quizzes.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-primary" />
-            {t('quiz.safetyQuizzes', 'Safety Quizzes')}
-          </CardTitle>
-          <CardDescription>{t('quiz.completeQuizzes', 'Complete quizzes to demonstrate your knowledge')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <div className="inline-flex p-4 bg-muted/50 rounded-full mb-4">
-              <ClipboardList className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground">{t('quiz.noQuizzes', 'No quizzes available yet')}</p>
-            <p className="text-sm text-muted-foreground mt-1">{t('quiz.checkBackLater', 'Check back later when your company uploads safety documents')}</p>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="h-5 w-5 text-emerald-600" />
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t('quiz.safetyQuizzes', 'Safety Quizzes')}</h3>
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('quiz.completeQuizzes', 'Complete quizzes to demonstrate your knowledge')}</p>
+        </div>
+        <div className="p-4 sm:p-5">
+          <div className="text-center py-8">
+            <div className="inline-flex p-4 bg-slate-100 dark:bg-slate-800 rounded-full mb-4">
+              <ClipboardList className="h-8 w-8 text-slate-400" />
+            </div>
+            <p className="text-slate-600 dark:text-slate-300">{t('quiz.noQuizzes', 'No quizzes available yet')}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('quiz.checkBackLater', 'Check back later when your company uploads safety documents')}</p>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -304,55 +305,55 @@ export function QuizSection() {
     <>
       <div className="space-y-6">
         {certificationQuizzes.length > 0 && (
-          <Card>
-            <CardHeader>
-              <div className="text-xs text-muted-foreground mb-1">{t('quiz.alignedWith', 'Aligned with IRATA & SPRAT training concepts')}</div>
-              <CardTitle className="flex items-center gap-2">
-                <GraduationCap className="h-5 w-5 text-blue-600" />
-                {t('quiz.ropeAccessQuizzes', 'Rope Access Knowledge Quizzes')}
-              </CardTitle>
-              <CardDescription>{t('quiz.testRopeAccess', 'Test your rope access knowledge with practice quizzes')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+            <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{t('quiz.alignedWith', 'Aligned with IRATA & SPRAT training concepts')}</p>
+              <div className="flex items-center gap-2">
+                <GraduationCap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t('quiz.ropeAccessQuizzes', 'Rope Access Knowledge Quizzes')}</h3>
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('quiz.testRopeAccess', 'Test your rope access knowledge with practice quizzes')}</p>
+            </div>
+            <div className="p-4 sm:p-5">
+              <div className="grid gap-3">
                 {certificationQuizzes.map(renderQuizCard)}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {safetyQuizzes.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-teal-600" />
-                {t('quiz.safetyPracticeQuizzes', 'Safety Practice Quizzes')}
-              </CardTitle>
-              <CardDescription>{t('quiz.testSafetyKnowledge', 'Test your knowledge of Safe Work Procedures, FLHA, and harness inspections')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+            <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t('quiz.safetyPracticeQuizzes', 'Safety Practice Quizzes')}</h3>
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('quiz.testSafetyKnowledge', 'Test your knowledge of Safe Work Procedures, FLHA, and harness inspections')}</p>
+            </div>
+            <div className="p-4 sm:p-5">
+              <div className="grid gap-3">
                 {safetyQuizzes.map(renderQuizCard)}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {companyQuizzes.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ClipboardList className="h-5 w-5 text-primary" />
-                {t('quiz.companyQuizzes', 'Company Safety Quizzes')}
-              </CardTitle>
-              <CardDescription>{t('quiz.earnCsrPoints', 'Complete quizzes to demonstrate your knowledge and earn CSR points')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
+            <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-2">
+                <ClipboardList className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t('quiz.companyQuizzes', 'Company Safety Quizzes')}</h3>
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('quiz.earnCsrPoints', 'Complete quizzes to demonstrate your knowledge and earn CSR points')}</p>
+            </div>
+            <div className="p-4 sm:p-5">
+              <div className="grid gap-3">
                 {companyQuizzes.map(renderQuizCard)}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </div>
 

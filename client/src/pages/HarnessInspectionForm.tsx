@@ -400,12 +400,12 @@ export default function HarnessInspectionForm() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">{t('harnessInspection.icop.title', 'irata International Code of Practice (ICOP)')}</CardTitle>
+              <CardTitle className="text-lg">{t('harnessInspection.icop.title', 'IRATA International Code of Practice (ICOP)')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              {t('harnessInspection.icop.description', 'All rope access operations must comply with the irata International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.')}
+              {t('harnessInspection.icop.description', 'All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.')}
             </p>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="text-xs">
@@ -427,7 +427,7 @@ export default function HarnessInspectionForm() {
                   className="flex items-center gap-1 hover:text-primary"
                   data-testid="link-irata-icop-info"
                 >
-                  {t('harnessInspection.icop.viewInfo', 'View irata ICOP Information')}
+                  {t('harnessInspection.icop.viewInfo', 'View IRATA ICOP Information')}
                 </a>
               </Badge>
             </div>

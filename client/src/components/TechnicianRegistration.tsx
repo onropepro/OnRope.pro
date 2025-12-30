@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 type RegistrationStep = "welcome" | "accountDetails" | "certification" | "referral" | "employer" | "success";
-type CertificationType = "irata" | "sprat" | "both" | "trainee" | null;
+type CertificationType = "irata" | "sprat" | "both" | null;
 
 interface TechnicianData {
   referralCodeInput: string;
@@ -73,6 +73,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     certificationCardFile: null,
   });
   const [error, setError] = useState("");
+  const [animatedBenefitIndex, setAnimatedBenefitIndex] = useState(-1);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const resetForm = () => {
@@ -106,6 +107,20 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     onOpenChange(false);
   };
 
+  // Staggered animation for PLUS benefits list
+  useEffect(() => {
+    if (open) {
+      setAnimatedBenefitIndex(-1);
+      const delays = [800, 1400, 2000, 2600, 3200, 3800];
+      const timers = delays.map((delay, index) => 
+        setTimeout(() => setAnimatedBenefitIndex(index), delay)
+      );
+      return () => timers.forEach(timer => clearTimeout(timer));
+    } else {
+      setAnimatedBenefitIndex(-1);
+    }
+  }, [open]);
+
   const registrationMutation = useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await fetch("/api/technician-register", {
@@ -127,8 +142,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
         title: "Registration Complete!",
         description: "Your account has been created successfully.",
       });
-      // Show employer info page before success
-      setStep("employer");
+      // Move to referral step after account creation
+      setStep("referral");
     },
     onError: (error: Error) => {
       setError(error.message);
@@ -211,12 +226,13 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       }
     } else if (step === "certification") {
       if (validateCertification()) {
-        setStep("referral");
+        handleSubmit();
       }
     } else if (step === "referral") {
-      handleSubmit();
+      setStep("employer");
     } else if (step === "employer") {
-      setStep("success");
+      onOpenChange(false);
+      setLocation("/technician-portal");
     }
   };
 
@@ -304,9 +320,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   // PLUS benefits (unlocked by referring one tech)
   const plusBenefits = [
-    t('techReg.plusBenefits.expiryAlerts', 'Certification expiry alerts (60 + 30 day warnings)'),
+    t('techReg.plusBenefits.jobBoard', 'Rope Access Job Board'),
+    t('techReg.plusBenefits.jobOffers', 'Employers Can Send Job Offers'),
+    t('techReg.plusBenefits.expiryAlerts', '30-day certification expiry alerts'),
     t('techReg.plusBenefits.multiEmployers', 'Work for multiple employers simultaneously'),
-    t('techReg.plusBenefits.jobBoard', 'Job Board access — see who\'s hiring'),
     t('techReg.plusBenefits.taskLogging', 'Enhanced task logging'),
     t('techReg.plusBenefits.analytics', 'Work history analytics'),
   ];
@@ -328,53 +345,67 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       <DialogContent className="max-w-5xl p-0 gap-0 overflow-hidden max-h-[90vh]">
         <div className="flex flex-col lg:flex-row min-h-[600px] max-h-[90vh]">
           {/* Left Panel - Rust Brown sidebar (Technician color) */}
-          <div className="hidden lg:flex lg:w-[320px] bg-[#AB4521] text-white p-8 flex-col">
+          <div className="hidden lg:flex lg:w-[320px] bg-[#5C7A84] text-white p-8 flex-col">
             <div className="mb-8">
-              <HardHat className="w-10 h-10 mb-4" />
-              <h2 className="text-xl font-bold mb-2">{t('techReg.sidebar.title', 'Your Urban Rope Access Work Passport')}</h2>
-              <p className="text-white/80 text-sm">{t('techReg.sidebar.subtitle', 'Your hours. Your proof. Forever.')}</p>
+              <div className="flex items-center gap-3 mb-2">
+                <HardHat className="w-10 h-10" />
+                <h2 className="text-xl font-bold">{t('techReg.sidebar.title', 'Create Your Profile')}</h2>
+              </div>
+              <p className="text-white/80 text-sm">{t('techReg.sidebar.subtitle', 'Join thousands of rope access technicians')}</p>
             </div>
             
             {/* Progress Steps */}
             <div className="space-y-3 mb-6">
               <div className={`flex items-center gap-3 ${getStepNumber() >= 1 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 1 ? 'bg-white text-[#AB4521]' : 'bg-white/20'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 1 ? 'bg-white text-[#5C7A84]' : 'bg-white/20'}`}>
                   {getStepNumber() > 1 ? <Check className="w-3.5 h-3.5" /> : "1"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.accountDetails', 'Account Details')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 2 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#AB4521]' : 'bg-white/20'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#5C7A84]' : 'bg-white/20'}`}>
                   {getStepNumber() > 2 ? <Check className="w-3.5 h-3.5" /> : "2"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.certification', 'Certification')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#AB4521]' : 'bg-white/20'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#5C7A84]' : 'bg-white/20'}`}>
                   {getStepNumber() > 3 ? <Check className="w-3.5 h-3.5" /> : "3"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.referral', 'Referral (Optional)')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 4 ? 'text-white' : 'text-white/50'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 4 ? 'bg-white text-[#AB4521]' : 'bg-white/20'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 4 ? 'bg-white text-[#5C7A84]' : 'bg-white/20'}`}>
                   {getStepNumber() > 4 ? <Check className="w-3.5 h-3.5" /> : "4"}
                 </div>
                 <span className="text-sm font-medium">{t('techReg.steps.employer', 'Employer Info')}</span>
               </div>
             </div>
 
-            {/* PLUS ACCOUNT Benefits (muted) */}
+            {/* PLUS ACCOUNT Benefits (animated) */}
             <div className="mt-auto">
-              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">{t('techReg.sidebar.plusAccount', 'PLUS Account - Refer 1 tech to unlock')}</p>
+              <p className="text-xs uppercase tracking-wider mb-2 text-[#ffffff]">{t('techReg.sidebar.plusAccount', 'Refer 1 tech to upgrade to a PLUS Account for free')}</p>
               <div className="space-y-2">
-                {plusBenefits.map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm opacity-60">
-                    <div className="w-4 h-4 rounded-full border border-white/40 shrink-0 mt-0.5" />
-                    <span className="text-white/70">{benefit}</span>
-                  </div>
-                ))}
+                {plusBenefits.map((benefit, i) => {
+                  const isActive = i <= animatedBenefitIndex;
+                  return (
+                    <div key={i} className="flex items-start gap-2 text-sm">
+                      <div className={`w-4 h-4 rounded-full shrink-0 mt-0.5 flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-white border-white' : 'border border-white/40'}`}>
+                        {isActive && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <Check className="w-2.5 h-2.5 text-[#5C7A84]" />
+                          </motion.div>
+                        )}
+                      </div>
+                      <span className={`transition-colors duration-300 ${isActive ? 'text-[#ffffff]' : 'text-white/70 opacity-60'}`}>{benefit}</span>
+                    </div>
+                  );
+                })}
               </div>
-              <p className="text-white/50 text-xs mt-3 italic">{t('techReg.sidebar.referFooter', 'Refer one tech → instant upgrade')}</p>
             </div>
           </div>
 
@@ -409,7 +440,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   <Button 
                     size="lg" 
-                    className="w-full gap-2 rounded-full bg-[#AB4521]"
+                    className="w-full gap-2 rounded-full bg-[#5C7A84]"
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
@@ -540,7 +571,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       {t('techReg.buttons.back', 'Back')}
                     </Button>
                     <Button 
-                      className="flex-1 gap-2 bg-[#AB4521]"
+                      className="flex-1 gap-2 bg-[#5C7A84]"
                       onClick={handleContinue}
                       data-testid="button-continue-to-certification"
                     >
@@ -564,14 +595,13 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       { value: "irata", label: "IRATA" },
                       { value: "sprat", label: "SPRAT" },
                       { value: "both", label: t('techReg.certification.both', 'Both') },
-                      { value: "trainee", label: t('techReg.certification.trainee', 'Trainee') },
                     ].map((cert) => (
                       <button
                         key={cert.value}
                         type="button"
                         className={`p-4 rounded-lg border-2 text-center font-medium transition-all ${
                           data.certification === cert.value
-                            ? "border-[#AB4521] bg-[#AB4521]/10 text-[#AB4521]"
+                            ? "border-[#5C7A84] bg-[#5C7A84]/10 text-[#5C7A84]"
                             : "border-border hover:border-muted-foreground/50"
                         }`}
                         onClick={() => setData({ ...data, certification: cert.value as CertificationType })}
@@ -586,7 +616,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   {(data.certification === "irata" || data.certification === "both") && (
                     <div className="space-y-4 mb-4 p-4 rounded-lg bg-muted/50">
                       <h4 className="font-medium flex items-center gap-2">
-                        <Award className="w-4 h-4 text-[#AB4521]" />
+                        <Award className="w-4 h-4 text-[#5C7A84]" />
                         {t('techReg.certification.irataDetails', 'IRATA Details')}
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
@@ -599,7 +629,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                                 type="button"
                                 className={`flex-1 py-2 rounded-md border text-sm font-medium transition-all ${
                                   data.irataLevel === level
-                                    ? "border-[#AB4521] bg-[#AB4521] text-white"
+                                    ? "border-[#5C7A84] bg-[#5C7A84] text-white"
                                     : "border-border hover:border-muted-foreground/50"
                                 }`}
                                 onClick={() => setData({ ...data, irataLevel: level })}
@@ -629,7 +659,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   {(data.certification === "sprat" || data.certification === "both") && (
                     <div className="space-y-4 mb-4 p-4 rounded-lg bg-muted/50">
                       <h4 className="font-medium flex items-center gap-2">
-                        <Award className="w-4 h-4 text-[#AB4521]" />
+                        <Award className="w-4 h-4 text-[#5C7A84]" />
                         {t('techReg.certification.spratDetails', 'SPRAT Details')}
                       </h4>
                       <div className="grid grid-cols-2 gap-3">
@@ -642,7 +672,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                                 type="button"
                                 className={`flex-1 py-2 rounded-md border text-sm font-medium transition-all ${
                                   data.spratLevel === level
-                                    ? "border-[#AB4521] bg-[#AB4521] text-white"
+                                    ? "border-[#5C7A84] bg-[#5C7A84] text-white"
                                     : "border-border hover:border-muted-foreground/50"
                                 }`}
                                 onClick={() => setData({ ...data, spratLevel: level })}
@@ -669,7 +699,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   )}
 
                   {/* Certification Card Upload */}
-                  {data.certification && data.certification !== "trainee" && (
+                  {data.certification && (
                     <div className="mb-4">
                       <Label className="mb-2 block">{t('techReg.certification.uploadCardLabel', 'Upload Certification Card (optional)')}</Label>
                       <input
@@ -718,124 +748,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       {t('techReg.buttons.back', 'Back')}
                     </Button>
                     <Button 
-                      className="flex-1 gap-2 bg-[#AB4521]"
-                      onClick={handleContinue}
-                      data-testid="button-continue-to-referral"
-                    >
-                      {t('techReg.buttons.continue', 'Continue')}
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Referral Screen (Optional Step 4) */}
-              {step === "referral" && (
-                <div className="max-w-lg mx-auto">
-                  <div className="mb-6">
-                                        <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Referral Code')}</h2>
-                    <p className="text-muted-foreground mt-1">{t('techReg.referral.subtitle', 'Got a referral code from a friend?')}</p>
-                  </div>
-
-                  {/* Referral Code Input */}
-                  <div className="mb-8">
-                    <Label className="text-sm mb-2 block">{t('techReg.referral.inputLabel', 'Enter referral code (optional)')}</Label>
-                    <Input
-                      placeholder={t('techReg.referral.inputPlaceholder', 'Enter referral code')}
-                      value={data.referralCodeInput}
-                      onChange={(e) => setData({ ...data, referralCodeInput: e.target.value.toUpperCase() })}
-                      className="text-center tracking-widest text-lg"
-                      data-testid="input-referral-code"
-                    />
-                  </div>
-
-                  {/* PLUS benefits section - locked/grayed with animated checkmarks */}
-                  <div className="mb-8">
-                    <div className="flex items-center gap-2 mb-2">
-                      <motion.div
-                        initial={{ rotate: 0 }}
-                        animate={{ rotate: [0, -15, 0] }}
-                        transition={{ 
-                          delay: 0.3,
-                          duration: 0.4,
-                          ease: "easeOut"
-                        }}
-                      >
-                        <motion.div
-                          initial={{ opacity: 1 }}
-                          animate={{ opacity: 0 }}
-                          transition={{ delay: 0.7, duration: 0.2 }}
-                          className="absolute"
-                        >
-                          <Lock className="w-4 h-4 text-amber-500" />
-                        </motion.div>
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.7, duration: 0.3, type: "spring" }}
-                        >
-                          <LockOpen className="w-4 h-4 text-green-500" />
-                        </motion.div>
-                      </motion.div>
-                      <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-                        {t('techReg.plusSection.header', 'Unlock PLUS for free by referring 1 other tech:')}
-                      </p>
-                    </div>
-                    <div className="space-y-1.5">
-                      {plusBenefits.map((benefit, i) => (
-                        <motion.div 
-                          key={i} 
-                          className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/30 border border-dashed border-muted-foreground/20"
-                          initial={{ opacity: 0.7 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: i * 0.1 }}
-                        >
-                          <motion.div 
-                            className="w-5 h-5 rounded-full border-2 border-green-500/50 flex items-center justify-center shrink-0 bg-green-50 dark:bg-green-900/20"
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ 
-                              delay: 0.5 + i * 0.15,
-                              type: "spring",
-                              stiffness: 300,
-                              damping: 20
-                            }}
-                          >
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ 
-                                delay: 0.6 + i * 0.15,
-                                type: "spring",
-                                stiffness: 400,
-                                damping: 15
-                              }}
-                            >
-                              <Check className="w-3 h-3 text-green-500" />
-                            </motion.div>
-                          </motion.div>
-                          <span className="text-sm text-muted-foreground">{benefit}</span>
-                        </motion.div>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 text-center">
-                      {t('techReg.plusSection.hint', 'Refer one tech after signup to unlock instantly')}
-                    </p>
-                  </div>
-
-                  {error && (
-                    <div className="mt-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-                      {error}
-                    </div>
-                  )}
-
-                  <div className="flex gap-3 mt-6">
-                    <Button variant="outline" onClick={handleBack} className="gap-2">
-                      <ArrowLeft className="w-4 h-4" />
-                      {t('techReg.buttons.back', 'Back')}
-                    </Button>
-                    <Button 
-                      className="flex-1 gap-2 bg-[#AB4521]"
+                      className="flex-1 gap-2 bg-[#5C7A84]"
                       onClick={handleContinue}
                       disabled={registrationMutation.isPending}
                       data-testid="button-create-account"
@@ -851,6 +764,61 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Referral Screen (Optional Step 4) */}
+              {step === "referral" && (
+                <div className="h-full flex flex-col justify-center max-w-lg mx-auto">
+                  {/* Account Created Confirmation */}
+                  <div className="mb-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <p className="font-semibold text-green-800 dark:text-green-300">{t('techReg.referral.accountCreated', 'Your Account Has Been Created')}</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-9">
+                    <h2 className="text-2xl font-bold">{t('techReg.referral.title', 'Pay-It-Forward Referral Code System')}</h2>
+                    <div className="text-muted-foreground mt-3 space-y-2">
+                      <p className="mt-[20px] mb-[20px] text-[16px]">
+                        <span className="font-medium">1 -</span> {t('techReg.referral.step1', "Got a referral code from a friend? Enter it and they'll get upgraded to a PLUS account for free.")}
+                      </p>
+                      <p className="text-[16px]">
+                        <span className="font-medium">2 -</span> {t('techReg.referral.step2', 'Access your own referral code within your personal passport dashboard and share your referral code to get upgraded to PLUS for free.')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Referral Code Input */}
+                  <div className="mb-8">
+                    <Input
+                      placeholder={t('techReg.referral.inputPlaceholder', 'Enter referral code (optional)')}
+                      value={data.referralCodeInput}
+                      onChange={(e) => setData({ ...data, referralCodeInput: e.target.value.toUpperCase() })}
+                      className="text-center tracking-widest text-lg"
+                      data-testid="input-referral-code"
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="mt-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+                      {error}
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 mt-6">
+                    <Button 
+                      className="flex-1 gap-2 bg-[#5C7A84]"
+                      onClick={handleContinue}
+                      data-testid="button-continue-referral"
+                    >
+                      {t('techReg.buttons.continueToPassport', 'Continue to My Passport')}
+                      <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -886,11 +854,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   </div>
 
                   <Button 
-                    className="w-full gap-2 bg-[#AB4521]"
+                    className="w-full gap-2 bg-[#5C7A84]"
                     onClick={handleContinue}
-                    data-testid="button-continue-to-success"
+                    data-testid="button-continue-to-passport"
                   >
-                    {t('techReg.buttons.continueToPortal', 'Continue to My Portal')}
+                    {t('techReg.buttons.continueToPassport', 'Continue to My Passport')}
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 </div>
@@ -966,7 +934,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
                   <Button 
                     size="lg"
-                    className="w-full gap-2 rounded-full bg-[#AB4521]"
+                    className="w-full gap-2 rounded-full bg-[#5C7A84]"
                     onClick={() => {
                       handleClose();
                       setLocation("/technician");

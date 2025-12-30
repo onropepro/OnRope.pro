@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  ArrowLeft, 
   Users, 
   MapPin, 
   Award,
@@ -39,7 +39,6 @@ import {
 import { format, differenceInYears } from "date-fns";
 import type { User as UserType } from "@shared/schema";
 import { JOB_TYPES } from "@shared/jobTypes";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
 
 type Language = 'en' | 'fr';
 
@@ -52,7 +51,7 @@ const translations = {
     certificationPlaceholder: "Certification",
     levelPlaceholder: "Level",
     allCerts: "All Certs",
-    irataOnly: "irata Only",
+    irataOnly: "IRATA Only",
     spratOnly: "SPRAT Only",
     bothCerts: "Both",
     allLevels: "All Levels",
@@ -69,8 +68,8 @@ const translations = {
     since: "Since",
     certifications: "Certifications",
     noCertifications: "No certifications on file",
-    specialties: "Specialties",
-    noSpecialties: "No specialties listed",
+    uploadedCertifications: "Uploaded Certifications",
+    viewDocument: "View Document",
     resumeCV: "Resume / CV",
     visibleSince: "Profile visible since",
     expired: "Expired",
@@ -80,7 +79,7 @@ const translations = {
     yrsExp: "yrs exp",
     resume: "Resume",
     unknown: "Unknown",
-    irataLevelLabel: "irata Level",
+    irataLevelLabel: "IRATA Level",
     spratLevelLabel: "SPRAT Level",
     sendJobOffer: "Send Job Offer",
     selectJob: "Select a job to offer",
@@ -105,7 +104,7 @@ const translations = {
     certificationPlaceholder: "Certification",
     levelPlaceholder: "Niveau",
     allCerts: "Toutes les certifications",
-    irataOnly: "irata seulement",
+    irataOnly: "IRATA seulement",
     spratOnly: "SPRAT seulement",
     bothCerts: "Les deux",
     allLevels: "Tous les niveaux",
@@ -122,8 +121,8 @@ const translations = {
     since: "Depuis",
     certifications: "Certifications",
     noCertifications: "Aucune certification en dossier",
-    specialties: "Spécialités",
-    noSpecialties: "Aucune spécialité indiquée",
+    uploadedCertifications: "Certifications téléversées",
+    viewDocument: "Voir le document",
     resumeCV: "CV / Resume",
     visibleSince: "Profil visible depuis",
     expired: "Expire",
@@ -133,7 +132,7 @@ const translations = {
     yrsExp: "ans exp",
     resume: "CV",
     unknown: "Inconnu",
-    irataLevelLabel: "irata Niveau",
+    irataLevelLabel: "IRATA Niveau",
     spratLevelLabel: "SPRAT Niveau",
     sendJobOffer: "Envoyer une offre d'emploi",
     selectJob: "Selectionnez un emploi a offrir",
@@ -178,7 +177,6 @@ interface VisibleTechnician {
   employeeProvinceState: string | null;
   employeeCountry: string | null;
   visibilityEnabledAt: Date | string | null;
-  ropeAccessSpecialties: string[] | null;
   safetyRating?: number;
   safetyLabel?: string;
   safetyColor?: string;
@@ -188,12 +186,20 @@ interface VisibleTechnician {
     hasValidCertification: boolean;
     yearsExperience: number;
     hasResume: boolean;
+  certifications?: Array<{
+    id: string;
+    description: string | null;
+    fileUrl: string;
+    expiryDate: string | null;
+    createdAt: string;
+  }>;
   };
 }
 
 export default function VisibleTechniciansBrowser() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [certFilter, setCertFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
@@ -201,10 +207,9 @@ export default function VisibleTechniciansBrowser() {
   const [showJobOfferDialog, setShowJobOfferDialog] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [offerMessage, setOfferMessage] = useState("");
-  const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem("dashboardLanguage");
-    return (saved === "fr" ? "fr" : "en") as Language;
-  });
+  
+  // Use global i18n language, not local storage
+  const language: Language = i18n.language === 'fr' ? 'fr' : 'en';
   const t = translations[language];
 
   const { data: userData } = useQuery<{ user: UserType }>({
@@ -299,7 +304,14 @@ export default function VisibleTechniciansBrowser() {
   const filteredTechnicians = technicians.filter(tech => {
     const name = getDisplayName(tech).toLowerCase();
     const location = getLocation(tech)?.toLowerCase() || "";
-    const matchesSearch = name.includes(searchQuery.toLowerCase()) || location.includes(searchQuery.toLowerCase());
+    const irataLicense = (tech.irataLicenseNumber || "").toLowerCase();
+    const spratLicense = (tech.spratLicenseNumber || "").toLowerCase();
+    const searchLower = searchQuery.toLowerCase();
+    
+    const matchesSearch = name.includes(searchLower) || 
+                          location.includes(searchLower) ||
+                          irataLicense.includes(searchLower) ||
+                          spratLicense.includes(searchLower);
 
     let matchesCert = true;
     if (certFilter === "irata") {
@@ -326,35 +338,20 @@ export default function VisibleTechniciansBrowser() {
     );
   }
 
+  // Configure unified header with back button
+  const handleBackClick = useCallback(() => {
+    setLocation('/dashboard');
+  }, [setLocation]);
+
+  useSetHeaderConfig({
+    pageTitle: t.title,
+    pageDescription: t.subtitle,
+    onBackClick: handleBackClick,
+    showSearch: false,
+  }, [t.title, t.subtitle, handleBackClick]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-primary/10">
-              <Users className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold">{t.title}</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">{t.subtitle}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <LanguageDropdown />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLocation("/dashboard")}
-              className="gap-1.5"
-              data-testid="button-back-to-dashboard"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.backToDashboard}</span>
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         {/* Search and Filters */}
         <Card>
@@ -468,7 +465,7 @@ export default function VisibleTechniciansBrowser() {
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {tech.irataLevel && (
                         <Badge variant={isExpired(tech.irataExpirationDate) ? "destructive" : isExpiringSoon(tech.irataExpirationDate) ? "secondary" : "default"} className="text-xs">
-                          irata L{tech.irataLevel}
+                          IRATA L{tech.irataLevel}
                         </Badge>
                       )}
                       {tech.spratLevel && (
@@ -658,36 +655,37 @@ export default function VisibleTechniciansBrowser() {
                     </div>
                   )}
 
-                  {!selectedTech.irataLevel && !selectedTech.spratLevel && (
-                    <p className="text-sm text-muted-foreground italic">{t.noCertifications}</p>
-                  )}
-                </div>
-
-                {/* Specialties */}
-                <div className="space-y-3">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <HardHat className="w-4 h-4" />
-                    {t.specialties}
-                  </h4>
-                  {selectedTech.ropeAccessSpecialties && selectedTech.ropeAccessSpecialties.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {selectedTech.ropeAccessSpecialties.map((specialty: string, index: number) => {
-                        const jobType = JOB_TYPES.find(jt => jt.value === specialty);
-                        return (
-                          <Badge 
-                            key={specialty} 
-                            variant="secondary"
-                            className="gap-1"
-                            data-testid={`badge-specialty-${index}`}
+                  
+                  {/* Uploaded Certifications */}
+                  {selectedTech.certifications && selectedTech.certifications.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">{t.uploadedCertifications}</p>
+                      {selectedTech.certifications.map((cert: any) => (
+                        <div key={cert.id} className="p-3 rounded-lg border flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{cert.description || "Certificate"}</p>
+                            {cert.expiryDate && (
+                              <p className="text-xs text-muted-foreground">
+                                {t.expires}: {formatDate(cert.expiryDate)}
+                                {isExpired(cert.expiryDate) && <Badge variant="destructive" className="ml-2">{t.expired}</Badge>}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(cert.fileUrl, "_blank")}
+                            data-testid={`button-view-cert-${cert.id}`}
                           >
-                            <HardHat className="w-3 h-3" />
-                            {jobType?.label || specialty}
-                          </Badge>
-                        );
-                      })}
+                            <Eye className="w-4 h-4 mr-1" />
+                            {t.viewDocument}
+                          </Button>
+                        </div>
+                      ))}
                     </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground italic">{t.noSpecialties}</p>
+                  )}
+                  {!selectedTech.irataLevel && !selectedTech.spratLevel && (!selectedTech.certifications || selectedTech.certifications.length === 0) && (
+                    <p className="text-sm text-muted-foreground italic">{t.noCertifications}</p>
                   )}
                 </div>
 

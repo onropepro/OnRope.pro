@@ -1,0 +1,279 @@
+# Ground Crew Passport Instructions v1.0
+**System**: OnRopePro - Rope Access Management Platform  
+**Domain**: Ground Crew Passport & Employment  
+**Version**: 1.0  
+**Last Updated**: December 27, 2024  
+**Status**: PRODUCTION-READY  
+**Safety Critical**: Indirect - Tracks employment and personal safety documents
+
+---
+
+## Terminology
+
+| Term | Definition |
+|------|------------|
+| **Passport** | The personal portable profile view (`/ground-crew-portal`). Contains profile, documents, job board, and employer connections. Uses forest green branding. |
+| **Dashboard** | The company work dashboard (`/dashboard`) accessed when linked to an employer. Uses employer's blue branding. |
+
+---
+
+## Purpose and Goal
+
+### Primary Objective
+The Ground Crew **Passport** is the personal portable profile for ground-based support workers who assist rope access technicians. Similar to the Technician Passport but with role-specific features, it manages profile information, employer connections, work history, and document uploads. Ground crew members work alongside technicians but do not perform rope access work themselves.
+
+### Key Goals
+- **Profile Management**: Personal information, emergency contacts, payroll details
+- **Employment Connections**: Link to employers via team invitations
+- **Document Storage**: Upload licenses, first aid certificates, void cheques
+- **Job Discovery**: Browse ground crew job board
+
+### Core Business Value
+- **Portable Account**: One account works across all employers
+- **Document Centralization**: All work documents in one place
+- **Employer Flexibility**: Connect to multiple employers with portable account
+- **Role-Specific Features**: Tailored for ground crew needs (no certification tracking)
+
+---
+
+## System Architecture
+
+### Component Overview
+
+```
++-------------------------------------------------------------------------+
+|                      GROUND CREW PASSPORT                                |
++-------------------------------------------------------------------------+
+|                                                                          |
+|  +------------------+     +--------------------+     +------------------+|
+|  | DashboardSidebar |     | GroundCrewPortal   |     | Account State    ||
+|  | (variant=gc)     |     | (.tsx ~2K lines)   |     | (Linked/Unlinked)||
+|  +------------------+     +--------------------+     +------------------+|
+|         |                         |                         |            |
+|         v                         v                         v            |
+|  +-------------------------------------------------------------------+  |
+|  |                    NAVIGATION GROUPS                               |  |
+|  |  Dashboard Link | Navigation | Employment | Resources              |  |
+|  +-------------------------------------------------------------------+  |
+|                                                                          |
++-------------------------------------------------------------------------+
+```
+
+### Passport vs Dashboard Experiences
+
+**SAME PATTERN AS TECHNICIAN**: Ground crew can access **two completely separate experiences** when linked:
+
+| Experience | Route | Component | Sidebar Variant | Brand Color |
+|------------|-------|-----------|-----------------|-------------|
+| **Passport** | `/ground-crew-portal` | `GroundCrewPortal.tsx` | `variant="ground-crew"` | Forest Green `#5D7B6F` |
+| **Dashboard** | `/dashboard` | `Dashboard.tsx` via `DashboardLayout` | `variant="employer"` | Blue `#0B64A3` |
+
+**Unlinked**: Passport only (green sidebar)  
+**Linked**: Both Passport (green) AND Dashboard (blue employer sidebar)
+
+**Employment Status Terminology:**
+| Status | Database Field | UI Label | Description |
+|--------|---------------|----------|-------------|
+| **Active** | `suspendedAt = null` | "Active" | Employee can access Work Dashboard |
+| **Inactive** | `suspendedAt = <date>` | "Inactive" | Temporary seat removal (slow periods) - cannot access Dashboard |
+| **Terminated** | `terminatedDate = <date>` | N/A | Permanent separation - must accept new invitation |
+
+### Comparison: Ground Crew vs Technician
+
+| Feature | Ground Crew | Technician |
+|---------|-------------|------------|
+| Portal File | `GroundCrewPortal.tsx` (~2K lines) | `TechnicianPortal.tsx` (~6.4K lines) |
+| Brand Color | Forest Green `#5D7B6F` | Rust `#AB4521` |
+| IRATA/SPRAT Certification | No | Yes |
+| Rope Access Hours Logging | No | Yes |
+| Safety Rating (PSR) | No | Yes |
+| Job Board | `/ground-crew-job-board` | `/technician-job-board` |
+| PLUS Access Tier | No | Yes (referral system) |
+| Visibility Settings | No | Yes |
+| Work Dashboard Access | Yes (when linked) | Yes (when linked) |
+
+### Integration Points
+
+- **Upstream Systems**: 
+  - Portable Accounts: Same architecture as technician
+  - Team Invitations: Same invitation workflow
+  
+- **Downstream Systems**:
+  - Employer Dashboard: Linked ground crew appear in team
+  - Job Board: Ground crew-specific listings
+
+---
+
+## Dependency Impact & Invariants
+
+### Non-negotiable Invariants
+
+#### 1. PORTABLE ACCOUNT ARCHITECTURE
+**Rule**: Ground crew accounts follow same portable account pattern as technicians
+
+```typescript
+// Ground crew maintains personal data independent of employer
+users.role = 'ground_crew'  // or 'ground_crew_supervisor'
+users.companyId             // Current employer (nullable)
+users.suspendedAt           // Temporary inactivation date (nullable)
+users.terminatedDate        // Permanent separation date (nullable)
+```
+
+- **Impact if violated**: Employment history lost on job change
+- **Enforcement mechanism**: Personal data on user record, not employer-controlled
+
+#### 2. DASHBOARD ACCESS CONTROL
+**Rule**: Dashboard access requires linked status AND active (not suspended) status
+
+```typescript
+// Dashboard access: Has employer, not terminated, and not inactive
+const canAccessDashboard = user.companyId && !user.terminatedDate && !user.suspendedAt;
+
+// Disabled states show appropriate messaging:
+// - No companyId: "You need to be linked with a company..."
+// - terminatedDate set: "Your employment has been terminated..."
+// - suspendedAt set: "You are currently inactive. Contact your employer..."
+```
+
+- **Impact if violated**: Inactive employees could access work tools
+- **Enforcement mechanism**: State checked before enabling Dashboard button
+
+#### 3. ROLE-BASED FEATURE VISIBILITY
+**Rule**: Ground crew does not see technician-specific features
+
+Ground crew portal excludes:
+- IRATA/SPRAT certification tracking
+- Rope access hours logging
+- Safety Rating (PSR)
+- Practice quizzes
+- Visibility settings (employer search)
+
+- **Impact if violated**: Confusion, incorrect data collection
+- **Enforcement mechanism**: Separate portal with different navigation groups
+
+---
+
+## Technical Implementation
+
+### Primary File
+```
+client/src/pages/GroundCrewPortal.tsx (~2,070 lines)
+```
+
+### Navigation Groups
+
+```typescript
+const groundCrewNavGroups: NavGroup[] = [
+  {
+    id: "dashboard",
+    label: "",
+    items: [
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard", isVisible: () => true },
+    ],
+  },
+  {
+    id: "main",
+    label: "NAVIGATION",
+    items: [
+      { id: "home", label: "Home", icon: Home, onClick: () => setActiveTab('home'), isVisible: () => true },
+      { id: "profile", label: "Profile", icon: User, onClick: () => setActiveTab('profile'), isVisible: () => true },
+      { id: "more", label: "More", icon: MoreHorizontal, onClick: () => setActiveTab('more'), isVisible: () => true },
+    ],
+  },
+  {
+    id: "employment",
+    label: "EMPLOYMENT",
+    items: [
+      { id: "job-board", label: "Job Board", icon: Briefcase, href: "/ground-crew-job-board", isVisible: () => true },
+      { id: "invitations", label: "Team Invitations", icon: Mail, badge: pendingInvitations.length, badgeType: "alert", isVisible: () => true },
+    ],
+  },
+  {
+    id: "resources",
+    label: "RESOURCES",
+    items: [
+      { id: "help", label: "Help Center", icon: Shield, href: "/help", isVisible: () => true },
+    ],
+  },
+];
+```
+
+### Tabs System
+
+```typescript
+type TabType = 'home' | 'profile' | 'invitations' | 'more';
+
+const [activeTab, setActiveTab] = useState<TabType>('home');
+```
+
+### Profile Fields
+
+Ground crew profiles include:
+- Personal information (name, email, phone, birthday)
+- Address details
+- Emergency contact
+- Payroll information (SIN, bank details)
+- Driver's license
+- Medical conditions
+- First aid certification
+- Uploaded documents (license photos, void cheque, driver abstract)
+
+### Multilingual Support
+
+Same as Technician Portal: English, French, Spanish
+
+---
+
+## User Experience
+
+### Desktop Layout
+- **Fixed sidebar** (left): Ground crew-branded (#5D7B6F) using `DashboardSidebar` with `variant="ground-crew"`
+- **Header bar** (top): `DashboardSearch` component (visible on md+ screens), `LanguageDropdown`, profile button, logout
+- **Main content area**: Tab-specific content (`home`, `profile`, `invitations`, `more`)
+
+### Common Workflows
+
+1. **Accept Team Invitation**
+   - Receive invitation → Navigate to Invitations tab → Accept/Decline → Linked to employer
+   
+2. **Update Profile**
+   - Profile tab → Edit Profile → Update personal/payroll/document info → Save
+   
+3. **Upload Documents**
+   - Profile tab → Documents section → Upload license/abstract/void cheque
+
+---
+
+## Testing Requirements
+
+### Role Tests
+```typescript
+describe('Ground Crew Portal', () => {
+  test('ground_crew role can access portal', () => {
+    // Authenticate as ground_crew role
+    // Assert portal loads correctly
+  });
+  
+  test('technician-specific features not visible', () => {
+    // Render ground crew portal
+    // Assert no IRATA certification UI
+    // Assert no hours logging UI
+  });
+});
+```
+
+---
+
+## Related Documentation
+
+- [shared-dashboard-components-v1.0.md](./shared-dashboard-components-v1.0.md) - Sidebar and layout components
+- [technician-passport-instructions-v1.0.md](./technician-passport-instructions-v1.0.md) - Similar passport for technicians
+- [employer-dashboard-instructions-v1.0.md](./employer-dashboard-instructions-v1.0.md) - Employer dashboard ground crew links to
+- `ConnectionsGuide.tsx` - Portable accounts architecture
+
+---
+
+## Version History
+
+- **v1.0** (December 25, 2024): Initial documentation
+- **v1.1** (December 26, 2024): Added suspendedAt field documentation, Active/Inactive terminology, dashboard access control invariant

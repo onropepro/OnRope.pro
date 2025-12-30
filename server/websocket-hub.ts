@@ -156,6 +156,21 @@ class WebSocketHub {
     await this.invalidateUserSessions(userId);
   }
 
+  // Notify user that their historical hours have been updated (added/deleted)
+  // This enables real-time sync across multiple devices
+  notifyHistoricalHoursUpdated(userId: string) {
+    const userConnections = this.connections.get(userId);
+    if (userConnections) {
+      const message = JSON.stringify({ type: 'historical-hours:updated' });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified user ${userId} of historical hours update`);
+    }
+  }
+
   // Notify technician that their access to a specific company has been suspended
   // This does NOT logout the technician - they can still access their portal
   notifyEmployerSuspension(userId: string, companyId: string, companyName: string) {
@@ -172,6 +187,103 @@ class WebSocketHub {
           ws.send(message);
         }
       });
+    }
+  }
+
+  // Notify property manager when a new quote is linked to them
+  notifyQuoteCreated(propertyManagerId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    status: string;
+    grandTotal: string | null;
+    createdAt: Date | string;
+    companyName: string | null;
+  }) {
+    const userConnections = this.connections.get(propertyManagerId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:created',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified property manager ${propertyManagerId} of new quote ${quote.quoteNumber}`);
+    }
+  }
+
+  // Notify company when a quote is accepted by property manager
+  notifyQuoteAccepted(companyId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    propertyManagerName: string | null;
+  }) {
+    const userConnections = this.connections.get(companyId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:accepted',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified company ${companyId} that quote ${quote.quoteNumber} was accepted`);
+    }
+  }
+
+  // Notify company when a quote is declined by property manager
+  notifyQuoteDeclined(companyId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    propertyManagerName: string | null;
+    reason: string | null;
+  }) {
+    const userConnections = this.connections.get(companyId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:declined',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified company ${companyId} that quote ${quote.quoteNumber} was declined`);
+    }
+  }
+
+  // Notify company when a property manager submits a counter-offer
+  notifyQuoteCounterOffer(companyId: string, quote: {
+    id: string;
+    quoteNumber: string | null;
+    buildingName: string | null;
+    strataPlanNumber: string | null;
+    propertyManagerName: string | null;
+    counterOfferAmount: string;
+  }) {
+    const userConnections = this.connections.get(companyId);
+    if (userConnections) {
+      const message = JSON.stringify({ 
+        type: 'quote:counter_offer',
+        quote
+      });
+      userConnections.forEach(ws => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(message);
+        }
+      });
+      console.log(`WebSocket: Notified company ${companyId} that quote ${quote.quoteNumber} received a counter-offer`);
     }
   }
 }

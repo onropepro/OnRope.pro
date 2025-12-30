@@ -3,16 +3,27 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, projects as projectsTable } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, equipmentCatalog, jobAssignments, scheduledJobs, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications, technicianEmployerConnections, featureRequests, featureRequestMessages, notifications, futureIdeas, insertFutureIdeaSchema, VALID_SHORTFALL_REASONS, insertTechnicianDocumentRequestSchema, technicianDocumentRequests, technicianDocumentRequestFiles, workNotices, insertWorkNoticeSchema, customNoticeTemplates, dashboardPreferences, sidebarPreferences, projects as projectsTable, incidentReports, clients, quizAttempts, founderResources, insertFounderResourceSchema, databaseCosts, insertDatabaseCostSchema, userCertifications, insertUserCertificationSchema, csrRatingHistory } from "@shared/schema";
 import { CARD_REGISTRY, getAvailableCardsForUser, getDefaultLayoutForRole, getCardsByCategory } from "@shared/dashboardCards";
 import { eq, sql, and, or, isNull, not, gt, gte, lt, lte, desc, asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
+import * as XLSX from "xlsx";
 import * as stripeService from "./stripe-service";
 import Stripe from "stripe";
-import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
+import { 
+  type TierName, 
+  type Currency, 
+  type BillingFrequency,
+  TIER_CONFIG, 
+  ADDON_CONFIG,
+  STRIPE_PRICE_IDS,
+  TRIAL_PERIOD_DAYS,
+  getBasePriceId,
+  detectCurrencyFromCountry
+} from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
 import { getDefaultElevation, usesPercentageProgress } from "@shared/jobTypes";
@@ -25,6 +36,7 @@ import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
 import { sendQuoteNotificationSMS } from "./services/twilio";
+import { sendTeamInvitationSMS, sendInvitationAcceptedSMS } from "./services/twilioService";
 import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
@@ -166,6 +178,18 @@ function canViewCSR(user: any): boolean {
   return permissions.includes('view_csr');
 }
 
+// Helper function to check if user can manage clients
+function canManageClients(user: any): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // All other roles need explicit permission
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('manage_clients');
+}
+
 // Helper function to get CSR rating label and color based on percentage
 // Per SCR.RATING.md: 90-100% Green (Excellent), 70-89% Yellow (Good), 50-69% Orange (Needs Improvement), <50% Red (Poor)
 function getCsrRatingInfo(percentage: number): { label: string; color: string } {
@@ -272,32 +296,46 @@ export async function calculateCompanyCSR(companyId: string, storage: any, skipH
   for (const project of projects) {
     if (project.status === 'deleted') continue;
     const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id);
-    const totalWorkSessionsForProject = projectSessions.length;
     
-    if (totalWorkSessionsForProject === 0) continue;
+    if (projectSessions.length === 0) continue;
     
     let completedInspectionsForProject = 0;
+    let applicableWorkSessionsForProject = 0;
+    
     for (const session of projectSessions) {
       if (!session.employeeId || !session.workDate) continue;
       const dateStr = normalizeDateToString(session.workDate);
-      const hasInspection = harnessInspections.some((insp: any) =>
+      
+      // Find any inspection for this worker on this date
+      const workerInspection = harnessInspections.find((insp: any) =>
         insp.workerId === session.employeeId && 
-        normalizeDateToString(insp.inspectionDate) === dateStr &&
-        insp.overallStatus !== "not_applicable"
+        normalizeDateToString(insp.inspectionDate) === dateStr
       );
-      if (hasInspection) completedInspectionsForProject++;
+      
+      // Skip work sessions where inspection is not_applicable (ground crew, ground-level work)
+      if (workerInspection?.overallStatus === "not_applicable") {
+        continue;
+      }
+      
+      // Count this as an applicable work session that requires inspection
+      applicableWorkSessionsForProject++;
+      
+      // Count as completed if there's a pass or fail inspection
+      if (workerInspection && (workerInspection.overallStatus === "pass" || workerInspection.overallStatus === "fail")) {
+        completedInspectionsForProject++;
+      }
     }
     
-    harnessRequiredInspections += totalWorkSessionsForProject;
+    harnessRequiredInspections += applicableWorkSessionsForProject;
     harnessCompletedInspections += completedInspectionsForProject;
     
-    const projectPoints = totalWorkSessionsForProject > 0 ? completedInspectionsForProject / totalWorkSessionsForProject : 0;
+    const projectPoints = applicableWorkSessionsForProject > 0 ? completedInspectionsForProject / applicableWorkSessionsForProject : 0;
     harnessInspectionPoints += projectPoints;
     
     harnessProjectBreakdown.push({
       projectId: project.id,
       projectName: project.name,
-      workSessions: totalWorkSessionsForProject,
+      workSessions: applicableWorkSessionsForProject,
       inspections: completedInspectionsForProject,
       points: Math.round(projectPoints * 100) / 100
     });
@@ -811,7 +849,39 @@ async function generateReferralCode(): Promise<string> {
   throw new Error('Failed to generate unique referral code after maximum attempts');
 }
 
+// Generate unique 10-character PM code for property managers using cryptographically secure randomness
+async function generatePmCode(): Promise<string> {
+  const crypto = await import('crypto');
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
+  const codeLength = 10;
+  const maxAttempts = 10;
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const randomBytes = crypto.randomBytes(codeLength);
+    let code = '';
+    
+    for (let i = 0; i < codeLength; i++) {
+      const randomIndex = randomBytes[i] % characters.length;
+      code += characters.charAt(randomIndex);
+    }
+    
+    // Check if code already exists
+    const [existing] = await db.select().from(users).where(eq(users.pmCode, code)).limit(1);
+    if (!existing) {
+      return code;
+    }
+  }
+  
+  throw new Error('Failed to generate unique PM code after maximum attempts');
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Helper function to check if user is superuser or staff with specific permission
+  const isSuperuserOrHasPermission = (req: Request, permission: string): boolean => {
+    if (req.session.userId === 'superuser') return true;
+    if (req.session.role === 'staff' && req.session.staffPermissions?.includes(permission)) return true;
+    return false;
+  };
   // ==================== HELP CENTER ROUTES ====================
   app.use('/api/help', helpRouter);
   
@@ -1337,6 +1407,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bankInstitutionNumber,
         bankAccountNumber,
         driversLicenseNumber,
+        driversLicenseIssuedDate,
         driversLicenseExpiry,
         birthday,
         specialMedicalConditions,
@@ -1514,6 +1585,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Contact info
         employeePhoneNumber: phone,
+        smsNotificationsEnabled: true,
         emergencyContactName,
         emergencyContactPhone,
         emergencyContactRelationship: emergencyContactRelationship || null,
@@ -1601,6 +1673,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Ground crew self-registration endpoint - SECURITY: Rate limited to prevent abuse
+  app.post("/api/ground-crew-register", registrationRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        streetAddress,
+        city,
+        provinceState,
+        country,
+        postalCode,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        employerCode,
+      } = req.body;
+
+      // Validate required fields
+      if (!firstName || !lastName || !email || !password || !phone || !emergencyContactName || !emergencyContactPhone) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      console.log(`[Ground-Crew-Register] Starting registration for ${email}`);
+
+      // Case-insensitive email check for existing user
+      const normalizedEmail = email.toLowerCase();
+      const existingUser = await storage.getUserByEmail(email);
+      
+      if (existingUser) {
+        console.log(`[Ground-Crew-Register] Email already exists: ${email}`);
+        return res.status(400).json({ message: "Email already registered" });
+      }
+
+      // If employer code is provided, validate it
+      let invitingEmployer = null;
+      if (employerCode) {
+        // Look up the employer by their company's property manager code (used for invitations)
+        const companyResults = await db.select().from(users).where(
+          and(
+            eq(users.role, 'company'),
+            sql`LOWER(${users.propertyManagerCode}) = ${employerCode.toLowerCase()}`
+          )
+        ).limit(1);
+        
+        if (companyResults.length === 0) {
+          console.log(`[Ground-Crew-Register] Invalid employer code: ${employerCode}`);
+          return res.status(400).json({ message: "Invalid employer code" });
+        }
+        invitingEmployer = companyResults[0];
+        console.log(`[Ground-Crew-Register] Valid employer code found for company: ${invitingEmployer.companyName}`);
+      }
+
+      // Create the ground crew user (pending company approval)
+      const user = await storage.createUser({
+        name: `${firstName} ${lastName}`,
+        email,
+        role: 'ground_crew',
+        passwordHash: password, // storage.createUser will hash this
+        companyId: invitingEmployer ? invitingEmployer.id : null,
+        
+        // Address fields
+        employeeStreetAddress: streetAddress || null,
+        employeeCity: city || null,
+        employeeProvinceState: provinceState || null,
+        employeeCountry: country || null,
+        employeePostalCode: postalCode || null,
+        
+        // Contact info
+        employeePhoneNumber: phone,
+        smsNotificationsEnabled: true,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship: emergencyContactRelationship || null,
+        
+        // Start date - use timezone-safe utility
+        startDate: getTodayString(),
+      });
+
+      console.log('[Ground-Crew-Register] User created:', user.id);
+
+      // Create session and auto-login the ground crew member
+      req.session.userId = user.id;
+      req.session.role = user.role;
+      
+      console.log(`[Ground-Crew-Register] Session created for ground crew: ${user.id}, email: ${user.email}`);
+      
+      // Save session before responding
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) {
+            console.error(`[Ground-Crew-Register] Session save error:`, err);
+            reject(err);
+          } else {
+            console.log(`[Ground-Crew-Register] Session saved successfully for ${user.email}`);
+            resolve();
+          }
+        });
+      });
+
+      // Return success with user data
+      const { passwordHash, ...userWithoutPassword } = user;
+      res.json({ 
+        success: true,
+        message: "Registration completed successfully.",
+        user: userWithoutPassword,
+      });
+    } catch (error: any) {
+      console.error('[Ground-Crew-Register] Error:', error);
+      res.status(500).json({ message: error.message || "Registration failed" });
+    }
+  });
+
   // Login endpoint - SECURITY: Rate limited to prevent brute force attacks
   app.post("/api/login", loginRateLimiter, async (req: Request, res: Response) => {
     try {
@@ -1642,6 +1829,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // STAFF ACCOUNT CHECK - Check if this is a staff account login
+      const staffAccount = await storage.verifyStaffAccountPassword(identifier, password);
+      if (staffAccount) {
+        // Create staff session
+        req.session.userId = staffAccount.id;
+        req.session.role = 'staff';
+        req.session.staffPermissions = staffAccount.permissions as string[];
+        
+        await new Promise<void>((resolve, reject) => {
+          req.session.save((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
+        });
+        
+        // Return staff account payload
+        return res.json({
+          user: {
+            id: staffAccount.id,
+            name: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            email: staffAccount.email,
+            role: 'staff',
+            permissions: staffAccount.permissions,
+          }
+        });
+      }
+      
       // Try to find user by email, company name, or rope access license number
       let user = await storage.getUserByEmail(identifier);
       
@@ -1665,20 +1879,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      // Check if user has been terminated (only applies to non-technicians)
+      // Check if user has been terminated (only applies to non-technicians and non-ground-crew)
       // Technicians can still access their portal even if terminated from a company
       // Self-resigned users (technicians who voluntarily left) are ALWAYS allowed to log in
-      const isTechnician = user.role === 'rope_access_tech' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
+      const isLinkableEmployee = user.role === 'rope_access_tech' || user.role === 'ground_crew' || !!(user.ropeAccessLicenseNumber || user.irataCertNumber || user.spratCertNumber);
       const isSelfResigned = user.terminationReason === "Self-resigned";
       
-      if (user.terminatedDate && !isTechnician && !isSelfResigned) {
+      if (user.terminatedDate && !isLinkableEmployee && !isSelfResigned) {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
       // Check if user's seat has been suspended (company removed their seat)
       // Technicians can still access their portal even when suspended from a company
       // They just lose access to that specific company's dashboard
-      if (user.suspendedAt && !isTechnician) {
+      if (user.suspendedAt && !isLinkableEmployee) {
         return res.status(403).json({ message: "Your account access has been suspended. Please contact your employer for more information." });
       }
       
@@ -3127,7 +3341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only company accounts can purchase subscriptions" });
       }
 
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3135,6 +3349,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      }
+
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
       }
 
       // Get or create Stripe customer
@@ -3145,9 +3363,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateUser(user.id, { stripeCustomerId: customerId });
       }
 
-      // Get price ID for selected tier and currency
-      const tierConfig = TIER_CONFIG[tier as TierName];
-      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+      // Get price ID using the new billing frequency-aware function
+      const priceId = getBasePriceId(billingFrequency, currency);
 
       // Construct base URL from request (works in both dev and production)
       const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
@@ -3192,7 +3409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only company accounts can purchase subscriptions" });
       }
 
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3200,6 +3417,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
       }
 
       // Get or create Stripe customer
@@ -3263,7 +3483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/stripe/create-embedded-license-checkout", async (req: Request, res: Response) => {
     try {
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3273,9 +3493,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
       }
 
-      // Get price ID for selected tier and currency
-      const tierConfig = TIER_CONFIG[tier as TierName];
-      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
+
+      // Get price ID using the new billing frequency-aware function
+      const priceId = getBasePriceId(billingFrequency, currency);
 
       // Construct base URL from request
       const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
@@ -3297,6 +3520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: {
           tier,
           currency,
+          billingFrequency,
           newCustomer: 'true',
         },
         subscription_data: {
@@ -3304,6 +3528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           metadata: {
             tier,
             currency,
+            billingFrequency,
           },
         },
         allow_promotion_codes: true,
@@ -3319,13 +3544,344 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
+   * Create Stripe embedded checkout for NEW employer registration
+   * POST /api/stripe/create-registration-checkout
+   * No authentication required - this is for new employer signups
+   * 
+   * New flow: Accepts account details + billing frequency, creates checkout session
+   * Billing address collected by Stripe will be used as company address
+   * License key generated server-side, never shown to user
+   */
+  app.post("/api/stripe/create-registration-checkout", async (req: Request, res: Response) => {
+    try {
+      const { 
+        companyName, 
+        ownerName, 
+        email, 
+        password,
+        billingFrequency = 'monthly' 
+      } = req.body;
+
+      // Validate required fields
+      if (!companyName || !ownerName || !email || !password) {
+        return res.status(400).json({ message: "Company name, owner name, email, and password are required" });
+      }
+
+      // Validate email format
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // Check if email already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "An account with this email already exists" });
+      }
+
+      // Validate billing frequency
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
+
+      // Default to USD - will be updated based on billing country after checkout
+      const currency: Currency = 'usd';
+      
+      // Get base price ID for the selected frequency (defaults to USD, will be updated by Stripe based on billing country)
+      const priceId = getBasePriceId(billingFrequency as BillingFrequency, currency);
+
+      // Construct base URL from request
+      const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
+      const host = req.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
+      // Hash the password before storing in metadata
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      // Create embedded checkout session with user data in metadata
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        ui_mode: 'embedded',
+        redirect_on_completion: 'never',
+        metadata: {
+          registrationType: 'employer',
+          companyName,
+          ownerName,
+          email,
+          passwordHash,
+          billingFrequency,
+          newCustomer: 'true',
+        },
+        subscription_data: {
+          trial_period_days: TRIAL_PERIOD_DAYS,
+          metadata: {
+            billingFrequency,
+            companyName,
+          },
+        },
+        allow_promotion_codes: true,
+        billing_address_collection: 'required',
+        customer_email: email,
+      });
+
+      console.log(`[Stripe] Registration checkout session created: ${session.id} for ${companyName}`);
+      res.json({ clientSecret: session.client_secret, sessionId: session.id });
+    } catch (error: any) {
+      console.error('[Stripe] Create registration checkout error:', error);
+      res.status(500).json({ message: error.message || "Failed to create registration checkout" });
+    }
+  });
+
+  /**
+   * Complete employer registration after embedded checkout
+   * GET /api/stripe/complete-registration/:sessionId
+   * 
+   * New flow: Validates completed checkout session, creates company account
+   * using data stored in session metadata. Billing address becomes company address.
+   * License key stored on company record, never exposed to user.
+   */
+  app.get("/api/stripe/complete-registration/:sessionId", async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      console.log(`[Registration] Processing registration for session: ${sessionId}`);
+
+      // Check if we already processed this session (idempotency via licenseKeys table)
+      const existingLicenseForSession = await db.query.licenseKeys.findFirst({
+        where: eq(licenseKeys.stripeSessionId, sessionId),
+      });
+
+      if (existingLicenseForSession) {
+        // Session already processed, find the associated company
+        const existingCompany = await db.query.users.findFirst({
+          where: eq(users.stripeCustomerId, existingLicenseForSession.stripeCustomerId),
+        });
+        
+        console.log(`[Registration] Session ${sessionId} already processed for company: ${existingCompany?.companyName}`);
+        return res.json({
+          flow: 'embedded',
+          success: true,
+          alreadyProcessed: true,
+          companyName: existingCompany?.companyName,
+          message: 'Registration already completed',
+        });
+      }
+
+      // Retrieve the session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['subscription', 'customer'],
+      });
+
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+
+      // Verify session is completed
+      if (session.status !== 'complete') {
+        return res.status(400).json({ message: `Checkout not completed. Status: ${session.status}` });
+      }
+
+      // Verify this is a registration checkout
+      const registrationType = session.metadata?.registrationType;
+      if (registrationType !== 'employer') {
+        return res.status(400).json({ message: "Invalid registration type. Use the legacy flow for license purchases." });
+      }
+
+      // Extract registration data from metadata
+      const companyName = session.metadata?.companyName;
+      const ownerName = session.metadata?.ownerName;
+      const email = session.metadata?.email;
+      const passwordHash = session.metadata?.passwordHash;
+      const billingFrequency = session.metadata?.billingFrequency || 'monthly';
+
+      if (!companyName || !ownerName || !email || !passwordHash) {
+        return res.status(400).json({ message: "Missing required registration data in session" });
+      }
+
+      // Check if account already exists (may have been created from a different checkout session)
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        // If the existing user was created from a registration flow (has licenseKey),
+        // treat this as "already processed" rather than an error
+        if (existingUser.role === 'company' && existingUser.licenseKey) {
+          console.log(`[Registration] Account already exists for ${email}, treating as already processed`);
+          
+          // Auto-login the user since they successfully completed checkout
+          req.session.userId = existingUser.id;
+          req.session.userRole = existingUser.role;
+          
+          return res.json({
+            flow: 'embedded',
+            success: true,
+            alreadyProcessed: true,
+            companyName: existingUser.companyName,
+            email: existingUser.email,
+            trialEnd: null,
+            message: 'Registration already completed',
+          });
+        }
+        return res.status(400).json({ message: "An account with this email already exists" });
+      }
+
+      // Check company name uniqueness
+      const existingCompanyByName = await storage.getUserByCompanyName(companyName);
+      if (existingCompanyByName) {
+        // Same check - if same email, likely same registration
+        if (existingCompanyByName.email === email) {
+          console.log(`[Registration] Company ${companyName} already exists for ${email}, treating as already processed`);
+          
+          req.session.userId = existingCompanyByName.id;
+          req.session.userRole = existingCompanyByName.role;
+          
+          return res.json({
+            flow: 'embedded',
+            success: true,
+            alreadyProcessed: true,
+            companyName: existingCompanyByName.companyName,
+            email: existingCompanyByName.email,
+            trialEnd: null,
+            message: 'Registration already completed',
+          });
+        }
+        return res.status(400).json({ message: "A company with this name already exists" });
+      }
+
+      // Get Stripe customer and subscription data
+      const stripeCustomerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+      const subscription = session.subscription as Stripe.Subscription;
+      const stripeSubscriptionId = typeof subscription === 'string' ? subscription : subscription?.id;
+
+      if (!stripeCustomerId || !stripeSubscriptionId) {
+        return res.status(400).json({ message: "Missing customer or subscription data" });
+      }
+
+      // Get billing address from session (if available)
+      const billingDetails = session.customer_details;
+      const address = billingDetails?.address;
+      
+      // Determine currency from billing country
+      const billingCountry = address?.country?.toUpperCase();
+      const currency = billingCountry === 'CA' ? 'cad' : 'usd';
+
+      // Generate license key server-side (never exposed to user)
+      const licenseKey = `ORP-${generateRandomSegment()}-${generateRandomSegment()}-${generateRandomSegment()}-B`;
+
+      // Generate unique codes for resident and property manager linking
+      const residentCode = await generateResidentCode();
+      const propertyManagerCode = await generatePropertyManagerCode();
+
+      // Create company account (role='company')
+      const [newCompany] = await db.insert(users).values({
+        email,
+        passwordHash, // Already hashed during checkout creation
+        role: 'company',
+        companyName,
+        name: ownerName,
+        // Stripe fields
+        stripeCustomerId,
+        stripeSubscriptionId,
+        licenseKey,
+        subscriptionTier: 'base',
+        subscriptionStatus: 'trialing',
+        // Address from Stripe billing
+        streetAddress: address?.line1 ? `${address.line1}${address.line2 ? ', ' + address.line2 : ''}` : null,
+        city: address?.city || null,
+        province: address?.state || null,
+        country: address?.country || null,
+        zipCode: address?.postal_code || null,
+        // Codes for linking
+        residentCode,
+        propertyManagerCode,
+        // Defaults
+        active: true,
+        onboardingComplete: false,
+      }).returning();
+
+      console.log(`[Registration] Created company: ${newCompany.companyName} (${newCompany.id})`);
+
+      // Get trial end date from subscription (needed for response)
+      const trialEnd = subscription && typeof subscription !== 'string' ? subscription.trial_end : null;
+
+      // Run independent operations in parallel for faster registration
+      // 1. License key record insertion (for tracking/idempotency)
+      // 2. Payroll config + period generation
+      // 3. Session save for auto-login
+      const licenseKeyPromise = db.insert(licenseKeys).values({
+        licenseKey,
+        stripeSessionId: sessionId,
+        stripeCustomerId,
+        stripeSubscriptionId,
+        tier: 'base',
+        currency,
+        used: true,
+        usedBy: newCompany.id,
+        usedAt: new Date(),
+      });
+
+      const payrollPromise = (async () => {
+        try {
+          await storage.createPayPeriodConfig({
+            companyId: newCompany.id,
+            periodType: 'semi-monthly',
+            firstPayDay: 15,
+            secondPayDay: 30,
+          });
+          await storage.generatePayPeriods(newCompany.id, 6);
+        } catch (error) {
+          console.error('[Registration] Error creating default payroll config:', error);
+        }
+      })();
+
+      const sessionPromise = new Promise<void>((resolve, reject) => {
+        req.session.userId = newCompany.id;
+        req.session.role = newCompany.role;
+        req.session.save((err) => {
+          if (err) {
+            console.error('[Registration] Session save error:', err);
+            reject(err);
+          } else {
+            console.log(`[Registration] Session created for ${newCompany.email}`);
+            resolve();
+          }
+        });
+      });
+
+      // Wait for all parallel operations to complete
+      await Promise.all([licenseKeyPromise, payrollPromise, sessionPromise]);
+
+      console.log(`[Registration] Registration completed for ${companyName}`);
+
+      res.json({
+        flow: 'embedded',
+        success: true,
+        companyName: newCompany.companyName,
+        email: newCompany.email,
+        trialEnd,
+        message: 'Registration completed successfully',
+      });
+
+    } catch (error: any) {
+      console.error('[Registration] Complete registration error:', error);
+      res.status(500).json({ 
+        message: error.message || "Failed to complete registration",
+        details: error.message 
+      });
+    }
+  });
+
+  /**
    * Create Stripe checkout session for NEW customers (license purchase)
    * POST /api/stripe/create-license-checkout
    * No authentication required - this is for new customers
    */
   app.post("/api/stripe/create-license-checkout", async (req: Request, res: Response) => {
     try {
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3333,6 +3889,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
       }
 
       // Get price ID for selected tier and currency
@@ -3682,7 +4241,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const filtered = cards.filter(card => {
           if (card.permission === null) return true;
           if (user.role === 'company') return true;
-          return user.permissions?.includes(card.permission.replace('can', 'view_').replace('manage', 'manage_'));
+          // Convert camelCase permission to snake_case (e.g., viewProjects -> view_projects)
+          const snakeCasePermission = card.permission.replace(/([A-Z])/g, '_$1').toLowerCase();
+          return user.permissions?.includes(snakeCasePermission);
         });
         if (filtered.length > 0) {
           filteredGrouped[category] = filtered.map(c => ({
@@ -3783,6 +4344,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // =====================================================================
   // END DASHBOARD PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // =====================================================================
+  // SIDEBAR PREFERENCES ENDPOINTS
+  // =====================================================================
+
+  // Get user's sidebar preferences for a specific dashboard variant
+  app.get("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant } = req.query;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant query parameter is required" });
+      }
+
+      const validVariants = ['employer', 'technician', 'property-manager', 'resident', 'building-manager', 'ground-crew'];
+      if (!validVariants.includes(variant)) {
+        return res.status(400).json({ message: `Invalid variant. Must be one of: ${validVariants.join(', ')}` });
+      }
+
+      const prefs = await db.select()
+        .from(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ))
+        .orderBy(asc(sidebarPreferences.groupId), asc(sidebarPreferences.position));
+
+      // Group by groupId for easier frontend consumption
+      const grouped: Record<string, { itemId: string; position: number }[]> = {};
+      for (const pref of prefs) {
+        if (!grouped[pref.groupId]) {
+          grouped[pref.groupId] = [];
+        }
+        grouped[pref.groupId].push({
+          itemId: pref.itemId,
+          position: pref.position,
+        });
+      }
+
+      res.json({ 
+        preferences: grouped,
+        variant,
+        isDefault: prefs.length === 0,
+      });
+    } catch (error: any) {
+      console.error('[Sidebar] Get preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to get sidebar preferences" });
+    }
+  });
+
+  // Save user's sidebar preferences for a specific dashboard variant
+  app.put("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant, groups } = req.body;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant is required" });
+      }
+
+      const validVariants = ['employer', 'technician', 'property-manager', 'resident', 'building-manager', 'ground-crew'];
+      if (!validVariants.includes(variant)) {
+        return res.status(400).json({ message: `Invalid variant. Must be one of: ${validVariants.join(', ')}` });
+      }
+
+      if (!groups || typeof groups !== 'object') {
+        return res.status(400).json({ message: "groups must be an object with groupId keys" });
+      }
+
+      // Validate structure: groups is Record<string, { itemId: string; position: number }[]>
+      const inserts: { userId: string; dashboardVariant: string; groupId: string; itemId: string; position: number }[] = [];
+      for (const [groupId, items] of Object.entries(groups)) {
+        if (!Array.isArray(items)) {
+          return res.status(400).json({ message: `Group ${groupId} must contain an array of items` });
+        }
+        for (const item of items as any[]) {
+          if (!item.itemId || typeof item.position !== 'number') {
+            return res.status(400).json({ message: `Each item must have itemId and position` });
+          }
+          inserts.push({
+            userId,
+            dashboardVariant: variant,
+            groupId,
+            itemId: item.itemId,
+            position: item.position,
+          });
+        }
+      }
+
+      // Delete existing preferences for this variant
+      await db.delete(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ));
+
+      // Insert new preferences
+      if (inserts.length > 0) {
+        await db.insert(sidebarPreferences).values(inserts);
+      }
+
+      res.json({ success: true, variant, groupCount: Object.keys(groups).length });
+    } catch (error: any) {
+      console.error('[Sidebar] Save preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to save sidebar preferences" });
+    }
+  });
+
+  // Reset sidebar preferences to default for a specific variant
+  app.delete("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { variant } = req.query;
+
+      if (!variant || typeof variant !== 'string') {
+        return res.status(400).json({ message: "variant query parameter is required" });
+      }
+
+      await db.delete(sidebarPreferences)
+        .where(and(
+          eq(sidebarPreferences.userId, userId),
+          eq(sidebarPreferences.dashboardVariant, variant)
+        ));
+
+      res.json({ success: true, message: "Sidebar preferences reset to default" });
+    } catch (error: any) {
+      console.error('[Sidebar] Reset preferences error:', error);
+      res.status(500).json({ message: error.message || "Failed to reset sidebar preferences" });
+    }
+  });
+
+  // =====================================================================
+  // END SIDEBAR PREFERENCES ENDPOINTS
   // =====================================================================
 
   // =====================================================================
@@ -4020,7 +4716,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      res.json({ days });
+      res.json({ days, uniqueJobCount: activeProjects.length });
     } catch (error: any) {
       console.error('[Dashboard] Get week summary error:', error);
       res.status(500).json({ message: error.message || "Failed to get week summary" });
@@ -4156,9 +4852,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let startDate: Date;
       let endDate: Date;
       
-      if (config) {
+      if (config && config.periodStartDate) {
         // Calculate based on config
         const periodStart = new Date(config.periodStartDate);
+        // Validate the date is valid
+        if (isNaN(periodStart.getTime())) {
+          // Fall back to semi-monthly if config date is invalid
+          const dayOfMonth = today.getDate();
+          if (dayOfMonth <= 15) {
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            endDate = new Date(today.getFullYear(), today.getMonth(), 15, 23, 59, 59, 999);
+          } else {
+            startDate = new Date(today.getFullYear(), today.getMonth(), 16);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+          }
+        } else {
         const periodLength = config.periodType === 'weekly' ? 7 : 
                            config.periodType === 'biweekly' ? 14 : 
                            config.periodType === 'semi_monthly' ? 15 : 30;
@@ -4173,6 +4881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + periodLength - 1);
         endDate.setHours(23, 59, 59, 999); // Include full final day
+        }
       } else {
         // Default to biweekly
         const dayOfMonth = today.getDate();
@@ -4187,29 +4896,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const daysRemaining = Math.max(0, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
 
-      // Get work sessions in this period (inclusive bounds)
-      const sessions = await db.select()
-        .from(workSessions)
-        .where(and(
-          eq(workSessions.companyId, companyId),
-          gte(workSessions.startTime, startDate),
-          lte(workSessions.startTime, endDate)
-        ));
+      // Use existing payroll calculation (same data as payroll page)
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
+      const hoursSummary = await storage.getEmployeeHoursForPayPeriod(companyId, startDateStr, endDateStr);
 
+      // Aggregate the results
       let totalHours = 0;
-      for (const session of sessions) {
-        if (session.startTime && session.endTime) {
-          totalHours += (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
-        }
+      let totalCost = 0;
+      const employeeCount = hoursSummary.length;
+
+      for (const emp of hoursSummary) {
+        totalHours += emp.totalHours || 0;
+        totalCost += emp.totalPay || 0;
       }
 
       res.json({
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
-        daysRemaining,
         totalHours: Math.round(totalHours * 10) / 10,
+        totalCost: Math.round(totalCost),
+        employeeCount,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('[Dashboard] Get current pay period error:', error);
       res.status(500).json({ message: error.message || "Failed to get pay period" });
     }
@@ -4691,6 +5400,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Handle Staff account session
+      if (req.session.role === 'staff') {
+        const staffAccount = await storage.getStaffAccountById(req.session.userId!);
+        if (!staffAccount || !staffAccount.isActive) {
+          return res.status(401).json({ message: "Staff account not found or disabled" });
+        }
+        
+        return res.json({
+          user: {
+            id: staffAccount.id,
+            name: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            fullName: `${staffAccount.firstName} ${staffAccount.lastName}`,
+            email: staffAccount.email,
+            role: 'staff',
+            permissions: staffAccount.permissions,
+          }
+        });
+      }
+      
       let user = await storage.getUserById(req.session.userId!);
       
       if (!user) {
@@ -4767,6 +5495,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateUser(user.id, updates);
           // Refetch user to get the updated codes
           user = await storage.getUserById(user.id) || user;
+        }
+      }
+      
+      // Auto-generate PM code if property manager doesn't have one
+      if (user.role === 'property_manager' && !user.pmCode) {
+        try {
+          console.log('[/api/user] Property manager missing PM code, generating...');
+          const pmCode = await generatePmCode();
+          await storage.updateUser(user.id, { pmCode });
+          user = await storage.getUserById(user.id) || user;
+          console.log(`[/api/user] PM code generated: ${pmCode}`);
+        } catch (error) {
+          console.error('[/api/user] Failed to generate PM code:', error);
         }
       }
       
@@ -4868,6 +5609,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         email,
         employeePhoneNumber,
+        smsNotificationsEnabled,
         employeeStreetAddress,
         employeeCity,
         employeeProvinceState,
@@ -4881,6 +5623,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bankInstitutionNumber,
         bankAccountNumber,
         driversLicenseNumber,
+        driversLicenseIssuedDate,
         driversLicenseExpiry,
         birthday,
         specialMedicalConditions,
@@ -4918,11 +5661,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         email,
         employeePhoneNumber,
+        smsNotificationsEnabled,
         emergencyContactName,
         emergencyContactPhone,
       };
 
       // Add optional address fields only if provided
+      if (smsNotificationsEnabled !== undefined) updateData.smsNotificationsEnabled = smsNotificationsEnabled ?? false;
       if (employeeStreetAddress !== undefined) updateData.employeeStreetAddress = employeeStreetAddress || null;
       if (employeeCity !== undefined) updateData.employeeCity = employeeCity || null;
       if (employeeProvinceState !== undefined) updateData.employeeProvinceState = employeeProvinceState || null;
@@ -4930,6 +5675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (employeePostalCode !== undefined) updateData.employeePostalCode = employeePostalCode || null;
       if (emergencyContactRelationship !== undefined) updateData.emergencyContactRelationship = emergencyContactRelationship || null;
       if (birthday !== undefined) updateData.birthday = birthday || null;
+      if (driversLicenseIssuedDate !== undefined) updateData.driversLicenseIssuedDate = driversLicenseIssuedDate || null;
       if (driversLicenseExpiry !== undefined) updateData.driversLicenseExpiry = driversLicenseExpiry || null;
       if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
       if (irataHoursAtLastUpgrade !== undefined) updateData.irataHoursAtLastUpgrade = irataHoursAtLastUpgrade || null;
@@ -5044,6 +5790,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technician: Upload profile photo
+  // Uses Object Storage to save the photo and updates the photoUrl in the database
+  const profilePhotoUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB max
+    },
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'));
+      }
+    },
+  });
+
+  app.post("/api/technician/profile-photo", requireAuth, profilePhotoUpload.single('photo'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Allow technicians and ground crew to upload their own photo
+      const allowedRoles = ['rope_access_tech', 'ground_crew', 'operations_manager', 'office_admin', 'safety_officer'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can update their profile photo" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No photo file provided" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      
+      // Generate unique filename with user ID and timestamp
+      const fileExtension = req.file.originalname.split('.').pop() || 'jpg';
+      const fileName = `profile-photos/${userId}_${Date.now()}.${fileExtension}`;
+      
+      // Upload to object storage
+      const photoUrl = await objectStorageService.uploadPublicFile(
+        fileName,
+        req.file.buffer,
+        req.file.mimetype
+      );
+
+      // Update user's photoUrl in database
+      await storage.updateUser(userId, { photoUrl });
+
+      console.log(`[Profile-Photo] Photo uploaded for user ${userId}: ${photoUrl}`);
+
+      res.json({ success: true, photoUrl });
+    } catch (error: any) {
+      console.error("[Profile-Photo] Error uploading photo:", error);
+      res.status(500).json({ message: error.message || "Failed to upload profile photo" });
+    }
+  });
+
+  app.delete("/api/technician/profile-photo", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Allow technicians and ground crew to delete their own photo
+      const allowedRoles = ['rope_access_tech', 'ground_crew', 'operations_manager', 'office_admin', 'safety_officer'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can delete their profile photo" });
+      }
+
+      // Set photoUrl to null in database
+      await storage.updateUser(userId, { photoUrl: null });
+
+      console.log(`[Profile-Photo] Photo deleted for user ${userId}`);
+
+      res.json({ success: true, message: "Profile photo deleted" });
+    } catch (error: any) {
+      console.error("[Profile-Photo] Error deleting photo:", error);
+      res.status(500).json({ message: error.message || "Failed to delete profile photo" });
+    }
+  });
+
   // Technician: Update experience start date only
   // This is a simpler endpoint that only updates the rope access start date
   app.patch("/api/technician/experience-date", requireAuth, async (req: Request, res: Response) => {
@@ -5102,9 +5941,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Only technicians can use this endpoint
-      if (user.role !== 'rope_access_tech') {
-        return res.status(403).json({ message: "Only technicians can leave a company" });
+      // Technicians and ground crew can use this endpoint
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians and ground crew can leave a company" });
       }
 
       // Must be linked to a company to leave
@@ -5176,6 +6015,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Redeem a referral code after registration
+  // Allows technicians who missed entering a code during signup to help their referrer earn PLUS
+  app.post("/api/user/redeem-referral-code", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians can redeem referral codes
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can redeem referral codes" });
+      }
+
+      // Check if user has already used a referral code
+      if (user.referredByUserId || user.referredByCode) {
+        return res.status(400).json({ message: "You have already redeemed a referral code" });
+      }
+
+      const { referralCode } = req.body;
+      if (!referralCode || !referralCode.trim()) {
+        return res.status(400).json({ message: "Referral code is required" });
+      }
+
+      const normalizedCode = referralCode.trim().toUpperCase();
+
+      // Validate the referral code exists and belongs to a technician
+      const referrer = await storage.getUserByReferralCode(normalizedCode);
+      if (!referrer) {
+        return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+      }
+
+      // Verify the referrer is an active technician
+      if (referrer.role !== 'rope_access_tech') {
+        return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+      }
+
+      // Can't use your own referral code
+      if (referrer.id === userId) {
+        return res.status(400).json({ message: "You cannot use your own referral code" });
+      }
+
+      // Update the user with the referral information
+      await storage.updateUser(userId, {
+        referredByUserId: referrer.id,
+        referredByCode: normalizedCode,
+      });
+
+      console.log(`[Referral] User ${userId} redeemed referral code ${normalizedCode} from ${referrer.id}`);
+
+      res.json({ 
+        success: true,
+        message: `Referral code redeemed successfully! ${referrer.name || 'The referrer'} will now have PLUS access.`,
+        referrerName: referrer.name
+      });
+    } catch (error: any) {
+      console.error("[Referral] Error redeeming referral code:", error);
+      res.status(500).json({ message: error.message || "Failed to redeem referral code" });
+    }
+  });
+
   // Multer config for technician document uploads (images or PDFs)
   const technicianDocumentUpload = multer({
     storage: multer.memoryStorage(),
@@ -5199,7 +6104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can upload documents through this endpoint" });
       }
 
@@ -5212,7 +6117,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type is required" });
       }
 
-      const validTypes = ['voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard', 'resume'];
+      const validTypes = [
+        'voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard', 'irataCertificationCard', 'spratCertificationCard', 'resume'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -5273,7 +6179,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can delete documents through this endpoint" });
       }
 
@@ -5282,7 +6188,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Document type and URL are required" });
       }
 
-      const validTypes = ['bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments', 'irataDocuments', 'spratDocuments', 'resumeDocuments'];
+      const validTypes = [
+        'bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments', 'irataDocuments', 'spratDocuments', 'resumeDocuments'];
       if (!validTypes.includes(documentType)) {
         return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
       }
@@ -5327,6 +6234,284 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message || "Failed to delete document" });
     }
   });
+
+  // Ground Crew: Upload documents (void cheque, driver's license, first aid)
+  app.post("/api/ground-crew/upload-document", requireAuth, technicianDocumentUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'ground_crew' && user.role !== 'ground_crew_supervisor') {
+        return res.status(403).json({ message: "Only ground crew members can upload documents through this endpoint" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { documentType } = req.body;
+      if (!documentType) {
+        return res.status(400).json({ message: "Document type is required" });
+      }
+
+      const validTypes = [
+        'voidCheque', 'driversLicense', 'firstAidCertificate'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Upload file to object storage
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
+      const filename = `ground-crew-${userId}-${documentType}-${timestamp}.${extension}`;
+      
+      const url = await objectStorageService.uploadPublicFile(filename, req.file.buffer, req.file.mimetype);
+      
+      console.log(`[GroundCrew] Uploaded ${documentType} for user ${userId}:`, url);
+
+      // Update the user's document arrays based on document type
+      let updateData: any = {};
+      
+      if (documentType === 'voidCheque') {
+        const existingDocs = user.bankDocuments || [];
+        updateData.bankDocuments = [...existingDocs, url];
+      } else if (documentType === 'driversLicense') {
+        const existingDocs = user.driversLicenseDocuments || [];
+        updateData.driversLicenseDocuments = [...existingDocs, url];
+      } else if (documentType === 'firstAidCertificate') {
+        const existingDocs = user.firstAidDocuments || [];
+        updateData.firstAidDocuments = [...existingDocs, url];
+      }
+
+      await storage.updateUser(userId, updateData);
+
+      res.json({ 
+        message: "Document uploaded successfully",
+        url,
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[GroundCrew] Error uploading document:", error);
+      res.status(500).json({ message: error.message || "Failed to upload document" });
+    }
+  });
+
+  // Ground Crew: Delete uploaded document
+  app.delete("/api/ground-crew/document", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'ground_crew' && user.role !== 'ground_crew_supervisor') {
+        return res.status(403).json({ message: "Only ground crew members can delete documents through this endpoint" });
+      }
+
+      const { documentType, documentUrl } = req.body;
+      if (!documentType || !documentUrl) {
+        return res.status(400).json({ message: "Document type and URL are required" });
+      }
+
+      const validTypes = [
+        'bankDocuments', 'driversLicenseDocuments', 'firstAidDocuments'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Get the current document array and remove the URL
+      let currentDocs: string[] = [];
+      
+      if (documentType === 'bankDocuments') {
+        currentDocs = user.bankDocuments || [];
+      } else if (documentType === 'driversLicenseDocuments') {
+        currentDocs = user.driversLicenseDocuments || [];
+      } else if (documentType === 'firstAidDocuments') {
+        currentDocs = user.firstAidDocuments || [];
+      }
+
+      // Check if the document exists
+      if (!currentDocs.includes(documentUrl)) {
+        return res.status(404).json({ message: "Document not found" });
+      }
+
+      // Remove the document URL from the array
+      const updatedDocs = currentDocs.filter(url => url !== documentUrl);
+      const updateData: any = {};
+      updateData[documentType] = updatedDocs;
+
+      await storage.updateUser(userId, updateData);
+
+      console.log(`[GroundCrew] Deleted ${documentType} document for user ${userId}`);
+
+      res.json({ 
+        message: "Document deleted successfully",
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[GroundCrew] Error deleting document:", error);
+      res.status(500).json({ message: error.message || "Failed to delete document" });
+    }
+  });
+
+  // ==================== USER CERTIFICATIONS API ====================
+  
+  // Get all certifications for the current user
+  app.get("/api/user/certifications", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can access certifications" });
+      }
+
+      const certifications = await db.select().from(userCertifications).where(eq(userCertifications.userId, userId)).orderBy(desc(userCertifications.createdAt));
+      
+      res.json({ certifications });
+    } catch (error: any) {
+      console.error("[UserCertifications] Error fetching certifications:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch certifications" });
+    }
+  });
+
+  // Upload a new certification document
+  app.post("/api/user/certifications", requireAuth, technicianDocumentUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can upload certifications" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { description, expiryDate } = req.body;
+
+      // Upload file to object storage
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
+      const filename = `certification-${userId}-${timestamp}.${extension}`;
+      
+      const url = await objectStorageService.uploadPublicFile(filename, req.file.buffer, req.file.mimetype);
+      
+      console.log(`[UserCertifications] Uploaded certification for user ${userId}:`, url);
+
+      // Insert into database
+      const [certification] = await db.insert(userCertifications).values({
+        userId,
+        fileName: req.file.originalname,
+        fileUrl: url,
+        description: description || null,
+        expiryDate: expiryDate || null,
+      }).returning();
+
+      res.json({ 
+        message: "Certification uploaded successfully",
+        certification
+      });
+    } catch (error: any) {
+      console.error("[UserCertifications] Error uploading certification:", error);
+      res.status(500).json({ message: error.message || "Failed to upload certification" });
+    }
+  });
+
+  // Update a certification
+  app.patch("/api/user/certifications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { id } = req.params;
+      const { description, expiryDate } = req.body;
+      
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can update certifications" });
+      }
+
+      // Verify ownership
+      const [existing] = await db.select().from(userCertifications).where(and(eq(userCertifications.id, id), eq(userCertifications.userId, userId)));
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Certification not found" });
+      }
+
+      const [updated] = await db.update(userCertifications)
+        .set({
+          description: description !== undefined ? description : existing.description,
+          expiryDate: expiryDate !== undefined ? expiryDate : existing.expiryDate,
+          updatedAt: new Date(),
+        })
+        .where(eq(userCertifications.id, id))
+        .returning();
+
+      res.json({ 
+        message: "Certification updated successfully",
+        certification: updated
+      });
+    } catch (error: any) {
+      console.error("[UserCertifications] Error updating certification:", error);
+      res.status(500).json({ message: error.message || "Failed to update certification" });
+    }
+  });
+
+  // Delete a certification
+  app.delete("/api/user/certifications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const { id } = req.params;
+      
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
+        return res.status(403).json({ message: "Only technicians can delete certifications" });
+      }
+
+      // Verify ownership
+      const [existing] = await db.select().from(userCertifications).where(and(eq(userCertifications.id, id), eq(userCertifications.userId, userId)));
+      
+      if (!existing) {
+        return res.status(404).json({ message: "Certification not found" });
+      }
+
+      await db.delete(userCertifications).where(eq(userCertifications.id, id));
+
+      console.log(`[UserCertifications] Deleted certification ${id} for user ${userId}`);
+
+      res.json({ message: "Certification deleted successfully" });
+    } catch (error: any) {
+      console.error("[UserCertifications] Error deleting certification:", error);
+      res.status(500).json({ message: error.message || "Failed to delete certification" });
+    }
+  });
+
 
   // Property Manager: Get all company links
   app.get("/api/property-manager/company-links", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
@@ -5635,7 +6820,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const { name, email, propertyManagerPhoneNumber, currentPassword, newPassword } = validationResult.data;
+      const { name, email, propertyManagerPhoneNumber, propertyManagerSmsOptIn, propertyManagementCompany, currentPassword, newPassword } = validationResult.data;
       
       // Get current property manager data
       const currentUser = await storage.getUserById(propertyManagerId);
@@ -5679,9 +6864,126 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .where(eq(users.id, propertyManagerId));
       }
       
+      // Update property management company if provided
+      if (propertyManagementCompany !== undefined) {
+        await db.update(users)
+          .set({ propertyManagementCompany: propertyManagementCompany || null })
+          .where(eq(users.id, propertyManagerId));
+      }
+      
+      // Update SMS opt-in if provided
+      if (propertyManagerSmsOptIn !== undefined) {
+        await db.update(users)
+          .set({ propertyManagerSmsOptIn })
+          .where(eq(users.id, propertyManagerId));
+      }
+      
+      // Sync property manager profile changes to linked client records
+      // This ensures companies see up-to-date PM information
+      try {
+        const pmLinks = await db.select()
+          .from(propertyManagerCompanyLinks)
+          .where(eq(propertyManagerCompanyLinks.propertyManagerId, propertyManagerId));
+        
+        if (pmLinks.length > 0) {
+          // Get updated PM data
+          const updatedPM = await storage.getUserById(propertyManagerId);
+          if (updatedPM) {
+            // Parse name into firstName and lastName
+            const nameParts = (updatedPM.name || '').trim().split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            
+            // Update client records in each linked company
+            // Match by strata number (building) since email may be empty
+            for (const link of pmLinks) {
+              if (!link.companyId) continue;
+              
+              // Find clients in this company that have this strata number in their lmsNumbers
+              // or match by email if available
+              const strataNumber = link.strataNumber;
+              
+              // Get all clients in this company
+              const companyClients = await db.select()
+                .from(clients)
+                .where(eq(clients.companyId, link.companyId));
+              
+              // Find clients that match by email OR by strata number in lmsNumbers
+              for (const client of companyClients) {
+                const matchesByEmail = client.email && client.email.toLowerCase() === updatedPM.email?.toLowerCase();
+                const lmsNumbers = client.lmsNumbers as Array<{ number: string }> | null;
+                const matchesByStrata = strataNumber && lmsNumbers?.some(
+                  (lms) => lms.number?.toUpperCase() === strataNumber.toUpperCase()
+                );
+                
+                if (matchesByEmail || matchesByStrata) {
+                  // Build update object with only non-empty values
+                  const updateData: Record<string, any> = { updatedAt: new Date() };
+                  if (firstName) updateData.firstName = firstName;
+                  if (lastName) updateData.lastName = lastName;
+                  if (updatedPM.propertyManagementCompany) updateData.company = updatedPM.propertyManagementCompany;
+                  if (updatedPM.propertyManagerPhoneNumber) updateData.phoneNumber = updatedPM.propertyManagerPhoneNumber;
+                  // Also sync email to ensure future syncs work by email
+                  if (updatedPM.email && !client.email) updateData.email = updatedPM.email;
+                  
+                  await db.update(clients)
+                    .set(updateData)
+                    .where(eq(clients.id, client.id));
+                  
+                  console.log(`[PM Sync] Updated client ${client.id} (${client.firstName} ${client.lastName}) with PM data`);
+                }
+              }
+            }
+            console.log(`[PM Sync] Completed sync for PM ${updatedPM.email} across ${pmLinks.length} linked companies`);
+          }
+        }
+      } catch (syncError) {
+        // Non-blocking - log but don't fail the request
+        console.error("[PM Sync] Error syncing PM profile to client records:", syncError);
+      }
+      
       res.json({ message: "Account settings updated successfully" });
     } catch (error) {
       console.error("Update property manager account error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Get all quotes sent to them
+  app.get("/api/property-managers/me/quotes", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      
+      // Get all quotes where this property manager is the recipient
+      const allQuotes = await db.select()
+        .from(quotes)
+        .where(eq(quotes.recipientPropertyManagerId, propertyManagerId))
+        .orderBy(sql`${quotes.createdAt} DESC`);
+      
+      // Enrich quotes with company names and services
+      const enrichedQuotes = await Promise.all(allQuotes.map(async (quote) => {
+        const company = await storage.getUserById(quote.companyId);
+        const services = await db.select().from(quoteServices).where(eq(quoteServices.quoteId, quote.id));
+        const grandTotal = services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+        
+        return {
+          id: quote.id,
+          quoteNumber: quote.quoteNumber,
+          buildingName: quote.buildingName,
+          strataPlanNumber: quote.strataPlanNumber,
+          buildingAddress: quote.buildingAddress,
+          status: quote.status,
+          pipelineStage: quote.pipelineStage,
+          createdAt: quote.createdAt,
+          companyName: company?.companyName || "Rope Access Company",
+          grandTotal,
+          serviceCount: services.length
+        };
+      }));
+      
+      res.json({ quotes: enrichedQuotes });
+    } catch (error) {
+      console.error("Get property manager quotes error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -5693,7 +6995,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { quoteId } = req.params;
       
       // Get the quote with services
-      const quote = await storage.getQuoteWithServicesById(quoteId);
+      const quote = await storage.getQuoteById(quoteId);
       
       if (!quote) {
         return res.status(404).json({ message: "Quote not found" });
@@ -5702,6 +7004,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verify this property manager is the recipient of the quote
       if (quote.recipientPropertyManagerId !== propertyManagerId) {
         return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Track first view: update viewedAt, collaborationStatus, and pipelineStage
+      if (!quote.viewedAt) {
+        await storage.updateQuote(quoteId, {
+          viewedAt: new Date(),
+          collaborationStatus: 'viewed',
+          pipelineStage: 'review',
+          stageUpdatedAt: new Date()
+        } as any);
+        
+        console.log(`[Quote] Property manager ${propertyManagerId} viewed quote ${quote.quoteNumber} - moved to 'In Review'`);
+        
+        // Log the view event in quote history
+        await db.insert(quoteHistory).values({
+          quoteId: quote.id,
+          companyId: quote.companyId,
+          eventType: 'viewed',
+          actorUserId: propertyManagerId,
+          actorName: 'Property Manager',
+          notes: `Quote first viewed by property manager`,
+        });
       }
       
       // Get the company info for display
@@ -5721,6 +7045,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           floorCount: quote.floorCount,
           status: quote.status,
           pipelineStage: quote.pipelineStage,
+          collaborationStatus: quote.collaborationStatus,
           createdAt: quote.createdAt,
           companyName,
           services: quote.services.map(s => ({
@@ -5738,42 +7063,316 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Get quote messages (collaboration thread)
+  app.get("/api/property-managers/quotes/:quoteId/messages", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Get all messages for this quote
+      const messages = await storage.getQuoteMessages(quoteId);
+      
+      // Mark messages from company as read
+      await storage.markQuoteMessagesAsRead(quoteId, 'property_manager');
+      
+      res.json({ messages });
+    } catch (error) {
+      console.error("Get quote messages error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Send a message on a quote
+  app.post("/api/property-managers/quotes/:quoteId/messages", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      const { content } = req.body;
+      
+      if (!content || typeof content !== 'string' || content.trim().length === 0) {
+        return res.status(400).json({ message: "Message content is required" });
+      }
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Get property manager info
+      const propertyManager = await storage.getUserById(propertyManagerId);
+      const senderName = propertyManager?.name || "Property Manager";
+      
+      // Create the message
+      const message = await storage.createQuoteMessage({
+        quoteId,
+        senderUserId: propertyManagerId,
+        senderType: 'property_manager',
+        senderName,
+        messageType: 'message',
+        content: content.trim(),
+      });
+      
+      // Update quote collaboration status if not already in negotiation
+      if (quote.collaborationStatus === 'sent' || quote.collaborationStatus === 'viewed') {
+        await storage.updateQuoteCollaborationStatus(quoteId, 'negotiation');
+      }
+      
+      res.json({ message, success: true });
+    } catch (error) {
+      console.error("Send quote message error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Accept a quote
+  app.post("/api/property-managers/quotes/:quoteId/accept", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Check quote is in a valid state for acceptance
+      if (quote.collaborationStatus === 'accepted') {
+        return res.status(400).json({ message: "Quote has already been accepted" });
+      }
+      if (quote.collaborationStatus === 'declined') {
+        return res.status(400).json({ message: "Quote has been declined and cannot be accepted" });
+      }
+      
+      // Get property manager info
+      const propertyManager = await storage.getUserById(propertyManagerId);
+      const senderName = propertyManager?.name || "Property Manager";
+      
+      // Create accept message
+      await storage.createQuoteMessage({
+        quoteId,
+        senderUserId: propertyManagerId,
+        senderType: 'property_manager',
+        senderName,
+        messageType: 'accept',
+        content: 'Quote accepted',
+      });
+      
+      // Update quote collaboration status
+      await storage.updateQuoteCollaborationStatus(quoteId, 'accepted');
+      
+      // Update status and pipeline stage to approved/closed
+      await db.update(quotes)
+        .set({ status: 'closed', pipelineStage: 'approved', stageUpdatedAt: new Date() })
+        .where(eq(quotes.id, quoteId));
+      
+      // Notify company via WebSocket
+      wsHub.notifyQuoteAccepted(quote.companyId, {
+        id: quote.id,
+        quoteNumber: quote.quoteNumber,
+        buildingName: quote.buildingName,
+        strataPlanNumber: quote.strataPlanNumber,
+        propertyManagerName: senderName,
+      });
+      
+      res.json({ success: true, message: "Quote accepted successfully" });
+    } catch (error) {
+      console.error("Accept quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Decline a quote
+  app.post("/api/property-managers/quotes/:quoteId/decline", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      const { reason } = req.body;
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Check quote is in a valid state
+      if (quote.collaborationStatus === 'declined') {
+        return res.status(400).json({ message: "Quote has already been declined" });
+      }
+      if (quote.collaborationStatus === 'accepted') {
+        return res.status(400).json({ message: "Quote has been accepted and cannot be declined" });
+      }
+      
+      // Get property manager info
+      const propertyManager = await storage.getUserById(propertyManagerId);
+      const senderName = propertyManager?.name || "Property Manager";
+      
+      // Create decline message
+      await storage.createQuoteMessage({
+        quoteId,
+        senderUserId: propertyManagerId,
+        senderType: 'property_manager',
+        senderName,
+        messageType: 'decline',
+        content: reason || 'Quote declined',
+      });
+      
+      // Update quote collaboration status
+      await storage.updateQuoteCollaborationStatus(quoteId, 'declined');
+      
+      // Update status and pipeline stage to lost/closed
+      await db.update(quotes)
+        .set({ status: 'closed', pipelineStage: 'lost', stageUpdatedAt: new Date() })
+        .where(eq(quotes.id, quoteId));
+      
+      // Notify company via WebSocket
+      wsHub.notifyQuoteDeclined(quote.companyId, {
+        id: quote.id,
+        quoteNumber: quote.quoteNumber,
+        buildingName: quote.buildingName,
+        strataPlanNumber: quote.strataPlanNumber,
+        propertyManagerName: senderName,
+        reason: reason || null,
+      });
+      
+      res.json({ success: true, message: "Quote declined" });
+    } catch (error) {
+      console.error("Decline quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Submit a counter-offer
+  app.post("/api/property-managers/quotes/:quoteId/counter-offer", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      const { quoteId } = req.params;
+      const { counterOfferAmount, notes } = req.body;
+      
+      if (!counterOfferAmount || isNaN(Number(counterOfferAmount))) {
+        return res.status(400).json({ message: "Valid counter-offer amount is required" });
+      }
+      
+      // Verify this property manager has access to this quote
+      const quote = await storage.getQuoteById(quoteId);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      if (quote.recipientPropertyManagerId !== propertyManagerId) {
+        return res.status(403).json({ message: "You do not have access to this quote" });
+      }
+      
+      // Check quote is in a valid state
+      if (quote.collaborationStatus === 'accepted' || quote.collaborationStatus === 'declined') {
+        return res.status(400).json({ message: "Cannot submit counter-offer on a closed quote" });
+      }
+      
+      // Get property manager info
+      const propertyManager = await storage.getUserById(propertyManagerId);
+      const senderName = propertyManager?.name || "Property Manager";
+      
+      // Create counter-offer message
+      const message = await storage.createQuoteMessage({
+        quoteId,
+        senderUserId: propertyManagerId,
+        senderType: 'property_manager',
+        senderName,
+        messageType: 'counter_offer',
+        content: notes || `Counter-offer submitted: $${Number(counterOfferAmount).toLocaleString()}`,
+        counterOfferAmount: String(counterOfferAmount),
+        counterOfferNotes: notes,
+      });
+      
+      // Update quote collaboration status to negotiation
+      await storage.updateQuoteCollaborationStatus(quoteId, 'negotiation');
+      
+      // Update quote pipeline stage to negotiation so it appears in the pipeline
+      await storage.updateQuote(quoteId, { pipelineStage: 'negotiation' } as any);
+      
+      // Send real-time WebSocket notification to company
+      wsHub.notifyQuoteCounterOffer(quote.companyId, {
+        id: quote.id,
+        quoteNumber: quote.quoteNumber,
+        buildingName: quote.buildingName,
+        strataPlanNumber: quote.strataPlanNumber,
+        propertyManagerName: senderName,
+        counterOfferAmount: String(counterOfferAmount),
+      });
+      
+      console.log(`[Counter-Offer] PM ${senderName} submitted counter-offer of $${counterOfferAmount} for quote ${quote.quoteNumber}`);
+      
+      res.json({ message, success: true });
+    } catch (error) {
+      console.error("Counter-offer error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // SuperUser: Get all companies
   app.get("/api/superuser/companies", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       // Fetch all users with company role
       const companies = await storage.getAllCompanies();
+      console.log(`[SuperUser] Found ${companies.length} companies`);
       
       // For each company, get the most recent activity from any user (owner + employees)
       const companiesWithActivity = await Promise.all(companies.map(async (company) => {
-        const { passwordHash, ...companyData } = company;
-        
-        // Query for the most recent activity across company owner and all employees
-        const activityResult = await db.select({
-          lastActivity: sql<Date>`MAX(last_activity_at)`
-        })
-        .from(users)
-        .where(
-          sql`${users.id} = ${company.id} OR ${users.companyId} = ${company.id}`
-        );
-        
-        const lastCompanyActivity = activityResult[0]?.lastActivity || company.lastActivityAt;
-        
-        return {
-          ...companyData,
-          lastCompanyActivity, // Most recent activity from any user in the company
-        };
+        try {
+          const { passwordHash, ...companyData } = company;
+          
+          // Query for the most recent activity across company owner and all employees
+          const activityResult = await db.select({
+            lastActivity: sql<Date>`MAX(last_activity_at)`
+          })
+          .from(users)
+          .where(
+            sql`${users.id} = ${company.id} OR ${users.companyId} = ${company.id}`
+          );
+          
+          const lastCompanyActivity = activityResult[0]?.lastActivity || company.lastActivityAt;
+          
+          return {
+            ...companyData,
+            lastCompanyActivity,
+          };
+        } catch (err) {
+          console.error(`[SuperUser] Error processing company ${company.id}:`, err);
+          const { passwordHash, ...companyData } = company;
+          return {
+            ...companyData,
+            lastCompanyActivity: company.lastActivityAt,
+          };
+        }
       }));
 
       res.json({ companies: companiesWithActivity });
     } catch (error) {
-      console.error("Get all companies error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("[SuperUser] Get all companies error:", error);
+      res.status(500).json({ message: "Internal server error", error: String(error) });
     }
   });
 
@@ -5781,8 +7380,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/superuser/companies/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const company = await storage.getUserById(req.params.id);
@@ -5803,8 +7402,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get company analytics for SuperUser
   app.get("/api/superuser/companies/:id/analytics", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.id;
@@ -5907,8 +7506,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/superuser/companies/:id/employees", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.id;
@@ -5955,8 +7554,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/superuser/gift-company", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { companyName, email, password, tier, licenseKey } = req.body;
@@ -5969,13 +7568,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Validate tier
-      const validTiers = ['basic', 'starter', 'premium', 'enterprise'];
+      const validTiers = ['basic', 'starter', 'premium', 'enterprise', 'onropepro'];
       if (!validTiers.includes(tier)) {
-        return res.status(400).json({ message: "Invalid tier. Must be one of: basic, starter, premium, enterprise" });
+        return res.status(400).json({ message: "Invalid tier. Must be one of: basic, starter, premium, enterprise, onropepro" });
       }
 
       // Validate license key format (GIFT-XXXXX-XXXXX-XXXXX-[1-4])
-      const expectedTierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : '4';
+      const expectedTierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : tier === 'enterprise' ? '4' : 'P';
       const licenseKeyPattern = new RegExp(`^GIFT-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-${expectedTierSuffix}$`);
       if (!licenseKeyPattern.test(licenseKey)) {
         return res.status(400).json({ message: "Invalid license key format or tier mismatch" });
@@ -6082,29 +7681,377 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== STAFF ACCOUNTS (Internal Platform Management) ====================
+  
+  // Helper to check if user is superuser or has specific staff permission
+  const requireSuperuserOrStaffPermission = (permission: string) => {
+    return async (req: Request, res: Response, next: Function) => {
+      if (req.session.userId === 'superuser') {
+        return next();
+      }
+      
+      if (req.session.role === 'staff') {
+        const permissions = req.session.staffPermissions || [];
+        if (permissions.includes(permission)) {
+          return next();
+        }
+      }
+      
+      return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+    };
+  };
+
+  // Inline helper to check superuser or staff permission (returns true if authorized)
+  // Get all staff accounts (superuser or staff with manage_staff_accounts permission)
+  app.get("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser or staff with manage_staff_accounts permission
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const accounts = await storage.getAllStaffAccounts();
+      
+      // Remove password hashes from response
+      const safeAccounts = accounts.map(({ passwordHash, ...rest }) => rest);
+      
+      res.json({ staffAccounts: safeAccounts });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Get all error:', error);
+      res.status(500).json({ message: error.message || "Failed to get staff accounts" });
+    }
+  });
+  
+  // Get single staff account
+  app.get("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const account = await storage.getStaffAccountById(req.params.id);
+      if (!account) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Get by ID error:', error);
+      res.status(500).json({ message: error.message || "Failed to get staff account" });
+    }
+  });
+  
+  // Create staff account
+  app.post("/api/staff-accounts", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const { firstName, lastName, email, password, permissions, isActive } = req.body;
+      
+      if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: "Missing required fields: firstName, lastName, email, password" });
+      }
+      
+      // Check if email already exists
+      const existing = await storage.getStaffAccountByEmail(email);
+      if (existing) {
+        return res.status(400).json({ message: "A staff account with this email already exists" });
+      }
+      
+      // Validate permissions
+      const validPermissions = [
+        'view_dashboard', 'view_companies', 'view_technicians', 'view_buildings',
+        'view_job_board', 'view_tasks', 'view_feature_requests', 'view_future_ideas',
+        'view_metrics', 'view_goals', 'view_changelog', 'view_founder_resources',
+        'manage_staff_accounts'
+      ];
+      
+      const requestedPermissions = permissions || [];
+      const invalidPermissions = requestedPermissions.filter((p: string) => !validPermissions.includes(p));
+      if (invalidPermissions.length > 0) {
+        return res.status(400).json({ message: `Invalid permissions: ${invalidPermissions.join(', ')}` });
+      }
+      
+      const account = await storage.createStaffAccount({
+        firstName,
+        lastName,
+        email,
+        passwordHash: password, // Will be hashed in storage
+        permissions: requestedPermissions,
+        isActive: isActive !== false,
+        createdBy: req.session.userId === 'superuser' ? 'superuser' : req.session.userId,
+      });
+      
+      console.log(`[Staff-Accounts] Created account for ${email} by ${req.session.userId}`);
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ success: true, message: "Staff account created", staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Create error:', error);
+      res.status(500).json({ message: error.message || "Failed to create staff account" });
+    }
+  });
+  
+  // Update staff account
+  app.patch("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      const { firstName, lastName, email, password, permissions, isActive } = req.body;
+      const updates: any = {};
+      
+      if (firstName !== undefined) updates.firstName = firstName;
+      if (lastName !== undefined) updates.lastName = lastName;
+      if (email !== undefined) updates.email = email;
+      if (password !== undefined) updates.passwordHash = password; // Will be hashed in storage
+      if (permissions !== undefined) updates.permissions = permissions;
+      if (isActive !== undefined) updates.isActive = isActive;
+      
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: "No updates provided" });
+      }
+      
+      const account = await storage.updateStaffAccount(req.params.id, updates);
+      if (!account) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      console.log(`[Staff-Accounts] Updated account ${req.params.id} by ${req.session.userId}`);
+      
+      const { passwordHash, ...safeAccount } = account;
+      res.json({ success: true, message: "Staff account updated", staffAccount: safeAccount });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Update error:', error);
+      res.status(500).json({ message: error.message || "Failed to update staff account" });
+    }
+  });
+  
+  // Delete staff account
+  app.delete("/api/staff-accounts/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_staff_accounts')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('manage_staff_accounts')) {
+          return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+        }
+      }
+      
+      // Prevent deleting yourself
+      if (req.session.role === 'staff' && req.session.userId === req.params.id) {
+        return res.status(400).json({ message: "You cannot delete your own account" });
+      }
+      
+      const deleted = await storage.deleteStaffAccount(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Staff account not found" });
+      }
+      
+      console.log(`[Staff-Accounts] Deleted account ${req.params.id} by ${req.session.userId}`);
+      
+      res.json({ success: true, message: "Staff account deleted" });
+    } catch (error: any) {
+      console.error('[Staff-Accounts] Delete error:', error);
+      res.status(500).json({ message: error.message || "Failed to delete staff account" });
+    }
+  });
+
+  // ============================================
+  // FOUNDER RESOURCES API
+  // ============================================
+
+  // Get all founder resources
+  app.get("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser or staff with view_founder_resources permission
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
+        if (req.session.role !== 'staff' || !req.session.staffPermissions?.includes('view_founder_resources')) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+
+      const resources = await db.select().from(founderResources).orderBy(founderResources.sortOrder);
+      res.json({ resources });
+    } catch (error: any) {
+      console.error("Get founder resources error:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch founder resources" });
+    }
+  });
+
+  // Add a founder resource
+  app.post("/api/founder-resources", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser can add resources
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const { name, url, description, icon, category } = req.body;
+
+      if (!name || !url) {
+        return res.status(400).json({ message: "Name and URL are required" });
+      }
+
+      // Get max sort order to add at the end
+      const maxOrder = await db.select({ max: sql<number>`COALESCE(MAX(sort_order), 0)` }).from(founderResources);
+      const newOrder = (maxOrder[0]?.max || 0) + 1;
+
+      const [resource] = await db.insert(founderResources).values({
+        name,
+        url,
+        description: description || null,
+        icon: icon || 'Link',
+        category: category || 'tools',
+        sortOrder: newOrder,
+        createdBy: 'superuser',
+      }).returning();
+
+      res.status(201).json({ resource });
+    } catch (error: any) {
+      console.error("Create founder resource error:", error);
+      res.status(500).json({ message: error.message || "Failed to create founder resource" });
+    }
+  });
+
+  // Delete a founder resource
+  app.delete("/api/founder-resources/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only superuser can delete resources
+      if (!isSuperuserOrHasPermission(req, 'view_founder_resources')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+
+  // Database Cost Tracking Endpoints
+  // Get all database costs with period summaries
+  app.get("/api/superuser/database-costs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const costs = await db.select().from(databaseCosts).orderBy(desc(databaseCosts.date));
+      
+      // Calculate period summaries
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+      const startOfDay = new Date(now);
+      startOfDay.setHours(0, 0, 0, 0);
+      
+      let allTime = 0, thisYear = 0, thisMonth = 0, thisWeek = 0, today = 0;
+      
+      costs.forEach(cost => {
+        const costDate = new Date(cost.date);
+        allTime += cost.amount;
+        if (costDate >= startOfYear) thisYear += cost.amount;
+        if (costDate >= startOfMonth) thisMonth += cost.amount;
+        if (costDate >= startOfWeek) thisWeek += cost.amount;
+        if (costDate >= startOfDay) today += cost.amount;
+      });
+      
+      res.json({
+        costs,
+        summary: {
+          allTime: Math.round(allTime * 100) / 100,
+          thisYear: Math.round(thisYear * 100) / 100,
+          thisMonth: Math.round(thisMonth * 100) / 100,
+          thisWeek: Math.round(thisWeek * 100) / 100,
+          today: Math.round(today * 100) / 100,
+        }
+      });
+    } catch (error) {
+      console.error("Get database costs error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Add a database cost entry
+  app.post("/api/superuser/database-costs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const parsed = insertDatabaseCostSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: "Invalid data", errors: parsed.error.errors });
+      }
+
+      const [newCost] = await db.insert(databaseCosts).values({
+        ...parsed.data,
+        createdBy: 'superuser',
+      }).returning();
+
+      res.status(201).json({ cost: newCost });
+    } catch (error) {
+      console.error("Add database cost error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete a database cost entry
+  app.delete("/api/superuser/database-costs/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const costId = req.params.id;
+      await db.delete(databaseCosts).where(eq(databaseCosts.id, costId));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete database cost error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+      }
+
+      const resourceId = req.params.id;
+      await db.delete(founderResources).where(eq(founderResources.id, resourceId));
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Delete founder resource error:", error);
+      res.status(500).json({ message: error.message || "Failed to delete founder resource" });
+    }
+  });
+
+
   // SuperUser: Gift add-ons to an existing company
   app.post("/api/superuser/companies/:id/gift-addons", requireAuth, async (req: Request, res: Response) => {
     try {
       // Only allow superuser to access this endpoint
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.id;
-      const { extraSeats, extraProjects, whiteLabel } = req.body;
+      const { extraSeats, whiteLabel } = req.body;
 
-      console.log('[Gift-Addons] Gifting add-ons to company:', { companyId, extraSeats, extraProjects, whiteLabel });
+      console.log('[Gift-Addons] Gifting add-ons to company:', { companyId, extraSeats, whiteLabel });
 
       // Validate inputs - ensure non-negative integers
       const parsedSeats = parseInt(extraSeats) || 0;
-      const parsedProjects = parseInt(extraProjects) || 0;
-      const parsedWhiteLabel = whiteLabel === true;
+            const parsedWhiteLabel = whiteLabel === true;
 
-      if (parsedSeats < 0 || parsedProjects < 0) {
+      if (parsedSeats < 0) {
         return res.status(400).json({ message: "Add-on counts cannot be negative" });
       }
 
-      if (parsedSeats === 0 && parsedProjects === 0 && !parsedWhiteLabel) {
+      if (parsedSeats === 0 && !parsedWhiteLabel) {
         return res.status(400).json({ message: "Please select at least one add-on to gift" });
       }
 
@@ -6122,11 +8069,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updates.giftedSeatsCount = (company.giftedSeatsCount || 0) + parsedSeats;
       }
       
-      if (parsedProjects > 0) {
-        updates.additionalProjectsCount = (company.additionalProjectsCount || 0) + parsedProjects;
-      }
-      
-      if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
+if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         updates.whitelabelBrandingActive = true;
       }
 
@@ -6148,7 +8091,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Build descriptive message
       const giftedItems: string[] = [];
       if (parsedSeats > 0) giftedItems.push(`${parsedSeats} seat${parsedSeats > 1 ? 's' : ''}`);
-      if (parsedProjects > 0) giftedItems.push(`${parsedProjects} projects`);
+      
       if (parsedWhiteLabel && !company.whitelabelBrandingActive) giftedItems.push('white-label branding');
 
       res.json({
@@ -6159,18 +8102,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyName: updatedCompany?.companyName,
           additionalSeatsCount: updatedCompany?.additionalSeatsCount,
           giftedSeatsCount: updatedCompany?.giftedSeatsCount,
-          additionalProjectsCount: updatedCompany?.additionalProjectsCount,
-          whitelabelBrandingActive: updatedCompany?.whitelabelBrandingActive,
+                    whitelabelBrandingActive: updatedCompany?.whitelabelBrandingActive,
         },
         gifted: {
           seats: parsedSeats,
-          projects: parsedProjects,
-          whiteLabel: parsedWhiteLabel && !company.whitelabelBrandingActive,
+                    whiteLabel: parsedWhiteLabel && !company.whitelabelBrandingActive,
         },
       });
     } catch (error: any) {
       console.error('[Gift-Addons] Error:', error);
       res.status(500).json({ message: error.message || "Failed to gift add-ons" });
+    }
+  });
+
+  // SuperUser: Toggle platform verification (grants free access)
+  app.post("/api/superuser/companies/:id/toggle-verification", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only allow superuser to access this endpoint
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. Only superuser can toggle verification." });
+      }
+
+      const companyId = req.params.id;
+      const { verified } = req.body;
+
+      console.log('[Platform-Verification] Toggling verification for company:', { companyId, verified });
+
+      // Fetch the company
+      const company = await storage.getUserById(companyId);
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Update the company verification status
+      const updates: any = {
+        isPlatformVerified: verified === true,
+      };
+
+      // If verifying, also set subscription to active to ensure full access
+      if (verified === true) {
+        updates.subscriptionStatus = 'active';
+        updates.subscriptionTier = 'basic'; // Set a tier for proper UI display
+      }
+
+      await db.update(users)
+        .set(updates)
+        .where(eq(users.id, companyId));
+
+      // Fetch updated company to confirm changes
+      const updatedCompany = await storage.getUserById(companyId);
+
+      console.log('[Platform-Verification] Verification toggled successfully:', { companyId, verified });
+
+      res.json({
+        success: true,
+        message: verified 
+          ? `${company.companyName} is now platform-verified with free access` 
+          : `Platform verification removed from ${company.companyName}`,
+        company: {
+          id: updatedCompany?.id,
+          companyName: updatedCompany?.companyName,
+          isPlatformVerified: updatedCompany?.isPlatformVerified,
+          subscriptionStatus: updatedCompany?.subscriptionStatus,
+        },
+      });
+    } catch (error: any) {
+      console.error('[Platform-Verification] Error:', error);
+      res.status(500).json({ message: error.message || "Failed to toggle verification" });
     }
   });
 
@@ -6180,8 +8178,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/superuser/companies/:id/remove-legacy-seats", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -6263,8 +8261,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get MRR metrics summary
   app.get("/api/superuser/metrics/mrr", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const mrrMetrics = await storage.calculateLiveMrrMetrics();
@@ -6288,8 +8286,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get customer summary metrics
   app.get("/api/superuser/metrics/customers", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const customerMetrics = await storage.getCustomerSummaryMetrics();
@@ -6303,8 +8301,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get product usage metrics
   app.get("/api/superuser/metrics/usage", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const usageMetrics = await storage.getProductUsageMetrics();
@@ -6318,8 +8316,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get subscription breakdown by company
   app.get("/api/superuser/metrics/subscriptions", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const subscriptionBreakdown = await storage.getSubscriptionBreakdown();
@@ -6333,8 +8331,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get combined dashboard metrics summary
   app.get("/api/superuser/metrics/summary", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       // Fetch all metrics in parallel
@@ -6366,8 +8364,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all feature requests with messages
   app.get("/api/superuser/feature-requests", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const requestsWithMessages = await storage.getFeatureRequestsWithMessages();
@@ -6403,8 +8401,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update feature request status
   app.patch("/api/superuser/feature-requests/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const requestId = req.params.id;
@@ -6431,8 +8429,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Send message on feature request
   app.post("/api/superuser/feature-requests/:id/messages", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const requestId = req.params.id;
@@ -6468,8 +8466,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all future ideas
   app.get("/api/superuser/future-ideas", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const ideas = await db.select().from(futureIdeas).orderBy(desc(futureIdeas.createdAt));
@@ -6483,8 +8481,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Create a future idea
   app.post("/api/superuser/future-ideas", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const parsed = insertFutureIdeaSchema.safeParse(req.body);
@@ -6503,8 +8501,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update a future idea
   app.patch("/api/superuser/future-ideas/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const ideaId = req.params.id;
@@ -6536,8 +8534,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Delete a future idea
   app.delete("/api/superuser/future-ideas/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_future_ideas')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const ideaId = req.params.id;
@@ -6552,8 +8550,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: View company dashboard data (impersonation mode - read-only)
   app.get("/api/superuser/impersonate/:companyId/dashboard", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.companyId;
@@ -6615,8 +8613,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get company safety data (impersonation mode - read-only)
   app.get("/api/superuser/impersonate/:companyId/safety", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const companyId = req.params.companyId;
@@ -6658,8 +8656,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get all buildings
   app.get("/api/superuser/buildings", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const allBuildings = await storage.getAllBuildings();
@@ -6677,8 +8675,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Get single building with project history
   app.get("/api/superuser/buildings/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const building = await storage.getBuildingById(req.params.id);
@@ -6719,8 +8717,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Update building details
   app.patch("/api/superuser/buildings/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const building = await storage.getBuildingById(req.params.id);
@@ -6749,8 +8747,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Reset building password
   app.post("/api/superuser/buildings/:id/reset-password", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const building = await storage.getBuildingById(req.params.id);
@@ -6772,8 +8770,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Geocode a building's address to get lat/lng
   app.post("/api/superuser/buildings/:id/geocode", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const building = await storage.getBuildingById(req.params.id);
@@ -6838,8 +8836,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // SuperUser: Batch geocode all buildings without coordinates
   app.post("/api/superuser/buildings/geocode-all", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_buildings')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const allBuildings = await storage.getAllBuildings();
@@ -7162,8 +9160,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all technicians (SuperUser only)
   app.get("/api/superuser/technicians", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const page = parseInt(req.query.page as string) || 1;
@@ -7239,8 +9237,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get single technician details (SuperUser only)
   app.get("/api/superuser/technicians/:technicianId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { technicianId } = req.params;
@@ -7284,6 +9282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Personal Info
         birthday: technician.birthday,
         employeePhoneNumber: technician.employeePhoneNumber,
+        smsNotificationsEnabled: technician.smsNotificationsEnabled,
         employeeStreetAddress: technician.employeeStreetAddress,
         employeeCity: technician.employeeCity,
         employeeProvinceState: technician.employeeProvinceState,
@@ -7347,8 +9346,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Toggle PLUS access for a technician (SuperUser only)
   app.put("/api/superuser/technicians/:technicianId/plus-access", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_technicians')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { technicianId } = req.params;
@@ -7384,8 +9383,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Disable/Enable account (SuperUser only) - for fraud or misuse
   app.put("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { userId } = req.params;
@@ -7459,8 +9458,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get account suspension status (SuperUser only)
   app.get("/api/superuser/accounts/:userId/status", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_companies')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { userId } = req.params;
@@ -7491,8 +9490,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all SuperUser tasks with comments
   app.get("/api/superuser/tasks", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const tasks = await db.query.superuserTasks.findMany({
@@ -7529,8 +9528,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new SuperUser task
   app.post("/api/superuser/tasks", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { title, description, section, assignee, dueDate, priority, createdBy } = req.body;
@@ -7559,8 +9558,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update a SuperUser task (status, details)
   app.patch("/api/superuser/tasks/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -7630,8 +9629,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a SuperUser task
   app.delete("/api/superuser/tasks/:id", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -7648,8 +9647,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add a comment to a SuperUser task
   app.post("/api/superuser/tasks/:id/comments", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -7675,8 +9674,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete a comment
   app.delete("/api/superuser/tasks/:taskId/comments/:commentId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { commentId } = req.params;
@@ -7728,8 +9727,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get attachments for a task
   app.get("/api/superuser/tasks/:id/attachments", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -7748,8 +9747,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Upload attachment to a task
   app.post("/api/superuser/tasks/:id/attachments", requireAuth, taskAttachmentUpload.single('file'), async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { id } = req.params;
@@ -7806,8 +9805,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Download attachment
   app.get("/api/superuser/tasks/:taskId/attachments/:attachmentId/download", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { attachmentId } = req.params;
@@ -7845,8 +9844,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete attachment
   app.delete("/api/superuser/tasks/:taskId/attachments/:attachmentId", requireAuth, async (req: Request, res: Response) => {
     try {
-      if (req.session.userId !== 'superuser') {
-        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      if (!isSuperuserOrHasPermission(req, 'view_tasks')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
       }
 
       const { attachmentId } = req.params;
@@ -8173,6 +10172,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Ground crew and rope access tech profile fields
+      if (user.role === "ground_crew" || user.role === "ground_crew_supervisor" || user.role === "rope_access_tech") {
+        // Map form fields to database columns
+        // Handle both field name variations from different frontend forms
+        if (req.body.employeePhoneNumber !== undefined) {
+          updates.employeePhoneNumber = req.body.employeePhoneNumber || null;
+        }
+        if (req.body.smsNotificationsEnabled !== undefined) {
+          updates.smsNotificationsEnabled = req.body.smsNotificationsEnabled ?? false;
+        }
+        if (req.body.phone !== undefined) {
+          updates.employeePhoneNumber = req.body.phone || null;
+        }
+        if (req.body.birthday !== undefined) {
+          updates.birthday = req.body.birthday || null;
+        }
+        if (req.body.address !== undefined) {
+          updates.employeeStreetAddress = req.body.address || null;
+        }
+        if (req.body.city !== undefined) {
+          updates.employeeCity = req.body.city || null;
+        }
+        if (req.body.provinceState !== undefined) {
+          updates.employeeProvinceState = req.body.provinceState || null;
+        }
+        if (req.body.country !== undefined) {
+          updates.employeeCountry = req.body.country || null;
+        }
+        if (req.body.postalCode !== undefined) {
+          updates.employeePostalCode = req.body.postalCode || null;
+        }
+        // Emergency contact fields
+        if (req.body.emergencyContactName !== undefined) {
+          updates.emergencyContactName = req.body.emergencyContactName || null;
+        }
+        if (req.body.emergencyContactPhone !== undefined) {
+          updates.emergencyContactPhone = req.body.emergencyContactPhone || null;
+        }
+        if (req.body.emergencyContactRelationship !== undefined) {
+          updates.emergencyContactRelationship = req.body.emergencyContactRelationship || null;
+        }
+        // Payroll and license fields
+        if (req.body.sin !== undefined) {
+          updates.sin = req.body.sin || null;
+        }
+        if (req.body.bankTransit !== undefined) {
+          updates.bankTransit = req.body.bankTransit || null;
+        }
+        if (req.body.bankInstitution !== undefined) {
+          updates.bankInstitution = req.body.bankInstitution || null;
+        }
+        if (req.body.bankAccount !== undefined) {
+          updates.bankAccount = req.body.bankAccount || null;
+        }
+        if (req.body.driversLicenseNumber !== undefined) {
+          updates.driversLicenseNumber = req.body.driversLicenseNumber || null;
+        }
+        if (req.body.driversLicenseIssuedDate !== undefined) {
+          updates.driversLicenseIssuedDate = req.body.driversLicenseIssuedDate || null;
+        }
+        if (req.body.driversLicenseExpiry !== undefined) {
+          updates.driversLicenseExpiry = req.body.driversLicenseExpiry || null;
+        }
+        // Medical and first aid fields
+        if (req.body.specialMedicalConditions !== undefined) {
+          updates.specialMedicalConditions = req.body.specialMedicalConditions || null;
+        }
+        if (req.body.firstAidType !== undefined) {
+          updates.firstAidType = req.body.firstAidType || null;
+        }
+        if (req.body.firstAidExpiry !== undefined) {
+          updates.firstAidExpiry = req.body.firstAidExpiry || null;
+        }
+      }
+      
       await storage.updateUser(user.id, updates);
       const updatedUser = await storage.getUserById(user.id);
       
@@ -8296,6 +10370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: company.id,
           companyName: company.companyName,
           residentCode: company.residentCode,
+          companyLogoUrl: company.brandingLogoUrl || null,
         }
       });
     } catch (error) {
@@ -8805,17 +10880,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ found: false, message: "This technician is already connected to your company" });
       }
       
-      // If technician is linked to another company and doesn't have PLUS access
-      if (technician.companyId && !technician.hasPlusAccess) {
+      // Technicians are visible to employers if they have visibility toggle on
+      // OR if they have PLUS access (which allows multi-employer connections)
+      const isVisible = technician.isVisibleToEmployers || technician.hasPlusAccess;
+      
+      // If technician is linked to another company, doesn't have PLUS, AND hasn't enabled visibility
+      if (technician.companyId && !technician.hasPlusAccess && !technician.isVisibleToEmployers) {
         return res.json({ 
           found: false, 
-          message: "This technician is already linked to another company. They need Technician PLUS to connect with multiple employers." 
+          message: "This technician is not currently visible to employers. They need to enable their visibility toggle or have Technician PLUS." 
         });
       }
       
       // Return limited info for privacy (don't expose sensitive fields)
       const { passwordHash, socialInsuranceNumber, bankTransitNumber, bankInstitutionNumber, 
               bankAccountNumber, driversLicenseNumber, specialMedicalConditions, ...safeInfo } = technician;
+      
+      // Check if technician is linked to another employer AND has visibility on
+      // This means their current employer can see they're advertising to other companies
+      const hasEmployerVisibilityWarning = !!technician.companyId && technician.isVisibleToEmployers;
       
       res.json({ 
         found: true, 
@@ -8832,8 +10915,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           hasFirstAid: safeInfo.hasFirstAid,
           firstAidType: safeInfo.firstAidType,
           hasPlusAccess: safeInfo.hasPlusAccess,
-          isAlreadyLinked: !!technician.companyId, // Tell frontend if this is a PLUS multi-employer link
-        }
+          isAlreadyLinked: !!technician.companyId,
+          isVisibleToEmployers: technician.isVisibleToEmployers,
+        },
+        warning: hasEmployerVisibilityWarning 
+          ? "This technician is currently employed and has their employer visibility turned on. Their current employer may be aware they are visible to other companies."
+          : null
       });
     } catch (error) {
       console.error("Search technicians error:", error);
@@ -8866,26 +10953,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician
+      // Find the technician or ground crew member
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
+        return res.status(404).json({ message: "Team member not found" });
       }
       
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "This user is not a technician" });
+      const LINKABLE_ROLES = ['rope_access_tech', 'ground_crew'];
+      if (!LINKABLE_ROLES.includes(technician.role)) {
+        return res.status(400).json({ message: "This user cannot be linked to a company" });
       }
       
       // Check if already linked to THIS company
       if (technician.companyId === companyId) {
-        return res.status(400).json({ message: "This technician is already linked to your company" });
+        return res.status(400).json({ message: "This team member is already linked to your company" });
       }
       
       // Check existing employer connections
       const existingConnections = (technician.employerConnections || []) as any[];
       const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
       if (alreadyConnected) {
-        return res.status(400).json({ message: "This technician is already connected to your company" });
+        return res.status(400).json({ message: "This team member is already connected to your company" });
       }
       
       // Get company name for the connection
@@ -8971,26 +11059,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
       }
       
-      // Find the technician
+      // Find the technician or ground crew member
       const technician = await storage.getUserById(technicianId);
       if (!technician) {
-        return res.status(404).json({ message: "Technician not found" });
+        return res.status(404).json({ message: "Team member not found" });
       }
       
-      if (technician.role !== 'rope_access_tech') {
-        return res.status(400).json({ message: "This user is not a technician" });
+      const INVITABLE_ROLES = ['rope_access_tech', 'ground_crew'];
+      if (!INVITABLE_ROLES.includes(technician.role)) {
+        return res.status(400).json({ message: "This user cannot be invited to a company" });
       }
       
       // Check if already linked to THIS company
       if (technician.companyId === companyId) {
-        return res.status(400).json({ message: "This technician is already linked to your company" });
+        return res.status(400).json({ message: "This team member is already linked to your company" });
       }
       
       // Check existing employer connections
       const existingConnections = (technician.employerConnections || []) as any[];
       const alreadyConnected = existingConnections.some((conn: any) => conn.companyId === companyId);
       if (alreadyConnected) {
-        return res.status(400).json({ message: "This technician is already connected to your company" });
+        return res.status(400).json({ message: "This team member is already connected to your company" });
       }
       
       // If linked to another company, require PLUS access
@@ -9015,19 +11104,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: message || null,
       });
       
+      
       console.log(`[Team-Invite] Company ${companyId} sent invitation ${invitation.id} to technician ${technicianId} (${technician.name})`);
       
-      res.json({ 
+      // Handle both camelCase and snake_case field names from Drizzle ORM
+      const techAny = technician as any;
+      const technicianPhone = techAny.employeePhoneNumber || techAny.employee_phone_number;
+      const smsEnabled = techAny.smsNotificationsEnabled ?? techAny.sms_notifications_enabled;
+      
+      // Debug info for response
+      const debugInfo = {
+        technicianId,
+        technicianName: technician.name,
+        rawPhoneField: technicianPhone,
+        rawSmsEnabled: smsEnabled,
+        invitationId: invitation.id,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log(`[Team-Invite] DEBUG: raw fields - phone=${technicianPhone}, smsEnabled=${smsEnabled}`);
+      
+      let smsStatus = 'not_attempted';
+      let smsError: string | null = null;
+      
+      if (smsEnabled && technicianPhone) {
+        try {
+          const company = await storage.getUserById(companyId);
+          const companyName = company?.companyName || 'An employer';
+          console.log(`[Team-Invite] Sending SMS to ${technicianPhone} from company ${companyName}`);
+          const smsResult = await sendTeamInvitationSMS(
+            technicianPhone,
+            companyName
+          );
+          if (smsResult.success) {
+            console.log(`[Team-Invite] SMS notification sent to ${technician.name}, SID: ${smsResult.messageId}`);
+            smsStatus = 'sent';
+            (debugInfo as any).twilioMessageSid = smsResult.messageId;
+            (debugInfo as any).twilioFormattedTo = (smsResult as any).formattedTo;
+            (debugInfo as any).twilioStatus = (smsResult as any).status;
+          } else {
+            console.log(`[Team-Invite] SMS notification failed for ${technician.name}: ${smsResult.error}`);
+            smsStatus = 'failed';
+            smsError = smsResult.error || null;
+          }
+        } catch (smsErr: any) {
+          console.error(`[Team-Invite] SMS notification error for ${technician.name}:`, smsErr);
+          smsStatus = 'error';
+          smsError = smsErr.message;
+        }
+      } else if (!smsEnabled) {
+        console.log(`[Team-Invite] SMS disabled for ${technician.name}, skipping SMS`);
+        smsStatus = 'skipped_disabled';
+      } else {
+        console.log(`[Team-Invite] No phone number for ${technician.name}, skipping SMS`);
+        smsStatus = 'skipped_no_phone';
+      }
+      
+      res.json({
         success: true, 
         message: `Invitation sent to ${technician.name}!`,
-        invitationId: invitation.id
+        invitationId: invitation.id,
+        debug: {
+          ...debugInfo,
+          smsStatus,
+          smsError
+        }
       });
     } catch (error) {
       console.error("Send team invitation error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
-  
   // Get the count of technicians referred by the logged-in user
   app.get("/api/my-referral-count", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -9036,7 +11183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view referral count" });
       }
       
@@ -9154,7 +11301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view their document requests" });
       }
       
@@ -9228,7 +11375,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can upload files to document requests" });
       }
       
@@ -9291,7 +11438,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can update their document requests" });
       }
       
@@ -9405,7 +11552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view invitations" });
       }
       
@@ -9495,6 +11642,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         console.log(`[Team-Invite] PLUS member ${user.id} (${user.name}) added secondary employer ${invitation.companyId} via invitation ${invitationId}`);
+        
+        // Send SMS to company owner about acceptance
+        if (company) {
+          const companyAny = company as any;
+          const ownerPhone = companyAny.employeePhoneNumber || companyAny.employee_phone_number;
+          const ownerSmsEnabled = companyAny.smsNotificationsEnabled ?? companyAny.sms_notifications_enabled;
+          if (ownerSmsEnabled && ownerPhone) {
+            try {
+              const smsResult = await sendInvitationAcceptedSMS(ownerPhone, user.name || 'A technician', user.role || 'rope_access_tech');
+              if (smsResult.success) {
+                console.log(`[Team-Invite] SMS sent to company owner about ${user.name} acceptance`);
+              }
+            } catch (smsErr) {
+              console.error('[Team-Invite] Failed to send acceptance SMS:', smsErr);
+            }
+          }
+        }
       } else {
         // Link the technician to the company and clear any previous termination status
         await storage.updateUser(user.id, {
@@ -9506,6 +11670,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         console.log(`[Team-Invite] Technician ${user.id} (${user.name}) accepted invitation ${invitationId} from company ${invitation.companyId}`);
+        
+        // Send SMS to company owner about acceptance
+        if (company) {
+          const companyAny = company as any;
+          const ownerPhone = companyAny.employeePhoneNumber || companyAny.employee_phone_number;
+          const ownerSmsEnabled = companyAny.smsNotificationsEnabled ?? companyAny.sms_notifications_enabled;
+          if (ownerSmsEnabled && ownerPhone) {
+            try {
+              const smsResult = await sendInvitationAcceptedSMS(ownerPhone, user.name || 'A technician', user.role || 'rope_access_tech');
+              if (smsResult.success) {
+                console.log(`[Team-Invite] SMS sent to company owner about ${user.name} acceptance`);
+              }
+            } catch (smsErr) {
+              console.error('[Team-Invite] Failed to send acceptance SMS:', smsErr);
+            }
+          }
+        }
       }
       
       res.json({ 
@@ -9566,7 +11747,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can view employer connections" });
       }
       
@@ -9650,7 +11831,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      if (user.role !== 'rope_access_tech') {
+      if (user.role !== 'rope_access_tech' && user.role !== 'ground_crew') {
         return res.status(403).json({ message: "Only technicians can manage employer connections" });
       }
       
@@ -9726,6 +11907,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: inv.technician.email,
           // Phone and address
           employeePhoneNumber: inv.technician.employeePhoneNumber,
+          smsNotificationsEnabled: inv.technician.smsNotificationsEnabled,
           employeeStreetAddress: inv.technician.employeeStreetAddress,
           employeeCity: inv.technician.employeeCity,
           employeeProvinceState: inv.technician.employeeProvinceState,
@@ -9785,6 +11967,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get pending onboarding invitations (acknowledged but not converted - technician has no hourlyRate)
+  // Get pending invitations SENT by this company (not yet responded)
+  app.get("/api/sent-invitations", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only company owners and authorized roles can view sent invitations
+      const authorizedRoles = ['owner', 'company', 'admin', 'operations_manager'];
+      if (!authorizedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only authorized users can view sent invitations" });
+      }
+      
+      const invitations = await storage.getPendingSentInvitationsForCompany(companyId);
+      
+      const safeInvitations = invitations.map(inv => ({
+        id: inv.id,
+        createdAt: inv.createdAt,
+        message: inv.message,
+        technician: {
+          id: inv.technician.id,
+          name: inv.technician.name,
+          email: inv.technician.email,
+          employeePhoneNumber: inv.technician.employeePhoneNumber,
+          role: inv.technician.role,
+        }
+      }));
+      
+      res.json({ invitations: safeInvitations });
+    } catch (error) {
+      console.error("Get sent invitations error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Cancel a pending invitation
+  app.delete("/api/sent-invitations/:invitationId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { invitationId } = req.params;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only company owners and authorized roles can cancel invitations
+      const authorizedRoles = ['owner', 'company', 'admin', 'operations_manager'];
+      if (!authorizedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only authorized users can cancel invitations" });
+      }
+      
+      // Verify the invitation exists and belongs to this company
+      const invitation = await storage.getTeamInvitationById(invitationId);
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      if (invitation.companyId !== companyId) {
+        return res.status(403).json({ message: "You can only cancel your own company's invitations" });
+      }
+      
+      if (invitation.status !== 'pending') {
+        return res.status(400).json({ message: "Only pending invitations can be cancelled" });
+      }
+      
+      await storage.cancelTeamInvitation(invitationId);
+      
+      console.log(`[Team-Invite] Company ${companyId} cancelled invitation ${invitationId}`);
+      
+      res.json({ success: true, message: "Invitation cancelled successfully" });
+    } catch (error) {
+      console.error("Cancel invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/pending-onboarding-invitations", requireAuth, async (req: Request, res: Response) => {
     try {
       const user = await storage.getUserById(req.session.userId!);
@@ -9815,6 +12084,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name: inv.technician.name,
           email: inv.technician.email,
           employeePhoneNumber: inv.technician.employeePhoneNumber,
+          smsNotificationsEnabled: inv.technician.smsNotificationsEnabled,
           employeeStreetAddress: inv.technician.employeeStreetAddress,
           employeeCity: inv.technician.employeeCity,
           employeeProvinceState: inv.technician.employeeProvinceState,
@@ -10284,6 +12554,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("SPRAT screenshot verification error:", error);
       res.status(500).json({ message: error.message || "Failed to analyze screenshot" });
+    }
+  });
+  
+  // ==================== DOCUMENT OCR ROUTES ====================
+  
+  // OCR scan driver's license to extract license number and expiry date
+  app.post("/api/ocr/drivers-license", verificationUpload.single("image"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+      
+      const imageBase64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[OCR] Analyzing driver's license for user ${req.session.userId}`);
+      
+      const { analyzeDriversLicense } = await import("./gemini");
+      const result = await analyzeDriversLicense(imageBase64, mimeType);
+      
+      res.json({
+        success: result.success,
+        data: {
+          licenseNumber: result.licenseNumber,
+          expiryDate: result.expiryDate,
+          issuedDate: result.issuedDate,
+          name: result.name
+        },
+        confidence: result.confidence,
+        error: result.error
+      });
+    } catch (error: any) {
+      console.error("Driver's license OCR error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze driver's license" });
+    }
+  });
+  
+  // OCR scan void cheque to extract banking info
+  app.post("/api/ocr/void-cheque", verificationUpload.single("image"), async (req, res) => {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ message: "Unauthorized - Please log in" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image file provided" });
+      }
+      
+      const imageBase64 = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[OCR] Analyzing void cheque for user ${req.session.userId}`);
+      
+      const { analyzeVoidCheque } = await import("./gemini");
+      const result = await analyzeVoidCheque(imageBase64, mimeType);
+      
+      res.json({
+        success: result.success,
+        data: {
+          transitNumber: result.transitNumber,
+          institutionNumber: result.institutionNumber,
+          accountNumber: result.accountNumber
+        },
+        confidence: result.confidence,
+        error: result.error
+      });
+    } catch (error: any) {
+      console.error("Void cheque OCR error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze void cheque" });
     }
   });
   
@@ -10793,6 +13136,197 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ==================== CLIENT ROUTES ====================
   
+  // Search property managers by pmCode, name, or email (for company owners)
+  app.get("/api/property-managers/search", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage_clients permission
+      if (!canManageClients(currentUser)) {
+        return res.status(403).json({ message: "Access denied - insufficient permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const query = (req.query.q as string || "").trim().toLowerCase();
+      if (!query || query.length < 2) {
+        return res.json({ results: [] });
+      }
+      
+      // Search users with role 'property_manager' by pmCode, name (firstName + lastName), or email
+      const allPMs = await db.select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        pmCode: users.pmCode,
+        propertyManagementCompany: users.propertyManagementCompany,
+        propertyManagerPhoneNumber: users.propertyManagerPhoneNumber,
+      }).from(users).where(eq(users.role, 'property_manager'));
+      
+      // Filter by search query
+      const results = allPMs.filter(pm => {
+        const fullName = `${pm.firstName || ''} ${pm.lastName || ''}`.toLowerCase().trim();
+        const email = (pm.email || '').toLowerCase();
+        const pmCode = (pm.pmCode || '').toLowerCase();
+        
+        return pmCode.includes(query) || 
+               fullName.includes(query) || 
+               email.includes(query);
+      }).slice(0, 20); // Limit to 20 results
+      
+      // Check if any of these PMs are already linked to this company
+      const linkedPMs = await db.select({ propertyManagerId: propertyManagerCompanyLinks.propertyManagerId })
+        .from(propertyManagerCompanyLinks)
+        .where(eq(propertyManagerCompanyLinks.companyId, companyId));
+      const linkedPMIds = new Set(linkedPMs.map(l => l.propertyManagerId));
+      
+      // Return results with linked status
+      const resultsWithStatus = results.map(pm => ({
+        id: pm.id,
+        email: pm.email,
+        name: `${pm.firstName || ''} ${pm.lastName || ''}`.trim() || pm.email,
+        pmCode: pm.pmCode,
+        company: pm.propertyManagementCompany,
+        phone: pm.propertyManagerPhoneNumber,
+        isLinked: linkedPMIds.has(pm.id),
+      }));
+      
+      res.json({ results: resultsWithStatus });
+    } catch (error) {
+      console.error("Error searching property managers:", error);
+      res.status(500).json({ message: "Failed to search property managers" });
+    }
+  });
+  
+  // Get all linked property managers for this company (for quote recipient dropdown)
+  app.get("/api/property-managers/linked", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get all PM links for this company
+      const pmLinks = await db.select()
+        .from(propertyManagerCompanyLinks)
+        .where(eq(propertyManagerCompanyLinks.companyId, companyId));
+      
+      // Fetch full PM details for each link
+      const linkedPMs = await Promise.all(
+        pmLinks.map(async (link) => {
+          const pm = await storage.getUserById(link.propertyManagerId);
+          if (!pm || pm.role !== 'property_manager') return null;
+          return {
+            id: pm.id,
+            name: `${pm.firstName || ''} ${pm.lastName || ''}`.trim() || pm.email,
+            email: pm.email,
+            phone: pm.propertyManagerPhoneNumber,
+            company: pm.propertyManagementCompany,
+            smsOptIn: pm.propertyManagerSmsOptIn,
+            strataNumber: link.strataNumber,
+          };
+        })
+      );
+      
+      res.json(linkedPMs.filter(Boolean));
+    } catch (error) {
+      console.error("Error fetching linked property managers:", error);
+      res.status(500).json({ message: "Failed to fetch linked property managers" });
+    }
+  });
+  
+  // Link a property manager to this company
+  app.post("/api/property-managers/:pmId/link", requireAuth, requireRole("company", "employee"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage_clients permission
+      if (!canManageClients(currentUser)) {
+        return res.status(403).json({ message: "Access denied - insufficient permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const pmId = req.params.pmId;
+      
+      // Get the company to access propertyManagerCode
+      const company = currentUser.role === "company" ? currentUser : await storage.getUserById(companyId);
+      if (!company || !company.propertyManagerCode) {
+        return res.status(400).json({ message: "Company does not have a property manager code configured" });
+      }
+      
+      // Verify the PM exists and is a property_manager
+      const pm = await storage.getUserById(pmId);
+      if (!pm || pm.role !== 'property_manager') {
+        return res.status(404).json({ message: "Property manager not found" });
+      }
+      
+      // Check if already linked
+      const existingLinks = await db.select()
+        .from(propertyManagerCompanyLinks)
+        .where(and(
+          eq(propertyManagerCompanyLinks.propertyManagerId, pmId),
+          eq(propertyManagerCompanyLinks.companyId, companyId)
+        ));
+      
+      if (existingLinks.length > 0) {
+        return res.status(400).json({ message: "Property manager is already linked to your company" });
+      }
+      
+      // Check if a client already exists for this PM email
+      const existingClients = await storage.getClientsByCompany(companyId);
+      const existingClient = existingClients.find((c: any) => 
+        c.email && pm.email && c.email.toLowerCase() === pm.email.toLowerCase()
+      );
+      
+      // Create the link with company code
+      await db.insert(propertyManagerCompanyLinks).values({
+        id: crypto.randomUUID(),
+        propertyManagerId: pmId,
+        companyId: companyId,
+        companyCode: company.propertyManagerCode,
+      });
+      
+      // Create a client record for this PM if one doesn't exist
+      if (!existingClient) {
+        const pmName = `${pm.firstName || ''} ${pm.lastName || ''}`.trim();
+        await storage.createClient({
+          companyId: companyId,
+          firstName: pm.firstName || '',
+          lastName: pm.lastName || '',
+          company: pm.propertyManagementCompany || '',
+          email: pm.email || '',
+          phoneNumber: pm.propertyManagerPhoneNumber || '',
+          address: '',
+          billingAddress: '',
+        });
+      }
+      
+      res.json({ success: true, message: "Property manager linked and added to client database" });
+    } catch (error) {
+      console.error("Error linking property manager:", error);
+      res.status(500).json({ message: "Failed to link property manager" });
+    }
+  });
+  
   // Get all clients for the company
   app.get("/api/clients", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -11003,6 +13537,179 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+
+  // Excel import for clients
+  const clientExcelUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+    fileFilter: (req, file, cb) => {
+      const validTypes = [
+        'text/csv', // .csv
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/vnd.ms-excel', // .xls
+        'application/octet-stream', // fallback for some browsers
+      ];
+      const validExtensions = ['.xlsx', '.xls', '.csv'];
+      const ext = file.originalname.toLowerCase().slice(file.originalname.lastIndexOf('.'));
+      if (validTypes.includes(file.mimetype) || validExtensions.includes(ext)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only Excel or CSV files (.xlsx, .xls, .csv) are allowed'));
+      }
+    },
+  });
+
+  app.post("/api/clients/import-excel", requireAuth, requireRole("company"), clientExcelUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.id;
+
+      // Parse Excel file
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: '' });
+
+      if (rows.length === 0) {
+        return res.status(400).json({ message: "Excel file is empty or has no data rows" });
+      }
+
+      // Log column names for debugging
+      const columnNames = Object.keys(rows[0]);
+      console.log('[Excel Import] Detected columns:', columnNames);
+
+      // Map column names (case-insensitive, flexible naming)
+      const findColumn = (row: Record<string, any>, possibleNames: string[]): string | null => {
+        for (const key of Object.keys(row)) {
+          const normalizedKey = key.toLowerCase().trim().replace(/[_\s-]+/g, '');
+          for (const name of possibleNames) {
+            const normalizedName = name.toLowerCase().trim().replace(/[_\s-]+/g, '');
+            if (normalizedKey === normalizedName || normalizedKey.includes(normalizedName)) {
+              return key;
+            }
+          }
+        }
+        return null;
+      };
+
+      // Detect column mappings once from first row
+      const firstRow = rows[0];
+      const cols = {
+        firstName: findColumn(firstRow, ['firstname', 'first name', 'first', 'given name', 'prenom']),
+        lastName: findColumn(firstRow, ['lastname', 'last name', 'last', 'surname', 'family name', 'nom']),
+        fullName: findColumn(firstRow, ['name', 'full name', 'contact name', 'client name', 'nom complet']),
+        company: findColumn(firstRow, ['company', 'property management company', 'property management', 'pm company', 'organization', 'entreprise', 'strata', 'building']),
+        email: findColumn(firstRow, ['email', 'email address', 'e-mail', 'courriel', 'mail']),
+        phone: findColumn(firstRow, ['phone', 'phone number', 'telephone', 'tel', 'mobile', 'cell', 'contact number']),
+        address: findColumn(firstRow, ['address', 'street address', 'adresse', 'location']),
+        billingAddress: findColumn(firstRow, ['billing address', 'billing', 'adresse de facturation']),
+      };
+      console.log('[Excel Import] Column mappings:', cols);
+
+      // Get existing client emails for duplicate check
+      const existingClients = await storage.getClientsByCompany(companyId);
+      const existingEmails = new Set(existingClients.map(c => c.email?.toLowerCase()).filter(Boolean));
+
+      const results = {
+        success: [] as Array<{ row: number; firstName: string; lastName: string; email: string }>,
+        skipped: [] as Array<{ row: number; reason: string; data?: Record<string, any> }>,
+      };
+
+      const emailsInFile = new Set<string>();
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const rowNum = i + 2; // Excel rows are 1-indexed, plus header row
+
+        // Extract values using pre-detected column mappings
+        let firstName = cols.firstName ? String(row[cols.firstName]).trim() : '';
+        let lastName = cols.lastName ? String(row[cols.lastName]).trim() : '';
+        
+        // If no separate first/last name columns, try to split full name
+        if (!firstName && !lastName && cols.fullName) {
+          const fullName = String(row[cols.fullName]).trim();
+          const nameParts = fullName.split(/\s+/);
+          if (nameParts.length >= 2) {
+            firstName = nameParts[0];
+            lastName = nameParts.slice(1).join(' ');
+          } else if (nameParts.length === 1) {
+            firstName = nameParts[0];
+          }
+        }
+        
+        const company = cols.company ? String(row[cols.company]).trim() : '';
+        const email = cols.email ? String(row[cols.email]).trim().toLowerCase() : '';
+        const phoneNumber = cols.phone ? String(row[cols.phone]).trim() : '';
+        const address = cols.address ? String(row[cols.address]).trim() : '';
+        const billingAddress = cols.billingAddress ? String(row[cols.billingAddress]).trim() : '';
+
+        // Skip completely empty rows (no useful data at all)
+        if (!firstName && !lastName && !company && !email && !phoneNumber && !address) {
+          results.skipped.push({ row: rowNum, reason: 'Empty row - no data found', data: { firstName, lastName, email } });
+          continue;
+        }
+
+        // Validate email format only if email is provided
+        if (email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Invalid email format', data: { firstName, lastName, email } });
+            continue;
+          }
+
+          // Check for duplicates in file (only if email provided)
+          if (emailsInFile.has(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Duplicate email in file', data: { firstName, lastName, email } });
+            continue;
+          }
+
+          // Check for existing clients (only if email provided)
+          if (existingEmails.has(email)) {
+            results.skipped.push({ row: rowNum, reason: 'Client with this email already exists', data: { firstName, lastName, email } });
+            continue;
+          }
+        }
+        // Create client
+        try {
+          await storage.createClient({
+            companyId,
+            firstName,
+            lastName,
+            company,
+            email,
+            phoneNumber: phoneNumber || undefined,
+            address: address || undefined,
+            billingAddress: billingAddress || undefined,
+          });
+
+          emailsInFile.add(email);
+          existingEmails.add(email);
+          results.success.push({ row: rowNum, firstName, lastName, email });
+        } catch (error) {
+          console.error(`Error creating client from row ${rowNum}:`, error);
+          results.skipped.push({ row: rowNum, reason: 'Failed to create client', data: { firstName, lastName, email } });
+        }
+      }
+
+      res.json({
+        message: `Import complete: ${results.success.length} clients created, ${results.skipped.length} rows skipped`,
+        imported: results.success.length,
+        skipped: results.skipped.length,
+        details: results,
+      });
+    } catch (error) {
+      console.error("Error importing clients from Excel:", error);
+      res.status(500).json({ message: "Failed to import clients from Excel" });
+    }
+  });
   app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
@@ -11913,27 +14620,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
       
-      // Calculate project usage using new subscription system (company users only)
+      // Calculate project usage for dashboard display (company users only)
+      // Note: Projects are unlimited for all tiers, so no limit enforcement needed
       let projectInfo = null;
       if (currentUser.role === "company") {
-        const limitsCheck = await checkSubscriptionLimits(currentUser.id);
         const tier = currentUser.subscriptionTier || 'none';
-        const additionalProjects = currentUser.additionalProjectsCount || 0;
-        const projectLimit = limitsCheck.limits.maxProjects;
-        const baseProjectLimit = projectLimit - additionalProjects;
-        // Only count non-completed projects toward the limit
+        // Count active (non-completed) projects for display purposes
         const projectsUsed = projectsWithProgress.filter(p => p.status !== "completed").length;
-        const projectsAvailable = projectLimit === -1 ? -1 : Math.max(0, projectLimit - projectsUsed);
-        const atProjectLimit = projectLimit > 0 && projectsUsed >= projectLimit;
         
         projectInfo = {
           tier,
-          projectLimit,
-          baseProjectLimit,
-          additionalProjects,
           projectsUsed,
-          projectsAvailable,
-          atProjectLimit
         };
       }
       
@@ -12612,6 +15309,249 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // ==================== WORK SESSION ROUTES ====================
+
+  // ==================== ROPE ACCESS PLAN SIGNATURE ROUTES ====================
+  
+  // Check if employee needs to sign rope access plan for a project
+  app.get("/api/projects/:projectId/rope-access-plan/check", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const project = await storage.getProjectById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // If no rope access plan exists, no signature needed
+      if (!project.ropeAccessPlanUrl) {
+        return res.json({ 
+          needsSignature: false, 
+          hasPlan: false,
+          message: "No rope access plan uploaded for this project"
+        });
+      }
+      
+      // Check if employee already signed
+      const existingSignature = await storage.getRopeAccessPlanSignature(projectId, currentUser.id);
+      
+      if (existingSignature) {
+        return res.json({ 
+          needsSignature: false, 
+          hasPlan: true,
+          alreadySigned: true,
+          signedAt: existingSignature.signedAt
+        });
+      }
+      
+      // Plan exists but not signed
+      return res.json({ 
+        needsSignature: true, 
+        hasPlan: true,
+        planUrl: project.ropeAccessPlanUrl,
+        projectName: project.name
+      });
+    } catch (error) {
+      console.error("Check rope access plan error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Sign the rope access plan
+  app.post("/api/projects/:projectId/rope-access-plan/sign", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const { signatureDataUrl } = req.body;
+      
+      if (!signatureDataUrl) {
+        return res.status(400).json({ message: "Signature is required" });
+      }
+      
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      if (!project.ropeAccessPlanUrl) {
+        return res.status(400).json({ message: "No rope access plan exists for this project" });
+      }
+      
+      // Check if already signed
+      const existingSignature = await storage.getRopeAccessPlanSignature(projectId, currentUser.id);
+      if (existingSignature) {
+        return res.status(400).json({ message: "You have already signed this rope access plan" });
+      }
+      
+      // Create signature record
+      const signature = await storage.createRopeAccessPlanSignature({
+        companyId: project.companyId,
+        projectId: projectId,
+        employeeId: currentUser.id,
+        documentName: `Rope Access Plan - ${project.name}`,
+        fileUrl: project.ropeAccessPlanUrl,
+        signatureDataUrl: signatureDataUrl,
+      });
+      
+      res.json({ signature, message: "Rope access plan signed successfully" });
+    } catch (error) {
+      console.error("Sign rope access plan error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get all signatures for a project's rope access plan (for audits)
+  app.get("/api/projects/:projectId/rope-access-plan/signatures", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const project = await storage.getProjectById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify company access
+      if (project.companyId !== currentUser.companyId && currentUser.role !== 'superuser') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const signatures = await storage.getRopeAccessPlanSignatures(projectId);
+      
+      // Add employee names to signatures
+      const signaturesWithNames = await Promise.all(
+        signatures.map(async (sig: any) => {
+          const employee = await storage.getUserById(sig.employeeId);
+          return {
+            ...sig,
+            employeeName: employee ? `${employee.firstName} ${employee.lastName}` : 'Unknown Employee'
+          };
+        })
+      );
+      
+      res.json({ 
+        signatures: signaturesWithNames,
+        hasPlan: !!project.ropeAccessPlanUrl,
+        planUrl: project.ropeAccessPlanUrl,
+        projectName: project.name
+      });
+    } catch (error) {
+      console.error("Get rope access plan signatures error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Generate PDF of rope access plan with all signatures (for audits)
+  app.get("/api/projects/:projectId/rope-access-plan/pdf", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      const project = await storage.getProjectById(projectId);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify company access
+      if (project.companyId !== currentUser.companyId && currentUser.role !== 'superuser') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      if (!project.ropeAccessPlanUrl) {
+        return res.status(400).json({ message: "No rope access plan exists for this project" });
+      }
+      
+      // Get all signatures
+      const signatures = await storage.getRopeAccessPlanSignatures(projectId);
+      
+      // Use jspdf to create PDF with signature sheet
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      
+      // Header
+      doc.setFontSize(18);
+      doc.text('Rope Access Plan Signature Sheet', 105, 20, { align: 'center' });
+      
+      doc.setFontSize(12);
+      doc.text(`Project: ${project.name}`, 20, 35);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 42);
+      doc.text(`Total Signatures: ${signatures.length}`, 20, 49);
+      
+      // Horizontal line
+      doc.line(20, 55, 190, 55);
+      
+      // Signatures table header
+      let yPos = 65;
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'bold');
+      doc.text('Employee Name', 20, yPos);
+      doc.text('Signed Date', 100, yPos);
+      doc.text('Signature', 150, yPos);
+      doc.setFont(undefined, 'normal');
+      
+      yPos += 10;
+      
+      // Add each signature
+      for (const sig of signatures) {
+        // Check if we need a new page
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        const employee = await storage.getUserById(sig.employeeId);
+        const employeeName = employee ? `${employee.firstName} ${employee.lastName}` : 'Unknown Employee';
+        const signedDate = sig.signedAt ? new Date(sig.signedAt).toLocaleString() : 'N/A';
+        
+        doc.text(employeeName, 20, yPos);
+        doc.text(signedDate, 100, yPos);
+        
+        // Add signature image if available
+        if (sig.signatureDataUrl && sig.signatureDataUrl.startsWith('data:image')) {
+          try {
+            doc.addImage(sig.signatureDataUrl, 'PNG', 150, yPos - 6, 30, 12);
+          } catch (imgError) {
+            doc.text('[Signature]', 150, yPos);
+          }
+        } else {
+          doc.text('[Signed]', 150, yPos);
+        }
+        
+        yPos += 15;
+      }
+      
+      // Footer
+      doc.setFontSize(8);
+      doc.text('This document certifies that all listed employees have reviewed and signed the Rope Access Plan.', 105, 290, { align: 'center' });
+      
+      // Send PDF
+      const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="rope-access-plan-signatures-${project.name.replace(/[^a-zA-Z0-9]/g, '-')}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Generate rope access plan PDF error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   
   // Start a work session
   app.post("/api/projects/:projectId/work-sessions/start", requireAuth, async (req: Request, res: Response) => {
@@ -12637,17 +15577,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied - you cannot work on this project" });
       }
       
-      // Check if there's already an active session for this employee on this project
-      const activeSession = await storage.getActiveWorkSession(currentUser.id, projectId);
+      // Check if there's already an active session (billable or non-billable) anywhere
+      const existingSession = await storage.getAnyActiveSession(currentUser.id);
       
-      if (activeSession) {
-        return res.status(400).json({ message: "You already have an active work session for this project" });
+      if (existingSession) {
+        if (existingSession.type === 'billable') {
+          return res.status(400).json({ 
+            message: `You already have an active work session at "${existingSession.projectName || 'another project'}". Please clock out first.`,
+            activeSession: {
+              type: 'billable',
+              projectName: existingSession.projectName,
+              startTime: existingSession.session.startTime
+            }
+          });
+        } else {
+          return res.status(400).json({ 
+            message: `You already have an active non-billable session ("${existingSession.description || 'activity'}"). Please clock out first.`,
+            activeSession: {
+              type: 'non_billable',
+              description: existingSession.description,
+              startTime: existingSession.session.startTime
+            }
+          });
+        }
       }
       
       // Get project to access company ID
       const project = await storage.getProjectById(projectId);
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Check if rope access plan exists and requires signature
+      if (project.ropeAccessPlanUrl) {
+        const existingSignature = await storage.getRopeAccessPlanSignature(projectId, currentUser.id);
+        if (!existingSignature) {
+          return res.status(400).json({ 
+            message: "You must review and sign the Rope Access Plan before starting work on this project.",
+            requiresSignature: true,
+            ropeAccessPlan: {
+              projectId: projectId,
+              projectName: project.name,
+              planUrl: project.ropeAccessPlanUrl
+            }
+          });
+        }
       }
       
       // Create new work session
@@ -13394,6 +16368,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get current user's active work session (if any)
+  app.get("/api/my-active-session", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get any active session (billable or non-billable) for this user
+      const activeSession = await storage.getAnyActiveSession(currentUser.id);
+      
+      if (!activeSession) {
+        return res.json({ hasActiveSession: false, session: null });
+      }
+      
+      // Enrich with additional info
+      const sessionData = {
+        hasActiveSession: true,
+        type: activeSession.type,
+        sessionId: activeSession.session.id,
+        startTime: activeSession.session.startTime,
+        projectName: activeSession.projectName || null,
+        buildingName: activeSession.buildingName || null,
+        description: activeSession.description || null,
+      };
+      
+      res.json(sessionData);
+    } catch (error) {
+      console.error("Get my active session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get all completed work sessions for the current user (across all projects)
   app.get("/api/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -13702,10 +16710,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Check if employee already has an active non-billable session
-      const activeSession = await storage.getActiveNonBillableSession(currentUser.id);
-      if (activeSession) {
-        return res.status(400).json({ message: "You already have an active non-billable session" });
+      // Check if there's already an active session (billable or non-billable) anywhere
+      const existingSession = await storage.getAnyActiveSession(currentUser.id);
+      
+      if (existingSession) {
+        if (existingSession.type === 'billable') {
+          return res.status(400).json({ 
+            message: `You already have an active work session at "${existingSession.projectName || 'a project'}". Please clock out first.`,
+            activeSession: {
+              type: 'billable',
+              projectName: existingSession.projectName,
+              startTime: existingSession.session.startTime
+            }
+          });
+        } else {
+          return res.status(400).json({ 
+            message: `You already have an active non-billable session ("${existingSession.description || 'activity'}"). Please clock out first.`,
+            activeSession: {
+              type: 'non_billable',
+              description: existingSession.description,
+              startTime: existingSession.session.startTime
+            }
+          });
+        }
       }
       
       // Use client's local date if provided, otherwise fall back to server date
@@ -14257,6 +17284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         countsTowardTotal: data.countsTowardTotal ?? false,
       });
       
+      wsHub.notifyHistoricalHoursUpdated(currentUser.id);
       res.json({ historicalHours: entry, message: "Previous hours added successfully" });
     } catch (error) {
       console.error("Create historical hours error:", error);
@@ -14284,6 +17312,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       await storage.deleteHistoricalHours(req.params.id);
+      wsHub.notifyHistoricalHoursUpdated(currentUser.id);
       res.json({ success: true, message: "Previous hours deleted successfully" });
     } catch (error) {
       console.error("Delete historical hours error:", error);
@@ -14391,6 +17420,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log(`[Logbook-Scan] Created ${createdEntries.length} entries, ${errors.length} errors`);
+      
+      // Notify across devices
+      if (createdEntries.length > 0) {
+        wsHub.notifyHistoricalHoursUpdated(currentUser.id);
+      }
       
       res.json({
         success: true,
@@ -17081,6 +20115,269 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workforce Safety Score (WSS) - Average of all employee PSRs
+  // Educational metric only - does not affect CSR
+  app.get("/api/workforce-safety-score", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only employers can view WSS
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Only employers can view WSS" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get all active employees for this company
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
+      
+      if (activeEmployees.length === 0) {
+        return res.json({
+          wssScore: 0,
+          wssLabel: "No Employees",
+          employeeCount: 0,
+          description: "Add employees to calculate Workforce Safety Score",
+        });
+      }
+      
+      // Calculate PSR for each employee
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const totalSafetyQuizTypes = 6;
+      
+      let totalPSR = 0;
+      let employeesWithPSR = 0;
+      
+      for (const employee of activeEmployees) {
+        // 1. Certification Score (25%)
+        let certScore = 0;
+        if (employee.irataLevel || employee.spratLevel) {
+          const expirationDate = employee.irataLevel 
+            ? (employee.irataExpirationDate ? new Date(employee.irataExpirationDate) : null)
+            : (employee.spratExpirationDate ? new Date(employee.spratExpirationDate) : null);
+          const verified = employee.irataLevel 
+            ? !!employee.irataVerifiedAt 
+            : !!employee.spratVerifiedAt;
+          
+          if (expirationDate && expirationDate > today) {
+            certScore = verified ? 100 : 75;
+          } else if (expirationDate && expirationDate <= today) {
+            certScore = 25;
+          } else {
+            certScore = 50;
+          }
+        }
+        
+        // 2. Safety Documents Score (25%) - Personal harness inspections
+        let docsScore = 0;
+        const personalInspections = await storage.getPersonalHarnessInspections(employee.id);
+        const recentInspections = personalInspections.filter((insp: any) => 
+          new Date(insp.inspectionDate) >= thirtyDaysAgo
+        );
+        const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+        if (recentInspections.length > 0) {
+          docsScore = Math.round((passedInspections.length / recentInspections.length) * 100);
+        }
+        
+        // 3. Safety Quizzes Score (25%)
+        let quizScore = 0;
+        const allAttempts = await storage.getAllQuizAttemptsByEmployee(employee.id);
+        const safetyQuizAttempts = allAttempts.filter((a: any) => 
+          a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+        );
+        const passedQuizzes = new Set(
+          safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+        );
+        quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+        
+        // 4. Work History Score (25%)
+        let workScore = 50; // Default for new employees
+        const workSessionsList = await db.select()
+          .from(workSessions)
+          .where(eq(workSessions.employeeId, employee.id));
+        const completedSessions = workSessionsList.filter((ws: any) => ws.endTime);
+        
+        const incidentReportsList = await db.select()
+          .from(incidentReports)
+          .where(eq(incidentReports.companyId, companyId));
+        const technicianIncidents = incidentReportsList.filter((ir: any) => 
+          ir.reportedById === employee.id || 
+          (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(employee.id))
+        );
+        
+        if (completedSessions.length > 0) {
+          const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+          workScore = Math.max(100 - incidentPenalty, 50);
+        }
+        
+        // Calculate employee PSR (25% each component)
+        const employeePSR = Math.round(
+          (certScore * 0.25) + 
+          (docsScore * 0.25) + 
+          (quizScore * 0.25) + 
+          (workScore * 0.25)
+        );
+        
+        totalPSR += employeePSR;
+        employeesWithPSR++;
+      }
+      
+      // Calculate average WSS
+      const wssScore = employeesWithPSR > 0 ? Math.round(totalPSR / employeesWithPSR) : 0;
+      
+      // Determine label
+      let wssLabel = "Critical";
+      if (wssScore >= 90) wssLabel = "Excellent";
+      else if (wssScore >= 70) wssLabel = "Good";
+      else if (wssScore >= 50) wssLabel = "Fair";
+      
+      res.json({
+        wssScore,
+        wssLabel,
+        employeeCount: employeesWithPSR,
+        description: "Average of all employee Personal Safety Ratings (PSR). Educational metric only - does not affect CSR.",
+      });
+    } catch (error) {
+      console.error("Get WSS error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Workforce Safety Score Details - Individual employee PSR breakdown
+  app.get("/api/workforce-safety-score/details", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Only employers can view WSS details" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployees = employees.filter((e: any) => !e.isSuspended && !e.terminationDate);
+      
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const totalSafetyQuizTypes = 6;
+      
+      const employeePSRDetails = [];
+      
+      for (const employee of activeEmployees) {
+        // 1. Certification Score (25%)
+        let certScore = 0;
+        let certStatus = "none";
+        if (employee.irataLevel || employee.spratLevel) {
+          const expirationDate = employee.irataLevel 
+            ? (employee.irataExpirationDate ? new Date(employee.irataExpirationDate) : null)
+            : (employee.spratExpirationDate ? new Date(employee.spratExpirationDate) : null);
+          const verified = employee.irataLevel 
+            ? !!employee.irataVerifiedAt 
+            : !!employee.spratVerifiedAt;
+          
+          if (expirationDate && expirationDate > today) {
+            certScore = verified ? 100 : 75;
+            certStatus = verified ? "verified" : "unverified";
+          } else if (expirationDate && expirationDate <= today) {
+            certScore = 25;
+            certStatus = "expired";
+          } else {
+            certScore = 50;
+            certStatus = "no_expiry";
+          }
+        }
+        
+        // 2. Safety Documents Score (25%)
+        let docsScore = 0;
+        const personalInspections = await storage.getPersonalHarnessInspections(employee.id);
+        const recentInspections = personalInspections.filter((insp: any) => 
+          new Date(insp.inspectionDate) >= thirtyDaysAgo
+        );
+        const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+        if (recentInspections.length > 0) {
+          docsScore = Math.round((passedInspections.length / recentInspections.length) * 100);
+        }
+        
+        // 3. Safety Quizzes Score (25%)
+        let quizScore = 0;
+        const allAttempts = await storage.getAllQuizAttemptsByEmployee(employee.id);
+        const safetyQuizAttempts = allAttempts.filter((a: any) => 
+          a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+        );
+        const passedQuizzes = new Set(
+          safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+        );
+        quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+        
+        // 4. Work History Score (25%)
+        let workScore = 50;
+        const workSessionsList = await db.select()
+          .from(workSessions)
+          .where(eq(workSessions.employeeId, employee.id));
+        const completedSessions = workSessionsList.filter((ws: any) => ws.endTime);
+        
+        const incidentReportsList = await db.select()
+          .from(incidentReports)
+          .where(eq(incidentReports.companyId, companyId));
+        const technicianIncidents = incidentReportsList.filter((ir: any) => 
+          ir.reportedById === employee.id || 
+          (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(employee.id))
+        );
+        
+        if (completedSessions.length > 0) {
+          const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+          workScore = Math.max(100 - incidentPenalty, 50);
+        }
+        
+        // Calculate employee PSR
+        const overallPSR = Math.round(
+          (certScore * 0.25) + 
+          (docsScore * 0.25) + 
+          (quizScore * 0.25) + 
+          (workScore * 0.25)
+        );
+        
+        employeePSRDetails.push({
+          id: employee.id,
+          name: employee.name,
+          role: employee.employeeRole || employee.role,
+          overallPSR,
+          components: {
+            certifications: { score: certScore, status: certStatus },
+            safetyDocs: { score: docsScore, recentInspections: recentInspections.length },
+            quizzes: { score: quizScore, passed: passedQuizzes.size, total: totalSafetyQuizTypes },
+            workHistory: { score: workScore, sessions: completedSessions.length, incidents: technicianIncidents.length },
+          },
+        });
+      }
+      
+      // Sort by PSR score descending
+      employeePSRDetails.sort((a, b) => b.overallPSR - a.overallPSR);
+      
+      res.json({ employees: employeePSRDetails });
+    } catch (error) {
+      console.error("Get WSS details error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Get CSR for a linked vendor company
   // SIMPLIFIED: Uses the same calculation as company CSR endpoint to ensure consistency
   app.get("/api/property-managers/vendors/:linkId/csr", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
@@ -17609,6 +20906,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const docType of requiredDocTypes) {
           const docs = await storage.getCompanyDocumentsByType(companyId, docType);
           for (const doc of docs) {
+            // Check if document targets this user's role (skip if not)
+            const targetRoles = (doc.targetRoles as string[] | null) || ['rope_access_tech', 'ground_crew'];
+            if (!targetRoles.includes(currentUser.role)) {
+              continue; // Skip documents not targeting this user's role
+            }
+            
             // If employee doesn't have a review for this document, create one
             if (!existingDocIds.has(doc.id)) {
               try {
@@ -17617,6 +20920,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   id: doc.id,
                   name: doc.fileName,
                   fileUrl: doc.fileUrl,
+                  targetRoles: targetRoles, // Inherit targetRoles from the document
                 }]);
               } catch (enrollErr) {
                 // Ignore duplicate errors - another request may have created it
@@ -17628,10 +20932,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Now fetch all reviews (including newly created ones)
-      const reviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      const allReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      
+      // Filter reviews to only include those targeting this user's role
+      const reviews = allReviews.filter(r => {
+        const targetRoles = (r.targetRoles as string[] | null) || ['rope_access_tech', 'ground_crew'];
+        return targetRoles.includes(currentUser.role);
+      });
+      
       res.json({ reviews });
     } catch (error) {
       console.error("Get my document reviews error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Check if employee has pending required documents to sign (for dashboard gate)
+  app.get("/api/document-reviews/pending-check", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only check for technicians and ground crew who are linked to a company
+      if (!['rope_access_tech', 'ground_crew'].includes(currentUser.role) || !currentUser.companyId) {
+        return res.json({ hasPendingDocuments: false, pendingCount: 0 });
+      }
+      
+      const companyId = currentUser.companyId;
+      
+      // Auto-enroll: Check for required documents that the employee hasn't been enrolled for yet
+      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
+      const existingReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      const existingDocIds = new Set(existingReviews.map(r => r.documentId).filter(Boolean));
+      
+      // Get all required company documents and auto-enroll if needed
+      for (const docType of requiredDocTypes) {
+        const docs = await storage.getCompanyDocumentsByType(companyId, docType);
+        for (const doc of docs) {
+          // Check if document targets this user's role (skip if not)
+          const targetRoles = (doc.targetRoles as string[] | null) || ['rope_access_tech', 'ground_crew'];
+          if (!targetRoles.includes(currentUser.role)) {
+            continue; // Skip documents not targeting this user's role
+          }
+          
+          // If employee doesn't have a review for this document, create one
+          if (!existingDocIds.has(doc.id)) {
+            try {
+              await storage.enrollEmployeeInDocumentReviews(companyId, currentUser.id, [{
+                type: docType,
+                id: doc.id,
+                name: doc.fileName,
+                fileUrl: doc.fileUrl,
+                targetRoles: targetRoles,
+              }]);
+            } catch (enrollErr) {
+              // Ignore duplicate errors
+              console.log(`Auto-enroll skipped for ${doc.fileName}: ${enrollErr}`);
+            }
+          }
+        }
+      }
+      
+      // Now get all reviews (including newly created ones)
+      const allReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      
+      // Count pending (unsigned) documents that apply to this user's role
+      const pendingReviews = allReviews.filter(r => {
+        // Document is not signed yet
+        if (r.signedAt) return false;
+        
+        // Check if document targets this user's role
+        const targetRoles = r.targetRoles as string[] | null;
+        if (!targetRoles || targetRoles.length === 0) {
+          return true; // Legacy documents apply to everyone
+        }
+        
+        return targetRoles.includes(currentUser.role);
+      });
+      
+      res.json({ 
+        hasPendingDocuments: pendingReviews.length > 0, 
+        pendingCount: pendingReviews.length 
+      });
+    } catch (error) {
+      console.error("Document review pending check error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -19124,7 +22511,232 @@ Do not include any other text, just the JSON object.`
       // Get the complete quote with services (after transaction)
       const fullQuote = await storage.getQuoteById(quoteWithServices.id);
       
-      res.json({ quote: fullQuote });
+      // Link property manager and send notifications
+      let smsResult: { sent: boolean; error?: string } = { sent: false };
+      try {
+        let propertyManager: any = null;
+        
+        // Check if PM was manually selected in the request
+        if (req.body.recipientPropertyManagerId) {
+          propertyManager = await storage.getUserById(req.body.recipientPropertyManagerId);
+          if (propertyManager && propertyManager.role !== 'property_manager') {
+            propertyManager = null; // Invalid - not a PM
+          }
+        }
+        
+        // If no manual selection, try auto-linking based on strata number
+        if (!propertyManager && fullQuote!.strataPlanNumber) {
+          const pmLinks = await db.select()
+            .from(propertyManagerCompanyLinks)
+            .where(
+              and(
+                eq(propertyManagerCompanyLinks.companyId, companyId),
+                eq(propertyManagerCompanyLinks.strataNumber, fullQuote!.strataPlanNumber)
+              )
+            );
+          
+          if (pmLinks.length > 0) {
+            propertyManager = await storage.getUserById(pmLinks[0].propertyManagerId);
+          }
+        }
+        
+        if (propertyManager && propertyManager.role === 'property_manager') {
+            // If PM was manually selected and quote has a strata number, update/add PM's strata link
+            if (req.body.recipientPropertyManagerId && fullQuote!.strataPlanNumber) {
+              const existingLink = await db.select()
+                .from(propertyManagerCompanyLinks)
+                .where(
+                  and(
+                    eq(propertyManagerCompanyLinks.propertyManagerId, propertyManager.id),
+                    eq(propertyManagerCompanyLinks.companyId, companyId)
+                  )
+                )
+                .limit(1);
+              
+              if (existingLink.length > 0) {
+                // Update existing link with the strata number if not already set or different
+                if (!existingLink[0].strataNumber || existingLink[0].strataNumber !== fullQuote!.strataPlanNumber) {
+                  await db.update(propertyManagerCompanyLinks)
+                    .set({ strataNumber: fullQuote!.strataPlanNumber })
+                    .where(eq(propertyManagerCompanyLinks.id, existingLink[0].id));
+                  console.log(`[Quote] Updated PM link with strata number ${fullQuote!.strataPlanNumber} for ${propertyManager.email}`);
+                }
+              }
+            }
+            
+            // Link the quote to this property manager and move to submitted stage
+            await storage.updateQuote(fullQuote!.id, { 
+              recipientPropertyManagerId: propertyManager.id,
+              collaborationStatus: 'sent',
+              sentAt: new Date(),
+              pipelineStage: 'submitted',
+              stageUpdatedAt: new Date()
+            } as any);
+            
+            console.log(`[Quote] Linked quote ${fullQuote!.quoteNumber} to property manager ${propertyManager.email}`);
+            
+            // Save building info to PM's client record if one exists
+            try {
+              const pmClient = await db.select()
+                .from(clients)
+                .where(
+                  and(
+                    eq(clients.companyId, companyId),
+                    eq(clients.email, propertyManager.email)
+                  )
+                )
+                .limit(1);
+              
+              if (pmClient.length > 0 && fullQuote!.strataPlanNumber) {
+                const existingBuildings = (pmClient[0].lmsNumbers as any[]) || [];
+                
+                // Check if this strata/building already exists
+                const existingBuildingIndex = existingBuildings.findIndex(
+                  (b: any) => b.number === fullQuote!.strataPlanNumber
+                );
+                
+                if (existingBuildingIndex === -1) {
+                  // Add the new building from the quote
+                  const newBuilding = {
+                    number: fullQuote!.strataPlanNumber,
+                    buildingName: fullQuote!.buildingName || '',
+                    address: fullQuote!.buildingAddress || '',
+                    stories: fullQuote!.floorCount || null,
+                    units: fullQuote!.unitCount || null,
+                    parkingStalls: fullQuote!.parkingStalls || null
+                  };
+                  
+                  await db.update(clients)
+                    .set({ lmsNumbers: [...existingBuildings, newBuilding] })
+                    .where(eq(clients.id, pmClient[0].id));
+                  
+                  console.log(`[Quote] Added building ${fullQuote!.buildingName} (${fullQuote!.strataPlanNumber}) to PM client record`);
+                } else {
+                  console.log(`[Quote] Building ${fullQuote!.strataPlanNumber} already exists in PM client record`);
+                }
+              }
+            } catch (clientError: any) {
+              console.warn(`[Quote] Could not update PM client record: ${clientError?.message}`);
+            }
+            
+            // Get company name for WebSocket notification
+            const companyUser = await storage.getUserById(companyId);
+            const companyNameForWs = companyUser?.companyName || 'Rope Access Company';
+            
+            // Send real-time WebSocket notification to property manager
+            wsHub.notifyQuoteCreated(propertyManager.id, {
+              id: fullQuote!.id,
+              quoteNumber: fullQuote!.quoteNumber,
+              buildingName: fullQuote!.buildingName,
+              strataPlanNumber: fullQuote!.strataPlanNumber,
+              status: fullQuote!.status,
+              grandTotal: fullQuote!.services?.reduce((sum: number, s: any) => sum + Number(s.totalCost || 0), 0)?.toString() || null,
+              createdAt: fullQuote!.createdAt,
+              companyName: companyNameForWs
+            });
+            
+            // Send SMS notification if PM has phone and opted in
+            if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
+              // Get company name for SMS
+              const company = await storage.getUserById(companyId);
+              const companyName = company?.companyName || 'Rope Access Company';
+              
+              // Extract service types from quote services
+              const serviceTypes = fullQuote!.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
+              
+              const smsResponse = await sendQuoteNotificationSMS(
+                propertyManager.propertyManagerPhoneNumber,
+                fullQuote!.buildingName,
+                companyName,
+                serviceTypes,
+                fullQuote!.strataPlanNumber
+              );
+              
+              if (smsResponse.success) {
+                console.log(`[SMS] Quote notification sent to ${propertyManager.propertyManagerPhoneNumber}, SID: ${smsResponse.messageId}`);
+                smsResult = { sent: true };
+              } else {
+                console.warn(`[SMS] Failed to send quote notification: ${smsResponse.error}`);
+                smsResult = { sent: false, error: smsResponse.error };
+              }
+            } else if (propertyManager.propertyManagerPhoneNumber && !propertyManager.propertyManagerSmsOptIn) {
+              console.log(`[SMS] Skipped - property manager ${propertyManager.email} has not opted-in to SMS notifications`);
+            }
+        }
+      } catch (pmError: any) {
+        console.error("[Quote] Auto-link property manager error (non-blocking):", pmError?.message || pmError);
+      }
+      
+      // If no SMS sent yet, try sending to the selected client from CRM
+      if (!smsResult.sent && fullQuote!.clientId) {
+        try {
+          const recipientClient = await storage.getClientById(fullQuote!.clientId);
+          if (recipientClient?.phoneNumber) {
+            const company = await storage.getUserById(companyId);
+            const companyName = company?.companyName || 'Rope Access Company';
+            const serviceTypes = fullQuote!.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
+            
+            const smsResponse = await sendQuoteNotificationSMS(
+              recipientClient.phoneNumber,
+              fullQuote!.buildingName,
+              companyName,
+              serviceTypes,
+              fullQuote!.strataPlanNumber
+            );
+            
+            if (smsResponse.success) {
+              console.log(`[SMS] Quote notification sent to client ${recipientClient.firstName} ${recipientClient.lastName} at ${recipientClient.phoneNumber}, SID: ${smsResponse.messageId}`);
+              smsResult = { sent: true };
+            } else {
+              console.warn(`[SMS] Failed to send quote notification to client: ${smsResponse.error}`);
+              smsResult = { sent: false, error: smsResponse.error };
+            }
+          } else {
+            console.log(`[SMS] Skipped - client ${recipientClient?.firstName} ${recipientClient?.lastName} has no phone number`);
+          }
+        } catch (clientSmsError: any) {
+          console.error("[SMS] Client notification error (non-blocking):", clientSmsError?.message || clientSmsError);
+        }
+      }
+      
+      
+      // Save building/strata info to CRM client's lmsNumbers if clientId is set
+      if (fullQuote!.clientId && fullQuote!.strataPlanNumber) {
+        try {
+          const crmClient = await storage.getClientById(fullQuote!.clientId);
+          if (crmClient) {
+            const existingBuildings = (crmClient.lmsNumbers as any[]) || [];
+            
+            // Check if this strata/building already exists
+            const existingBuildingIndex = existingBuildings.findIndex(
+              (b: any) => b.number === fullQuote!.strataPlanNumber
+            );
+            
+            if (existingBuildingIndex === -1) {
+              // Add the new building from the quote
+              const newBuilding = {
+                number: fullQuote!.strataPlanNumber,
+                buildingName: fullQuote!.buildingName || '',
+                address: fullQuote!.buildingAddress || '',
+                stories: fullQuote!.floorCount || null,
+                units: null,
+                parkingStalls: null
+              };
+              
+              await db.update(clients)
+                .set({ lmsNumbers: [...existingBuildings, newBuilding] })
+                .where(eq(clients.id, crmClient.id));
+              
+              console.log(`[Quote] Added building ${fullQuote!.buildingName} (${fullQuote!.strataPlanNumber}) to CRM client ${crmClient.firstName} ${crmClient.lastName}`);
+            } else {
+              console.log(`[Quote] Building ${fullQuote!.strataPlanNumber} already exists in CRM client record`);
+            }
+          }
+        } catch (clientUpdateError: any) {
+          console.warn(`[Quote] Could not update CRM client lmsNumbers: ${clientUpdateError?.message}`);
+        }
+      }
+      res.json({ quote: fullQuote, sms: smsResult });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
@@ -20528,20 +24140,17 @@ Do not include any other text, just the JSON object.`
           // Link the quote to this property manager so they can view it
           await storage.updateQuote(quote.id, { recipientPropertyManagerId: propertyManager.id } as any);
           
-          // If they have a phone number, send SMS notification
-          if (propertyManager.propertyManagerPhoneNumber) {
-            // Build the deep link URL to the specific quote
-            const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-              ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-              : process.env.REPLIT_DEPLOYMENT_URL || 'https://onropepro.com';
-            const quoteViewUrl = `${baseUrl}/property-manager/quotes/${quote.id}`;
+          // If they have a phone number AND opted-in to SMS, send SMS notification
+          if (propertyManager.propertyManagerPhoneNumber && propertyManager.propertyManagerSmsOptIn) {
+            // Extract service types from quote services
+            const serviceTypes = quote.services?.map((s: any) => s.serviceType).filter(Boolean) || [];
             
             const smsResponse = await sendQuoteNotificationSMS(
               propertyManager.propertyManagerPhoneNumber,
               quote.buildingName,
               companyName,
-              grandTotal,
-              quoteViewUrl
+              serviceTypes,
+              quote.strataPlanNumber
             );
             if (smsResponse.success) {
               console.log(`[SMS] Quote notification sent to ${propertyManager.propertyManagerPhoneNumber}, SID: ${smsResponse.messageId}`);
@@ -20550,6 +24159,8 @@ Do not include any other text, just the JSON object.`
               console.warn(`[SMS] Failed to send quote notification: ${smsResponse.error}`);
               smsResult = { sent: false, error: smsResponse.error };
             }
+          } else if (propertyManager.propertyManagerPhoneNumber && !propertyManager.propertyManagerSmsOptIn) {
+            console.log(`[SMS] Skipped - property manager ${recipientEmail} has not opted-in to SMS notifications`);
           }
         }
       } catch (smsError: any) {
@@ -20565,6 +24176,68 @@ Do not include any other text, just the JSON object.`
     } catch (error) {
       console.error("Email quote error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== WEATHER ROUTES ====================
+
+  // Get weather data from Open-Meteo (free, no API key required)
+  app.get("/api/weather", requireAuth, requireRole("company", "employee", "rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "labourer"), async (req: Request, res: Response) => {
+    try {
+      const lat = parseFloat(req.query.lat as string);
+      const lon = parseFloat(req.query.lon as string);
+      
+      if (isNaN(lat) || isNaN(lon)) {
+        return res.status(400).json({ message: "Invalid coordinates. Please provide lat and lon query parameters." });
+      }
+      
+      // Fetch from Open-Meteo API - free, no key required
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto&forecast_days=2`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Open-Meteo API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Transform the data for easier frontend consumption
+      const current = {
+        temperature: data.current?.temperature_2m,
+        temperatureUnit: data.current_units?.temperature_2m || "°C",
+        humidity: data.current?.relative_humidity_2m,
+        weatherCode: data.current?.weather_code,
+        windSpeed: data.current?.wind_speed_10m,
+        windSpeedUnit: data.current_units?.wind_speed_10m || "km/h",
+        windDirection: data.current?.wind_direction_10m,
+        windGusts: data.current?.wind_gusts_10m,
+        time: data.current?.time,
+      };
+      
+      // Build hourly forecast
+      const hourly = [];
+      if (data.hourly?.time) {
+        for (let i = 0; i < data.hourly.time.length; i++) {
+          hourly.push({
+            time: data.hourly.time[i],
+            temperature: data.hourly.temperature_2m?.[i],
+            weatherCode: data.hourly.weather_code?.[i],
+            windSpeed: data.hourly.wind_speed_10m?.[i],
+            windDirection: data.hourly.wind_direction_10m?.[i],
+            windGusts: data.hourly.wind_gusts_10m?.[i],
+          });
+        }
+      }
+      
+      res.json({
+        current,
+        hourly,
+        timezone: data.timezone,
+        location: { lat, lon },
+      });
+    } catch (error) {
+      console.error("Weather API error:", error);
+      res.status(500).json({ message: "Failed to fetch weather data" });
     }
   });
 
@@ -21547,26 +25220,55 @@ Do not include any other text, just the JSON object.`
     try {
       // Get only active, non-expired job postings
       const now = new Date();
+      const positionType = req.query.positionType as string | undefined;
+      
+      // Build conditions array
+      const conditions: any[] = [
+        eq(jobPostings.status, "active"),
+        or(
+          isNull(jobPostings.expiresAt),
+          gt(jobPostings.expiresAt, now)
+        )
+      ];
+      
+      // Add position type filter if specified
+      if (positionType && (positionType === "rope_access" || positionType === "ground_crew")) {
+        conditions.push(eq(jobPostings.positionType, positionType));
+      }
       
       const activeJobs = await db.select({
         job: jobPostings,
         companyName: users.companyName,
+        companyLogoUrl: users.brandingLogoUrl,
       }).from(jobPostings)
         .leftJoin(users, eq(jobPostings.companyId, users.id))
-        .where(
-          and(
-            eq(jobPostings.status, "active"),
-            or(
-              isNull(jobPostings.expiresAt),
-              gt(jobPostings.expiresAt, now)
-            )
-          )
-        )
+        .where(and(...conditions))
         .orderBy(desc(jobPostings.createdAt));
+
+      // Get CSR ratings for all companies that have job postings
+      const companyIds = [...new Set(activeJobs.map(item => item.job.companyId).filter(Boolean))];
+      const csrMap = new Map<string, number>();
+      
+      for (const companyId of companyIds) {
+        if (companyId) {
+          const [latestCsr] = await db.select({
+            newScore: csrRatingHistory.newScore,
+          }).from(csrRatingHistory)
+            .where(eq(csrRatingHistory.companyId, companyId))
+            .orderBy(desc(csrRatingHistory.createdAt))
+            .limit(1);
+          
+          if (latestCsr) {
+            csrMap.set(companyId, latestCsr.newScore);
+          }
+        }
+      }
 
       const jobsWithCompany = activeJobs.map(item => ({
         ...item.job,
         companyName: item.job.isPlatformPost ? "OnRopePro Platform" : (item.companyName || "Unknown Company"),
+        companyCsr: item.job.companyId ? csrMap.get(item.job.companyId) ?? null : null,
+        companyLogoUrl: item.job.isPlatformPost ? null : (item.companyLogoUrl || null),
       }));
 
       res.json({ jobPostings: jobsWithCompany });
@@ -21664,6 +25366,9 @@ Do not include any other text, just the JSON object.`
         description: req.body.description,
         requirements: req.body.requirements,
         location: req.body.location,
+        jobCountry: req.body.jobCountry,
+        jobProvinceState: req.body.jobProvinceState,
+        jobCity: req.body.jobCity,
         isRemote: req.body.isRemote,
         jobType: req.body.jobType,
         employmentType: req.body.employmentType,
@@ -21748,11 +25453,19 @@ Do not include any other text, just the JSON object.`
         .where(eq(jobApplications.technicianId, currentUser.id))
         .orderBy(desc(jobApplications.appliedAt));
 
-      // Fetch job posting details for each application
+      // Fetch job posting details and company info for each application
       const applicationsWithJobs = await Promise.all(
         applications.map(async (app) => {
           const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, app.jobPostingId));
-          return { ...app, jobPosting: job };
+          let companyName = null;
+          if (job?.companyId) {
+            const [company] = await db.select({ 
+              companyName: users.companyName, 
+              name: users.name 
+            }).from(users).where(eq(users.id, job.companyId));
+            companyName = company?.companyName || company?.name || null;
+          }
+          return { ...app, jobPosting: job ? { ...job, companyName } : null };
         })
       );
 
@@ -22263,6 +25976,210 @@ Do not include any other text, just the JSON object.`
   // END JOB APPLICATIONS ENDPOINTS
   // =====================================================================
 
+  // Get technician's Personal Safety Rating (PSR)
+  app.get("/api/technician/psr", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const ALLOWED_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "company"];
+      if (!ALLOWED_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians can view PSR" });
+      }
+
+      // 1. Certification Score (25% of total)
+      let certScore = 0;
+      let certStatus = "none";
+      let certDetails: any = { level: null, expirationDate: null, daysUntilExpiry: null, verified: false };
+      
+      const today = new Date();
+      if (currentUser.irataLevel || currentUser.spratLevel) {
+        const certType = currentUser.irataLevel ? "IRATA" : "SPRAT";
+        const level = currentUser.irataLevel || currentUser.spratLevel;
+        const expirationDate = currentUser.irataLevel 
+          ? (currentUser.irataExpirationDate ? new Date(currentUser.irataExpirationDate) : null)
+          : (currentUser.spratExpirationDate ? new Date(currentUser.spratExpirationDate) : null);
+        const verified = currentUser.irataLevel 
+          ? !!currentUser.irataVerifiedAt 
+          : !!currentUser.spratVerifiedAt;
+
+        certDetails = {
+          type: certType,
+          level,
+          expirationDate: expirationDate?.toISOString() || null,
+          daysUntilExpiry: expirationDate ? Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : null,
+          verified,
+        };
+
+        if (expirationDate && expirationDate > today) {
+          certScore = verified ? 100 : 75;
+          certStatus = verified ? "verified" : "unverified";
+        } else if (expirationDate && expirationDate <= today) {
+          certScore = 25;
+          certStatus = "expired";
+        } else {
+          certScore = 50;
+          certStatus = "no_expiry_date";
+        }
+      }
+
+      // 2. Safety Documents Score (25% of total) - Personal harness inspections
+      let docsScore = 0;
+      let docsStatus = "none";
+      const personalInspections = await storage.getPersonalHarnessInspections(currentUser.id);
+      
+      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const recentInspections = personalInspections.filter((insp: any) => 
+        new Date(insp.inspectionDate) >= thirtyDaysAgo
+      );
+      
+      const passedInspections = recentInspections.filter((insp: any) => insp.overallStatus === "pass");
+      const inspectionCount = recentInspections.length;
+      
+      if (inspectionCount === 0) {
+        docsScore = 0;
+        docsStatus = "none";
+      } else {
+        docsScore = Math.round((passedInspections.length / Math.max(inspectionCount, 1)) * 100);
+        docsStatus = docsScore >= 80 ? "good" : docsScore >= 50 ? "fair" : "poor";
+      }
+
+      const docsDetails = {
+        totalInspections: personalInspections.length,
+        recentInspections: inspectionCount,
+        passedRecent: passedInspections.length,
+        last30Days: inspectionCount,
+      };
+
+      // 3. Safety Quizzes Score (25% of total)
+      let quizScore = 0;
+      let quizStatus = "none";
+      const allAttempts = await storage.getAllQuizAttemptsByEmployee(currentUser.id);
+      
+      const safetyQuizAttempts = allAttempts.filter((a: any) => 
+        a.quizId?.startsWith("safety_") || a.quizId?.startsWith("cert_")
+      );
+      
+      const passedQuizzes = new Set(
+        safetyQuizAttempts.filter((a: any) => a.passed).map((a: any) => a.quizId)
+      );
+      
+      const totalSafetyQuizTypes = 6;
+      quizScore = Math.round((passedQuizzes.size / totalSafetyQuizTypes) * 100);
+      quizStatus = quizScore >= 80 ? "good" : quizScore >= 50 ? "fair" : quizScore > 0 ? "started" : "none";
+
+      const quizDetails = {
+        totalAttempts: safetyQuizAttempts.length,
+        passedQuizTypes: passedQuizzes.size,
+        totalQuizTypes: totalSafetyQuizTypes,
+        quizzesPassed: Array.from(passedQuizzes),
+      };
+
+      // 4. Work History Score (25% of total) - Only for employer-linked technicians
+      let workScore = 0;
+      let workStatus = "not_applicable";
+      let workDetails: any = { isLinked: false };
+
+      const connections = await db.select()
+        .from(technicianEmployerConnections)
+        .where(
+          and(
+            eq(technicianEmployerConnections.technicianId, currentUser.id),
+            eq(technicianEmployerConnections.status, "active")
+          )
+        );
+
+      if (connections.length > 0 || currentUser.companyId) {
+        workDetails.isLinked = true;
+        const companyId = currentUser.companyId || connections[0]?.companyId;
+        
+        if (companyId) {
+          const workSessions = await storage.getAllWorkSessionsByEmployee(currentUser.id);
+          const completedSessions = workSessions.filter((ws: any) => ws.endTime);
+          
+          const incidentReportsList = await db.select()
+            .from(incidentReports)
+            .where(eq(incidentReports.companyId, companyId));
+          
+          const technicianIncidents = incidentReportsList.filter((ir: any) => 
+            ir.reportedById === currentUser.id || 
+            (ir.witnesses && Array.isArray(ir.witnesses) && ir.witnesses.includes(currentUser.id))
+          );
+
+          workDetails = {
+            isLinked: true,
+            totalSessions: completedSessions.length,
+            incidentCount: technicianIncidents.length,
+          };
+
+          if (completedSessions.length === 0) {
+            workScore = 50;
+            workStatus = "new";
+          } else {
+            const incidentPenalty = Math.min(technicianIncidents.length * 10, 50);
+            workScore = Math.max(100 - incidentPenalty, 50);
+            workStatus = workScore >= 90 ? "excellent" : workScore >= 70 ? "good" : "fair";
+          }
+        }
+      }
+
+      // Calculate overall PSR
+      const weights = { cert: 0.25, docs: 0.25, quiz: 0.25, work: 0.25 };
+      
+      let overallScore: number;
+      if (!workDetails.isLinked) {
+        overallScore = Math.round(
+          (certScore * 0.33) + 
+          (docsScore * 0.33) + 
+          (quizScore * 0.34)
+        );
+      } else {
+        overallScore = Math.round(
+          (certScore * weights.cert) + 
+          (docsScore * weights.docs) + 
+          (quizScore * weights.quiz) + 
+          (workScore * weights.work)
+        );
+      }
+
+      res.json({
+        overallScore,
+        isLinkedToEmployer: workDetails.isLinked,
+        components: {
+          certifications: {
+            score: certScore,
+            status: certStatus,
+            details: certDetails,
+            weight: workDetails.isLinked ? 25 : 33,
+          },
+          safetyDocs: {
+            score: docsScore,
+            status: docsStatus,
+            details: docsDetails,
+            weight: workDetails.isLinked ? 25 : 33,
+          },
+          quizzes: {
+            score: quizScore,
+            status: quizStatus,
+            details: quizDetails,
+            weight: workDetails.isLinked ? 25 : 34,
+          },
+          workHistory: {
+            score: workScore,
+            status: workStatus,
+            details: workDetails,
+            weight: workDetails.isLinked ? 25 : 0,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Get technician PSR error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Toggle technician visibility to employers
   app.patch("/api/technician/visibility", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -22299,40 +26216,6 @@ Do not include any other text, just the JSON object.`
       });
     } catch (error) {
       console.error("Update technician visibility error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Update technician specialties
-  app.post("/api/technician/specialties", requireAuth, async (req: Request, res: Response) => {
-    try {
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Technicians and company owners (who often also work as techs) can update their specialties
-      const ALLOWED_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager", "company"];
-      if (!ALLOWED_ROLES.includes(currentUser.role)) {
-        return res.status(403).json({ message: "Only technicians and company owners can update specialties" });
-      }
-
-      const { specialties } = req.body;
-      
-      if (!Array.isArray(specialties)) {
-        return res.status(400).json({ message: "Specialties must be an array" });
-      }
-
-      const [updatedUser] = await db.update(users)
-        .set({ ropeAccessSpecialties: specialties })
-        .where(eq(users.id, currentUser.id))
-        .returning();
-
-      res.json({ 
-        ropeAccessSpecialties: updatedUser.ropeAccessSpecialties,
-      });
-    } catch (error) {
-      console.error("Update technician specialties error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -22551,9 +26434,29 @@ Do not include any other text, just the JSON object.`
       // Fetch all quiz attempts for visible technicians (for PSR calculation)
       const techIds = visibleTechs.map(t => t.id);
       const allQuizAttempts = techIds.length > 0 
-        ? await db.select().from(quizAttempts).where(sql`${quizAttempts.employeeId} = ANY(${techIds})`)
+        ? await db.select().from(quizAttempts).where(inArray(quizAttempts.employeeId, techIds))
         : [];
       
+      
+      // Fetch all certifications for visible technicians
+      const allCertifications = techIds.length > 0
+        ? await db.select().from(userCertifications).where(inArray(userCertifications.userId, techIds))
+        : [];
+      
+      // Group certifications by user ID
+      const certificationsByUser = new Map<string, any[]>();
+      for (const cert of allCertifications) {
+        if (!certificationsByUser.has(cert.userId)) {
+          certificationsByUser.set(cert.userId, []);
+        }
+        certificationsByUser.get(cert.userId)!.push({
+          id: cert.id,
+          description: cert.description,
+          fileUrl: cert.fileUrl,
+          expiryDate: cert.expiryDate,
+          createdAt: cert.createdAt,
+        });
+      }
       // Group quiz attempts by employee ID
       const quizAttemptsByEmployee = new Map<string, any[]>();
       for (const attempt of allQuizAttempts) {
@@ -22575,6 +26478,7 @@ Do not include any other text, just the JSON object.`
           safetyLabel,
           safetyColor,
           safetyBreakdown,
+          certifications: certificationsByUser.get(tech.id) || [],
         };
       });
 

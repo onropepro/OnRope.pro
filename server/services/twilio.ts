@@ -74,16 +74,25 @@ export async function sendQuoteNotificationSMS(
   phoneNumber: string,
   buildingName: string,
   companyName: string,
-  totalAmount: number,
-  quoteViewUrl: string
+  serviceTypes: string[],
+  strataPlanNumber: string | null
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
-  const formattedAmount = totalAmount.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2
-  });
+  // Build PM login URL from environment
+  const domain = process.env.REPLIT_DEV_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || 'onropepro.com';
+  const pmLoginUrl = `https://${domain}/pm-dashboard`;
   
-  const message = `You've received a service quote for ${buildingName} from ${companyName}. Amount: ${formattedAmount}. View details: ${quoteViewUrl}`;
+  // Format service types for display
+  const servicesText = serviceTypes.length > 0 
+    ? serviceTypes.join(', ').replace(/_/g, ' ')
+    : 'building maintenance';
+  
+  // Build message with building name and strata
+  const buildingInfo = strataPlanNumber 
+    ? `${buildingName} (${strataPlanNumber})`
+    : buildingName;
+  
+  // Twilio compliant: Sender ID + clear message + opt-out
+  const message = `OnRopePro: ${companyName} has sent you a quote for ${servicesText} at ${buildingInfo}. Log in to review: ${pmLoginUrl} Reply STOP to opt out.`;
   
   return sendSMS(phoneNumber, message);
 }

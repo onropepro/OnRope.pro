@@ -66,10 +66,10 @@ export function TodaysHoursCard({ onRouteNavigate, branding }: CardProps) {
               variant="ghost"
               size="sm"
               className="w-full justify-between"
-              onClick={() => onRouteNavigate("/timesheets")}
+              onClick={() => onRouteNavigate("/my-logged-hours")}
               data-testid="button-view-todays-hours"
             >
-              View Timesheets
+              View Logged Hours
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>

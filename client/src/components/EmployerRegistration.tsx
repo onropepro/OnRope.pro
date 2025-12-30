@@ -1,31 +1,34 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Briefcase, ArrowRight, ArrowLeft, Loader2, 
+  ArrowRight, ArrowLeft, Loader2, 
   Check, Shield, Clock, DollarSign, Users,
-  BarChart3, FileText, Eye, EyeOff, Building2, Lock
+  BarChart3, Eye, EyeOff, Building2, Lock, CreditCard
 } from "lucide-react";
+import { 
+  PRICING, 
+  TRIAL_PERIOD_DAYS,
+  type BillingFrequency 
+} from "@shared/stripe-config";
+import { RegistrationEmbeddedCheckout } from "./RegistrationEmbeddedCheckout";
 
-type RegistrationStep = "welcome" | "companyDetails" | "addressDetails" | "success";
+type RegistrationStep = "welcome" | "companyDetails" | "payment" | "processing" | "success";
 
 interface EmployerData {
   companyName: string;
   ownerName: string;
   email: string;
-  streetAddress: string;
-  province: string;
-  country: string;
-  zipCode: string;
-  licenseKey: string;
   password: string;
   confirmPassword: string;
+  billingFrequency: BillingFrequency;
 }
 
 interface EmployerRegistrationProps {
@@ -35,6 +38,19 @@ interface EmployerRegistrationProps {
 
 const EMPLOYER_COLOR = "#0B64A3";
 
+interface ProcessingStatus {
+  step: number;
+  message: string;
+}
+
+const PROCESSING_STEPS = [
+  "Verifying payment...",
+  "Creating your company account...",
+  "Setting up your dashboard...",
+  "Configuring permissions...",
+  "Finalizing setup...",
+];
+
 export function EmployerRegistration({ open, onOpenChange }: EmployerRegistrationProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -42,35 +58,103 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   const [step, setStep] = useState<RegistrationStep>("welcome");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [processingStatus, setProcessingStatus] = useState<ProcessingStatus>({ step: 0, message: PROCESSING_STEPS[0] });
+  const [registrationResult, setRegistrationResult] = useState<{ companyName: string; trialEnd: number | null } | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    };
+  }, []);
   const [data, setData] = useState<EmployerData>({
     companyName: "",
     ownerName: "",
     email: "",
-    streetAddress: "",
-    province: "",
-    country: "",
-    zipCode: "",
-    licenseKey: "",
     password: "",
     confirmPassword: "",
+    billingFrequency: "monthly",
   });
   const [error, setError] = useState("");
 
   const resetForm = () => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
     setStep("welcome");
     setData({
       companyName: "",
       ownerName: "",
       email: "",
-      streetAddress: "",
-      province: "",
-      country: "",
-      zipCode: "",
-      licenseKey: "",
       password: "",
       confirmPassword: "",
+      billingFrequency: "monthly",
     });
     setError("");
+    setSessionId(null);
+    setProcessingStatus({ step: 0, message: PROCESSING_STEPS[0] });
+    setRegistrationResult(null);
+  };
+
+  const completeRegistration = async (checkoutSessionId: string) => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+
+    try {
+      setStep("processing");
+      setProcessingStatus({ step: 0, message: PROCESSING_STEPS[0] });
+
+      progressIntervalRef.current = setInterval(() => {
+        setProcessingStatus(prev => {
+          const nextStep = Math.min(prev.step + 1, PROCESSING_STEPS.length - 1);
+          return { step: nextStep, message: PROCESSING_STEPS[nextStep] };
+        });
+      }, 2500);
+
+      const response = await fetch(`/api/stripe/complete-registration/${checkoutSessionId}`, {
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setRegistrationResult({
+          companyName: result.companyName || data.companyName,
+          trialEnd: result.trialEnd,
+        });
+        setStep("success");
+        
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+        
+        toast({
+          title: "Registration Complete!",
+          description: "Your company account has been created successfully.",
+        });
+      } else {
+        throw new Error(result.message || "Registration failed");
+      }
+    } catch (err: any) {
+      console.error("[Registration] Error completing registration:", err);
+      setError(err.message || "Failed to complete registration");
+      setStep("payment");
+      toast({
+        title: "Registration Error",
+        description: err.message || "Failed to complete registration. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    }
   };
 
   const handleClose = () => {
@@ -87,12 +171,8 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
           companyName: formData.companyName,
           name: formData.ownerName,
           email: formData.email,
-          streetAddress: formData.streetAddress,
-          province: formData.province,
-          country: formData.country,
-          zipCode: formData.zipCode,
-          licenseKey: formData.licenseKey || undefined,
           passwordHash: formData.password,
+          billingFrequency: formData.billingFrequency,
           role: "company",
         }),
         credentials: "include",
@@ -144,26 +224,6 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
     return true;
   };
 
-  const validateAddressDetails = (): boolean => {
-    if (!data.streetAddress.trim()) {
-      setError("Street address is required");
-      return false;
-    }
-    if (!data.province.trim()) {
-      setError("Province/State is required");
-      return false;
-    }
-    if (!data.country.trim()) {
-      setError("Country is required");
-      return false;
-    }
-    if (!data.zipCode.trim()) {
-      setError("Postal/Zip code is required");
-      return false;
-    }
-    return true;
-  };
-
   const handleContinue = () => {
     setError("");
     
@@ -171,12 +231,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
       setStep("companyDetails");
     } else if (step === "companyDetails") {
       if (validateCompanyDetails()) {
-        setStep("addressDetails");
+        setStep("payment");
       }
-    } else if (step === "addressDetails") {
-      if (validateAddressDetails()) {
-        handleSubmit();
-      }
+    } else if (step === "payment") {
+      handleSubmit();
     }
   };
 
@@ -184,7 +242,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
     setError("");
     if (step === "companyDetails") {
       setStep("welcome");
-    } else if (step === "addressDetails") {
+    } else if (step === "payment") {
       setStep("companyDetails");
     }
   };
@@ -195,7 +253,8 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
 
   const getStepNumber = () => {
     if (step === "companyDetails") return 1;
-    if (step === "addressDetails") return 2;
+    if (step === "payment") return 2;
+    if (step === "processing") return 3;
     if (step === "success") return 3;
     return 0;
   };
@@ -218,11 +277,14 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   ];
 
   const trialBenefits = [
-    "60-day free trial - no credit card required",
     "Full access to all features",
     "Cancel anytime with data export",
     "Priority support during trial",
+    "No charge until trial ends",
   ];
+
+  const monthlyPrice = PRICING.base.monthly;
+  const monthlySeatPrice = PRICING.seat.monthly;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -242,13 +304,13 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 1 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
                   {getStepNumber() > 1 ? <Check className="w-4 h-4" /> : "1"}
                 </div>
-                <span className="text-sm font-medium">Company Details</span>
+                <span className="text-sm font-medium">Account Details</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 2 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
                   {getStepNumber() > 2 ? <Check className="w-4 h-4" /> : "2"}
                 </div>
-                <span className="text-sm font-medium">Address & License</span>
+                <span className="text-sm font-medium">Billing Details</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
@@ -278,18 +340,18 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
               {/* Welcome Screen */}
               {step === "welcome" && (
                 <div className="h-full flex flex-col justify-center max-w-md mx-auto">
-                  <div className="text-center mb-4">
+                  <div className="text-center mb-6">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0B64A3]/10 border border-[#0B64A3]/20 mb-3">
                       <Building2 className="w-4 h-4 text-[#0B64A3]" />
                       <span className="text-xs font-medium text-[#0B64A3] text-center leading-tight">
                         For Rope Access Company Owners
                       </span>
                     </div>
-                    <h1 className="text-2xl font-bold mb-1">Start Your Free Trial</h1>
-                    <p className="text-sm text-muted-foreground">60 days of full access. No credit card required.</p>
+                    <h1 className="text-3xl font-bold mb-2">{TRIAL_PERIOD_DAYS} Days Free</h1>
+                    <p className="text-muted-foreground">Full access to all features. No commitment.</p>
                   </div>
 
-                  {/* Benefits section */}
+                  {/* Benefits section - now first */}
                   <div className="space-y-1.5 mb-4">
                     {welcomeBenefits.map((benefit, i) => (
                       <div key={i} className="flex items-center gap-2 py-1.5 px-2 rounded-md bg-muted/50">
@@ -318,13 +380,22 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
                   </div>
 
+                  {/* Pricing - now secondary, below features */}
+                  <div className="text-center text-sm text-muted-foreground mb-4 py-3 border-t border-b border-border/50">
+                    <p>
+                      After trial: <span className="font-medium text-foreground">${monthlyPrice}/month</span>
+                      {" "}+ ${monthlySeatPrice}/seat
+                    </p>
+                    <p className="text-xs mt-1">Cancel anytime during trial. Annual plans available later.</p>
+                  </div>
+
                   <Button 
                     size="lg" 
                     className="w-full gap-2 rounded-full bg-[#0B64A3] hover:bg-[#0B64A3]/90"
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
-                    Get Started
+                    Start Free Trial
                     <ArrowRight className="w-5 h-5" />
                   </Button>
 
@@ -352,7 +423,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     Back
                   </button>
 
-                  <h2 className="text-xl font-bold mb-1">Company Information</h2>
+                  <h2 className="text-xl font-bold mb-1">Account Details</h2>
                   <p className="text-sm text-muted-foreground mb-6">Tell us about your rope access business</p>
 
                   {error && (
@@ -446,12 +517,16 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       Continue
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
+                    <p className="text-xs text-center mt-2 text-[#ff0000]">
+                      <Lock className="w-3 h-3 inline mr-1" />
+                      You won't be charged during your {TRIAL_PERIOD_DAYS}-day trial
+                    </p>
                   </div>
                 </div>
               )}
 
-              {/* Address Details Step */}
-              {step === "addressDetails" && (
+              {/* Payment Step - Placeholder for Stripe Embedded Checkout */}
+              {step === "payment" && (
                 <div className="max-w-md mx-auto">
                   <button 
                     onClick={handleBack}
@@ -462,8 +537,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     Back
                   </button>
 
-                  <h2 className="text-xl font-bold mb-1">Business Address</h2>
-                  <p className="text-sm text-muted-foreground mb-6">Where is your company located?</p>
+                  <h2 className="text-xl font-bold mb-1">Billing Details</h2>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Enter your billing details to start your {TRIAL_PERIOD_DAYS}-day free trial
+                  </p>
 
                   {error && (
                     <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
@@ -471,84 +548,99 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
                   )}
 
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="streetAddress">Street Address</Label>
-                      <Input
-                        id="streetAddress"
-                        placeholder="123 Main Street"
-                        value={data.streetAddress}
-                        onChange={(e) => setData({ ...data, streetAddress: e.target.value })}
-                        data-testid="input-street-address"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="province">Province/State</Label>
-                        <Input
-                          id="province"
-                          placeholder="BC"
-                          value={data.province}
-                          onChange={(e) => setData({ ...data, province: e.target.value })}
-                          data-testid="input-province"
-                        />
+                  {/* Order Summary */}
+                  <div className="bg-muted/50 rounded-lg p-4 mb-6">
+                    <h3 className="font-medium mb-3">Order Summary</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>OnRopePro Base Plan (Monthly)</span>
+                        <span className="font-medium">
+                          ${monthlyPrice}/mo
+                        </span>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="country">Country</Label>
-                        <Input
-                          id="country"
-                          placeholder="Canada"
-                          value={data.country}
-                          onChange={(e) => setData({ ...data, country: e.target.value })}
-                          data-testid="input-country"
-                        />
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Billing Cycle</span>
+                        <span>Monthly</span>
+                      </div>
+                      <div className="border-t pt-2 mt-2">
+                        <div className="flex justify-between text-green-600 dark:text-green-400">
+                          <span>Free trial</span>
+                          <span>{TRIAL_PERIOD_DAYS} days</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          You won't be charged until your trial ends
+                        </p>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="zipCode">Postal/Zip Code</Label>
-                      <Input
-                        id="zipCode"
-                        placeholder="V6B 1A1"
-                        value={data.zipCode}
-                        onChange={(e) => setData({ ...data, zipCode: e.target.value })}
-                        data-testid="input-zip-code"
+                  {/* Stripe Embedded Checkout */}
+                  <div className="border rounded-lg overflow-hidden">
+                    <RegistrationEmbeddedCheckout
+                      companyName={data.companyName}
+                      ownerName={data.ownerName}
+                      email={data.email}
+                      password={data.password}
+                      billingFrequency={data.billingFrequency}
+                      onComplete={(checkoutSessionId) => {
+                        setSessionId(checkoutSessionId);
+                        completeRegistration(checkoutSessionId);
+                      }}
+                      onError={(errorMsg) => setError(errorMsg)}
+                    />
+                  </div>
+
+                  <p className="text-xs text-center text-muted-foreground mt-4">
+                    By continuing, you agree to our Terms of Service and Privacy Policy.
+                    Your billing address will be used as your company address.
+                  </p>
+                </div>
+              )}
+
+              {/* Processing Step - Shows immediately when Stripe checkout completes */}
+              {step === "processing" && (
+                <div className="h-full flex flex-col justify-center items-center max-w-md mx-auto text-center py-8">
+                  <div className="relative mb-6">
+                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                    </div>
+                  </div>
+                  
+                  <h2 className="text-xl font-bold mb-2">Setting up your account...</h2>
+                  <p className="text-muted-foreground mb-6">
+                    Just a moment while we finalize everything.
+                  </p>
+
+                  {/* Progress indicator */}
+                  <div className="w-full space-y-4 mb-6">
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary transition-all duration-500 ease-out"
+                        style={{ width: `${((processingStatus.step + 1) / PROCESSING_STEPS.length) * 100}%` }}
                       />
                     </div>
+                    <p className="text-sm text-muted-foreground animate-pulse">
+                      {processingStatus.message}
+                    </p>
+                  </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="licenseKey">License Key (Optional)</Label>
-                      <Input
-                        id="licenseKey"
-                        placeholder="Enter license key if you have one"
-                        value={data.licenseKey}
-                        onChange={(e) => setData({ ...data, licenseKey: e.target.value })}
-                        data-testid="input-license-key"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Have a license key from a purchase? Enter it here.
-                      </p>
-                    </div>
-
-                    <Button 
-                      className="w-full bg-[#0B64A3] hover:bg-[#0B64A3]/90"
-                      onClick={handleContinue}
-                      disabled={registrationMutation.isPending}
-                      data-testid="button-create-account"
-                    >
-                      {registrationMutation.isPending ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Creating Account...
-                        </>
-                      ) : (
-                        <>
-                          Create Account
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </>
-                      )}
-                    </Button>
+                  {/* Helpful tips while waiting */}
+                  <div className="w-full bg-muted/50 rounded-lg p-4 text-left">
+                    <h3 className="font-medium text-sm mb-2">While you wait...</h3>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 text-green-500" />
+                        Your payment has been confirmed
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 text-green-500" />
+                        {TRIAL_PERIOD_DAYS}-day free trial activated
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Creating your workspace
+                      </li>
+                    </ul>
                   </div>
                 </div>
               )}
@@ -561,8 +653,11 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-2">Welcome to OnRopePro!</h2>
-                  <p className="text-muted-foreground mb-6">
-                    Your company account has been created. You're ready to start managing your rope access business.
+                  <p className="text-muted-foreground mb-2">
+                    Your account for {registrationResult?.companyName || data.companyName} is ready.
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Your {TRIAL_PERIOD_DAYS}-day free trial has started. You're ready to start managing your rope access business.
                   </p>
 
                   <div className="space-y-3 w-full">
@@ -576,6 +671,14 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     >
                       Go to Dashboard
                       <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={handleClose}
+                      data-testid="button-close"
+                    >
+                      Close
                     </Button>
                   </div>
                 </div>

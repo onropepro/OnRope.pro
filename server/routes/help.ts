@@ -253,11 +253,13 @@ router.post('/reindex', async (req: Request, res: Response) => {
 
 /**
  * GET /api/help/modules
- * Get list of all available modules/guides
+ * Get list of all available modules/guides (excludes Popular Topics)
  */
 router.get('/modules', async (req: Request, res: Response) => {
   try {
-    res.json({ modules: guideRegistry });
+    // Filter out items marked as hideFromModulesGrid (Popular Topics)
+    const modules = guideRegistry.filter((m: any) => !m.hideFromModulesGrid);
+    res.json({ modules });
   } catch (error: any) {
     console.error('[Help Modules] Error:', error);
     res.status(500).json({ error: 'Failed to fetch modules' });

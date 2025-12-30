@@ -24,6 +24,15 @@ The Time Tracking module provides GPS-verified work session tracking for field t
 - Overtime calculated based on company settings
 - Daily and weekly hour totals computed in real-time
 
+### Technician Self-Logged Hours
+Technicians can track their hours even when not linked to an employer:
+- **Manual Hours**: Hours entered when your employer doesn't use OnRopePro - these count toward your total hours and certification progress
+- **Previous Hours**: Historical hours from work before joining the platform - shown as reference only and NOT counted in totals
+
+This distinction helps technicians:
+- Maintain accurate running totals for IRATA/SPRAT certification upgrades
+- Keep a complete historical record without inflating current totals
+
 ### Valid Shortfall Reasons
 When technicians end sessions below daily target hours, they can provide valid reasons:
 - Weather conditions

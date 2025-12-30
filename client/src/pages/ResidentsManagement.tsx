@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useLocation } from "wouter";
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 
 interface Resident {
   id: string;
@@ -63,23 +62,20 @@ export default function ResidentsManagement() {
     setExpandedStrataPlans(newExpanded);
   };
 
+  // Configure unified header with back button
+  const handleBackClick = useCallback(() => {
+    setLocation('/dashboard');
+  }, [setLocation]);
+
+  useSetHeaderConfig({
+    pageTitle: t('residentsManagement.title', 'Residents'),
+    pageDescription: t('residentsManagement.subtitle', 'Manage building residents'),
+    onBackClick: handleBackClick,
+    showSearch: false,
+  }, [t, handleBackClick]);
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with back button */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm border-b shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <BackButton size="icon" />
-          <MainMenuButton size="icon" />
-          <div className="flex items-center gap-3">
-            <span className="material-icons text-3xl text-primary">people</span>
-            <div>
-              <h1 className="text-2xl font-bold">{t('residentsManagement.title', 'Residents')}</h1>
-              <p className="text-sm text-muted-foreground">{t('residentsManagement.subtitle', 'Manage building residents')}</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Main content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
         {/* Resident Seats Management */}

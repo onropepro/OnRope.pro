@@ -464,7 +464,29 @@ All 17 module landing pages have translations:
 | Technician Passport | /modules/technician-passport | ✅ | ✅ | ✅ |
 | Job Board | /modules/employer-job-board | ✅ | ✅ | ✅ |
 
+## Dashboard and Sidebar Translation Updates (December 30, 2024)
+
+**Recently Added Translation Keys:**
+- `dashboard.sidebar.*` - Menu item translations (dashboard, work dashboard, weather, off-site, certifications, inspections, gear management, training, performance, my passport, settings, help center, customize)
+- `dashboard.categories.*` - Category header translations (OPERATIONS, TEAM, EQUIPMENT, SAFETY, FINANCES/CLIENTS, ANALYTICS, COMMUNICATION)
+- `dashboard.cards.*` - Card label/description translations for Job Board, Pay Period, Today's Hours, New Feedback, Active Projects, Today's Schedule, Safety Ratings
+
+**Translation Coverage**: All keys implemented in English (en.json), French (fr.json), and Spanish (es.json) with consistent key structure across all three language files.
+
+**Adherence to Guidelines**: 
+- ✅ Keys added to en.json first (source of truth)
+- ✅ Identical key structure replicated to fr.json and es.json
+- ✅ Follows `path.to.key` naming convention
+- ✅ Used by DashboardSidebar.tsx and related components via `t('key', 'fallback')`
+
 ## Version History
+- **v1.1** (December 30, 2024): Dashboard and Sidebar Translation Updates
+  - Added dashboard.sidebar menu translations (12 items)
+  - Added dashboard.categories section headers (7 items)
+  - Added dashboard.cards descriptions for key cards
+  - Verified consistency across all three language files (EN, FR, ES)
+  - Ensured compliance with translation key naming conventions
+
 - **v1.0** (December 23, 2024): Initial comprehensive documentation
   - Documented i18next configuration and setup
   - Added translation file structure details

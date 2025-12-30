@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
-import { SignInModal } from "@/components/SignInModal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
@@ -46,7 +46,7 @@ const ALL_ACCORDION_ITEMS = [
 
 export default function CRMLanding() {
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
   const allExpanded = expandedProblems.length === ALL_ACCORDION_ITEMS.length;
 
@@ -88,12 +88,10 @@ export default function CRMLanding() {
                 Start Your Free 60-Day Trial
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-cta-signin">
+              <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/10" onClick={openLogin} data-testid="button-cta-signin">
                 Sign In
               </Button>
             </div>
-            
-            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
             
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["client-relationship-management"]} 
@@ -317,10 +315,10 @@ export default function CRMLanding() {
 
             {/* For Technicians */}
             <Card className="overflow-hidden">
-              <CardHeader className="bg-[#AB4521]/10 dark:bg-[#AB4521]/20 border-b">
+              <CardHeader className="bg-[#5C7A84]/10 dark:bg-[#5C7A84]/20 border-b">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 dark:bg-[#AB4521]/30 flex items-center justify-center">
-                    <Wrench className="w-5 h-5 text-[#AB4521]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#5C7A84]/20 dark:bg-[#5C7A84]/30 flex items-center justify-center">
+                    <Wrench className="w-5 h-5 text-[#5C7A84]" />
                   </div>
                   <CardTitle className="text-xl">For Technicians</CardTitle>
                 </div>

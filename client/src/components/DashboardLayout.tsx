@@ -1,12 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { useContext, ReactNode } from "react";
+import { useContext, ReactNode, useState } from "react";
 import { BrandingContext } from "@/App";
-import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { DashboardSidebar, type NavGroup, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";
+import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
+import { TechnicianDashboardHeader } from "@/components/TechnicianDashboardHeader";
+import { useHeaderConfig, HeaderConfigProvider } from "@/contexts/HeaderConfigContext";
 import type { User } from "@/lib/permissions";
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  variant?: DashboardVariant;
+  customNavigationGroups?: NavGroup[];
+  customBrandColor?: string;
+  showDashboardLink?: boolean;
+  dashboardLinkLabel?: string;
+  headerContent?: React.ReactNode;
+  onTabChange?: (tab: string) => void;
+  activeTab?: string;
 }
 
 interface BrandingSettings {
@@ -17,7 +28,18 @@ interface BrandingSettings {
   pwaAppIconUrl?: string | null;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+function DashboardLayoutInner({ 
+  children,
+  variant = "employer",
+  customNavigationGroups,
+  customBrandColor,
+  showDashboardLink = true,
+  dashboardLinkLabel,
+  headerContent,
+  onTabChange: externalTabChange,
+  activeTab: externalActiveTab,
+}: DashboardLayoutProps) {
+  const { config: headerConfig } = useHeaderConfig();
   const [location, setLocation] = useLocation();
   const brandingContext = useContext(BrandingContext);
 
@@ -100,22 +122,79 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   // White label is active if the API says subscriptionActive is true
   const whitelabelActive = !!brandingData?.subscriptionActive;
 
+  // Use external handlers if provided, otherwise use internal defaults
+  const resolvedActiveTab = externalActiveTab ?? getActiveTab();
+  const resolvedTabChange = externalTabChange ?? handleTabChange;
+
+  // Mobile sidebar state - controlled by DashboardLayout for all variants
+  const [mobileOpen, setMobileOpen] = useState(false);
+  
+  // All non-employer variants use the unified TechnicianDashboardHeader
+  // This provides consistent navigation across technician, ground-crew, property-manager, resident, and building-manager dashboards
+  const usesUnifiedHeader = variant !== "employer";
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <DashboardSidebar
         currentUser={currentUser}
-        activeTab={getActiveTab()}
-        onTabChange={handleTabChange}
+        activeTab={resolvedActiveTab}
+        onTabChange={resolvedTabChange}
         brandingLogoUrl={brandingData?.logoUrl}
         whitelabelBrandingActive={whitelabelActive}
         companyName={brandingData?.companyName || currentUser?.username}
         employeeCount={employees?.length || 0}
         alertCounts={alertCounts}
+        variant={variant}
+        customNavigationGroups={customNavigationGroups}
+        customBrandColor={customBrandColor}
+        showDashboardLink={showDashboardLink}
+        dashboardLinkLabel={dashboardLinkLabel}
+        headerContent={headerContent}
+        mobileOpen={mobileOpen}
+        onMobileOpenChange={setMobileOpen}
       />
       
-      <main className="lg:pl-60 min-h-screen">
-        {children}
+      <main className="lg:pl-60 min-h-screen flex flex-col">
+        {variant === "employer" && (
+          <EmployerDashboardHeader
+            currentUser={currentUser}
+            employees={employees}
+            logoUrl={brandingData?.logoUrl || undefined}
+            pageTitle={headerConfig?.pageTitle}
+            pageDescription={headerConfig?.pageDescription}
+            actionButtons={headerConfig?.actionButtons}
+            onBackClick={headerConfig?.onBackClick || undefined}
+            showSearch={headerConfig?.showSearch ?? true}
+            showNotifications={headerConfig?.showNotifications ?? true}
+            showLanguageDropdown={headerConfig?.showLanguageDropdown ?? true}
+            showProfile={headerConfig?.showProfile ?? true}
+            showLogout={headerConfig?.showLogout ?? true}
+            onMobileMenuClick={() => setMobileOpen(prev => !prev)}
+          />
+        )}
+        {usesUnifiedHeader && (
+          <TechnicianDashboardHeader
+            currentUser={currentUser}
+            onMobileMenuClick={() => setMobileOpen(prev => !prev)}
+          />
+        )}
+        <div className="flex-1">
+          {children}
+        </div>
       </main>
     </div>
   );
 }
+
+export function DashboardLayout(props: DashboardLayoutProps) {
+  return (
+    <HeaderConfigProvider>
+      <DashboardLayoutInner {...props} />
+    </HeaderConfigProvider>
+  );
+}
+
+// Re-export types for convenience
+export { type NavGroup, type NavItem, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";
+export { useSetHeaderConfig } from "@/contexts/HeaderConfigContext";
+export type { HeaderConfig } from "@/contexts/HeaderConfigContext";

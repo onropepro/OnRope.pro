@@ -132,11 +132,9 @@ export default function TechnicianLogin() {
   useEffect(() => {
     if (userData?.user) {
       if (userData.user.role === "rope_access_tech") {
-        if (userData.user.companyId && !userData.user.terminatedDate) {
-          setLocation("/dashboard");
-        } else {
-          setLocation("/technician-portal");
-        }
+        setLocation("/technician-portal");
+      } else if (userData.user.role === "ground_crew") {
+        setLocation("/ground-crew-portal");
       } else if (userData.user.role === "resident") {
         setLocation("/resident-dashboard");
       } else if (userData.user.role === "property_manager") {
@@ -187,11 +185,9 @@ export default function TechnicianLogin() {
       });
       
       if (user.role === "rope_access_tech") {
-        if (user.companyId && !user.terminatedDate) {
-          setLocation("/dashboard");
-        } else {
-          setLocation("/technician-portal");
-        }
+        setLocation("/technician-portal");
+      } else if (user.role === "ground_crew") {
+        setLocation("/ground-crew-portal");
       } else {
         setLocation("/dashboard");
       }
@@ -214,7 +210,7 @@ export default function TechnicianLogin() {
     {
       icon: FileText,
       title: "Logbook Reference",
-      description: "Every session recorded. Building, tasks, height, hours. Fill out your irata logbook from real data, not guesswork two weeks later."
+      description: "Every session recorded. Building, tasks, height, hours. Fill out your IRATA logbook from real data, not guesswork two weeks later."
     },
     {
       icon: Award,
@@ -2187,6 +2183,37 @@ export default function TechnicianLogin() {
                 >
                   {form.formState.isSubmitting ? t('techLogin.dialog.signingIn', 'Signing in...') : t('techLogin.dialog.signIn', 'Sign In')}
                 </Button>
+
+                {/* Quick Login Buttons for Testing */}
+                <div className="pt-3 border-t mt-3">
+                  <p className="text-xs text-muted-foreground text-center mb-2">Quick Login (Testing)</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        form.setValue("identifier", "tester@tester.com");
+                        form.setValue("password", "tester123");
+                      }}
+                      data-testid="button-quick-login-tester"
+                    >
+                      Tester
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        form.setValue("identifier", "166459");
+                        form.setValue("password", "Mhlqt419!");
+                      }}
+                      data-testid="button-quick-login-tech"
+                    >
+                      Tech
+                    </Button>
+                  </div>
+                </div>
               </form>
             </Form>
 

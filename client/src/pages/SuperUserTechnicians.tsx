@@ -150,7 +150,7 @@ export default function SuperUserTechnicians() {
     },
   });
 
-  const { data: technicianDetailData, isLoading: isLoadingDetail } = useQuery<TechnicianDetailResponse>({
+  const { data: technicianDetailData, isLoading: isLoadingDetail, error: detailError } = useQuery<TechnicianDetailResponse>({
     queryKey: ["/api/superuser/technicians", "detail", selectedTechnician],
     queryFn: async () => {
       const res = await fetch(`/api/superuser/technicians/${selectedTechnician}`, { credentials: "include" });
@@ -274,7 +274,7 @@ export default function SuperUserTechnicians() {
           variant={tech.irataVerified ? "default" : "outline"}
           className={tech.irataVerified ? "bg-blue-600" : ""}
         >
-          irata L{tech.irataLevel} {tech.irataVerified && "✓"}
+          IRATA L{tech.irataLevel} {tech.irataVerified && "✓"}
         </Badge>
       );
     }
@@ -454,6 +454,12 @@ export default function SuperUserTechnicians() {
               <div className="flex items-center justify-center py-12">
                 <span className="material-icons animate-spin text-4xl text-muted-foreground">sync</span>
               </div>
+            ) : detailError ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <span className="material-icons text-4xl text-destructive mb-4">error</span>
+                <p className="text-destructive font-medium">Failed to load technician details</p>
+                <p className="text-sm text-muted-foreground mt-2">{(detailError as Error).message}</p>
+              </div>
             ) : technicianDetailData?.technician ? (
               <ScrollArea className="max-h-[70vh]">
                 <div className="space-y-6 pr-4">
@@ -495,7 +501,7 @@ export default function SuperUserTechnicians() {
                           </div>
                           <InfoItem label="Company" value={technicianDetailData.company.name} />
                           <InfoItem label="Company Email" value={technicianDetailData.company.email} />
-                          <InfoItem label="Subscription Tier" value={technicianDetailData.company.subscriptionTier || "None"} />
+                          <InfoItem label="Plan" value="OnRopePro" />
                           <InfoItem label="Start Date" value={formatDate(technicianDetailData.technician.startDate)} />
                           {technicianDetailData.technician.isSalary ? (
                             <InfoItem label="Salary" value={technicianDetailData.technician.salary ? `$${Number(technicianDetailData.technician.salary).toLocaleString()}/year` : "Not set"} />
@@ -534,11 +540,11 @@ export default function SuperUserTechnicians() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
                       {technicianDetailData.technician.irataLevel && (
                         <>
-                          <InfoItem label="irata Level" value={`Level ${technicianDetailData.technician.irataLevel}`} />
-                          <InfoItem label="irata License" value={technicianDetailData.technician.irataLicenseNumber} />
-                          <InfoItem label="irata Expiry" value={formatDate(technicianDetailData.technician.irataExpiry)} />
+                          <InfoItem label="IRATA Level" value={`Level ${technicianDetailData.technician.irataLevel}`} />
+                          <InfoItem label="IRATA License" value={technicianDetailData.technician.irataLicenseNumber} />
+                          <InfoItem label="IRATA Expiry" value={formatDate(technicianDetailData.technician.irataExpiry)} />
                           <InfoItem 
-                            label="irata Verified" 
+                            label="IRATA Verified" 
                             value={
                               technicianDetailData.technician.irataVerified 
                                 ? `Yes (${formatDate(technicianDetailData.technician.irataVerifiedAt)})` 
@@ -546,7 +552,7 @@ export default function SuperUserTechnicians() {
                             } 
                           />
                           {technicianDetailData.technician.irataBaselineHours && (
-                            <InfoItem label="irata Baseline Hours" value={technicianDetailData.technician.irataBaselineHours} />
+                            <InfoItem label="IRATA Baseline Hours" value={technicianDetailData.technician.irataBaselineHours} />
                           )}
                         </>
                       )}
@@ -645,7 +651,7 @@ export default function SuperUserTechnicians() {
                       <DocumentCount label="Bank Docs" count={technicianDetailData.technician.bankDocuments?.length || 0} />
                       <DocumentCount label="License Docs" count={technicianDetailData.technician.driversLicenseDocuments?.length || 0} />
                       <DocumentCount label="First Aid" count={technicianDetailData.technician.firstAidDocuments?.length || 0} />
-                      <DocumentCount label="irata Docs" count={technicianDetailData.technician.irataDocuments?.length || 0} />
+                      <DocumentCount label="IRATA Docs" count={technicianDetailData.technician.irataDocuments?.length || 0} />
                       <DocumentCount label="SPRAT Docs" count={technicianDetailData.technician.spratDocuments?.length || 0} />
                     </div>
                   </div>

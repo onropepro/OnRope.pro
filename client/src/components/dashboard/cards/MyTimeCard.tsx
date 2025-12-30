@@ -77,8 +77,8 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
-        <div className="space-y-3">
+      <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 space-y-3">
           {isClockedIn && timeData?.currentSessionStart && (
             <div className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
               <p className="text-2xl font-bold text-green-700 dark:text-green-400" data-testid="text-current-session">
@@ -97,17 +97,18 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
               {(timeData?.hoursToday || 0).toFixed(1)}h
             </span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-between"
-            onClick={() => onRouteNavigate("/time-tracking")}
-            data-testid="button-view-my-timesheet"
-          >
-            View My Timesheet
-            <ChevronRight className="w-4 h-4" />
-          </Button>
         </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-between mt-auto"
+          onClick={() => onRouteNavigate("/time-tracking")}
+          data-testid="button-view-my-timesheet"
+        >
+          View My Timesheet
+          <ChevronRight className="w-4 h-4" />
+        </Button>
       </CardContent>
     </div>
   );

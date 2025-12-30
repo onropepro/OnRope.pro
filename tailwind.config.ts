@@ -5,6 +5,10 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontSize: {
+        /* Override text-xs to meet 14px minimum readability standard */
+        'xs': ['0.875rem', { lineHeight: '1.25rem' }], /* 14px instead of 12px */
+      },
       borderRadius: {
         lg: ".5rem", /* 8px - Material Design 3 */
         md: ".375rem", /* 6px */

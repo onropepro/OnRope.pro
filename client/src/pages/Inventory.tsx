@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
@@ -1558,15 +1559,11 @@ export default function Inventory() {
     return Math.round((compliantWorkDays / totalWorkDays) * 100);
   }, [inspectionFilter, inspectionDays, allSessions, harnessInspections]);
 
+  // Use default header config to show consistent unified header with search bar
+  useSetHeaderConfig({}, []);
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-14 flex items-center justify-between max-w-7xl mx-auto">
-          <h1 className="text-xl font-bold tracking-tight">{t('inventory.title', 'Inventory')}</h1>
-        </div>
-      </header>
-
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="flex flex-wrap w-full mb-4 h-auto gap-1 p-1">

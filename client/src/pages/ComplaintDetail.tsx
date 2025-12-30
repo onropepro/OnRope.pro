@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { queryClient } from "@/lib/queryClient";
@@ -177,6 +178,9 @@ export default function ComplaintDetail() {
     toggleStatusMutation.mutate(newStatus);
   };
 
+  // Use default header config to show consistent unified header with search bar
+  useSetHeaderConfig({}, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -200,36 +204,6 @@ export default function ComplaintDetail() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
-        <div className="px-4 h-16 flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="min-w-11 min-h-11" 
-            onClick={() => {
-              // Navigate back to appropriate dashboard based on user role
-              const dashboardPath = userData?.user?.role === "resident" ? "/resident" : "/dashboard";
-              setLocation(dashboardPath);
-            }}
-            data-testid="button-back"
-          >
-            <span className="material-icons">arrow_back</span>
-          </Button>
-          <h1 className="text-lg font-bold flex-1">{t('feedbackDetail.feedbackDetails', 'Feedback Details')}</h1>
-          <Badge 
-            variant="secondary" 
-            className={complaint.status === "open" 
-              ? "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20" 
-              : "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
-            }
-            data-testid="badge-status"
-          >
-            {complaint.status === "open" ? t('feedbackDetail.statusOpen', 'Open') : t('feedbackDetail.statusClosed', 'Closed')}
-          </Badge>
-        </div>
-      </header>
-
       <div className="p-4 max-w-2xl mx-auto space-y-4">
         {/* Complaint Info */}
         <Card>

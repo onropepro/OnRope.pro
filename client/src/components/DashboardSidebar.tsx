@@ -1,6 +1,11 @@
 import { useLocation } from "wouter";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Building2,
   Users,
@@ -16,24 +21,43 @@ import {
   Settings,
   HelpCircle,
   ChevronRight,
+  ChevronDown,
   Award,
   Wrench,
   ClipboardCheck,
   Menu,
   X,
+  Building,
+  Cloud,
+  SlidersHorizontal,
+  User as UserIcon,
+  Mail,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { LanguageDropdown } from "@/components/LanguageDropdown";
 import type { User } from "@/lib/permissions";
 import {
   hasFinancialAccess,
   canManageEmployees,
   canAccessQuotes,
+  hasPermission,
+  canViewPerformance,
 } from "@/lib/permissions";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import { SidebarCustomizeDialog } from "./SidebarCustomizeDialog";
+import { useTechnicianContext } from "@/hooks/use-technician-context";
+import { CarabinerIcon } from "./icons/CarabinerIcon";
 
-interface NavItem {
+interface SidebarPreferencesResponse {
+  preferences: Record<string, { itemId: string; position: number }[]>;
+  variant: string;
+  isDefault: boolean;
+}
+
+export interface NavItem {
   id: string;
   label: string;
   icon: React.ElementType;
@@ -41,16 +65,28 @@ interface NavItem {
   onClick?: () => void;
   badge?: number;
   badgeType?: "alert" | "info";
+  useProfilePhoto?: boolean;
   isVisible: (user: User | null | undefined) => boolean;
 }
 
-interface NavGroup {
+export interface NavGroup {
   id: string;
   label: string;
   items: NavItem[];
 }
 
-interface DashboardSidebarProps {
+export type DashboardVariant = "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew";
+
+export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
+  employer: "#0B64A3",
+  technician: "#5C7A84",
+  "property-manager": "#6E9075",
+  resident: "#86A59C",
+  "building-manager": "#B89685",
+  "ground-crew": "#5D7B6F",
+};
+
+export interface DashboardSidebarProps {
   currentUser: User | null | undefined;
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -66,6 +102,16 @@ interface DashboardSidebarProps {
     jobApplications?: number;
     quoteNotifications?: number;
   };
+  variant?: DashboardVariant;
+  customNavigationGroups?: NavGroup[];
+  customBrandColor?: string;
+  showDashboardLink?: boolean;
+  dashboardLinkLabel?: string;
+  headerContent?: React.ReactNode;
+  /** External control for mobile sidebar open state */
+  mobileOpen?: boolean;
+  /** Callback when mobile sidebar open state changes */
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 export function DashboardSidebar({
@@ -77,13 +123,116 @@ export function DashboardSidebar({
   companyName,
   employeeCount = 0,
   alertCounts = {},
+  variant = "employer",
+  customNavigationGroups,
+  customBrandColor,
+  showDashboardLink = true,
+  dashboardLinkLabel,
+  headerContent,
+  mobileOpen,
+  onMobileOpenChange,
 }: DashboardSidebarProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [customizeDialogOpen, setCustomizeDialogOpen] = useState(false);
+  
+  // Technician context for checking active employer connections
+  const technicianContext = useTechnicianContext();
+  const hasActiveEmployerConnection = variant === "technician" && technicianContext.activeConnectionsCount > 0;
+  
+  // Collapsible group state - tracks which groups are expanded
+  // Initialize with empty Set, will be populated by effect based on variant
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  
+  // Track variant to detect changes and reload state
+  const [loadedVariant, setLoadedVariant] = useState<string | null>(null);
 
-  // Deep Blue brand color - used when white label is not active
-  const BRAND_COLOR = "#0B64A3";
+  // Load collapsed state from localStorage when variant changes
+  // Version 2: Reset to new defaults (only OPERATIONS open for employer)
+  useEffect(() => {
+    if (loadedVariant === variant) return;
+    
+    try {
+      const storageKey = `sidebar-collapsed-v2-${variant}`;
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        setCollapsedGroups(new Set(JSON.parse(stored)));
+      } else {
+        // Default state: For employer variant, collapse all groups except "operations"
+        if (variant === 'employer') {
+          setCollapsedGroups(new Set(['team', 'equipment', 'safety', 'financial', 'analytics']));
+        } else {
+          setCollapsedGroups(new Set()); // All groups expanded by default for other variants
+        }
+      }
+    } catch {
+      setCollapsedGroups(new Set());
+    }
+    setLoadedVariant(variant);
+  }, [variant, loadedVariant]);
+
+  // Persist collapsed state to localStorage (only after initial load)
+  useEffect(() => {
+    if (loadedVariant !== variant) return; // Don't persist until we've loaded for this variant
+    
+    try {
+      const storageKey = `sidebar-collapsed-v2-${variant}`;
+      localStorage.setItem(storageKey, JSON.stringify(Array.from(collapsedGroups)));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [collapsedGroups, variant, loadedVariant]);
+
+  // Toggle group collapse state
+  const toggleGroupCollapse = useCallback((groupId: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  }, []);
+  
+  // Use external control if provided, otherwise use internal state
+  const isOpen = mobileOpen !== undefined ? mobileOpen : internalOpen;
+  const setIsOpen = (open: boolean) => {
+    if (onMobileOpenChange) {
+      onMobileOpenChange(open);
+    } else {
+      setInternalOpen(open);
+    }
+  };
+
+  // Fetch sidebar preferences for ordering
+  const { data: sidebarPreferences } = useQuery<SidebarPreferencesResponse>({
+    queryKey: ["/api/sidebar/preferences", variant],
+    queryFn: async () => {
+      const response = await fetch(`/api/sidebar/preferences?variant=${variant}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch sidebar preferences");
+      }
+      return response.json();
+    },
+    enabled: !!currentUser,
+    retry: false,
+  });
+
+  // Fetch pending invitations for technicians and ground crew
+  const { data: invitationsData } = useQuery<{ invitations: any[] }>({
+    queryKey: ["/api/my-invitations"],
+    enabled: !!currentUser && (
+      currentUser.role === 'rope_access_tech' || 
+      currentUser.role === 'ground_crew' || 
+      currentUser.role === 'ground_crew_supervisor'
+    ),
+    refetchInterval: 60000, // Refresh every minute
+  });
+  
+  const pendingInvitationsCount = invitationsData?.invitations?.length || 0;
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -129,8 +278,15 @@ export function DashboardSidebar({
           isVisible: () => true,
         },
         {
+          id: "weather",
+          label: t("dashboard.sidebar.weather", "Weather"),
+          icon: Cloud,
+          href: "/weather",
+          isVisible: () => true,
+        },
+        {
           id: "timesheets",
-          label: t("dashboard.sidebar.timesheets", "Timesheets"),
+          label: t("dashboard.sidebar.offSite", "Off-Site"),
           icon: Clock,
           href: "/non-billable-hours",
           badge: alertCounts.pendingTimesheets,
@@ -156,6 +312,7 @@ export function DashboardSidebar({
           id: "certifications",
           label: t("dashboard.sidebar.certifications", "Certifications"),
           icon: Award,
+          href: "/dashboard",
           onClick: () => onTabChange("employees"),
           isVisible: (user) => canManageEmployees(user),
         },
@@ -230,7 +387,7 @@ export function DashboardSidebar({
     },
     {
       id: "financial",
-      label: t("dashboard.categories.financial", "FINANCIAL"),
+      label: t("dashboard.categories.financialClients", "FINANCIAL/CLIENTS"),
       items: [
         {
           id: "payroll",
@@ -248,6 +405,26 @@ export function DashboardSidebar({
           badgeType: alertCounts.quoteNotifications ? "alert" : undefined,
           isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
         },
+        {
+          id: "clients",
+          label: t("dashboard.cards.clients.label", "Clients"),
+          icon: Building,
+          href: "/dashboard?tab=clients",
+          isVisible: (user) => hasPermission(user, 'view_clients'),
+        },
+      ],
+    },
+    {
+      id: "analytics",
+      label: t("dashboard.categories.analytics", "ANALYTICS"),
+      items: [
+        {
+          id: "performance",
+          label: t("dashboard.sidebar.performance", "Performance"),
+          icon: BarChart3,
+          href: "/performance",
+          isVisible: (user) => canViewPerformance(user),
+        },
       ],
     },
   ];
@@ -264,60 +441,95 @@ export function DashboardSidebar({
   };
 
   const handleItemClick = (item: NavItem) => {
-    if (item.href) {
-      setLocation(item.href);
-    } else if (item.onClick) {
+    // Call onClick first if provided (e.g., tab changes)
+    if (item.onClick) {
       item.onClick();
     }
+    // Then navigate if href is provided
+    if (item.href) {
+      setLocation(item.href);
+    }
+    // Close mobile sidebar after navigation
+    setIsOpen(false);
   };
 
-  const filteredGroups = navigationGroups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => item.isVisible(currentUser)),
-    }))
-    .filter((group) => group.items.length > 0);
+  // Use custom navigation groups if provided, otherwise use default employer groups
+  const activeNavigationGroups = customNavigationGroups || navigationGroups;
+  
+  // Apply custom ordering from preferences
+  const filteredGroups = useMemo(() => {
+    const groups = activeNavigationGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => item.isVisible(currentUser)),
+      }))
+      .filter((group) => group.items.length > 0);
+
+    // If we have saved preferences, apply the custom ordering (with defensive guards)
+    if (sidebarPreferences && !sidebarPreferences.isDefault && sidebarPreferences.preferences) {
+      return groups.map((group) => {
+        const savedOrder = sidebarPreferences.preferences[group.id];
+        if (!savedOrder || !Array.isArray(savedOrder) || savedOrder.length === 0) return group;
+
+        // Create a map of items for quick lookup
+        const itemMap = new Map(group.items.map((item) => [item.id, item]));
+        const orderedItems: NavItem[] = [];
+
+        // First add items in saved order
+        savedOrder
+          .sort((a, b) => a.position - b.position)
+          .forEach(({ itemId }) => {
+            const item = itemMap.get(itemId);
+            if (item) {
+              orderedItems.push(item);
+              itemMap.delete(itemId);
+            }
+          });
+
+        // Add any remaining items that weren't in saved preferences
+        itemMap.forEach((item) => orderedItems.push(item));
+
+        return { ...group, items: orderedItems };
+      });
+    }
+
+    return groups;
+  }, [activeNavigationGroups, currentUser, sidebarPreferences]);
 
   const displayCompanyName = companyName || "My Company";
   const isDashboardActive = activeTab === "home" || activeTab === "" || !activeTab;
-
-  // Get brand color - use CSS variable when white label is active, otherwise use Deep Blue
-  const getBrandColor = () => {
-    if (whitelabelBrandingActive) {
-      return "hsl(var(--sidebar-primary))";
-    }
-    return BRAND_COLOR;
-  };
+  // Work dashboard variants that should show "Work Dashboard" instead of "Dashboard"
+  const workDashboardVariants: DashboardVariant[] = ["employer", "building-manager", "property-manager"];
+  const isWorkDashboard = workDashboardVariants.includes(variant);
+  const resolvedDashboardLabel = dashboardLinkLabel || (isWorkDashboard 
+    ? t("dashboard.sidebar.workDashboard", "Work Dashboard")
+    : t("dashboard.sidebar.dashboard", "Dashboard"));
 
   const sidebarContent = (
     <>
       {/* Logo Header - h-14 (56px) */}
-      <div className="h-14 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="h-14 flex items-center justify-center px-4 border-b border-slate-100 dark:border-slate-800 relative">
         {whitelabelBrandingActive && brandingLogoUrl ? (
           <img
             src={brandingLogoUrl}
             alt="Company Logo"
-            className="h-7 w-auto max-w-[160px] object-contain"
+            className="h-8 w-auto max-w-[180px] object-contain"
             data-testid="img-sidebar-logo"
           />
         ) : (
-          <div className="flex items-center gap-2.5" data-testid="sidebar-default-logo">
-            <div 
-              className="flex h-7 w-7 items-center justify-center rounded-md text-white font-semibold text-sm"
-              style={{ backgroundColor: getBrandColor() }}
-            >
-              OR
-            </div>
-            <span className="font-medium text-base text-slate-900 dark:text-slate-100">
-              OnRopePro
-            </span>
+          <div className="flex items-center justify-center" data-testid="sidebar-default-logo">
+            <img
+              src={onRopeProLogo}
+              alt="OnRopePro"
+              className="h-10 w-auto object-contain"
+            />
           </div>
         )}
         {/* Close button for mobile */}
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden"
+          className="lg:hidden absolute right-2"
           onClick={() => setIsOpen(false)}
           data-testid="button-sidebar-close"
         >
@@ -326,100 +538,175 @@ export function DashboardSidebar({
       </div>
 
 
+      {/* Optional Header Content (e.g., user info card) */}
+      {headerContent && (
+        <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+          {headerContent}
+        </div>
+      )}
+
       {/* Dashboard Primary Link */}
-      <div className="px-3 pb-2">
-        <button
-          onClick={() => onTabChange("home")}
-          data-testid="sidebar-nav-dashboard"
-          className={cn(
-            "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium transition-colors",
-            isDashboardActive 
-              ? "text-white shadow-sm"
-              : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          )}
-          style={isDashboardActive ? { backgroundColor: getBrandColor() } : undefined}
-        >
-          <LayoutDashboard className="h-4 w-4 shrink-0" />
-          <span>{t("dashboard.sidebar.dashboard", "Dashboard")}</span>
-        </button>
-      </div>
+      {showDashboardLink && (
+        <div className="px-3 pb-2">
+          <button
+            onClick={() => { onTabChange("home"); setIsOpen(false); }}
+            data-testid="sidebar-nav-dashboard"
+            className={cn(
+              "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
+              isDashboardActive 
+                ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            )}
+          >
+            {variant === "technician" && (currentUser as any)?.photoUrl ? (
+              <Avatar className="h-4 w-4 shrink-0">
+                <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
+                <AvatarFallback className="text-[8px]">
+                  {((currentUser as any).name || "U").charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <CarabinerIcon className="h-4 w-4 shrink-0" />
+            )}
+            <span>{resolvedDashboardLabel}</span>
+          </button>
+        </div>
+      )}
 
       {/* Navigation Groups - Scrollable */}
       <nav className="flex-1 overflow-y-auto px-3 py-1">
-        {filteredGroups.map((group) => (
-          <div key={group.id} className="mb-4">
-            {/* Group Header */}
-            <div className="text-sm font-semibold text-slate-400 uppercase tracking-wider px-3 py-2">
-              {group.label}
-            </div>
-            
-            {/* Group Items */}
-            <div className="space-y-0.5">
-              {group.items.map((item) => {
-                const Icon = item.icon;
-                const isActive = isActiveItem(item);
+        {filteredGroups.map((group) => {
+          const isCollapsed = collapsedGroups.has(group.id);
+          
+          return (
+            <Collapsible
+              key={group.id}
+              open={!isCollapsed}
+              onOpenChange={() => toggleGroupCollapse(group.id)}
+              className="mb-3"
+            >
+              {/* Group Header with Toggle */}
+              <CollapsibleTrigger
+                className="w-full flex items-center justify-between px-3 py-1.5 group"
+                data-testid={`sidebar-group-toggle-${group.id}`}
+              >
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  {group.label}
+                </span>
+                <ChevronDown 
+                  className={cn(
+                    "h-3.5 w-3.5 text-slate-400 transition-transform duration-200",
+                    isCollapsed && "-rotate-90"
+                  )}
+                />
+              </CollapsibleTrigger>
+              
+              {/* Group Items - Collapsible */}
+              <CollapsibleContent>
+                <div className="space-y-0.5 pt-0.5">
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = isActiveItem(item);
 
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleItemClick(item)}
-                    data-testid={`sidebar-nav-${item.id}`}
-                    className={cn(
-                      "w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium transition-colors",
-                      isActive 
-                        ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-                    )}
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span className="flex-1 text-left truncate">{item.label}</span>
-                    {item.badge !== undefined && item.badge > 0 && (
-                      <span
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handleItemClick(item)}
+                        data-testid={`sidebar-nav-${item.id}`}
                         className={cn(
-                          "flex items-center justify-center rounded-full text-sm font-medium h-5 min-w-5 px-1.5",
-                          item.badgeType === "alert" 
-                            ? "bg-rose-500 text-white"
-                            : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                          "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
+                          isActive 
+                            ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                         )}
-                        data-testid={`badge-${item.id}-count`}
                       >
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+                        {item.useProfilePhoto && (currentUser as any)?.photoUrl ? (
+                          <Avatar className="h-4 w-4 shrink-0">
+                            <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
+                            <AvatarFallback className="text-[8px]">
+                              {((currentUser as any).name || "U").charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <Icon className="h-4 w-4 shrink-0" />
+                        )}
+                        <span className="flex-1 text-left truncate">{item.label}</span>
+                        {item.badge !== undefined && item.badge > 0 && (
+                          <span
+                            className={cn(
+                              "flex items-center justify-center rounded-full text-sm font-medium h-5 min-w-5 px-1.5",
+                              item.badgeType === "alert" 
+                                ? "bg-rose-500 text-white"
+                                : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                            )}
+                            data-testid={`badge-${item.id}-count`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          );
+        })}
       </nav>
 
-      {/* Footer - Settings, Help, and Language */}
+      {/* Footer - Settings and Help */}
       <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
         <div className="space-y-0.5">
+          {/* Go to My Passport - shown in Work Dashboard for technicians */}
+          {variant !== "technician" && (currentUser?.role === 'rope_access_tech' || currentUser?.role === 'ground_crew') && (
+            <button
+              onClick={() => { setLocation("/technician-portal"); setIsOpen(false); }}
+              data-testid="sidebar-nav-my-passport"
+              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <UserIcon className="h-4 w-4 shrink-0" />
+              <span>{t("dashboard.sidebar.myPassport", "Go to My Passport")}</span>
+            </button>
+          )}
+          {/* Settings button - hidden for technician variant (they have Profile in main nav) */}
+          {variant !== "technician" && (
+            <button
+              onClick={() => { setLocation("/profile"); setIsOpen(false); }}
+              data-testid="sidebar-nav-settings"
+              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+            >
+              <Settings className="h-4 w-4 shrink-0" />
+              <span>{t("dashboard.sidebar.settings", "Settings")}</span>
+            </button>
+          )}
+          {/* Go to Work Dashboard - shown only for technicians with active company connections */}
+          {hasActiveEmployerConnection && (
+            <button
+              onClick={() => { setLocation("/dashboard"); setIsOpen(false); }}
+              data-testid="sidebar-nav-work-dashboard"
+              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <CarabinerIcon className="h-4 w-4 shrink-0" />
+              <span>{t("dashboard.sidebar.workDashboard", "Go to Work Dashboard")}</span>
+            </button>
+          )}
           <button
-            onClick={() => setLocation("/profile")}
-            data-testid="sidebar-nav-settings"
-            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-          >
-            <Settings className="h-4 w-4 shrink-0" />
-            <span>{t("dashboard.sidebar.settings", "Settings")}</span>
-          </button>
-          <button
-            onClick={() => setLocation("/help")}
+            onClick={() => { setLocation("/help"); setIsOpen(false); }}
             data-testid="sidebar-nav-help"
-            className="w-full flex items-center gap-2.5 py-2 px-3 rounded-md text-base font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+            className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
           >
             <HelpCircle className="h-4 w-4 shrink-0" />
             <span>{t("dashboard.sidebar.help", "Help Center")}</span>
           </button>
-        </div>
-        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-          <LanguageDropdown 
-            variant="ghost" 
-            size="sm"
-            className="w-full justify-start text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          />
+          {/* Customize Sidebar button */}
+          <button
+            onClick={() => setCustomizeDialogOpen(true)}
+            data-testid="sidebar-nav-customize"
+            className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
+            <SlidersHorizontal className="h-4 w-4 shrink-0" />
+            <span>{t("dashboard.sidebar.customize", "Customize")}</span>
+          </button>
         </div>
       </div>
     </>
@@ -427,21 +714,23 @@ export function DashboardSidebar({
 
   return (
     <>
-      {/* Mobile Toggle Button - visible only on small screens */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-3 left-3 z-30 lg:hidden"
-        onClick={() => setIsOpen(true)}
-        data-testid="button-sidebar-toggle"
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
+      {/* Mobile Toggle Button - visible only on small screens, hidden when external control is used */}
+      {!onMobileOpenChange && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed top-3 left-3 z-30 lg:hidden"
+          onClick={() => setIsOpen(true)}
+          data-testid="button-sidebar-toggle"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      )}
 
       {/* Mobile Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-[90] lg:hidden"
           onClick={() => setIsOpen(false)}
           data-testid="sidebar-overlay"
         />
@@ -450,7 +739,7 @@ export function DashboardSidebar({
       {/* Sidebar - Fixed on desktop, slide-in on mobile */}
       <aside 
         className={cn(
-          "fixed h-full left-0 top-0 z-40 w-60 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-700/80 flex flex-col transition-transform duration-200",
+          "fixed h-full left-0 top-0 z-[95] w-60 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-700/80 flex flex-col transition-transform duration-200",
           "lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
@@ -458,6 +747,15 @@ export function DashboardSidebar({
       >
         {sidebarContent}
       </aside>
+
+      {/* Sidebar Customization Dialog */}
+      <SidebarCustomizeDialog
+        open={customizeDialogOpen}
+        onOpenChange={setCustomizeDialogOpen}
+        variant={variant}
+        navigationGroups={activeNavigationGroups}
+        currentUser={currentUser}
+      />
     </>
   );
 }

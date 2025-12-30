@@ -16,7 +16,6 @@ import { formatTimestampDate } from "@/lib/dateUtils";
 
 interface GiftAddonsForm {
   extraSeats: number;
-  extraProjects: number;
   whiteLabel: boolean;
 }
 
@@ -29,8 +28,7 @@ export default function CompanyDetail() {
   const [giftAddonsDialogOpen, setGiftAddonsDialogOpen] = useState(false);
   const [addonsForm, setAddonsForm] = useState<GiftAddonsForm>({
     extraSeats: 0,
-    extraProjects: 0,
-    whiteLabel: false,
+        whiteLabel: false,
   });
 
   const { data: userData } = useQuery<{ user: any }>({
@@ -65,7 +63,7 @@ export default function CompanyDetail() {
         description: data.message,
       });
       // Reset form and close dialog
-      setAddonsForm({ extraSeats: 0, extraProjects: 0, whiteLabel: false });
+      setAddonsForm({ extraSeats: 0, whiteLabel: false });
       setGiftAddonsDialogOpen(false);
       // Refresh company data
       queryClient.invalidateQueries({ queryKey: ['/api/superuser/companies', companyId] });
@@ -79,8 +77,36 @@ export default function CompanyDetail() {
     },
   });
 
-  // ProtectedRoute handles auth - but we still need to prevent render before data loads
-  if (userData?.user?.role !== 'superuser') {
+  const toggleVerificationMutation = useMutation({
+    mutationFn: async (verified: boolean) => {
+      const response = await apiRequest('POST', `/api/superuser/companies/${companyId}/toggle-verification`, { verified });
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: data.company?.isPlatformVerified ? "Company Verified" : "Verification Removed",
+        description: data.message,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/superuser/companies', companyId] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to toggle verification",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Check if user is superuser or staff with view_companies permission
+  const isSuperuser = userData?.user?.role === 'superuser';
+  const isStaffWithPermission = userData?.user?.role === 'staff' && 
+    userData?.user?.permissions?.includes('view_companies');
+  const hasAccess = isSuperuser || isStaffWithPermission;
+
+  // Only redirect after user data has loaded and we know they don't have access
+  const isLoadingUser = userData === undefined;
+  if (!isLoadingUser && !hasAccess) {
     setLocation('/');
     return null;
   }
@@ -137,7 +163,12 @@ export default function CompanyDetail() {
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-4xl font-bold gradient-text">{company.companyName || "Unnamed Company"}</h1>
-                {company.subscriptionStatus === 'active' || company.subscriptionStatus === 'trialing' ? (
+                {company.isPlatformVerified ? (
+                  <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20" data-testid="badge-platform-verified">
+                    <span className="material-icons text-sm mr-1">verified</span>
+                    Platform Verified
+                  </Badge>
+                ) : company.subscriptionStatus === 'active' || company.subscriptionStatus === 'trialing' ? (
                   <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20" data-testid="badge-verified">
                     <span className="material-icons text-sm mr-1">verified</span>
                     {company.subscriptionStatus === 'trialing' ? 'Trial' : 'Verified'}
@@ -154,13 +185,30 @@ export default function CompanyDetail() {
               </p>
             </div>
           </div>
-          <Button 
-            onClick={() => setGiftAddonsDialogOpen(true)}
-            data-testid="button-gift-addons"
-          >
-            <span className="material-icons mr-2">card_giftcard</span>
-            Gift Add-ons
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {isSuperuser && (
+              <Button 
+                variant={company.isPlatformVerified ? "outline" : "default"}
+                onClick={() => toggleVerificationMutation.mutate(!company.isPlatformVerified)}
+                disabled={toggleVerificationMutation.isPending}
+                data-testid="button-toggle-verification"
+              >
+                {toggleVerificationMutation.isPending ? (
+                  <span className="material-icons animate-spin mr-2">autorenew</span>
+                ) : (
+                  <span className="material-icons mr-2">{company.isPlatformVerified ? 'remove_done' : 'verified'}</span>
+                )}
+                {company.isPlatformVerified ? 'Remove Verification' : 'Verify & Grant Free Access'}
+              </Button>
+            )}
+            <Button 
+              onClick={() => setGiftAddonsDialogOpen(true)}
+              data-testid="button-gift-addons"
+            >
+              <span className="material-icons mr-2">card_giftcard</span>
+              Gift Add-ons
+            </Button>
+          </div>
         </div>
 
         {/* Company Info Card */}
@@ -191,7 +239,7 @@ export default function CompanyDetail() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Subscription Tier</p>
-                  <p className="text-sm font-medium capitalize">{company.subscriptionTier || 'None'}</p>
+                  <p className="text-sm font-medium capitalize">OnRopePro</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Status</p>
@@ -204,13 +252,10 @@ export default function CompanyDetail() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Add-ons</p>
                   <div className="flex flex-wrap gap-1">
-                    {(company.additionalSeatsCount > 0 || company.additionalProjectsCount > 0 || company.whitelabelBrandingActive) ? (
+                    {(company.additionalSeatsCount > 0 || company.whitelabelBrandingActive) ? (
                       <>
                         {company.additionalSeatsCount > 0 && (
                           <Badge variant="secondary" className="text-xs">+{company.additionalSeatsCount} Seats</Badge>
-                        )}
-                        {company.additionalProjectsCount > 0 && (
-                          <Badge variant="secondary" className="text-xs">+{company.additionalProjectsCount} Projects</Badge>
                         )}
                         {company.whitelabelBrandingActive && (
                           <Badge variant="secondary" className="text-xs">White Label</Badge>
@@ -504,13 +549,10 @@ export default function CompanyDetail() {
                 {company.additionalSeatsCount > 0 && (
                   <Badge variant="secondary">+{company.additionalSeatsCount} Seats</Badge>
                 )}
-                {company.additionalProjectsCount > 0 && (
-                  <Badge variant="secondary">+{company.additionalProjectsCount} Projects</Badge>
-                )}
                 {company.whitelabelBrandingActive && (
                   <Badge variant="secondary">White Label Active</Badge>
                 )}
-                {!company.additionalSeatsCount && !company.additionalProjectsCount && !company.whitelabelBrandingActive && (
+                {!company.additionalSeatsCount && !company.whitelabelBrandingActive && (
                   <p className="text-sm text-muted-foreground">No add-ons</p>
                 )}
               </div>
@@ -530,23 +572,6 @@ export default function CompanyDetail() {
               />
               <p className="text-xs text-muted-foreground">
                 {addonsForm.extraSeats > 0 ? `Will add ${addonsForm.extraSeats} seat${addonsForm.extraSeats > 1 ? 's' : ''}` : 'Enter number of seats to gift'}
-              </p>
-            </div>
-
-            {/* Extra Projects */}
-            <div className="space-y-2">
-              <Label htmlFor="extraProjects">Extra Projects</Label>
-              <Input
-                id="extraProjects"
-                type="number"
-                min={0}
-                max={100}
-                value={addonsForm.extraProjects}
-                onChange={(e) => setAddonsForm(prev => ({ ...prev, extraProjects: parseInt(e.target.value) || 0 }))}
-                data-testid="input-extra-projects"
-              />
-              <p className="text-xs text-muted-foreground">
-                {addonsForm.extraProjects > 0 ? `Will add ${addonsForm.extraProjects} project slots` : 'Enter number of extra projects to gift'}
               </p>
             </div>
 
@@ -576,7 +601,7 @@ export default function CompanyDetail() {
             <Button 
               variant="outline" 
               onClick={() => {
-                setAddonsForm({ extraSeats: 0, extraProjects: 0, whiteLabel: false });
+                setAddonsForm({ extraSeats: 0, whiteLabel: false });
                 setGiftAddonsDialogOpen(false);
               }}
               data-testid="button-cancel-gift"
@@ -585,7 +610,7 @@ export default function CompanyDetail() {
             </Button>
             <Button 
               onClick={() => giftAddonsMutation.mutate(addonsForm)}
-              disabled={giftAddonsMutation.isPending || (!addonsForm.extraSeats && !addonsForm.extraProjects && !addonsForm.whiteLabel)}
+              disabled={giftAddonsMutation.isPending || (!addonsForm.extraSeats && !addonsForm.whiteLabel)}
               data-testid="button-confirm-gift"
             >
               {giftAddonsMutation.isPending ? (

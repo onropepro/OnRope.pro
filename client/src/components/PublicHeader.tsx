@@ -4,91 +4,72 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
-import { useAuthPortal, type UserType } from "@/hooks/use-auth-portal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { Shield, Lock, Briefcase, Gauge, Clock, ClipboardCheck, FileText, Users, Menu, X, ChevronDown, IdCard, HardHat, Search, Package, Calendar, DollarSign, Calculator, Palette, HelpCircle, MessageSquare, Globe, BookOpen, Settings, HeartPulse, Wallet } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
 interface PublicHeaderProps {
-  activeNav?: "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "modules";
+  activeNav?: "employer" | "technician" | "property-manager" | "resident" | "building-manager" | "ground-crew" | "modules";
   onSignInClick?: () => void;
+  stakeholderColor?: string;
 }
 
-// Stakeholder color constants
+// Stakeholder color constants - must match hero gradient colors
 const STAKEHOLDER_COLORS = {
-  technician: "#AB4521",
+  technician: "#5C7A84",
   "property-manager": "#6E9075", 
   resident: "#86A59C",
-  "building-manager": "#4A6C8C",
+  "building-manager": "#B89685", // Warm Taupe per design guidelines
+  "ground-crew": "#5D7B6F",
   employer: "#0B64A3", // Ocean Blue for employer - matches hero gradients
+  safety: "#193A63", // Navy Blue for safety manifesto page
 } as const;
 
-export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
+// Colors that require dark text for WCAG accessibility (lighter backgrounds)
+// These have insufficient contrast with white text (< 4.5:1 ratio)
+const LIGHT_BACKGROUND_COLORS: string[] = [
+  STAKEHOLDER_COLORS.resident,      // #86A59C - Mint Green
+  STAKEHOLDER_COLORS["property-manager"], // #6E9075 - Sage Green  
+  STAKEHOLDER_COLORS["building-manager"], // #B89685 - Warm Taupe
+];
+
+// Helper to determine if color needs dark foreground text
+const needsDarkText = (color: string): boolean => {
+  return LIGHT_BACKGROUND_COLORS.includes(color);
+};
+
+export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propStakeholderColor }: PublicHeaderProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
-  const { openAuthPortal } = useAuthPortal();
+  const { openLogin, openRegister } = useAuthPortal();
   const [showModulesMenu, setShowModulesMenu] = useState(false);
   const [showTechnicianMenu, setShowTechnicianMenu] = useState(false);
   const [showPropertyManagerMenu, setShowPropertyManagerMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [utilityMenuOpen, setUtilityMenuOpen] = useState(false);
   const [mobileModulesExpanded, setMobileModulesExpanded] = useState(false);
   const [mobileTechnicianExpanded, setMobileTechnicianExpanded] = useState(false);
   const [mobilePropertyManagerExpanded, setMobilePropertyManagerExpanded] = useState(false);
+  // Mobile employer category accordions - all closed by default
+  const [mobileOperationsExpanded, setMobileOperationsExpanded] = useState(false);
+  const [mobileSafetyExpanded, setMobileSafetyExpanded] = useState(false);
+  const [mobileTeamExpanded, setMobileTeamExpanded] = useState(false);
+  const [mobileFinancialExpanded, setMobileFinancialExpanded] = useState(false);
+  const [mobileCommunicationExpanded, setMobileCommunicationExpanded] = useState(false);
   const modulesMenuRef = useRef<HTMLDivElement>(null);
   const technicianMenuRef = useRef<HTMLDivElement>(null);
   const propertyManagerMenuRef = useRef<HTMLDivElement>(null);
-  
-  const getDefaultUserType = (): UserType => {
-    const path = location.toLowerCase();
-    
-    if (path.startsWith('/technician') || 
-        path.startsWith('/help/for-technicians') ||
-        path.startsWith('/help/technician') ||
-        path.startsWith('/modules/technician-job-board') ||
-        path.startsWith('/modules/technician-passport') ||
-        path.startsWith('/modules/work-session') ||
-        path.startsWith('/modules/irata')) {
-      return 'technician';
-    }
-    
-    if (path.startsWith('/property-manager') ||
-        path.startsWith('/help/for-property-managers') ||
-        path.startsWith('/help/property-manager') ||
-        path.startsWith('/modules/csr-property-manager') ||
-        path.startsWith('/modules/property-manager-interface')) {
-      return 'property_manager';
-    }
-    
-    if (path.startsWith('/building-portal') || 
-        path.startsWith('/building-manager') ||
-        path.startsWith('/help/for-building-managers') ||
-        path.startsWith('/help/building-manager')) {
-      return 'building_manager';
-    }
-    
-    if (path.startsWith('/resident') ||
-        path.startsWith('/help/for-residents') ||
-        path.startsWith('/help/resident') ||
-        path.startsWith('/modules/resident-portal')) {
-      return 'resident';
-    }
-    
-    return 'company';
-  };
-  
-  const handleSignInClick = () => {
-    if (onSignInClick) {
-      onSignInClick();
-    } else {
-      openAuthPortal({
-        mode: 'login',
-        initialUserType: getDefaultUserType(),
-      });
-    }
-  };
+  const utilityMenuRef = useRef<HTMLDivElement>(null);
   
   // Determine stakeholder color based on current path
-  const getStakeholderColor = (): string | null => {
+  // This color is used for BOTH the hero gradient AND the top utility bar
+  const getStakeholderColor = (): string => {
+    if (propStakeholderColor) return propStakeholderColor;
     const path = location.toLowerCase();
+    // Safety manifesto page uses Navy Blue
+    if (path === '/safety') {
+      return STAKEHOLDER_COLORS.safety;
+    }
     // Homepage uses employer Ocean Blue
     if (path === '/') {
       return STAKEHOLDER_COLORS.employer;
@@ -121,6 +102,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     if (path.startsWith('/technician')) {
       return STAKEHOLDER_COLORS.technician;
     }
+    // Ground crew paths
+    if (path.startsWith('/ground-crew')) {
+      return STAKEHOLDER_COLORS["ground-crew"];
+    }
     if (path.startsWith('/property-manager')) {
       return STAKEHOLDER_COLORS["property-manager"];
     }
@@ -130,10 +115,15 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
     if (path.startsWith('/building-portal') || path.startsWith('/building-manager')) {
       return STAKEHOLDER_COLORS["building-manager"];
     }
-    return null;
+    // Default to employer Ocean Blue
+    return STAKEHOLDER_COLORS.employer;
   };
   
   const stakeholderColor = getStakeholderColor();
+  const useDarkText = false;
+  const textColorClass = "text-white";
+  const hoverBgClass = "hover:bg-white/10";
+  const borderColorClass = "border-white/10";
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -146,17 +136,20 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
       if (propertyManagerMenuRef.current && !propertyManagerMenuRef.current.contains(e.target as Node)) {
         setShowPropertyManagerMenu(false);
       }
+      if (utilityMenuRef.current && !utilityMenuRef.current.contains(e.target as Node)) {
+        setUtilityMenuOpen(false);
+      }
     };
     
-    if (showModulesMenu || showTechnicianMenu || showPropertyManagerMenu) {
+    if (showModulesMenu || showTechnicianMenu || showPropertyManagerMenu || utilityMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [showModulesMenu, showTechnicianMenu, showPropertyManagerMenu]);
+  }, [showModulesMenu, showTechnicianMenu, showPropertyManagerMenu, utilityMenuOpen]);
 
   const navItems = [
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
-    { id: "technician", label: t('navigation.technician', 'Technician'), href: "/technician" },
+    { id: "technician", label: t('navigation.technician', 'Rope Access Technician / Ground Crew'), href: "/technician" },
     { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
     { id: "resident", label: t('navigation.resident', 'Resident'), href: "/resident" },
     { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-portal" },
@@ -164,46 +157,101 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Top Utility Bar */}
+      {/* Top Utility Bar - matches hero gradient color per page */}
       <div 
-        className={stakeholderColor ? "border-b border-white/20" : "bg-muted border-b border-border/50"}
-        style={stakeholderColor ? { backgroundColor: stakeholderColor } : undefined}
+        className={`border-b ${borderColorClass}`}
+        style={{ backgroundColor: stakeholderColor }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex items-center justify-end gap-3">
-          <Button 
-            variant="ghost"
-            size="sm"
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={handleSignInClick}
-            data-testid="button-sign-in-header"
-          >
-            {t('login.header.signIn', 'Sign In')}
-          </Button>
-          <Button 
-            variant="ghost"
-            size="sm"
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            onClick={() => setLocation("/pricing")}
-            data-testid="link-pricing-header"
-          >
-            {t('login.header.pricing', 'Pricing')}
-          </Button>
-          <InstallPWAButton stakeholderColor={stakeholderColor} />
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation("/help")}
-            className={stakeholderColor ? "text-white hover:bg-white/10" : ""}
-            data-testid="button-help-header"
-          >
-            <HelpCircle className="w-4 h-4 mr-1" />
-            {t('navigation.help', 'Help')}
-          </Button>
-          <LanguageDropdown 
-            variant="ghost" 
-            size="sm" 
-            stakeholderColor={stakeholderColor}
-          />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-10 flex justify-between sm:justify-end items-center">
+          {/* Primary links - always visible */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button 
+              variant="ghost"
+              size="sm"
+              className={`${textColorClass} ${hoverBgClass}`}
+              onClick={() => setLocation("/safety")}
+              data-testid="button-safety-manifesto-header"
+            >
+              Our Safety Manifesto
+            </Button>
+            <Button 
+              variant="ghost"
+              size="sm"
+              className={`${textColorClass} ${hoverBgClass}`}
+              onClick={() => setLocation("/pricing")}
+              data-testid="link-pricing-header"
+            >
+              {t('login.header.pricing', 'Pricing')}
+            </Button>
+            {/* Desktop-only: Help */}
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/help")}
+              className={`hidden sm:inline-flex ${textColorClass} ${hoverBgClass}`}
+              data-testid="button-help-header"
+            >
+              {t('navigation.help', 'Help')}
+            </Button>
+          </div>
+          
+          {/* Desktop-only: Install App and Language selector */}
+          <div className="hidden sm:flex items-center gap-1 sm:gap-2">
+            <InstallPWAButton stakeholderColor={stakeholderColor} useDarkText={useDarkText} />
+            <LanguageDropdown 
+              variant="ghost" 
+              size="sm" 
+              stakeholderColor={stakeholderColor}
+              useDarkText={useDarkText}
+              showLabel={false}
+            />
+          </div>
+          
+          {/* Mobile-only: Hamburger menu for Help, Install App, Language */}
+          <div className="relative sm:hidden" ref={utilityMenuRef}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`${textColorClass} ${hoverBgClass}`}
+              onClick={() => setUtilityMenuOpen(!utilityMenuOpen)}
+              data-testid="button-utility-menu-toggle"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
+            
+            {utilityMenuOpen && (
+              <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-md shadow-lg py-1 min-w-[160px] z-50">
+                <button
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover-elevate text-left"
+                  onClick={() => {
+                    setLocation("/help");
+                    setUtilityMenuOpen(false);
+                  }}
+                  data-testid="button-help-mobile"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  {t('navigation.help', 'Help')}
+                </button>
+                <div className="px-4 py-2">
+                  <InstallPWAButton 
+                    stakeholderColor={stakeholderColor} 
+                    useDarkText={false}
+                    className="w-full justify-start text-foreground"
+                    showAsMenuItem
+                  />
+                </div>
+                <div className="px-4 py-2">
+                  <LanguageDropdown 
+                    variant="ghost" 
+                    size="sm" 
+                    stakeholderColor={undefined}
+                    useDarkText={false}
+                    className="w-full justify-start"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -233,7 +281,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </Button>
 
-          {/* Navigation - Right Aligned (Desktop) */}
+            {/* Navigation - Right Aligned (Desktop) */}
           <nav className="hidden lg:flex items-center justify-end gap-1 flex-1">
             {/* Employer with Modules Dropdown */}
             <div 
@@ -259,7 +307,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                   className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 pointer-events-none"
                 >
                   <div 
-                    className="bg-card border border-border rounded-xl shadow-xl p-5 w-[1100px] max-w-[calc(100vw-2rem)] pointer-events-auto"
+                    className="bg-card border border-border rounded-xl shadow-xl p-5 w-[1100px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-120px)] overflow-y-auto pointer-events-auto"
                     onMouseEnter={() => setShowModulesMenu(true)}
                     onMouseLeave={() => setShowModulesMenu(false)}
                   >
@@ -613,7 +661,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/technician")}
                 data-testid="nav-technician"
               >
-                {t('navigation.technician', 'Technician')}
+                <span className="flex flex-col items-center leading-tight">
+                  <span>Rope Access Technician</span>
+                  <span className="text-xs text-muted-foreground font-normal">& Ground Crew</span>
+                </span>
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showTechnicianMenu && (
@@ -652,6 +703,26 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                         <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.technicianJobBoard.description', 'Browse jobs, apply instantly, control profile visibility')}</div>
                       </div>
                     </button>
+                    
+                    <div className="border-t pt-3 mt-2">
+                      <div className="text-xs font-medium text-muted-foreground mb-2 px-1">{t('navigation.supportRoles', 'Support Roles')}</div>
+                      <button
+                        className="flex items-start gap-3 p-3 rounded-lg hover-elevate transition-colors text-left group w-full"
+                        onClick={() => {
+                          setLocation("/ground-crew");
+                          setShowTechnicianMenu(false);
+                        }}
+                        data-testid="nav-ground-crew"
+                      >
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform" style={{ backgroundColor: "#5D7B6F20" }}>
+                          <HardHat className="w-5 h-5" style={{ color: "#5D7B6F" }} />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.groundCrew.title', 'Ground Crew')}</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.groundCrew.description', 'Support techs from the ground, no heights required')}</div>
+                        </div>
+                      </button>
+                    </div>
                     </div>
                   </div>
                 </div>
@@ -675,7 +746,10 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setLocation("/property-manager")}
                 data-testid="nav-property-manager"
               >
-                {t('navigation.propertyManager', 'Property Manager')}
+                <span className="flex flex-col items-center leading-tight">
+                  <span>Property</span>
+                  <span className="text-xs text-muted-foreground font-normal">Manager</span>
+                </span>
                 <ChevronDown className="w-3 h-3" />
               </Button>
               {showPropertyManagerMenu && (
@@ -720,23 +794,60 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               )}
             </div>
             
-            {/* Other nav items (excluding employer, technician, and property-manager since they're handled above) */}
-            {navItems.filter(item => item.id !== "employer" && item.id !== "technician" && item.id !== "property-manager").map((item) => (
+            {/* Building Manager - two line button */}
+            <Button
+              variant="ghost"
+              className={`text-sm font-medium ${activeNav === "building-manager" ? "text-primary" : ""}`}
+              onClick={() => setLocation("/building-portal")}
+              onMouseEnter={() => {
+                setShowModulesMenu(false);
+                setShowTechnicianMenu(false);
+                setShowPropertyManagerMenu(false);
+              }}
+              data-testid="nav-building-manager"
+            >
+              <span className="flex flex-col items-center leading-tight">
+                <span>Building</span>
+                <span className="text-xs text-muted-foreground font-normal">Manager</span>
+              </span>
+            </Button>
+            
+            {/* Resident - single line button */}
+            <Button
+              variant="ghost"
+              className={`text-sm font-medium ${activeNav === "resident" ? "text-primary" : ""}`}
+              onClick={() => setLocation("/resident")}
+              onMouseEnter={() => {
+                setShowModulesMenu(false);
+                setShowTechnicianMenu(false);
+                setShowPropertyManagerMenu(false);
+              }}
+              data-testid="nav-resident"
+            >
+              {t('navigation.resident', 'Resident')}
+            </Button>
+
+            {/* Sign Up and Sign In Buttons */}
+            <div className="pl-2 flex items-center gap-2">
               <Button
-                key={item.id}
-                variant="ghost"
-                className={`text-sm font-medium ${activeNav === item.id ? "text-primary" : ""}`}
-                onClick={() => setLocation(item.href)}
-                onMouseEnter={() => {
-                  setShowModulesMenu(false);
-                  setShowTechnicianMenu(false);
-                  setShowPropertyManagerMenu(false);
-                }}
-                data-testid={`nav-${item.id}`}
+                variant="default"
+                size="sm"
+                className="border-0 text-xs font-semibold px-6 text-white bg-[#AB4521] hover:bg-[#8a3719]"
+                onClick={openRegister}
+                data-testid="nav-sign-up"
               >
-                {item.label}
+                {t('login.header.signUp', 'Sign Up')}
               </Button>
-            ))}
+              <Button
+                variant="default"
+                size="sm"
+                className="border-0 text-xs font-semibold px-6 text-white bg-[#193A63] hover:bg-[#0d2340]"
+                onClick={onSignInClick || openLogin}
+                data-testid="nav-sign-in"
+              >
+                {t('login.header.signIn', 'Sign In')}
+              </Button>
+            </div>
           </nav>
         </div>
       </div>
@@ -761,127 +872,172 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
               </button>
               
               {mobileModulesExpanded && (
-                <div className="mt-2 ml-4 space-y-3">
-                  {/* Operations */}
+                <div className="mt-2 ml-4 space-y-1">
+                  {/* Operations Accordion */}
                   <div>
-                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-blue-600 uppercase tracking-wide" data-testid="mobile-menu-category-operations">
-                      <Settings className="w-3.5 h-3.5" />
-                      Operations
-                    </div>
-                    <div className="space-y-0.5">
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/project-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-project-management">
-                        <Briefcase className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm">Project Management</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/work-session-time-tracking"); setMobileMenuOpen(false); }} data-testid="nav-mobile-work-session">
-                        <Clock className="w-4 h-4 text-amber-600" />
-                        <span className="text-sm">Work Session & Time Tracking</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/scheduling-calendar"); setMobileMenuOpen(false); }} data-testid="nav-mobile-scheduling-calendar">
-                        <Calendar className="w-4 h-4 text-indigo-600" />
-                        <span className="text-sm">Scheduling & Calendar</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/gear-inventory"); setMobileMenuOpen(false); }} data-testid="nav-mobile-gear-inventory">
-                        <Package className="w-4 h-4 text-teal-600" />
-                        <span className="text-sm">Gear Inventory Management</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/white-label-branding"); setMobileMenuOpen(false); }} data-testid="nav-mobile-white-label-branding">
-                        <Palette className="w-4 h-4 text-purple-600" />
-                        <span className="text-sm">White-Label Branding</span>
-                      </button>
-                    </div>
+                    <button 
+                      className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-left hover-elevate"
+                      onClick={() => setMobileOperationsExpanded(!mobileOperationsExpanded)}
+                      data-testid="mobile-menu-category-operations"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 uppercase tracking-wide">
+                        <Settings className="w-3.5 h-3.5" />
+                        Operations
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-blue-600 transition-transform ${mobileOperationsExpanded ? "rotate-180" : ""}`} />
+                    </button>
+                    {mobileOperationsExpanded && (
+                      <div className="space-y-0.5 ml-2">
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/project-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-project-management">
+                          <Briefcase className="w-4 h-4 text-emerald-600" />
+                          <span className="text-sm">Project Management</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/work-session-time-tracking"); setMobileMenuOpen(false); }} data-testid="nav-mobile-work-session">
+                          <Clock className="w-4 h-4 text-amber-600" />
+                          <span className="text-sm">Work Session & Time Tracking</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/scheduling-calendar"); setMobileMenuOpen(false); }} data-testid="nav-mobile-scheduling-calendar">
+                          <Calendar className="w-4 h-4 text-indigo-600" />
+                          <span className="text-sm">Scheduling & Calendar</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/gear-inventory"); setMobileMenuOpen(false); }} data-testid="nav-mobile-gear-inventory">
+                          <Package className="w-4 h-4 text-teal-600" />
+                          <span className="text-sm">Gear Inventory Management</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/white-label-branding"); setMobileMenuOpen(false); }} data-testid="nav-mobile-white-label-branding">
+                          <Palette className="w-4 h-4 text-purple-600" />
+                          <span className="text-sm">White-Label Branding</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Safety */}
+                  {/* Safety Accordion */}
                   <div>
-                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-red-600 uppercase tracking-wide" data-testid="mobile-menu-category-safety">
-                      <HeartPulse className="w-3.5 h-3.5" />
-                      Safety
-                    </div>
-                    <div className="space-y-0.5">
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/safety-compliance"); setMobileMenuOpen(false); }} data-testid="nav-mobile-safety-compliance">
-                        <Shield className="w-4 h-4 text-sky-600" />
-                        <span className="text-sm">Safety & Compliance</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/company-safety-rating"); setMobileMenuOpen(false); }} data-testid="nav-mobile-company-safety-rating">
-                        <Gauge className="w-4 h-4 text-orange-600" />
-                        <span className="text-sm">Company Safety Rating</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/irata-sprat-task-logging"); setMobileMenuOpen(false); }} data-testid="nav-mobile-irata-logging">
-                        <ClipboardCheck className="w-4 h-4 text-cyan-600" />
-                        <span className="text-sm">IRATA/SPRAT Task Logging</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/document-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-document-management">
-                        <FileText className="w-4 h-4 text-violet-600" />
-                        <span className="text-sm">Document Management</span>
-                      </button>
-                    </div>
+                    <button 
+                      className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-left hover-elevate"
+                      onClick={() => setMobileSafetyExpanded(!mobileSafetyExpanded)}
+                      data-testid="mobile-menu-category-safety"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-semibold text-red-600 uppercase tracking-wide">
+                        <HeartPulse className="w-3.5 h-3.5" />
+                        Safety
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-red-600 transition-transform ${mobileSafetyExpanded ? "rotate-180" : ""}`} />
+                    </button>
+                    {mobileSafetyExpanded && (
+                      <div className="space-y-0.5 ml-2">
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/safety-compliance"); setMobileMenuOpen(false); }} data-testid="nav-mobile-safety-compliance">
+                          <Shield className="w-4 h-4 text-sky-600" />
+                          <span className="text-sm">Safety & Compliance</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/company-safety-rating"); setMobileMenuOpen(false); }} data-testid="nav-mobile-company-safety-rating">
+                          <Gauge className="w-4 h-4 text-orange-600" />
+                          <span className="text-sm">Company Safety Rating</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/irata-sprat-task-logging"); setMobileMenuOpen(false); }} data-testid="nav-mobile-irata-logging">
+                          <ClipboardCheck className="w-4 h-4 text-cyan-600" />
+                          <span className="text-sm">IRATA/SPRAT Task Logging</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/document-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-document-management">
+                          <FileText className="w-4 h-4 text-violet-600" />
+                          <span className="text-sm">Document Management</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Team */}
+                  {/* Team Accordion */}
                   <div>
-                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-violet-600 uppercase tracking-wide" data-testid="mobile-menu-category-team">
-                      <Users className="w-3.5 h-3.5" />
-                      Team
-                    </div>
-                    <div className="space-y-0.5">
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/employee-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-employee-management">
-                        <Users className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm">Employee Management</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/technician-passport"); setMobileMenuOpen(false); }} data-testid="nav-mobile-technician-passport">
-                        <IdCard className="w-4 h-4 text-amber-600" />
-                        <span className="text-sm">Technician Passport</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/employer-job-board"); setMobileMenuOpen(false); }} data-testid="nav-mobile-employer-job-board">
-                        <Search className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm">Job Board Ecosystem</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/user-access-authentication"); setMobileMenuOpen(false); }} data-testid="nav-mobile-user-access">
-                        <Lock className="w-4 h-4 text-slate-600" />
-                        <span className="text-sm">User Access & Authentication</span>
-                      </button>
-                    </div>
+                    <button 
+                      className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-left hover-elevate"
+                      onClick={() => setMobileTeamExpanded(!mobileTeamExpanded)}
+                      data-testid="mobile-menu-category-team"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-semibold text-violet-600 uppercase tracking-wide">
+                        <Users className="w-3.5 h-3.5" />
+                        Team
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-violet-600 transition-transform ${mobileTeamExpanded ? "rotate-180" : ""}`} />
+                    </button>
+                    {mobileTeamExpanded && (
+                      <div className="space-y-0.5 ml-2">
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/employee-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-employee-management">
+                          <Users className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm">Employee Management</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/technician-passport"); setMobileMenuOpen(false); }} data-testid="nav-mobile-technician-passport">
+                          <IdCard className="w-4 h-4 text-amber-600" />
+                          <span className="text-sm">Technician Passport</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/employer-job-board"); setMobileMenuOpen(false); }} data-testid="nav-mobile-employer-job-board">
+                          <Search className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm">Job Board Ecosystem</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/user-access-authentication"); setMobileMenuOpen(false); }} data-testid="nav-mobile-user-access">
+                          <Lock className="w-4 h-4 text-slate-600" />
+                          <span className="text-sm">User Access & Authentication</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Financial */}
+                  {/* Financial Accordion */}
                   <div>
-                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-emerald-600 uppercase tracking-wide" data-testid="mobile-menu-category-financial-sales">
-                      <Wallet className="w-3.5 h-3.5" />
-                      Financial & Sales
-                    </div>
-                    <div className="space-y-0.5">
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/payroll-financial"); setMobileMenuOpen(false); }} data-testid="nav-mobile-payroll-financial">
-                        <DollarSign className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm">Payroll & Financial</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/quoting-sales-pipeline"); setMobileMenuOpen(false); }} data-testid="nav-mobile-quoting-sales-pipeline">
-                        <Calculator className="w-4 h-4 text-rose-600" />
-                        <span className="text-sm">Quoting & Sales Pipeline</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/client-relationship-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-crm">
-                        <Users className="w-4 h-4 text-cyan-600" />
-                        <span className="text-sm">Client Relationship Management</span>
-                      </button>
-                    </div>
+                    <button 
+                      className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-left hover-elevate"
+                      onClick={() => setMobileFinancialExpanded(!mobileFinancialExpanded)}
+                      data-testid="mobile-menu-category-financial-sales"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 uppercase tracking-wide">
+                        <Wallet className="w-3.5 h-3.5" />
+                        Financial & Sales
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-emerald-600 transition-transform ${mobileFinancialExpanded ? "rotate-180" : ""}`} />
+                    </button>
+                    {mobileFinancialExpanded && (
+                      <div className="space-y-0.5 ml-2">
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/payroll-financial"); setMobileMenuOpen(false); }} data-testid="nav-mobile-payroll-financial">
+                          <DollarSign className="w-4 h-4 text-emerald-600" />
+                          <span className="text-sm">Payroll & Financial</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/quoting-sales-pipeline"); setMobileMenuOpen(false); }} data-testid="nav-mobile-quoting-sales-pipeline">
+                          <Calculator className="w-4 h-4 text-rose-600" />
+                          <span className="text-sm">Quoting & Sales Pipeline</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/client-relationship-management"); setMobileMenuOpen(false); }} data-testid="nav-mobile-crm">
+                          <Users className="w-4 h-4 text-cyan-600" />
+                          <span className="text-sm">Client Relationship Management</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Communication */}
+                  {/* Communication Accordion */}
                   <div>
-                    <div className="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold text-rose-600 uppercase tracking-wide" data-testid="mobile-menu-category-communication">
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      Communication
-                    </div>
-                    <div className="space-y-0.5">
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/resident-portal"); setMobileMenuOpen(false); }} data-testid="nav-mobile-resident-portal">
-                        <MessageSquare className="w-4 h-4 text-rose-600" />
-                        <span className="text-sm">Resident Portal</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/property-manager-interface"); setMobileMenuOpen(false); }} data-testid="nav-mobile-property-manager-interface">
-                        <Globe className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm">Property Manager Interface</span>
-                      </button>
-                    </div>
+                    <button 
+                      className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-left hover-elevate"
+                      onClick={() => setMobileCommunicationExpanded(!mobileCommunicationExpanded)}
+                      data-testid="mobile-menu-category-communication"
+                    >
+                      <div className="flex items-center gap-2 text-xs font-semibold text-rose-600 uppercase tracking-wide">
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        Communication
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-rose-600 transition-transform ${mobileCommunicationExpanded ? "rotate-180" : ""}`} />
+                    </button>
+                    {mobileCommunicationExpanded && (
+                      <div className="space-y-0.5 ml-2">
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/resident-portal"); setMobileMenuOpen(false); }} data-testid="nav-mobile-resident-portal">
+                          <MessageSquare className="w-4 h-4 text-rose-600" />
+                          <span className="text-sm">Resident Portal</span>
+                        </button>
+                        <button className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left hover-elevate" onClick={() => { setLocation("/modules/property-manager-interface"); setMobileMenuOpen(false); }} data-testid="nav-mobile-property-manager-interface">
+                          <Globe className="w-4 h-4 text-emerald-600" />
+                          <span className="text-sm">Property Manager Interface</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -898,7 +1054,7 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
               >
-                <span>{t('navigation.technician', 'Technician')}</span>
+                <span>{t('navigation.technician', 'Rope Access Technician / Ground Crew')}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileTechnicianExpanded ? "rotate-180" : ""}`} />
               </button>
               
@@ -991,6 +1147,36 @@ export function PublicHeader({ activeNav, onSignInClick }: PublicHeaderProps) {
                 {item.label}
               </button>
             ))}
+
+            {/* Sign Up and Sign In Buttons - Mobile */}
+            <div className="pt-4 mt-4 border-t border-border grid grid-cols-2 gap-3">
+              <Button
+                variant="default"
+                className="w-full font-semibold text-white bg-[#AB4521] hover:bg-[#8d391b]"
+                onClick={() => {
+                  openRegister();
+                  setMobileMenuOpen(false);
+                }}
+                data-testid="nav-mobile-sign-up"
+              >
+                {t('login.header.signUp', 'Sign Up')}
+              </Button>
+              <Button
+                variant="default"
+                className="w-full font-semibold text-white bg-[#193A63] hover:bg-[#0d2340]"
+                onClick={() => {
+                  if (onSignInClick) {
+                    onSignInClick();
+                  } else {
+                    openLogin();
+                  }
+                  setMobileMenuOpen(false);
+                }}
+                data-testid="nav-mobile-sign-in"
+              >
+                {t('login.header.signIn', 'Sign In')}
+              </Button>
+            </div>
           </nav>
         </div>
       )}

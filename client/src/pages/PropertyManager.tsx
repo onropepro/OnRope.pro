@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users, Map, MapPin, Save, Loader2 } from "lucide-react";
+import { Building2, Plus, Mail, Phone, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield, Users, Map, MapPin, Save, Loader2, Copy, Check } from "lucide-react";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { PropertyManagerBuildingsMap, MapBuildingData } from "@/components/PropertyManagerBuildingsMap";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
@@ -22,6 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import {
   DropdownMenu,
@@ -60,6 +61,136 @@ type CsrRatingHistory = {
   createdAt: string;
 };
 
+type PropertyManagerQuote = {
+  id: string;
+  quoteNumber: string | null;
+  buildingName: string;
+  strataPlanNumber: string;
+  buildingAddress: string;
+  status: string;
+  pipelineStage: string;
+  createdAt: string;
+  companyName: string;
+  grandTotal: number;
+  serviceCount: number;
+};
+
+function QuotesSection() {
+  const { t } = useTranslation();
+  const [, setLocation] = useLocation();
+
+  const { data: quotesData, isLoading } = useQuery<{ quotes: PropertyManagerQuote[] }>({
+    queryKey: ["/api/property-managers/me/quotes"],
+  });
+
+  const quotes = quotesData?.quotes || [];
+
+  if (isLoading) {
+    return (
+      <Card className="mb-6" data-testid="card-my-quotes">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            {t('propertyManager.quotes.title', 'My Quotes')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            {t('propertyManager.quotes.loading', 'Loading quotes...')}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (quotes.length === 0) {
+    return (
+      <Card className="mb-6" data-testid="card-my-quotes">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            {t('propertyManager.quotes.title', 'My Quotes')}
+          </CardTitle>
+          <CardDescription>
+            {t('propertyManager.quotes.noQuotesDescription', 'Service quotes from your vendors will appear here')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-12">
+            <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-lg font-semibold mb-2">{t('propertyManager.quotes.noQuotesTitle', 'No Quotes Yet')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('propertyManager.quotes.noQuotesMessage', 'When vendors send you quotes, they will appear here for review')}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="mb-6" data-testid="card-my-quotes">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="h-5 w-5" />
+          {t('propertyManager.quotes.title', 'My Quotes')}
+        </CardTitle>
+        <CardDescription>
+          {quotes.length === 1
+            ? t('propertyManager.quotes.quoteCount', 'You have {{count}} quote to review', { count: quotes.length })
+            : t('propertyManager.quotes.quoteCountPlural', 'You have {{count}} quotes to review', { count: quotes.length })}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {quotes.map((quote) => (
+            <div
+              key={quote.id}
+              className="p-4 border rounded-md hover-elevate cursor-pointer"
+              onClick={() => setLocation(`/property-manager/quotes/${quote.id}`)}
+              data-testid={`card-quote-${quote.id}`}
+            >
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold" data-testid={`text-quote-building-${quote.id}`}>
+                      {quote.buildingName}
+                    </span>
+                    {quote.quoteNumber && (
+                      <Badge variant="outline" className="text-xs">
+                        {quote.quoteNumber}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground" data-testid={`text-quote-address-${quote.id}`}>
+                    {quote.buildingAddress}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('propertyManager.quotes.fromVendor', 'From')}: {quote.companyName}
+                  </p>
+                </div>
+                <div className="text-right space-y-1">
+                  <div className="text-lg font-bold" data-testid={`text-quote-total-${quote.id}`}>
+                    ${quote.grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {quote.serviceCount} {quote.serviceCount === 1 ? t('propertyManager.quotes.service', 'service') : t('propertyManager.quotes.services', 'services')}
+                  </p>
+                  <Badge 
+                    variant={quote.pipelineStage === 'won' ? 'default' : quote.pipelineStage === 'lost' ? 'destructive' : 'secondary'}
+                  >
+                    {quote.pipelineStage}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function PropertyManager() {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -69,6 +200,7 @@ export default function PropertyManager() {
   const [selectedVendor, setSelectedVendor] = useState<VendorSummary | null>(null);
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [pmCodeCopied, setPmCodeCopied] = useState(false);
   const [strataNumber, setStrataNumber] = useState("");
   const [uploadingAnchorInspection, setUploadingAnchorInspection] = useState(false);
   const [vendorToRemove, setVendorToRemove] = useState<VendorSummary | null>(null);
@@ -105,6 +237,9 @@ export default function PropertyManager() {
     defaultValues: {
       name: "",
       email: "",
+      propertyManagerPhoneNumber: "",
+      propertyManagerSmsOptIn: false,
+      propertyManagementCompany: "",
       currentPassword: "",
       newPassword: "",
     },
@@ -128,8 +263,8 @@ export default function PropertyManager() {
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
       
-      // Navigate to home page
-      setLocation("/");
+      // Navigate to property manager landing page
+      setLocation("/property-manager");
       
       toast({
         title: t('propertyManager.toasts.loggedOut', 'Logged Out'),
@@ -652,6 +787,17 @@ export default function PropertyManager() {
     if (data.email && data.email !== userData?.user?.email) {
       updateData.email = data.email;
     }
+    // Check phone number changes (allow clearing by comparing with empty string)
+    const currentPhone = userData?.user?.propertyManagerPhoneNumber || '';
+    const newPhone = data.propertyManagerPhoneNumber || '';
+    if (newPhone !== currentPhone) {
+      updateData.propertyManagerPhoneNumber = newPhone;
+    }
+    // Check SMS opt-in changes
+    const currentSmsOptIn = userData?.user?.propertyManagerSmsOptIn ?? false;
+    if (data.propertyManagerSmsOptIn !== currentSmsOptIn) {
+      updateData.propertyManagerSmsOptIn = data.propertyManagerSmsOptIn;
+    }
     if (data.newPassword) {
       updateData.currentPassword = data.currentPassword;
       updateData.newPassword = data.newPassword;
@@ -717,6 +863,9 @@ export default function PropertyManager() {
                   accountForm.reset({
                     name: userData?.user?.name || "",
                     email: userData?.user?.email || "",
+                    propertyManagerPhoneNumber: userData?.user?.propertyManagerPhoneNumber || "",
+                    propertyManagerSmsOptIn: userData?.user?.propertyManagerSmsOptIn || false,
+                    propertyManagementCompany: userData?.user?.propertyManagementCompany || "",
                     currentPassword: "",
                     newPassword: "",
                   });
@@ -739,6 +888,52 @@ export default function PropertyManager() {
             </DropdownMenu>
           </div>
         </div>
+
+        {/* PM Code Section */}
+        {userData?.user?.pmCode && (
+          <Card className="mb-6" data-testid="card-pm-code">
+            <CardContent className="py-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-primary/10">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      {t('propertyManager.pmCode.label', 'Your PM Code')}
+                    </p>
+                    <p className="font-mono text-lg font-semibold tracking-wider" data-testid="text-pm-code">
+                      {userData.user.pmCode}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(userData.user.pmCode);
+                    setPmCodeCopied(true);
+                    setTimeout(() => setPmCodeCopied(false), 2000);
+                    toast({
+                      title: t('propertyManager.pmCode.copied', 'Code Copied'),
+                      description: t('propertyManager.pmCode.copiedDesc', 'Your PM code has been copied to clipboard'),
+                    });
+                  }}
+                  data-testid="button-copy-pm-code"
+                >
+                  {pmCodeCopied ? (
+                    <Check className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Copy className="h-4 w-4 mr-2" />
+                  )}
+                  {pmCodeCopied 
+                    ? t('propertyManager.pmCode.copiedButton', 'Copied') 
+                    : t('propertyManager.pmCode.copyButton', 'Copy Code')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="mb-6">
           <Card data-testid="card-buildings-map">
@@ -929,6 +1124,9 @@ export default function PropertyManager() {
             )}
           </CardContent>
         </Card>
+
+        {/* Quotes Section */}
+        <QuotesSection />
 
         <Dialog open={addCodeOpen} onOpenChange={setAddCodeOpen}>
           <DialogContent data-testid="dialog-add-vendor">
@@ -1392,6 +1590,64 @@ export default function PropertyManager() {
                         />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="propertyManagementCompany"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('propertyManager.accountSettings.company', 'Property Management Company')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('propertyManager.accountSettings.companyPlaceholder', 'e.g., ABC Property Management')}
+                          {...field}
+                          data-testid="input-account-company"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="propertyManagerPhoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('propertyManager.accountSettings.phone', 'Phone Number')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="tel"
+                          placeholder={t('propertyManager.accountSettings.phonePlaceholder', 'Enter your phone number')}
+                          {...field}
+                          data-testid="input-account-phone"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="propertyManagerSmsOptIn"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">
+                          {t('propertyManager.accountSettings.smsOptIn', 'Receive SMS Notifications')}
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          {t('propertyManager.accountSettings.smsOptInDescription', 'Get text message alerts when companies send you new quotes')}
+                        </p>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="switch-sms-opt-in"
+                        />
+                      </FormControl>
                     </FormItem>
                   )}
                 />

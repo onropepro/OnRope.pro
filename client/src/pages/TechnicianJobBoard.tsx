@@ -6,6 +6,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { 
   ArrowLeft, 
   Briefcase, 
@@ -38,12 +41,21 @@ import {
   Gift,
   Save,
   X,
-  Trash2
+  Trash2,
+  Menu,
+  LogOut,
+  Crown,
+  LayoutGrid,
+  List
 } from "lucide-react";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
-type ApplicationWithJob = JobApplication & { jobPosting: JobPosting };
+type JobPostingWithCompany = JobPosting & { companyName?: string | null; companyCsr?: number | null; companyLogoUrl?: string | null };
+type ApplicationWithJob = JobApplication & { jobPosting: JobPostingWithCompany | null };
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 
@@ -100,7 +112,7 @@ const translations = {
     weekly: "per week",
     monthly: "per month",
     annually: "per year",
-    irataLevel: "irata Level",
+    irataLevel: "IRATA Level",
     spratLevel: "SPRAT Level",
     close: "Close",
     apply: "Express Interest",
@@ -144,6 +156,7 @@ const translations = {
     statusRefused: "Offer Declined",
     jobOfferReceived: "You received a job offer!",
     receivedOn: "Received",
+    fromCompany: "from",
     refuseOffer: "Decline Offer",
     deleteApplication: "Delete",
     offerRefused: "Offer Declined",
@@ -292,6 +305,7 @@ const translations = {
     statusRefused: "Offre refusee",
     jobOfferReceived: "Vous avez recu une offre d'emploi!",
     receivedOn: "Recu le",
+    fromCompany: "de",
     refuseOffer: "Refuser l'offre",
     deleteApplication: "Supprimer",
     offerRefused: "Offre refusee",
@@ -351,15 +365,38 @@ const translations = {
 export default function TechnicianJobBoard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [language, setLanguage] = useState<Language>(() => {
-    // Use same localStorage key as TechnicianPortal for consistency
-    const saved = localStorage.getItem("techPortalLanguage");
-    return (saved === "fr" ? "fr" : "en") as Language;
-  });
+  const { i18n } = useTranslation();
+  
+  // Mobile sidebar state for external control
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  
+  // Use global i18n language, not local storage
+  const language: Language = (i18n.language === 'fr' || i18n.language === 'es') ? 
+    (i18n.language === 'fr' ? 'fr' : 'en') : 'en';
   const t = translations[language];
+  
+  // Header labels
+  const proBadge = language === 'en' ? 'PLUS' : 'PLUS';
+  const proBadgeTooltip = language === 'en' ? 'You have PLUS access' : 'Vous avez un acces PLUS';
+  const roleLabel = language === 'en' ? 'Technician' : 'Technicien';
 
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
   const [showConfirmVisibility, setShowConfirmVisibility] = useState(false);
+  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
+  
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST", credentials: "include" });
+      queryClient.clear();
+      setLocation("/");
+    } catch (error) {
+      toast({
+        title: language === 'en' ? "Logout failed" : "Echec de la deconnexion",
+        variant: "destructive",
+      });
+    }
+  };
   
   // Location filters
   const [filterCountry, setFilterCountry] = useState<string>("");
@@ -376,7 +413,12 @@ export default function TechnicianJobBoard() {
   });
 
   const { data: jobsData, isLoading: jobsLoading } = useQuery<{ jobPostings: JobPosting[] }>({
-    queryKey: ["/api/job-postings/public"],
+    queryKey: ["/api/job-postings/public", "rope_access"],
+    queryFn: async () => {
+      const res = await fetch("/api/job-postings/public?positionType=rope_access", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch jobs");
+      return res.json();
+    },
   });
 
   const { data: applicationsData } = useQuery<{ applications: ApplicationWithJob[] }>({
@@ -449,44 +491,6 @@ export default function TechnicianJobBoard() {
     onError: () => {
       toast({
         title: t.withdrawFailed,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const refuseMutation = useMutation({
-    mutationFn: async (applicationId: string) => {
-      return apiRequest("POST", `/api/job-applications/${applicationId}/refuse`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/my"] });
-      toast({
-        title: t.offerRefused,
-        description: t.offerRefusedDesc,
-      });
-    },
-    onError: () => {
-      toast({
-        title: t.refuseFailed,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (applicationId: string) => {
-      return apiRequest("DELETE", `/api/job-applications/${applicationId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/my"] });
-      toast({
-        title: t.applicationDeleted,
-        description: t.applicationDeletedDesc,
-      });
-    },
-    onError: () => {
-      toast({
-        title: t.deleteFailed,
         variant: "destructive",
       });
     },
@@ -619,38 +623,99 @@ export default function TechnicianJobBoard() {
     return `$${min || max} ${periodLabel}`;
   };
 
+  const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <img 
-              src={onRopeProLogo} 
-              alt="OnRopePro" 
-              className="h-8 w-auto"
-            />
-            <div>
-              <h1 className="text-lg font-bold">{t.title}</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">{t.subtitle}</p>
+      {/* Sidebar - Desktop fixed, Mobile hamburger menu */}
+      <DashboardSidebar
+        currentUser={user as any}
+        activeTab="job-board"
+        onTabChange={() => {}}
+        variant="technician"
+        customNavigationGroups={technicianNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
+      
+      {/* Main content wrapper - offset for sidebar on desktop */}
+      <div className="lg:pl-60">
+        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
+          <div className="h-full flex items-center justify-between gap-4">
+            {/* Left Side: Hamburger menu (mobile) + Search */}
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              {/* Mobile hamburger menu button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setMobileSidebarOpen(true)}
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <div className="hidden md:flex flex-1 max-w-xl">
+                <DashboardSearch />
+              </div>
+            </div>
+            
+            {/* Right Side: Actions Group */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              {/* PLUS Badge - Technicians with PLUS access */}
+              {user?.role === 'rope_access_tech' && (user as any).hasPlusAccess && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge 
+                      variant="default" 
+                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-xs px-2 py-0.5 font-bold border-0 cursor-help" 
+                      data-testid="badge-pro"
+                    >
+                      <Crown className="w-3 h-3 mr-1 fill-current" />
+                      {proBadge}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{proBadgeTooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              
+              {/* Language Selector */}
+              <LanguageDropdown />
+              
+              {/* User Profile - Clickable to go to Portal Profile tab */}
+              <button 
+                onClick={() => setLocation("/technician-portal")}
+                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
+                data-testid="link-user-profile"
+              >
+                <Avatar className="w-8 h-8 bg-[#5C7A84]">
+                  <AvatarFallback className="bg-[#5C7A84] text-white text-xs font-medium">
+                    {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
+                  <p className="text-xs text-slate-400 leading-tight">{roleLabel}</p>
+                </div>
+              </button>
+              
+              {/* Logout Button */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                data-testid="button-logout" 
+                onClick={handleLogout} 
+                className="text-slate-600 dark:text-slate-300"
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <LanguageDropdown />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setLocation("/technician-portal")}
-              className="gap-1.5"
-              data-testid="button-back-to-portal"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.backToPortal}</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        <main className="px-4 sm:px-6 py-6 space-y-6">
         {/* PLUS Required Gate */}
         {user && !(user as any).hasPlusAccess && (
           <Card className="border-amber-500/50 bg-gradient-to-r from-amber-500/10 to-transparent">
@@ -712,258 +777,6 @@ export default function TechnicianJobBoard() {
         {/* Main content - only shown for PLUS users */}
         {(user as any)?.hasPlusAccess && (
           <>
-        {/* Visibility Settings Card */}
-        <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-full bg-primary/10">
-                {user?.isVisibleToEmployers ? (
-                  <Eye className="w-5 h-5 text-primary" />
-                ) : (
-                  <EyeOff className="w-5 h-5 text-muted-foreground" />
-                )}
-              </div>
-              <div className="flex-1">
-                <CardTitle className="text-lg">{t.visibilitySettings}</CardTitle>
-                <CardDescription>{t.visibilityDesc}</CardDescription>
-              </div>
-              <div className="flex items-center gap-3">
-                <Label htmlFor="visibility-toggle" className="text-sm font-medium">
-                  {user?.isVisibleToEmployers ? t.visibleToEmployers : t.hiddenFromEmployers}
-                </Label>
-                <Switch
-                  id="visibility-toggle"
-                  checked={user?.isVisibleToEmployers || false}
-                  onCheckedChange={handleVisibilityToggle}
-                  disabled={visibilityMutation.isPending}
-                  data-testid="switch-visibility"
-                />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {user?.isVisibleToEmployers ? (
-              <div className="space-y-3">
-                <Alert className="border-green-500/50 bg-green-50 dark:bg-green-950/30">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  <AlertTitle className="text-green-700 dark:text-green-400">{t.visibleToEmployers}</AlertTitle>
-                  <AlertDescription className="text-green-600 dark:text-green-300">
-                    {t.visibilityEnabled}
-                    {user.visibilityEnabledAt && (
-                      <span className="block mt-1 text-sm">
-                        {t.enabledSince}: {format(new Date(user.visibilityEnabledAt), "PPP")}
-                      </span>
-                    )}
-                  </AlertDescription>
-                </Alert>
-                <div className="pt-2">
-                  <p className="text-sm font-medium text-muted-foreground mb-2">{t.whatEmployersSee}</p>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                    {t.visibleFields.map((field, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-3 h-3 text-green-500" />
-                        {field}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ) : (
-              <Alert>
-                <EyeOff className="w-4 h-4" />
-                <AlertTitle>{t.hiddenFromEmployers}</AlertTitle>
-                <AlertDescription>{t.visibilityDisabled}</AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Expected Salary Card - Only show when visibility is enabled */}
-        {user?.isVisibleToEmployers && (
-          <Card className="border-muted">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-primary" />
-                {t.expectedSalary}
-              </CardTitle>
-              <CardDescription>{t.expectedSalaryDesc}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>{t.minimumSalary}</Label>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={expectedSalaryMin}
-                    onChange={(e) => setExpectedSalaryMin(e.target.value)}
-                    data-testid="input-salary-min"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t.maximumSalary}</Label>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={expectedSalaryMax}
-                    onChange={(e) => setExpectedSalaryMax(e.target.value)}
-                    data-testid="input-salary-max"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t.salaryPeriod}</Label>
-                  <Select value={expectedSalaryPeriod} onValueChange={setExpectedSalaryPeriod}>
-                    <SelectTrigger data-testid="select-salary-period">
-                      <SelectValue placeholder={t.selectPeriod} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hourly">{t.perHour}</SelectItem>
-                      <SelectItem value="daily">{t.perDay}</SelectItem>
-                      <SelectItem value="weekly">{t.perWeek}</SelectItem>
-                      <SelectItem value="monthly">{t.perMonth}</SelectItem>
-                      <SelectItem value="yearly">{t.perYear}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="mt-4 flex justify-end">
-                <Button 
-                  onClick={handleSaveSalary}
-                  disabled={salaryMutation.isPending}
-                  data-testid="button-save-salary"
-                >
-                  {salaryMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : (
-                    <Save className="w-4 h-4 mr-2" />
-                  )}
-                  {t.saveSalary}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <Separator />
-
-        {/* My Applications & Offers Section */}
-        {myApplications.length > 0 && (
-          <>
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" />
-                {t.myApplications}
-                <Badge variant="secondary">{myApplications.length}</Badge>
-              </h2>
-
-              <div className="grid gap-3">
-                {myApplications.map((app) => {
-                  const isOffer = app.status === "offered";
-                  const isRefused = app.status === "refused";
-                  const statusLabel = {
-                    applied: t.statusApplied,
-                    reviewing: t.statusReviewing,
-                    interviewed: t.statusInterviewed,
-                    offered: t.statusOffered,
-                    hired: t.statusHired,
-                    rejected: t.statusRejected,
-                    refused: t.statusRefused,
-                  }[app.status] || app.status;
-
-                  const statusVariant = {
-                    applied: "secondary" as const,
-                    reviewing: "secondary" as const,
-                    interviewed: "secondary" as const,
-                    offered: "default" as const,
-                    hired: "default" as const,
-                    rejected: "destructive" as const,
-                    refused: "outline" as const,
-                  }[app.status] || "secondary" as const;
-
-                  return (
-                    <Card 
-                      key={app.id}
-                      className={`${isOffer ? "border-primary bg-primary/5" : ""} hover-elevate cursor-pointer`}
-                      onClick={() => app.jobPosting && setSelectedJob(app.jobPosting)}
-                      data-testid={`card-application-${app.id}`}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <div className="flex-1 space-y-1">
-                            <div className="flex items-center gap-2">
-                              {isOffer && (
-                                <Badge className="bg-primary text-primary-foreground">
-                                  {t.jobOfferReceived}
-                                </Badge>
-                              )}
-                              <h3 className="font-semibold">
-                                {app.jobPosting?.title || "Unknown Job"}
-                              </h3>
-                            </div>
-                            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                              {!isOffer && <Badge variant={statusVariant}>{statusLabel}</Badge>}
-                              {app.jobPosting?.location && (
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" />
-                                  {app.jobPosting.location}
-                                </span>
-                              )}
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
-                                {t.receivedOn} {format(new Date(app.appliedAt), "MMM d, yyyy")}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {isOffer && (
-                              <>
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    refuseMutation.mutate(app.id);
-                                  }}
-                                  disabled={refuseMutation.isPending}
-                                  data-testid={`button-refuse-offer-${app.id}`}
-                                >
-                                  {refuseMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4 mr-1" />}
-                                  {t.refuseOffer}
-                                </Button>
-                              </>
-                            )}
-                            {(isRefused || app.status === "rejected" || app.status === "withdrawn") && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteMutation.mutate(app.id);
-                                }}
-                                disabled={deleteMutation.isPending}
-                                className="text-destructive"
-                                data-testid={`button-delete-app-${app.id}`}
-                              >
-                                {deleteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4 mr-1" />}
-                                {t.deleteApplication}
-                              </Button>
-                            )}
-                            <Button variant="ghost" size="sm" className="gap-1">
-                              {t.viewDetails}
-                              <ChevronRight className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-
-            <Separator />
-          </>
-        )}
 
         {/* Location Filters */}
         <Card className="border-muted">
@@ -977,57 +790,63 @@ export default function TechnicianJobBoard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="filter-country" className="text-xs text-muted-foreground">{t.country}</Label>
-                <select
-                  id="filter-country"
-                  value={filterCountry}
-                  onChange={(e) => {
-                    setFilterCountry(e.target.value);
+                <Select
+                  value={filterCountry || "all"}
+                  onValueChange={(value) => {
+                    setFilterCountry(value === "all" ? "" : value);
                     setFilterProvince("");
                     setFilterCity("");
                   }}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-country"
                 >
-                  <option value="">{t.allCountries}</option>
-                  {uniqueCountries.map(country => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-country" data-testid="select-filter-country">
+                    <SelectValue placeholder={t.allCountries} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allCountries}</SelectItem>
+                    {uniqueCountries.map(country => (
+                      <SelectItem key={country} value={country}>{country}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-1.5">
                 <Label htmlFor="filter-province" className="text-xs text-muted-foreground">{t.provinceState}</Label>
-                <select
-                  id="filter-province"
-                  value={filterProvince}
-                  onChange={(e) => {
-                    setFilterProvince(e.target.value);
+                <Select
+                  value={filterProvince || "all"}
+                  onValueChange={(value) => {
+                    setFilterProvince(value === "all" ? "" : value);
                     setFilterCity("");
                   }}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-province"
                 >
-                  <option value="">{t.allProvinces}</option>
-                  {uniqueProvinces.map(province => (
-                    <option key={province} value={province}>{province}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-province" data-testid="select-filter-province">
+                    <SelectValue placeholder={t.allProvinces} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allProvinces}</SelectItem>
+                    {uniqueProvinces.map(province => (
+                      <SelectItem key={province} value={province}>{province}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-1.5">
                 <Label htmlFor="filter-city" className="text-xs text-muted-foreground">{t.city}</Label>
-                <select
-                  id="filter-city"
-                  value={filterCity}
-                  onChange={(e) => setFilterCity(e.target.value)}
-                  className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                  data-testid="select-filter-city"
+                <Select
+                  value={filterCity || "all"}
+                  onValueChange={(value) => setFilterCity(value === "all" ? "" : value)}
                 >
-                  <option value="">{t.allCities}</option>
-                  {uniqueCities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
+                  <SelectTrigger id="filter-city" data-testid="select-filter-city">
+                    <SelectValue placeholder={t.allCities} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.allCities}</SelectItem>
+                    {uniqueCities.map(city => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
@@ -1051,13 +870,35 @@ export default function TechnicianJobBoard() {
 
         {/* Job Listings */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-primary" />
-            {t.activeJobs}
-            {jobs.length > 0 && (
-              <Badge variant="secondary">{jobs.length}</Badge>
-            )}
-          </h2>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-primary" />
+              {t.activeJobs}
+              {jobs.length > 0 && (
+                <Badge variant="secondary">{jobs.length}</Badge>
+              )}
+            </h2>
+            
+            {/* View Toggle */}
+            <div className="flex items-center gap-1">
+              <Button
+                variant={viewMode === "cards" ? "default" : "outline"}
+                size="icon"
+                onClick={() => setViewMode("cards")}
+                data-testid="button-jobs-view-cards"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "outline"}
+                size="icon"
+                onClick={() => setViewMode("list")}
+                data-testid="button-jobs-view-list"
+              >
+                <List className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
 
           {jobsLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -1072,26 +913,111 @@ export default function TechnicianJobBoard() {
                 <p className="text-muted-foreground mt-1">{t.noJobsDesc}</p>
               </CardContent>
             </Card>
+          ) : viewMode === "list" ? (
+            /* List View - Table format */
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{language === 'en' ? 'Title' : 'Titre'}</TableHead>
+                      <TableHead>{language === 'en' ? 'Company' : 'Entreprise'}</TableHead>
+                      <TableHead className="hidden md:table-cell">{language === 'en' ? 'Location' : 'Emplacement'}</TableHead>
+                      <TableHead className="hidden lg:table-cell">{language === 'en' ? 'Salary' : 'Salaire'}</TableHead>
+                      <TableHead className="hidden xl:table-cell">{language === 'en' ? 'Certification' : 'Certification'}</TableHead>
+                      <TableHead className="text-right">{language === 'en' ? 'Actions' : 'Actions'}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {jobs.map((job) => (
+                      <TableRow 
+                        key={job.id}
+                        className="cursor-pointer"
+                        onClick={() => setSelectedJob(job)}
+                        data-testid={`row-job-${job.id}`}
+                      >
+                        <TableCell>
+                          <div className="font-medium" data-testid={`text-job-title-${job.id}`}>{job.title}</div>
+                          <div className="text-xs text-muted-foreground line-clamp-1">
+                            {job.description}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {(job as JobPostingWithCompany).companyName || "Unknown Company"}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground hidden md:table-cell">
+                          {job.location || (job.isRemote ? t.remote : "-")}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground hidden lg:table-cell">
+                          {(job.salaryMin || job.salaryMax) 
+                            ? formatSalary(job.salaryMin, job.salaryMax, job.salaryPeriod) 
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="hidden xl:table-cell">
+                          <div className="flex flex-wrap gap-1">
+                            {job.requiredIrataLevel && (
+                              <Badge variant="outline" className="border-amber-500 text-amber-600 text-xs">
+                                IRATA {job.requiredIrataLevel}
+                              </Badge>
+                            )}
+                            {job.requiredSpratLevel && (
+                              <Badge variant="outline" className="border-purple-500 text-purple-600 text-xs">
+                                SPRAT {job.requiredSpratLevel}
+                              </Badge>
+                            )}
+                            {!job.requiredIrataLevel && !job.requiredSpratLevel && "-"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            data-testid={`button-view-job-${job.id}`}
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           ) : (
-            <div className="grid gap-4">
+            /* Cards View - Multi-column grid */
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {jobs.map((job) => (
                 <Card 
                   key={job.id} 
-                  className="hover-elevate cursor-pointer transition-all"
+                  className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer flex flex-col"
                   onClick={() => setSelectedJob(job)}
                   data-testid={`card-job-${job.id}`}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <CardContent className="p-4 flex-1">
+                    <div className="flex flex-col h-full">
                       <div className="flex-1 space-y-2">
                         <div className="flex items-start gap-3">
-                          <div className="p-2 rounded-lg bg-primary/10">
-                            <Building className="w-5 h-5 text-primary" />
-                          </div>
+                          {(job as JobPostingWithCompany).companyLogoUrl ? (
+                            <div className="w-10 h-10 rounded-lg shrink-0 overflow-hidden bg-muted flex items-center justify-center">
+                              <img 
+                                src={(job as JobPostingWithCompany).companyLogoUrl!} 
+                                alt={(job as JobPostingWithCompany).companyName || "Company"} 
+                                className="w-full h-full object-contain"
+                                data-testid={`img-company-logo-${job.id}`}
+                              />
+                            </div>
+                          ) : (
+                            <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                              <Building className="w-5 h-5 text-primary" />
+                            </div>
+                          )}
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-lg" data-testid={`text-job-title-${job.id}`}>
+                            <h3 className="font-semibold text-base" data-testid={`text-job-title-${job.id}`}>
                               {job.title}
                             </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {(job as JobPostingWithCompany).companyName || "Unknown Company"}
+                            </p>
                             <p className="text-sm text-muted-foreground line-clamp-2">
                               {job.description}
                             </p>
@@ -1124,12 +1050,12 @@ export default function TechnicianJobBoard() {
                             <Award className="w-4 h-4 text-amber-500" />
                             {job.requiredIrataLevel && (
                               <Badge variant="outline" className="border-amber-500 text-amber-600">
-                                irata {job.requiredIrataLevel}
+                                IRATA Level {job.requiredIrataLevel}
                               </Badge>
                             )}
                             {job.requiredSpratLevel && (
                               <Badge variant="outline" className="border-purple-500 text-purple-600">
-                                SPRAT {job.requiredSpratLevel}
+                                SPRAT Level {job.requiredSpratLevel}
                               </Badge>
                             )}
                           </div>
@@ -1139,7 +1065,7 @@ export default function TechnicianJobBoard() {
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        className="shrink-0"
+                        className="self-end mt-auto"
                         data-testid={`button-view-job-${job.id}`}
                       >
                         <ChevronRight className="w-5 h-5" />
@@ -1154,6 +1080,7 @@ export default function TechnicianJobBoard() {
           </>
         )}
       </main>
+      </div>
 
       {/* Job Details Dialog */}
       <Dialog open={!!selectedJob} onOpenChange={(open) => !open && setSelectedJob(null)}>
@@ -1170,6 +1097,27 @@ export default function TechnicianJobBoard() {
 
           {selectedJob && (
             <div className="space-y-6">
+              {/* Company Info Section */}
+              <div className="flex items-center justify-between gap-3 p-3 bg-muted/50 rounded-md">
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-muted-foreground">business</span>
+                  <span className="font-medium">{(selectedJob as JobPostingWithCompany).companyName || "Unknown Company"}</span>
+                </div>
+                {(selectedJob as JobPostingWithCompany).companyCsr != null && (
+                  <Badge 
+                    variant="outline" 
+                    className={`${
+                      (selectedJob as JobPostingWithCompany).companyCsr! >= 90 ? 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700' :
+                      (selectedJob as JobPostingWithCompany).companyCsr! >= 70 ? 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700' :
+                      (selectedJob as JobPostingWithCompany).companyCsr! >= 50 ? 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700' :
+                      'bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700'
+                    }`}
+                  >
+                    CSR: {Math.round((selectedJob as JobPostingWithCompany).companyCsr!)}%
+                  </Badge>
+                )}
+              </div>
+
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary">{getJobTypeBadge(selectedJob.jobType)}</Badge>
                 {selectedJob.employmentType && (

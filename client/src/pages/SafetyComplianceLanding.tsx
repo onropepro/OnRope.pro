@@ -8,7 +8,7 @@ import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { useSafetyAuthority } from "@/hooks/useSafetyAuthority";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SignInModal } from "@/components/SignInModal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import {
@@ -48,7 +48,7 @@ import {
 export default function SafetyComplianceLanding() {
   const { t } = useTranslation();
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
   const [, setLocation] = useLocation();
   const [count1, setCount1] = useState(0);
@@ -114,12 +114,10 @@ export default function SafetyComplianceLanding() {
                 {t('modules.safety.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-hero-signin">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-hero-signin">
                 {t('login.header.signIn', 'Sign In')}
               </Button>
             </div>
-            
-            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
             
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["safety-compliance"]} 
@@ -290,7 +288,7 @@ export default function SafetyComplianceLanding() {
                 <CardTitle className="text-xl">{t('modules.safety.solutionCards.audit.title', 'Audit-Ready PDFs in Four Clicks')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>{t('modules.safety.solutionCards.audit.description', "When the irata auditor calls, you don't panic. You search and export.")}</p>
+                <p>{t('modules.safety.solutionCards.audit.description', "When the IRATA auditor calls, you don't panic. You search and export.")}</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 mt-0.5 text-emerald-600 shrink-0" />
@@ -397,7 +395,7 @@ export default function SafetyComplianceLanding() {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="space-y-3 text-muted-foreground pb-4">
-                <p>{t('modules.safety.problemsSolved.liability.p1', "Rope access work is dangerous. Everyone knows it. That's why irata and SPRAT exist. That's why inspections are mandatory.")}</p>
+                <p>{t('modules.safety.problemsSolved.liability.p1', "Rope access work is dangerous. Everyone knows it. That's why IRATA and SPRAT exist. That's why inspections are mandatory.")}</p>
                 <p>{t('modules.safety.problemsSolved.liability.p2', 'But mandatory and documented are not the same thing.')}</p>
                 <p className="text-foreground font-medium">{t('modules.safety.problemsSolved.liability.p3', "If a harness fails and someone gets hurt, the investigation starts with one question: can you prove you inspected it? Can you prove you trained your people? Can you prove you discussed the specific hazards of this specific job?")}</p>
                 <p>{t('modules.safety.problemsSolved.liability.p4', "With paper forms, you're hoping the right pieces of paper exist and can be found. With digital records, you know exactly what exists because you can search for it.")}</p>
@@ -476,7 +474,7 @@ export default function SafetyComplianceLanding() {
                   <div>
                     <h3 className="font-semibold">{t('modules.safety.keyFeatures.auditPdfs.title', 'Audit-Ready PDFs')}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      {t('modules.safety.keyFeatures.auditPdfs.description', 'Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or irata audits.')}
+                      {t('modules.safety.keyFeatures.auditPdfs.description', 'Search by equipment, technician, date, or project. Export comprehensive reports instantly. Ready for insurance or IRATA audits.')}
                     </p>
                   </div>
                 </div>
@@ -595,7 +593,7 @@ export default function SafetyComplianceLanding() {
                 <div>
                   <h3 className="font-bold text-lg text-sky-900 dark:text-sky-100">{t('modules.safety.measurableResults.auditPrep.title', 'Audit Preparation: Days to Minutes')}</h3>
                   <p className="text-sm text-sky-800 dark:text-sky-200 mt-1">
-                    {t('modules.safety.measurableResults.auditPrep.description', 'The scramble before an irata audit used to take days. Now it takes minutes. Search. Export. Done.')}
+                    {t('modules.safety.measurableResults.auditPrep.description', 'The scramble before an IRATA audit used to take days. Now it takes minutes. Search. Export. Done.')}
                   </p>
                 </div>
               </CardContent>
@@ -670,7 +668,7 @@ export default function SafetyComplianceLanding() {
             />
             <ObjectionCard
               question={t('modules.safety.commonQuestions.q2.question', "We're too small to need software.")}
-              answer={t('modules.safety.commonQuestions.q2.answer', "The smaller you are, the more every audit matters. One failed irata audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software.")}
+              answer={t('modules.safety.commonQuestions.q2.answer', "The smaller you are, the more every audit matters. One failed IRATA audit. One insurance coverage gap. One lawsuit where you can't prove due diligence. The cost of any of those is more than years of software.")}
             />
             <ObjectionCard
               question={t('modules.safety.commonQuestions.q3.question', 'Paper has worked fine so far.')}

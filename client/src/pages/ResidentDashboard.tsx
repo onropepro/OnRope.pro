@@ -486,8 +486,8 @@ export default function ResidentDashboard() {
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
       
-      // Redirect to home page
-      setLocation("/");
+      // Redirect to resident landing page
+      setLocation("/resident");
     } catch (error) {
       toast({ title: t('residentPortal.error.title', 'Error'), description: t('residentPortal.error.logoutFailed', 'Failed to logout'), variant: "destructive" });
       setShowLogoutDialog(false);

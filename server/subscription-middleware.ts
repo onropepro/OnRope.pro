@@ -49,6 +49,16 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
     let maxProjects = 0;
     let maxSeats = 0;
 
+    // Check if company is platform-verified (SuperUser granted free access)
+    if (user.isPlatformVerified) {
+      console.log(`[Subscription] Company ${user.id} is platform-verified - unlimited access granted`);
+      return {
+        exceeded: false,
+        limits: { maxProjects: -1, maxSeats: -1 },
+        usage: { currentProjects: 0, currentEmployees: 0 },
+      };
+    }
+
     // Check if company is in trial period - unlimited seats during trial
     // Still count actual usage for accurate telemetry/dashboards
     const isTrialing = user.subscriptionStatus === 'trialing';
@@ -65,21 +75,20 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
       };
       
       // Add purchased add-ons and gifted seats to base limits
-      const additionalProjects = user.additionalProjectsCount || 0;
-      const paidSeats = user.additionalSeatsCount || 0;
+            const paidSeats = user.additionalSeatsCount || 0;
       const giftedSeats = user.giftedSeatsCount || 0;
       const totalAdditionalSeats = paidSeats + giftedSeats;
       
       // Calculate total limits (handle unlimited tier)
       maxProjects = baseLimits.projects === -1 
         ? -1 
-        : baseLimits.projects + additionalProjects;
+        : baseLimits.projects; // Projects now unlimited in new model
       
       maxSeats = baseLimits.seats === -1 
         ? -1 
         : baseLimits.seats + totalAdditionalSeats;
       
-      console.log(`[Subscription] Company ${user.id} limits - Base: ${baseLimits.projects}p/${baseLimits.seats}s, Add-ons: +${additionalProjects}p/+${paidSeats}paid+${giftedSeats}gifted seats, Total: ${maxProjects}p/${maxSeats}s`);
+      console.log(`[Subscription] Company ${user.id} limits - Base: ${baseLimits.projects}p/${baseLimits.seats}s, Add-ons: +${paidSeats}paid+${giftedSeats}gifted seats, Total: ${maxProjects}p/${maxSeats}s`);
     } else if (user.subscriptionStatus === 'canceled' && user.subscriptionEndDate) {
       // Grace period check - 48 hours after subscription end
       const endDate = new Date(user.subscriptionEndDate);
@@ -144,48 +153,6 @@ export async function checkSubscriptionLimits(userId: string): Promise<{
       limits: { maxProjects: -1, maxSeats: -1 },
       usage: { currentProjects: 0, currentEmployees: 0 },
     };
-  }
-}
-
-/**
- * Middleware: Block creation of new projects if limit exceeded
- * Use on: POST /api/projects
- */
-export async function requireProjectsWithinLimit(req: Request, res: Response, next: NextFunction) {
-  try {
-    if (!req.session.userId) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    const user = await storage.getUserById(req.session.userId);
-    if (!user || user.role !== 'company') {
-      return next(); // Not a company, no limits apply
-    }
-
-    const check = await checkSubscriptionLimits(user.id);
-
-    // If within grace period, always allow
-    if (check.withinGracePeriod) {
-      console.log(`[Subscription] Allowing project creation during grace period`);
-      return next();
-    }
-
-    // Check if project limit would be exceeded
-    if (check.limits.maxProjects !== -1 && check.usage.currentProjects >= check.limits.maxProjects) {
-      console.warn(`[Subscription] Project limit exceeded for company ${user.id}: ${check.usage.currentProjects}/${check.limits.maxProjects}`);
-      return res.status(403).json({
-        message: `Project limit reached (${check.limits.maxProjects}). Please upgrade your subscription to create more projects.`,
-        exceeded: true,
-        limits: check.limits,
-        usage: check.usage,
-      });
-    }
-
-    next();
-  } catch (error) {
-    console.error('[Subscription] Error in requireProjectsWithinLimit:', error);
-    // FAIL-SAFE: Allow on error (don't block emergency operations)
-    next();
   }
 }
 

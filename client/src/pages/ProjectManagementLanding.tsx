@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
-import { SignInModal } from "@/components/SignInModal";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import ropeAccessSoftwareImg from "@assets/rope-access-software_1765481835892.jpg";
@@ -52,7 +52,7 @@ const ALL_ACCORDION_ITEMS = [
 export default function ProjectManagementLanding() {
   const { t } = useTranslation();
   const [expandedProblems, setExpandedProblems] = useState<string[]>([]);
-  const [showSignIn, setShowSignIn] = useState(false);
+  const { openLogin } = useAuthPortal();
   const [showRegistration, setShowRegistration] = useState(false);
   const [, setLocation] = useLocation();
   const allExpanded = expandedProblems.length === ALL_ACCORDION_ITEMS.length;
@@ -94,12 +94,10 @@ export default function ProjectManagementLanding() {
                 {t('modules.projects.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowSignIn(true)} data-testid="button-cta-signin">
+              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-cta-signin">
                 {t('login.header.signIn', 'Sign In')}
               </Button>
             </div>
-            
-            <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} buttonColor="#0B64A3" />
             
             <SoftwareReplaces 
               software={MODULE_SOFTWARE_MAPPING["project-management"]} 
@@ -596,7 +594,7 @@ export default function ProjectManagementLanding() {
               <CardContent className="space-y-3 text-base">
                 <div>
                   <p className="font-medium text-foreground">{t('modules.projects.integrations.whatConnects', 'What Connects:')}</p>
-                  <p className="text-muted-foreground mt-1">{t('modules.projects.integrations.employee.connects', 'Crew assignments pull directly from your employee directory. System filters by qualification level (irata Level 2+). Performance metrics from work sessions feed back into employee records.')}</p>
+                  <p className="text-muted-foreground mt-1">{t('modules.projects.integrations.employee.connects', 'Crew assignments pull directly from your employee directory. System filters by qualification level (IRATA Level 2+). Performance metrics from work sessions feed back into employee records.')}</p>
                 </div>
                 <div>
                   <p className="font-medium text-foreground">{t('modules.projects.integrations.whyMatters', 'Why It Matters:')}</p>

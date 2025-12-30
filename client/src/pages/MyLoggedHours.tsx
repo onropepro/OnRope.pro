@@ -4,8 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
-import { BackButton } from "@/components/BackButton";
-import { MainMenuButton } from "@/components/MainMenuButton";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { parseLocalDate } from "@/lib/dateUtils";
@@ -15,8 +14,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { Calendar, Pencil } from "lucide-react";
 import i18n from "@/i18n";
 import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
@@ -66,6 +66,10 @@ export default function MyLoggedHours() {
   const [showCertBaselineDialog, setShowCertBaselineDialog] = useState(false);
   const [certBaselineHours, setCertBaselineHours] = useState("");
   const [certBaselineDate, setCertBaselineDate] = useState("");
+  
+  // Rope Access Experience state
+  const [showExperienceDialog, setShowExperienceDialog] = useState(false);
+  const [experienceStartDate, setExperienceStartDate] = useState("");
 
   const { data: userData, refetch: refetchUser } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -152,6 +156,62 @@ export default function MyLoggedHours() {
     }
     updateCertBaselineMutation.mutate({ hours: certBaselineHours, date: certBaselineDate });
   };
+
+  // Rope Access Experience mutation
+  const updateExperienceMutation = useMutation({
+    mutationFn: async (startDate: string) => {
+      return apiRequest("PATCH", "/api/technician/profile", { 
+        name: currentUser?.name,
+        email: currentUser?.email,
+        employeePhoneNumber: currentUser?.employeePhoneNumber || "",
+        emergencyContactName: currentUser?.emergencyContactName || "",
+        emergencyContactPhone: currentUser?.emergencyContactPhone || "",
+        ropeAccessStartDate: startDate,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      refetchUser();
+      setShowExperienceDialog(false);
+      toast({ title: t('loggedHours.success', 'Success'), description: t('loggedHours.experienceUpdated', 'Experience start date updated successfully') });
+    },
+    onError: (error: Error) => {
+      toast({ title: t('loggedHours.error', 'Error'), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const openExperienceDialog = () => {
+    setExperienceStartDate(currentUser?.ropeAccessStartDate || "");
+    setShowExperienceDialog(true);
+  };
+
+  const handleSaveExperience = () => {
+    if (!experienceStartDate) {
+      toast({ title: t('loggedHours.invalidInput', 'Invalid input'), description: t('loggedHours.enterStartDate', 'Please enter a start date'), variant: "destructive" });
+      return;
+    }
+    updateExperienceMutation.mutate(experienceStartDate);
+  };
+
+  // Calculate experience duration
+  const calculateExperience = () => {
+    if (!currentUser?.ropeAccessStartDate) return null;
+    const startDate = parseLocalDate(currentUser.ropeAccessStartDate);
+    const now = new Date();
+    let years = now.getFullYear() - startDate.getFullYear();
+    let months = now.getMonth() - startDate.getMonth();
+    if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
+      years--;
+      months += 12;
+    }
+    if (now.getDate() < startDate.getDate()) {
+      months--;
+      if (months < 0) months += 12;
+    }
+    return { years, months };
+  };
+
+  const experienceDuration = calculateExperience();
 
   // Calculate upgrade progress
   const calculateUpgradeProgress = () => {
@@ -252,6 +312,10 @@ export default function MyLoggedHours() {
   const sortedProjects = Object.entries(groupedByProject)
     .sort(([, a], [, b]) => b.totalHours - a.totalHours);
 
+  // Use default header config to show consistent unified header with search bar
+  // Must be called before any conditional returns to maintain hook order
+  useSetHeaderConfig({}, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -264,40 +328,6 @@ export default function MyLoggedHours() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <BackButton size="icon" />
-            <MainMenuButton size="icon" />
-            <div>
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight">{t('loggedHours.title', 'My Logged Hours')}</h1>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t('loggedHours.subtitle', 'irata Logbook')}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col items-start sm:items-end gap-1 pl-12 sm:pl-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="material-icons text-sm text-muted-foreground hidden sm:inline">person</span>
-              <span className="font-semibold text-sm sm:text-base truncate max-w-[150px] sm:max-w-none" data-testid="text-employee-name">{currentUser?.name}</span>
-              {currentUser?.irataLevel && (
-                <Badge variant="outline" className="flex items-center gap-1 text-xs">
-                  <span className="material-icons text-xs">verified</span>
-                  {t('loggedHours.level', 'Level')} {currentUser.irataLevel}
-                </Badge>
-              )}
-            </div>
-            {currentUser?.irataLicenseNumber && (
-              <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
-                <span className="material-icons text-xs">badge</span>
-                <span>{t('loggedHours.license', 'License')}:</span>
-                <span className="font-medium text-foreground" data-testid="text-irata-license">{currentUser.irataLicenseNumber}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card className="bg-primary/5 border-primary/20">
@@ -383,6 +413,45 @@ export default function MyLoggedHours() {
           </Card>
         </div>
 
+        {/* Rope Access Experience Card */}
+        <Card className="mb-6 border-indigo-500/30 bg-indigo-500/5">
+          <CardContent className="pt-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <div>
+                  <p className="font-medium text-sm">{t('loggedHours.ropeAccessExperience', 'Rope Access Experience')}</p>
+                  {experienceDuration ? (
+                    <>
+                      <p className="text-sm text-indigo-700 dark:text-indigo-300">
+                        {experienceDuration.years > 0 || experienceDuration.months > 0 
+                          ? t('loggedHours.yearsMonths', '{years} years, {months} months')
+                              .replace('{years}', experienceDuration.years.toString())
+                              .replace('{months}', experienceDuration.months.toString())
+                          : t('loggedHours.lessThanMonth', 'Less than 1 month')}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('loggedHours.startedOn', 'Started on')}: {format(parseLocalDate(currentUser?.ropeAccessStartDate), 'PPP', { locale: getDateLocale() })}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-base text-muted-foreground italic">{t('loggedHours.addExperience', 'Add your experience start date')}</p>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={openExperienceDialog}
+                data-testid="button-edit-experience"
+              >
+                <Pencil className="w-4 h-4 mr-2" />
+                {currentUser?.ropeAccessStartDate ? t('loggedHours.editExperience', 'Edit Experience') : t('loggedHours.setExperience', 'Set Experience')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Next Level Progress Section */}
         {currentUser?.irataLevel && (
           <Card className="mb-6 border-amber-500/30 bg-amber-500/5">
@@ -396,12 +465,12 @@ export default function MyLoggedHours() {
               {upgradeProgress.isMaxLevel ? (
                 <div className="text-center py-4">
                   <span className="material-icons text-4xl text-amber-600 mb-2">emoji_events</span>
-                  <p className="font-medium">{t('loggedHours.maxLevelReached', 'Congratulations! You have reached irata Level 3')}</p>
-                  <p className="text-sm text-muted-foreground">{t('loggedHours.highestLevel', 'This is the highest irata certification level')}</p>
+                  <p className="font-medium">{t('loggedHours.maxLevelReached', 'Congratulations! You have reached IRATA Level 3')}</p>
+                  <p className="text-sm text-muted-foreground">{t('loggedHours.highestLevel', 'This is the highest IRATA certification level')}</p>
                 </div>
               ) : upgradeProgress.noLevel ? (
                 <div className="text-center py-4">
-                  <p className="text-muted-foreground">{t('loggedHours.noLevelSet', 'Set your irata level in your profile to track upgrade progress')}</p>
+                  <p className="text-muted-foreground">{t('loggedHours.noLevelSet', 'Set your IRATA level in your profile to track upgrade progress')}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -526,7 +595,7 @@ export default function MyLoggedHours() {
                 <span className="material-icons text-6xl text-muted-foreground/30">assignment</span>
                 <h3 className="text-lg font-medium mt-4">{t('loggedHours.noLoggedHoursYet', 'No logged hours yet')}</h3>
                 <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-                  {t('loggedHours.noLoggedHoursDesc', "When you end a work session, you'll be prompted to log the irata tasks you performed. Your logged hours will appear here for your irata certification logbook.")}
+                  {t('loggedHours.noLoggedHoursDesc', "When you end a work session, you'll be prompted to log the IRATA tasks you performed. Your logged hours will appear here for your IRATA certification logbook.")}
                 </p>
               </div>
             ) : (
@@ -613,7 +682,7 @@ export default function MyLoggedHours() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <span className="material-icons">info</span>
-                {t('loggedHours.irataCertInfo', 'irata Certification Info')}
+                {t('loggedHours.irataCertInfo', 'IRATA Certification Info')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -658,7 +727,7 @@ export default function MyLoggedHours() {
               {t('loggedHours.setPriorHoursTitle', 'Set Prior Logbook Hours')}
             </DialogTitle>
             <DialogDescription>
-              {t('loggedHours.setPriorHoursDesc', 'Enter the total number of hours you have recorded in your irata logbook before using this system. This will be added to your hours logged here to show your complete total.')}
+              {t('loggedHours.setPriorHoursDesc', 'Enter the total number of hours you have recorded in your IRATA logbook before using this system. This will be added to your hours logged here to show your complete total.')}
             </DialogDescription>
           </DialogHeader>
           
@@ -718,7 +787,7 @@ export default function MyLoggedHours() {
               {t('loggedHours.certBaselineTitle', 'Certification Upgrade Baseline')}
             </DialogTitle>
             <DialogDescription>
-              {t('loggedHours.certBaselineDesc', 'Enter your total logbook hours and the date when you achieved your current irata level. This helps track your progress toward the next level.')}
+              {t('loggedHours.certBaselineDesc', 'Enter your total logbook hours and the date when you achieved your current IRATA level. This helps track your progress toward the next level.')}
             </DialogDescription>
           </DialogHeader>
           
@@ -737,7 +806,7 @@ export default function MyLoggedHours() {
                 data-testid="input-cert-baseline-hours"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {t('loggedHours.hoursAtUpgradeNote', 'Your total logged hours when you passed your last irata assessment')}
+                {t('loggedHours.hoursAtUpgradeNote', 'Your total logged hours when you passed your last IRATA assessment')}
               </p>
             </div>
 
@@ -752,7 +821,7 @@ export default function MyLoggedHours() {
                 data-testid="input-cert-baseline-date"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {t('loggedHours.dateOfUpgradeNote', 'The date you achieved your current irata level')}
+                {t('loggedHours.dateOfUpgradeNote', 'The date you achieved your current IRATA level')}
               </p>
             </div>
           </div>
@@ -779,6 +848,63 @@ export default function MyLoggedHours() {
                 <>
                   <span className="material-icons text-sm mr-1">save</span>
                   {t('loggedHours.saveBaseline', 'Save Baseline')}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rope Access Experience Dialog */}
+      <Dialog open={showExperienceDialog} onOpenChange={setShowExperienceDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-indigo-600" />
+              {t('loggedHours.experienceTitle', 'Rope Access Experience')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('loggedHours.experienceDesc', 'Enter the date when you first started working in rope access. This helps calculate your total experience in the industry.')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <Label className="text-sm font-medium block mb-2">
+              {t('loggedHours.experienceStartDate', 'Experience Start Date')}
+            </Label>
+            <Input
+              type="date"
+              value={experienceStartDate}
+              onChange={(e) => setExperienceStartDate(e.target.value)}
+              data-testid="input-experience-start-date"
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('loggedHours.experienceStartDateNote', 'The date when you first started working in rope access')}
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowExperienceDialog(false)}
+              data-testid="button-cancel-experience"
+            >
+              {t('common.cancel', 'Cancel')}
+            </Button>
+            <Button 
+              onClick={handleSaveExperience}
+              disabled={updateExperienceMutation.isPending}
+              data-testid="button-save-experience"
+            >
+              {updateExperienceMutation.isPending ? (
+                <>
+                  <span className="material-icons animate-spin text-sm mr-1">refresh</span>
+                  {t('common.saving', 'Saving...')}
+                </>
+              ) : (
+                <>
+                  <span className="material-icons text-sm mr-1">save</span>
+                  {t('loggedHours.saveExperience', 'Save Experience')}
                 </>
               )}
             </Button>

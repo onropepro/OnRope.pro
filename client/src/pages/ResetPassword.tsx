@@ -8,12 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { PublicHeader } from "@/components/PublicHeader";
+import { useAuthPortal } from "@/hooks/use-auth-portal";
 
 const RESIDENT_COLOR = "#86A59C";
 
 export default function ResetPassword() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { openLogin } = useAuthPortal();
   
   const [token, setToken] = useState("");
   const [email, setEmail] = useState("");
@@ -173,7 +175,6 @@ export default function ResetPassword() {
                 <Button
                   type="submit"
                   className="w-full"
-                  style={{ backgroundColor: RESIDENT_COLOR }}
                   disabled={isSubmitting}
                   data-testid="button-reset-password"
                 >
@@ -191,9 +192,11 @@ export default function ResetPassword() {
                   Remember your password?{" "}
                   <button
                     type="button"
-                    onClick={() => setLocation("/resident")}
-                    className="font-medium hover:underline"
-                    style={{ color: RESIDENT_COLOR }}
+                    onClick={() => {
+                      setLocation("/");
+                      openLogin();
+                    }}
+                    className="font-medium text-primary hover:underline"
                     data-testid="link-back-to-signin"
                   >
                     Sign In

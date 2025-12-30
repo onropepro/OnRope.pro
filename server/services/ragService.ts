@@ -88,11 +88,25 @@ export const guideRegistry = [
     stakeholders: ['owner', 'building-manager', 'property-manager'],
   },
   {
+    slug: 'personal-safety-rating',
+    title: 'Personal Safety Rating (PSR)',
+    category: 'safety',
+    sourceFile: 'client/src/pages/PSRGuide.tsx',
+    stakeholders: ['technician', 'owner', 'operations_manager'],
+  },
+  {
     slug: 'job-board',
     title: 'Job Board',
     category: 'hr',
     sourceFile: 'client/src/pages/JobBoardGuide.tsx',
     stakeholders: ['owner', 'technician'],
+  },
+  {
+    slug: 'technician-portal',
+    title: 'Technician Portal',
+    category: 'hr',
+    sourceFile: 'client/src/pages/TechnicianPortal.tsx',
+    stakeholders: ['technician'],
   },
   {
     slug: 'quoting-sales',
@@ -142,6 +156,7 @@ export const guideRegistry = [
     category: 'customization',
     sourceFile: 'client/src/pages/DashboardCustomizationGuide.tsx',
     stakeholders: ['owner', 'operations_manager', 'supervisor'],
+    hideFromModulesGrid: true, // This is a "Popular Topic", shown in Popular Topics section not modules grid
   },
 ];
 

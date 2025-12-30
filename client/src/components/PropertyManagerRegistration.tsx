@@ -303,7 +303,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                   <p className="text-center text-sm text-muted-foreground mt-4">
                     Already registered?{" "}
                     <button 
-                      onClick={() => { handleClose(); setLocation("/"); }}
+                      onClick={() => { handleClose(); setLocation("/login"); }}
                       className="font-medium hover:underline"
                       style={{color: SAGE_GREEN}}
                       data-testid="link-sign-in"

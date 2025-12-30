@@ -38,12 +38,12 @@ import { useLocation, useSearch, Link } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Project, Client, InsertClient } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canAccessQuotes, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule, canViewPastProjects } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
-import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { SubscriptionRenewalBadge } from "@/components/SubscriptionRenewalBadge";
@@ -69,11 +69,13 @@ import { CSS } from '@dnd-kit/utilities';
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ProgressPromptDialog } from "@/components/ProgressPromptDialog";
 import { BusinessCardScanner } from "@/components/BusinessCardScanner";
+import { ClientExcelImport } from "@/components/ClientExcelImport";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { DashboardOverview } from "@/components/DashboardOverview";
+import { DocumentReviews } from "@/components/DocumentReviews";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
-import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -256,6 +258,37 @@ const getJobTypeLabel = (t: (key: string) => string, jobType: string): string =>
 // Flat list of all permissions for compatibility
 const AVAILABLE_PERMISSIONS = PERMISSION_CATEGORIES.flatMap(cat => cat.permissions);
 
+// Quote-related permissions that should auto-select view_clients
+const QUOTE_PERMISSIONS = ['view_quotes', 'create_quotes', 'edit_quotes', 'delete_quotes', 'view_quote_financials'];
+
+// Helper function to handle permission cascading (quotes -> clients)
+const handlePermissionChange = (
+  currentPermissions: string[],
+  permissionId: string,
+  checked: boolean
+): string[] => {
+  let newPermissions = checked
+    ? [...currentPermissions, permissionId]
+    : currentPermissions.filter((p) => p !== permissionId);
+
+  // If a quote permission is being enabled, also enable view_clients
+  if (checked && QUOTE_PERMISSIONS.includes(permissionId)) {
+    if (!newPermissions.includes('view_clients')) {
+      newPermissions = [...newPermissions, 'view_clients'];
+    }
+  }
+
+  // If a quote permission is being disabled, check if any quote permissions remain
+  if (!checked && QUOTE_PERMISSIONS.includes(permissionId)) {
+    const hasRemainingQuotePermissions = newPermissions.some((p) => QUOTE_PERMISSIONS.includes(p));
+    if (!hasRemainingQuotePermissions) {
+      newPermissions = newPermissions.filter((p) => p !== 'view_clients');
+    }
+  }
+
+  return newPermissions;
+};
+
 const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
@@ -277,7 +310,7 @@ const employeeSchema = z.object({
   emergencyContactName: z.string().optional(),
   emergencyContactPhone: z.string().optional(),
   specialMedicalConditions: z.string().optional(),
-  // irata fields
+  // IRATA fields
   irataLevel: z.string().optional(),
   irataLicenseNumber: z.string().optional(),
   irataIssuedDate: z.string().optional(),
@@ -309,7 +342,7 @@ const editEmployeeSchema = z.object({
   emergencyContactName: z.string().optional(),
   emergencyContactPhone: z.string().optional(),
   specialMedicalConditions: z.string().optional(),
-  // irata fields
+  // IRATA fields
   irataLevel: z.string().optional(),
   irataLicenseNumber: z.string().optional(),
   irataIssuedDate: z.string().optional(),
@@ -337,10 +370,10 @@ const dropLogSchema = z.object({
 });
 
 const endDaySchema = z.object({
-  dropsNorth: z.string().default("0"),
-  dropsEast: z.string().default("0"),
-  dropsSouth: z.string().default("0"),
-  dropsWest: z.string().default("0"),
+  dropsNorth: z.string().default(""),
+  dropsEast: z.string().default(""),
+  dropsSouth: z.string().default(""),
+  dropsWest: z.string().default(""),
   shortfallReason: z.string().optional(),
   logRopeAccessHours: z.boolean().default(false),
   ropeAccessTaskHours: z.string().default(""),
@@ -680,7 +713,7 @@ function DeletedProjectsTab() {
                             {dayProjects.map((project: Project) => (
                               <Card 
                                 key={project.id} 
-                                className="group shadow-md hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
+                                className="group shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
                                 data-testid={`deleted-project-${project.id}`}
                               >
                                 <CardContent className="p-4">
@@ -815,7 +848,7 @@ function CompletedProjectsTab() {
                             {dayProjects.map((project: Project) => (
                               <Card 
                                 key={project.id} 
-                                className="group shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                                className="group shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
                                 data-testid={`completed-project-${project.id}`}
                                 onClick={() => setLocation(`/projects/${project.id}`)}
                               >
@@ -1180,8 +1213,14 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState("");
   const [showClientDialog, setShowClientDialog] = useState(false);
   const [showBusinessCardScanner, setShowBusinessCardScanner] = useState(false);
+  const [showPMSearchDialog, setShowPMSearchDialog] = useState(false);
+  const [pmSearchQuery, setPMSearchQuery] = useState("");
+  const [pmSearchResults, setPMSearchResults] = useState<Array<{ id: string; email: string; name: string; pmCode: string | null; company: string | null; phone: string | null; isLinked: boolean }>>([]);
+  const [pmSearchLoading, setPMSearchLoading] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
+  const [showClientDetailDialog, setShowClientDetailDialog] = useState(false);
+  const [clientToView, setClientToView] = useState<Client | null>(null);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
   const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; buildingName?: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>([{ number: "", address: "" }]);
@@ -1197,8 +1236,15 @@ export default function Dashboard() {
   const [clientDropdownStep, setClientDropdownStep] = useState<"clients" | "buildings">("clients");
   const [selectedClientInDropdown, setSelectedClientInDropdown] = useState<string | null>(null);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
+  const [clientViewMode, setClientViewMode] = useState<"cards" | "table">("cards");
+  const [clientSortField, setClientSortField] = useState<"name" | "company" | "email" | "phone">("name");
+  const [clientSortDirection, setClientSortDirection] = useState<"asc" | "desc">("asc");
+  const [projectsViewMode, setProjectsViewMode] = useState<"cards" | "list">("cards");
+  const [employeesViewMode, setEmployeesViewMode] = useState<"cards" | "list">("cards");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [employeeToSuspendSeat, setEmployeeToSuspendSeat] = useState<any | null>(null); // For seat removal/suspend
+  const [showDeactivateInfoModal, setShowDeactivateInfoModal] = useState(false); // Info modal for deactivate function
+  const [showUnlinkInfoModal, setShowUnlinkInfoModal] = useState(false); // Info modal for unlink function
   const [showDropDialog, setShowDropDialog] = useState(false);
   const [dropProject, setDropProject] = useState<any>(null);
   const [showInspectionCheckDialog, setShowInspectionCheckDialog] = useState(false);
@@ -1222,6 +1268,8 @@ export default function Dashboard() {
   const [onRopeProSearchType, setOnRopeProSearchType] = useState<'irata' | 'sprat' | 'email'>('irata'); // Search type for OnRopePro
   const [onRopeProSearchValue, setOnRopeProSearchValue] = useState(''); // Search value for OnRopePro
   const [foundTechnician, setFoundTechnician] = useState<any>(null); // Found technician from search
+  const [inviteDebugResponse, setInviteDebugResponse] = useState<any>(null); // Debug info from last invite
+  const [technicianSearchWarning, setTechnicianSearchWarning] = useState<string | null>(null); // Warning from search
   const [technicianSearching, setTechnicianSearching] = useState(false); // Loading state for search
   const [technicianLinking, setTechnicianLinking] = useState(false); // Loading state for linking
   const [editEmployeeFormStep, setEditEmployeeFormStep] = useState<1 | 2>(1); // Track edit form step
@@ -1281,6 +1329,12 @@ export default function Dashboard() {
   // Fetch current user to get company info
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
+  });
+
+  // Check if employee has pending required documents to sign (blocks dashboard access)
+  const { data: pendingDocsData, isLoading: pendingDocsLoading } = useQuery<{ hasPendingDocuments: boolean; pendingCount: number }>({
+    queryKey: ["/api/document-reviews/pending-check"],
+    enabled: !!userData?.user && ['rope_access_tech', 'ground_crew'].includes(userData.user.role),
   });
 
   // Fetch unread feature request message count for company owners
@@ -1561,6 +1615,56 @@ export default function Dashboard() {
   });
 
   const pendingOnboardingInvitations = pendingOnboardingData?.invitations || [];
+
+  // Query for sent invitations (pending, not yet responded)
+  const { data: sentInvitationsData } = useQuery<{
+    invitations: Array<{
+      id: string;
+      createdAt: string;
+      message?: string;
+      technician: {
+        id: string;
+        name: string;
+        email: string;
+        employeePhoneNumber?: string;
+        role: string;
+      };
+    }>;
+  }>({
+    queryKey: ["/api/sent-invitations"],
+    enabled: userData?.user?.role === 'owner' || userData?.user?.role === 'company' || userData?.user?.role === 'admin' || userData?.user?.role === 'operations_manager',
+  });
+
+  const sentInvitations = sentInvitationsData?.invitations || [];
+
+  // Mutation to cancel a sent invitation
+  const cancelInvitationMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      const response = await fetch(`/api/sent-invitations/${invitationId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to cancel invitation');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sent-invitations"] });
+      toast({
+        title: t('dashboard.invitations.cancelled', 'Invitation Cancelled'),
+        description: t('dashboard.invitations.cancelledDesc', 'The invitation has been cancelled.'),
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('common.error', 'Error'),
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
 
   // Mutation to acknowledge accepted invitation
   const acknowledgeInvitationMutation = useMutation({
@@ -1855,10 +1959,10 @@ export default function Dashboard() {
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
     defaultValues: {
-      dropsNorth: "0",
-      dropsEast: "0",
-      dropsSouth: "0",
-      dropsWest: "0",
+      dropsNorth: "",
+      dropsEast: "",
+      dropsSouth: "",
+      dropsWest: "",
       shortfallReason: "",
       ropeAccessTaskHours: "",
     },
@@ -2268,6 +2372,7 @@ export default function Dashboard() {
     
     setTechnicianSearching(true);
     setFoundTechnician(null);
+    setTechnicianSearchWarning(null);
     
     try {
       const response = await fetch(`/api/technicians/search?searchType=${onRopeProSearchType}&searchValue=${encodeURIComponent(onRopeProSearchValue)}`, {
@@ -2282,6 +2387,7 @@ export default function Dashboard() {
       
       if (data.found) {
         setFoundTechnician(data.technician);
+        setTechnicianSearchWarning(data.warning || null);
       } else {
         toast({ 
           title: "No technician found", 
@@ -2316,6 +2422,14 @@ export default function Dashboard() {
       
       const data = await response.json();
       
+      // Store debug response for visibility
+      setInviteDebugResponse({
+        timestamp: new Date().toISOString(),
+        status: response.status,
+        statusOk: response.ok,
+        data
+      });
+      
       if (!response.ok) {
         throw new Error(data.message || "Invitation failed");
       }
@@ -2327,6 +2441,10 @@ export default function Dashboard() {
         description: data.message || t('dashboard.toast.invitationSentDesc', `An invitation has been sent to ${foundTechnician.name}. They can accept or decline in their portal.`),
       });
     } catch (error: any) {
+      setInviteDebugResponse({
+        timestamp: new Date().toISOString(),
+        error: error.message
+      });
       toast({ 
         title: t('dashboard.toast.invitationFailed', 'Failed to send invitation'), 
         description: error.message, 
@@ -2737,7 +2855,7 @@ export default function Dashboard() {
       setEmployeeToSuspendSeat(null);
       const creditAmount = data.creditAmount || 0;
       toast({ 
-        title: t('dashboard.toast.employeeSuspended', 'Employee suspended'),
+        title: t('dashboard.toast.employeeInactive', 'Employee now inactive'),
         description: creditAmount > 0 
           ? t('dashboard.toast.seatRemovedWithCredit', `Seat removed. $${creditAmount.toFixed(2)} credit applied to your account.`)
           : t('dashboard.toast.seatRemoved', 'Seat removed from your subscription.')
@@ -3122,10 +3240,14 @@ export default function Dashboard() {
       });
       // Clear ALL query cache to prevent stale data from causing redirect issues
       queryClient.clear();
-      // Redirect technicians to technician landing, others to home page
+      // Use router navigation (instant) instead of full page reload
+      // Redirect to role-appropriate landing pages
       if (userRole === 'rope_access_tech') {
         setLocation("/technician");
+      } else if (userRole === 'ground_crew' || userRole === 'ground_crew_supervisor') {
+        setLocation("/ground-crew");
       } else {
+        // Employers/company owners go to main landing page
         setLocation("/");
       }
     } catch (error) {
@@ -3171,10 +3293,10 @@ export default function Dashboard() {
     } else {
       // Reset to defaults for drop-based projects
       endDayForm.reset({
-        dropsNorth: "0",
-        dropsEast: "0",
-        dropsSouth: "0",
-        dropsWest: "0",
+        dropsNorth: "",
+        dropsEast: "",
+        dropsSouth: "",
+        dropsWest: "",
         shortfallReason: "",
         logRopeAccessHours: false,
         ropeAccessTaskHours: "",
@@ -3615,6 +3737,48 @@ export default function Dashboard() {
     }
   };
 
+  // Configure unified header - no page title for dashboard (shows search), no back button
+  useSetHeaderConfig({
+    showSearch: true,
+    showNotifications: true,
+    showLanguageDropdown: true,
+    showProfile: true,
+    showLogout: true,
+  }, []);
+
+  // Block dashboard access if employee has pending required documents to sign
+  const isTechOrGroundCrew = ['rope_access_tech', 'ground_crew'].includes(user?.role || '');
+  
+  // While checking for pending documents, show loading for technicians/ground crew
+  if (isTechOrGroundCrew && pendingDocsLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium">{t('common.loading', 'Loading...')}</div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Block access if there are pending documents to sign
+  if (pendingDocsData?.hasPendingDocuments && isTechOrGroundCrew) {
+    return (
+      <div className="min-h-screen bg-background p-4 md:p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {t('documents.requiredReviewTitle', 'Required Document Review')}
+            </h1>
+            <p className="text-muted-foreground">
+              {t('documents.requiredReviewDesc', 'You must review and sign the following company safety documents before accessing the dashboard.')}
+            </p>
+          </div>
+          <DocumentReviews companyDocuments={[]} />
+        </div>
+      </div>
+    );
+  }
+
   if (projectsLoading || employeesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -3631,69 +3795,8 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full">
-      {/* Main Content - sidebar is now provided by DashboardLayout wrapper */}
+      {/* Main Content - sidebar and header are now provided by DashboardLayout wrapper */}
       <div className="flex-1 flex flex-col page-gradient min-h-screen">
-          {/* Header - Modern SaaS Design */}
-          <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
-            <div className="h-full flex items-center justify-between gap-4">
-              {/* Left Side: Search */}
-              <div className="flex items-center gap-4 flex-1 min-w-0">
-                <div className="hidden md:flex flex-1 max-w-xl">
-                  <DashboardSearch />
-                </div>
-              </div>
-              
-              {/* Right Side: Actions Group */}
-              <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                {/* License Expiry Warning - Inline in header */}
-                {currentUser && (currentUser.role === 'company' || canManageEmployees(currentUser)) && employees.length > 0 && (
-                  <LicenseExpiryWarningBanner employees={employees} onReviewClick={() => handleTabChange("employees")} />
-                )}
-                
-                {/* Trial Badge - Company owners only */}
-                {currentUser?.role === 'company' && (
-                  <SubscriptionRenewalBadge 
-                    subscriptionEndDate={currentUser.subscriptionEndDate} 
-                    subscriptionStatus={currentUser.subscriptionStatus}
-                  />
-                )}
-                
-                {/* Install App Button */}
-                <InstallPWAButton />
-                
-                {/* Notification Bell - Company owners only */}
-                {currentUser?.role === 'company' && (
-                  <NotificationBell />
-                )}
-                
-                {/* Language Selector */}
-                <LanguageDropdown />
-                
-                {/* User Profile - Clickable to go to Settings */}
-                <Link 
-                  href="/profile" 
-                  className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
-                  data-testid="link-user-profile"
-                >
-                  <Avatar className="w-8 h-8 bg-[#0B64A3]">
-                    <AvatarFallback className="bg-[#0B64A3] text-white text-xs font-medium">
-                      {currentUser?.fullName ? currentUser.fullName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="hidden lg:block">
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{currentUser?.fullName || 'User'}</p>
-                    <p className="text-xs text-slate-400 leading-tight">{currentUser?.role === 'company' ? 'Admin' : currentUser?.role}</p>
-                  </div>
-                </Link>
-                
-                {/* Logout Button */}
-                <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
-                  <span className="material-icons text-xl">logout</span>
-                </Button>
-              </div>
-            </div>
-          </header>
-
       {/* Read-Only Mode Banner - Shows on all tabs */}
       {currentUser && isReadOnly(currentUser) && (
         <div 
@@ -3749,62 +3852,18 @@ export default function Dashboard() {
                       <div>
                         <div className="font-medium">{t('dashboard.projects.title', 'Projects')}</div>
                         <div className="text-sm text-muted-foreground">
-                          {projectsData.projectInfo.tier && projectsData.projectInfo.tier !== 'none'
-                            ? (() => {
-                                const projectsRemaining = projectsData.projectInfo.projectLimit === -1 
-                                  ? '∞' 
-                                  : Math.max(0, projectsData.projectInfo.projectLimit - projectsData.projectInfo.projectsUsed);
-                                const additionalInfo = projectsData.projectInfo.additionalProjects > 0 
-                                  ? ` (${projectsData.projectInfo.baseProjectLimit} ${t('dashboard.projects.base', 'base')} + ${projectsData.projectInfo.additionalProjects} ${t('dashboard.projects.additional', 'additional')})` 
-                                  : '';
-                                
-                                return projectsData.projectInfo.projectLimit === -1
-                                  ? t('dashboard.projects.usageUnlimited', '{{used}} projects used • Unlimited available', { used: projectsData.projectInfo.projectsUsed })
-                                  : t('dashboard.projects.usage', '{{used}} of {{total}} used • {{remaining}} {{projectLabel}} remaining{{additionalInfo}}', { 
-                                      used: projectsData.projectInfo.projectsUsed, 
-                                      total: projectsData.projectInfo.projectLimit, 
-                                      remaining: projectsRemaining, 
-                                      projectLabel: projectsRemaining === 1 ? t('dashboard.projects.project', 'project') : t('dashboard.projects.projectsLabel', 'projects'),
-                                      additionalInfo
-                                    });
-                              })()
-                            : t('dashboard.projects.manageCapacity', 'Manage your project capacity')
-                          }
+                          {t('dashboard.projects.usageUnlimited', '{{used}} active projects', { used: projectsData.projectInfo.projectsUsed })}
                         </div>
                       </div>
                     </div>
                     {projectsData.projectInfo.tier && projectsData.projectInfo.tier !== 'none' && (
                       <div className="text-right">
-                        <Badge variant={projectsData.projectInfo.atProjectLimit ? "destructive" : "secondary"} data-testid="badge-project-tier-status">
-                          {projectsData.projectInfo.tier.charAt(0).toUpperCase() + projectsData.projectInfo.tier.slice(1)}
+                        <Badge variant="secondary" data-testid="badge-project-tier-status">
+                          OnRopePro
                         </Badge>
                       </div>
                     )}
                   </div>
-                  
-                  {projectsData.projectInfo.atProjectLimit && (
-                    <div className="mt-3 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-                      <div className="flex items-start gap-2">
-                        <span className="material-icons text-destructive text-sm mt-0.5">warning</span>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-destructive">{t('dashboard.projects.limitReached', 'Project Limit Reached')}</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {t('dashboard.projects.limitReachedDesc', "You've reached your {{limit}}-project limit. Visit Profile → Subscription to upgrade your tier or add more projects.", { limit: projectsData.projectInfo.projectLimit })}
-                          </div>
-                        </div>
-                      </div>
-                      <Button 
-                        size="sm" 
-                        variant="default" 
-                        className="mt-2 w-full"
-                        data-testid="button-manage-subscription"
-                        onClick={() => window.location.href = "/profile"}
-                      >
-                        <span className="material-icons text-sm mr-1">settings</span>
-                        {t('dashboard.projects.manageSubscription', 'Manage Subscription')}
-                      </Button>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             )}
@@ -3828,10 +3887,10 @@ export default function Dashboard() {
                     <Button 
                       className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
                       data-testid="button-create-project"
-                      disabled={userIsReadOnly || (projectsData?.projectInfo?.atProjectLimit ?? false)}
+                      disabled={userIsReadOnly}
                     >
                       <span className="material-icons text-xl text-primary-foreground">add_circle</span>
-                      <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? t('dashboard.projects.limitReached', 'Project Limit Reached') : t('dashboard.projects.newProject', 'New Project')}</span>
+                      <span className="hidden sm:inline">{t('dashboard.projects.newProject', 'New Project')}</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl p-0 max-h-[95vh] flex flex-col gap-0">
@@ -4655,8 +4714,8 @@ export default function Dashboard() {
                                 <FormDescription className="text-xs mt-2">
                                   <span className="font-medium text-foreground">{t('dashboard.projectForm.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
                                   {isRockScaling
-                                    ? t('dashboard.projectForm.siteHeightExplain', 'Site height is required for irata logbook entries. Technicians need this to track work at height for certification progression.')
-                                    : t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for irata logbook entries. Technicians need this to track work at height for certification progression.')
+                                    ? t('dashboard.projectForm.siteHeightExplain', 'Site height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')
+                                    : t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')
                                   }
                                 </FormDescription>
                                 {!isRockScaling && floorCount && parseInt(floorCount) > 0 && (
@@ -4891,38 +4950,58 @@ export default function Dashboard() {
 
               {/* Projects with Active/Past Tabs */}
               <div>
-                <div className="flex items-center justify-between mb-6 mt-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 mt-8">
                   <div className="flex items-center gap-2">
                     <div className="h-8 w-1 bg-primary rounded-full"></div>
                     <h2 className="text-xl font-bold">{t('dashboard.projects.title', 'Projects')}</h2>
                   </div>
-                  {canViewPastProjects(currentUser) && (
-                    <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
-                      <TabsList className="bg-muted/80 p-1 h-auto">
-                        <TabsTrigger 
-                          value="active" 
-                          data-testid="tab-active-projects"
-                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
-                        >
-                          <span className="material-icons text-base">play_circle</span>
-                          {t('dashboard.projects.activeProjects', 'Active Projects')}
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="past" 
-                          data-testid="tab-past-projects"
-                          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
-                        >
-                          <span className="material-icons text-base">history</span>
-                          {t('dashboard.projects.pastProjects', 'Past Projects')}
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={projectsViewMode === "cards" ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setProjectsViewMode("cards")}
+                        data-testid="button-projects-view-cards"
+                      >
+                        <span className="material-icons text-sm">grid_view</span>
+                      </Button>
+                      <Button
+                        variant={projectsViewMode === "list" ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setProjectsViewMode("list")}
+                        data-testid="button-projects-view-list"
+                      >
+                        <span className="material-icons text-sm">view_list</span>
+                      </Button>
+                    </div>
+                    {canViewPastProjects(currentUser) && (
+                      <Tabs value={projectsSubTab} onValueChange={(v) => setProjectsSubTab(v as "active" | "past")}>
+                        <TabsList className="bg-muted/80 p-1 h-auto">
+                          <TabsTrigger 
+                            value="active" 
+                            data-testid="tab-active-projects"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                          >
+                            <span className="material-icons text-base">play_circle</span>
+                            {t('dashboard.projects.activeProjects', 'Active Projects')}
+                          </TabsTrigger>
+                          <TabsTrigger 
+                            value="past" 
+                            data-testid="tab-past-projects"
+                            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2 gap-2"
+                          >
+                            <span className="material-icons text-base">history</span>
+                            {t('dashboard.projects.pastProjects', 'Past Projects')}
+                          </TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    )}
+                  </div>
                 </div>
 
                 {/* Active Projects */}
                 {projectsSubTab === "active" && (
-                <div className="space-y-4">
+                <div>
                   {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
                     <Card>
                       <CardContent className="p-8 text-center text-muted-foreground">
@@ -4930,8 +5009,126 @@ export default function Dashboard() {
                         <div>{t('dashboard.projects.noActiveProjects', 'No active projects yet')}</div>
                       </CardContent>
                     </Card>
+                  ) : projectsViewMode === "list" ? (
+                    /* List View - Table format */
+                    <Card>
+                      <CardContent className="p-0">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{t('dashboard.projects.building', 'Building')}</TableHead>
+                              <TableHead>{t('dashboard.projects.strataNumber', 'Strata #')}</TableHead>
+                              <TableHead className="hidden md:table-cell">{t('dashboard.projects.jobType', 'Job Type')}</TableHead>
+                              <TableHead className="hidden lg:table-cell">{t('dashboard.projects.created', 'Created')}</TableHead>
+                              <TableHead>{t('dashboard.projects.progress', 'Progress')}</TableHead>
+                              <TableHead className="hidden xl:table-cell">{t('dashboard.projects.team', 'Team')}</TableHead>
+                              <TableHead className="text-right">{t('dashboard.projects.actions', 'Actions')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
+                              const progressType = getProgressType(project.jobType);
+                              const isHoursBased = progressType === 'hours';
+                              const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
+                              const isParkade = project.jobType === "parkade_pressure_cleaning";
+                              const isAnchorInspection = project.jobType === "anchor_inspection";
+                              
+                              let progressPercent: number;
+                              if (isHoursBased) {
+                                const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+                                const totalHoursWorked = projectSessions.reduce((sum: number, s: any) => {
+                                  const regular = parseFloat(s.regularHours) || 0;
+                                  const overtime = parseFloat(s.overtimeHours) || 0;
+                                  const doubleTime = parseFloat(s.doubleTimeHours) || 0;
+                                  return sum + regular + overtime + doubleTime;
+                                }, 0);
+                                if ((project as any).overallCompletionPercentage !== null && (project as any).overallCompletionPercentage !== undefined) {
+                                  progressPercent = (project as any).overallCompletionPercentage;
+                                } else if (project.estimatedHours && project.estimatedHours > 0) {
+                                  progressPercent = Math.min((totalHoursWorked / project.estimatedHours) * 100, 100);
+                                } else {
+                                  progressPercent = 0;
+                                }
+                              } else if (isInSuite) {
+                                const completed = project.completedDrops || 0;
+                                const total = project.floorCount || 0;
+                                progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                              } else if (isParkade) {
+                                const completed = project.completedDrops || 0;
+                                const total = project.totalStalls || project.floorCount || 0;
+                                progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                              } else if (isAnchorInspection) {
+                                const anchorSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+                                const totalAnchorsInspected = anchorSessions.reduce((sum: number, s: any) => sum + (s.anchorsInspected || 0), 0);
+                                const total = project.totalAnchors || 0;
+                                progressPercent = total > 0 ? (totalAnchorsInspected / total) * 100 : 0;
+                              } else {
+                                const completed = project.completedDrops || 0;
+                                const total = project.totalDrops || 0;
+                                progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                              }
+
+                              return (
+                                <TableRow 
+                                  key={project.id}
+                                  className="cursor-pointer"
+                                  onClick={() => setLocation(`/projects/${project.id}`)}
+                                  data-testid={`project-row-${project.id}`}
+                                >
+                                  <TableCell className="font-medium">{project.buildingName}</TableCell>
+                                  <TableCell className="text-muted-foreground">{project.strataPlanNumber}</TableCell>
+                                  <TableCell className="text-muted-foreground hidden md:table-cell">{getJobTypeLabel(t, project.jobType)}</TableCell>
+                                  <TableCell className="text-muted-foreground hidden lg:table-cell">
+                                    {project.createdAt ? formatTimestampDateShort(project.createdAt) : '-'}
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex items-center gap-2">
+                                      <Progress value={progressPercent} className="h-2 w-16" />
+                                      <span className="text-sm font-medium">{Math.round(progressPercent)}%</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="hidden xl:table-cell">
+                                    {project.assignedTechnicians && project.assignedTechnicians.length > 0 ? (
+                                      <div className="flex items-center -space-x-1">
+                                        {project.assignedTechnicians.slice(0, 3).map((tech: any) => (
+                                          <Avatar key={tech.id} className="w-6 h-6 border border-background">
+                                            {tech.photoUrl ? <AvatarImage src={tech.photoUrl} alt={tech.name} /> : null}
+                                            <AvatarFallback className="text-xs bg-muted">
+                                              {tech.name?.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || '?'}
+                                            </AvatarFallback>
+                                          </Avatar>
+                                        ))}
+                                        {project.assignedTechnicians.length > 3 && (
+                                          <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs border border-background">
+                                            +{project.assignedTechnicians.length - 3}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <span className="text-muted-foreground">-</span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={(e) => { e.stopPropagation(); setLocation(`/projects/${project.id}`); }}
+                                      data-testid={`button-view-project-${project.id}`}
+                                    >
+                                      <span className="material-icons text-sm">arrow_forward</span>
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
                   ) : (
-                    filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
+                    /* Cards View - Multi-column grid */
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                       const isParkade = project.jobType === "parkade_pressure_cleaning";
                       const isAnchorInspection = project.jobType === "anchor_inspection";
@@ -5010,7 +5207,7 @@ export default function Dashboard() {
                       return (
                         <Card 
                           key={project.id} 
-                          className="group relative border-l-4 border-l-primary shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer overflow-visible bg-gradient-to-br from-background to-muted/30" 
+                          className="group relative shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer" 
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >
@@ -5159,7 +5356,8 @@ export default function Dashboard() {
                           </CardContent>
                         </Card>
                       );
-                    })
+                    })}
+                    </div>
                   )}
                 </div>
                 )}
@@ -5225,7 +5423,7 @@ export default function Dashboard() {
                   {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
                     <Card 
                       key={project.id} 
-                      className="group border-l-4 border-l-success shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                      className="group border-l-4 border-l-success shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
                       data-testid={`completed-project-${project.id}`}
                       onClick={() => setLocation(`/projects/${project.id}`)}
                     >
@@ -5561,7 +5759,7 @@ export default function Dashboard() {
                                   {building.complaints.map((complaint: any) => (
                                     <Card 
                                       key={complaint.id} 
-                                      className="hover-elevate cursor-pointer"
+                                      className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer"
                                       onClick={() => setLocation(`/complaints/${complaint.id}`)}
                                       data-testid={`feedback-card-${complaint.id}`}
                                     >
@@ -5603,6 +5801,30 @@ export default function Dashboard() {
         {activeTab === "employees" && (
           <div>
             <div className="space-y-4">
+              {/* Debug Panel for Invite Response */}
+              {inviteDebugResponse && (
+                <Card className="border-amber-500 bg-amber-50 dark:bg-amber-950/20" data-testid="card-invite-debug">
+                  <CardHeader className="flex flex-row items-center justify-between gap-2 py-2 px-4">
+                    <div className="flex items-center gap-2">
+                      <span className="material-icons text-amber-600">bug_report</span>
+                      <span className="font-medium text-amber-800 dark:text-amber-200">Invite Debug Response</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setInviteDebugResponse(null)}
+                      data-testid="button-clear-debug"
+                    >
+                      <span className="material-icons">close</span>
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="px-4 pb-4">
+                    <pre className="text-xs bg-background p-3 rounded overflow-auto max-h-64 border">
+                      {JSON.stringify(inviteDebugResponse, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
               {/* Seat Usage Information */}
               {employeesData?.seatInfo && (
                 <Card data-testid="card-seat-info">
@@ -5866,7 +6088,7 @@ export default function Dashboard() {
                           <label className="text-sm font-medium">Search by</label>
                           <div className="grid grid-cols-3 gap-3">
                             {[
-                              { value: 'irata', label: 'irata License', icon: 'badge' },
+                              { value: 'irata', label: 'IRATA License', icon: 'badge' },
                               { value: 'sprat', label: 'SPRAT License', icon: 'verified' },
                               { value: 'email', label: 'Email', icon: 'email' },
                             ].map((option) => (
@@ -5890,7 +6112,7 @@ export default function Dashboard() {
                         {/* Search Input */}
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            {onRopeProSearchType === 'irata' ? 'irata License Number' :
+                            {onRopeProSearchType === 'irata' ? 'IRATA License Number' :
                              onRopeProSearchType === 'sprat' ? 'SPRAT License Number' :
                              'Email Address'}
                           </label>
@@ -5940,7 +6162,7 @@ export default function Dashboard() {
                             <div className="grid grid-cols-2 gap-3 pt-2 border-t">
                               {foundTechnician.irataLevel && (
                                 <div className="text-sm">
-                                  <span className="text-muted-foreground">irata:</span>
+                                  <span className="text-muted-foreground">IRATA:</span>
                                   <span className="ml-2 font-medium">{foundTechnician.irataLevel}</span>
                                   {foundTechnician.irataLicenseNumber && (
                                     <span className="text-muted-foreground ml-1">({foundTechnician.irataLicenseNumber})</span>
@@ -5971,6 +6193,16 @@ export default function Dashboard() {
                                 </div>
                               )}
                             </div>
+                            
+                            {/* Warning if technician is employed and has visibility on */}
+                            {technicianSearchWarning && (
+                              <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                                <span className="material-icons text-amber-500 text-lg mt-0.5">warning</span>
+                                <p className="text-sm text-amber-700 dark:text-amber-400">
+                                  {technicianSearchWarning}
+                                </p>
+                              </div>
+                            )}
                             
                             <Button 
                               type="button"
@@ -6337,14 +6569,14 @@ export default function Dashboard() {
                           />
 
                           <div className="border-t pt-4 mt-4">
-                            <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'irata Certification (Optional)')}</h4>
+                            <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification (Optional)')}</h4>
                             <div className="space-y-4">
                               <FormField
                                 control={employeeForm.control}
                                 name="irataLevel"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>{t('dashboard.employeeForm.irataLevel', 'irata Level')}</FormLabel>
+                                    <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                                     <Select onValueChange={field.onChange} value={field.value}>
                                       <FormControl>
                                         <SelectTrigger className="h-12" data-testid="select-irata-level">
@@ -6369,7 +6601,7 @@ export default function Dashboard() {
                                     name="irataLicenseNumber"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'irata License Number')}</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
                                         <FormControl>
                                           <Input placeholder="License number" {...field} data-testid="input-irata-license" className="h-12" />
                                         </FormControl>
@@ -6383,7 +6615,7 @@ export default function Dashboard() {
                                     name="irataIssuedDate"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'irata Issued Date')}</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'IRATA Issued Date')}</FormLabel>
                                         <FormControl>
                                           <Input type="date" {...field} data-testid="input-irata-issued" className="h-12" />
                                         </FormControl>
@@ -6397,7 +6629,7 @@ export default function Dashboard() {
                                     name="irataExpirationDate"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'irata Expiration Date')}</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'IRATA Expiration Date')}</FormLabel>
                                         <FormControl>
                                           <Input type="date" {...field} data-testid="input-irata-expiration" className="h-12" />
                                         </FormControl>
@@ -6555,13 +6787,12 @@ export default function Dashboard() {
                                                 <Checkbox
                                                   checked={field.value?.includes(permission.id)}
                                                   onCheckedChange={(checked) => {
-                                                    return checked
-                                                      ? field.onChange([...field.value, permission.id])
-                                                      : field.onChange(
-                                                          field.value?.filter(
-                                                            (value) => value !== permission.id
-                                                          )
-                                                        )
+                                                    const newPermissions = handlePermissionChange(
+                                                      field.value || [],
+                                                      permission.id,
+                                                      !!checked
+                                                    );
+                                                    field.onChange(newPermissions);
                                                   }}
                                                   data-testid={`checkbox-permission-${permission.id}`}
                                                 />
@@ -6634,7 +6865,7 @@ export default function Dashboard() {
                                 <div className="text-sm text-muted-foreground">{inv.technician.email}</div>
                                 {inv.technician.irataLevel && (
                                   <Badge variant="outline" className="text-xs mt-1">
-                                    irata {inv.technician.irataLevel}
+                                    IRATA {inv.technician.irataLevel}
                                   </Badge>
                                 )}
                                 {inv.technician.spratLevel && !inv.technician.irataLevel && (
@@ -6692,9 +6923,116 @@ export default function Dashboard() {
                   </div>
                 )}
 
+                {/* Pending Sent Invitations */}
+                {sentInvitations.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-medium flex items-center gap-2">
+                      <span className="material-icons text-amber-500">mail_outline</span>
+                      {t('dashboard.employees.pendingSentInvitations', 'Pending Invitations')}
+                      <Badge variant="secondary" className="ml-2">{sentInvitations.length}</Badge>
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t('dashboard.employees.pendingSentInvitationsDesc', 'Invitations sent that are awaiting response')}
+                    </p>
+                    <div className="grid gap-3">
+                      {sentInvitations.map((inv) => (
+                        <Card key={inv.id} className="border-amber-200 dark:border-amber-800" data-testid={`sent-invitation-${inv.id}`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-medium">{inv.technician.name}</span>
+                                  <Badge variant="outline" className="text-xs">
+                                    {inv.technician.role === 'ground_crew' ? t('dashboard.employees.groundCrew', 'Ground Crew') : t('dashboard.employees.ropeAccessTech', 'Rope Access Tech')}
+                                  </Badge>
+                                </div>
+                                <div className="text-sm text-muted-foreground mt-1">
+                                  <span className="material-icons text-xs mr-1 align-middle">email</span>
+                                  {inv.technician.email}
+                                </div>
+                                {inv.technician.employeePhoneNumber && (
+                                  <div className="text-sm text-muted-foreground">
+                                    <span className="material-icons text-xs mr-1 align-middle">phone</span>
+                                    {inv.technician.employeePhoneNumber}
+                                  </div>
+                                )}
+                                <div className="text-xs text-muted-foreground mt-2">
+                                  {t('dashboard.employees.sentOn', 'Sent')} {new Date(inv.createdAt).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => cancelInvitationMutation.mutate(inv.id)}
+                                disabled={cancelInvitationMutation.isPending}
+                                className="text-destructive hover:text-destructive"
+                                data-testid={`button-cancel-invitation-${inv.id}`}
+                              >
+                                <span className="material-icons text-sm mr-1">close</span>
+                                {t('dashboard.employees.cancelInvitation', 'Cancel')}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Active Employees */}
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">{t('dashboard.employees.activeEmployees', 'Active Employees')}</h3>
+                <Card>
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          <span className="material-icons text-primary">people</span>
+                          {t('dashboard.employees.activeEmployees', 'Active Employees')}
+                        </CardTitle>
+                        <CardDescription>{t('dashboard.employees.activeEmployeesDescription', 'Team members currently active in your company')}</CardDescription>
+                        <div className="flex items-center gap-4 mt-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowDeactivateInfoModal(true)}
+                            className="text-muted-foreground h-auto py-1 px-2"
+                            data-testid="button-deactivate-info"
+                          >
+                            <span className="material-icons text-sm mr-1">info</span>
+                            {t('dashboard.employees.whatIsDeactivate', "What is 'Deactivate'?")}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowUnlinkInfoModal(true)}
+                            className="text-muted-foreground h-auto py-1 px-2"
+                            data-testid="button-unlink-info"
+                          >
+                            <span className="material-icons text-sm mr-1">info</span>
+                            {t('dashboard.employees.whatIsUnlink', "What is 'Unlink'?")}
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant={employeesViewMode === "cards" ? "default" : "outline"}
+                          size="icon"
+                          onClick={() => setEmployeesViewMode("cards")}
+                          data-testid="button-employees-view-cards"
+                        >
+                          <span className="material-icons text-sm">grid_view</span>
+                        </Button>
+                        <Button
+                          variant={employeesViewMode === "list" ? "default" : "outline"}
+                          size="icon"
+                          onClick={() => setEmployeesViewMode("list")}
+                          data-testid="button-employees-view-list"
+                        >
+                          <span className="material-icons text-sm">view_list</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
                   {(() => {
                     // Exclude both primary suspended (suspendedAt) and secondary suspended (connectionStatus)
                     const activeEmployees = employees.filter((emp: any) => 
@@ -6703,17 +7041,126 @@ export default function Dashboard() {
                     
                     if (activeEmployees.length === 0) {
                       return (
-                        <Card>
-                          <CardContent className="p-8 text-center text-muted-foreground">
-                            <span className="material-icons text-4xl mb-2 opacity-50">people</span>
-                            <div>{t('dashboard.employees.noActiveEmployees', 'No active employees yet')}</div>
-                          </CardContent>
-                        </Card>
+                        <div className="p-8 text-center text-muted-foreground">
+                          <span className="material-icons text-4xl mb-2 opacity-50">people</span>
+                          <div>{t('dashboard.employees.noActiveEmployees', 'No active employees yet')}</div>
+                        </div>
+                      );
+                    }
+
+                    // Table/List view
+                    if (employeesViewMode === "list") {
+                      return (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{t('dashboard.employees.name', 'Name')}</TableHead>
+                              <TableHead>{t('dashboard.employees.role', 'Role')}</TableHead>
+                              <TableHead className="hidden md:table-cell">{t('dashboard.employees.email', 'Email')}</TableHead>
+                              <TableHead className="hidden lg:table-cell">{t('dashboard.employees.phone', 'Phone')}</TableHead>
+                              <TableHead className="hidden xl:table-cell">{t('dashboard.employees.certification', 'Certification')}</TableHead>
+                              <TableHead className="text-right">{t('dashboard.employees.actions', 'Actions')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {activeEmployees.map((employee: any) => (
+                              <TableRow 
+                                key={employee.id} 
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() => {
+                                  setEmployeeToView(employee);
+                                  setShowEmployeeDetailDialog(true);
+                                }}
+                                data-testid={`employee-row-${employee.id}`}
+                              >
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium">{employee.name || employee.companyName || employee.email}</span>
+                                    {employee.role === 'rope_access_tech' && employee.hasPlusAccess && (
+                                      <Badge 
+                                        variant="default" 
+                                        className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0"
+                                      >
+                                        <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
+                                        PLUS
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="secondary" className="text-xs capitalize">
+                                    {employee.role?.replace(/_/g, ' ') || 'Employee'}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="hidden md:table-cell">{employee.email}</TableCell>
+                                <TableCell className="hidden lg:table-cell">{employee.employeePhoneNumber || '-'}</TableCell>
+                                <TableCell className="hidden xl:table-cell">
+                                  {employee.irataLevel ? (
+                                    <Badge variant="outline" className="text-xs">IRATA {employee.irataLevel}</Badge>
+                                  ) : employee.spratLevel ? (
+                                    <Badge variant="outline" className="text-xs">SPRAT {employee.spratLevel}</Badge>
+                                  ) : '-'}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex justify-end gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditEmployee(employee);
+                                      }}
+                                      data-testid={`button-edit-employee-row-${employee.id}`}
+                                      disabled={userIsReadOnly}
+                                    >
+                                      <span className="material-icons text-sm">edit</span>
+                                    </Button>
+                                    {user?.role === "company" && employee.id !== user?.id && (
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEmployeeToSuspendSeat(employee);
+                                        }}
+                                        data-testid={`button-deactivate-row-${employee.id}`}
+                                        className="text-amber-600 hover:text-amber-700"
+                                        disabled={userIsReadOnly}
+                                        title={t('dashboard.employees.deactivate', 'Deactivate')}
+                                      >
+                                        <span className="material-icons text-sm">person_remove</span>
+                                      </Button>
+                                    )}
+                                    {employee.id !== user?.id && (
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setEmployeeToDelete(employee.id);
+                                        }}
+                                        data-testid={`button-unlink-employee-row-${employee.id}`}
+                                        className="text-amber-600 hover:text-amber-700"
+                                        disabled={userIsReadOnly}
+                                        title={t('dashboard.employees.unlink', 'Unlink')}
+                                      >
+                                        <span className="material-icons text-sm">link_off</span>
+                                      </Button>
+                                    )}
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       );
                     }
                     
-                    return activeEmployees.map((employee: any) => {
-                      // Check irata license expiration status using timezone-safe date parsing
+                    // Cards view
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {activeEmployees.map((employee: any) => {
+                      // Check IRATA license expiration status using timezone-safe date parsing
                       const irataStatus = employee.irataExpirationDate ? (() => {
                         const expirationDate = parseLocalDate(employee.irataExpirationDate);
                         if (!expirationDate) return null;
@@ -6774,7 +7221,7 @@ export default function Dashboard() {
                       <Card 
                         key={employee.id} 
                         data-testid={`employee-card-${employee.id}`} 
-                        className="hover-elevate cursor-pointer"
+                        className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer"
                         onClick={() => {
                           setEmployeeToView(employee);
                           setShowEmployeeDetailDialog(true);
@@ -6839,7 +7286,7 @@ export default function Dashboard() {
                                   {employee.role.replace(/_/g, ' ')}
                                 </Badge>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1 flex-wrap justify-end">
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -6848,7 +7295,6 @@ export default function Dashboard() {
                                     handleEditEmployee(employee);
                                   }}
                                   data-testid={`button-edit-employee-${employee.id}`}
-                                  className="h-9 w-9"
                                   disabled={userIsReadOnly}
                                 >
                                   <span className="material-icons text-sm">edit</span>
@@ -6864,27 +7310,26 @@ export default function Dashboard() {
                                       setShowChangePasswordDialog(true);
                                     }}
                                     data-testid={`button-change-password-${employee.id}`}
-                                    className="h-9 w-9"
                                     disabled={userIsReadOnly}
                                   >
                                     <span className="material-icons text-sm">lock_reset</span>
                                   </Button>
                                 )}
-                                {/* Remove Seat button - only for employees, not company owner */}
+                                {/* Deactivate button - only for employees, not company owner */}
                                 {user?.role === "company" && employee.id !== user?.id && (
                                   <Button
                                     variant="ghost"
-                                    size="sm"
+                                    size="icon"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEmployeeToSuspendSeat(employee);
                                     }}
-                                    data-testid={`button-remove-seat-${employee.id}`}
+                                    data-testid={`button-deactivate-${employee.id}`}
                                     className="text-amber-600 hover:text-amber-700"
                                     disabled={userIsReadOnly}
+                                    title={t('dashboard.employees.deactivate', 'Deactivate')}
                                   >
-                                    <span className="material-icons text-sm mr-1">person_remove</span>
-                                    {t('dashboard.employees.removeSeat', 'Remove Seat')}
+                                    <span className="material-icons text-sm">person_remove</span>
                                   </Button>
                                 )}
                                 {/* Unlink button - only for employees, not company owner (can't unlink yourself) */}
@@ -6897,8 +7342,9 @@ export default function Dashboard() {
                                       setEmployeeToDelete(employee.id);
                                     }}
                                     data-testid={`button-unlink-employee-${employee.id}`}
-                                    className="h-9 w-9 text-amber-600 hover:text-amber-700"
+                                    className="text-amber-600 hover:text-amber-700"
                                     disabled={userIsReadOnly}
+                                    title={t('dashboard.employees.unlink', 'Unlink')}
                                   >
                                     <span className="material-icons text-sm">link_off</span>
                                   </Button>
@@ -6942,17 +7388,17 @@ export default function Dashboard() {
                               ))}
                               {employee.techLevel && (
                                 <Badge variant="outline" className="text-xs">
-                                  irata {employee.techLevel}
+                                  IRATA {employee.techLevel}
                                 </Badge>
                               )}
                             </div>
 
-                            {/* irata Details */}
+                            {/* IRATA Details */}
                             {employee.irataLevel && (
                               <div className="text-sm text-muted-foreground space-y-1 pt-2 border-t">
                                 <div className="flex items-center gap-2">
                                   <span className="material-icons text-sm">workspace_premium</span>
-                                  <span>{t('dashboard.employees.irataLevel', 'irata Level')} {employee.irataLevel}</span>
+                                  <span>{t('dashboard.employees.irataLevel', 'IRATA Level')} {employee.irataLevel}</span>
                                 </div>
                                 {employee.irataLicenseNumber && (
                                   <div className="ml-6">{t('dashboard.employees.license', 'License:')} {employee.irataLicenseNumber}</div>
@@ -7078,33 +7524,36 @@ export default function Dashboard() {
                         </CardContent>
                       </Card>
                       );
-                    });
+                    })}
+                      </div>
+                    );
                   })()}
-                </div>
+                  </CardContent>
+                </Card>
 
-                {/* Suspended Employees - Seat removed but can be reactivated */}
+                {/* Inactive Employees - Seat removed but can be reactivated */}
                 {(() => {
                   // Check both primary (suspendedAt) and secondary (connectionStatus) suspensions
-                  const suspendedEmployees = employees.filter((emp: any) => 
+                  const inactiveEmployees = employees.filter((emp: any) => 
                     (emp.suspendedAt || emp.connectionStatus === 'suspended') && !emp.terminatedDate
                   );
                   
-                  if (suspendedEmployees.length > 0) {
+                  if (inactiveEmployees.length > 0) {
                     return (
                       <div className="space-y-2 mt-6">
                         <div className="flex items-center gap-2">
                           <h3 className="text-lg font-medium text-amber-600 dark:text-amber-400">
-                            {t('dashboard.employees.suspendedEmployees', 'Suspended Employees')}
+                            {t('dashboard.employees.inactiveEmployees', 'Inactive Employees')}
                           </h3>
                           <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                            {suspendedEmployees.length}
+                            {inactiveEmployees.length}
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {t('dashboard.employees.suspendedDesc', 'These employees had their seats removed. Purchase a new seat to reactivate them.')}
+                          {t('dashboard.employees.inactiveDesc', 'These employees had their seats removed. Purchase a new seat to reactivate them.')}
                         </p>
-                        {suspendedEmployees.map((employee: any) => (
-                          <Card key={employee.id} data-testid={`suspended-employee-card-${employee.id}`} className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+                        {inactiveEmployees.map((employee: any) => (
+                          <Card key={employee.id} data-testid={`inactive-employee-card-${employee.id}`} className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
                             <CardContent className="p-4">
                               <div className="flex items-center justify-between gap-3 flex-wrap">
                                 <div className="flex items-center gap-3">
@@ -7118,7 +7567,7 @@ export default function Dashboard() {
                                         {employee.role?.replace(/_/g, ' ') || 'Employee'}
                                       </Badge>
                                       <span className="text-xs text-muted-foreground">
-                                        {t('dashboard.employees.suspendedOn', 'Suspended:')} {formatTimestampDate(employee.suspendedAt)}
+                                        {t('dashboard.employees.inactiveSince', 'Inactive since:')} {formatTimestampDate(employee.suspendedAt)}
                                       </span>
                                     </div>
                                   </div>
@@ -7128,7 +7577,7 @@ export default function Dashboard() {
                                   size="sm"
                                   onClick={() => reactivateSuspendedMutation.mutate(employee.id)}
                                   disabled={reactivateSuspendedMutation.isPending}
-                                  data-testid={`button-reactivate-suspended-${employee.id}`}
+                                  data-testid={`button-reactivate-inactive-${employee.id}`}
                                 >
                                   {reactivateSuspendedMutation.isPending ? (
                                     <>
@@ -7263,7 +7712,7 @@ export default function Dashboard() {
                                   ))}
                                   {employee.techLevel && (
                                     <Badge variant="outline" className="text-xs">
-                                      irata {employee.techLevel}
+                                      IRATA {employee.techLevel}
                                     </Badge>
                                   )}
                                 </div>
@@ -7308,7 +7757,7 @@ export default function Dashboard() {
                     {harnessInspections.map((inspection: any) => (
                       <Card 
                         key={inspection.id} 
-                        className="hover-elevate cursor-pointer"
+                        className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer"
                         onClick={() => setSelectedInspection(inspection)}
                         data-testid={`inspection-card-${inspection.id}`}
                       >
@@ -7365,7 +7814,7 @@ export default function Dashboard() {
                     {toolboxMeetings.map((meeting: any) => (
                       <Card 
                         key={meeting.id} 
-                        className="hover-elevate cursor-pointer"
+                        className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer"
                         onClick={() => setSelectedMeeting(meeting)}
                         data-testid={`meeting-card-${meeting.id}`}
                       >
@@ -7815,6 +8264,32 @@ export default function Dashboard() {
                     {t('dashboard.clientDatabase.scanCard', 'Scan Business Card')}
                   </Button>
                 )}
+                
+                {/* Excel Import Button */}
+                {currentUser?.role === "company" && (
+                  <ClientExcelImport
+                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                    onImportComplete={() => queryClient.invalidateQueries({ queryKey: ["/api/clients"] })}
+                  />
+                )}
+
+                {/* Search Property Manager Button */}
+                {(currentUser?.role === "company" || currentUser?.role === "employee") && (
+                  <Button 
+                    variant="outline"
+                    className="h-12 gap-2" 
+                    onClick={() => {
+                      setPMSearchQuery("");
+                      setPMSearchResults([]);
+                      setShowPMSearchDialog(true);
+                    }}
+                    data-testid="button-search-pm"
+                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                  >
+                    <span className="material-icons">person_search</span>
+                    {t('dashboard.clientDatabase.searchPM', 'Find Property Manager')}
+                  </Button>
+                )}
               </div>
 
               {/* Business Card Scanner Dialog */}
@@ -7837,25 +8312,218 @@ export default function Dashboard() {
                 }}
               />
 
+              {/* Property Manager Search Dialog */}
+              <Dialog open={showPMSearchDialog} onOpenChange={setShowPMSearchDialog}>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <span className="material-icons text-primary">person_search</span>
+                      {t('dashboard.pmSearch.title', 'Find Property Manager')}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {t('dashboard.pmSearch.description', 'Search by PM code, name, or email to link them to your company')}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                        search
+                      </span>
+                      <Input
+                        placeholder={t('dashboard.pmSearch.placeholder', 'Enter PM code, name, or email...')}
+                        value={pmSearchQuery}
+                        onChange={async (e) => {
+                          const query = e.target.value;
+                          setPMSearchQuery(query);
+                          
+                          if (query.trim().length < 2) {
+                            setPMSearchResults([]);
+                            return;
+                          }
+                          
+                          setPMSearchLoading(true);
+                          try {
+                            const response = await fetch(`/api/property-managers/search?q=${encodeURIComponent(query)}`);
+                            if (response.ok) {
+                              const data = await response.json();
+                              setPMSearchResults(data.results || []);
+                            }
+                          } catch (error) {
+                            console.error("PM search error:", error);
+                          } finally {
+                            setPMSearchLoading(false);
+                          }
+                        }}
+                        className="h-10 pl-10"
+                        data-testid="input-search-pm"
+                      />
+                    </div>
+                    
+                    {pmSearchLoading && (
+                      <div className="text-center py-4 text-muted-foreground text-sm">
+                        {t('dashboard.pmSearch.searching', 'Searching...')}
+                      </div>
+                    )}
+                    
+                    {!pmSearchLoading && pmSearchQuery.length >= 2 && pmSearchResults.length === 0 && (
+                      <div className="text-center py-6 text-muted-foreground">
+                        <span className="material-icons text-3xl mb-2 block">search_off</span>
+                        <p className="text-sm">{t('dashboard.pmSearch.noResults', 'No property managers found')}</p>
+                      </div>
+                    )}
+                    
+                    {pmSearchResults.length > 0 && (
+                      <div className="space-y-2 max-h-80 overflow-y-auto">
+                        {pmSearchResults.map((pm) => (
+                          <div 
+                            key={pm.id} 
+                            className="p-3 border rounded-md hover-elevate"
+                            data-testid={`pm-result-${pm.id}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate">{pm.name || pm.email}</p>
+                                {pm.company && (
+                                  <p className="text-sm text-muted-foreground truncate">{pm.company}</p>
+                                )}
+                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                  {pm.pmCode && (
+                                    <Badge variant="outline" className="font-mono text-xs">
+                                      {pm.pmCode}
+                                    </Badge>
+                                  )}
+                                  {pm.email && (
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <span className="material-icons text-xs">mail</span>
+                                      {pm.email}
+                                    </span>
+                                  )}
+                                  {pm.phone && (
+                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                      <span className="material-icons text-xs">phone</span>
+                                      {pm.phone}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              {pm.isLinked ? (
+                                <Badge variant="secondary" className="shrink-0">
+                                  <span className="material-icons text-xs mr-1">check_circle</span>
+                                  {t('dashboard.pmSearch.linked', 'Linked')}
+                                </Badge>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  onClick={async () => {
+                                    try {
+                                      const response = await apiRequest("POST", `/api/property-managers/${pm.id}/link`);
+                                      if (response.ok) {
+                                        toast({
+                                          title: t('dashboard.pmSearch.linkSuccess', 'Property Manager Linked'),
+                                          description: t('dashboard.pmSearch.linkSuccessDesc', '{{name}} has been linked and added to your client database', { name: pm.name || pm.email }),
+                                        });
+                                        // Invalidate clients query to refresh the list
+                                        queryClient.invalidateQueries({ queryKey: ['/api/clients'] });
+                                        // Update local state to show as linked
+                                        setPMSearchResults(prev => 
+                                          prev.map(p => p.id === pm.id ? { ...p, isLinked: true } : p)
+                                        );
+                                      } else {
+                                        const error = await response.json();
+                                        toast({
+                                          title: t('dashboard.pmSearch.linkError', 'Link Failed'),
+                                          description: error.message || t('dashboard.pmSearch.linkErrorDesc', 'Could not link property manager'),
+                                          variant: "destructive",
+                                        });
+                                      }
+                                    } catch (error) {
+                                      console.error("Link PM error:", error);
+                                      toast({
+                                        title: t('dashboard.pmSearch.linkError', 'Link Failed'),
+                                        description: t('dashboard.pmSearch.linkErrorDesc', 'Could not link property manager'),
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }}
+                                  data-testid={`button-link-pm-${pm.id}`}
+                                >
+                                  <span className="material-icons text-sm mr-1">link</span>
+                                  {t('dashboard.pmSearch.link', 'Link')}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               {/* Clients List */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="material-icons text-primary">business</span>
-                    {t('dashboard.clientDatabase.title', 'Client Database')}
-                  </CardTitle>
-                  <CardDescription>{t('dashboard.clientDatabase.description', 'Property managers and building contacts')}</CardDescription>
-                  <div className="mt-4 relative">
-                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                      search
-                    </span>
-                    <Input
-                      placeholder={t('dashboard.clientDatabase.searchPlaceholder', 'Search by name, company, strata number, or address...')}
-                      value={clientSearchQuery}
-                      onChange={(e) => setClientSearchQuery(e.target.value)}
-                      className="h-10 pl-10"
-                      data-testid="input-search-clients"
-                    />
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <span className="material-icons text-primary">business</span>
+                        {t('dashboard.clientDatabase.title', 'Client Database')}
+                      </CardTitle>
+                      <CardDescription>{t('dashboard.clientDatabase.description', 'Property managers and building contacts')}</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={clientViewMode === "cards" ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setClientViewMode("cards")}
+                        data-testid="button-view-cards"
+                      >
+                        <span className="material-icons text-sm">grid_view</span>
+                      </Button>
+                      <Button
+                        variant={clientViewMode === "table" ? "default" : "outline"}
+                        size="icon"
+                        onClick={() => setClientViewMode("table")}
+                        data-testid="button-view-table"
+                      >
+                        <span className="material-icons text-sm">view_list</span>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
+                      <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                        search
+                      </span>
+                      <Input
+                        placeholder={t('dashboard.clientDatabase.searchPlaceholder', 'Search by name, company, strata number, or address...')}
+                        value={clientSearchQuery}
+                        onChange={(e) => setClientSearchQuery(e.target.value)}
+                        className="h-10 pl-10"
+                        data-testid="input-search-clients"
+                      />
+                    </div>
+                    <Select value={clientSortField} onValueChange={(v) => setClientSortField(v as any)}>
+                      <SelectTrigger className="w-full sm:w-40" data-testid="select-sort-field">
+                        <SelectValue placeholder="Sort by" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="name">{t('dashboard.clientDatabase.sortName', 'Name')}</SelectItem>
+                        <SelectItem value="company">{t('dashboard.clientDatabase.sortCompany', 'Company')}</SelectItem>
+                        <SelectItem value="email">{t('dashboard.clientDatabase.sortEmail', 'Email')}</SelectItem>
+                        <SelectItem value="phone">{t('dashboard.clientDatabase.sortPhone', 'Phone')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setClientSortDirection(d => d === "asc" ? "desc" : "asc")}
+                      data-testid="button-toggle-sort-direction"
+                    >
+                      <span className="material-icons text-sm">
+                        {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                      </span>
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -7864,87 +8532,331 @@ export default function Dashboard() {
                   ) : !clientsData || clientsData.length === 0 ? (
                     <p className="text-sm text-muted-foreground">{t('dashboard.clientDatabase.noClients', 'No clients yet. Add your first client to get started.')}</p>
                   ) : (
-                    <div className="space-y-3">
-                      {clientsData
-                        .filter(client => {
-                          if (!clientSearchQuery) return true;
-                          const query = clientSearchQuery.toLowerCase();
-                          return (
-                            client.firstName.toLowerCase().includes(query) ||
-                            client.lastName.toLowerCase().includes(query) ||
-                            client.company?.toLowerCase().includes(query) ||
-                            client.lmsNumbers?.some(lms => 
-                              lms.number.toLowerCase().includes(query) ||
-                              lms.address?.toLowerCase().includes(query)
-                            )
-                          );
-                        })
-                        .map((client) => (
-                        <Card key={client.id} className="hover-elevate" data-testid={`client-card-${client.id}`}>
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="font-medium text-base mb-1">
-                                  {client.firstName} {client.lastName}
+                    <>
+                      {/* Table View */}
+                      {clientViewMode === "table" && (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead 
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() => {
+                                  if (clientSortField === "name") {
+                                    setClientSortDirection(d => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setClientSortField("name");
+                                    setClientSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  {t('dashboard.clientDatabase.columnName', 'Name')}
+                                  {clientSortField === "name" && (
+                                    <span className="material-icons text-xs">
+                                      {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  )}
                                 </div>
-                                {client.company && (
-                                  <div className="text-sm text-muted-foreground mb-1">
-                                    {client.company}
-                                  </div>
-                                )}
-                                {client.phoneNumber && (
-                                  <div className="text-sm text-muted-foreground mb-1">
-                                    {client.phoneNumber}
-                                  </div>
-                                )}
-                                {client.email && (
-                                  <div className="text-sm text-muted-foreground mb-1">
-                                    {client.email}
-                                  </div>
-                                )}
-                                {client.lmsNumbers && client.lmsNumbers.length > 0 && (
-                                  <div className="space-y-2 mt-2">
-                                    {client.lmsNumbers.map((lms, idx) => (
-                                      <div key={idx} className="text-sm">
-                                        {lms.buildingName && (
-                                          <div className="text-xs font-medium mb-1">{lms.buildingName}</div>
-                                        )}
-                                        <Badge variant="secondary" className="text-xs mr-2">
+                              </TableHead>
+                              <TableHead 
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() => {
+                                  if (clientSortField === "company") {
+                                    setClientSortDirection(d => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setClientSortField("company");
+                                    setClientSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  {t('dashboard.clientDatabase.columnCompany', 'Company')}
+                                  {clientSortField === "company" && (
+                                    <span className="material-icons text-xs">
+                                      {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead 
+                                className="cursor-pointer hover:bg-muted/50 hidden md:table-cell"
+                                onClick={() => {
+                                  if (clientSortField === "email") {
+                                    setClientSortDirection(d => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setClientSortField("email");
+                                    setClientSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  {t('dashboard.clientDatabase.columnEmail', 'Email')}
+                                  {clientSortField === "email" && (
+                                    <span className="material-icons text-xs">
+                                      {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead 
+                                className="cursor-pointer hover:bg-muted/50 hidden lg:table-cell"
+                                onClick={() => {
+                                  if (clientSortField === "phone") {
+                                    setClientSortDirection(d => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setClientSortField("phone");
+                                    setClientSortDirection("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  {t('dashboard.clientDatabase.columnPhone', 'Phone')}
+                                  {clientSortField === "phone" && (
+                                    <span className="material-icons text-xs">
+                                      {clientSortDirection === "asc" ? "arrow_upward" : "arrow_downward"}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableHead>
+                              <TableHead className="hidden xl:table-cell">{t('dashboard.clientDatabase.columnBuildings', 'Buildings')}</TableHead>
+                              <TableHead className="text-right">{t('dashboard.clientDatabase.columnActions', 'Actions')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {clientsData
+                              .filter(client => {
+                                if (!clientSearchQuery) return true;
+                                const query = clientSearchQuery.toLowerCase();
+                                return (
+                                  client.firstName.toLowerCase().includes(query) ||
+                                  client.lastName.toLowerCase().includes(query) ||
+                                  client.company?.toLowerCase().includes(query) ||
+                                  client.lmsNumbers?.some(lms => 
+                                    lms.number.toLowerCase().includes(query) ||
+                                    lms.address?.toLowerCase().includes(query)
+                                  )
+                                );
+                              })
+                              .sort((a, b) => {
+                                let aVal = "";
+                                let bVal = "";
+                                switch (clientSortField) {
+                                  case "name":
+                                    aVal = `${a.firstName} ${a.lastName}`.toLowerCase();
+                                    bVal = `${b.firstName} ${b.lastName}`.toLowerCase();
+                                    break;
+                                  case "company":
+                                    aVal = (a.company || "").toLowerCase();
+                                    bVal = (b.company || "").toLowerCase();
+                                    break;
+                                  case "email":
+                                    aVal = (a.email || "").toLowerCase();
+                                    bVal = (b.email || "").toLowerCase();
+                                    break;
+                                  case "phone":
+                                    aVal = (a.phoneNumber || "").toLowerCase();
+                                    bVal = (b.phoneNumber || "").toLowerCase();
+                                    break;
+                                }
+                                if (clientSortDirection === "asc") {
+                                  return aVal.localeCompare(bVal);
+                                } else {
+                                  return bVal.localeCompare(aVal);
+                                }
+                              })
+                              .map((client) => (
+                              <TableRow 
+                                key={client.id} 
+                                className="cursor-pointer"
+                                onClick={() => {
+                                  setClientToView(client);
+                                  setShowClientDetailDialog(true);
+                                }}
+                                data-testid={`table-row-client-${client.id}`}
+                              >
+                                <TableCell className="font-medium">
+                                  {client.firstName} {client.lastName}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground">
+                                  {client.company || "-"}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground hidden md:table-cell">
+                                  {client.email || "-"}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground hidden lg:table-cell">
+                                  {client.phoneNumber || "-"}
+                                </TableCell>
+                                <TableCell className="hidden xl:table-cell">
+                                  {client.lmsNumbers && client.lmsNumbers.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1">
+                                      {client.lmsNumbers.slice(0, 2).map((lms, idx) => (
+                                        <Badge key={idx} variant="secondary" className="text-xs">
                                           {lms.number}
                                         </Badge>
-                                        {lms.address && (
-                                          <span className="text-muted-foreground text-xs">{lms.address}</span>
+                                      ))}
+                                      {client.lmsNumbers.length > 2 && (
+                                        <Badge variant="outline" className="text-xs">
+                                          +{client.lmsNumbers.length - 2}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
+                                    <div className="flex justify-end gap-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); handleEditClient(client); }}
+                                        data-testid={`button-edit-client-${client.id}`}
+                                      >
+                                        <span className="material-icons text-sm">edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); handleDeleteClient(client); }}
+                                        data-testid={`button-delete-client-${client.id}`}
+                                      >
+                                        <span className="material-icons text-destructive text-sm">delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      )}
+
+                      {/* Cards View */}
+                      {clientViewMode === "cards" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                          {clientsData
+                            .filter(client => {
+                              if (!clientSearchQuery) return true;
+                              const query = clientSearchQuery.toLowerCase();
+                              return (
+                                client.firstName.toLowerCase().includes(query) ||
+                                client.lastName.toLowerCase().includes(query) ||
+                                client.company?.toLowerCase().includes(query) ||
+                                client.lmsNumbers?.some(lms => 
+                                  lms.number.toLowerCase().includes(query) ||
+                                  lms.address?.toLowerCase().includes(query)
+                                )
+                              );
+                            })
+                            .sort((a, b) => {
+                              let aVal = "";
+                              let bVal = "";
+                              switch (clientSortField) {
+                                case "name":
+                                  aVal = `${a.firstName} ${a.lastName}`.toLowerCase();
+                                  bVal = `${b.firstName} ${b.lastName}`.toLowerCase();
+                                  break;
+                                case "company":
+                                  aVal = (a.company || "").toLowerCase();
+                                  bVal = (b.company || "").toLowerCase();
+                                  break;
+                                case "email":
+                                  aVal = (a.email || "").toLowerCase();
+                                  bVal = (b.email || "").toLowerCase();
+                                  break;
+                                case "phone":
+                                  aVal = (a.phoneNumber || "").toLowerCase();
+                                  bVal = (b.phoneNumber || "").toLowerCase();
+                                  break;
+                              }
+                              if (clientSortDirection === "asc") {
+                                return aVal.localeCompare(bVal);
+                              } else {
+                                return bVal.localeCompare(aVal);
+                              }
+                            })
+                            .map((client) => (
+                            <Card 
+                              key={client.id} 
+                              className="shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer" 
+                              data-testid={`client-card-${client.id}`}
+                              onClick={() => {
+                                setClientToView(client);
+                                setShowClientDetailDialog(true);
+                              }}
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium text-base mb-1 truncate">
+                                      {client.firstName} {client.lastName}
+                                    </div>
+                                    {client.company && (
+                                      <div className="text-sm text-muted-foreground mb-1 truncate">
+                                        {client.company}
+                                      </div>
+                                    )}
+                                    {client.phoneNumber && (
+                                      <div className="text-sm text-muted-foreground mb-1">
+                                        {client.phoneNumber}
+                                      </div>
+                                    )}
+                                    {client.email && (
+                                      <div className="text-sm text-muted-foreground mb-1 truncate">
+                                        {client.email}
+                                      </div>
+                                    )}
+                                    {client.lmsNumbers && client.lmsNumbers.length > 0 && (
+                                      <div className="space-y-2 mt-2">
+                                        {client.lmsNumbers.slice(0, 2).map((lms, idx) => (
+                                          <div key={idx} className="text-sm">
+                                            {lms.buildingName && (
+                                              <div className="text-sm font-medium mb-1 truncate">{lms.buildingName}</div>
+                                            )}
+                                            <Badge variant="secondary" className="text-xs mr-2">
+                                              {lms.number}
+                                            </Badge>
+                                            {lms.address && (
+                                              <span className="text-muted-foreground text-sm">{lms.address}</span>
+                                            )}
+                                          </div>
+                                        ))}
+                                        {client.lmsNumbers.length > 2 && (
+                                          <Badge variant="outline" className="text-xs">
+                                            +{client.lmsNumbers.length - 2} more
+                                          </Badge>
                                         )}
                                       </div>
-                                    ))}
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                              {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
-                                <div className="flex gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleEditClient(client)}
-                                    data-testid={`button-edit-client-${client.id}`}
-                                  >
-                                    <span className="material-icons">edit</span>
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleDeleteClient(client)}
-                                    data-testid={`button-delete-client-${client.id}`}
-                                  >
-                                    <span className="material-icons text-destructive">delete</span>
-                                  </Button>
+                                  {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
+                                    <div className="flex gap-1 ml-2 flex-shrink-0">
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); handleEditClient(client); }}
+                                        data-testid={`button-edit-client-card-${client.id}`}
+                                      >
+                                        <span className="material-icons">edit</span>
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={(e) => { e.stopPropagation(); handleDeleteClient(client); }}
+                                        data-testid={`button-delete-client-card-${client.id}`}
+                                      >
+                                        <span className="material-icons text-destructive">delete</span>
+                                      </Button>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>
@@ -8335,6 +9247,113 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
+      {/* Client Detail Dialog */}
+      <Dialog open={showClientDetailDialog} onOpenChange={setShowClientDetailDialog}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" data-testid="dialog-client-detail">
+          <DialogHeader className="pb-4">
+            <DialogTitle>{clientToView?.firstName} {clientToView?.lastName}</DialogTitle>
+            <DialogDescription>{clientToView?.company || t('dashboard.clientDetail.noCompany', 'No company specified')}</DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Contact Information */}
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-muted-foreground">{t('dashboard.clientDetail.contactInfo', 'Contact Information')}</h4>
+              {clientToView?.email && (
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-muted-foreground text-sm">email</span>
+                  <a href={`mailto:${clientToView.email}`} className="text-sm text-primary hover:underline">{clientToView.email}</a>
+                </div>
+              )}
+              {clientToView?.phoneNumber && (
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-muted-foreground text-sm">phone</span>
+                  <a href={`tel:${clientToView.phoneNumber}`} className="text-sm text-primary hover:underline">{clientToView.phoneNumber}</a>
+                </div>
+              )}
+              {clientToView?.address && (
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-muted-foreground text-sm">location_on</span>
+                  <span className="text-sm">{clientToView.address}</span>
+                </div>
+              )}
+              {clientToView?.billingAddress && clientToView.billingAddress !== clientToView.address && (
+                <div className="flex items-start gap-2">
+                  <span className="material-icons text-muted-foreground text-sm">receipt</span>
+                  <div>
+                    <span className="text-xs text-muted-foreground">{t('dashboard.clientDetail.billingAddress', 'Billing:')}</span>
+                    <span className="text-sm ml-1">{clientToView.billingAddress}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Buildings / Strata Numbers */}
+            {clientToView?.lmsNumbers && clientToView.lmsNumbers.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-muted-foreground">{t('dashboard.clientDetail.buildings', 'Buildings')}</h4>
+                <div className="space-y-3">
+                  {clientToView.lmsNumbers.map((lms, idx) => (
+                    <Card key={idx} className="p-3">
+                      <div className="space-y-1">
+                        {lms.buildingName && (
+                          <div className="font-medium text-sm">{lms.buildingName}</div>
+                        )}
+                        <Badge variant="secondary" className="text-xs">{lms.number}</Badge>
+                        {lms.address && (
+                          <div className="text-sm text-muted-foreground">{lms.address}</div>
+                        )}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {lms.stories && (
+                            <span className="text-sm text-muted-foreground">{lms.stories} {t('dashboard.clientDetail.floors', 'floors')}</span>
+                          )}
+                          {lms.units && (
+                            <span className="text-sm text-muted-foreground">{lms.units} {t('dashboard.clientDetail.units', 'units')}</span>
+                          )}
+                          {lms.parkingStalls && (
+                            <span className="text-sm text-muted-foreground">{lms.parkingStalls} {t('dashboard.clientDetail.parkingStalls', 'parking stalls')}</span>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
+              <div className="flex gap-2 pt-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setShowClientDetailDialog(false);
+                    if (clientToView) handleEditClient(clientToView);
+                  }}
+                  data-testid="button-detail-edit-client"
+                >
+                  <span className="material-icons text-sm mr-1">edit</span>
+                  {t('common.edit', 'Edit')}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="text-destructive"
+                  onClick={() => {
+                    setShowClientDetailDialog(false);
+                    if (clientToView) handleDeleteClient(clientToView);
+                  }}
+                  data-testid="button-detail-delete-client"
+                >
+                  <span className="material-icons text-sm mr-1">delete</span>
+                  {t('common.delete', 'Delete')}
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Delete Client Confirmation Dialog */}
       <AlertDialog open={showDeleteClientDialog} onOpenChange={setShowDeleteClientDialog}>
         <AlertDialogContent data-testid="dialog-delete-client">
@@ -8452,7 +9471,7 @@ export default function Dashboard() {
                     name="techLevel"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('dashboard.employeeForm.irataLevel', 'irata Level')}</FormLabel>
+                        <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="h-12" data-testid="select-edit-tech-level">
@@ -8698,14 +9717,14 @@ export default function Dashboard() {
                     />
 
                     <div className="border-t pt-4 mt-4">
-                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'irata Certification (Optional)')}</h4>
+                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification (Optional)')}</h4>
                       <div className="space-y-4">
                         <FormField
                           control={editEmployeeForm.control}
                           name="irataLevel"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('dashboard.employeeForm.irataLevel', 'irata Level')}</FormLabel>
+                              <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="h-12" data-testid="select-edit-irata-level">
@@ -8730,7 +9749,7 @@ export default function Dashboard() {
                               name="irataLicenseNumber"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'irata License Number')}</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
                                   <FormControl>
                                     <Input placeholder="License number" {...field} data-testid="input-edit-irata-license" className="h-12" />
                                   </FormControl>
@@ -8744,7 +9763,7 @@ export default function Dashboard() {
                               name="irataIssuedDate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'irata Issued Date')}</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'IRATA Issued Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-edit-irata-issued" className="h-12" />
                                   </FormControl>
@@ -8758,7 +9777,7 @@ export default function Dashboard() {
                               name="irataExpirationDate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'irata Expiration Date')}</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'IRATA Expiration Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-edit-irata-expiration" className="h-12" />
                                   </FormControl>
@@ -8926,13 +9945,12 @@ export default function Dashboard() {
                                           <Checkbox
                                             checked={field.value?.includes(permission.id)}
                                             onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([...field.value, permission.id])
-                                                : field.onChange(
-                                                    field.value?.filter(
-                                                      (value) => value !== permission.id
-                                                    )
-                                                  )
+                                              const newPermissions = handlePermissionChange(
+                                                field.value || [],
+                                                permission.id,
+                                                !!checked
+                                              );
+                                              field.onChange(newPermissions);
                                             }}
                                             data-testid={`checkbox-edit-permission-${permission.id}`}
                                           />
@@ -9106,7 +10124,7 @@ export default function Dashboard() {
                       {employeeToView.techLevel && (
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.techLevel', 'Tech Level')}</div>
-                          <div className="text-sm font-medium">irata {employeeToView.techLevel}</div>
+                          <div className="text-sm font-medium">IRATA {employeeToView.techLevel}</div>
                         </div>
                       )}
                       {employeeToView.ropeAccessStartDate && (
@@ -9147,14 +10165,14 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* irata Certification */}
+                  {/* IRATA Certification */}
                   {(employeeToView.irataLevel || employeeToView.irataLicenseNumber || employeeToView.irataExpirationDate || (employeeToView.irataDocuments?.length > 0)) && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2 justify-between">
                           <div className="flex items-center gap-2">
                             <span className="material-icons text-lg">workspace_premium</span>
-                            {t('dashboard.employeeDetails.irataCertification', 'irata Certification')}
+                            {t('dashboard.employeeDetails.irataCertification', 'IRATA Certification')}
                           </div>
                           {employeeToView.irataVerifiedAt ? (
                             <Badge variant="default" className="bg-green-600">
@@ -9685,25 +10703,25 @@ export default function Dashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Suspend Employee / Remove Seat Confirmation Dialog */}
+      {/* Deactivate / Make Inactive Confirmation Dialog */}
       <AlertDialog open={employeeToSuspendSeat !== null} onOpenChange={(open) => !open && setEmployeeToSuspendSeat(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('dashboard.suspendEmployee.title', 'Suspend Employee')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.deactivate.title', 'Deactivate Employee')}</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <span className="block">
-                {t('dashboard.suspendEmployee.description', 'Are you sure you want to suspend')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
+                {t('dashboard.deactivate.description', 'Are you sure you want to deactivate')} <strong>{employeeToSuspendSeat?.name || employeeToSuspendSeat?.email}</strong>?
               </span>
               <span className="block text-amber-600 dark:text-amber-400">
-                {t('dashboard.suspendEmployee.warning', 'This will remove one seat from your subscription. The employee will lose access but can be reactivated later.')}
+                {t('dashboard.deactivate.warning', 'This will remove one seat from your subscription. The employee will become inactive but can be reactivated later.')}
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-suspend">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-deactivate">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => employeeToSuspendSeat && suspendSeatMutation.mutate(employeeToSuspendSeat.id)}
-              data-testid="button-confirm-suspend"
+              data-testid="button-confirm-deactivate"
               className="bg-amber-600 text-white hover:bg-amber-700"
               disabled={suspendSeatMutation.isPending}
             >
@@ -9712,13 +10730,91 @@ export default function Dashboard() {
               ) : (
                 <>
                   <span className="material-icons text-sm mr-1">person_remove</span>
-                  {t('dashboard.suspendEmployee.confirm', 'Suspend Employee')}
+                  {t('dashboard.deactivate.confirm', 'Deactivate')}
                 </>
               )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Deactivate Info Modal */}
+      <Dialog open={showDeactivateInfoModal} onOpenChange={setShowDeactivateInfoModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-amber-600">person_remove</span>
+              {t('dashboard.deactivateInfo.title', 'About Deactivate')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-sm mb-1">{t('dashboard.deactivateInfo.whenToUse', 'When to use')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('dashboard.deactivateInfo.whenDescription', 'Use this when an employee is temporarily laid off, during slow periods, or when you need to pause their access without permanently removing them from your roster.')}
+              </p>
+            </div>
+            <div>
+              <h4 className="font-medium text-sm mb-1">{t('dashboard.deactivateInfo.whatHappens', 'What happens')}</h4>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>{t('dashboard.deactivateInfo.bullet1', 'Employee remains on your roster but becomes inactive')}</li>
+                <li>{t('dashboard.deactivateInfo.bullet2', 'They lose access to your company dashboard')}</li>
+                <li>{t('dashboard.deactivateInfo.bullet3', 'The $34.95/month payment for this seat is paused until reactivated')}</li>
+                <li>{t('dashboard.deactivateInfo.bullet4', 'You can easily reactivate them when work picks up again')}</li>
+              </ul>
+            </div>
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md p-3">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                <strong>{t('dashboard.deactivateInfo.tip', 'Tip:')}</strong> {t('dashboard.deactivateInfo.tipDescription', 'This is ideal for seasonal workers or during temporary slowdowns. The employee can be brought back with a single click.')}
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" onClick={() => setShowDeactivateInfoModal(false)} data-testid="button-close-deactivate-info">
+              {t('common.gotIt', 'Got it')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Unlink Info Modal */}
+      <Dialog open={showUnlinkInfoModal} onOpenChange={setShowUnlinkInfoModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-amber-600">link_off</span>
+              {t('dashboard.unlinkInfo.title', 'About Unlink')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium text-sm mb-1">{t('dashboard.unlinkInfo.whenToUse', 'When to use')}</h4>
+              <p className="text-sm text-muted-foreground">
+                {t('dashboard.unlinkInfo.whenDescription', 'Use this when an employee has been fired, quit, or is permanently leaving your company. This is for final separations where you do not expect them to return.')}
+              </p>
+            </div>
+            <div>
+              <h4 className="font-medium text-sm mb-1">{t('dashboard.unlinkInfo.whatHappens', 'What happens')}</h4>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>{t('dashboard.unlinkInfo.bullet1', 'Employee is completely removed from your roster')}</li>
+                <li>{t('dashboard.unlinkInfo.bullet2', 'They lose all access to your company dashboard')}</li>
+                <li>{t('dashboard.unlinkInfo.bullet3', 'The $34.95/month payment for this seat stops immediately')}</li>
+                <li>{t('dashboard.unlinkInfo.bullet4', 'If you hire them back later, a new connection will need to be established')}</li>
+              </ul>
+            </div>
+            <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
+              <p className="text-sm text-destructive dark:text-destructive">
+                <strong>{t('dashboard.unlinkInfo.note', 'Note:')}</strong> {t('dashboard.unlinkInfo.noteDescription', 'Their personal OnRopePro account and certifications remain intact. They can still work for other employers.')}
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" onClick={() => setShowUnlinkInfoModal(false)} data-testid="button-close-unlink-info">
+              {t('common.gotIt', 'Got it')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Change Password Dialog */}
       <Dialog open={showChangePasswordDialog} onOpenChange={(open) => {
@@ -10075,7 +11171,7 @@ export default function Dashboard() {
                       <div className="space-y-0.5">
                         <FormLabel>{t('dashboard.endDay.logRopeAccessHours', 'Log rope access hours for your logbook?')}</FormLabel>
                         <FormDescription className="text-xs">
-                          {t('dashboard.endDay.logRopeAccessHoursDesc', 'Track actual time on ropes for irata/SPRAT certification')}
+                          {t('dashboard.endDay.logRopeAccessHoursDesc', 'Track actual time on ropes for IRATA/SPRAT certification')}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -10471,7 +11567,7 @@ export default function Dashboard() {
   <div class="report-container">
     <div class="report-header">
       <div class="report-title">ROPE ACCESS EQUIPMENT INSPECTION REPORT</div>
-      <div class="report-subtitle">irata Compliant Documentation</div>
+      <div class="report-subtitle">IRATA Compliant Documentation</div>
     </div>
     
     <div class="metadata-grid">
@@ -10569,7 +11665,7 @@ export default function Dashboard() {
     </div>
     
     <div class="footer">
-      This inspection report was generated in accordance with irata International Code of Practice.<br>
+      This inspection report was generated in accordance with IRATA International Code of Practice.<br>
       Document generated on ${formatLocalDateLong(new Date().toISOString())}
     </div>
   </div>
@@ -10939,7 +12035,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-2 mt-1">
                         {acceptedInvitations[0]?.technician?.irataLevel && (
                           <Badge variant="secondary" className="text-xs">
-                            irata {acceptedInvitations[0]?.technician?.irataLevel}
+                            IRATA {acceptedInvitations[0]?.technician?.irataLevel}
                           </Badge>
                         )}
                         {acceptedInvitations[0]?.technician?.spratLevel && (
@@ -11112,7 +12208,7 @@ export default function Dashboard() {
                       {employeeForm.watch("irataLevel") && (
                         <div className="col-span-2 flex items-center gap-2">
                           <span className="text-muted-foreground">{t('dashboard.employeeForm.certifications', 'Certifications')}:</span>
-                          <Badge variant="secondary">irata Level {employeeForm.watch("irataLevel")}</Badge>
+                          <Badge variant="secondary">IRATA Level {employeeForm.watch("irataLevel")}</Badge>
                         </div>
                       )}
                       {employeeForm.watch("hasFirstAid") && (
@@ -11132,13 +12228,13 @@ export default function Dashboard() {
                     </h4>
                     
                     <div className="space-y-3">
-                      {/* irata License */}
+                      {/* IRATA License */}
                       {(invitationToConvert?.technician?.irataLicenseNumber || invitationToConvert?.technician?.irataDocuments?.length > 0) && (
                         <div className="flex items-center justify-between p-3 bg-background rounded-md border">
                           <div className="flex items-center gap-3">
                             <span className="material-icons text-orange-500">badge</span>
                             <div>
-                              <p className="font-medium text-sm">{t('dashboard.invitations.irataLicense', 'irata License')}</p>
+                              <p className="font-medium text-sm">{t('dashboard.invitations.irataLicense', 'IRATA License')}</p>
                               {invitationToConvert?.technician?.irataLicenseNumber && (
                                 <p className="text-xs text-muted-foreground">
                                   {t('dashboard.invitations.licenseNumber', 'License #')}: {invitationToConvert.technician.irataLicenseNumber}
@@ -11409,13 +12505,12 @@ export default function Dashboard() {
                                             <Checkbox
                                               checked={field.value?.includes(permission.id)}
                                               onCheckedChange={(checked) => {
-                                                return checked
-                                                  ? field.onChange([...field.value, permission.id])
-                                                  : field.onChange(
-                                                      field.value?.filter(
-                                                        (value) => value !== permission.id
-                                                      )
-                                                    )
+                                                const newPermissions = handlePermissionChange(
+                                                  field.value || [],
+                                                  permission.id,
+                                                  !!checked
+                                                );
+                                                field.onChange(newPermissions);
                                               }}
                                               data-testid={`checkbox-invitation-permission-${permission.id}`}
                                             />

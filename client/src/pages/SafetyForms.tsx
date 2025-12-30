@@ -40,7 +40,7 @@ export default function SafetyForms() {
     },
     {
       id: "irata-icop",
-      title: t('safetyForms.irataIcop.title', 'irata ICOP'),
+      title: t('safetyForms.irataIcop.title', 'IRATA ICOP'),
       description: t('safetyForms.irataIcop.description', 'International Code of Practice (TC-102ENG)'),
       icon: BookOpen,
       onClick: () => window.open("https://irata.org/downloads/2055", "_blank", "noopener,noreferrer"),

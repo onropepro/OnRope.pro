@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,18 +24,10 @@ import {
   Building2,
   UserPlus,
   LogIn,
-  X,
-  Loader2,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
 import { PublicHeader } from "@/components/PublicHeader";
-import { ResidentSlidingSignup } from "@/components/ResidentSlidingSignup";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import projectProgressImg from "@assets/residents-project-progress_1766199096691.png";
@@ -50,9 +42,7 @@ const RESIDENT_COLOR = "#86A59C";
 export default function ResidentLanding() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
-  const { openAuthPortal } = useAuthPortal();
-  const [showSignup, setShowSignup] = useState(false);
-  const { toast } = useToast();
+  const { openLogin, openRegister } = useAuthPortal();
   
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -64,14 +54,6 @@ export default function ResidentLanding() {
       setLocation("/resident-dashboard");
     }
   }, [userData, setLocation]);
-
-  const handleSignIn = () => {
-    openAuthPortal({ mode: 'login' });
-  };
-
-  const handleToggleSignup = () => {
-    setShowSignup(!showSignup);
-  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -102,55 +84,23 @@ export default function ResidentLanding() {
                 size="lg" 
                 className="bg-white hover:bg-gray-50" 
                 style={{color: RESIDENT_COLOR}} 
-                onClick={handleToggleSignup}
+                onClick={openRegister}
                 data-testid="button-create-account-hero"
               >
-                {showSignup ? (
-                  <>
-                    <X className="mr-2 w-5 h-5" />
-                    {t('residentLanding.buttons.close')}
-                  </>
-                ) : (
-                  <>
-                    {t('residentLanding.buttons.createAccount')}
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </>
-                )}
+                {t('residentLanding.buttons.createAccount')}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              {!showSignup && (
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-white/40 text-white hover:bg-white/10"
-                  onClick={handleSignIn}
-                  data-testid="button-sign-in-hero"
-                >
-                  {t('residentLanding.buttons.signIn')}
-                  <LogIn className="ml-2 w-5 h-5" />
-                </Button>
-              )}
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white/40 text-white hover:bg-white/10"
+                onClick={openLogin}
+                data-testid="button-sign-in-hero"
+              >
+                {t('residentLanding.buttons.signIn')}
+                <LogIn className="ml-2 w-5 h-5" />
+              </Button>
             </div>
-
-            {/* Sliding Signup Form */}
-            <AnimatePresence>
-              {showSignup && (
-                <motion.div
-                  initial={{ opacity: 0, y: -20, height: 0 }}
-                  animate={{ opacity: 1, y: 0, height: "auto" }}
-                  exit={{ opacity: 0, y: -20, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="max-w-md mx-auto pt-6"
-                >
-                  <ResidentSlidingSignup 
-                    onClose={() => setShowSignup(false)} 
-                    onShowSignIn={() => {
-                      setShowSignup(false);
-                      openAuthPortal({ mode: 'login' });
-                    }}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         </div>
         
@@ -820,23 +770,11 @@ export default function ResidentLanding() {
             {t('residentLanding.cta.tagline')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button 
-              size="lg" 
-              className="bg-white hover:bg-gray-50" 
-              style={{color: RESIDENT_COLOR}}
-              onClick={() => openAuthPortal({ mode: 'register', initialUserType: 'resident' })}
-              data-testid="button-create-account"
-            >
+            <Button size="lg" className="bg-white hover:bg-gray-50" style={{color: RESIDENT_COLOR}} onClick={openRegister} data-testid="button-create-account">
               {t('residentLanding.buttons.createAccount')}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-white/40 text-white hover:bg-white/10"
-              onClick={() => openAuthPortal({ mode: 'login', initialUserType: 'resident' })}
-              data-testid="button-login-cta"
-            >
+            <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-login-cta">
               {t('residentLanding.buttons.logIn')}
             </Button>
           </div>

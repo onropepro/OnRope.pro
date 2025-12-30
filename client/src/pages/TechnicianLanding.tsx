@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
 import { PublicHeader } from "@/components/PublicHeader";
-import { useToast } from "@/hooks/use-toast";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import {
   ArrowRight,
@@ -36,19 +35,21 @@ import {
   Camera,
   XCircle,
   Calculator,
+  CreditCard,
+  Mail,
+  Loader2
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
-const TECHNICIAN_COLOR = "#AB4521";
-const TECHNICIAN_GRADIENT_END = "#8B371A";
+const TECHNICIAN_COLOR = "#5C7A84";
+const TECHNICIAN_GRADIENT_END = "#4A656E";
 
 export default function TechnicianLanding() {
   const { t } = useTranslation();
-  const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { openLogin } = useAuthPortal();
   const [faqOpen, setFaqOpen] = useState<string[]>([]);
   const [showRegistration, setShowRegistration] = useState(false);
-  const { openAuthPortal } = useAuthPortal();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -57,10 +58,6 @@ export default function TechnicianLanding() {
       window.history.replaceState({}, '', '/technician');
     }
   }, []);
-
-  const handleSignIn = () => {
-    openAuthPortal({ mode: 'login' });
-  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -103,7 +100,7 @@ export default function TechnicianLanding() {
                 size="lg" 
                 variant="outline" 
                 className="border-white/40 text-white hover:bg-white/10" 
-                onClick={handleSignIn}
+                onClick={openLogin}
                 data-testid="button-hero-login"
               >
                 {t('technicianLanding.hero.signIn')}
@@ -121,6 +118,42 @@ export default function TechnicianLanding() {
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block">
             <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" className="fill-white dark:fill-slate-950"/>
           </svg>
+        </div>
+      </section>
+      {/* Physical Logbook Disclaimer - CRITICAL PLACEMENT AT TOP */}
+      <section className="py-8 md:py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="w-6 h-6 text-amber-600" />
+                <CardTitle className="text-xl">THIS DOES NOT REPLACE YOUR PHYSICAL LOGBOOK</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-base text-amber-900 dark:text-amber-100">
+                <strong>Your IRATA/SPRAT physical logbook is still required.</strong> OnRopePro is a digital assistant that gives you accurate data to transfer into your official logbook-it does not replace it.
+              </p>
+              <p className="text-base text-amber-900 dark:text-amber-100">
+                IRATA and SPRAT certification bodies require you to maintain your physical logbook. That requirement hasn't changed. What has changed is how accurate your entries can be.
+              </p>
+              
+              <div className="grid md:grid-cols-2 gap-4 mt-4">
+                <div className="bg-white dark:bg-amber-900 rounded-lg p-4">
+                  <p className="font-medium text-foreground">Before:</p>
+                  <p className="text-muted-foreground">You guess at hours and details when filling your logbook weeks later</p>
+                </div>
+                <div className="bg-white dark:bg-amber-900 rounded-lg p-4">
+                  <p className="font-medium text-foreground">After:</p>
+                  <p className="text-muted-foreground">You copy precise, timestamped data from OnRopePro into your logbook</p>
+                </div>
+              </div>
+              
+              <p className="text-base text-amber-900 dark:text-amber-100">
+                Your assessor still checks your physical book. OnRopePro just makes sure the data in that book is right.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
       {/* Problem Validation Section */}
@@ -147,7 +180,7 @@ export default function TechnicianLanding() {
             </p>
           </div>
           
-          <Card className="mt-8 border-2 border-[#AB4521]/30 bg-[#AB4521]/5">
+          <Card className="mt-8 border-2 border-[#5C7A84]/30 bg-[#5C7A84]/5">
             <CardContent className="p-6 text-center">
               <p className="text-xl font-semibold text-foreground">
                 The industry average: 15-20% of logged hours are estimates, not records.
@@ -181,12 +214,12 @@ export default function TechnicianLanding() {
             </p>
           </div>
           
-          <Card className="mt-8 border-2 border-[#AB4521] bg-white dark:bg-slate-950">
+          <Card className="mt-8 border-2 border-[#5C7A84] bg-white dark:bg-slate-950">
             <CardContent className="p-6 text-center">
               <p className="text-xl font-semibold text-foreground">
                 {t('technicianLanding.valueProposition.cta')}
               </p>
-              <p className="text-lg text-[#AB4521] font-medium mt-2">
+              <p className="text-lg text-[#5C7A84] font-medium mt-2">
                 {t('technicianLanding.valueProposition.ctaHighlight')}
               </p>
             </CardContent>
@@ -269,7 +302,7 @@ export default function TechnicianLanding() {
                   </div>
                 </div>
                 <div className="pt-4 border-t">
-                  <p className="text-center font-medium text-[#AB4521]">
+                  <p className="text-center font-medium text-[#5C7A84]">
                     This is yours. Forever. No strings.
                   </p>
                 </div>
@@ -277,16 +310,16 @@ export default function TechnicianLanding() {
             </Card>
 
             {/* PLUS Account Card */}
-            <Card className="overflow-hidden border-2 border-[#AB4521]">
-              <CardHeader className="bg-[#AB4521]/10 border-b border-[#AB4521]/20">
+            <Card className="overflow-hidden border-2 border-[#5C7A84]">
+              <CardHeader className="bg-[#5C7A84]/10 border-b border-[#5C7A84]/20">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 flex items-center justify-center">
-                    <Star className="w-5 h-5 text-[#AB4521]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#5C7A84]/20 flex items-center justify-center">
+                    <Star className="w-5 h-5 text-[#5C7A84]" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <CardTitle className="text-xl">{t('technicianLanding.freeVsPlus.plusAccount.title')}</CardTitle>
-                      <Badge className="bg-[#AB4521] text-white">PRO</Badge>
+                      <Badge className="bg-[#5C7A84] text-white">PRO</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">{t('technicianLanding.freeVsPlus.plusAccount.orFree')}</p>
                   </div>
@@ -296,35 +329,35 @@ export default function TechnicianLanding() {
                 <p className="text-sm text-muted-foreground italic">Everything in Free, plus...</p>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <Bell className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <Bell className="w-5 h-5 text-[#5C7A84] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Certification Expiry Alerts</p>
                       <p className="text-sm text-muted-foreground">60-day yellow warning, 30-day red alert. Never miss a renewal.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <Users className="w-5 h-5 text-[#5C7A84] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Multi-Employer Connections</p>
                       <p className="text-sm text-muted-foreground">Work your main job Monday-Thursday, pick up side gigs Friday-Sunday.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Search className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <Search className="w-5 h-5 text-[#5C7A84] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Job Board Access</p>
                       <p className="text-sm text-muted-foreground">See and apply to urban rope tech positions posted by companies on the platform</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Eye className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <Eye className="w-5 h-5 text-[#5C7A84] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Enhanced Profile Visibility</p>
                       <p className="text-sm text-muted-foreground">Employers searching for techs see your profile first</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <BarChart3 className="w-5 h-5 text-[#AB4521] mt-0.5 shrink-0" />
+                    <BarChart3 className="w-5 h-5 text-[#5C7A84] mt-0.5 shrink-0" />
                     <div>
                       <p className="font-medium">Level Progression Tracking</p>
                       <p className="text-sm text-muted-foreground">Visual display of hours toward your next IRATA level (L1 to L2 to L3)</p>
@@ -379,11 +412,11 @@ export default function TechnicianLanding() {
             </Card>
 
             {/* With Employer on OnRopePro */}
-            <Card className="overflow-hidden border-2 border-[#AB4521]">
-              <CardHeader className="bg-[#AB4521]/10 border-b border-[#AB4521]/20">
+            <Card className="overflow-hidden border-2 border-[#5C7A84]">
+              <CardHeader className="bg-[#5C7A84]/10 border-b border-[#5C7A84]/20">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 flex items-center justify-center">
-                    <Zap className="w-5 h-5 text-[#AB4521]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#5C7A84]/20 flex items-center justify-center">
+                    <Zap className="w-5 h-5 text-[#5C7A84]" />
                   </div>
                   <div>
                     <CardTitle className="text-lg">WITH employer on OnRopePro</CardTitle>
@@ -405,11 +438,11 @@ export default function TechnicianLanding() {
           </div>
 
           {/* The Math */}
-          <Card className="border-2 border-[#AB4521]/30 bg-[#AB4521]/5">
-            <CardHeader className="border-b border-[#AB4521]/20">
+          <Card className="border-2 border-[#5C7A84]/30 bg-[#5C7A84]/5">
+            <CardHeader className="border-b border-[#5C7A84]/20">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#AB4521]/20 flex items-center justify-center">
-                  <Calculator className="w-5 h-5 text-[#AB4521]" />
+                <div className="w-10 h-10 rounded-lg bg-[#5C7A84]/20 flex items-center justify-center">
+                  <Calculator className="w-5 h-5 text-[#5C7A84]" />
                 </div>
                 <CardTitle className="text-xl">The Math</CardTitle>
               </div>
@@ -425,7 +458,7 @@ export default function TechnicianLanding() {
                   <p className="text-muted-foreground">0 minutes. It just happens.</p>
                 </div>
               </div>
-              <p className="text-lg font-semibold text-[#AB4521] text-center pt-4 border-t">
+              <p className="text-lg font-semibold text-[#5C7A84] text-center pt-4 border-t">
                 At $50/hour, that's $1,000-2,000 worth of your time back every year.
               </p>
             </CardContent>
@@ -458,11 +491,11 @@ export default function TechnicianLanding() {
             </p>
           </div>
           
-          <Card className="border-2 border-[#AB4521]/30">
+          <Card className="border-2 border-[#5C7A84]/30">
             <CardHeader className="border-b">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#AB4521]/10 flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-[#AB4521]" />
+                <div className="w-10 h-10 rounded-lg bg-[#5C7A84]/10 flex items-center justify-center">
+                  <Camera className="w-5 h-5 text-[#5C7A84]" />
                 </div>
                 <CardTitle className="text-xl">Here's how it works:</CardTitle>
               </div>
@@ -470,23 +503,23 @@ export default function TechnicianLanding() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">1</div>
+                  <div className="w-8 h-8 rounded-full bg-[#5C7A84] text-white flex items-center justify-center shrink-0 font-bold">1</div>
                   <p className="text-base text-muted-foreground pt-1">Open the app</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">2</div>
+                  <div className="w-8 h-8 rounded-full bg-[#5C7A84] text-white flex items-center justify-center shrink-0 font-bold">2</div>
                   <p className="text-base text-muted-foreground pt-1">Photograph your logbook pages</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">3</div>
+                  <div className="w-8 h-8 rounded-full bg-[#5C7A84] text-white flex items-center justify-center shrink-0 font-bold">3</div>
                   <p className="text-base text-muted-foreground pt-1">The app reads your handwriting and extracts the data</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">4</div>
+                  <div className="w-8 h-8 rounded-full bg-[#5C7A84] text-white flex items-center justify-center shrink-0 font-bold">4</div>
                   <p className="text-base text-muted-foreground pt-1">Review the import, confirm accuracy</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center shrink-0 font-bold">5</div>
+                  <div className="w-8 h-8 rounded-full bg-[#5C7A84] text-white flex items-center justify-center shrink-0 font-bold">5</div>
                   <p className="text-base text-muted-foreground pt-1">Your historical hours are now in your digital profile</p>
                 </div>
               </div>
@@ -559,7 +592,7 @@ export default function TechnicianLanding() {
               
               <div className="flex justify-center">
                 <Button 
-                  className="bg-[#AB4521] hover:bg-[#8B371A] text-white" 
+                  className="bg-[#5C7A84] hover:bg-[#4A656E] text-white" 
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-career-climbers-cta"
                 >
@@ -623,7 +656,7 @@ export default function TechnicianLanding() {
               
               <div className="flex flex-wrap justify-center gap-4">
                 <Button 
-                  className="bg-[#AB4521] hover:bg-[#8B371A] text-white" 
+                  className="bg-[#5C7A84] hover:bg-[#4A656E] text-white" 
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-hustlers-cta"
                 >
@@ -695,7 +728,7 @@ export default function TechnicianLanding() {
               
               <div className="flex justify-center">
                 <Button 
-                  className="bg-[#AB4521] hover:bg-[#8B371A] text-white" 
+                  className="bg-[#5C7A84] hover:bg-[#4A656E] text-white" 
                   onClick={() => setShowRegistration(true)}
                   data-testid="button-freedom-seekers-cta"
                 >
@@ -719,7 +752,7 @@ export default function TechnicianLanding() {
           <div className="space-y-8">
             {/* Step 1 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#AB4521] text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#5C7A84] text-white flex items-center justify-center font-bold text-lg">
                 1
               </div>
               <div className="space-y-2">
@@ -732,7 +765,7 @@ export default function TechnicianLanding() {
 
             {/* Step 2 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#AB4521] text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#5C7A84] text-white flex items-center justify-center font-bold text-lg">
                 2
               </div>
               <div className="space-y-2">
@@ -745,7 +778,7 @@ export default function TechnicianLanding() {
 
             {/* Step 3 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#AB4521] text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#5C7A84] text-white flex items-center justify-center font-bold text-lg">
                 3
               </div>
               <div className="space-y-2">
@@ -758,7 +791,7 @@ export default function TechnicianLanding() {
 
             {/* Step 4 */}
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#AB4521] text-white flex items-center justify-center font-bold text-lg">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#5C7A84] text-white flex items-center justify-center font-bold text-lg">
                 4
               </div>
               <div className="space-y-2">
@@ -775,7 +808,7 @@ export default function TechnicianLanding() {
               <p className="text-base text-muted-foreground">
                 <strong className="text-foreground">Note:</strong> Your account works even without an employer on the platform. You can store certifications, track history manually, and access the job board (PLUS). But when your employer also uses OnRopePro? Everything supercharges-automatic hour tracking, instant onboarding, seamless documentation.
               </p>
-              <p className="text-base font-medium text-[#AB4521] mt-3">
+              <p className="text-base font-medium text-[#5C7A84] mt-3">
                 Tell your boss to check it out. You both win.
               </p>
             </CardContent>
@@ -783,46 +816,14 @@ export default function TechnicianLanding() {
         </div>
       </section>
       <Separator />
-      {/* Important Clarifications Section */}
+      {/* Data Control & Security Section */}
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
-          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-6 h-6 text-amber-600" />
-                <CardTitle className="text-xl">THIS DOES NOT REPLACE YOUR PHYSICAL LOGBOOK</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-base text-amber-900 dark:text-amber-100">
-                <strong>Your IRATA/SPRAT physical logbook is still required.</strong> OnRopePro is a digital assistant that gives you accurate data to transfer into your official logbook-it does not replace it.
-              </p>
-              <p className="text-base text-amber-900 dark:text-amber-100">
-                IRATA and SPRAT certification bodies require you to maintain your physical logbook. That requirement hasn't changed. What has changed is how accurate your entries can be.
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-4 mt-4">
-                <div className="bg-white dark:bg-amber-900 rounded-lg p-4">
-                  <p className="font-medium text-foreground">Before:</p>
-                  <p className="text-muted-foreground">You guess at hours and details when filling your logbook weeks later</p>
-                </div>
-                <div className="bg-white dark:bg-amber-900 rounded-lg p-4">
-                  <p className="font-medium text-foreground">After:</p>
-                  <p className="text-muted-foreground">You copy precise, timestamped data from OnRopePro into your logbook</p>
-                </div>
-              </div>
-              
-              <p className="text-base text-amber-900 dark:text-amber-100">
-                Your assessor still checks your physical book. OnRopePro just makes sure the data in that book is right.
-              </p>
-            </CardContent>
-          </Card>
-
-          <div className="grid md:grid-cols-2 gap-6 mt-8">
+          <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-[#AB4521]" />
+                  <Lock className="w-5 h-5 text-[#5C7A84]" />
                   <CardTitle className="text-lg">Your data. Your control.</CardTitle>
                 </div>
               </CardHeader>
@@ -849,7 +850,7 @@ export default function TechnicianLanding() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-[#AB4521]" />
+                  <Shield className="w-5 h-5 text-[#5C7A84]" />
                   <CardTitle className="text-lg">Security</CardTitle>
                 </div>
               </CardHeader>
@@ -926,7 +927,7 @@ export default function TechnicianLanding() {
             </h2>
           </div>
           
-          <Card className="border-2 border-[#AB4521]">
+          <Card className="border-2 border-[#5C7A84]">
             <CardContent className="p-8 space-y-6">
               <p className="text-lg text-center text-muted-foreground">
                 PLUS accounts are free. Not "free trial." Not "free for 30 days." <strong className="text-foreground">Actually free.</strong>
@@ -936,21 +937,21 @@ export default function TechnicianLanding() {
                 <h3 className="font-semibold text-xl text-center">How it works:</h3>
                 <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center font-bold">1</div>
+                    <div className="w-8 h-8 rounded-full bg-[#5C7A84] text-white flex items-center justify-center font-bold">1</div>
                     <span className="text-base">Create your free account</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center font-bold">2</div>
+                    <div className="w-8 h-8 rounded-full bg-[#5C7A84] text-white flex items-center justify-center font-bold">2</div>
                     <span className="text-base">Refer one other rope tech</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#AB4521] text-white flex items-center justify-center font-bold">3</div>
+                    <div className="w-8 h-8 rounded-full bg-[#5C7A84] text-white flex items-center justify-center font-bold">3</div>
                     <span className="text-base">You get upgraded automatically</span>
                   </div>
                 </div>
               </div>
               
-              <p className="text-center font-medium text-[#AB4521]">
+              <p className="text-center font-medium text-[#5C7A84]">
                 That's it. One referral. Lifetime PLUS access for you.
               </p>
               
@@ -1125,6 +1126,7 @@ export default function TechnicianLanding() {
           </div>
         </div>
       </footer>
+
       {/* Registration Modal */}
       <TechnicianRegistration 
         open={showRegistration} 
