@@ -158,6 +158,14 @@ export const guideRegistry = [
     stakeholders: ['owner', 'operations_manager', 'supervisor'],
     hideFromModulesGrid: true, // This is a "Popular Topic", shown in Popular Topics section not modules grid
   },
+  {
+    slug: 'install-app',
+    title: 'How To Install the App',
+    category: 'customization',
+    sourceFile: '', // No TSX source, markdown only
+    stakeholders: ['owner', 'operations_manager', 'supervisor', 'technician'],
+    hideFromModulesGrid: true, // This is a "Popular Topic", shown in Popular Topics section not modules grid
+  },
 ];
 
 /**

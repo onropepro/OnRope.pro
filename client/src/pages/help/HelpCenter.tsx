@@ -279,6 +279,11 @@ export default function HelpCenter() {
               description="Personalize your dashboard with widgets and layouts"
               href="/help/modules/dashboard-customization"
             />
+            <TopicCard 
+              title="How To Install the App" 
+              description="Add OnRopePro to your home screen for quick access"
+              href="/help/modules/install-app"
+            />
           </div>
         </section>
         
