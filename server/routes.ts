@@ -1212,6 +1212,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+
+  // Dedicated resident registration endpoint - SECURITY: Rate limited
+  app.post("/api/register/resident", registrationRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const { name, email, phone, strataPlanNumber, unitNumber, parkingStallNumber, password } = req.body;
+
+      // Validate required fields
+      if (!name || !email || !password || !strataPlanNumber || !unitNumber) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // Validate password length
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
+
+      // Check if email already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "An account with this email already exists" });
+      }
+
+      // Check for existing resident with same strata + unit
+      const existingResident = await db.select({ id: users.id })
+        .from(users)
+        .where(
+          and(
+            eq(users.role, 'resident'),
+            eq(users.strataPlanNumber, strataPlanNumber),
+            eq(users.unitNumber, unitNumber)
+          )
+        )
+        .limit(1);
+
+      if (existingResident.length > 0) {
+        return res.status(400).json({ 
+          message: "A resident is already registered for this unit. Please contact your property manager if you believe this is an error." 
+        });
+      }
+
+      // Split name into first and last name
+      const nameParts = name.trim().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create the resident user
+      const [newUser] = await db.insert(users).values({
+        firstName,
+        lastName,
+        email: email.toLowerCase(),
+        passwordHash: hashedPassword,
+        role: 'resident',
+        strataPlanNumber,
+        unitNumber,
+        parkingStallNumber: parkingStallNumber || null,
+        employeePhoneNumber: phone || null,
+      }).returning();
+
+      // Log the user in
+      req.session.userId = newUser.id;
+      req.session.role = 'resident';
+      req.session.strataPlanNumber = strataPlanNumber;
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+
+      res.status(201).json({
+        message: "Account created successfully",
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          role: newUser.role,
+        },
+      });
+    } catch (error) {
+      console.error("Resident registration error:", error);
+      res.status(500).json({ message: "Failed to create account. Please try again." });
+    }
+  });
   // Registration with license (for new customers after Stripe checkout) - SECURITY: Rate limited
   app.post("/api/register-with-license", registrationRateLimiter, async (req: Request, res: Response) => {
     try {
