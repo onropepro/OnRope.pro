@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { Crown, LogOut, Home, Menu } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTechnicianContext } from "@/hooks/use-technician-context";
 
 interface TechnicianHeaderProps {
   language?: "en" | "es" | "fr";
@@ -19,12 +20,7 @@ interface TechnicianHeaderProps {
 export function TechnicianHeader({ language = "en", onProfileClick, onMobileMenuClick }: TechnicianHeaderProps) {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-
-  const { data: userData } = useQuery<{ user: any }>({
-    queryKey: ["/api/user"],
-  });
-
-  const user = userData?.user;
+  const { user } = useTechnicianContext();
 
   const translations = {
     en: {

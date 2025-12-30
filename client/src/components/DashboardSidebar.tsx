@@ -32,6 +32,7 @@ import {
   SlidersHorizontal,
   User as UserIcon,
   Mail,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -41,12 +42,14 @@ import {
   canManageEmployees,
   canAccessQuotes,
   hasPermission,
+  canViewPerformance,
 } from "@/lib/permissions";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import { SidebarCustomizeDialog } from "./SidebarCustomizeDialog";
 import { useTechnicianContext } from "@/hooks/use-technician-context";
+import { CarabinerIcon } from "./icons/CarabinerIcon";
 
 interface SidebarPreferencesResponse {
   preferences: Record<string, { itemId: string; position: number }[]>;
@@ -158,7 +161,7 @@ export function DashboardSidebar({
       } else {
         // Default state: For employer variant, collapse all groups except "operations"
         if (variant === 'employer') {
-          setCollapsedGroups(new Set(['team', 'equipment', 'safety', 'financial', 'clients']));
+          setCollapsedGroups(new Set(['team', 'equipment', 'safety', 'financial', 'analytics']));
         } else {
           setCollapsedGroups(new Set()); // All groups expanded by default for other variants
         }
@@ -203,9 +206,6 @@ export function DashboardSidebar({
       setInternalOpen(open);
     }
   };
-
-  // Get brand color based on variant or custom override
-  const BRAND_COLOR = customBrandColor || STAKEHOLDER_COLORS[variant];
 
   // Fetch sidebar preferences for ordering
   const { data: sidebarPreferences } = useQuery<SidebarPreferencesResponse>({
@@ -387,7 +387,7 @@ export function DashboardSidebar({
     },
     {
       id: "financial",
-      label: t("dashboard.categories.financial", "FINANCIAL"),
+      label: t("dashboard.categories.financialClients", "FINANCIAL/CLIENTS"),
       items: [
         {
           id: "payroll",
@@ -405,18 +405,25 @@ export function DashboardSidebar({
           badgeType: alertCounts.quoteNotifications ? "alert" : undefined,
           isVisible: (user) => canAccessQuotes(user) || hasFinancialAccess(user),
         },
-      ],
-    },
-    {
-      id: "clients",
-      label: t("dashboard.categories.clients", "CLIENTS"),
-      items: [
         {
           id: "clients",
           label: t("dashboard.cards.clients.label", "Clients"),
           icon: Building,
           href: "/dashboard?tab=clients",
           isVisible: (user) => hasPermission(user, 'view_clients'),
+        },
+      ],
+    },
+    {
+      id: "analytics",
+      label: t("dashboard.categories.analytics", "ANALYTICS"),
+      items: [
+        {
+          id: "performance",
+          label: t("dashboard.sidebar.performance", "Performance"),
+          icon: BarChart3,
+          href: "/performance",
+          isVisible: (user) => canViewPerformance(user),
         },
       ],
     },
@@ -498,14 +505,6 @@ export function DashboardSidebar({
     ? t("dashboard.sidebar.workDashboard", "Work Dashboard")
     : t("dashboard.sidebar.dashboard", "Dashboard"));
 
-  // Get brand color - use CSS variable when white label is active, otherwise use Deep Blue
-  const getBrandColor = () => {
-    if (whitelabelBrandingActive) {
-      return "hsl(var(--sidebar-primary))";
-    }
-    return BRAND_COLOR;
-  };
-
   const sidebarContent = (
     <>
       {/* Logo Header - h-14 (56px) */}
@@ -555,12 +554,20 @@ export function DashboardSidebar({
             className={cn(
               "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
               isDashboardActive 
-                ? "text-white shadow-sm"
+                ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
                 : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             )}
-            style={isDashboardActive ? { backgroundColor: getBrandColor() } : undefined}
           >
-            <LayoutDashboard className="h-4 w-4 shrink-0" />
+            {variant === "technician" && (currentUser as any)?.photoUrl ? (
+              <Avatar className="h-4 w-4 shrink-0">
+                <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
+                <AvatarFallback className="text-[8px]">
+                  {((currentUser as any).name || "U").charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            ) : (
+              <CarabinerIcon className="h-4 w-4 shrink-0" />
+            )}
             <span>{resolvedDashboardLabel}</span>
           </button>
         </div>
@@ -679,7 +686,7 @@ export function DashboardSidebar({
               data-testid="sidebar-nav-work-dashboard"
               className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              <Briefcase className="h-4 w-4 shrink-0" />
+              <CarabinerIcon className="h-4 w-4 shrink-0" />
               <span>{t("dashboard.sidebar.workDashboard", "Go to Work Dashboard")}</span>
             </button>
           )}

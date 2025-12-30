@@ -44,7 +44,6 @@ export function getTechnicianNavGroups(
           label: language === 'en' ? "Profile" : language === 'es' ? "Perfil" : "Profil",
           icon: User,
           href: "/technician-portal?tab=profile",
-          useProfilePhoto: true,
           isVisible: () => true,
         },
         {

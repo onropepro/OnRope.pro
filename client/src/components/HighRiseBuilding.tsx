@@ -73,19 +73,19 @@ export function HighRiseBuilding({
       </div>
 
       {/* Four Elevations - Minimalist Premium Design */}
-      <div className="flex justify-center gap-8 overflow-x-auto pb-4 px-4">
+      <div className="flex justify-center gap-2 sm:gap-4 md:gap-6 pb-4 px-2">
         {elevations.map((elevation, index) => {
           return (
-          <div key={elevation.name} className="flex flex-col items-center min-w-[120px]">
+          <div key={elevation.name} className="flex flex-col items-center flex-1 max-w-[140px]">
             {/* Elevation Label - Soft Pill */}
-            <div className="mb-6 px-6 py-2 rounded-full bg-muted">
-              <span className="text-sm font-bold uppercase tracking-wide text-foreground">
+            <div className="mb-4 sm:mb-6 px-3 sm:px-6 py-1.5 sm:py-2 rounded-full bg-muted">
+              <span className="text-xs sm:text-sm font-bold uppercase tracking-wide text-foreground">
                 {elevation.name}
               </span>
             </div>
             
             {/* Building Visualization - Clean Minimal Style */}
-            <div className="relative w-24 h-96 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-xl border border-border/50 dark:border-muted-foreground/50 overflow-hidden">
+            <div className="relative w-16 sm:w-20 md:w-24 h-64 sm:h-80 md:h-96 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl sm:rounded-3xl shadow-xl border border-border/50 dark:border-muted-foreground/50 overflow-hidden">
               {/* Progress Fill from Bottom */}
               <div 
                 className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out rounded-3xl bg-gradient-to-t from-primary/90 via-primary/70 to-primary/50"
@@ -114,11 +114,11 @@ export function HighRiseBuilding({
             </div>
             
             {/* Stats Below */}
-            <div className="mt-6 text-center">
-              <div className="text-3xl font-bold mb-1 text-primary">
+            <div className="mt-4 sm:mt-6 text-center">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 text-primary">
                 {Math.round(elevation.progress)}%
               </div>
-              <div className={`text-sm font-medium flex items-center justify-center gap-1 ${elevation.exceeded ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
+              <div className={`text-xs sm:text-sm font-medium flex items-center justify-center gap-1 ${elevation.exceeded ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
                 {elevation.exceeded && <AlertTriangle className="w-3 h-3" />}
                 {elevation.completed} / {elevation.total}
               </div>

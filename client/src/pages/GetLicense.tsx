@@ -4,13 +4,14 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { TIER_CONFIG } from "@shared/stripe-config";
+import { TIER_CONFIG, PRICING, ANNUAL_DISCOUNT_PERCENT, type BillingFrequency, type Currency } from "@shared/stripe-config";
 import { EmbeddedCheckoutDialog } from "@/components/EmbeddedCheckout";
 
 export default function GetLicense() {
   const { t } = useTranslation();
   const [processingTier, setProcessingTier] = useState<string | null>(null);
-  const [currency, setCurrency] = useState<'usd' | 'cad'>('usd');
+  const [currency, setCurrency] = useState<Currency>('usd');
+  const [billingFrequency, setBillingFrequency] = useState<BillingFrequency>('monthly');
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<string>('basic');
   const { toast } = useToast();
@@ -75,6 +76,30 @@ export default function GetLicense() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {/* Billing Frequency Toggle */}
+              <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+                <Button
+                  variant={billingFrequency === 'monthly' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setBillingFrequency('monthly')}
+                  className="text-sm"
+                  data-testid="button-billing-monthly"
+                >
+                  Monthly
+                </Button>
+                <Button
+                  variant={billingFrequency === 'annual' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setBillingFrequency('annual')}
+                  className="text-sm"
+                  data-testid="button-billing-annual"
+                >
+                  Annual
+                  <Badge variant="secondary" className="ml-1 text-xs">
+                    Save {ANNUAL_DISCOUNT_PERCENT}%
+                  </Badge>
+                </Button>
+              </div>
               {/* Currency Toggle */}
               <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
                 <Button
@@ -134,18 +159,26 @@ export default function GetLicense() {
               <CardDescription>
                 <div className="mt-4">
                   <span className="text-5xl font-bold text-foreground">
-                    $99
+                    ${billingFrequency === 'monthly' ? PRICING.base.monthly : PRICING.base.annual}
                   </span>
                   <span className="text-muted-foreground ml-2">
-                    {currencySymbol}/month
+                    {currencySymbol}/{billingFrequency === 'monthly' ? 'month' : 'year'}
                   </span>
                 </div>
+                {billingFrequency === 'annual' && (
+                  <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                    Save ${(PRICING.base.monthly * 12) - PRICING.base.annual}/year ({ANNUAL_DISCOUNT_PERCENT}% off)
+                  </div>
+                )}
                 <div className="mt-3 space-y-1">
                   <Badge variant="secondary" className="text-xs">
                     {t('getLicense.tier.freeTrial', '30-Day Free Trial')}
                   </Badge>
                   <p className="text-sm text-muted-foreground mt-2">
-                    + $34.95/month per additional employee seat
+                    + ${billingFrequency === 'monthly' ? PRICING.seat.monthly : PRICING.seat.annual}/{billingFrequency === 'monthly' ? 'month' : 'year'} per additional employee seat
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Volume discount: ${billingFrequency === 'monthly' ? PRICING.volumeSeat.monthly : PRICING.volumeSeat.annual}/{billingFrequency === 'monthly' ? 'month' : 'year'} per seat for 30+ employees
                   </p>
                 </div>
               </CardDescription>
@@ -220,8 +253,8 @@ export default function GetLicense() {
                   <h3 className="font-semibold text-lg">{t('getLicense.nextSteps.title', 'What happens next?')}</h3>
                   <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
                     <li>{t('getLicense.nextSteps.step1', 'Complete secure payment via Stripe (30-day free trial)')}</li>
-                    <li>{t('getLicense.nextSteps.step2', 'Receive your unique license key instantly')}</li>
-                    <li>{t('getLicense.nextSteps.step3', 'Create your company account with full access')}</li>
+                    <li>{t('getLicense.nextSteps.step2', 'Your company account is created automatically')}</li>
+                    <li>{t('getLicense.nextSteps.step3', 'Log in with your email and password')}</li>
                     <li>{t('getLicense.nextSteps.step4', 'Start managing your rope access operations immediately')}</li>
                   </ol>
                   <p className="text-xs text-muted-foreground pt-2">
@@ -239,6 +272,7 @@ export default function GetLicense() {
         onOpenChange={handleCheckoutClose}
         tier={selectedTier}
         currency={currency}
+        billingFrequency={billingFrequency}
         isNewCustomer={true}
       />
     </div>

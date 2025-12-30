@@ -1535,27 +1535,15 @@ export default function ProjectDetail() {
               </>
             )}
 
-            {/* Stats - Hide for hours-based projects since they don't have daily targets */}
+            {/* Stats - Show drops remaining, est days, and hours/budget for financial users */}
             {!isPercentageBased && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold">
-                    {project.jobType === "in_suite_dryer_vent_cleaning" 
-                      ? project.suitesPerDay 
-                      : project.jobType === "parkade_pressure_cleaning" 
-                      ? project.stallsPerDay 
-                      : project.dailyDropTarget}
-                  </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {project.jobType === "in_suite_dryer_vent_cleaning" 
-                      ? t('projectDetail.progress.unitsPerDay', 'Expected Suites/Day') 
-                      : project.jobType === "parkade_pressure_cleaning" 
-                      ? t('projectDetail.progress.stallsPerDay', 'Expected Stalls/Day') 
-                      : t('projectDetail.progress.dailyTarget', 'Daily Target')}
-                  </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="text-center p-2 bg-muted/50 rounded-lg">
+                  <div className="text-lg font-bold">{totalDrops - completedDrops}</div>
+                  <div className="text-xs text-muted-foreground">{t('projectDetail.progress.dropsRemaining', 'Drops Left')}</div>
                 </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold">
+                <div className="text-center p-2 bg-muted/50 rounded-lg">
+                  <div className="text-lg font-bold">
                     {completedDrops > 0 
                       ? (() => {
                           const dailyTarget = project.jobType === "in_suite_dryer_vent_cleaning" 
@@ -1568,8 +1556,41 @@ export default function ProjectDetail() {
                         })()
                       : "N/A"}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">{t('projectDetail.progress.remaining', 'Days Remaining')}</div>
+                  <div className="text-xs text-muted-foreground">{t('projectDetail.progress.daysRemaining', 'Est. Days Left')}</div>
                 </div>
+                {canViewFinancialData && project.estimatedHours && (
+                  <>
+                    <div className="text-center p-2 bg-muted/50 rounded-lg">
+                      <div className="text-lg font-bold text-primary">
+                        {(() => {
+                          const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
+                            const regular = parseFloat(session.regularHours) || 0;
+                            const overtime = parseFloat(session.overtimeHours) || 0;
+                            const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                            return sum + regular + overtime + doubleTime;
+                          }, 0);
+                          return totalHoursWorked.toFixed(1);
+                        })()}h
+                      </div>
+                      <div className="text-xs text-muted-foreground">{t('projectDetail.progress.hoursWorked', 'Hours Worked')}</div>
+                    </div>
+                    <div className="text-center p-2 bg-muted/50 rounded-lg">
+                      <div className="text-lg font-bold">
+                        {(() => {
+                          const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
+                            const regular = parseFloat(session.regularHours) || 0;
+                            const overtime = parseFloat(session.overtimeHours) || 0;
+                            const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                            return sum + regular + overtime + doubleTime;
+                          }, 0);
+                          const hoursRemaining = Math.max(0, project.estimatedHours - totalHoursWorked);
+                          return hoursRemaining.toFixed(1);
+                        })()}h
+                      </div>
+                      <div className="text-xs text-muted-foreground">{t('projectDetail.progress.hoursRemaining', 'Hours Left')}</div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -1945,15 +1966,12 @@ export default function ProjectDetail() {
                 {canViewFinancialData && project.estimatedHours && (
                   <TabsContent value="budget" className="mt-4">
                     {(() => {
-                      // Calculate total hours worked from completed sessions
+                      // Calculate total hours worked from pre-calculated hours fields (matches Dashboard calculation)
                       const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
-                        if (session.startTime && session.endTime) {
-                          const start = new Date(session.startTime);
-                          const end = new Date(session.endTime);
-                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                          return sum + hours;
-                        }
-                        return sum;
+                        const regular = parseFloat(session.regularHours) || 0;
+                        const overtime = parseFloat(session.overtimeHours) || 0;
+                        const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                        return sum + regular + overtime + doubleTime;
                       }, 0);
                       
                       const estimatedHours = project.estimatedHours || 0;
@@ -1961,22 +1979,23 @@ export default function ProjectDetail() {
                       const isOverBudget = totalHoursWorked > estimatedHours;
                       const hoursOver = isOverBudget ? totalHoursWorked - estimatedHours : 0;
                       
-                      // Calculate total labor cost and overage cost
+                      // Calculate total labor cost and overage cost using pre-calculated hours
                       let totalLaborCost = 0;
                       let cumulativeHours = 0;
                       let overageCost = 0;
                       
                       completedSessions.forEach((session: any) => {
-                        if (session.startTime && session.endTime && session.techHourlyRate) {
-                          const start = new Date(session.startTime);
-                          const end = new Date(session.endTime);
-                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                        const regular = parseFloat(session.regularHours) || 0;
+                        const overtime = parseFloat(session.overtimeHours) || 0;
+                        const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+                        const hours = regular + overtime + doubleTime;
+                        
+                        if (hours > 0 && session.techHourlyRate) {
                           const cost = hours * parseFloat(session.techHourlyRate);
                           totalLaborCost += cost;
                           
                           // Track overage cost (hours beyond estimated hours)
                           if (isOverBudget) {
-                            const previousCumulative = cumulativeHours;
                             cumulativeHours += hours;
                             
                             if (cumulativeHours > estimatedHours) {

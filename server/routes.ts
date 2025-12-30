@@ -3341,7 +3341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only company accounts can purchase subscriptions" });
       }
 
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3349,6 +3349,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      }
+
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
       }
 
       // Get or create Stripe customer
@@ -3359,9 +3363,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateUser(user.id, { stripeCustomerId: customerId });
       }
 
-      // Get price ID for selected tier and currency
-      const tierConfig = TIER_CONFIG[tier as TierName];
-      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+      // Get price ID using the new billing frequency-aware function
+      const priceId = getBasePriceId(billingFrequency, currency);
 
       // Construct base URL from request (works in both dev and production)
       const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
@@ -3406,7 +3409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only company accounts can purchase subscriptions" });
       }
 
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3414,6 +3417,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
       }
 
       // Get or create Stripe customer
@@ -3477,7 +3483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/stripe/create-embedded-license-checkout", async (req: Request, res: Response) => {
     try {
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3487,9 +3493,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
       }
 
-      // Get price ID for selected tier and currency
-      const tierConfig = TIER_CONFIG[tier as TierName];
-      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
+
+      // Get price ID using the new billing frequency-aware function
+      const priceId = getBasePriceId(billingFrequency, currency);
 
       // Construct base URL from request
       const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
@@ -3511,6 +3520,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: {
           tier,
           currency,
+          billingFrequency,
           newCustomer: 'true',
         },
         subscription_data: {
@@ -3518,6 +3528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           metadata: {
             tier,
             currency,
+            billingFrequency,
           },
         },
         allow_promotion_codes: true,
@@ -3866,7 +3877,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
    */
   app.post("/api/stripe/create-license-checkout", async (req: Request, res: Response) => {
     try {
-      const { tier, currency = 'usd' } = req.body;
+      const { tier, currency = 'usd', billingFrequency = 'monthly' } = req.body;
 
       if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
         return res.status(400).json({ message: "Invalid subscription tier" });
@@ -3874,6 +3885,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!['usd', 'cad'].includes(currency)) {
         return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      if (!['monthly', 'annual'].includes(billingFrequency)) {
+        return res.status(400).json({ message: "Invalid billing frequency. Must be 'monthly' or 'annual'" });
+      }
       }
 
       // Get price ID for selected tier and currency
@@ -10339,6 +10353,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
           id: company.id,
           companyName: company.companyName,
           residentCode: company.residentCode,
+          companyLogoUrl: company.brandingLogoUrl || null,
         }
       });
     } catch (error) {
