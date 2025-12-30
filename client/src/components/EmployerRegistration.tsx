@@ -665,7 +665,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       className="w-full bg-[#0B64A3] hover:bg-[#0B64A3]/90"
                       onClick={() => {
                         handleClose();
-                        setLocation("/employer");
+                        setLocation("/dashboard");
                       }}
                       data-testid="button-go-to-dashboard"
                     >
