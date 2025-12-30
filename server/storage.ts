@@ -1204,16 +1204,18 @@ export class Storage {
   }
 
   // Get any active session (billable or non-billable) for this employee
-  async getAnyActiveSession(employeeId: string): Promise<{ type: 'billable' | 'non_billable', session: any, projectName?: string, description?: string } | null> {
+  async getAnyActiveSession(employeeId: string): Promise<{ type: 'billable' | 'non_billable', session: any, projectName?: string, buildingName?: string, description?: string } | null> {
     // Check billable sessions first
     const activeBillable = await this.getActiveWorkSessionAcrossProjects(employeeId);
     if (activeBillable) {
       let projectName: string | undefined;
+      let buildingName: string | undefined;
       if (activeBillable.projectId) {
         const project = await this.getProjectById(activeBillable.projectId);
         projectName = project?.name;
+        buildingName = project?.buildingName || undefined;
       }
-      return { type: 'billable', session: activeBillable, projectName };
+      return { type: 'billable', session: activeBillable, projectName, buildingName };
     }
     
     // Check non-billable sessions

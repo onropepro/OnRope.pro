@@ -4848,9 +4848,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let startDate: Date;
       let endDate: Date;
       
-      if (config) {
+      if (config && config.periodStartDate) {
         // Calculate based on config
         const periodStart = new Date(config.periodStartDate);
+        // Validate the date is valid
+        if (isNaN(periodStart.getTime())) {
+          // Fall back to semi-monthly if config date is invalid
+          const dayOfMonth = today.getDate();
+          if (dayOfMonth <= 15) {
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            endDate = new Date(today.getFullYear(), today.getMonth(), 15, 23, 59, 59, 999);
+          } else {
+            startDate = new Date(today.getFullYear(), today.getMonth(), 16);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+          }
+        } else {
         const periodLength = config.periodType === 'weekly' ? 7 : 
                            config.periodType === 'biweekly' ? 14 : 
                            config.periodType === 'semi_monthly' ? 15 : 30;
@@ -4865,6 +4877,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + periodLength - 1);
         endDate.setHours(23, 59, 59, 999); // Include full final day
+        }
       } else {
         // Default to biweekly
         const dayOfMonth = today.getDate();
@@ -4879,29 +4892,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const daysRemaining = Math.max(0, Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
 
-      // Get work sessions in this period (inclusive bounds)
-      const sessions = await db.select()
-        .from(workSessions)
-        .where(and(
-          eq(workSessions.companyId, companyId),
-          gte(workSessions.startTime, startDate),
-          lte(workSessions.startTime, endDate)
-        ));
+      // Use existing payroll calculation (same data as payroll page)
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
+      const hoursSummary = await storage.getEmployeeHoursForPayPeriod(companyId, startDateStr, endDateStr);
 
+      // Aggregate the results
       let totalHours = 0;
-      for (const session of sessions) {
-        if (session.startTime && session.endTime) {
-          totalHours += (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
-        }
+      let totalCost = 0;
+      const employeeCount = hoursSummary.length;
+
+      for (const emp of hoursSummary) {
+        totalHours += emp.totalHours || 0;
+        totalCost += emp.totalPay || 0;
       }
 
       res.json({
         startDate: startDate.toISOString().split('T')[0],
         endDate: endDate.toISOString().split('T')[0],
-        daysRemaining,
         totalHours: Math.round(totalHours * 10) / 10,
+        totalCost: Math.round(totalCost),
+        employeeCount,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('[Dashboard] Get current pay period error:', error);
       res.status(500).json({ message: error.message || "Failed to get pay period" });
     }
@@ -16351,6 +16364,40 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
   
+  // Get current user's active work session (if any)
+  app.get("/api/my-active-session", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get any active session (billable or non-billable) for this user
+      const activeSession = await storage.getAnyActiveSession(currentUser.id);
+      
+      if (!activeSession) {
+        return res.json({ hasActiveSession: false, session: null });
+      }
+      
+      // Enrich with additional info
+      const sessionData = {
+        hasActiveSession: true,
+        type: activeSession.type,
+        sessionId: activeSession.session.id,
+        startTime: activeSession.session.startTime,
+        projectName: activeSession.projectName || null,
+        buildingName: activeSession.buildingName || null,
+        description: activeSession.description || null,
+      };
+      
+      res.json(sessionData);
+    } catch (error) {
+      console.error("Get my active session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get all completed work sessions for the current user (across all projects)
   app.get("/api/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
     try {

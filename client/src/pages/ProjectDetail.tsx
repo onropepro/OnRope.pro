@@ -1288,9 +1288,9 @@ export default function ProjectDetail() {
               <h1 className="text-lg font-semibold truncate">{project.buildingName || project.strataPlanNumber}</h1>
               <p className="text-sm text-muted-foreground truncate">{project.buildingAddress}</p>
               <div className="flex items-center gap-2 mt-1.5">
-                <Badge variant={project.status === 'completed' ? 'default' : project.status === 'in_progress' ? 'secondary' : 'outline'}>
+                <Badge variant={project.status === 'completed' ? 'default' : project.status === 'active' ? 'secondary' : 'outline'}>
                   {project.status === 'completed' ? t('projectDetail.status.completed', 'Completed') : 
-                   project.status === 'in_progress' ? t('projectDetail.status.inProgress', 'In Progress') : 
+                   project.status === 'active' ? t('projectDetail.status.inProgress', 'In Progress') : 
                    t('projectDetail.status.pending', 'Pending')}
                 </Badge>
                 <Badge variant="outline" className="gap-1">

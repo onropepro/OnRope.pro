@@ -18,6 +18,7 @@ import { getCardById, type CardDefinition } from "@shared/dashboardCards";
 import { DashboardCard } from "./DashboardCard";
 import { CardSkeleton } from "./CardSkeleton";
 import { getCardComponent } from "./cardRegistry";
+import { ActiveSessionBadge } from "@/components/ActiveSessionBadge";
 
 interface DashboardGridProps {
   currentUser: any;
@@ -300,6 +301,7 @@ export function DashboardGrid({
                   )}
                 </div>
               )}
+              <ActiveSessionBadge />
               <Button
                 variant="outline"
                 size="sm"

@@ -14,8 +14,8 @@ interface DashboardCardProps {
 }
 
 const CARD_HEIGHT = {
-  single: 'h-[200px]',
-  double: 'h-[416px]', // 200 * 2 + 16px gap
+  single: 'h-[220px]',
+  double: 'h-[456px]', // 220 * 2 + 16px gap
 };
 
 export function DashboardCard({
