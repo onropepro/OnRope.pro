@@ -1835,6 +1835,7 @@ const optionalNumber = z.union([z.number(), z.null()]).transform(v => v === null
 
 export const insertClientSchema = createInsertSchema(clients).omit({
   id: true,
+  companyId: true,
   createdAt: true,
   updatedAt: true,
 }).extend({
