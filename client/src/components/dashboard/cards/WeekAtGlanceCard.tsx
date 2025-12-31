@@ -5,6 +5,7 @@ import { CalendarRange, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { format, addDays, startOfWeek, parseISO } from "date-fns";
 import { canViewSchedule } from "@/lib/permissions";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 
 interface WeekDay {
@@ -15,6 +16,7 @@ interface WeekDay {
 }
 
 export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: CardProps) {
+  const { t } = useLanguage();
   const hasAccess = canViewSchedule(currentUser) || currentUser?.role === "company";
   const accentColor = branding?.primaryColor || "#0B64A3";
 
@@ -29,11 +31,11 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <CalendarRange className="w-5 h-5" style={{ color: accentColor }} />
-            Week at a Glance
+            {t("dashboardCards.weekAtGlance.title", "Week at a Glance")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
-          <p className="text-base text-muted-foreground">No access</p>
+          <p className="text-base text-muted-foreground">{t("common.noAccess", "No access")}</p>
         </CardContent>
       </div>
     );
@@ -45,7 +47,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <CalendarRange className="w-5 h-5" style={{ color: accentColor }} />
-            Week at a Glance
+            {t("dashboardCards.weekAtGlance.title", "Week at a Glance")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0">
@@ -76,10 +78,10 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <CalendarRange className="w-5 h-5" style={{ color: accentColor }} />
-            Week at a Glance
+            {t("dashboardCards.weekAtGlance.title", "Week at a Glance")}
           </CardTitle>
           <Badge variant="secondary" className="text-xs" data-testid="badge-week-total">
-            {totalJobs} jobs
+            {totalJobs} {t("common.jobs", "jobs")}
           </Badge>
         </div>
       </CardHeader>
@@ -103,7 +105,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
                 <p className={`text-lg font-bold ${day.isToday ? "" : ""}`}>{dayOfMonth}</p>
                 {day.jobCount > 0 && (
                   <p className={`text-[10px] ${day.isToday ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
-                    {day.jobCount} job{day.jobCount !== 1 ? 's' : ''}
+                    {day.jobCount} {day.jobCount !== 1 ? t("common.jobs", "jobs") : t("common.job", "job")}
                   </p>
                 )}
               </div>
@@ -117,7 +119,7 @@ export function WeekAtGlanceCard({ currentUser, onRouteNavigate, branding }: Car
           onClick={() => onRouteNavigate("/schedule")}
           data-testid="button-view-week-schedule"
         >
-          Open Schedule
+          {t("dashboardCards.weekAtGlance.openSchedule", "Open Schedule")}
           <ChevronRight className="w-4 h-4" />
         </Button>
       </CardContent>

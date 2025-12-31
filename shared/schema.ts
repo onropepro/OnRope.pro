@@ -655,6 +655,8 @@ export const gearItems = pgTable("gear_items", {
   dateInService: date("date_in_service"), // Optional
   dateOutOfService: date("date_out_of_service"), // Optional
   inService: boolean("in_service").notNull().default(true), // Checkbox for in service status
+  isConsumable: boolean("is_consumable").notNull().default(false), // True for consumable items (squeegee rubber, soap, gloves, applicators) - no serial numbers, permanently consumed when taken
+  itemSuffix: varchar("item_suffix"), // Optional suffix to append to item type (e.g., "18"" for "Squeegee Rubber 18"")
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [

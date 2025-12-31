@@ -28,6 +28,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function SuperUserFeatureRequests() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
@@ -61,8 +62,8 @@ export default function SuperUserFeatureRequests() {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to update status",
+        title: t("common.error"),
+        description: t("superUserFeatureRequests.failedToUpdateStatus"),
         variant: "destructive",
       });
     },
@@ -83,8 +84,8 @@ export default function SuperUserFeatureRequests() {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to send message",
+        title: t("common.error"),
+        description: t("superUserFeatureRequests.failedToSendMessage"),
         variant: "destructive",
       });
     },
@@ -232,7 +233,7 @@ export default function SuperUserFeatureRequests() {
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your response to the company owner..."
+                  placeholder={t('superuserFeatureRequests.typeResponse', 'Type your response to the company owner...')}
                   className="w-full min-h-[120px] p-3 border rounded-lg bg-background resize-none focus:ring-2 focus:ring-primary/20"
                   data-testid="textarea-admin-response"
                 />

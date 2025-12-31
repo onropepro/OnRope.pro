@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'wouter';
 import { 
   Search, 
@@ -34,6 +35,7 @@ const commonQuestions = [
 ];
 
 export default function FeatureFinder() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -112,7 +114,7 @@ export default function FeatureFinder() {
               <form onSubmit={handleSubmit} className="flex gap-2">
                 <Input
                   type="text"
-                  placeholder="e.g., I need to track employee time with GPS..."
+                  placeholder={t('featureFinder.searchPlaceholder', 'e.g., I need to track employee time with GPS...')}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="flex-1"

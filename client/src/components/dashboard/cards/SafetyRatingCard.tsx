@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldCheck, TrendingUp, TrendingDown, Users, ChevronRight, Award, FileCheck, BookOpen, Briefcase, Building2, Calendar, ClipboardCheck, AlertTriangle, History } from "lucide-react";
 import { canViewCSR } from "@/lib/permissions";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 import {
   Dialog,
@@ -59,6 +60,7 @@ interface WSSDetailsData {
 }
 
 export function SafetyRatingCard({ currentUser, branding }: CardProps) {
+  const { t } = useLanguage();
   const [showCSRDialog, setShowCSRDialog] = useState(false);
   const [showWSSDialog, setShowWSSDialog] = useState(false);
   const hasAccess = canViewCSR(currentUser);
@@ -92,6 +94,13 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
     return { bg: "bg-red-50 dark:bg-red-950/30", text: "text-red-700 dark:text-red-400", badge: "bg-red-100 text-red-700" };
   };
 
+  const getRatingLabel = (r: number) => {
+    if (r >= 90) return t("safetyRating.excellent", "Excellent");
+    if (r >= 70) return t("safetyRating.good", "Good");
+    if (r >= 50) return t("safetyRating.warning", "Warning");
+    return t("safetyRating.critical", "Critical");
+  };
+
   const colors = getColorScheme(rating);
   const accentColor = branding?.primaryColor || "#0B64A3";
 
@@ -101,11 +110,11 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
-            Safety Rating
+            {t("dashboardCards.safetyRating.title", "Safety Rating")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
-          <p className="text-base text-muted-foreground">No access</p>
+          <p className="text-base text-muted-foreground">{t("common.noAccess", "No access")}</p>
         </CardContent>
       </div>
     );
@@ -117,7 +126,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
-            Safety Rating
+            {t("dashboardCards.safetyRating.title", "Safety Rating")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0">
@@ -135,7 +144,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <ShieldCheck className="w-5 h-5" style={{ color: accentColor }} />
-          Safety Ratings
+          {t("dashboardCards.safetyRating.titlePlural", "Safety Ratings")}
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4 flex-1 min-h-0 flex flex-col gap-2">
@@ -152,7 +161,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                 <p className={`text-xl font-bold ${colors.text}`} data-testid="text-safety-rating-value">
                   {Math.round(rating)}%
                 </p>
-                <p className="text-xs text-muted-foreground">Company Safety</p>
+                <p className="text-xs text-muted-foreground">{t("dashboardCards.safetyRating.companySafety", "Company Safety")}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -162,7 +171,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                 ) : (
                   <TrendingDown className="w-3 h-3 mr-1" />
                 )}
-                {rating >= 90 ? "Excellent" : rating >= 70 ? "Good" : rating >= 50 ? "Warning" : "Critical"}
+                {getRatingLabel(rating)}
               </Badge>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </div>
@@ -183,12 +192,12 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                   <p className={`text-lg font-semibold ${wssColors.text}`} data-testid="text-wss-value">
                     {wssScore}%
                   </p>
-                  <p className="text-xs text-muted-foreground">Workforce Safety</p>
+                  <p className="text-xs text-muted-foreground">{t("dashboardCards.safetyRating.workforceSafety", "Workforce Safety")}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <Badge variant="outline" className="text-xs">
-                  {wssData.employeeCount} emp
+                  {wssData.employeeCount} {t("common.emp", "emp")}
                 </Badge>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
               </div>
@@ -203,7 +212,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5" />
-              Company Safety Rating (CSR)
+              {t("safetyRating.csrTitle", "Company Safety Rating (CSR)")}
             </DialogTitle>
           </DialogHeader>
           
@@ -215,34 +224,34 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                     {Math.round(rating)}%
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Current Rating: {csrData?.csrLabel || "Unknown"}
+                    {t("safetyRating.currentRating", "Current Rating")}: {csrData?.csrLabel || t("common.unknown", "Unknown")}
                   </p>
                 </div>
                 <Badge className={colors.badge}>
-                  {rating >= 90 ? "Excellent" : rating >= 70 ? "Good" : rating >= 50 ? "Warning" : "Critical"}
+                  {getRatingLabel(rating)}
                 </Badge>
               </div>
             </div>
             
             <div className="text-sm bg-muted/50 rounded-md p-3 space-y-2">
-              <p className="font-medium">What is CSR?</p>
+              <p className="font-medium">{t("safetyRating.whatIsCSR", "What is CSR?")}</p>
               <p className="text-muted-foreground text-xs">
-                The Company Safety Rating measures your company's overall safety compliance based on:
+                {t("safetyRating.csrDescription", "The Company Safety Rating measures your company's overall safety compliance based on:")}
               </p>
               <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-                <div className="flex items-center gap-1"><ClipboardCheck className="w-3 h-3" /> Harness inspections</div>
-                <div className="flex items-center gap-1"><FileCheck className="w-3 h-3" /> Toolbox meetings</div>
-                <div className="flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> FLHA compliance</div>
-                <div className="flex items-center gap-1"><Building2 className="w-3 h-3" /> Incident reports</div>
+                <div className="flex items-center gap-1"><ClipboardCheck className="w-3 h-3" /> {t("safetyRating.harnessInspections", "Harness inspections")}</div>
+                <div className="flex items-center gap-1"><FileCheck className="w-3 h-3" /> {t("safetyRating.toolboxMeetings", "Toolbox meetings")}</div>
+                <div className="flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> {t("safetyRating.flhaCompliance", "FLHA compliance")}</div>
+                <div className="flex items-center gap-1"><Building2 className="w-3 h-3" /> {t("safetyRating.incidentReports", "Incident reports")}</div>
               </div>
               <p className="text-muted-foreground text-xs pt-2">
-                This rating affects your company's reputation with property managers and clients.
+                {t("safetyRating.reputationNote", "This rating affects your company's reputation with property managers and clients.")}
               </p>
             </div>
             
             <div>
               <p className="font-medium text-sm flex items-center gap-1 mb-2">
-                <History className="w-4 h-4" /> Rating History
+                <History className="w-4 h-4" /> {t("safetyRating.ratingHistory", "Rating History")}
               </p>
               <ScrollArea className="h-[200px] pr-2">
                 {csrHistoryLoading ? (
@@ -256,14 +265,14 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                     {csrHistory.history.map((entry) => {
                       const change = entry.newScore - entry.previousScore;
                       const isPositive = change >= 0;
-                      let formattedDate = "Unknown date";
+                      let formattedDate = t("common.unknownDate", "Unknown date");
                       try {
                         const date = new Date(entry.changedAt);
                         if (!isNaN(date.getTime())) {
                           formattedDate = format(date, "MMM d, yyyy");
                         }
                       } catch {
-                        formattedDate = "Unknown date";
+                        formattedDate = t("common.unknownDate", "Unknown date");
                       }
                       return (
                         <div 
@@ -294,7 +303,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                 ) : (
                   <div className="text-center py-6 text-muted-foreground">
                     <History className="w-6 h-6 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No rating changes recorded yet</p>
+                    <p className="text-sm">{t("safetyRating.noChanges", "No rating changes recorded yet")}</p>
                   </div>
                 )}
               </ScrollArea>
@@ -309,7 +318,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
-              Workforce Safety Score Details
+              {t("safetyRating.wssTitle", "Workforce Safety Score Details")}
             </DialogTitle>
           </DialogHeader>
           
@@ -321,31 +330,30 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                     {wssScore}% WSS
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Workforce Safety Score
+                    {t("safetyRating.workforceSafetyScore", "Workforce Safety Score")}
                   </p>
                 </div>
-                <Badge variant="outline">{wssData?.employeeCount || 0} employees</Badge>
+                <Badge variant="outline">{wssData?.employeeCount || 0} {t("common.employees", "employees")}</Badge>
               </div>
             </div>
             
             <div className="text-sm bg-muted/50 rounded-md p-3 space-y-2">
-              <p className="font-medium">What is WSS?</p>
+              <p className="font-medium">{t("safetyRating.whatIsWSS", "What is WSS?")}</p>
               <p className="text-muted-foreground text-xs">
-                The Workforce Safety Score is the average of all employee Personal Safety Ratings (PSR). 
-                Each employee's PSR is calculated from 4 components (25% each):
+                {t("safetyRating.wssDescription", "The Workforce Safety Score is the average of all employee Personal Safety Ratings (PSR). Each employee's PSR is calculated from 4 components (25% each):")}
               </p>
               <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-                <div className="flex items-center gap-1"><Award className="w-3 h-3" /> Certifications status</div>
-                <div className="flex items-center gap-1"><FileCheck className="w-3 h-3" /> Safety documents</div>
-                <div className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> Safety quizzes passed</div>
-                <div className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> Work history</div>
+                <div className="flex items-center gap-1"><Award className="w-3 h-3" /> {t("safetyRating.certsStatus", "Certifications status")}</div>
+                <div className="flex items-center gap-1"><FileCheck className="w-3 h-3" /> {t("safetyRating.safetyDocs", "Safety documents")}</div>
+                <div className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {t("safetyRating.quizzesPassed", "Safety quizzes passed")}</div>
+                <div className="flex items-center gap-1"><Briefcase className="w-3 h-3" /> {t("safetyRating.workHistory", "Work history")}</div>
               </div>
               <p className="text-muted-foreground text-xs pt-2 italic">
-                This is an educational metric only and does not affect your CSR.
+                {t("safetyRating.educationalNote", "This is an educational metric only and does not affect your CSR.")}
               </p>
             </div>
             
-            <p className="font-medium text-sm">Employee PSR Breakdown</p>
+            <p className="font-medium text-sm">{t("safetyRating.employeePSR", "Employee PSR Breakdown")}</p>
             
             <ScrollArea className="h-[300px] pr-2">
               {wssDetailsLoading ? (
@@ -378,7 +386,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                           <div className="space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="flex items-center gap-1">
-                                <Award className="w-3 h-3" /> Certs
+                                <Award className="w-3 h-3" /> {t("safetyRating.certs", "Certs")}
                               </span>
                               <span className="font-medium">{emp.components.certifications.score}%</span>
                             </div>
@@ -388,7 +396,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                           <div className="space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="flex items-center gap-1">
-                                <FileCheck className="w-3 h-3" /> Docs
+                                <FileCheck className="w-3 h-3" /> {t("safetyRating.docs", "Docs")}
                               </span>
                               <span className="font-medium">{emp.components.safetyDocs.score}%</span>
                             </div>
@@ -398,7 +406,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                           <div className="space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="flex items-center gap-1">
-                                <BookOpen className="w-3 h-3" /> Quizzes
+                                <BookOpen className="w-3 h-3" /> {t("safetyRating.quizzes", "Quizzes")}
                               </span>
                               <span className="font-medium">{emp.components.quizzes.score}%</span>
                             </div>
@@ -408,7 +416,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                           <div className="space-y-1">
                             <div className="flex items-center justify-between">
                               <span className="flex items-center gap-1">
-                                <Briefcase className="w-3 h-3" /> Work
+                                <Briefcase className="w-3 h-3" /> {t("safetyRating.work", "Work")}
                               </span>
                               <span className="font-medium">{emp.components.workHistory.score}%</span>
                             </div>
@@ -417,11 +425,11 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
                         </div>
                         
                         <div className="flex flex-wrap gap-2 text-xs text-muted-foreground pt-1">
-                          <span>{emp.components.quizzes.passed}/{emp.components.quizzes.total} quizzes</span>
-                          <span>{emp.components.safetyDocs.recentInspections} recent inspections</span>
-                          <span>{emp.components.workHistory.sessions} work sessions</span>
+                          <span>{emp.components.quizzes.passed}/{emp.components.quizzes.total} {t("safetyRating.quizzes", "quizzes")}</span>
+                          <span>{emp.components.safetyDocs.recentInspections} {t("safetyRating.recentInspections", "recent inspections")}</span>
+                          <span>{emp.components.workHistory.sessions} {t("safetyRating.workSessions", "work sessions")}</span>
                           {emp.components.workHistory.incidents > 0 && (
-                            <span className="text-destructive">{emp.components.workHistory.incidents} incidents</span>
+                            <span className="text-destructive">{emp.components.workHistory.incidents} {t("safetyRating.incidents", "incidents")}</span>
                           )}
                         </div>
                       </div>
@@ -431,7 +439,7 @@ export function SafetyRatingCard({ currentUser, branding }: CardProps) {
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>No employee PSR data available</p>
+                  <p>{t("safetyRating.noEmployeePSR", "No employee PSR data available")}</p>
                 </div>
               )}
             </ScrollArea>

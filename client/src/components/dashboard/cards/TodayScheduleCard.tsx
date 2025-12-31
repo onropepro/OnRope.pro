@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar, ChevronRight, MapPin } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 
 interface ScheduleItem {
@@ -16,6 +17,7 @@ interface ScheduleItem {
 }
 
 export function TodayScheduleCard({ onRouteNavigate, branding }: CardProps) {
+  const { t } = useLanguage();
   const accentColor = branding?.primaryColor || "#0B64A3";
 
   const { data: scheduleData, isLoading } = useQuery<{ scheduleItems: ScheduleItem[] }>({
@@ -30,7 +32,7 @@ export function TodayScheduleCard({ onRouteNavigate, branding }: CardProps) {
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Calendar className="w-5 h-5" style={{ color: accentColor }} />
-            Today's Schedule
+            {t("dashboardCards.todaySchedule.title", "Today's Schedule")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0">
@@ -49,17 +51,17 @@ export function TodayScheduleCard({ onRouteNavigate, branding }: CardProps) {
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Calendar className="w-5 h-5" style={{ color: accentColor }} />
-            Today's Schedule
+            {t("dashboardCards.todaySchedule.title", "Today's Schedule")}
           </CardTitle>
           <Badge variant="secondary" className="text-xs" data-testid="badge-schedule-count">
-            {items.length} jobs
+            {items.length} {t("dashboardCards.todaySchedule.jobs", "jobs")}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {items.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-base text-muted-foreground">No jobs scheduled for today</p>
+            <p className="text-base text-muted-foreground">{t("dashboardCards.todaySchedule.noJobs", "No jobs scheduled for today")}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -110,7 +112,7 @@ export function TodayScheduleCard({ onRouteNavigate, branding }: CardProps) {
                 onClick={() => onRouteNavigate("/schedule")}
                 data-testid="button-view-full-schedule"
               >
-                View Full Schedule
+                {t("dashboardCards.todaySchedule.viewFullSchedule", "View Full Schedule")}
                 <ChevronRight className="w-4 h-4" />
               </Button>
             )}

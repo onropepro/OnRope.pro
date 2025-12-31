@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camera, Upload, X, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
 
 interface DocumentUploaderProps {
   documents: string[];
@@ -16,19 +17,23 @@ export function DocumentUploader({
   documents,
   onDocumentsChange,
   maxDocuments = 5,
-  label = "Documents",
-  description = "Upload documents or take photos",
+  label,
+  description,
 }: DocumentUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
+
+  const displayLabel = label || t("common.documents", "Documents");
+  const displayDescription = description || t("documentUploader.uploadOrTakePhotos", "Upload documents or take photos");
 
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     if (documents.length + files.length > maxDocuments) {
       toast({
-        title: "Too many documents",
-        description: `You can only upload up to ${maxDocuments} documents`,
+        title: t("documentUploader.tooManyDocuments", "Too many documents"),
+        description: t("documentUploader.maxDocumentsMessage", `You can only upload up to ${maxDocuments} documents`).replace("{{max}}", String(maxDocuments)),
         variant: "destructive",
       });
       return;
@@ -59,13 +64,13 @@ export function DocumentUploader({
 
       onDocumentsChange([...documents, ...uploadedUrls]);
       toast({
-        title: "Success",
-        description: `${uploadedUrls.length} document(s) uploaded`,
+        title: t("common.success", "Success"),
+        description: t("documentUploader.documentsUploaded", `${uploadedUrls.length} document(s) uploaded`).replace("{{count}}", String(uploadedUrls.length)),
       });
     } catch (error) {
       toast({
-        title: "Upload failed",
-        description: "Failed to upload one or more documents",
+        title: t("documentUploader.uploadFailed", "Upload failed"),
+        description: t("documentUploader.uploadFailedMessage", "Failed to upload one or more documents"),
         variant: "destructive",
       });
     } finally {
@@ -81,13 +86,12 @@ export function DocumentUploader({
   return (
     <div className="space-y-3">
       <div>
-        <label className="text-sm font-medium">{label}</label>
-        {description && (
-          <p className="text-xs text-muted-foreground mt-1">{description}</p>
+        <label className="text-sm font-medium">{displayLabel}</label>
+        {displayDescription && (
+          <p className="text-xs text-muted-foreground mt-1">{displayDescription}</p>
         )}
       </div>
 
-      {/* Document Grid */}
       {documents.length > 0 && (
         <div className="grid grid-cols-2 gap-2">
           {documents.map((url, index) => (
@@ -97,7 +101,7 @@ export function DocumentUploader({
                   {url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                     <img
                       src={url}
-                      alt={`Document ${index + 1}`}
+                      alt={`${t("common.document", "Document")} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -120,7 +124,6 @@ export function DocumentUploader({
         </div>
       )}
 
-      {/* Upload Buttons */}
       {documents.length < maxDocuments && (
         <div className="flex gap-2">
           <Button
@@ -139,7 +142,7 @@ export function DocumentUploader({
             data-testid="button-take-photo"
           >
             <Camera className="w-4 h-4 mr-2" />
-            Take Photo
+            {t("common.takePhoto", "Take Photo")}
           </Button>
 
           <Button
@@ -158,13 +161,13 @@ export function DocumentUploader({
             data-testid="button-upload-document"
           >
             <Upload className="w-4 h-4 mr-2" />
-            {uploading ? "Uploading..." : "Choose Files"}
+            {uploading ? t("common.uploading", "Uploading...") : t("common.chooseFiles", "Choose Files")}
           </Button>
         </div>
       )}
 
       <p className="text-xs text-muted-foreground">
-        {documents.length} / {maxDocuments} documents uploaded
+        {documents.length} / {maxDocuments} {t("common.documentsUploaded", "documents uploaded")}
       </p>
     </div>
   );

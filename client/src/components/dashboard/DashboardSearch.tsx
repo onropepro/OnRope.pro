@@ -5,6 +5,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
 
 function formatResponseText(text: string): JSX.Element[] {
   const elements: JSX.Element[] = [];
@@ -70,6 +71,7 @@ const typeConfig = {
 };
 
 export function DashboardSearch() {
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,8 +102,8 @@ export function DashboardSearch() {
       setResponse(null);
       setIsOpen(false);
       toast({
-        title: 'Search unavailable',
-        description: 'Please try again in a moment.',
+        title: t('search.unavailable', 'Search unavailable'),
+        description: t('search.tryAgain', 'Please try again in a moment.'),
         variant: 'destructive',
       });
     } finally {
@@ -192,7 +194,7 @@ export function DashboardSearch() {
         <Input
           ref={inputRef}
           type="text"
-          placeholder="Ask anything..."
+          placeholder={t('search.placeholder', 'Ask anything...')}
           value={query}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
@@ -271,7 +273,7 @@ export function DashboardSearch() {
 
           {response.suggestions && response.suggestions.length > 0 && (
             <div className="px-4 py-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-              <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5">Try asking</p>
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1.5">{t('search.tryAsking', 'Try asking')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {response.suggestions.slice(0, 3).map((suggestion, i) => (
                   <button

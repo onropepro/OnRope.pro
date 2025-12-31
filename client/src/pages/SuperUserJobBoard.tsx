@@ -90,6 +90,7 @@ const EXPERIENCE_OPTIONS = [
 ];
 
 export default function SuperUserJobBoard() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
@@ -133,10 +134,10 @@ export default function SuperUserJobBoard() {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setIsCreateOpen(false);
       resetForm();
-      toast({ title: "Job posting created successfully" });
+      toast({ title: t("superUserJobBoard.created") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to create job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.createFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -149,10 +150,10 @@ export default function SuperUserJobBoard() {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setEditingJob(null);
       resetForm();
-      toast({ title: "Job posting updated successfully" });
+      toast({ title: t("superUserJobBoard.updated") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to update job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.updateFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -164,10 +165,10 @@ export default function SuperUserJobBoard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setDeleteConfirmId(null);
-      toast({ title: "Job posting deleted successfully" });
+      toast({ title: t("superUserJobBoard.deleted") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to delete job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.deleteFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -195,7 +196,7 @@ export default function SuperUserJobBoard() {
 
   const handleCreate = () => {
     if (!formData.title || !formData.description) {
-      toast({ title: "Please fill in required fields", variant: "destructive" });
+      toast({ title: t("superUserJobBoard.fillRequired"), variant: "destructive" });
       return;
     }
     createMutation.mutate({
@@ -221,7 +222,7 @@ export default function SuperUserJobBoard() {
 
   const handleUpdate = () => {
     if (!editingJob || !formData.title || !formData.description) {
-      toast({ title: "Please fill in required fields", variant: "destructive" });
+      toast({ title: t("superUserJobBoard.fillRequired"), variant: "destructive" });
       return;
     }
     updateMutation.mutate({
@@ -445,7 +446,7 @@ export default function SuperUserJobBoard() {
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g., Senior Rope Access Technician"
+                placeholder={t('jobBoard.placeholders.jobTitle', 'e.g., Senior Rope Access Technician')}
                 data-testid="input-job-title"
               />
             </div>
@@ -456,7 +457,7 @@ export default function SuperUserJobBoard() {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe the role and responsibilities..."
+                placeholder={t('jobBoard.describeRole', 'Describe the role and responsibilities...')}
                 rows={4}
                 data-testid="input-job-description"
               />
@@ -468,7 +469,7 @@ export default function SuperUserJobBoard() {
                 id="requirements"
                 value={formData.requirements}
                 onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-                placeholder="List the qualifications and requirements..."
+                placeholder={t('jobBoard.listRequirements', 'List the qualifications and requirements...')}
                 rows={3}
                 data-testid="input-job-requirements"
               />
@@ -481,7 +482,7 @@ export default function SuperUserJobBoard() {
                   id="location"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder="e.g., Vancouver, BC"
+                  placeholder={t('common.placeholders.location', 'e.g., Vancouver, BC')}
                   data-testid="input-job-location"
                 />
               </div>
@@ -570,7 +571,7 @@ export default function SuperUserJobBoard() {
                 <Label htmlFor="requiredIrataLevel">Required IRATA Level</Label>
                 <Select value={formData.requiredIrataLevel} onValueChange={(v) => setFormData({ ...formData, requiredIrataLevel: v })}>
                   <SelectTrigger data-testid="select-irata-level">
-                    <SelectValue placeholder="Not Required" />
+                    <SelectValue placeholder={t('jobBoard.notRequired', 'Not Required')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CERT_LEVELS.map((t) => (
@@ -583,7 +584,7 @@ export default function SuperUserJobBoard() {
                 <Label htmlFor="requiredSpratLevel">Required SPRAT Level</Label>
                 <Select value={formData.requiredSpratLevel} onValueChange={(v) => setFormData({ ...formData, requiredSpratLevel: v })}>
                   <SelectTrigger data-testid="select-sprat-level">
-                    <SelectValue placeholder="Not Required" />
+                    <SelectValue placeholder={t('jobBoard.notRequired', 'Not Required')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CERT_LEVELS.map((t) => (
@@ -622,7 +623,7 @@ export default function SuperUserJobBoard() {
                 <Label htmlFor="workDays">Work Days</Label>
                 <Select value={formData.workDays} onValueChange={(v) => setFormData({ ...formData, workDays: v })}>
                   <SelectTrigger data-testid="select-work-days">
-                    <SelectValue placeholder="Select schedule" />
+                    <SelectValue placeholder={t('jobBoard.selectSchedule', 'Select schedule')} />
                   </SelectTrigger>
                   <SelectContent>
                     {WORK_DAYS_OPTIONS.map((t) => (
@@ -635,7 +636,7 @@ export default function SuperUserJobBoard() {
                 <Label htmlFor="experienceRequired">Experience Required</Label>
                 <Select value={formData.experienceRequired} onValueChange={(v) => setFormData({ ...formData, experienceRequired: v })}>
                   <SelectTrigger data-testid="select-experience">
-                    <SelectValue placeholder="Select experience level" />
+                    <SelectValue placeholder={t('jobBoard.selectExperience', 'Select experience level')} />
                   </SelectTrigger>
                   <SelectContent>
                     {EXPERIENCE_OPTIONS.map((t) => (
@@ -652,7 +653,7 @@ export default function SuperUserJobBoard() {
                 id="benefits"
                 value={formData.benefits}
                 onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
-                placeholder="Health insurance, dental, vision, 401k, PTO, etc."
+                placeholder={t('jobBoard.benefitsPlaceholder', 'Health insurance, dental, vision, 401k, PTO, etc.')}
                 rows={3}
                 data-testid="textarea-benefits"
               />
@@ -665,14 +666,14 @@ export default function SuperUserJobBoard() {
               setEditingJob(null);
               resetForm();
             }}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={editingJob ? handleUpdate : handleCreate}
               disabled={createMutation.isPending || updateMutation.isPending}
               data-testid="button-submit-job"
             >
-              {createMutation.isPending || updateMutation.isPending ? "Saving..." : editingJob ? "Update" : "Create"}
+              {createMutation.isPending || updateMutation.isPending ? t('common.saving', 'Saving...') : editingJob ? t('common.update', 'Update') : t('common.create', 'Create')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -682,20 +683,20 @@ export default function SuperUserJobBoard() {
       <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Job Posting?</DialogTitle>
+            <DialogTitle>{t('superUserJobBoard.deleteJobPosting', 'Delete Job Posting?')}</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. The job posting will be permanently removed.
+              {t('superUserJobBoard.deleteConfirmMessage', 'This action cannot be undone. The job posting will be permanently removed.')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>{t('common.cancel', 'Cancel')}</Button>
             <Button
               variant="destructive"
               onClick={() => deleteConfirmId && deleteMutation.mutate(deleteConfirmId)}
               disabled={deleteMutation.isPending}
               data-testid="button-confirm-delete"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

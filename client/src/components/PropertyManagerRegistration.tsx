@@ -97,14 +97,14 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     onSuccess: () => {
       setStep("success");
       toast({
-        title: "Registration Complete!",
-        description: "Your property manager account has been created successfully.",
+        title: t('pmReg.toast.registrationComplete', 'Registration Complete!'),
+        description: t('pmReg.toast.accountCreated', 'Your property manager account has been created successfully.'),
       });
     },
     onError: (error: Error) => {
       setError(error.message);
       toast({
-        title: "Registration Failed",
+        title: t('pmReg.toast.registrationFailed', 'Registration Failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -113,27 +113,27 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
 
   const validateAccountDetails = (): boolean => {
     if (!data.firstName.trim()) {
-      setError("First name is required");
+      setError(t('validation.firstNameRequired', 'First name is required'));
       return false;
     }
     if (!data.lastName.trim()) {
-      setError("Last name is required");
+      setError(t('validation.lastNameRequired', 'Last name is required'));
       return false;
     }
     if (!data.propertyManagementCompany.trim()) {
-      setError("Property management company is required");
+      setError(t('pmReg.validation.companyRequired', 'Property management company is required'));
       return false;
     }
     if (!data.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      setError("Valid email is required");
+      setError(t('validation.validEmailRequired', 'Valid email is required'));
       return false;
     }
     if (!data.password || data.password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(t('validation.passwordMin6', 'Password must be at least 6 characters'));
       return false;
     }
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('validation.passwordsNoMatch', 'Passwords do not match'));
       return false;
     }
     return true;
@@ -339,7 +339,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                           id="firstName"
                           value={data.firstName}
                           onChange={(e) => setData({ ...data, firstName: e.target.value })}
-                          placeholder="John"
+                          placeholder={t('common.placeholders.firstName', 'John')}
                           data-testid="input-first-name"
                         />
                       </div>
@@ -349,7 +349,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                           id="lastName"
                           value={data.lastName}
                           onChange={(e) => setData({ ...data, lastName: e.target.value })}
-                          placeholder="Smith"
+                          placeholder={t('common.placeholders.lastName', 'Smith')}
                           data-testid="input-last-name"
                         />
                       </div>
@@ -361,7 +361,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                         id="propertyManagementCompany"
                         value={data.propertyManagementCompany}
                         onChange={(e) => setData({ ...data, propertyManagementCompany: e.target.value })}
-                        placeholder="ABC Property Management"
+                        placeholder={t('common.placeholders.company', 'ABC Property Management')}
                         data-testid="input-company"
                       />
                     </div>
@@ -373,7 +373,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                         type="email"
                         value={data.email}
                         onChange={(e) => setData({ ...data, email: e.target.value })}
-                        placeholder="you@company.com"
+                        placeholder={t('common.placeholders.companyEmail', 'you@company.com')}
                         data-testid="input-email"
                       />
                     </div>
@@ -399,7 +399,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                           type={showPassword ? "text" : "password"}
                           value={data.password}
                           onChange={(e) => setData({ ...data, password: e.target.value })}
-                          placeholder="Minimum 6 characters"
+                          placeholder={t('common.placeholders.minSixChars', 'Minimum 6 characters')}
                           className="pr-10"
                           data-testid="input-password"
                         />
@@ -422,7 +422,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                           type={showConfirmPassword ? "text" : "password"}
                           value={data.confirmPassword}
                           onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
-                          placeholder="Re-enter password"
+                          placeholder={t('common.placeholders.reenterPassword', 'Re-enter password')}
                           className="pr-10"
                           data-testid="input-confirm-password"
                         />

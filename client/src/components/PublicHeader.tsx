@@ -304,95 +304,80 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               </Button>
               {showModulesMenu && (
                 <div 
-                  className="absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50 pointer-events-none"
+                  className="fixed top-[100px] left-0 right-0 z-50 pointer-events-none"
                 >
                   <div 
-                    className="bg-card border border-border rounded-xl shadow-xl p-5 w-[1100px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-120px)] overflow-y-auto pointer-events-auto"
+                    className="bg-card border-y border-border shadow-lg py-4 w-full max-h-[calc(100vh-120px)] overflow-y-auto pointer-events-auto"
                     onMouseEnter={() => setShowModulesMenu(true)}
                     onMouseLeave={() => setShowModulesMenu(false)}
                   >
-                  <div className="flex gap-4">
+                  <div className="max-w-6xl mx-auto px-6"><div className="flex gap-6">
                     {/* Column 1: Operations (5 items) */}
-                    <div className="flex-1 flex flex-col gap-1">
-                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-operations">
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-operations">
                         <Settings className="w-4 h-4 text-blue-600" />
                         <span className="font-semibold text-sm text-foreground">Operations</span>
                       </div>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/project-management");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-project-management"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Briefcase className="w-4 h-4 text-emerald-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.projectManagement.title', 'Project Management')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">4-elevation tracking, dashboards</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/work-session-time-tracking");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-work-session-time-tracking"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Clock className="w-4 h-4 text-amber-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.workSession.title', 'Work Session & Time Tracking')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">GPS clock-in, drop tracking</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/scheduling-calendar");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-scheduling-calendar"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Calendar className="w-4 h-4 text-indigo-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.scheduling.title', 'Scheduling & Calendar')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Conflict detection, time-off</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/gear-inventory");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-gear-inventory"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-teal-100 dark:bg-teal-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Package className="w-4 h-4 text-teal-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.gearInventory.title', 'Gear Inventory Management')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Equipment tracking, service life</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/white-label-branding");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-white-label-branding"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Palette className="w-4 h-4 text-purple-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.whiteLabel.title', 'White-Label Branding')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Custom logo, colors, brand</div>
@@ -401,70 +386,58 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                     </div>
 
                     {/* Column 2: Safety (4 items) */}
-                    <div className="flex-1 flex flex-col gap-1">
-                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-safety">
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-safety">
                         <HeartPulse className="w-4 h-4 text-red-600" />
                         <span className="font-semibold text-sm text-foreground">Safety</span>
                       </div>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/safety-compliance");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-safety-compliance"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-sky-100 dark:bg-sky-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Shield className="w-4 h-4 text-sky-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.safetyCompliance.title', 'Safety & Compliance')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Inspections, toolbox meetings</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/company-safety-rating");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-company-safety-rating"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-orange-100 dark:bg-orange-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Gauge className="w-4 h-4 text-orange-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.csr.title', 'Company Safety Rating')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Compliance scoring, safety posture</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/irata-sprat-task-logging");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-irata-task-logging"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <ClipboardCheck className="w-4 h-4 text-cyan-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.irataLogging.title', 'IRATA/SPRAT Task Logging')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Task logging, OCR import</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/document-management");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-document-management"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-violet-100 dark:bg-violet-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <FileText className="w-4 h-4 text-violet-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.documentManagement.title', 'Document Management')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Digital signatures, audit trails</div>
@@ -473,70 +446,58 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                     </div>
 
                     {/* Column 3: Team (4 items) */}
-                    <div className="flex-1 flex flex-col gap-1">
-                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-team">
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-team">
                         <Users className="w-4 h-4 text-violet-600" />
                         <span className="font-semibold text-sm text-foreground">Team</span>
                       </div>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/employee-management");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-employee-management"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Users className="w-4 h-4 text-blue-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.employeeManagement.title', 'Employee Management')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Certifications, permissions</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/technician-passport");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-technician-passport"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <IdCard className="w-4 h-4 text-amber-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.technicianPassport.title', 'Technician Passport')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Portable work history, records</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/employer-job-board");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-employer-job-board"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Search className="w-4 h-4 text-blue-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.employerJobBoard.title', 'Job Board Ecosystem')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Talent browser, job postings</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/user-access-authentication");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-user-access"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Lock className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.userAccess.title', 'User Access & Authentication')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Permissions, role-based access</div>
@@ -545,54 +506,45 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                     </div>
 
                     {/* Column 4: Financial & Sales (3 items) */}
-                    <div className="flex-1 flex flex-col gap-1">
-                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-financial-sales">
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-financial-sales">
                         <Wallet className="w-4 h-4 text-emerald-600" />
                         <span className="font-semibold text-sm text-foreground">Financial & Sales</span>
                       </div>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/payroll-financial");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-payroll-financial"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <DollarSign className="w-4 h-4 text-emerald-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.payroll.title', 'Payroll & Financial')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Timesheets, overtime, exports</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/quoting-sales-pipeline");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-quoting-sales-pipeline"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Calculator className="w-4 h-4 text-rose-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.quoting.title', 'Quoting & Sales Pipeline')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Service quotes, visual pipeline</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/client-relationship-management");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-client-relationship-management"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Users className="w-4 h-4 text-cyan-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">Client Relationship Management</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Client portfolios, building specs</div>
@@ -601,44 +553,39 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                     </div>
 
                     {/* Column 5: Communication (2 items) */}
-                    <div className="flex-1 flex flex-col gap-1">
-                      <div className="flex items-center gap-2 px-3 py-2 mb-1" data-testid="menu-category-communication">
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-communication">
                         <MessageSquare className="w-4 h-4 text-rose-600" />
                         <span className="font-semibold text-sm text-foreground">Communication</span>
                       </div>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/resident-portal");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-resident-portal"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <MessageSquare className="w-4 h-4 text-rose-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">{t('navigation.modules.residentPortal.title', 'Resident Portal')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">Real-time feedback, photos</div>
                         </div>
                       </button>
                       <button
-                        className="flex items-start gap-3 p-2.5 rounded-lg hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/property-manager-interface");
                           setShowModulesMenu(false);
                         }}
                         data-testid="nav-property-manager-interface"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                          <Globe className="w-4 h-4 text-emerald-600" />
-                        </div>
                         <div>
                           <div className="font-medium text-sm">Property Manager Interface</div>
                           <div className="text-xs text-muted-foreground mt-0.5">CSR visibility, due diligence</div>
                         </div>
                       </button>
                     </div>
+                  </div>
                   </div>
                   </div>
                 </div>

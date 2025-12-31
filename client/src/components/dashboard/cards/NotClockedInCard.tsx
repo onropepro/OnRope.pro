@@ -2,6 +2,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserX, ChevronRight, Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 
 interface NotClockedInData {
@@ -14,6 +15,7 @@ interface NotClockedInData {
 }
 
 export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
+  const { t } = useLanguage();
   const accentColor = branding?.primaryColor || "#0B64A3";
 
   const { data, isLoading } = useQuery<NotClockedInData>({
@@ -26,7 +28,7 @@ export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <UserX className="w-5 h-5" style={{ color: accentColor }} />
-            Not Clocked In
+            {t("dashboardCards.notClockedIn.title", "Not Clocked In")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0">
@@ -43,7 +45,7 @@ export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <UserX className="w-5 h-5" style={{ color: accentColor }} />
-          Not Clocked In
+          {t("dashboardCards.notClockedIn.title", "Not Clocked In")}
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
@@ -53,7 +55,7 @@ export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
               <p className="text-2xl font-bold text-amber-600" data-testid="text-not-clocked-count">
                 {data!.count}
               </p>
-              <p className="text-sm text-muted-foreground">Scheduled but not started</p>
+              <p className="text-sm text-muted-foreground">{t("dashboardCards.notClockedIn.scheduled", "Scheduled but not started")}</p>
             </div>
             <div className="space-y-2">
               {data!.employees.slice(0, 3).map((emp) => (
@@ -68,7 +70,7 @@ export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
               ))}
               {data!.count > 3 && (
                 <p className="text-xs text-muted-foreground text-center">
-                  +{data!.count - 3} more
+                  +{data!.count - 3} {t("common.more", "more")}
                 </p>
               )}
             </div>
@@ -79,15 +81,15 @@ export function NotClockedInCard({ onRouteNavigate, branding }: CardProps) {
               onClick={() => onRouteNavigate("/timesheets")}
               data-testid="button-view-not-clocked"
             >
-              View All
+              {t("common.viewAll", "View All")}
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-center">
             <Users className="w-10 h-10 text-muted-foreground/50 mb-2" />
-            <p className="text-base text-muted-foreground">All scheduled employees clocked in</p>
-            <p className="text-sm text-muted-foreground/70">No missing check-ins</p>
+            <p className="text-base text-muted-foreground">{t("dashboardCards.notClockedIn.allClockedIn", "All scheduled employees clocked in")}</p>
+            <p className="text-sm text-muted-foreground/70">{t("dashboardCards.notClockedIn.noMissing", "No missing check-ins")}</p>
           </div>
         )}
       </CardContent>

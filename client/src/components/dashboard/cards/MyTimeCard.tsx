@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Play, Square, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 
 interface MyTimeData {
@@ -13,6 +14,7 @@ interface MyTimeData {
 }
 
 export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps) {
+  const { t } = useLanguage();
   const accentColor = branding?.primaryColor || "#0B64A3";
 
   const { data: timeData, isLoading } = useQuery<MyTimeData>({
@@ -35,7 +37,7 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Clock className="w-5 h-5" style={{ color: accentColor }} />
-            My Time Today
+            {t("dashboardCards.myTime.title", "My Time Today")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0">
@@ -53,7 +55,7 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Clock className="w-5 h-5" style={{ color: accentColor }} />
-            My Time Today
+            {t("dashboardCards.myTime.title", "My Time Today")}
           </CardTitle>
           <Badge 
             variant="secondary"
@@ -66,12 +68,12 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
             {isClockedIn ? (
               <>
                 <Play className="w-3 h-3 mr-1 fill-current" />
-                Clocked In
+                {t("common.clockedIn", "Clocked In")}
               </>
             ) : (
               <>
                 <Square className="w-3 h-3 mr-1" />
-                Off Duty
+                {t("common.offDuty", "Off Duty")}
               </>
             )}
           </Badge>
@@ -86,13 +88,13 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
               </p>
               {timeData.projectName && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  Working on: {timeData.projectName}
+                  {t("dashboardCards.myTime.workingOn", "Working on")}: {timeData.projectName}
                 </p>
               )}
             </div>
           )}
           <div className="flex items-center justify-between">
-            <span className="text-base text-muted-foreground">Hours today:</span>
+            <span className="text-base text-muted-foreground">{t("dashboardCards.myTime.hoursToday", "Hours today")}:</span>
             <span className="text-base font-medium" data-testid="text-hours-today">
               {(timeData?.hoursToday || 0).toFixed(1)}h
             </span>
@@ -106,7 +108,7 @@ export function MyTimeCard({ currentUser, onRouteNavigate, branding }: CardProps
           onClick={() => onRouteNavigate("/time-tracking")}
           data-testid="button-view-my-timesheet"
         >
-          View My Timesheet
+          {t("dashboardCards.myTime.viewTimesheet", "View My Timesheet")}
           <ChevronRight className="w-4 h-4" />
         </Button>
       </CardContent>

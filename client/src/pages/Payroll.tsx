@@ -1237,7 +1237,7 @@ export default function Payroll() {
                       type="text"
                       value={shortfallReason}
                       onChange={(e) => setShortfallReason(e.target.value)}
-                      placeholder="e.g., Weather delay, Equipment issue"
+                      placeholder={t('payroll.placeholders.shortfallReason', 'e.g., Weather delay, Equipment issue')}
                       data-testid="input-shortfall-reason"
                     />
                   </div>

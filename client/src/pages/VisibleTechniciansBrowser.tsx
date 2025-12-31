@@ -34,7 +34,8 @@ import {
   User,
   Briefcase,
   Send,
-  HardHat
+  HardHat,
+  DollarSign
 } from "lucide-react";
 import { format, differenceInYears } from "date-fns";
 import type { User as UserType } from "@shared/schema";
@@ -95,6 +96,12 @@ const translations = {
     noActiveJobsDesc: "You need to create a job posting first.",
     createJob: "Create Job",
     cancel: "Cancel",
+    expectedSalary: "Expected Salary",
+    perHour: "/hour",
+    perDay: "/day",
+    perWeek: "/week",
+    perMonth: "/month",
+    perYear: "/year",
   },
   fr: {
     title: "Navigateur de talents",
@@ -148,6 +155,12 @@ const translations = {
     noActiveJobsDesc: "Vous devez d'abord creer une offre d'emploi.",
     createJob: "Creer un emploi",
     cancel: "Annuler",
+    expectedSalary: "Salaire attendu",
+    perHour: "/heure",
+    perDay: "/jour",
+    perWeek: "/semaine",
+    perMonth: "/mois",
+    perYear: "/an",
   }
 };
 
@@ -172,11 +185,14 @@ interface VisibleTechnician {
   spratLicenseNumber: string | null;
   spratExpirationDate: Date | string | null;
   ropeAccessStartDate: Date | string | null;
-  resumeDocuments: any[] | null;
+  resumeDocuments: string[] | null;
   employeeCity: string | null;
   employeeProvinceState: string | null;
   employeeCountry: string | null;
   visibilityEnabledAt: Date | string | null;
+  expectedSalaryMin: string | null;
+  expectedSalaryMax: string | null;
+  expectedSalaryPeriod: string | null;
   safetyRating?: number;
   safetyLabel?: string;
   safetyColor?: string;
@@ -186,6 +202,7 @@ interface VisibleTechnician {
     hasValidCertification: boolean;
     yearsExperience: number;
     hasResume: boolean;
+  };
   certifications?: Array<{
     id: string;
     description: string | null;
@@ -193,7 +210,6 @@ interface VisibleTechnician {
     expiryDate: string | null;
     createdAt: string;
   }>;
-  };
 }
 
 export default function VisibleTechniciansBrowser() {
@@ -600,6 +616,30 @@ export default function VisibleTechniciansBrowser() {
                   </div>
                 )}
 
+                {/* Expected Salary */}
+                {(selectedTech.expectedSalaryMin || selectedTech.expectedSalaryMax) && (
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <DollarSign className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t.expectedSalary}</p>
+                      <p className="font-medium">
+                        {selectedTech.expectedSalaryMin && selectedTech.expectedSalaryMax ? (
+                          `$${Number(selectedTech.expectedSalaryMin).toLocaleString()} - $${Number(selectedTech.expectedSalaryMax).toLocaleString()}`
+                        ) : selectedTech.expectedSalaryMin ? (
+                          `$${Number(selectedTech.expectedSalaryMin).toLocaleString()}+`
+                        ) : (
+                          `Up to $${Number(selectedTech.expectedSalaryMax).toLocaleString()}`
+                        )}
+                        {selectedTech.expectedSalaryPeriod === 'hourly' && t.perHour}
+                        {selectedTech.expectedSalaryPeriod === 'daily' && t.perDay}
+                        {selectedTech.expectedSalaryPeriod === 'weekly' && t.perWeek}
+                        {selectedTech.expectedSalaryPeriod === 'monthly' && t.perMonth}
+                        {selectedTech.expectedSalaryPeriod === 'annually' && t.perYear}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Certifications */}
                 <div className="space-y-3">
                   <h4 className="font-semibold flex items-center gap-2">
@@ -690,24 +730,24 @@ export default function VisibleTechniciansBrowser() {
                 </div>
 
                 {/* Resume/CV */}
-                {selectedTech.resumeDocuments && selectedTech.resumeDocuments.length > 0 && (
+                {selectedTech.resumeDocuments && selectedTech.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                   <div className="space-y-3">
                     <h4 className="font-semibold flex items-center gap-2">
                       <FileText className="w-4 h-4" />
                       {t.resumeCV}
                     </h4>
                     <div className="space-y-2">
-                      {selectedTech.resumeDocuments.map((doc: any, index: number) => (
+                      {selectedTech.resumeDocuments.filter((u: string) => u && u.trim()).map((docUrl: string, index: number) => (
                         <a
                           key={index}
-                          href={doc.url}
+                          href={docUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 p-2 rounded-lg border hover-elevate"
                           data-testid={`link-resume-${index}`}
                         >
                           <FileText className="w-4 h-4 text-muted-foreground" />
-                          <span className="flex-1 truncate text-sm">{doc.name || `${t.resume} ${index + 1}`}</span>
+                          <span className="flex-1 truncate text-sm">{`${t.resume} ${index + 1}`}</span>
                           <Download className="w-4 h-4 text-muted-foreground" />
                         </a>
                       ))}

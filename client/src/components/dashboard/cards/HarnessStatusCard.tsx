@@ -3,9 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, ChevronRight, CheckCircle } from "lucide-react";
 import { canViewSafetyDocuments } from "@/lib/permissions";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 
 export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavigate, branding }: CardProps) {
+  const { t } = useLanguage();
   const hasAccess = canViewSafetyDocuments(currentUser) || currentUser?.role === "company";
   const accentColor = branding?.primaryColor || "#0B64A3";
 
@@ -15,11 +17,11 @@ export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavi
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldAlert className="w-5 h-5" style={{ color: accentColor }} />
-            Harness Status
+            {t("dashboardCards.harnessStatus.title", "Harness Status")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
-          <p className="text-base text-muted-foreground">No access</p>
+          <p className="text-base text-muted-foreground">{t("common.noAccess", "No access")}</p>
         </CardContent>
       </div>
     );
@@ -52,11 +54,11 @@ export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavi
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ShieldAlert className="w-5 h-5" style={{ color: accentColor }} />
-            Harness Status
+            {t("dashboardCards.harnessStatus.title", "Harness Status")}
           </CardTitle>
           {totalAlerts > 0 && (
             <Badge variant="destructive" className="text-xs" data-testid="badge-harness-alert-count">
-              {totalAlerts} need attention
+              {totalAlerts} {t("common.needAttention", "need attention")}
             </Badge>
           )}
         </div>
@@ -65,32 +67,32 @@ export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavi
         {totalAlerts === 0 && dueSoon.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center">
             <CheckCircle className="w-8 h-8 mx-auto text-green-500 mb-2" />
-            <p className="text-base text-muted-foreground">All harnesses inspected</p>
+            <p className="text-base text-muted-foreground">{t("dashboardCards.harnessStatus.allInspected", "All harnesses inspected")}</p>
           </div>
         ) : (
           <div className="space-y-3">
             {overdue.length > 0 && (
               <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-lg">
                 <p className="text-base font-medium text-red-700 dark:text-red-400">
-                  {overdue.length} Overdue
+                  {overdue.length} {t("common.overdueLabel", "Overdue")}
                 </p>
-                <p className="text-sm text-muted-foreground">Past inspection date</p>
+                <p className="text-sm text-muted-foreground">{t("dashboardCards.harnessStatus.pastInspection", "Past inspection date")}</p>
               </div>
             )}
             {dueToday.length > 0 && (
               <div className="bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg">
                 <p className="text-base font-medium text-amber-700 dark:text-amber-400">
-                  {dueToday.length} Due Today
+                  {dueToday.length} {t("common.dueToday", "Due Today")}
                 </p>
-                <p className="text-sm text-muted-foreground">Inspection required</p>
+                <p className="text-sm text-muted-foreground">{t("common.inspectionRequired", "Inspection required")}</p>
               </div>
             )}
             {dueSoon.length > 0 && (
               <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg">
                 <p className="text-base font-medium text-blue-700 dark:text-blue-400">
-                  {dueSoon.length} Due This Week
+                  {dueSoon.length} {t("common.dueThisWeek", "Due This Week")}
                 </p>
-                <p className="text-sm text-muted-foreground">Schedule inspection</p>
+                <p className="text-sm text-muted-foreground">{t("common.scheduleInspection", "Schedule inspection")}</p>
               </div>
             )}
             <Button
@@ -100,7 +102,7 @@ export function HarnessStatusCard({ currentUser, harnessInspections, onRouteNavi
               onClick={() => onRouteNavigate("/inventory")}
               data-testid="button-view-harness-inspections"
             >
-              View Inspections
+              {t("dashboardCards.harnessStatus.viewInspections", "View Inspections")}
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>

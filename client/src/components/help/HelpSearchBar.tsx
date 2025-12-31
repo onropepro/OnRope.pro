@@ -4,6 +4,7 @@ import { Search, Loader2, MessageCircle, Send, ArrowRight, FileText, X } from 'l
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/use-language';
 
 interface SearchResult {
   id: number;
@@ -43,11 +44,13 @@ function isQuestion(text: string): boolean {
 }
 
 export default function HelpSearchBar({ 
-  placeholder = 'Ask a question or search for help with projects, safety, scheduling...', 
+  placeholder, 
   size = 'default',
   autoFocus = false,
   stakeholderColor,
 }: HelpSearchBarProps) {
+  const { t } = useLanguage();
+  const defaultPlaceholder = t('helpCenter.search.placeholder', 'Ask a question or search for help with projects, safety, scheduling...');
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -134,7 +137,7 @@ export default function HelpSearchBar({
         setChatMessages([{
           id: 'greeting',
           role: 'assistant',
-          content: "I'm here to help! Let me find an answer for you...",
+          content: t('helpCenter.chat.greeting', "I'm here to help! Let me find an answer for you..."),
         }]);
       }
 
@@ -179,7 +182,7 @@ export default function HelpSearchBar({
         setChatMessages(prev => [...prev, {
           id: Date.now().toString() + '-error',
           role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again.',
+          content: t('helpCenter.chat.error', 'Sorry, I encountered an error. Please try again.'),
         }]);
       } finally {
         setIsChatLoading(false);
@@ -257,7 +260,7 @@ export default function HelpSearchBar({
                 setShowResults(true);
               }
             }}
-            placeholder={chatMode ? "Ask a follow-up question..." : placeholder}
+            placeholder={chatMode ? t('helpCenter.chat.followUp', 'Ask a follow-up question...') : (placeholder || defaultPlaceholder)}
             className={cn(
               'flex-1 text-foreground bg-background focus-visible:ring-0 focus-visible:ring-offset-0',
               inputBaseClasses,
@@ -275,7 +278,7 @@ export default function HelpSearchBar({
                   ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" 
                   : "bg-muted text-muted-foreground"
               )}>
-                {inputModeHint === 'chat' ? 'AI Chat' : 'Search'}
+                {inputModeHint === 'chat' ? t('helpCenter.chat.aiChat', 'AI Chat') : t('helpCenter.search.label', 'Search')}
               </span>
             )}
             
@@ -304,7 +307,7 @@ export default function HelpSearchBar({
               ) : chatMode ? (
                 <Send className="h-4 w-4" />
               ) : (
-                isQuestion(query) ? 'Ask' : 'Search'
+                isQuestion(query) ? t('helpCenter.chat.ask', 'Ask') : t('helpCenter.search.label', 'Search')
               )}
             </Button>
           </div>
@@ -315,7 +318,7 @@ export default function HelpSearchBar({
         <div className="absolute top-full left-0 right-0 mt-2 bg-background rounded-xl shadow-xl border z-50 max-h-80 overflow-y-auto">
           <div className="p-2">
             <p className="text-xs text-muted-foreground px-3 py-2">
-              {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found
+              {t('helpCenter.search.resultsFound', '{{count}} results found', { count: searchResults.length })}
             </p>
             {searchResults.map((result) => (
               <button
@@ -343,7 +346,7 @@ export default function HelpSearchBar({
               className="text-sm text-blue-600 flex items-center gap-1"
               data-testid="button-view-all-results"
             >
-              View all results
+              {t('helpCenter.search.viewAll', 'View all results')}
               <ArrowRight className="h-3 w-3" />
             </button>
           </div>
@@ -378,7 +381,7 @@ export default function HelpSearchBar({
                   
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/30">
-                      <p className="text-xs text-muted-foreground mb-2">Related articles:</p>
+                      <p className="text-xs text-muted-foreground mb-2">{t('helpCenter.chat.relatedArticles', 'Related articles:')}</p>
                       <div className="space-y-1">
                         {message.sources.map(source => (
                           <button
@@ -411,7 +414,7 @@ export default function HelpSearchBar({
           
           <div className="border-t px-4 py-3 flex items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">
-              AI-powered assistant
+              {t('helpCenter.chat.aiPowered', 'AI-powered assistant')}
             </p>
             <Button
               variant="ghost"
@@ -420,7 +423,7 @@ export default function HelpSearchBar({
               className="text-xs"
               data-testid="button-close-chat"
             >
-              Close chat
+              {t('helpCenter.chat.close', 'Close chat')}
             </Button>
           </div>
         </div>

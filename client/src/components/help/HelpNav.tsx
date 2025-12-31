@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/use-language';
 
 interface HelpNavProps {
   currentSection?: 'home' | 'owner' | 'technician' | 'building-manager' | 'property-manager' | 'module' | 'getting-started' | 'search';
@@ -18,46 +19,49 @@ interface HelpNavProps {
   backLabel?: string;
 }
 
-const navItems = [
-  { 
-    id: 'home', 
-    label: 'Help Home', 
-    href: '/help', 
-    icon: Home 
-  },
-  { 
-    id: 'owner', 
-    label: 'Company Owners', 
-    href: '/help/for-company-owners', 
-    icon: Building2 
-  },
-  { 
-    id: 'technician', 
-    label: 'Technicians', 
-    href: '/help/for-technicians', 
-    icon: HardHat 
-  },
-  { 
-    id: 'building-manager', 
-    label: 'Building Managers', 
-    href: '/help/for-building-managers', 
-    icon: Building2 
-  },
-  { 
-    id: 'property-manager', 
-    label: 'Property Managers', 
-    href: '/help/for-property-managers', 
-    icon: Users 
-  },
-];
-
 export default function HelpNav({ 
   currentSection = 'home', 
   showBackButton = false,
   backHref = '/help',
-  backLabel = 'Back to Help',
+  backLabel,
 }: HelpNavProps) {
   const [location] = useLocation();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { 
+      id: 'home', 
+      label: t('helpNav.helpHome', 'Help Home'), 
+      href: '/help', 
+      icon: Home 
+    },
+    { 
+      id: 'owner', 
+      label: t('helpNav.companyOwners', 'Company Owners'), 
+      href: '/help/for-company-owners', 
+      icon: Building2 
+    },
+    { 
+      id: 'technician', 
+      label: t('helpNav.technicians', 'Technicians'), 
+      href: '/help/for-technicians', 
+      icon: HardHat 
+    },
+    { 
+      id: 'building-manager', 
+      label: t('helpNav.buildingManagers', 'Building Managers'), 
+      href: '/help/for-building-managers', 
+      icon: Building2 
+    },
+    { 
+      id: 'property-manager', 
+      label: t('helpNav.propertyManagers', 'Property Managers'), 
+      href: '/help/for-property-managers', 
+      icon: Users 
+    },
+  ];
+
+  const defaultBackLabel = t('helpNav.backToHelp', 'Back to Help');
 
   return (
     <nav 
@@ -77,7 +81,7 @@ export default function HelpNav({
                   data-testid="button-help-back"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  {backLabel}
+                  {backLabel || defaultBackLabel}
                 </Button>
               </Link>
             )}
@@ -116,7 +120,7 @@ export default function HelpNav({
                 data-testid="nav-help-getting-started"
               >
                 <Book className="h-4 w-4" />
-                <span className="hidden sm:inline">Getting Started</span>
+                <span className="hidden sm:inline">{t('helpNav.gettingStarted', 'Getting Started')}</span>
               </Button>
             </Link>
             <Link href="/help/search">
@@ -127,7 +131,7 @@ export default function HelpNav({
                 data-testid="nav-help-search"
               >
                 <Search className="h-4 w-4" />
-                <span className="hidden sm:inline">Search</span>
+                <span className="hidden sm:inline">{t('helpNav.search', 'Search')}</span>
               </Button>
             </Link>
           </div>

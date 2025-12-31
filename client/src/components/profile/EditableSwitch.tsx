@@ -3,6 +3,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface EditableSwitchProps<T extends FieldValues> {
   isEditing: boolean;
@@ -28,11 +29,14 @@ export function EditableSwitch<T extends FieldValues>({
   icon,
   helpText,
   disabled,
-  enabledText = "Enabled",
-  disabledText = "Disabled",
+  enabledText,
+  disabledText,
   testId,
   className = "",
 }: EditableSwitchProps<T>) {
+  const { t } = useTranslation();
+  const defaultEnabledText = enabledText ?? t('profile.enabled', 'Enabled');
+  const defaultDisabledText = disabledText ?? t('profile.disabled', 'Disabled');
   const baseTestId = testId || `field-${String(name)}`;
 
   if (isEditing && control) {
@@ -75,7 +79,7 @@ export function EditableSwitch<T extends FieldValues>({
         <span className="text-sm">{label}</span>
       </div>
       <Badge variant={isEnabled ? "default" : "secondary"}>
-        {isEnabled ? enabledText : disabledText}
+        {isEnabled ? defaultEnabledText : defaultDisabledText}
       </Badge>
     </div>
   );

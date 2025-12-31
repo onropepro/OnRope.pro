@@ -192,6 +192,46 @@ const PRE_POPULATED_EQUIPMENT = [
   { equipmentType: "Work positioning device", brand: "Petzl", model: "PROGRESS ADJUST" },
   { equipmentType: "Work positioning device", brand: "Singing Rock", model: "Reactor" },
   { equipmentType: "Work positioning device", brand: "Skylotec", model: "SKN LT" },
+  
+  // High pressure hoses
+  { equipmentType: "High pressure hose", brand: "Generic", model: "Standard" },
+  
+  // Air hoses
+  { equipmentType: "Air hose", brand: "Generic", model: "Standard" },
+  
+  // Caution signs
+  { equipmentType: "Caution signs", brand: "Generic", model: "Standard" },
+  
+  // Cones
+  { equipmentType: "Cones", brand: "Generic", model: "Standard" },
+  
+  // Street signs
+  { equipmentType: "Street signs", brand: "Generic", model: "Standard" },
+  
+  // Delineators
+  { equipmentType: "Delineator", brand: "Generic", model: "Standard" },
+  
+  // Pressure hose gaskets
+  { equipmentType: "Pressure hose gasket", brand: "Generic", model: "Standard" },
+  
+  // Pressure washer wands
+  { equipmentType: "Pressure washer wand", brand: "Generic", model: "Standard" },
+  
+  // Pulleys
+  { equipmentType: "Pulley", brand: "CMC", model: "Rescue Pulley" },
+  { equipmentType: "Pulley", brand: "Petzl", model: "RESCUE" },
+  { equipmentType: "Pulley", brand: "Petzl", model: "PRO" },
+  { equipmentType: "Pulley", brand: "Petzl", model: "MICRO TRAXION" },
+  { equipmentType: "Pulley", brand: "Rock Exotica", model: "Omni-Block" },
+  { equipmentType: "Pulley", brand: "ISC", model: "Double Pulley" },
+  
+  // Slings
+  { equipmentType: "Slings", brand: "Petzl", model: "ANNEAU" },
+  { equipmentType: "Slings", brand: "Petzl", model: "ST'ANNEAU" },
+  { equipmentType: "Slings", brand: "Black Diamond", model: "Nylon Runner" },
+  { equipmentType: "Slings", brand: "Black Diamond", model: "Dynex Runner" },
+  { equipmentType: "Slings", brand: "Sterling", model: "Tubular Webbing" },
+  { equipmentType: "Slings", brand: "BlueWater", model: "Anchor Sling" },
 ];
 
 export async function seedEquipmentCatalog(): Promise<void> {
