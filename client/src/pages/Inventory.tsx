@@ -3490,6 +3490,50 @@ export default function Inventory() {
                   )}
                 </>
               )}
+
+              {/* Consumables (Squeegee rubbers, Applicators, Gloves): show price but not serial/dates */}
+              {(form.watch("equipmentType") === "Squeegee rubbers" ||
+                form.watch("equipmentType") === "Applicators" ||
+                form.watch("equipmentType") === "Gloves") && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.notes', 'Notes')}</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder={t('inventory.placeholders.additionalInfo', 'Additional information...')} {...field} value={field.value || ""} data-testid="textarea-notes" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {canViewFinancials && (
+                    <FormField
+                      control={form.control}
+                      name="itemPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('inventory.price', 'Price')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder={t('inventory.placeholders.price', '0.00')}
+                              {...field}
+                              value={field.value || ""}
+                              data-testid="input-price-consumable"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </>
+              )}
                   </div>
 
                   <div className="flex gap-2 pt-4 flex-shrink-0">
