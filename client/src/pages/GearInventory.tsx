@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { hasFinancialAccess } from "@/lib/permissions";
-import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
+import { UnifiedDashboardHeader } from "@/components/UnifiedDashboardHeader";
 
 const gearFormSchema = z.object({
   brand: z.string().optional(),
@@ -89,7 +89,8 @@ export default function GearInventory() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <EmployerDashboardHeader
+      <UnifiedDashboardHeader
+        variant="employer"
         currentUser={currentUser}
         pageTitle={t('gearInventory.title', 'Build my Kit')}
         pageDescription={t('gearInventory.subtitle', 'Manage your equipment inventory')}
