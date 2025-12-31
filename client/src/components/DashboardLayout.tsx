@@ -3,8 +3,7 @@ import { useLocation } from "wouter";
 import { useContext, ReactNode, useState } from "react";
 import { BrandingContext } from "@/App";
 import { DashboardSidebar, type NavGroup, type DashboardVariant, STAKEHOLDER_COLORS } from "@/components/DashboardSidebar";
-import { EmployerDashboardHeader } from "@/components/EmployerDashboardHeader";
-import { TechnicianDashboardHeader } from "@/components/TechnicianDashboardHeader";
+import { UnifiedDashboardHeader, getSafeVariant, type HeaderVariant } from "@/components/UnifiedDashboardHeader";
 import { useHeaderConfig, HeaderConfigProvider } from "@/contexts/HeaderConfigContext";
 import type { User } from "@/lib/permissions";
 
@@ -129,9 +128,8 @@ function DashboardLayoutInner({
   // Mobile sidebar state - controlled by DashboardLayout for all variants
   const [mobileOpen, setMobileOpen] = useState(false);
   
-  // All non-employer variants use the unified TechnicianDashboardHeader
-  // This provides consistent navigation across technician, ground-crew, property-manager, resident, and building-manager dashboards
-  const usesUnifiedHeader = variant !== "employer";
+  // Safely map DashboardVariant to HeaderVariant with runtime validation
+  const headerVariant: HeaderVariant = getSafeVariant(variant);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -155,29 +153,25 @@ function DashboardLayoutInner({
       />
       
       <main className="lg:pl-60 min-h-screen flex flex-col">
-        {variant === "employer" && (
-          <EmployerDashboardHeader
-            currentUser={currentUser}
-            employees={employees}
-            logoUrl={brandingData?.logoUrl || undefined}
-            pageTitle={headerConfig?.pageTitle}
-            pageDescription={headerConfig?.pageDescription}
-            actionButtons={headerConfig?.actionButtons}
-            onBackClick={headerConfig?.onBackClick || undefined}
-            showSearch={headerConfig?.showSearch ?? true}
-            showNotifications={headerConfig?.showNotifications ?? true}
-            showLanguageDropdown={headerConfig?.showLanguageDropdown ?? true}
-            showProfile={headerConfig?.showProfile ?? true}
-            showLogout={headerConfig?.showLogout ?? true}
-            onMobileMenuClick={() => setMobileOpen(prev => !prev)}
-          />
-        )}
-        {usesUnifiedHeader && (
-          <TechnicianDashboardHeader
-            currentUser={currentUser}
-            onMobileMenuClick={() => setMobileOpen(prev => !prev)}
-          />
-        )}
+        <UnifiedDashboardHeader
+          variant={headerVariant}
+          currentUser={currentUser}
+          employees={employees}
+          logoUrl={brandingData?.logoUrl || undefined}
+          pageTitle={headerConfig?.pageTitle}
+          pageDescription={headerConfig?.pageDescription}
+          actionButtons={headerConfig?.actionButtons}
+          onBackClick={headerConfig?.onBackClick || undefined}
+          showSearch={headerConfig?.showSearch ?? true}
+          showNotifications={headerConfig?.showNotifications ?? true}
+          showLanguageDropdown={headerConfig?.showLanguageDropdown ?? true}
+          showProfile={headerConfig?.showProfile ?? true}
+          showLogout={headerConfig?.showLogout ?? true}
+          onMobileMenuClick={() => setMobileOpen(prev => !prev)}
+          brandingLogoUrl={undefined}
+          brandingColor={undefined}
+          brandingCompanyName={undefined}
+        />
         <div className="flex-1">
           {children}
         </div>

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import { queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -80,6 +81,21 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
     billingFrequency: "monthly",
   });
   const [error, setError] = useState("");
+  const [animatedBenefitIndex, setAnimatedBenefitIndex] = useState(-1);
+
+  // Staggered animation for sidebar benefits list
+  useEffect(() => {
+    if (open) {
+      setAnimatedBenefitIndex(-1);
+      const delays = [800, 1400, 2000, 2600, 3200, 3800];
+      const timers = delays.map((delay, index) => 
+        setTimeout(() => setAnimatedBenefitIndex(index), delay)
+      );
+      return () => timers.forEach(timer => clearTimeout(timer));
+    } else {
+      setAnimatedBenefitIndex(-1);
+    }
+  }, [open]);
 
   const resetForm = () => {
     if (progressIntervalRef.current) {
@@ -320,18 +336,67 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
               </div>
             </div>
 
-            {/* Benefits */}
-            <div className="mt-auto">
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-3">What You Get:</p>
-              <div className="space-y-3">
-                {sidebarBenefits.map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm">
-                    <benefit.icon className="w-4 h-4 text-white/80 mt-0.5 shrink-0" />
-                    <span className="text-white/90">{benefit.text}</span>
-                  </div>
-                ))}
+            {/* Benefits - only show on welcome and company details steps (animated) */}
+            {(step === "welcome" || step === "companyDetails") && (
+              <div className="mt-auto">
+                <p className="text-white/60 text-xs uppercase tracking-wider mb-3">What You Get:</p>
+                <div className="space-y-2">
+                  {sidebarBenefits.map((benefit, i) => {
+                    const isActive = i <= animatedBenefitIndex;
+                    return (
+                      <div key={i} className="flex items-start gap-2 text-sm">
+                        <div className={`w-4 h-4 rounded-full shrink-0 mt-0.5 flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-white border-white' : 'border border-white/40'}`}>
+                          {isActive && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <Check className="w-2.5 h-2.5 text-[#0B64A3]" />
+                            </motion.div>
+                          )}
+                        </div>
+                        <span className="text-white/90">{benefit.text}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Billing Details info and Order Summary - show on payment step */}
+            {step === "payment" && (
+              <div className="mt-auto">
+                <h2 className="text-xl font-bold text-white mb-2">Billing Details</h2>
+                <p className="text-sm text-white/80 mb-4">
+                  Enter your billing details to start your {TRIAL_PERIOD_DAYS}-day free trial
+                </p>
+                
+                {/* Order Summary */}
+                <div className="bg-white/10 rounded-lg p-3 mt-4">
+                  <h3 className="font-medium text-white text-sm mb-2">Order Summary</h3>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between gap-2">
+                      <span className="text-white/80">OnRopePro Base (Monthly)</span>
+                      <span className="text-white font-medium">${monthlyPrice}/mo</span>
+                    </div>
+                    <div className="flex justify-between text-white/60">
+                      <span>Billing Cycle</span>
+                      <span>Monthly</span>
+                    </div>
+                    <div className="border-t border-white/20 pt-1.5 mt-1.5">
+                      <div className="flex justify-between text-green-300">
+                        <span>Free trial</span>
+                        <span>{TRIAL_PERIOD_DAYS} days</span>
+                      </div>
+                      <p className="text-white/60 text-xs mt-1">
+                        No charge until trial ends
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Panel - Form content */}
@@ -537,42 +602,11 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     Back
                   </button>
 
-                  <h2 className="text-xl font-bold mb-1">Billing Details</h2>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Enter your billing details to start your {TRIAL_PERIOD_DAYS}-day free trial
-                  </p>
-
                   {error && (
                     <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
                       {error}
                     </div>
                   )}
-
-                  {/* Order Summary */}
-                  <div className="bg-muted/50 rounded-lg p-4 mb-6">
-                    <h3 className="font-medium mb-3">Order Summary</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>OnRopePro Base Plan (Monthly)</span>
-                        <span className="font-medium">
-                          ${monthlyPrice}/mo
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-muted-foreground">
-                        <span>Billing Cycle</span>
-                        <span>Monthly</span>
-                      </div>
-                      <div className="border-t pt-2 mt-2">
-                        <div className="flex justify-between text-green-600 dark:text-green-400">
-                          <span>Free trial</span>
-                          <span>{TRIAL_PERIOD_DAYS} days</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          You won't be charged until your trial ends
-                        </p>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Stripe Embedded Checkout */}
                   <div className="border rounded-lg overflow-hidden">

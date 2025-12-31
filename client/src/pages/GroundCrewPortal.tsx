@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { UnifiedDashboardHeader } from "@/components/UnifiedDashboardHeader";
 import { getGroundCrewNavGroups } from "@/lib/groundCrewNavigation";
 
 import { Button } from "@/components/ui/button";
@@ -1411,72 +1412,20 @@ export default function GroundCrewPortal() {
       />
       
       <div className="lg:pl-60">
-        <header className="sticky top-0 z-[100] h-14 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-700/80 px-4 sm:px-6">
-          <div className="h-full flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4 flex-1 min-w-0">
-              {/* Mobile hamburger menu button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={() => setMobileSidebarOpen(true)}
-                data-testid="button-mobile-menu"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              <div className="hidden md:flex flex-1 max-w-xl">
-                <DashboardSearch />
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              {user.role === 'company' && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => setLocation('/dashboard')}
-                  className="gap-1.5"
-                  data-testid="button-return-dashboard"
-                >
-                  <span className="material-icons text-base">dashboard</span>
-                  <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : language === 'es' ? 'Panel' : 'Tableau de bord'}</span>
-                </Button>
-              )}
-              
-              {/* Notifications */}
-              <NotificationBell />
-              
-              {/* Language Selector */}
-              <LanguageDropdown iconOnly />
-              
-              <button 
-                onClick={() => setActiveTab('profile')}
-                className="hidden sm:flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700 cursor-pointer hover-elevate rounded-md py-1 pr-2"
-                data-testid="link-user-profile"
-              >
-                <Avatar className="w-8 h-8 bg-[#5D7B6F]">
-                  <AvatarFallback className="bg-[#5D7B6F] text-white text-xs font-medium">
-                    {user?.name ? user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="hidden lg:block">
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200 leading-tight">{user?.name || 'User'}</p>
-                  <p className="text-xs text-slate-400 leading-tight">{t.groundCrewMember}</p>
-                </div>
-              </button>
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                data-testid="button-logout" 
-                onClick={handleLogout} 
-                className="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-              >
-                <LogOut className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </header>
+        <UnifiedDashboardHeader
+          variant="ground-crew"
+          currentUser={user}
+          onMobileMenuClick={() => setMobileSidebarOpen(true)}
+          showSearch={true}
+          showNotifications={true}
+          showLanguageDropdown={true}
+          showInstallPWA={true}
+          showProfile={true}
+          showLogout={true}
+          useInlineActions={true}
+          onProfileClick={() => setActiveTab('profile')}
+          onLogout={handleLogout}
+        />
 
         <main className="px-4 sm:px-6 py-6 pb-24 lg:pb-6">
           {activeTab === 'home' && (
