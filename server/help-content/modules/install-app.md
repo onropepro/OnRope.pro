@@ -17,11 +17,20 @@ You can install OnRopePro from Safari or Chrome on your iOS device.
 
 ### Using Safari
 
-- Open **Safari** and navigate to OnRopePro
-- Tap the **Share** button (the square with an arrow pointing up)
-- Scroll down and tap **Add to Home Screen**
-- Tap **Add** in the top right corner
-- OnRopePro will now appear on your home screen
+1. Open **Safari** and navigate to OnRopePro
+2. Tap the **Share** button at the bottom of the screen (the square with an arrow pointing up)
+
+![Tap the Share button at the bottom of Safari](/assets/help/share-button.png)
+
+3. Scroll down and tap **Add to Home Screen**
+
+![Select Add to Home Screen from the menu](/assets/help/add-to-home-screen.png)
+
+4. Tap **Add** in the top right corner to confirm
+
+![Tap Add to confirm](/assets/help/click-done.png)
+
+5. OnRopePro will now appear on your home screen
 
 ### Using Chrome
 
