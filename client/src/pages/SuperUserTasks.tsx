@@ -631,7 +631,7 @@ export default function SuperUserTasks() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddTaskOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setAddTaskOpen(false)}>{t('common.cancel', 'Cancel')}</Button>
             <Button
               onClick={() => {
                 if (!taskForm.title || !taskForm.section || !taskForm.assignee) {
@@ -643,7 +643,7 @@ export default function SuperUserTasks() {
               disabled={createTaskMutation.isPending}
               data-testid="button-create-task"
             >
-              {createTaskMutation.isPending ? "Creating..." : "Create Task"}
+              {createTaskMutation.isPending ? t('common.creating', 'Creating...') : t('superUserTasks.createTask', 'Create Task')}
             </Button>
           </DialogFooter>
         </DialogContent>

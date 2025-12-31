@@ -869,6 +869,11 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "deleting": "Deleting...",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "adding": "Adding...",
+    "creating": "Creating...",
+    "cannotBeUndone": "This action cannot be undone.",
     "edit": "Edit",
     "add": "Add",
     "create": "Create",
@@ -9609,6 +9614,13 @@
     "templateSaved": "Template saved",
     "templateSavedDescription": "You can now use this template for future notices.",
     "updated": "Work notice updated",
-    "deleted": "Work notice deleted"
+    "deleted": "Work notice deleted",
+    "title": "Work Notices",
+    "createNotice": "Create Notice",
+    "noNoticesYet": "No work notices yet",
+    "noNoticesDescription": "Create a notice to inform residents about upcoming work",
+    "published": "Published",
+    "draft": "Draft",
+    "preview": "Preview as Resident"
   }
 }

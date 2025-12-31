@@ -485,18 +485,18 @@ export default function PersonalSafetyDocuments() {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Inspection?</AlertDialogTitle>
+                                  <AlertDialogTitle>{t('personalSafetyDocuments.deleteInspection', 'Delete Inspection?')}</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    This will permanently delete this inspection record. This action cannot be undone.
+                                    {t('personalSafetyDocuments.deleteConfirmMessage', 'This will permanently delete this inspection record.')} {t('common.cannotBeUndone', 'This action cannot be undone.')}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => deleteInspection.mutate(inspection.id)}
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   >
-                                    Delete
+                                    {t('common.delete', 'Delete')}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -513,7 +513,7 @@ export default function PersonalSafetyDocuments() {
         ) : (
           <>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">New Inspection</h2>
+              <h2 className="text-lg font-semibold">{t('personalSafetyDocuments.newInspection', 'New Inspection')}</h2>
               <Button
                 variant="outline"
                 onClick={() => {
@@ -522,7 +522,7 @@ export default function PersonalSafetyDocuments() {
                 }}
                 data-testid="button-cancel-inspection"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
             </div>
 

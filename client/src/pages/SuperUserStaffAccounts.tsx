@@ -540,14 +540,14 @@ export default function SuperUserStaffAccounts() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button 
               onClick={handleUpdate} 
               disabled={updateMutation.isPending}
               data-testid="button-submit-edit"
             >
-              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+              {updateMutation.isPending ? t('common.saving', 'Saving...') : t('common.saveChanges', 'Save Changes')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -556,21 +556,21 @@ export default function SuperUserStaffAccounts() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Staff Account</AlertDialogTitle>
+            <AlertDialogTitle>{t('staffAccounts.deleteTitle', 'Delete Staff Account')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the staff account for{' '}
+              {t('staffAccounts.deleteConfirm', 'Are you sure you want to delete the staff account for')}{' '}
               <strong>{selectedAccount?.firstName} {selectedAccount?.lastName}</strong>?
-              This action cannot be undone.
+              {t('common.cannotBeUndone', 'This action cannot be undone.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => selectedAccount && deleteMutation.mutate(selectedAccount.id)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
-              {deleteMutation.isPending ? 'Deleting...' : 'Delete Account'}
+              {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('staffAccounts.deleteAccount', 'Delete Account')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

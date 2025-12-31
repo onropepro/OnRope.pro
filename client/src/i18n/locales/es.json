@@ -942,7 +942,12 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
-    "deleting": "Deleting...",
+    "deleting": "Eliminando...",
+    "saving": "Guardando...",
+    "saveChanges": "Guardar cambios",
+    "adding": "Agregando...",
+    "creating": "Creando...",
+    "cannotBeUndone": "Esta acción no se puede deshacer.",
     "edit": "Editar",
     "add": "Agregar",
     "create": "Crear",
@@ -13084,6 +13089,13 @@
     "templateSaved": "Plantilla guardada",
     "templateSavedDescription": "Ahora puede usar esta plantilla para futuros avisos.",
     "updated": "Aviso de trabajo actualizado",
-    "deleted": "Aviso de trabajo eliminado"
+    "deleted": "Aviso de trabajo eliminado",
+    "title": "Avisos de Trabajo",
+    "createNotice": "Crear Aviso",
+    "noNoticesYet": "No hay avisos de trabajo",
+    "noNoticesDescription": "Cree un aviso para informar a los residentes sobre los próximos trabajos",
+    "published": "Publicado",
+    "draft": "Borrador",
+    "preview": "Vista previa como Residente"
   }
 }

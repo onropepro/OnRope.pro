@@ -880,6 +880,11 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "deleting": "Suppression...",
+    "saving": "Enregistrement...",
+    "saveChanges": "Enregistrer les modifications",
+    "adding": "Ajout...",
+    "creating": "Création...",
+    "cannotBeUndone": "Cette action ne peut pas être annulée.",
     "edit": "Modifier",
     "add": "Ajouter",
     "create": "Créer",
@@ -13236,6 +13241,13 @@
     "templateSaved": "Modèle enregistré",
     "templateSavedDescription": "Vous pouvez maintenant utiliser ce modèle pour les futurs avis.",
     "updated": "Avis de travaux mis à jour",
-    "deleted": "Avis de travaux supprimé"
+    "deleted": "Avis de travaux supprimé",
+    "title": "Avis de Travaux",
+    "createNotice": "Créer un Avis",
+    "noNoticesYet": "Aucun avis de travaux",
+    "noNoticesDescription": "Créez un avis pour informer les résidents des travaux à venir",
+    "published": "Publié",
+    "draft": "Brouillon",
+    "preview": "Aperçu en tant que Résident"
   }
 }

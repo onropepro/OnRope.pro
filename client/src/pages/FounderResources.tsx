@@ -356,9 +356,9 @@ export default function FounderResources() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setAddDialogOpen(false)}>{t('common.cancel', 'Cancel')}</Button>
                 <Button onClick={handleAddResource} disabled={addResourceMutation.isPending} data-testid="button-save-resource">
-                  {addResourceMutation.isPending ? "Adding..." : "Add Resource"}
+                  {addResourceMutation.isPending ? t('common.adding', 'Adding...') : t('founderResources.addResource', 'Add Resource')}
                 </Button>
               </DialogFooter>
             </DialogContent>

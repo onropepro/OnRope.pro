@@ -3377,13 +3377,13 @@ export default function Quotes() {
         <AlertDialog open={isSubmitDialogOpen} onOpenChange={setIsSubmitDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Submit Quote</AlertDialogTitle>
+              <AlertDialogTitle>{t('quotes.submitQuote', 'Submit Quote')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to submit this quote? Once submitted, it will be sent to management for review.
+                {t('quotes.submitConfirmMessage', 'Are you sure you want to submit this quote? Once submitted, it will be sent to management for review.')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel data-testid="button-cancel-submit">Cancel</AlertDialogCancel>
+              <AlertDialogCancel data-testid="button-cancel-submit">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => {
                   if (quoteToSubmit) {
@@ -3393,7 +3393,7 @@ export default function Quotes() {
                 className="bg-primary hover:bg-primary/90"
                 data-testid="button-confirm-submit"
               >
-                Submit Quote
+                {t('quotes.submitQuote', 'Submit Quote')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

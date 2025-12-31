@@ -666,14 +666,14 @@ export default function SuperUserJobBoard() {
               setEditingJob(null);
               resetForm();
             }}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={editingJob ? handleUpdate : handleCreate}
               disabled={createMutation.isPending || updateMutation.isPending}
               data-testid="button-submit-job"
             >
-              {createMutation.isPending || updateMutation.isPending ? "Saving..." : editingJob ? "Update" : "Create"}
+              {createMutation.isPending || updateMutation.isPending ? t('common.saving', 'Saving...') : editingJob ? t('common.update', 'Update') : t('common.create', 'Create')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -683,20 +683,20 @@ export default function SuperUserJobBoard() {
       <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Job Posting?</DialogTitle>
+            <DialogTitle>{t('superUserJobBoard.deleteJobPosting', 'Delete Job Posting?')}</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. The job posting will be permanently removed.
+              {t('superUserJobBoard.deleteConfirmMessage', 'This action cannot be undone. The job posting will be permanently removed.')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>{t('common.cancel', 'Cancel')}</Button>
             <Button
               variant="destructive"
               onClick={() => deleteConfirmId && deleteMutation.mutate(deleteConfirmId)}
               disabled={deleteMutation.isPending}
               data-testid="button-confirm-delete"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

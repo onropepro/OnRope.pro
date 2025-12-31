@@ -2437,14 +2437,14 @@ export default function Profile() {
               }}
               data-testid="button-cancel-delete-account"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete-account"
             >
-              Delete Account
+              {t('profile.deleteAccount', 'Delete Account')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2454,15 +2454,15 @@ export default function Profile() {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogTitle>{t('profile.confirmLogout', 'Confirm Logout')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to logout?
+              {t('profile.logoutConfirmMessage', 'Are you sure you want to logout?')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-logout">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
-              Logout
+              {t('profile.logout', 'Logout')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2472,16 +2472,16 @@ export default function Profile() {
       <AlertDialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Update License Key</AlertDialogTitle>
+            <AlertDialogTitle>{t('profile.updateLicenseKey', 'Update License Key')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Enter your new license key. This is required after upgrading your tier.
+              {t('profile.licenseKeyDescription', 'Enter your new license key. This is required after upgrading your tier.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <Label htmlFor="new-license-key">New License Key</Label>
+            <Label htmlFor="new-license-key">{t('profile.newLicenseKey', 'New License Key')}</Label>
             <Input
               id="new-license-key"
-              placeholder="Enter your new license key"
+              placeholder={t('profile.enterLicenseKey', 'Enter your new license key')}
               value={newLicenseKey}
               onChange={(e) => setNewLicenseKey(e.target.value)}
               data-testid="input-new-license-key"
@@ -2492,7 +2492,7 @@ export default function Profile() {
               setShowLicenseDialog(false);
               setNewLicenseKey("");
             }}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
