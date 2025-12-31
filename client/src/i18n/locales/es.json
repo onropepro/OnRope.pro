@@ -12644,5 +12644,29 @@
     "resident": "Residente",
     "propertyManager": "Administrador de propiedades",
     "buildingManager": "Administrador de edificio"
+  },
+  "helpNav": {
+    "helpHome": "Inicio de ayuda",
+    "companyOwners": "Propietarios de empresas",
+    "technicians": "Técnicos",
+    "buildingManagers": "Administradores de edificios",
+    "propertyManagers": "Administradores de propiedades",
+    "backToHelp": "Volver a la ayuda",
+    "gettingStarted": "Primeros pasos",
+    "search": "Buscar"
+  },
+  "helpBreadcrumb": {
+    "help": "Ayuda"
+  },
+  "helpCategories": {
+    "operations": "Operaciones",
+    "safety": "Seguridad",
+    "team": "Equipo",
+    "financialSales": "Finanzas y Ventas",
+    "communication": "Comunicación"
+  },
+  "helpArticle": {
+    "match": "coincidencia",
+    "learnMore": "Más información sobre esta función"
   }
 }

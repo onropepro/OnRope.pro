@@ -12796,5 +12796,29 @@
     "resident": "Résident",
     "propertyManager": "Gestionnaire de propriété",
     "buildingManager": "Gestionnaire d'immeuble"
+  },
+  "helpNav": {
+    "helpHome": "Accueil de l'aide",
+    "companyOwners": "Propriétaires d'entreprise",
+    "technicians": "Techniciens",
+    "buildingManagers": "Gestionnaires d'immeubles",
+    "propertyManagers": "Gestionnaires de propriétés",
+    "backToHelp": "Retour à l'aide",
+    "gettingStarted": "Premiers pas",
+    "search": "Rechercher"
+  },
+  "helpBreadcrumb": {
+    "help": "Aide"
+  },
+  "helpCategories": {
+    "operations": "Opérations",
+    "safety": "Sécurité",
+    "team": "Équipe",
+    "financialSales": "Finances & Ventes",
+    "communication": "Communication"
+  },
+  "helpArticle": {
+    "match": "correspondance",
+    "learnMore": "En savoir plus sur cette fonctionnalité"
   }
 }

@@ -9169,5 +9169,29 @@
     "resident": "Resident",
     "propertyManager": "Property Manager",
     "buildingManager": "Building Manager"
+  },
+  "helpNav": {
+    "helpHome": "Help Home",
+    "companyOwners": "Company Owners",
+    "technicians": "Technicians",
+    "buildingManagers": "Building Managers",
+    "propertyManagers": "Property Managers",
+    "backToHelp": "Back to Help",
+    "gettingStarted": "Getting Started",
+    "search": "Search"
+  },
+  "helpBreadcrumb": {
+    "help": "Help"
+  },
+  "helpCategories": {
+    "operations": "Operations",
+    "safety": "Safety",
+    "team": "Team",
+    "financialSales": "Financial & Sales",
+    "communication": "Communication"
+  },
+  "helpArticle": {
+    "match": "match",
+    "learnMore": "Learn more about this feature"
   }
 }
