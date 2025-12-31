@@ -139,8 +139,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
         setGeneratedReferralCode(data.referralCode);
       }
       toast({
-        title: "Registration Complete!",
-        description: "Your account has been created successfully.",
+        title: t('techReg.success.title', 'Registration Complete!'),
+        description: t('techReg.success.subtitle', 'Your account has been created successfully.'),
       });
       // Move to referral step after account creation
       setStep("referral");
@@ -148,7 +148,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     onError: (error: Error) => {
       setError(error.message);
       toast({
-        title: "Registration Failed",
+        title: t('common.error', 'Registration Failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -284,8 +284,8 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   const copyReferralCode = () => {
     navigator.clipboard.writeText(generatedReferralCode);
     toast({
-      title: "Copied!",
-      description: "Referral code copied to clipboard",
+      title: t('common.copied', 'Copied!'),
+      description: t('techReg.referral.copiedToClipboard', 'Referral code copied to clipboard'),
     });
   };
 

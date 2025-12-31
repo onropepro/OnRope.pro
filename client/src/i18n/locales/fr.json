@@ -430,6 +430,106 @@
       "closeDialog": "Fermer ce dialogue"
     }
   },
+  "employerReg": {
+    "sidebar": {
+      "title": "Gestion d'entreprise d'accès sur cordes",
+      "subtitle": "Tout connecté. Rien de perdu."
+    },
+    "steps": {
+      "accountDetails": "Détails du compte",
+      "billingDetails": "Détails de facturation",
+      "complete": "Terminé"
+    },
+    "processing": {
+      "verifyingPayment": "Vérification du paiement...",
+      "creatingAccount": "Création de votre compte entreprise...",
+      "settingUpDashboard": "Configuration de votre tableau de bord...",
+      "configuringPermissions": "Configuration des permissions...",
+      "finalizingSetup": "Finalisation de la configuration..."
+    },
+    "toast": {
+      "registrationComplete": "Inscription terminée!",
+      "accountCreatedSuccess": "Votre compte entreprise a été créé avec succès.",
+      "registrationError": "Erreur d'inscription",
+      "registrationFailed": "Échec de l'inscription",
+      "failedToComplete": "Échec de la finalisation de l'inscription. Veuillez réessayer."
+    },
+    "errors": {
+      "companyNameRequired": "Le nom de l'entreprise est requis",
+      "ownerNameRequired": "Le nom du propriétaire est requis",
+      "validEmailRequired": "Un courriel valide est requis",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+      "passwordsMismatch": "Les mots de passe ne correspondent pas",
+      "registrationFailed": "Échec de l'inscription"
+    },
+    "welcome": {
+      "badge": "Pour les entreprises d'accès sur cordes",
+      "title": "Créez votre compte entreprise",
+      "subtitle": "Commencez votre essai gratuit aujourd'hui",
+      "getStarted": "Commencer",
+      "haveAccount": "Vous avez déjà un compte?",
+      "signIn": "Se connecter"
+    },
+    "benefits": {
+      "jobBoard": "Accédez à notre babillard d'emplois et atteignez des milliers de techniciens qualifiés",
+      "projectTracking": "Suivi de projet en temps réel et surveillance du budget",
+      "payrollSavings": "Éliminez 4-8 heures de traitement de paie par période de paie",
+      "safetyDocs": "Documentation de sécurité numérique pour les audits et la conformité",
+      "permissions": "44 niveaux de permission individuels pour un contrôle d'accès complet",
+      "quoteAccuracy": "Amélioration de 15-20% de la précision des devis"
+    },
+    "welcomeBenefits": {
+      "jobBoard": "Publiez des offres sur notre babillard d'emplois exclusif aux cordes",
+      "projectTracking": "Suivez chaque projet et chaque descente dans un tableau de bord central",
+      "payrollIntegration": "Le pointage alimente directement la paie",
+      "auditTrail": "Piste d'audit complète pour la conformité en sécurité",
+      "budgetMonitoring": "Surveillance budget vs réel en temps réel"
+    },
+    "trialBenefits": {
+      "fullAccess": "Accès complet à toutes les fonctionnalités",
+      "cancelAnytime": "Annulez à tout moment avec export de données",
+      "prioritySupport": "Support prioritaire pendant l'essai",
+      "noCharge": "Aucun frais jusqu'à la fin de l'essai"
+    },
+    "companyDetails": {
+      "step": "Étape 1 sur 3",
+      "title": "Détails de l'entreprise",
+      "companyName": "Nom de l'entreprise",
+      "companyNamePlaceholder": "Votre entreprise d'accès sur cordes",
+      "ownerName": "Nom du propriétaire",
+      "ownerNamePlaceholder": "Jean Dupont",
+      "email": "Courriel",
+      "emailPlaceholder": "vous@exemple.com",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Créez un mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre mot de passe"
+    },
+    "payment": {
+      "step": "Étape 2 sur 3",
+      "title": "Détails de facturation",
+      "subtitle": "Entrez vos détails de facturation pour commencer votre essai gratuit de {{days}} jours",
+      "orderSummary": "Résumé de la commande",
+      "basePlan": "OnRopePro Base (Mensuel)",
+      "billingCycle": "Cycle de facturation",
+      "monthly": "Mensuel",
+      "freeTrial": "Essai gratuit",
+      "days": "jours",
+      "noChargeUntilTrialEnds": "Aucun frais jusqu'à la fin de l'essai"
+    },
+    "success": {
+      "title": "Bienvenue sur OnRopePro!",
+      "subtitle": "Votre compte entreprise est prêt",
+      "trialInfo": "Votre essai gratuit de {{days}} jours a commencé",
+      "goToDashboard": "Aller au tableau de bord"
+    },
+    "buttons": {
+      "back": "Retour",
+      "continue": "Continuer",
+      "createAccount": "Créer le compte",
+      "creatingAccount": "Création du compte..."
+    }
+  },
   "navigation": {
     "dashboard": "Tableau de bord",
     "projects": "Projets",
@@ -808,6 +908,7 @@
     "no": "Non",
     "ok": "OK",
     "done": "Terminé",
+    "copied": "Copié!",
     "actions": "Actions",
     "status": "Statut",
     "details": "Détails",
@@ -891,6 +992,13 @@
     "signIn": "Se Connecter",
     "signUp": "S'inscrire",
     "signOut": "Se deconnecter",
+    "free": "Gratuit",
+    "whatYouGet": "Ce que vous obtenez:",
+    "includedInTrial": "Inclus dans votre essai:",
+    "afterTrial": "Apres l'essai:",
+    "cancelAnytimeDuringTrial": "Annulez a tout moment pendant l'essai. Plans annuels disponibles plus tard.",
+    "termsAgreement": "En continuant, vous acceptez nos Conditions d'utilisation et Politique de confidentialite. Votre adresse de facturation sera utilisee comme adresse de votre entreprise.",
+    "whileYouWait": "Pendant que vous attendez...",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
     "forgotPassword": "Mot de passe oublie",
@@ -2095,7 +2203,40 @@
     "emergencyProcedures": "Procédures d'urgence",
     "competencyRequirements": "Exigences de compétence",
     "reviewBeforeSigning": "Examinez ce document attentivement avant de signer pour accuser réception et compréhension.",
-    "proceedToSign": "Procéder à la signature"
+    "proceedToSign": "Procéder à la signature",
+    "exporting": "Exportation en cours...",
+    "exportZip": "Exporter ZIP",
+    "noDocsFound": "Aucun document trouvé",
+    "noDocsInRange": "Aucun document dans la plage de dates sélectionnée.",
+    "exportFailed": "Échec de l'exportation",
+    "exportFailedPdfs": "Impossible de générer les PDF. Veuillez réessayer.",
+    "exportPartial": "Exportation partiellement complète",
+    "exportPartialDesc": "{{successCount}} documents exportés. {{failedCount}} document(s) ont échoué.",
+    "exportComplete": "Exportation complète",
+    "exportCompleteDesc": "{{successCount}} documents {{documentType}} exportés avec succès.",
+    "exportError": "Une erreur s'est produite lors de l'exportation. Veuillez réessayer.",
+    "quizGenerated": "Quiz généré",
+    "quizGeneratedDesc": "Le quiz a été créé et est maintenant disponible pour les employés.",
+    "quizError": "Erreur",
+    "quizGenerationFailed": "Échec de la génération du quiz",
+    "documentSigned": "Document signé",
+    "signatureRecorded": "Votre signature a été enregistrée avec succès.",
+    "signFailed": "Échec de la signature du document",
+    "signatureRequired": "Signature requise",
+    "provideSignature": "Veuillez fournir votre signature avant de soumettre.",
+    "complianceDownloaded": "Rapport de conformité téléchargé avec succès",
+    "complianceFailed": "Échec du téléchargement du rapport de conformité",
+    "uploadSuccess": "Document téléchargé avec succès",
+    "uploadFailed": "Échec du téléchargement du document",
+    "selectJobType": "Veuillez sélectionner un type de travail pour cet énoncé de méthode",
+    "enterCustomJobType": "Veuillez entrer un nom de type de travail personnalisé",
+    "methodStatementUploaded": "Énoncé de méthode téléchargé avec succès",
+    "methodStatementFailed": "Échec du téléchargement de l'énoncé de méthode",
+    "deleteSuccess": "Document supprimé avec succès",
+    "deleteFailed": "Échec de la suppression du document",
+    "templatesAdded": "{{count}} procédure(s) de travail sécuritaire ajoutée(s)",
+    "templatesFailed": "Échec de l'initialisation des modèles",
+    "uploadMethodStatementDesc": "Téléchargez le document d'énoncé de méthode de votre entreprise pour un type de travail spécifique afin de satisfaire aux exigences de conformité."
   },
   "safety": {
     "title": "Sécurité",

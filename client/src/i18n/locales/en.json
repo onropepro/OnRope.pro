@@ -419,6 +419,106 @@
       "closeDialog": "Close this dialog"
     }
   },
+  "employerReg": {
+    "sidebar": {
+      "title": "Rope Access Business Management",
+      "subtitle": "Everything connected. Nothing lost."
+    },
+    "steps": {
+      "accountDetails": "Account Details",
+      "billingDetails": "Billing Details",
+      "complete": "Complete"
+    },
+    "processing": {
+      "verifyingPayment": "Verifying payment...",
+      "creatingAccount": "Creating your company account...",
+      "settingUpDashboard": "Setting up your dashboard...",
+      "configuringPermissions": "Configuring permissions...",
+      "finalizingSetup": "Finalizing setup..."
+    },
+    "toast": {
+      "registrationComplete": "Registration Complete!",
+      "accountCreatedSuccess": "Your company account has been created successfully.",
+      "registrationError": "Registration Error",
+      "registrationFailed": "Registration Failed",
+      "failedToComplete": "Failed to complete registration. Please try again."
+    },
+    "errors": {
+      "companyNameRequired": "Company name is required",
+      "ownerNameRequired": "Owner name is required",
+      "validEmailRequired": "Valid email is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordsMismatch": "Passwords do not match",
+      "registrationFailed": "Registration failed"
+    },
+    "welcome": {
+      "badge": "For Rope Access Companies",
+      "title": "Create your company account",
+      "subtitle": "Start your free trial today",
+      "getStarted": "Get Started",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign In"
+    },
+    "benefits": {
+      "jobBoard": "Access our job board and reach 1000's of qualified techs",
+      "projectTracking": "Real-time project tracking and budget monitoring",
+      "payrollSavings": "Eliminate 4-8 hours of payroll processing per pay period",
+      "safetyDocs": "Digital safety documentation for audits and compliance",
+      "permissions": "44 individual permission levels for complete access control",
+      "quoteAccuracy": "15-20% improvement in quote accuracy"
+    },
+    "welcomeBenefits": {
+      "jobBoard": "Post jobs on our Rope Access Only Job Board",
+      "projectTracking": "Track every project and every drop in one central dashboard",
+      "payrollIntegration": "Clock in/out flows directly to payroll",
+      "auditTrail": "Complete audit trail for safety compliance",
+      "budgetMonitoring": "Real-time budget vs. actual monitoring"
+    },
+    "trialBenefits": {
+      "fullAccess": "Full access to all features",
+      "cancelAnytime": "Cancel anytime with data export",
+      "prioritySupport": "Priority support during trial",
+      "noCharge": "No charge until trial ends"
+    },
+    "companyDetails": {
+      "step": "Step 1 of 3",
+      "title": "Company Details",
+      "companyName": "Company Name",
+      "companyNamePlaceholder": "Your Rope Access Company",
+      "ownerName": "Owner Name",
+      "ownerNamePlaceholder": "John Smith",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Create a password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password"
+    },
+    "payment": {
+      "step": "Step 2 of 3",
+      "title": "Billing Details",
+      "subtitle": "Enter your billing details to start your {{days}}-day free trial",
+      "orderSummary": "Order Summary",
+      "basePlan": "OnRopePro Base (Monthly)",
+      "billingCycle": "Billing Cycle",
+      "monthly": "Monthly",
+      "freeTrial": "Free trial",
+      "days": "days",
+      "noChargeUntilTrialEnds": "No charge until trial ends"
+    },
+    "success": {
+      "title": "Welcome to OnRopePro!",
+      "subtitle": "Your company account is ready",
+      "trialInfo": "Your {{days}}-day free trial has started",
+      "goToDashboard": "Go to Dashboard"
+    },
+    "buttons": {
+      "back": "Back",
+      "continue": "Continue",
+      "createAccount": "Create Account",
+      "creatingAccount": "Creating Account..."
+    }
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "projects": "Projects",
@@ -797,6 +897,7 @@
     "no": "No",
     "ok": "OK",
     "done": "Done",
+    "copied": "Copied!",
     "actions": "Actions",
     "status": "Status",
     "details": "Details",
@@ -882,6 +983,13 @@
     "signOut": "Sign Out",
     "password": "Password",
     "confirmPassword": "Confirm Password",
+    "free": "Free",
+    "whatYouGet": "What You Get:",
+    "includedInTrial": "Included in your trial:",
+    "afterTrial": "After trial:",
+    "cancelAnytimeDuringTrial": "Cancel anytime during trial. Annual plans available later.",
+    "termsAgreement": "By continuing, you agree to our Terms of Service and Privacy Policy. Your billing address will be used as your company address.",
+    "whileYouWait": "While you wait...",
     "forgotPassword": "Forgot Password",
     "rememberMe": "Remember Me",
     "or": "or",
@@ -2042,7 +2150,40 @@
     "emergencyProcedures": "Emergency Procedures",
     "competencyRequirements": "Competency Requirements",
     "reviewBeforeSigning": "Review this document carefully before signing to acknowledge receipt and understanding.",
-    "proceedToSign": "Proceed to Sign"
+    "proceedToSign": "Proceed to Sign",
+    "exporting": "Exporting...",
+    "exportZip": "Export ZIP",
+    "noDocsFound": "No documents found",
+    "noDocsInRange": "There are no documents in the selected date range.",
+    "exportFailed": "Export failed",
+    "exportFailedPdfs": "Could not generate any PDFs. Please try again.",
+    "exportPartial": "Export partially complete",
+    "exportPartialDesc": "Exported {{successCount}} documents. {{failedCount}} document(s) failed to generate.",
+    "exportComplete": "Export complete",
+    "exportCompleteDesc": "Successfully exported {{successCount}} {{documentType}} documents.",
+    "exportError": "There was an error generating the export. Please try again.",
+    "quizGenerated": "Quiz Generated",
+    "quizGeneratedDesc": "The quiz has been created and is now available for employees.",
+    "quizError": "Error",
+    "quizGenerationFailed": "Failed to generate quiz",
+    "documentSigned": "Document Signed",
+    "signatureRecorded": "Your signature has been recorded successfully.",
+    "signFailed": "Failed to sign document",
+    "signatureRequired": "Signature Required",
+    "provideSignature": "Please provide your signature before submitting.",
+    "complianceDownloaded": "Compliance report downloaded successfully",
+    "complianceFailed": "Failed to download compliance report",
+    "uploadSuccess": "Document uploaded successfully",
+    "uploadFailed": "Failed to upload document",
+    "selectJobType": "Please select a job type for this method statement",
+    "enterCustomJobType": "Please enter a custom job type name",
+    "methodStatementUploaded": "Method statement uploaded successfully",
+    "methodStatementFailed": "Failed to upload method statement",
+    "deleteSuccess": "Document deleted successfully",
+    "deleteFailed": "Failed to delete document",
+    "templatesAdded": "Added {{count}} safe work procedure(s)",
+    "templatesFailed": "Failed to initialize templates",
+    "uploadMethodStatementDesc": "Upload your company's method statement document for a specific job type to satisfy compliance requirements."
   },
   "safety": {
     "title": "Safety",

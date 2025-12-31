@@ -481,6 +481,106 @@
       "closeDialog": "Cerrar este dialogo"
     }
   },
+  "employerReg": {
+    "sidebar": {
+      "title": "Gestion de empresa de acceso con cuerdas",
+      "subtitle": "Todo conectado. Nada perdido."
+    },
+    "steps": {
+      "accountDetails": "Detalles de la cuenta",
+      "billingDetails": "Detalles de facturacion",
+      "complete": "Completado"
+    },
+    "processing": {
+      "verifyingPayment": "Verificando pago...",
+      "creatingAccount": "Creando su cuenta de empresa...",
+      "settingUpDashboard": "Configurando su panel...",
+      "configuringPermissions": "Configurando permisos...",
+      "finalizingSetup": "Finalizando configuracion..."
+    },
+    "toast": {
+      "registrationComplete": "Registro completado!",
+      "accountCreatedSuccess": "Su cuenta de empresa ha sido creada exitosamente.",
+      "registrationError": "Error de registro",
+      "registrationFailed": "Registro fallido",
+      "failedToComplete": "Error al completar el registro. Por favor intente de nuevo."
+    },
+    "errors": {
+      "companyNameRequired": "El nombre de la empresa es requerido",
+      "ownerNameRequired": "El nombre del propietario es requerido",
+      "validEmailRequired": "Se requiere un correo electronico valido",
+      "passwordMinLength": "La contrasena debe tener al menos 6 caracteres",
+      "passwordsMismatch": "Las contrasenas no coinciden",
+      "registrationFailed": "Registro fallido"
+    },
+    "welcome": {
+      "badge": "Para empresas de acceso con cuerdas",
+      "title": "Cree su cuenta de empresa",
+      "subtitle": "Comience su prueba gratuita hoy",
+      "getStarted": "Comenzar",
+      "haveAccount": "Ya tiene una cuenta?",
+      "signIn": "Iniciar sesion"
+    },
+    "benefits": {
+      "jobBoard": "Acceda a nuestra bolsa de trabajo y llegue a miles de tecnicos calificados",
+      "projectTracking": "Seguimiento de proyectos en tiempo real y monitoreo de presupuesto",
+      "payrollSavings": "Elimine 4-8 horas de procesamiento de nomina por periodo de pago",
+      "safetyDocs": "Documentacion de seguridad digital para auditorias y cumplimiento",
+      "permissions": "44 niveles de permisos individuales para control de acceso completo",
+      "quoteAccuracy": "Mejora del 15-20% en la precision de cotizaciones"
+    },
+    "welcomeBenefits": {
+      "jobBoard": "Publique trabajos en nuestra bolsa exclusiva de acceso con cuerdas",
+      "projectTracking": "Rastree cada proyecto y cada descenso en un panel central",
+      "payrollIntegration": "El fichaje fluye directamente a nomina",
+      "auditTrail": "Rastro de auditoria completo para cumplimiento de seguridad",
+      "budgetMonitoring": "Monitoreo en tiempo real de presupuesto vs real"
+    },
+    "trialBenefits": {
+      "fullAccess": "Acceso completo a todas las funciones",
+      "cancelAnytime": "Cancele en cualquier momento con exportacion de datos",
+      "prioritySupport": "Soporte prioritario durante la prueba",
+      "noCharge": "Sin cargo hasta que termine la prueba"
+    },
+    "companyDetails": {
+      "step": "Paso 1 de 3",
+      "title": "Detalles de la empresa",
+      "companyName": "Nombre de la empresa",
+      "companyNamePlaceholder": "Su empresa de acceso con cuerdas",
+      "ownerName": "Nombre del propietario",
+      "ownerNamePlaceholder": "Juan Garcia",
+      "email": "Correo electronico",
+      "emailPlaceholder": "usted@ejemplo.com",
+      "password": "Contrasena",
+      "passwordPlaceholder": "Cree una contrasena",
+      "confirmPassword": "Confirmar contrasena",
+      "confirmPasswordPlaceholder": "Confirme su contrasena"
+    },
+    "payment": {
+      "step": "Paso 2 de 3",
+      "title": "Detalles de facturacion",
+      "subtitle": "Ingrese sus detalles de facturacion para comenzar su prueba gratuita de {{days}} dias",
+      "orderSummary": "Resumen del pedido",
+      "basePlan": "OnRopePro Base (Mensual)",
+      "billingCycle": "Ciclo de facturacion",
+      "monthly": "Mensual",
+      "freeTrial": "Prueba gratuita",
+      "days": "dias",
+      "noChargeUntilTrialEnds": "Sin cargo hasta que termine la prueba"
+    },
+    "success": {
+      "title": "Bienvenido a OnRopePro!",
+      "subtitle": "Su cuenta de empresa esta lista",
+      "trialInfo": "Su prueba gratuita de {{days}} dias ha comenzado",
+      "goToDashboard": "Ir al panel"
+    },
+    "buttons": {
+      "back": "Atras",
+      "continue": "Continuar",
+      "createAccount": "Crear cuenta",
+      "creatingAccount": "Creando cuenta..."
+    }
+  },
   "navigation": {
     "language": "Idioma",
     "help": "Ayuda",
@@ -871,6 +971,7 @@
     "no": "No",
     "ok": "OK",
     "done": "Listo",
+    "copied": "Copiado!",
     "actions": "Acciones",
     "status": "Estado",
     "details": "Detalles",
@@ -954,6 +1055,13 @@
     "signIn": "Iniciar Sesión",
     "signUp": "Registrarse",
     "signOut": "Cerrar Sesion",
+    "free": "Gratis",
+    "whatYouGet": "Lo que obtienes:",
+    "includedInTrial": "Incluido en tu prueba:",
+    "afterTrial": "Despues de la prueba:",
+    "cancelAnytimeDuringTrial": "Cancela en cualquier momento durante la prueba. Planes anuales disponibles despues.",
+    "termsAgreement": "Al continuar, aceptas nuestros Terminos de Servicio y Politica de Privacidad. Tu direccion de facturacion se usara como direccion de tu empresa.",
+    "whileYouWait": "Mientras esperas...",
     "password": "Contrasena",
     "confirmPassword": "Confirmar Contrasena",
     "forgotPassword": "Olvide mi Contrasena",
@@ -2159,8 +2267,41 @@
     "workProcedure": "Work Procedure",
     "emergencyProcedures": "Emergency Procedures",
     "competencyRequirements": "Competency Requirements",
-    "reviewBeforeSigning": "Review this document carefully before signing to acknowledge receipt and understanding.",
-    "proceedToSign": "Proceed to Sign"
+    "reviewBeforeSigning": "Revise este documento cuidadosamente antes de firmar para confirmar recibo y comprensión.",
+    "proceedToSign": "Proceder a firmar",
+    "exporting": "Exportando...",
+    "exportZip": "Exportar ZIP",
+    "noDocsFound": "No se encontraron documentos",
+    "noDocsInRange": "No hay documentos en el rango de fechas seleccionado.",
+    "exportFailed": "Fallo en la exportación",
+    "exportFailedPdfs": "No se pudieron generar los PDF. Por favor, intente de nuevo.",
+    "exportPartial": "Exportación parcialmente completa",
+    "exportPartialDesc": "Se exportaron {{successCount}} documentos. {{failedCount}} documento(s) fallaron.",
+    "exportComplete": "Exportación completa",
+    "exportCompleteDesc": "Se exportaron exitosamente {{successCount}} documentos {{documentType}}.",
+    "exportError": "Ocurrió un error al generar la exportación. Por favor, intente de nuevo.",
+    "quizGenerated": "Quiz generado",
+    "quizGeneratedDesc": "El quiz ha sido creado y ahora está disponible para los empleados.",
+    "quizError": "Error",
+    "quizGenerationFailed": "Fallo al generar el quiz",
+    "documentSigned": "Documento firmado",
+    "signatureRecorded": "Su firma ha sido registrada exitosamente.",
+    "signFailed": "Fallo al firmar el documento",
+    "signatureRequired": "Firma requerida",
+    "provideSignature": "Por favor, proporcione su firma antes de enviar.",
+    "complianceDownloaded": "Reporte de cumplimiento descargado exitosamente",
+    "complianceFailed": "Fallo al descargar el reporte de cumplimiento",
+    "uploadSuccess": "Documento cargado exitosamente",
+    "uploadFailed": "Fallo al cargar el documento",
+    "selectJobType": "Por favor, seleccione un tipo de trabajo para esta declaración de método",
+    "enterCustomJobType": "Por favor, ingrese un nombre de tipo de trabajo personalizado",
+    "methodStatementUploaded": "Declaración de método cargada exitosamente",
+    "methodStatementFailed": "Fallo al cargar la declaración de método",
+    "deleteSuccess": "Documento eliminado exitosamente",
+    "deleteFailed": "Fallo al eliminar el documento",
+    "templatesAdded": "Se agregaron {{count}} procedimiento(s) de trabajo seguro",
+    "templatesFailed": "Fallo al inicializar las plantillas",
+    "uploadMethodStatementDesc": "Cargue el documento de declaración de método de su empresa para un tipo de trabajo específico para satisfacer los requisitos de cumplimiento."
   },
   "safety": {
     "title": "Safety",
