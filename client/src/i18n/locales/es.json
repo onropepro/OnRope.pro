@@ -929,7 +929,7 @@
     "to": "To",
     "start": "Start",
     "end": "End",
-    "more": "More",
+    "more": "más",
     "less": "Less",
     "showMore": "Ver más",
     "showLess": "Ver menos",
@@ -951,7 +951,7 @@
     "logout": "Cerrar Sesion",
     "login": "Iniciar Sesion",
     "register": "Registrarse",
-    "signIn": "Iniciar Sesion",
+    "signIn": "Iniciar Sesión",
     "signUp": "Registrarse",
     "signOut": "Cerrar Sesion",
     "password": "Contrasena",
@@ -997,7 +997,23 @@
     "options": "Opciones",
     "chooseFiles": "Elegir archivos",
     "takePhoto": "Tomar foto",
-    "documentsUploaded": "documentos subidos"
+    "documentsUploaded": "documentos subidos",
+    "timesheets": "Hojas de tiempo",
+    "totalHours": "Horas Totales",
+    "reviewTimesheets": "Revisar hojas de tiempo",
+    "allTimesheetsReviewed": "Todas las hojas de tiempo revisadas",
+    "pastDueDate": "Fecha vencida",
+    "overdue": "atrasado",
+    "untitled": "Sin título",
+    "somethingWentWrong": "Algo salió mal. Por favor inténtelo de nuevo.",
+    "upcoming": "próximos",
+    "jobsThisMonth": "Trabajos Este Mes",
+    "hoursLogged": "Horas Registradas",
+    "avgPerJob": "Prom.",
+    "perJob": "por trabajo",
+    "viewDetails": "Ver detalles",
+    "noActivityThisMonth": "Sin actividad este mes",
+    "completeSessionsForStats": "Complete sesiones para ver sus estadísticas"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -12203,16 +12219,33 @@
     "sendLink": "Enviar enlace",
     "sending": "Enviando...",
     "backToLogin": "Volver al inicio de sesión",
-    "successTitle": "Revisa tu correo",
+    "successTitle": "Contraseña Restablecida",
     "successMessage": "Si existe una cuenta con ese correo, recibirás un enlace de restablecimiento.",
     "errorTitle": "Error",
     "errorMessage": "Error al enviar el enlace. Por favor intenta de nuevo.",
-    "newPassword": "Nueva contraseña",
-    "confirmPassword": "Confirmar contraseña",
-    "resetButton": "Restablecer",
+    "newPassword": "Nueva Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "resetButton": "Restablecer Contraseña",
     "resetting": "Restableciendo...",
     "resetSuccess": "Contraseña restablecida exitosamente",
-    "resetError": "Error al restablecer la contraseña"
+    "resetError": "Error al restablecer la contraseña",
+    "invalidLink": "Enlace inválido. Por favor solicite un nuevo restablecimiento de contraseña.",
+    "minLength": "La contraseña debe tener al menos 8 caracteres",
+    "uppercase": "La contraseña debe contener al menos una mayúscula",
+    "lowercase": "La contraseña debe contener al menos una minúscula",
+    "number": "La contraseña debe contener al menos un número",
+    "mismatch": "Las contraseñas no coinciden",
+    "successDescription": "Ahora puede iniciar sesión con su nueva contraseña.",
+    "failed": "Error al restablecer la contraseña. Inténtelo de nuevo.",
+    "completeTitle": "Restablecimiento Completo",
+    "completeDescription": "Su contraseña se ha restablecido correctamente. Ahora puede iniciar sesión.",
+    "goToSignIn": "Ir a Iniciar Sesión",
+    "createNewTitle": "Crear Nueva Contraseña",
+    "createNewDescription": "Ingrese su nueva contraseña a continuación.",
+    "enterNewPassword": "Ingrese nueva contraseña",
+    "requirements": "Al menos 8 caracteres con mayúscula, minúscula y número",
+    "confirmNewPassword": "Confirmar nueva contraseña",
+    "rememberPassword": "¿Recuerda su contraseña?"
   },
   "help": {
     "title": "Centro de Ayuda",
@@ -12234,5 +12267,146 @@
     "featureFinder": "Buscador de características",
     "noResults": "No se encontraron artículos",
     "tryDifferentSearch": "Intenta con otro término de búsqueda"
+  },
+  "dashboardCards": {
+    "activeWorkers": {
+      "title": "Trabajadores Activos",
+      "noAccess": "Sin acceso",
+      "clockedIn": "fichados",
+      "noWorkers": "Ningún trabajador fichado actualmente",
+      "more": "más"
+    },
+    "todaySchedule": {
+      "title": "Horario de Hoy",
+      "jobs": "trabajos",
+      "noJobs": "No hay trabajos programados para hoy",
+      "viewFullSchedule": "Ver horario completo"
+    },
+    "expiringCerts": {
+      "title": "Certificaciones por Vencer",
+      "within60Days": "Dentro de 60 días",
+      "noCerts": "Sin certificaciones por vencer",
+      "allCurrent": "Todas al día",
+      "viewEmployees": "Ver empleados",
+      "more": "más"
+    },
+    "certificationAlerts": {
+      "title": "Alertas de Certificación",
+      "expiring": "Por vencer",
+      "expired": "Vencidas",
+      "viewAll": "Ver Todo"
+    },
+    "harnessStatus": {
+      "title": "Estado de Arneses",
+      "needsInspection": "Inspección Requerida",
+      "upToDate": "Al Día",
+      "noHarnesses": "Sin datos de arneses",
+      "viewInventory": "Ver inventario"
+    },
+    "myPerformance": {
+      "title": "Mi Rendimiento",
+      "hoursThisWeek": "Horas Esta Semana",
+      "projectsCompleted": "Proyectos Completados",
+      "safetyScore": "Puntuación Seguridad",
+      "noData": "Sin datos de rendimiento"
+    },
+    "mySchedule": {
+      "title": "Mi Horario",
+      "upcomingShifts": "Turnos Próximos",
+      "noShifts": "Sin turnos próximos",
+      "viewSchedule": "Ver horario"
+    },
+    "newFeedback": {
+      "title": "Nuevos Comentarios",
+      "unread": "Sin leer",
+      "noFeedback": "Sin nuevos comentarios",
+      "viewAll": "Ver Todo"
+    },
+    "notClockedIn": {
+      "title": "Sin Fichar",
+      "expected": "Esperados en sitio",
+      "allClockedIn": "Todos los trabajadores esperados han fichado",
+      "viewDetails": "Ver detalles"
+    },
+    "outstandingQuotes": {
+      "title": "Cotizaciones Pendientes",
+      "pending": "Pendientes",
+      "totalValue": "Valor Total",
+      "noQuotes": "Sin cotizaciones pendientes",
+      "viewQuotes": "Ver cotizaciones"
+    },
+    "overdueProjects": {
+      "title": "Proyectos Atrasados",
+      "projects": "Proyectos",
+      "noOverdue": "Sin proyectos atrasados",
+      "allOnTrack": "Todos los proyectos al día",
+      "viewProjects": "Ver proyectos"
+    },
+    "overtimeAlert": {
+      "title": "Alerta Horas Extra",
+      "approaching": "Acercándose a HE",
+      "inOvertime": "En Horas Extra",
+      "noAlerts": "Sin alertas",
+      "viewDetails": "Ver detalles"
+    },
+    "payPeriod": {
+      "title": "Período de Pago",
+      "currentPeriod": "Período Actual",
+      "daysRemaining": "días restantes",
+      "totalHours": "Horas Totales",
+      "viewPayroll": "Ver nómina"
+    },
+    "pendingApprovals": {
+      "title": "Aprobaciones Pendientes",
+      "awaiting": "En espera",
+      "noPending": "Sin aprobaciones pendientes",
+      "allCaughtUp": "Todo al día",
+      "viewAll": "Ver Todo"
+    },
+    "toolboxCoverage": {
+      "title": "Cobertura Toolbox",
+      "coverage": "Cobertura",
+      "thisWeek": "Esta Semana",
+      "viewMeetings": "Ver reuniones"
+    },
+    "safetyRating": {
+      "title": "Puntuación Seguridad",
+      "companyScore": "Puntuación Empresa",
+      "trend": "Tendencia",
+      "viewDetails": "Ver detalles"
+    },
+    "todaysHours": {
+      "title": "Horas de Hoy",
+      "hoursLogged": "Horas Registradas",
+      "clockIn": "Fichar entrada",
+      "clockOut": "Fichar salida",
+      "onBreak": "En descanso"
+    },
+    "weekAtGlance": {
+      "title": "Semana de un Vistazo",
+      "scheduledHours": "Horas Programadas",
+      "actualHours": "Horas Reales",
+      "projects": "Proyectos"
+    },
+    "myTime": {
+      "title": "Mi Tiempo",
+      "hoursThisWeek": "Horas Esta Semana",
+      "breaksTaken": "Descansos Tomados",
+      "viewTimesheet": "Ver hoja de tiempo"
+    },
+    "activeProjects": {
+      "title": "Proyectos Activos",
+      "inProgress": "En Progreso",
+      "noProjects": "Sin proyectos activos",
+      "viewAll": "Ver Todo"
+    },
+    "weather": {
+      "title": "Clima",
+      "noData": "Sin datos del clima"
+    },
+    "placeholder": {
+      "title": "Próximamente",
+      "description": "Esta función está en desarrollo"
+    }
   }
 }

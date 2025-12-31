@@ -866,7 +866,7 @@
     "to": "À",
     "start": "Début",
     "end": "Fin",
-    "more": "Plus",
+    "more": "de plus",
     "less": "Moins",
     "showMore": "Voir plus",
     "showLess": "Voir moins",
@@ -888,7 +888,7 @@
     "logout": "Deconnexion",
     "login": "Connexion",
     "register": "S'enregistrer",
-    "signIn": "Se connecter",
+    "signIn": "Se Connecter",
     "signUp": "S'inscrire",
     "signOut": "Se deconnecter",
     "password": "Mot de passe",
@@ -932,7 +932,23 @@
     "options": "Options",
     "chooseFiles": "Choisir des fichiers",
     "takePhoto": "Prendre une photo",
-    "documentsUploaded": "documents téléversés"
+    "documentsUploaded": "documents téléversés",
+    "timesheets": "Feuilles de temps",
+    "totalHours": "Heures Totales",
+    "reviewTimesheets": "Réviser les feuilles de temps",
+    "allTimesheetsReviewed": "Toutes les feuilles de temps révisées",
+    "pastDueDate": "Date d'échéance dépassée",
+    "overdue": "en retard",
+    "untitled": "Sans titre",
+    "somethingWentWrong": "Une erreur s'est produite. Veuillez réessayer.",
+    "upcoming": "à venir",
+    "jobsThisMonth": "Travaux Ce Mois",
+    "hoursLogged": "Heures Enregistrées",
+    "avgPerJob": "Moy.",
+    "perJob": "par travail",
+    "viewDetails": "Voir les détails",
+    "noActivityThisMonth": "Aucune activité ce mois",
+    "completeSessionsForStats": "Complétez des sessions pour voir vos stats"
   },
   "auth": {
     "welcomeBack": "Bon retour",
@@ -12355,16 +12371,33 @@
     "sendLink": "Envoyer le lien",
     "sending": "Envoi...",
     "backToLogin": "Retour à la connexion",
-    "successTitle": "Vérifiez votre courriel",
+    "successTitle": "Réinitialisation Réussie",
     "successMessage": "Si un compte existe avec ce courriel, vous recevrez un lien de réinitialisation.",
     "errorTitle": "Erreur",
     "errorMessage": "Échec de l'envoi du lien. Veuillez réessayer.",
-    "newPassword": "Nouveau mot de passe",
-    "confirmPassword": "Confirmer le mot de passe",
-    "resetButton": "Réinitialiser",
+    "newPassword": "Nouveau Mot de Passe",
+    "confirmPassword": "Confirmer le Mot de Passe",
+    "resetButton": "Réinitialiser le Mot de Passe",
     "resetting": "Réinitialisation...",
     "resetSuccess": "Mot de passe réinitialisé avec succès",
-    "resetError": "Échec de la réinitialisation"
+    "resetError": "Échec de la réinitialisation",
+    "invalidLink": "Lien invalide. Veuillez demander une nouvelle réinitialisation de mot de passe.",
+    "minLength": "Le mot de passe doit contenir au moins 8 caractères",
+    "uppercase": "Le mot de passe doit contenir au moins une majuscule",
+    "lowercase": "Le mot de passe doit contenir au moins une minuscule",
+    "number": "Le mot de passe doit contenir au moins un chiffre",
+    "mismatch": "Les mots de passe ne correspondent pas",
+    "successDescription": "Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+    "failed": "Échec de la réinitialisation. Veuillez réessayer.",
+    "completeTitle": "Réinitialisation Terminée",
+    "completeDescription": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+    "goToSignIn": "Aller à la Connexion",
+    "createNewTitle": "Créer un Nouveau Mot de Passe",
+    "createNewDescription": "Entrez votre nouveau mot de passe ci-dessous.",
+    "enterNewPassword": "Entrer le nouveau mot de passe",
+    "requirements": "Au moins 8 caractères avec majuscule, minuscule et chiffre",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "rememberPassword": "Vous vous souvenez de votre mot de passe ?"
   },
   "help": {
     "title": "Centre d'aide",
@@ -12386,5 +12419,146 @@
     "featureFinder": "Recherche de fonctionnalités",
     "noResults": "Aucun article trouvé",
     "tryDifferentSearch": "Essayez un autre terme de recherche"
+  },
+  "dashboardCards": {
+    "activeWorkers": {
+      "title": "Travailleurs Actifs",
+      "noAccess": "Aucun accès",
+      "clockedIn": "pointés",
+      "noWorkers": "Aucun travailleur pointé actuellement",
+      "more": "de plus"
+    },
+    "todaySchedule": {
+      "title": "Horaire d'Aujourd'hui",
+      "jobs": "travaux",
+      "noJobs": "Aucun travail prévu pour aujourd'hui",
+      "viewFullSchedule": "Voir l'horaire complet"
+    },
+    "expiringCerts": {
+      "title": "Certifications Expirantes",
+      "within60Days": "Dans les 60 jours",
+      "noCerts": "Aucune certification expirante",
+      "allCurrent": "Toutes à jour",
+      "viewEmployees": "Voir les employés",
+      "more": "de plus"
+    },
+    "certificationAlerts": {
+      "title": "Alertes Certification",
+      "expiring": "Expirantes",
+      "expired": "Expirées",
+      "viewAll": "Voir Tout"
+    },
+    "harnessStatus": {
+      "title": "État des Harnais",
+      "needsInspection": "Inspection Requise",
+      "upToDate": "À Jour",
+      "noHarnesses": "Aucune donnée de harnais",
+      "viewInventory": "Voir l'inventaire"
+    },
+    "myPerformance": {
+      "title": "Ma Performance",
+      "hoursThisWeek": "Heures Cette Semaine",
+      "projectsCompleted": "Projets Terminés",
+      "safetyScore": "Score Sécurité",
+      "noData": "Aucune donnée de performance"
+    },
+    "mySchedule": {
+      "title": "Mon Horaire",
+      "upcomingShifts": "Quarts à Venir",
+      "noShifts": "Aucun quart à venir",
+      "viewSchedule": "Voir l'horaire"
+    },
+    "newFeedback": {
+      "title": "Nouveaux Commentaires",
+      "unread": "Non lus",
+      "noFeedback": "Aucun nouveau commentaire",
+      "viewAll": "Voir Tout"
+    },
+    "notClockedIn": {
+      "title": "Non Pointés",
+      "expected": "Attendus sur site",
+      "allClockedIn": "Tous les travailleurs attendus sont pointés",
+      "viewDetails": "Voir les détails"
+    },
+    "outstandingQuotes": {
+      "title": "Devis en Attente",
+      "pending": "En attente",
+      "totalValue": "Valeur Totale",
+      "noQuotes": "Aucun devis en attente",
+      "viewQuotes": "Voir les devis"
+    },
+    "overdueProjects": {
+      "title": "Projets en Retard",
+      "projects": "Projets",
+      "noOverdue": "Aucun projet en retard",
+      "allOnTrack": "Tous les projets sont à jour",
+      "viewProjects": "Voir les projets"
+    },
+    "overtimeAlert": {
+      "title": "Alerte Heures Sup.",
+      "approaching": "Approchant les HS",
+      "inOvertime": "En Heures Sup.",
+      "noAlerts": "Aucune alerte",
+      "viewDetails": "Voir les détails"
+    },
+    "payPeriod": {
+      "title": "Période de Paie",
+      "currentPeriod": "Période Actuelle",
+      "daysRemaining": "jours restants",
+      "totalHours": "Heures Totales",
+      "viewPayroll": "Voir la paie"
+    },
+    "pendingApprovals": {
+      "title": "Approbations en Attente",
+      "awaiting": "En attente",
+      "noPending": "Aucune approbation en attente",
+      "allCaughtUp": "Tout est à jour",
+      "viewAll": "Voir Tout"
+    },
+    "toolboxCoverage": {
+      "title": "Couverture Toolbox",
+      "coverage": "Couverture",
+      "thisWeek": "Cette Semaine",
+      "viewMeetings": "Voir les réunions"
+    },
+    "safetyRating": {
+      "title": "Score Sécurité",
+      "companyScore": "Score Entreprise",
+      "trend": "Tendance",
+      "viewDetails": "Voir les détails"
+    },
+    "todaysHours": {
+      "title": "Heures d'Aujourd'hui",
+      "hoursLogged": "Heures Enregistrées",
+      "clockIn": "Pointer l'entrée",
+      "clockOut": "Pointer la sortie",
+      "onBreak": "En pause"
+    },
+    "weekAtGlance": {
+      "title": "Semaine en un Coup d'Oeil",
+      "scheduledHours": "Heures Prévues",
+      "actualHours": "Heures Réelles",
+      "projects": "Projets"
+    },
+    "myTime": {
+      "title": "Mon Temps",
+      "hoursThisWeek": "Heures Cette Semaine",
+      "breaksTaken": "Pauses Prises",
+      "viewTimesheet": "Voir la feuille de temps"
+    },
+    "activeProjects": {
+      "title": "Projets Actifs",
+      "inProgress": "En Cours",
+      "noProjects": "Aucun projet actif",
+      "viewAll": "Voir Tout"
+    },
+    "weather": {
+      "title": "Météo",
+      "noData": "Aucune donnée météo"
+    },
+    "placeholder": {
+      "title": "Bientôt Disponible",
+      "description": "Cette fonctionnalité est en développement"
+    }
   }
 }

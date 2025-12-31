@@ -855,7 +855,7 @@
     "to": "To",
     "start": "Start",
     "end": "End",
-    "more": "More",
+    "more": "more",
     "less": "Less",
     "showMore": "Show more",
     "showLess": "Show less",
@@ -921,7 +921,23 @@
     "options": "Options",
     "chooseFiles": "Choose Files",
     "takePhoto": "Take Photo",
-    "documentsUploaded": "documents uploaded"
+    "documentsUploaded": "documents uploaded",
+    "timesheets": "Timesheets",
+    "totalHours": "Total Hours",
+    "reviewTimesheets": "Review Timesheets",
+    "allTimesheetsReviewed": "All timesheets reviewed",
+    "pastDueDate": "Past due date",
+    "overdue": "overdue",
+    "untitled": "Untitled",
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "upcoming": "upcoming",
+    "jobsThisMonth": "Jobs This Month",
+    "hoursLogged": "Hours Logged",
+    "avgPerJob": "Avg",
+    "perJob": "per job",
+    "viewDetails": "View Details",
+    "noActivityThisMonth": "No activity this month",
+    "completeSessionsForStats": "Complete work sessions to see your stats"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -8728,7 +8744,7 @@
     "sendLink": "Send Reset Link",
     "sending": "Sending...",
     "backToLogin": "Back to Login",
-    "successTitle": "Check Your Email",
+    "successTitle": "Password Reset Successful",
     "successMessage": "If an account exists with that email, you will receive a password reset link.",
     "errorTitle": "Error",
     "errorMessage": "Failed to send reset link. Please try again.",
@@ -8737,7 +8753,24 @@
     "resetButton": "Reset Password",
     "resetting": "Resetting...",
     "resetSuccess": "Password reset successfully",
-    "resetError": "Failed to reset password"
+    "resetError": "Failed to reset password",
+    "invalidLink": "Invalid reset link. Please request a new password reset.",
+    "minLength": "Password must be at least 8 characters long",
+    "uppercase": "Password must contain at least one uppercase letter",
+    "lowercase": "Password must contain at least one lowercase letter",
+    "number": "Password must contain at least one number",
+    "mismatch": "Passwords do not match",
+    "successDescription": "You can now sign in with your new password.",
+    "failed": "Failed to reset password. Please try again.",
+    "completeTitle": "Password Reset Complete",
+    "completeDescription": "Your password has been successfully reset. You can now sign in with your new password.",
+    "goToSignIn": "Go to Sign In",
+    "createNewTitle": "Create New Password",
+    "createNewDescription": "Enter your new password below.",
+    "enterNewPassword": "Enter new password",
+    "requirements": "At least 8 characters with uppercase, lowercase, and a number",
+    "confirmNewPassword": "Confirm new password",
+    "rememberPassword": "Remember your password?"
   },
   "help": {
     "title": "Help Center",
@@ -8759,5 +8792,146 @@
     "featureFinder": "Feature Finder",
     "noResults": "No articles found",
     "tryDifferentSearch": "Try a different search term"
+  },
+  "dashboardCards": {
+    "activeWorkers": {
+      "title": "Active Workers",
+      "noAccess": "No access",
+      "clockedIn": "clocked in",
+      "noWorkers": "No workers currently clocked in",
+      "more": "more"
+    },
+    "todaySchedule": {
+      "title": "Today's Schedule",
+      "jobs": "jobs",
+      "noJobs": "No jobs scheduled for today",
+      "viewFullSchedule": "View Full Schedule"
+    },
+    "expiringCerts": {
+      "title": "Expiring Certs",
+      "within60Days": "Within 60 days",
+      "noCerts": "No expiring certifications",
+      "allCurrent": "All certs current",
+      "viewEmployees": "View Employees",
+      "more": "more"
+    },
+    "certificationAlerts": {
+      "title": "Certification Alerts",
+      "expiring": "Expiring",
+      "expired": "Expired",
+      "viewAll": "View All"
+    },
+    "harnessStatus": {
+      "title": "Harness Status",
+      "needsInspection": "Needs Inspection",
+      "upToDate": "Up to Date",
+      "noHarnesses": "No harness data",
+      "viewInventory": "View Inventory"
+    },
+    "myPerformance": {
+      "title": "My Performance",
+      "hoursThisWeek": "Hours This Week",
+      "projectsCompleted": "Projects Completed",
+      "safetyScore": "Safety Score",
+      "noData": "No performance data"
+    },
+    "mySchedule": {
+      "title": "My Schedule",
+      "upcomingShifts": "Upcoming Shifts",
+      "noShifts": "No upcoming shifts",
+      "viewSchedule": "View Schedule"
+    },
+    "newFeedback": {
+      "title": "New Feedback",
+      "unread": "Unread",
+      "noFeedback": "No new feedback",
+      "viewAll": "View All"
+    },
+    "notClockedIn": {
+      "title": "Not Clocked In",
+      "expected": "Expected on site",
+      "allClockedIn": "All expected workers clocked in",
+      "viewDetails": "View Details"
+    },
+    "outstandingQuotes": {
+      "title": "Outstanding Quotes",
+      "pending": "Pending",
+      "totalValue": "Total Value",
+      "noQuotes": "No outstanding quotes",
+      "viewQuotes": "View Quotes"
+    },
+    "overdueProjects": {
+      "title": "Overdue Projects",
+      "projects": "Projects",
+      "noOverdue": "No overdue projects",
+      "allOnTrack": "All projects on track",
+      "viewProjects": "View Projects"
+    },
+    "overtimeAlert": {
+      "title": "Overtime Alert",
+      "approaching": "Approaching OT",
+      "inOvertime": "In Overtime",
+      "noAlerts": "No overtime alerts",
+      "viewDetails": "View Details"
+    },
+    "payPeriod": {
+      "title": "Pay Period",
+      "currentPeriod": "Current Period",
+      "daysRemaining": "days remaining",
+      "totalHours": "Total Hours",
+      "viewPayroll": "View Payroll"
+    },
+    "pendingApprovals": {
+      "title": "Pending Approvals",
+      "awaiting": "Awaiting",
+      "noPending": "No pending approvals",
+      "allCaughtUp": "All caught up",
+      "viewAll": "View All"
+    },
+    "toolboxCoverage": {
+      "title": "Toolbox Coverage",
+      "coverage": "Coverage",
+      "thisWeek": "This Week",
+      "viewMeetings": "View Meetings"
+    },
+    "safetyRating": {
+      "title": "Safety Rating",
+      "companyScore": "Company Score",
+      "trend": "Trend",
+      "viewDetails": "View Details"
+    },
+    "todaysHours": {
+      "title": "Today's Hours",
+      "hoursLogged": "Hours Logged",
+      "clockIn": "Clock In",
+      "clockOut": "Clock Out",
+      "onBreak": "On Break"
+    },
+    "weekAtGlance": {
+      "title": "Week at a Glance",
+      "scheduledHours": "Scheduled Hours",
+      "actualHours": "Actual Hours",
+      "projects": "Projects"
+    },
+    "myTime": {
+      "title": "My Time",
+      "hoursThisWeek": "Hours This Week",
+      "breaksTaken": "Breaks Taken",
+      "viewTimesheet": "View Timesheet"
+    },
+    "activeProjects": {
+      "title": "Active Projects",
+      "inProgress": "In Progress",
+      "noProjects": "No active projects",
+      "viewAll": "View All"
+    },
+    "weather": {
+      "title": "Weather",
+      "noData": "No weather data"
+    },
+    "placeholder": {
+      "title": "Coming Soon",
+      "description": "This feature is under development"
+    }
   }
 }
