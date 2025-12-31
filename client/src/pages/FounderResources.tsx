@@ -233,6 +233,7 @@ function StatusBadge({ status }: { status: "completed" | "in-progress" | "planne
 }
 
 export default function FounderResources() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newResource, setNewResource] = useState({ name: "", url: "", description: "", icon: "Link" });
@@ -252,10 +253,10 @@ export default function FounderResources() {
       queryClient.invalidateQueries({ queryKey: ["/api/founder-resources"] });
       setAddDialogOpen(false);
       setNewResource({ name: "", url: "", description: "", icon: "Link" });
-      toast({ title: "Resource added", description: "The resource has been added successfully." });
+      toast({ title: t('founderResources.resourceAdded', 'Resource added'), description: t('founderResources.resourceAddedDesc', 'The resource has been added successfully.') });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message || "Failed to add resource", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message || t('founderResources.addFailed', 'Failed to add resource'), variant: "destructive" });
     },
   });
 
@@ -266,16 +267,16 @@ export default function FounderResources() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/founder-resources"] });
-      toast({ title: "Resource deleted", description: "The resource has been removed." });
+      toast({ title: t('founderResources.resourceDeleted', 'Resource deleted'), description: t('founderResources.resourceDeletedDesc', 'The resource has been removed.') });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message || "Failed to delete resource", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message || t('founderResources.deleteFailed', 'Failed to delete resource'), variant: "destructive" });
     },
   });
 
   const handleAddResource = () => {
     if (!newResource.name || !newResource.url) {
-      toast({ title: "Error", description: "Name and URL are required", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('founderResources.nameUrlRequired', 'Name and URL are required'), variant: "destructive" });
       return;
     }
     addResourceMutation.mutate(newResource);

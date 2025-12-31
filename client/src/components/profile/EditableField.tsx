@@ -2,6 +2,7 @@ import { Control, FieldValues, Path } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface EditableFieldProps<T extends FieldValues> {
   isEditing: boolean;
@@ -47,10 +48,12 @@ export function EditableField<T extends FieldValues>({
   maskChar = "x",
   showLastN = 4,
   formatValue,
-  emptyText = "Not provided",
+  emptyText,
   testId,
   className = "",
 }: EditableFieldProps<T>) {
+  const { t } = useTranslation();
+  const defaultEmptyText = emptyText ?? t('profile.notProvided', 'Not provided');
   const baseTestId = testId || `field-${String(name)}`;
 
   if (isEditing && control) {
@@ -106,7 +109,7 @@ export function EditableField<T extends FieldValues>({
         <span>{label}</span>
       </div>
       <p className="text-base" aria-label={masked && value ? `${label}: Value set, partially hidden for security` : undefined}>
-        {displayValue || <span className="text-muted-foreground">{emptyText}</span>}
+        {displayValue || <span className="text-muted-foreground">{defaultEmptyText}</span>}
       </p>
     </div>
   );

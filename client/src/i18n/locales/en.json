@@ -922,6 +922,8 @@
     "noResults": "No results found",
     "noData": "No data available",
     "error": "Error",
+    "failed": "Failed",
+    "networkError": "Network error",
     "success": "Success",
     "warning": "Warning",
     "info": "Info",
@@ -2966,7 +2968,20 @@
     "previousWeek": "Previous Week",
     "nextWeek": "Next Week",
     "noJobs": "No scheduled jobs",
-    "createFirstJob": "Create your first scheduled job"
+    "createFirstJob": "Create your first scheduled job",
+    "timeOffRemoved": "Time Off Removed",
+    "timeOffRemovedDesc": "Time off entry has been removed.",
+    "timeOffRemoveFailed": "Failed to remove time off.",
+    "missingInfo": "Missing Information",
+    "selectTimeOffFields": "Please select an employee, start date, and time off type.",
+    "invalidDateRange": "Invalid Date Range",
+    "endBeforeStart": "End date cannot be before start date.",
+    "timeOffScheduled": "Time Off Scheduled",
+    "timeOffScheduledDesc": "Time off has been scheduled for {{count}} day(s).",
+    "timeOffScheduleFailed": "Failed to schedule some time off entries.",
+    "employeeAssigned": "Employee assigned",
+    "employeeAssignedDesc": "Team member has been assigned with specified dates",
+    "assignFailed": "Failed to assign employee"
   },
   "resident": {
     "title": "Resident Portal",
@@ -3273,7 +3288,14 @@
       "generateNew": "Generate New Code",
       "copyCode": "Copy Code",
       "codeCopied": "Code copied to clipboard"
-    }
+    },
+    "notProvided": "Not provided",
+    "selectOption": "Select an option",
+    "notSelected": "Not selected",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "notSet": "Not set",
+    "noAddressProvided": "No address provided"
   },
   "subscription": {
     "title": "Subscription",
@@ -7512,7 +7534,23 @@
     "loading": "Loading building portal...",
     "anchors": "Anchor Points",
     "instructions": "Building Instructions",
-    "projectProgress": "Project Progress"
+    "projectProgress": "Project Progress",
+    "instructionsSaved": "Instructions Saved",
+    "instructionsSavedDesc": "Building instructions have been updated successfully.",
+    "saveFailed": "Save Failed",
+    "saveInstructionsFailed": "Failed to save building instructions.",
+    "addressUpdated": "Building address has been updated.",
+    "addressUpdateFailed": "Failed to update building address.",
+    "loginSuccessful": "Login Successful",
+    "welcomePortal": "Welcome to your building portal.",
+    "loginFailed": "Login Failed",
+    "invalidCredentials": "Invalid strata plan number or password.",
+    "passwordChanged": "Password Changed",
+    "passwordChangedDesc": "Your password has been updated successfully.",
+    "passwordChangeFailed": "Password Change Failed",
+    "passwordChangeError": "Failed to change password. Please try again.",
+    "fillAllPasswordFields": "Please fill in all password fields.",
+    "enterBothFields": "Please enter both strata plan number and password."
   },
   "manageSubscription": {
     "title": "Manage Subscription",
@@ -7598,7 +7636,58 @@
     "fieldRequired": "This field is required",
     "invalidFormat": "Invalid format",
     "tooShort": "Too short",
-    "tooLong": "Too long"
+    "tooLong": "Too long",
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "validEmailRequired": "Valid email is required",
+    "passwordMin6": "Password must be at least 6 characters",
+    "passwordsNoMatch": "Passwords do not match",
+    "fullNameRequired": "Full name is required",
+    "validEmail": "Please enter a valid email address"
+  },
+  "pmReg": {
+    "toast": {
+      "registrationComplete": "Registration Complete!",
+      "accountCreated": "Your property manager account has been created successfully.",
+      "registrationFailed": "Registration Failed"
+    },
+    "validation": {
+      "companyRequired": "Property management company is required"
+    }
+  },
+  "residentReg": {
+    "toast": {
+      "registrationFailed": "Registration Failed"
+    },
+    "validation": {
+      "strataRequired": "Strata/HOA/LMS Plan Number is required"
+    },
+    "sidebar": {
+      "title": "Resident Portal",
+      "subtitle": "Your voice matters in building maintenance"
+    },
+    "steps": {
+      "personalDetails": "Personal Details",
+      "buildingInfo": "Building Information"
+    },
+    "benefits": {
+      "submitFeedback": "Submit maintenance feedback with photos",
+      "trackResolution": "Track complaint resolution in real-time",
+      "getNotified": "Get notified when work is scheduled",
+      "rateWork": "Rate completed work quality",
+      "directComms": "Direct communication with property management",
+      "viewHistory": "View building maintenance history"
+    },
+    "features": {
+      "photoEvidence": "Photo Evidence",
+      "photoDesc": "Upload photos of issues for faster resolution",
+      "realTimeUpdates": "Real-time Updates",
+      "realTimeDesc": "Get notified when your complaint status changes",
+      "qualityRatings": "Quality Ratings",
+      "qualityDesc": "Rate contractors after work completion",
+      "securePortal": "Secure Portal",
+      "secureDesc": "Your information is protected and private"
+    }
   },
   "residentPortal": {
     "title": "Resident Portal",
@@ -9369,5 +9458,46 @@
   "helpArticle": {
     "match": "match",
     "learnMore": "Learn more about this feature"
+  },
+  "staffAccounts": {
+    "title": "Staff Accounts",
+    "subtitle": "Manage internal staff accounts for platform administration",
+    "created": "Staff account created successfully",
+    "updated": "Staff account updated successfully",
+    "deleted": "Staff account deleted successfully",
+    "createFailed": "Failed to create staff account",
+    "updateFailed": "Failed to update staff account",
+    "deleteFailed": "Failed to delete staff account",
+    "validationError": "Validation Error",
+    "fillRequired": "Please fill in all required fields"
+  },
+  "founderResources": {
+    "resourceAdded": "Resource added",
+    "resourceAddedDesc": "The resource has been added successfully.",
+    "addFailed": "Failed to add resource",
+    "resourceDeleted": "Resource deleted",
+    "resourceDeletedDesc": "The resource has been removed.",
+    "deleteFailed": "Failed to delete resource",
+    "nameUrlRequired": "Name and URL are required"
+  },
+  "superUserTasks": {
+    "taskCreated": "Task created",
+    "taskCreatedDesc": "New task has been added",
+    "createFailed": "Failed to create task",
+    "updateFailed": "Failed to update task",
+    "taskDeleted": "Task deleted",
+    "deleteFailed": "Failed to delete task",
+    "commentFailed": "Failed to add comment",
+    "attachmentDeleted": "Attachment deleted",
+    "attachmentDeleteFailed": "Failed to delete attachment",
+    "fileUploaded": "File uploaded",
+    "filesUploadedCount": "{{count}} file(s) uploaded successfully",
+    "uploadFailed": "Upload failed",
+    "uploadError": "Failed to upload file",
+    "notAllowed": "Not allowed",
+    "onlyAssigneeComplete": "Only the assignee can complete this task",
+    "onlyAssigneeToggle": "Only the assignee can complete or uncomplete this task",
+    "missingFields": "Missing fields",
+    "fillRequiredFields": "Please fill in title, section, and assignee"
   }
 }

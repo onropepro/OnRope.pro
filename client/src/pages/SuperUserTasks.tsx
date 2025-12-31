@@ -121,6 +121,7 @@ const PRIORITY_STYLES: Record<string, { bg: string; text: string }> = {
 };
 
 export default function SuperUserTasks() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
@@ -160,10 +161,10 @@ export default function SuperUserTasks() {
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/tasks"] });
       setAddTaskOpen(false);
       setTaskForm({ title: "", description: "", section: "", assignee: "", dueDate: "", priority: "medium" });
-      toast({ title: "Task created", description: "New task has been added" });
+      toast({ title: t('superUserTasks.taskCreated', 'Task created'), description: t('superUserTasks.taskCreatedDesc', 'New task has been added') });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to create task", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('superUserTasks.createFailed', 'Failed to create task'), variant: "destructive" });
     },
   });
 
@@ -172,7 +173,7 @@ export default function SuperUserTasks() {
       const response = await apiRequest("PATCH", `/api/superuser/tasks/${id}`, data);
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to update task");
+        throw new Error(error.message || t('superUserTasks.updateFailed', 'Failed to update task'));
       }
       return response.json();
     },
@@ -183,7 +184,7 @@ export default function SuperUserTasks() {
       }
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -194,10 +195,10 @@ export default function SuperUserTasks() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/tasks"] });
       setSelectedTask(null);
-      toast({ title: "Task deleted" });
+      toast({ title: t('superUserTasks.taskDeleted', 'Task deleted') });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete task", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('superUserTasks.deleteFailed', 'Failed to delete task'), variant: "destructive" });
     },
   });
 
@@ -211,7 +212,7 @@ export default function SuperUserTasks() {
       setNewComment("");
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to add comment", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('superUserTasks.commentFailed', 'Failed to add comment'), variant: "destructive" });
     },
   });
 
@@ -223,10 +224,10 @@ export default function SuperUserTasks() {
     },
     onSuccess: () => {
       refetchAttachments();
-      toast({ title: "Attachment deleted" });
+      toast({ title: t('superUserTasks.attachmentDeleted', 'Attachment deleted') });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete attachment", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('superUserTasks.attachmentDeleteFailed', 'Failed to delete attachment'), variant: "destructive" });
     },
   });
 
@@ -253,11 +254,11 @@ export default function SuperUserTasks() {
       }
       
       refetchAttachments();
-      toast({ title: "File uploaded", description: `${files.length} file(s) uploaded successfully` });
+      toast({ title: t('superUserTasks.fileUploaded', 'File uploaded'), description: t('superUserTasks.filesUploadedCount', '{{count}} file(s) uploaded successfully', { count: files.length }) });
     } catch (error) {
       toast({ 
-        title: "Upload failed", 
-        description: error instanceof Error ? error.message : "Failed to upload file", 
+        title: t('superUserTasks.uploadFailed', 'Upload failed'), 
+        description: error instanceof Error ? error.message : t('superUserTasks.uploadError', 'Failed to upload file'), 
         variant: "destructive" 
       });
     } finally {
@@ -326,7 +327,7 @@ export default function SuperUserTasks() {
   const handleToggleComplete = (task: Task) => {
     // Only the assignee can complete or uncomplete a task
     if (task.assignee !== currentUser) {
-      toast({ title: "Not allowed", description: "Only the assignee can complete this task", variant: "destructive" });
+      toast({ title: t('superUserTasks.notAllowed', 'Not allowed'), description: t('superUserTasks.onlyAssigneeComplete', 'Only the assignee can complete this task'), variant: "destructive" });
       return;
     }
     const newStatus = task.status === "completed" ? "todo" : "completed";
@@ -634,7 +635,7 @@ export default function SuperUserTasks() {
             <Button
               onClick={() => {
                 if (!taskForm.title || !taskForm.section || !taskForm.assignee) {
-                  toast({ title: "Missing fields", description: "Please fill in title, section, and assignee", variant: "destructive" });
+                  toast({ title: t('superUserTasks.missingFields', 'Missing fields'), description: t('superUserTasks.fillRequiredFields', 'Please fill in title, section, and assignee'), variant: "destructive" });
                   return;
                 }
                 createTaskMutation.mutate({ ...taskForm, createdBy: taskForm.assignee });
@@ -729,7 +730,7 @@ export default function SuperUserTasks() {
                       onValueChange={(status) => {
                         // Check if changing to/from completed and not assignee
                         if ((status === "completed" || selectedTask.status === "completed") && selectedTask.assignee !== currentUser) {
-                          toast({ title: "Not allowed", description: "Only the assignee can complete or uncomplete this task", variant: "destructive" });
+                          toast({ title: t('superUserTasks.notAllowed', 'Not allowed'), description: t('superUserTasks.onlyAssigneeToggle', 'Only the assignee can complete or uncomplete this task'), variant: "destructive" });
                           return;
                         }
                         updateTaskMutation.mutate({

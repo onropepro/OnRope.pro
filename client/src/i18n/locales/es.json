@@ -996,6 +996,8 @@
     "noResults": "No se encontraron resultados",
     "noData": "Sin datos disponibles",
     "error": "Error",
+    "failed": "Fallido",
+    "networkError": "Error de red",
     "success": "Éxito",
     "warning": "Advertencia",
     "info": "Información",
@@ -3084,7 +3086,20 @@
     "previousWeek": "Previous Week",
     "nextWeek": "Next Week",
     "noJobs": "No scheduled jobs",
-    "createFirstJob": "Create your first scheduled job"
+    "createFirstJob": "Crea tu primer trabajo programado",
+    "timeOffRemoved": "Tiempo libre eliminado",
+    "timeOffRemovedDesc": "La entrada de tiempo libre ha sido eliminada.",
+    "timeOffRemoveFailed": "Error al eliminar tiempo libre.",
+    "missingInfo": "Información faltante",
+    "selectTimeOffFields": "Por favor selecciona un empleado, fecha de inicio y tipo de tiempo libre.",
+    "invalidDateRange": "Rango de fechas inválido",
+    "endBeforeStart": "La fecha de fin no puede ser antes de la fecha de inicio.",
+    "timeOffScheduled": "Tiempo libre programado",
+    "timeOffScheduledDesc": "El tiempo libre ha sido programado para {{count}} día(s).",
+    "timeOffScheduleFailed": "Error al programar algunas entradas de tiempo libre.",
+    "employeeAssigned": "Empleado asignado",
+    "employeeAssignedDesc": "El miembro del equipo ha sido asignado con las fechas especificadas",
+    "assignFailed": "Error al asignar empleado"
   },
   "resident": {
     "title": "Resident Portal",
@@ -3386,12 +3401,19 @@
     "irataLevel": "IRATA / SPRAT Level",
     "companyLogo": "Company Logo",
     "codes": {
-      "residentCode": "Resident Code",
-      "propertyManagerCode": "Property Manager Code",
-      "generateNew": "Generate New Code",
-      "copyCode": "Copy Code",
-      "codeCopied": "Code copied to clipboard"
-    }
+      "residentCode": "Código de Residente",
+      "propertyManagerCode": "Código de Administrador de Propiedades",
+      "generateNew": "Generar Nuevo Código",
+      "copyCode": "Copiar Código",
+      "codeCopied": "Código copiado al portapapeles"
+    },
+    "notProvided": "No proporcionado",
+    "selectOption": "Selecciona una opción",
+    "notSelected": "No seleccionado",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado",
+    "notSet": "No establecido",
+    "noAddressProvided": "No se proporcionó dirección"
   },
   "subscription": {
     "title": "Subscription",
@@ -6155,7 +6177,23 @@
     "loading": "Cargando portal del edificio...",
     "anchors": "Puntos de Anclaje",
     "instructions": "Instrucciones del Edificio",
-    "projectProgress": "Progreso del Proyecto"
+    "projectProgress": "Progreso del Proyecto",
+    "instructionsSaved": "Instrucciones guardadas",
+    "instructionsSavedDesc": "Las instrucciones del edificio se han actualizado correctamente.",
+    "saveFailed": "Error al guardar",
+    "saveInstructionsFailed": "Error al guardar las instrucciones del edificio.",
+    "addressUpdated": "La dirección del edificio ha sido actualizada.",
+    "addressUpdateFailed": "Error al actualizar la dirección del edificio.",
+    "loginSuccessful": "Inicio de sesión exitoso",
+    "welcomePortal": "Bienvenido a su portal de edificio.",
+    "loginFailed": "Error de inicio de sesión",
+    "invalidCredentials": "Número de plan de strata o contraseña inválidos.",
+    "passwordChanged": "Contraseña cambiada",
+    "passwordChangedDesc": "Su contraseña ha sido actualizada correctamente.",
+    "passwordChangeFailed": "Error al cambiar contraseña",
+    "passwordChangeError": "Error al cambiar la contraseña. Por favor intente de nuevo.",
+    "fillAllPasswordFields": "Por favor complete todos los campos de contraseña.",
+    "enterBothFields": "Por favor ingrese el número de plan de strata y la contraseña."
   },
   "manageSubscription": {
     "title": "Administrar Suscripcion",
@@ -6245,7 +6283,58 @@
     "fieldRequired": "Este campo es requerido",
     "invalidFormat": "Formato invalido",
     "tooShort": "Muy corto",
-    "tooLong": "Muy largo"
+    "tooLong": "Muy largo",
+    "firstNameRequired": "Se requiere nombre",
+    "lastNameRequired": "Se requiere apellido",
+    "validEmailRequired": "Se requiere un email válido",
+    "passwordMin6": "La contraseña debe tener al menos 6 caracteres",
+    "passwordsNoMatch": "Las contraseñas no coinciden",
+    "fullNameRequired": "Se requiere nombre completo",
+    "validEmail": "Por favor ingresa una dirección de email válida"
+  },
+  "pmReg": {
+    "toast": {
+      "registrationComplete": "Registro completado!",
+      "accountCreated": "Tu cuenta de administrador de propiedades ha sido creada exitosamente.",
+      "registrationFailed": "Registro fallido"
+    },
+    "validation": {
+      "companyRequired": "Se requiere la empresa de administración de propiedades"
+    }
+  },
+  "residentReg": {
+    "toast": {
+      "registrationFailed": "Registro fallido"
+    },
+    "validation": {
+      "strataRequired": "Se requiere el número de plan Strata/HOA/LMS"
+    },
+    "sidebar": {
+      "title": "Portal de Residente",
+      "subtitle": "Tu voz importa en el mantenimiento del edificio"
+    },
+    "steps": {
+      "personalDetails": "Datos personales",
+      "buildingInfo": "Información del edificio"
+    },
+    "benefits": {
+      "submitFeedback": "Enviar comentarios de mantenimiento con fotos",
+      "trackResolution": "Seguir la resolución de quejas en tiempo real",
+      "getNotified": "Ser notificado cuando se programe el trabajo",
+      "rateWork": "Calificar la calidad del trabajo completado",
+      "directComms": "Comunicación directa con la administración de propiedades",
+      "viewHistory": "Ver el historial de mantenimiento del edificio"
+    },
+    "features": {
+      "photoEvidence": "Evidencia fotográfica",
+      "photoDesc": "Sube fotos de problemas para una resolución más rápida",
+      "realTimeUpdates": "Actualizaciones en tiempo real",
+      "realTimeDesc": "Recibe notificaciones cuando cambie el estado de tu queja",
+      "qualityRatings": "Calificaciones de calidad",
+      "qualityDesc": "Califica a los contratistas después de completar el trabajo",
+      "securePortal": "Portal seguro",
+      "secureDesc": "Tu información está protegida y es privada"
+    }
   },
   "residentPortal": {
     "title": "Portal de Residente",
@@ -12844,5 +12933,46 @@
   "helpArticle": {
     "match": "coincidencia",
     "learnMore": "Más información sobre esta función"
+  },
+  "staffAccounts": {
+    "title": "Cuentas del personal",
+    "subtitle": "Administrar cuentas del personal interno para la administración de la plataforma",
+    "created": "Cuenta del personal creada exitosamente",
+    "updated": "Cuenta del personal actualizada exitosamente",
+    "deleted": "Cuenta del personal eliminada exitosamente",
+    "createFailed": "Error al crear la cuenta del personal",
+    "updateFailed": "Error al actualizar la cuenta del personal",
+    "deleteFailed": "Error al eliminar la cuenta del personal",
+    "validationError": "Error de validación",
+    "fillRequired": "Por favor complete todos los campos requeridos"
+  },
+  "founderResources": {
+    "resourceAdded": "Recurso agregado",
+    "resourceAddedDesc": "El recurso ha sido agregado exitosamente.",
+    "addFailed": "Error al agregar recurso",
+    "resourceDeleted": "Recurso eliminado",
+    "resourceDeletedDesc": "El recurso ha sido eliminado.",
+    "deleteFailed": "Error al eliminar recurso",
+    "nameUrlRequired": "El nombre y la URL son obligatorios"
+  },
+  "superUserTasks": {
+    "taskCreated": "Tarea creada",
+    "taskCreatedDesc": "La nueva tarea ha sido agregada",
+    "createFailed": "Error al crear tarea",
+    "updateFailed": "Error al actualizar tarea",
+    "taskDeleted": "Tarea eliminada",
+    "deleteFailed": "Error al eliminar tarea",
+    "commentFailed": "Error al agregar comentario",
+    "attachmentDeleted": "Adjunto eliminado",
+    "attachmentDeleteFailed": "Error al eliminar adjunto",
+    "fileUploaded": "Archivo subido",
+    "filesUploadedCount": "{{count}} archivo(s) subido(s) exitosamente",
+    "uploadFailed": "Error de carga",
+    "uploadError": "Error al subir archivo",
+    "notAllowed": "No permitido",
+    "onlyAssigneeComplete": "Solo el asignado puede completar esta tarea",
+    "onlyAssigneeToggle": "Solo el asignado puede completar o reabrir esta tarea",
+    "missingFields": "Campos faltantes",
+    "fillRequiredFields": "Por favor complete el título, la sección y el asignado"
   }
 }

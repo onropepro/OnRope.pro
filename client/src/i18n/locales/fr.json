@@ -933,6 +933,8 @@
     "noResults": "Aucun résultat trouvé",
     "noData": "Aucune donnee disponible",
     "error": "Erreur",
+    "failed": "Échec",
+    "networkError": "Erreur réseau",
     "success": "Succès",
     "warning": "Avertissement",
     "info": "Info",
@@ -3019,7 +3021,20 @@
     "previousWeek": "Semaine précédente",
     "nextWeek": "Semaine suivante",
     "noJobs": "Aucun travail planifié",
-    "createFirstJob": "Créer votre premier travail planifié"
+    "createFirstJob": "Créer votre premier travail planifié",
+    "timeOffRemoved": "Congé supprimé",
+    "timeOffRemovedDesc": "L'entrée de congé a été supprimée.",
+    "timeOffRemoveFailed": "Échec de la suppression du congé.",
+    "missingInfo": "Information manquante",
+    "selectTimeOffFields": "Veuillez sélectionner un employé, une date de début et un type de congé.",
+    "invalidDateRange": "Plage de dates invalide",
+    "endBeforeStart": "La date de fin ne peut pas être avant la date de début.",
+    "timeOffScheduled": "Congé planifié",
+    "timeOffScheduledDesc": "Le congé a été planifié pour {{count}} jour(s).",
+    "timeOffScheduleFailed": "Échec de la planification de certaines entrées de congé.",
+    "employeeAssigned": "Employé assigné",
+    "employeeAssignedDesc": "Le membre de l'équipe a été assigné avec les dates spécifiées",
+    "assignFailed": "Échec de l'assignation de l'employé"
   },
   "resident": {
     "title": "Portail résident",
@@ -3326,7 +3341,14 @@
       "generateNew": "Générer un nouveau code",
       "copyCode": "Copier le code",
       "codeCopied": "Code copié dans le presse-papiers"
-    }
+    },
+    "notProvided": "Non fourni",
+    "selectOption": "Sélectionnez une option",
+    "notSelected": "Non sélectionné",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "notSet": "Non défini",
+    "noAddressProvided": "Aucune adresse fournie"
   },
   "subscription": {
     "title": "Abonnement",
@@ -6098,7 +6120,23 @@
     "loading": "Chargement du portail de l'immeuble...",
     "anchors": "Points d'Ancrage",
     "instructions": "Instructions du Batiment",
-    "projectProgress": "Progression du Projet"
+    "projectProgress": "Progression du Projet",
+    "instructionsSaved": "Instructions enregistrées",
+    "instructionsSavedDesc": "Les instructions du bâtiment ont été mises à jour avec succès.",
+    "saveFailed": "Échec de l'enregistrement",
+    "saveInstructionsFailed": "Échec de l'enregistrement des instructions du bâtiment.",
+    "addressUpdated": "L'adresse du bâtiment a été mise à jour.",
+    "addressUpdateFailed": "Échec de la mise à jour de l'adresse du bâtiment.",
+    "loginSuccessful": "Connexion réussie",
+    "welcomePortal": "Bienvenue sur votre portail bâtiment.",
+    "loginFailed": "Échec de connexion",
+    "invalidCredentials": "Numéro de plan de strata ou mot de passe invalide.",
+    "passwordChanged": "Mot de passe modifié",
+    "passwordChangedDesc": "Votre mot de passe a été mis à jour avec succès.",
+    "passwordChangeFailed": "Échec du changement de mot de passe",
+    "passwordChangeError": "Échec du changement de mot de passe. Veuillez réessayer.",
+    "fillAllPasswordFields": "Veuillez remplir tous les champs de mot de passe.",
+    "enterBothFields": "Veuillez entrer le numéro de plan de strata et le mot de passe."
   },
   "manageSubscription": {
     "title": "Gerer l'Abonnement",
@@ -6184,7 +6222,58 @@
     "fieldRequired": "Ce champ est requis",
     "invalidFormat": "Format invalide",
     "tooShort": "Trop court",
-    "tooLong": "Trop long"
+    "tooLong": "Trop long",
+    "firstNameRequired": "Le prénom est requis",
+    "lastNameRequired": "Le nom de famille est requis",
+    "validEmailRequired": "Un email valide est requis",
+    "passwordMin6": "Le mot de passe doit avoir au moins 6 caractères",
+    "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+    "fullNameRequired": "Le nom complet est requis",
+    "validEmail": "Veuillez entrer une adresse email valide"
+  },
+  "pmReg": {
+    "toast": {
+      "registrationComplete": "Inscription terminée!",
+      "accountCreated": "Votre compte de gestionnaire immobilier a été créé avec succès.",
+      "registrationFailed": "Échec de l'inscription"
+    },
+    "validation": {
+      "companyRequired": "La société de gestion immobilière est requise"
+    }
+  },
+  "residentReg": {
+    "toast": {
+      "registrationFailed": "Échec de l'inscription"
+    },
+    "validation": {
+      "strataRequired": "Le numéro de plan Strata/HOA/LMS est requis"
+    },
+    "sidebar": {
+      "title": "Portail Résident",
+      "subtitle": "Votre voix compte dans l'entretien de l'immeuble"
+    },
+    "steps": {
+      "personalDetails": "Informations personnelles",
+      "buildingInfo": "Informations du bâtiment"
+    },
+    "benefits": {
+      "submitFeedback": "Soumettre des commentaires de maintenance avec photos",
+      "trackResolution": "Suivre la résolution des plaintes en temps réel",
+      "getNotified": "Être notifié lorsque le travail est planifié",
+      "rateWork": "Évaluer la qualité du travail terminé",
+      "directComms": "Communication directe avec la gestion immobilière",
+      "viewHistory": "Voir l'historique de maintenance du bâtiment"
+    },
+    "features": {
+      "photoEvidence": "Preuves photographiques",
+      "photoDesc": "Téléchargez des photos des problèmes pour une résolution plus rapide",
+      "realTimeUpdates": "Mises à jour en temps réel",
+      "realTimeDesc": "Soyez notifié lorsque le statut de votre plainte change",
+      "qualityRatings": "Évaluations de qualité",
+      "qualityDesc": "Évaluez les entrepreneurs après l'achèvement des travaux",
+      "securePortal": "Portail sécurisé",
+      "secureDesc": "Vos informations sont protégées et privées"
+    }
   },
   "residentPortal": {
     "title": "Portail Resident",
@@ -12996,5 +13085,46 @@
   "helpArticle": {
     "match": "correspondance",
     "learnMore": "En savoir plus sur cette fonctionnalité"
+  },
+  "staffAccounts": {
+    "title": "Comptes du personnel",
+    "subtitle": "Gérer les comptes du personnel interne pour l'administration de la plateforme",
+    "created": "Compte du personnel créé avec succès",
+    "updated": "Compte du personnel mis à jour avec succès",
+    "deleted": "Compte du personnel supprimé avec succès",
+    "createFailed": "Échec de la création du compte du personnel",
+    "updateFailed": "Échec de la mise à jour du compte du personnel",
+    "deleteFailed": "Échec de la suppression du compte du personnel",
+    "validationError": "Erreur de validation",
+    "fillRequired": "Veuillez remplir tous les champs obligatoires"
+  },
+  "founderResources": {
+    "resourceAdded": "Ressource ajoutée",
+    "resourceAddedDesc": "La ressource a été ajoutée avec succès.",
+    "addFailed": "Échec de l'ajout de la ressource",
+    "resourceDeleted": "Ressource supprimée",
+    "resourceDeletedDesc": "La ressource a été supprimée.",
+    "deleteFailed": "Échec de la suppression de la ressource",
+    "nameUrlRequired": "Le nom et l'URL sont obligatoires"
+  },
+  "superUserTasks": {
+    "taskCreated": "Tâche créée",
+    "taskCreatedDesc": "La nouvelle tâche a été ajoutée",
+    "createFailed": "Échec de la création de la tâche",
+    "updateFailed": "Échec de la mise à jour de la tâche",
+    "taskDeleted": "Tâche supprimée",
+    "deleteFailed": "Échec de la suppression de la tâche",
+    "commentFailed": "Échec de l'ajout du commentaire",
+    "attachmentDeleted": "Pièce jointe supprimée",
+    "attachmentDeleteFailed": "Échec de la suppression de la pièce jointe",
+    "fileUploaded": "Fichier téléchargé",
+    "filesUploadedCount": "{{count}} fichier(s) téléchargé(s) avec succès",
+    "uploadFailed": "Échec du téléchargement",
+    "uploadError": "Échec du téléchargement du fichier",
+    "notAllowed": "Non autorisé",
+    "onlyAssigneeComplete": "Seul l'assigné peut terminer cette tâche",
+    "onlyAssigneeToggle": "Seul l'assigné peut terminer ou rouvrir cette tâche",
+    "missingFields": "Champs manquants",
+    "fillRequiredFields": "Veuillez remplir le titre, la section et l'assigné"
   }
 }
