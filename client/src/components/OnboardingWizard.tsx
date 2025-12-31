@@ -241,11 +241,6 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
       case "welcome":
         return (
           <div className="space-y-6 py-4">
-            <div className="flex justify-center">
-              <div className="p-4 bg-primary/10 rounded-full">
-                <Rocket className="w-12 h-12 text-primary" />
-              </div>
-            </div>
             <div className="text-center space-y-2">
               <h3 className="text-xl font-semibold">
                 {t("onboarding.welcome.title", "Welcome to OnRopePro!")}
