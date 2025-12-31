@@ -2506,10 +2506,31 @@ export default function TechnicianPortal() {
               }
               
               if (fieldsUpdated > 0) {
+                // Auto-save the OCR data to database so UI updates immediately
+                const ocrSaveData: Partial<ProfileFormData> = {};
+                if (ocrResult.data.licenseNumber) {
+                  ocrSaveData.driversLicenseNumber = ocrResult.data.licenseNumber;
+                }
+                if (ocrResult.data.expiryDate) {
+                  ocrSaveData.driversLicenseExpiry = ocrResult.data.expiryDate;
+                }
+                if (ocrResult.data.issuedDate) {
+                  ocrSaveData.driversLicenseIssuedDate = ocrResult.data.issuedDate;
+                }
+                
+                // Save immediately to database and refresh user data
+                try {
+                  await apiRequest("PATCH", "/api/technician/profile", ocrSaveData);
+                  await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                  console.log('[TechnicianPortal] OCR data auto-saved successfully');
+                } catch (saveError) {
+                  console.error('[TechnicianPortal] Failed to auto-save OCR data:', saveError);
+                }
+                
                 toast({
                   title: t.ocrSuccess || "Document Scanned",
                   description: t.ocrFieldsAutofilled?.replace('{count}', String(fieldsUpdated)) || 
-                    `${fieldsUpdated} field(s) auto-filled from your driver's license. Please verify the information.`,
+                    `${fieldsUpdated} field(s) auto-filled from your driver's license and saved automatically.`,
                 });
               }
             }
@@ -2553,10 +2574,31 @@ export default function TechnicianPortal() {
               }
               
               if (fieldsUpdated > 0) {
+                // Auto-save the OCR data to database so UI updates immediately
+                const bankOcrData: Partial<ProfileFormData> = {};
+                if (ocrResult.data.transitNumber) {
+                  bankOcrData.bankTransitNumber = ocrResult.data.transitNumber;
+                }
+                if (ocrResult.data.institutionNumber) {
+                  bankOcrData.bankInstitutionNumber = ocrResult.data.institutionNumber;
+                }
+                if (ocrResult.data.accountNumber) {
+                  bankOcrData.bankAccountNumber = ocrResult.data.accountNumber;
+                }
+                
+                // Save immediately to database and refresh user data
+                try {
+                  await apiRequest("PATCH", "/api/technician/profile", bankOcrData);
+                  await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                  console.log('[TechnicianPortal] Banking OCR data auto-saved successfully');
+                } catch (saveError) {
+                  console.error('[TechnicianPortal] Failed to auto-save banking OCR data:', saveError);
+                }
+                
                 toast({
                   title: t.ocrSuccess || "Document Scanned",
                   description: t.ocrBankFieldsAutofilled?.replace('{count}', String(fieldsUpdated)) || 
-                    `${fieldsUpdated} banking field(s) auto-filled from your void cheque. Please verify the information.`,
+                    `${fieldsUpdated} banking field(s) auto-filled and saved automatically.`,
                 });
               }
             }

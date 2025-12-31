@@ -18340,6 +18340,71 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
 
+  // Consume consumable items (permanently decrease quantity - no assignment created)
+  app.post("/api/gear-items/:id/consume", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const { quantity } = req.body;
+      const consumeQuantity = Number(quantity) || 1;
+      
+      if (consumeQuantity <= 0) {
+        return res.status(400).json({ message: "Quantity must be positive" });
+      }
+      
+      // Get the gear item
+      const [gearItem] = await db.select()
+        .from(gearItems)
+        .where(and(
+          eq(gearItems.id, req.params.id),
+          eq(gearItems.companyId, companyId)
+        ));
+      
+      if (!gearItem) {
+        return res.status(404).json({ message: "Gear item not found" });
+      }
+      
+      if (!gearItem.isConsumable) {
+        return res.status(400).json({ message: "This item is not consumable. Use gear assignments instead." });
+      }
+      
+      const currentQuantity = Number(gearItem.quantity) || 0;
+      
+      if (consumeQuantity > currentQuantity) {
+        return res.status(400).json({ message: "Not enough stock. Only " + currentQuantity + " available." });
+      }
+      
+      // Permanently decrease the quantity
+      const newQuantity = currentQuantity - consumeQuantity;
+      
+      await db.update(gearItems)
+        .set({ 
+          quantity: newQuantity,
+          updatedAt: new Date()
+        })
+        .where(eq(gearItems.id, req.params.id));
+      
+      res.json({ 
+        success: true, 
+        consumed: consumeQuantity, 
+        remaining: newQuantity 
+      });
+    } catch (error) {
+      console.error("Consume gear item error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Gear assignments routes
   
   // Get all gear assignments (for My Gear view)
