@@ -1893,7 +1893,7 @@ export default function Schedule() {
                 onValueChange={setSelectedTimeOffType}
               >
                 <SelectTrigger data-testid="select-time-off-type">
-                  <SelectValue placeholder="Select type..." />
+                  <SelectValue placeholder={t('schedule.selectType', 'Select type...')} />
                 </SelectTrigger>
                 <SelectContent>
                   {timeOffTypes.map((type) => (

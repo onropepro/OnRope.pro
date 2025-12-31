@@ -584,7 +584,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
               <textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
+                placeholder={t('profile.typeMessage', 'Type your message...')}
                 className="w-full min-h-[100px] p-3 border rounded-lg bg-background resize-none focus:ring-2 focus:ring-primary/20"
                 data-testid="textarea-reply-message"
               />
@@ -639,7 +639,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
                     <FormLabel>Title</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Brief summary of your request"
+                        placeholder={t('profile.requestSummary', 'Brief summary of your request')}
                         {...field}
                         data-testid="input-request-title"
                         className="h-12"
@@ -708,7 +708,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
                     <FormControl>
                       <textarea
                         {...field}
-                        placeholder="Please describe your feature request in detail. Include any specific use cases or examples that would help us understand your needs."
+                        placeholder={t('profile.featureRequestDescription', 'Please describe your feature request in detail. Include any specific use cases or examples that would help us understand your needs.')}
                         className="w-full min-h-[150px] p-3 border rounded-lg bg-background resize-none focus:ring-2 focus:ring-primary/20"
                         data-testid="textarea-request-description"
                       />
@@ -1246,7 +1246,7 @@ export default function Profile() {
                             <FormControl>
                               <Input
                                 type="email"
-                                placeholder="your.email@example.com"
+                                placeholder={t('common.placeholders.email', 'your.email@example.com')}
                                 {...field}
                                 data-testid="input-email"
                                 className="h-12"
@@ -1270,7 +1270,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="e.g., 101, 1205"
+                                placeholder={t('resident.placeholders.unitNumber', 'e.g., 101, 1205')}
                                 {...field}
                                 data-testid="input-unit-number"
                                 className="h-12"
@@ -1288,7 +1288,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="e.g., 42, A-5, P1-23"
+                                placeholder={t('resident.placeholders.parkingStall', 'e.g., 42, A-5, P1-23')}
                                 {...field}
                                 data-testid="input-parking-stall"
                                 className="h-12"
@@ -1332,7 +1332,7 @@ export default function Profile() {
                           <FormLabel>Company Code {!user?.companyId && "(Required to view projects)"}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter 10-character code"
+                              placeholder={t('profile.enterCompanyCode', 'Enter 10-character code')}
                               {...field}
                               onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                               maxLength={10}
@@ -1358,7 +1358,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.companyName', 'Company Name')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Company name"
+                                placeholder={t('profile.companyNamePlaceholder', 'Company name')}
                                 {...field}
                                 data-testid="input-company-name"
                                 className="h-12"
@@ -1404,7 +1404,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.streetAddress', 'Street Address')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="123 Main St, Suite 100"
+                                placeholder={t('common.placeholders.streetAddress', '123 Main St, Suite 100')}
                                 {...field}
                                 data-testid="input-street-address"
                                 className="h-12"
@@ -1424,7 +1424,7 @@ export default function Profile() {
                               <FormLabel>{t('profile.provinceState', 'Province/State')}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="BC, ON, etc."
+                                  placeholder={t('common.placeholders.province', 'BC, ON, etc.')}
                                   {...field}
                                   data-testid="input-province"
                                   className="h-12"
@@ -1443,7 +1443,7 @@ export default function Profile() {
                               <FormLabel>{t('profile.country', 'Country')}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="Canada, USA, etc."
+                                  placeholder={t('profile.countryPlaceholder', 'Canada, USA, etc.')}
                                   {...field}
                                   data-testid="input-country"
                                   className="h-12"
@@ -1463,7 +1463,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.postalZipCode', 'Postal/Zip Code')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="V6B 1A1, 90210, etc."
+                                placeholder={t('common.placeholders.postalCode', 'V6B 1A1, 90210, etc.')}
                                 {...field}
                                 data-testid="input-zip-code"
                                 className="h-12"
@@ -1483,7 +1483,7 @@ export default function Profile() {
                             <Select onValueChange={field.onChange} value={field.value || "America/Vancouver"}>
                               <FormControl>
                                 <SelectTrigger className="h-12" data-testid="select-timezone">
-                                  <SelectValue placeholder="Select timezone" />
+                                  <SelectValue placeholder={t('profile.selectTimezone', 'Select timezone')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -1660,7 +1660,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter current password"
+                          placeholder={t('profile.enterCurrentPassword', 'Enter current password')}
                           {...field}
                           data-testid="input-current-password"
                           className="h-12"
@@ -1680,7 +1680,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter new password"
+                          placeholder={t('profile.enterNewPassword', 'Enter new password')}
                           {...field}
                           data-testid="input-new-password"
                           className="h-12"
@@ -1700,7 +1700,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Confirm new password"
+                          placeholder={t('profile.confirmNewPasswordPlaceholder', 'Confirm new password')}
                           {...field}
                           data-testid="input-confirm-password"
                           className="h-12"
@@ -2153,7 +2153,7 @@ export default function Profile() {
                       <FormLabel>Name</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Your name"
+                          placeholder={t('profile.yourName', 'Your name')}
                           {...field}
                           data-testid="input-name"
                           className="h-12"
@@ -2173,7 +2173,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="your.email@example.com"
+                          placeholder={t('common.placeholders.email', 'your.email@example.com')}
                           {...field}
                           data-testid="input-email"
                           className="h-12"
@@ -2194,7 +2194,7 @@ export default function Profile() {
                           <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="e.g., 101, 1205"
+                              placeholder={t('resident.placeholders.unitNumber', 'e.g., 101, 1205')}
                               {...field}
                               data-testid="input-unit-number"
                               className="h-12"
@@ -2212,7 +2212,7 @@ export default function Profile() {
                           <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="e.g., 42, A-5, P1-23"
+                              placeholder={t('resident.placeholders.parkingStall', 'e.g., 42, A-5, P1-23')}
                               {...field}
                               data-testid="input-parking-stall"
                               className="h-12"
@@ -2255,7 +2255,7 @@ export default function Profile() {
                           <FormLabel>Company Code {!user?.companyId && "(Required to view projects)"}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter 10-character code"
+                              placeholder={t('profile.enterCompanyCode', 'Enter 10-character code')}
                               {...field}
                               onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                               maxLength={10}
@@ -2316,7 +2316,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter current password"
+                          placeholder={t('profile.enterCurrentPassword', 'Enter current password')}
                           {...field}
                           data-testid="input-current-password"
                           className="h-12"
@@ -2336,7 +2336,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter new password"
+                          placeholder={t('profile.enterNewPassword', 'Enter new password')}
                           {...field}
                           data-testid="input-new-password"
                           className="h-12"
@@ -2356,7 +2356,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Confirm new password"
+                          placeholder={t('profile.confirmNewPasswordPlaceholder', 'Confirm new password')}
                           {...field}
                           data-testid="input-confirm-password"
                           className="h-12"
@@ -2422,7 +2422,7 @@ export default function Profile() {
           <div className="py-4">
             <Input
               type="password"
-              placeholder="Enter your password"
+              placeholder={t('profile.enterPasswordToConfirm', 'Enter your password')}
               value={deletePassword}
               onChange={(e) => setDeletePassword(e.target.value)}
               className="h-12"

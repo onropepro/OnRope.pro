@@ -4096,7 +4096,7 @@ export default function Dashboard() {
                             <FormItem>
                               <FormLabel>{t('dashboard.createProject.strataPlanNumber', 'Strata plan number / Job number')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="LMS2345" {...field} data-testid="input-strata-plan-number" className="h-12" />
+                                <Input placeholder={t('common.placeholders.strataPlan', 'LMS2345')} {...field} data-testid="input-strata-plan-number" className="h-12" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -4370,7 +4370,7 @@ export default function Dashboard() {
                                 <FormItem>
                                   <FormLabel>{t('dashboard.projectForm.suitesPerDay', 'Expected completed suite per day')}</FormLabel>
                                   <FormControl>
-                                    <Input type="number" min="0" placeholder="e.g., 10" {...field} data-testid="input-suites-per-day" className="h-12" />
+                                    <Input type="number" min="0" placeholder={t('dashboard.placeholders.suitesPerDay', 'e.g., 10')} {...field} data-testid="input-suites-per-day" className="h-12" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -4403,7 +4403,7 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.projectForm.stallsPerDay', 'Stalls per Day')}</FormLabel>
                                 <FormControl>
-                                  <Input type="number" min="0" placeholder="e.g., 20" {...field} data-testid="input-stalls-per-day" className="h-12" />
+                                  <Input type="number" min="0" placeholder={t('dashboard.placeholders.stallsPerDay', 'e.g., 20')} {...field} data-testid="input-stalls-per-day" className="h-12" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -4420,7 +4420,7 @@ export default function Dashboard() {
                                 <FormItem>
                                   <FormLabel>{t('dashboard.projectForm.totalAnchors', 'Total Anchors to Inspect')}</FormLabel>
                                   <FormControl>
-                                    <Input type="number" min="1" placeholder="e.g., 14" {...field} data-testid="input-total-anchors" className="h-12" />
+                                    <Input type="number" min="1" placeholder={t('dashboard.placeholders.totalAnchors', 'e.g., 14')} {...field} data-testid="input-total-anchors" className="h-12" />
                                   </FormControl>
                                   <FormDescription className="text-xs">
                                     {t('dashboard.projectForm.totalAnchorsDesc', 'How many anchor points need to be inspected?')}
@@ -4436,7 +4436,7 @@ export default function Dashboard() {
                                 <FormItem>
                                   <FormLabel>{t('dashboard.projectForm.anchorsPerDay', 'Target Anchors per Day')}</FormLabel>
                                   <FormControl>
-                                    <Input type="number" min="1" placeholder="e.g., 5" {...field} data-testid="input-anchors-per-day" className="h-12" />
+                                    <Input type="number" min="1" placeholder={t('dashboard.placeholders.anchorsPerDay', 'e.g., 5')} {...field} data-testid="input-anchors-per-day" className="h-12" />
                                   </FormControl>
                                   <FormDescription className="text-xs">
                                     {t('dashboard.projectForm.anchorsPerDayDesc', 'Expected number of anchors to inspect per day')}
@@ -6257,7 +6257,7 @@ export default function Dashboard() {
                           <FormItem>
                             <FormLabel>{t('dashboard.employeeForm.fullName', 'Full Name')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="John Doe" {...field} data-testid="input-employee-name" className="h-12" />
+                              <Input placeholder={t('dashboard.employeeForm.namePlaceholder', 'John Doe')} {...field} data-testid="input-employee-name" className="h-12" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -6271,7 +6271,7 @@ export default function Dashboard() {
                           <FormItem>
                             <FormLabel>{t('dashboard.employeeForm.emailAddress', 'Email Address')}</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="employee@company.com" {...field} data-testid="input-employee-email" className="h-12" />
+                              <Input type="email" placeholder={t('common.placeholders.employeeEmail', 'employee@company.com')} {...field} data-testid="input-employee-email" className="h-12" />
                             </FormControl>
                             <FormDescription className="text-xs">
                               {t('dashboard.employeeForm.emailDescription', 'Will be used as username')}
@@ -6288,7 +6288,7 @@ export default function Dashboard() {
                           <FormItem>
                             <FormLabel>{t('dashboard.employeeForm.temporaryPassword', 'Temporary Password')}</FormLabel>
                             <FormControl>
-                              <Input type="text" placeholder="Enter temporary password" {...field} data-testid="input-employee-password" className="h-12" />
+                              <Input type="text" placeholder={t('dashboard.employeeForm.tempPasswordPlaceholder', 'Enter temporary password')} {...field} data-testid="input-employee-password" className="h-12" />
                             </FormControl>
                             <FormDescription className="text-xs">
                               {t('dashboard.employeeForm.passwordDescription', 'Give this password to the employee')}
@@ -6455,7 +6455,7 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.employeeForm.socialInsuranceNumber', 'Social Insurance Number')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="XXX-XXX-XXX" {...field} data-testid="input-employee-sin" className="h-12" />
+                                  <Input placeholder={t('common.placeholders.sin', 'XXX-XXX-XXX')} {...field} data-testid="input-employee-sin" className="h-12" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -6469,7 +6469,7 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.employeeForm.driversLicenseNumber', "Driver's License Number")}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="License number" {...field} data-testid="input-employee-dl-number" className="h-12" />
+                                  <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-employee-dl-number" className="h-12" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -6483,7 +6483,7 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.employeeForm.driversLicenseProvince', "Driver's License Province/State")}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="BC, AB, etc." {...field} data-testid="input-employee-dl-province" className="h-12" />
+                                  <Input placeholder={t('common.placeholders.province', 'BC, AB, etc.')} {...field} data-testid="input-employee-dl-province" className="h-12" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -6505,7 +6505,7 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.employeeForm.homeAddress', 'Home Address')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Street address" {...field} data-testid="input-employee-address" className="h-12" />
+                                  <Input placeholder={t('dashboard.employeeForm.streetAddressPlaceholder', 'Street address')} {...field} data-testid="input-employee-address" className="h-12" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -6533,7 +6533,7 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.employeeForm.emergencyContactName', 'Emergency Contact Name')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Contact name" {...field} data-testid="input-employee-emergency-name" className="h-12" />
+                                  <Input placeholder={t('dashboard.employeeForm.contactNamePlaceholder', 'Contact name')} {...field} data-testid="input-employee-emergency-name" className="h-12" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -6561,7 +6561,7 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.employeeForm.specialMedicalConditions', 'Special Medical Conditions')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="Medical conditions to be aware of" {...field} data-testid="input-employee-medical" className="h-12" />
+                                  <Input placeholder={t('dashboard.employeeForm.medicalConditionsPlaceholder', 'Medical conditions to be aware of')} {...field} data-testid="input-employee-medical" className="h-12" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -6603,7 +6603,7 @@ export default function Dashboard() {
                                       <FormItem>
                                         <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
                                         <FormControl>
-                                          <Input placeholder="License number" {...field} data-testid="input-irata-license" className="h-12" />
+                                          <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-irata-license" className="h-12" />
                                         </FormControl>
                                         <FormMessage />
                                       </FormItem>
@@ -7885,7 +7885,7 @@ export default function Dashboard() {
                           <FormItem>
                             <FormLabel>{t('dashboard.clientForm.firstName', 'First Name')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="John" {...field} className="h-12" data-testid="input-client-firstname" />
+                              <Input placeholder={t('common.firstName', 'John')} {...field} className="h-12" data-testid="input-client-firstname" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -7899,7 +7899,7 @@ export default function Dashboard() {
                           <FormItem>
                             <FormLabel>{t('dashboard.clientForm.lastName', 'Last Name')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="Smith" {...field} className="h-12" data-testid="input-client-lastname" />
+                              <Input placeholder={t('common.lastName', 'Smith')} {...field} className="h-12" data-testid="input-client-lastname" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -7913,7 +7913,7 @@ export default function Dashboard() {
                           <FormItem>
                             <FormLabel>{t('dashboard.clientForm.companyOptional', 'Company (Optional)')}</FormLabel>
                             <FormControl>
-                              <Input placeholder="ABC Property Management" {...field} className="h-12" data-testid="input-client-company" />
+                              <Input placeholder={t('common.placeholders.company', 'ABC Property Management')} {...field} className="h-12" data-testid="input-client-company" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -7941,7 +7941,7 @@ export default function Dashboard() {
                           <FormItem>
                             <FormLabel>{t('dashboard.clientForm.emailOptional', 'Email (Optional)')}</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-client-email" />
+                              <Input type="email" placeholder={t('common.placeholders.email', 'john@example.com')} {...field} className="h-12" data-testid="input-client-email" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -7987,7 +7987,7 @@ export default function Dashboard() {
                                 <div className="flex-1">
                                   <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.strataNumber', 'Strata Number')}</label>
                                   <Input
-                                    placeholder="LMS1234 or VR5678"
+                                    placeholder={t('common.placeholders.strataPlan', 'LMS1234 or VR5678')}
                                     value={lms.number}
                                     onChange={(e) => {
                                       const newLmsNumbers = [...lmsNumbers];
@@ -8017,7 +8017,7 @@ export default function Dashboard() {
                               <div>
                                 <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.buildingName', 'Building Name (Optional)')}</label>
                                 <Input
-                                  placeholder="Harbour View Towers"
+                                  placeholder={t('dashboard.clientForm.buildingNamePlaceholder', 'Harbour View Towers')}
                                   value={lms.buildingName || ""}
                                   onChange={(e) => {
                                     const newLmsNumbers = [...lmsNumbers];
@@ -8505,7 +8505,7 @@ export default function Dashboard() {
                     </div>
                     <Select value={clientSortField} onValueChange={(v) => setClientSortField(v as any)}>
                       <SelectTrigger className="w-full sm:w-40" data-testid="select-sort-field">
-                        <SelectValue placeholder="Sort by" />
+                        <SelectValue placeholder={t('common.sortBy', 'Sort by')} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="name">{t('dashboard.clientDatabase.sortName', 'Name')}</SelectItem>
@@ -8881,7 +8881,7 @@ export default function Dashboard() {
                   <FormItem>
                     <FormLabel>{t('dashboard.clientForm.firstName', 'First Name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} className="h-12" data-testid="input-edit-client-firstname" />
+                      <Input placeholder={t('common.firstName', 'John')} {...field} className="h-12" data-testid="input-edit-client-firstname" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8895,7 +8895,7 @@ export default function Dashboard() {
                   <FormItem>
                     <FormLabel>{t('dashboard.clientForm.lastName', 'Last Name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Smith" {...field} className="h-12" data-testid="input-edit-client-lastname" />
+                      <Input placeholder={t('common.lastName', 'Smith')} {...field} className="h-12" data-testid="input-edit-client-lastname" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8909,7 +8909,7 @@ export default function Dashboard() {
                   <FormItem>
                     <FormLabel>{t('dashboard.clientForm.companyOptional', 'Company (Optional)')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="ABC Property Management" {...field} className="h-12" data-testid="input-edit-client-company" />
+                      <Input placeholder={t('common.placeholders.company', 'ABC Property Management')} {...field} className="h-12" data-testid="input-edit-client-company" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8937,7 +8937,7 @@ export default function Dashboard() {
                   <FormItem>
                     <FormLabel>{t('dashboard.clientForm.emailOptional', 'Email (Optional)')}</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-edit-client-email" />
+                      <Input type="email" placeholder={t('common.placeholders.email', 'john@example.com')} {...field} className="h-12" data-testid="input-edit-client-email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -8983,7 +8983,7 @@ export default function Dashboard() {
                         <div className="flex-1">
                           <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.strataNumber', 'Strata Number')}</label>
                           <Input
-                            placeholder="LMS1234 or VR5678"
+                            placeholder={t('common.placeholders.strataPlan', 'LMS1234 or VR5678')}
                             value={lms.number}
                             onChange={(e) => {
                               const newLmsNumbers = [...editLmsNumbers];
@@ -9013,7 +9013,7 @@ export default function Dashboard() {
                       <div>
                         <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.buildingNameOptional', 'Building Name (Optional)')}</label>
                         <Input
-                          placeholder="Harbour View Towers"
+                          placeholder={t('dashboard.clientForm.buildingNamePlaceholder', 'Harbour View Towers')}
                           value={lms.buildingName || ""}
                           onChange={(e) => {
                             const newLmsNumbers = [...editLmsNumbers];
@@ -9400,7 +9400,7 @@ export default function Dashboard() {
                     <FormItem>
                       <FormLabel>{t('dashboard.employeeForm.fullName', 'Full Name')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} className="h-12" data-testid="input-edit-employee-name" />
+                        <Input placeholder={t('dashboard.employeeForm.namePlaceholder', 'John Doe')} {...field} className="h-12" data-testid="input-edit-employee-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -9414,7 +9414,7 @@ export default function Dashboard() {
                     <FormItem>
                       <FormLabel>{t('dashboard.employeeForm.emailAddress', 'Email Address')}</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-edit-employee-email" />
+                        <Input type="email" placeholder={t('common.placeholders.email', 'john@example.com')} {...field} className="h-12" data-testid="input-edit-employee-email" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -9603,7 +9603,7 @@ export default function Dashboard() {
                         <FormItem>
                           <FormLabel>{t('dashboard.employeeForm.socialInsuranceNumber', 'Social Insurance Number')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="XXX-XXX-XXX" {...field} data-testid="input-edit-employee-sin" className="h-12" />
+                            <Input placeholder={t('common.placeholders.sin', 'XXX-XXX-XXX')} {...field} data-testid="input-edit-employee-sin" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -9617,7 +9617,7 @@ export default function Dashboard() {
                         <FormItem>
                           <FormLabel>{t('dashboard.employeeForm.driversLicenseNumber', "Driver's License Number")}</FormLabel>
                           <FormControl>
-                            <Input placeholder="License number" {...field} data-testid="input-edit-employee-dl-number" className="h-12" />
+                            <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-employee-dl-number" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -9631,7 +9631,7 @@ export default function Dashboard() {
                         <FormItem>
                           <FormLabel>{t('dashboard.employeeForm.driversLicenseProvince', "Driver's License Province/State")}</FormLabel>
                           <FormControl>
-                            <Input placeholder="BC, AB, etc." {...field} data-testid="input-edit-employee-dl-province" className="h-12" />
+                            <Input placeholder={t('common.placeholders.province', 'BC, AB, etc.')} {...field} data-testid="input-edit-employee-dl-province" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -9653,7 +9653,7 @@ export default function Dashboard() {
                         <FormItem>
                           <FormLabel>{t('dashboard.employeeForm.homeAddress', 'Home Address')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Street address" {...field} data-testid="input-edit-employee-address" className="h-12" />
+                            <Input placeholder={t('dashboard.employeeForm.streetAddressPlaceholder', 'Street address')} {...field} data-testid="input-edit-employee-address" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -9681,7 +9681,7 @@ export default function Dashboard() {
                         <FormItem>
                           <FormLabel>{t('dashboard.employeeForm.emergencyContactName', 'Emergency Contact Name')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Contact name" {...field} data-testid="input-edit-employee-emergency-name" className="h-12" />
+                            <Input placeholder={t('dashboard.employeeForm.contactNamePlaceholder', 'Contact name')} {...field} data-testid="input-edit-employee-emergency-name" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -9709,7 +9709,7 @@ export default function Dashboard() {
                         <FormItem>
                           <FormLabel>{t('dashboard.employeeForm.specialMedicalConditions', 'Special Medical Conditions')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Medical conditions to be aware of" {...field} data-testid="input-edit-employee-medical" className="h-12" />
+                            <Input placeholder={t('dashboard.employeeForm.medicalConditionsPlaceholder', 'Medical conditions to be aware of')} {...field} data-testid="input-edit-employee-medical" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -9751,7 +9751,7 @@ export default function Dashboard() {
                                 <FormItem>
                                   <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="License number" {...field} data-testid="input-edit-irata-license" className="h-12" />
+                                    <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-irata-license" className="h-12" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -9825,7 +9825,7 @@ export default function Dashboard() {
                                 <FormItem>
                                   <FormLabel>{t('dashboard.employeeForm.spratLicenseNumber', 'SPRAT License Number')}</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="License number" {...field} data-testid="input-edit-sprat-license" className="h-12" />
+                                    <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-sprat-license" className="h-12" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -11198,7 +11198,7 @@ export default function Dashboard() {
                             min="0"
                             max="24"
                             step="0.25"
-                            placeholder="e.g., 6.5"
+                            placeholder={t('dashboard.placeholders.hours', 'e.g., 6.5')}
                             {...field}
                             data-testid="input-rope-access-hours"
                             className="h-12 text-xl"

@@ -233,7 +233,7 @@ export default function SuperUserFeatureRequests() {
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your response to the company owner..."
+                  placeholder={t('superuserFeatureRequests.typeResponse', 'Type your response to the company owner...')}
                   className="w-full min-h-[120px] p-3 border rounded-lg bg-background resize-none focus:ring-2 focus:ring-primary/20"
                   data-testid="textarea-admin-response"
                 />

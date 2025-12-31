@@ -589,7 +589,7 @@ export default function PersonalSafetyDocuments() {
                           <FormItem>
                             <FormLabel>Manufacturer / Model</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., Petzl Astro" {...field} data-testid="input-manufacturer" />
+                              <Input placeholder={t('safetyDocuments.placeholders.manufacturer', 'e.g., Petzl Astro')} {...field} data-testid="input-manufacturer" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -602,7 +602,7 @@ export default function PersonalSafetyDocuments() {
                           <FormItem>
                             <FormLabel>Equipment ID / Serial</FormLabel>
                             <FormControl>
-                              <Input placeholder="Serial number" {...field} data-testid="input-equipment-id" />
+                              <Input placeholder={t('safetyDocuments.serialNumber', 'Serial number')} {...field} data-testid="input-equipment-id" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -699,7 +699,7 @@ export default function PersonalSafetyDocuments() {
                                       </div>
                                       {itemData?.result === "fail" && (
                                         <Input
-                                          placeholder="Notes about the issue..."
+                                          placeholder={t('safetyDocuments.issueNotes', 'Notes about the issue...')}
                                           value={itemData?.notes || ""}
                                           onChange={(e) => setItemNotes(categoryKey, item.key, e.target.value)}
                                           className="text-sm"
@@ -729,7 +729,7 @@ export default function PersonalSafetyDocuments() {
                         <FormItem>
                           <FormControl>
                             <Textarea 
-                              placeholder="Any additional notes or observations..."
+                              placeholder={t('safetyDocuments.additionalNotes', 'Any additional notes or observations...')}
                               {...field}
                               data-testid="input-comments"
                             />

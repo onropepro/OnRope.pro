@@ -476,7 +476,7 @@ export default function BuildingPortal() {
                   <Input
                     id="strataPlanNumber"
                     type="text"
-                    placeholder="Enter your strata or job number"
+                    placeholder={t('buildingPortal.strataPlaceholder', 'Enter your strata or job number')}
                     value={strataPlanNumber}
                     onChange={(e) => setStrataPlanNumber(e.target.value)}
                     className="pl-10 h-12"
@@ -495,7 +495,7 @@ export default function BuildingPortal() {
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder={t('buildingPortal.passwordPlaceholder', 'Enter your password')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 h-12"
@@ -1245,7 +1245,7 @@ export default function BuildingPortal() {
                   onSelect={(address, lat, lng) => {
                     setAddressForm({ address, latitude: lat, longitude: lng });
                   }}
-                  placeholder="Start typing to search..."
+                  placeholder={t('buildingPortal.addressPlaceholder', 'Start typing to search...')}
                   data-testid="input-building-address"
                 />
                 <p className="text-xs text-muted-foreground">
@@ -1283,7 +1283,7 @@ export default function BuildingPortal() {
                   <Label htmlFor="buildingManagerName">Building Manager Name</Label>
                   <Input
                     id="buildingManagerName"
-                    placeholder="e.g., John Smith"
+                    placeholder={t('buildingPortal.placeholders.managerName', 'e.g., John Smith')}
                     value={instructionsForm.buildingManagerName}
                     onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingManagerName: e.target.value }))}
                     data-testid="input-manager-name"
@@ -1293,7 +1293,7 @@ export default function BuildingPortal() {
                   <Label htmlFor="buildingManagerPhone">Building Manager Phone</Label>
                   <Input
                     id="buildingManagerPhone"
-                    placeholder="e.g., (604) 555-1234"
+                    placeholder={t('common.placeholders.phone', 'e.g., (604) 555-1234')}
                     value={instructionsForm.buildingManagerPhone}
                     onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingManagerPhone: e.target.value }))}
                     data-testid="input-manager-phone"
@@ -1306,7 +1306,7 @@ export default function BuildingPortal() {
                   <Label htmlFor="conciergeNames">Concierge Name(s)</Label>
                   <Input
                     id="conciergeNames"
-                    placeholder="e.g., Jane Doe, Mike Wilson"
+                    placeholder={t('buildingPortal.placeholders.conciergeNames', 'e.g., Jane Doe, Mike Wilson')}
                     value={instructionsForm.conciergeNames}
                     onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeNames: e.target.value }))}
                     data-testid="input-concierge-names"
@@ -1317,7 +1317,7 @@ export default function BuildingPortal() {
                   <Label htmlFor="conciergePhone">Concierge Phone</Label>
                   <Input
                     id="conciergePhone"
-                    placeholder="e.g., (604) 555-5678"
+                    placeholder={t('common.placeholders.phone', 'e.g., (604) 555-5678')}
                     value={instructionsForm.conciergePhone}
                     onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergePhone: e.target.value }))}
                     data-testid="input-concierge-phone"
@@ -1329,7 +1329,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="conciergeHours">Concierge Hours of Operation</Label>
                 <Input
                   id="conciergeHours"
-                  placeholder="e.g., Mon-Fri 8am-8pm, Sat-Sun 9am-5pm"
+                  placeholder={t('buildingPortal.placeholders.conciergeHours', 'e.g., Mon-Fri 8am-8pm, Sat-Sun 9am-5pm')}
                   value={instructionsForm.conciergeHours}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeHours: e.target.value }))}
                   data-testid="input-concierge-hours"
@@ -1341,7 +1341,7 @@ export default function BuildingPortal() {
                   <Label htmlFor="maintenanceName">Maintenance Contact Name</Label>
                   <Input
                     id="maintenanceName"
-                    placeholder="e.g., Building Maintenance"
+                    placeholder={t('buildingPortal.placeholders.maintenanceName', 'e.g., Building Maintenance')}
                     value={instructionsForm.maintenanceName}
                     onChange={(e) => setInstructionsForm(prev => ({ ...prev, maintenanceName: e.target.value }))}
                     data-testid="input-maintenance-name"
@@ -1351,7 +1351,7 @@ export default function BuildingPortal() {
                   <Label htmlFor="maintenancePhone">Maintenance Phone</Label>
                   <Input
                     id="maintenancePhone"
-                    placeholder="e.g., (604) 555-9012"
+                    placeholder={t('common.placeholders.phone', 'e.g., (604) 555-9012')}
                     value={instructionsForm.maintenancePhone}
                     onChange={(e) => setInstructionsForm(prev => ({ ...prev, maintenancePhone: e.target.value }))}
                     data-testid="input-maintenance-phone"
@@ -1363,7 +1363,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="councilMemberUnits">Council Member Units</Label>
                 <Input
                   id="councilMemberUnits"
-                  placeholder="e.g., Unit 301, 502, 1205"
+                  placeholder={t('buildingPortal.placeholders.councilUnits', 'e.g., Unit 301, 502, 1205')}
                   value={instructionsForm.councilMemberUnits}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, councilMemberUnits: e.target.value }))}
                   data-testid="input-council-units"
@@ -1385,7 +1385,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="buildingAccess">Building Access Instructions</Label>
                 <Textarea
                   id="buildingAccess"
-                  placeholder="e.g., Enter through main lobby, check in with concierge..."
+                  placeholder={t('buildingPortal.placeholders.buildingAccess', 'e.g., Enter through main lobby, check in with concierge...')}
                   value={instructionsForm.buildingAccess}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingAccess: e.target.value }))}
                   rows={3}
@@ -1397,7 +1397,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="keysAndFob">Keys / Fob Pickup</Label>
                 <Textarea
                   id="keysAndFob"
-                  placeholder="e.g., Pick up keys from concierge desk, return by 5pm..."
+                  placeholder={t('buildingPortal.placeholders.keysAndFob', 'e.g., Pick up keys from concierge desk, return by 5pm...')}
                   value={instructionsForm.keysAndFob}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, keysAndFob: e.target.value }))}
                   rows={3}
@@ -1412,7 +1412,7 @@ export default function BuildingPortal() {
                   onValueChange={(value) => setInstructionsForm(prev => ({ ...prev, keysReturnPolicy: value }))}
                 >
                   <SelectTrigger data-testid="select-keys-return">
-                    <SelectValue placeholder="Select when to return keys..." />
+                    <SelectValue placeholder={t('buildingPortal.keysReturnPlaceholder', 'Select when to return keys...')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="end_of_day">End of Every Day</SelectItem>
@@ -1427,7 +1427,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="roofAccess">Roof Access Instructions</Label>
                 <Textarea
                   id="roofAccess"
-                  placeholder="e.g., Roof access via penthouse level, key required..."
+                  placeholder={t('buildingPortal.placeholders.roofAccess', 'e.g., Roof access via penthouse level, key required...')}
                   value={instructionsForm.roofAccess}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, roofAccess: e.target.value }))}
                   rows={3}
@@ -1451,7 +1451,7 @@ export default function BuildingPortal() {
                   id="tradeParkingSpots"
                   type="number"
                   min="0"
-                  placeholder="e.g., 2"
+                  placeholder={t('buildingPortal.placeholders.parkingSpots', 'e.g., 2')}
                   value={instructionsForm.tradeParkingSpots}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingSpots: e.target.value }))}
                   data-testid="input-trade-parking-spots"
@@ -1462,7 +1462,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="tradeParkingInstructions">Trade Parking Instructions</Label>
                 <Textarea
                   id="tradeParkingInstructions"
-                  placeholder="e.g., Visitor parking on P1, loading zone available, street parking with permit..."
+                  placeholder={t('buildingPortal.placeholders.parkingInstructions', 'e.g., Visitor parking on P1, loading zone available...')}
                   value={instructionsForm.tradeParkingInstructions}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingInstructions: e.target.value }))}
                   rows={3}
@@ -1484,7 +1484,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="tradeWashroomLocation">Washroom Location</Label>
                 <Textarea
                   id="tradeWashroomLocation"
-                  placeholder="e.g., Main floor lobby, P1 parkade near elevator, amenity room on 2nd floor..."
+                  placeholder={t('buildingPortal.placeholders.washroomLocation', 'e.g., Main floor lobby, P1 parkade near elevator...')}
                   value={instructionsForm.tradeWashroomLocation}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeWashroomLocation: e.target.value }))}
                   rows={2}
@@ -1506,7 +1506,7 @@ export default function BuildingPortal() {
                 <Label htmlFor="specialRequests">Additional Instructions or Requests</Label>
                 <Textarea
                   id="specialRequests"
-                  placeholder="e.g., Quiet hours before 8am, no work on weekends..."
+                  placeholder={t('buildingPortal.placeholders.specialRequests', 'e.g., Quiet hours before 8am, no work on weekends...')}
                   value={instructionsForm.specialRequests}
                   onChange={(e) => setInstructionsForm(prev => ({ ...prev, specialRequests: e.target.value }))}
                   rows={4}
@@ -1561,7 +1561,7 @@ export default function BuildingPortal() {
                 type="password"
                 value={passwordForm.currentPassword}
                 onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                placeholder="Enter your current password"
+                placeholder={t('buildingPortal.currentPasswordPlaceholder', 'Enter your current password')}
                 data-testid="input-current-password"
               />
               <p className="text-xs text-muted-foreground">
@@ -1575,7 +1575,7 @@ export default function BuildingPortal() {
                 type="password"
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                placeholder="Enter new password (min 6 characters)"
+                placeholder={t('buildingPortal.newPasswordPlaceholder', 'Enter new password (min 6 characters)')}
                 data-testid="input-new-password"
               />
             </div>
@@ -1586,7 +1586,7 @@ export default function BuildingPortal() {
                 type="password"
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                placeholder="Confirm new password"
+                placeholder={t('buildingPortal.confirmPasswordPlaceholder', 'Confirm new password')}
                 data-testid="input-confirm-password"
               />
             </div>

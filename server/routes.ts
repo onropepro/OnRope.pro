@@ -18340,6 +18340,71 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
 
+  // Consume consumable items (permanently decrease quantity - no assignment created)
+  app.post("/api/gear-items/:id/consume", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const { quantity } = req.body;
+      const consumeQuantity = Number(quantity) || 1;
+      
+      if (consumeQuantity <= 0) {
+        return res.status(400).json({ message: "Quantity must be positive" });
+      }
+      
+      // Get the gear item
+      const [gearItem] = await db.select()
+        .from(gearItems)
+        .where(and(
+          eq(gearItems.id, req.params.id),
+          eq(gearItems.companyId, companyId)
+        ));
+      
+      if (!gearItem) {
+        return res.status(404).json({ message: "Gear item not found" });
+      }
+      
+      if (!gearItem.isConsumable) {
+        return res.status(400).json({ message: "This item is not consumable. Use gear assignments instead." });
+      }
+      
+      const currentQuantity = Number(gearItem.quantity) || 0;
+      
+      if (consumeQuantity > currentQuantity) {
+        return res.status(400).json({ message: "Not enough stock. Only " + currentQuantity + " available." });
+      }
+      
+      // Permanently decrease the quantity
+      const newQuantity = currentQuantity - consumeQuantity;
+      
+      await db.update(gearItems)
+        .set({ 
+          quantity: newQuantity,
+          updatedAt: new Date()
+        })
+        .where(eq(gearItems.id, req.params.id));
+      
+      res.json({ 
+        success: true, 
+        consumed: consumeQuantity, 
+        remaining: newQuantity 
+      });
+    } catch (error) {
+      console.error("Consume gear item error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Gear assignments routes
   
   // Get all gear assignments (for My Gear view)
@@ -18880,6 +18945,100 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       res.json({ success: true });
     } catch (error) {
       console.error("Delete gear assignment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+
+  // Get field value - total value of gear assigned to employees (excluding consumables)
+  app.get("/api/gear/field-value", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check inventory view permission
+      if (!canViewInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Consumable equipment types to exclude from field value calculation
+      const consumableTypes = ['Squeegee rubbers', 'Applicators', 'Soap'];
+      
+      // Get all gear assignments with their gear item prices and employee info
+      const assignmentsWithPrices = await db
+        .select({
+          employeeId: gearAssignments.employeeId,
+          quantity: gearAssignments.quantity,
+          itemPrice: gearItems.itemPrice,
+          equipmentType: gearItems.equipmentType,
+        })
+        .from(gearAssignments)
+        .innerJoin(gearItems, eq(gearAssignments.gearItemId, gearItems.id))
+        .where(eq(gearAssignments.companyId, companyId));
+      
+      // Get employee names for the breakdown
+      const employeeIds = [...new Set(assignmentsWithPrices.map(a => a.employeeId))];
+      const employees = employeeIds.length > 0 
+        ? await db.select({ id: users.id, firstName: users.firstName, lastName: users.lastName })
+            .from(users)
+            .where(inArray(users.id, employeeIds))
+        : [];
+      
+      const employeeMap = new Map(employees.map(e => [e.id, `${e.firstName || ''} ${e.lastName || ''}`.trim() || 'Unknown']));
+      
+      // Calculate per-employee values (excluding consumables)
+      const employeeValues: Record<string, { name: string; value: number; itemCount: number }> = {};
+      let totalFieldValue = 0;
+      let totalItemCount = 0;
+      
+      for (const assignment of assignmentsWithPrices) {
+        // Skip consumable items
+        if (consumableTypes.includes(assignment.equipmentType || '')) {
+          continue;
+        }
+        
+        const price = parseFloat(assignment.itemPrice || '0');
+        const quantity = assignment.quantity || 1;
+        const lineValue = price * quantity;
+        
+        if (!employeeValues[assignment.employeeId]) {
+          employeeValues[assignment.employeeId] = {
+            name: employeeMap.get(assignment.employeeId) || 'Unknown',
+            value: 0,
+            itemCount: 0,
+          };
+        }
+        
+        employeeValues[assignment.employeeId].value += lineValue;
+        employeeValues[assignment.employeeId].itemCount += quantity;
+        totalFieldValue += lineValue;
+        totalItemCount += quantity;
+      }
+      
+      // Convert to array and sort by value descending
+      const employeeBreakdown = Object.entries(employeeValues)
+        .map(([employeeId, data]) => ({
+          employeeId,
+          ...data,
+        }))
+        .sort((a, b) => b.value - a.value);
+      
+      res.json({
+        totalFieldValue,
+        totalItemCount,
+        employeeBreakdown,
+      });
+    } catch (error) {
+      console.error("Get field value error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

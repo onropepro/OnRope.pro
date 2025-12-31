@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { 
   Building2, 
   Users, 
@@ -202,7 +203,7 @@ export default function HelpCenter() {
             <div className="max-w-xl mx-auto pt-4">
               <HelpSearchBar 
                 size="large" 
-                placeholder="Ask a question or search for help with projects, safety, scheduling..."
+                placeholder={t('helpCenter.searchPlaceholder', 'Ask a question or search for help with projects, safety, scheduling...')}
                 autoFocus
                 stakeholderColor="#0B64A3"
               />

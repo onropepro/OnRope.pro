@@ -938,7 +938,7 @@
     "noResults": "Aucun résultat trouvé",
     "noData": "Aucune donnee disponible",
     "error": "Erreur",
-    "failed": "Échec",
+    "failed": "Échoué",
     "networkError": "Erreur réseau",
     "success": "Succès",
     "warning": "Avertissement",
@@ -985,8 +985,6 @@
     "employee": "Employé",
     "you": "Vous",
     "remove": "Retirer",
-    "saving": "Enregistrement...",
-    "saveChanges": "Enregistrer les modifications",
     "language": "Langue",
     "english": "Anglais",
     "french": "Français",
@@ -1040,7 +1038,6 @@
     "copyright": "Tous droits reserves",
     "processing": "Traitement...",
     "selected": "Sélectionné",
-    "failed": "Échoué",
     "expired": "Expiré",
     "tryAgain": "Réessayer",
     "preferences": "Préférences",
@@ -1110,6 +1107,19 @@
       "noDocsInRange": "Il n'y a aucun document dans la plage de dates sélectionnée.",
       "exportedDocs": "{{count}} documents {{type}} exportés avec succès.",
       "exportedPartial": "{{success}} documents exportés. {{failed}} document(s) n'ont pas pu être générés."
+    },
+    "placeholders": {
+      "email": "votre.courriel@exemple.com",
+      "phone": "p.ex., (604) 555-1234",
+      "url": "https://exemple.com",
+      "strataPlan": "p.ex., LMS1234",
+      "streetAddress": "123 Rue Principale, Bureau 100",
+      "province": "QC, ON, etc.",
+      "postalCode": "H2X 1Y4, etc.",
+      "fullName": "p.ex., Jean Dupont",
+      "hours": "p.ex., 6.5",
+      "location": "p.ex., Montréal, QC",
+      "adminEmail": "admin@entreprise.com"
     }
   },
   "services": {
@@ -2145,110 +2155,7 @@
     "floorNumber": "Numéro d'étage"
   },
   "documents": {
-    "employeeDocumentCompliance": "Conformité documentaire des employés",
-    "trackEmployeesReviewed": "Suivre quels employés ont examiné et signé les documents requis",
-    "downloadReport": "Télécharger le rapport",
-    "signed": "Signé",
-    "totalEmployees": "Total des employés",
-    "fullyCompliant": "Entièrement conforme",
-    "pendingSignatures": "Signatures en attente",
-    "documentsSigned": "Documents signés",
-    "csrPenalty": "pénalité CSR",
-    "pending": "En attente",
-    "complete": "Complet",
-    "documentReviewsRequired": "Examens de documents requis",
-    "reviewAndSignDocuments": "Examiner et signer les documents suivants pour accuser réception et compréhension",
-    "signedDocuments": "Documents signés",
-    "healthSafetyManual": "Manuel de santé et sécurité",
-    "essentialWorkplaceSafety": "Documentation essentielle de sécurité au travail",
-    "uploadNewManual": "Télécharger un nouveau manuel",
-    "chooseFile": "Choisir un fichier",
-    "noFileChosen": "Aucun fichier choisi",
-    "ropeAccessPlans": "Plans d'accès par corde",
-    "projectSpecificPlans": "Plans d'accès et documentation spécifiques aux projets",
-    "safeWorkProcedures": "Procédures de travail sécuritaires",
-    "stepByStepProcedures": "Procédures étape par étape pour les tâches courantes",
-    "safeWorkPractices": "Pratiques de travail sécuritaires",
-    "generalSafetyGuidelines": "Directives générales de sécurité",
-    "companyPolicies": "Politiques de l'entreprise",
-    "backToDashboard": "Retour au tableau de bord",
-    "uploading": "Téléchargement en cours...",
-    "view": "Voir",
-    "uploadedBy": "Téléchargé par",
-    "notViewed": "Non consulté",
-    "noDocumentReviewsAssigned": "Aucun examen de document assigné",
-    "enrollEmployees": "Inscrire les employés aux examens de documents pour suivre leur conformité",
-    "noHealthSafetyManual": "Aucun manuel de santé et sécurité téléchargé",
-    "noCompanyPolicies": "Aucune politique d'entreprise téléchargée",
-    "noCustomSWP": "Aucune procédure de travail sécuritaire personnalisée téléchargée",
-    "noSWPDocuments": "Aucun document de pratique de travail sécuritaire téléchargé",
-    "customSafeWorkProcedures": "Procédures de travail sécuritaires personnalisées",
-    "uploadCustomSWP": "Téléchargez vos propres procédures de travail sécuritaires spécifiques à vos opérations.",
-    "uploadPDFDocument": "Télécharger un document PDF avec votre procédure de travail sécuritaire personnalisée",
-    "activeSafeWorkProcedures": "Procédures de travail sécuritaires actives",
-    "templateSWPNote": "Ce sont des modèles de procédures de travail sécuritaires. Examinez-les et personnalisez-les pour correspondre à vos opérations spécifiques.",
-    "templateSWPracticesNote": "Ce sont des modèles de pratiques de travail sécuritaires. Examinez-les et personnalisez-les pour correspondre à vos opérations spécifiques.",
-    "uploadSWPDocument": "Télécharger un document de pratique de travail sécuritaire",
-    "equipmentInspections": "Inspections d'équipement",
-    "damageReports": "Rapports de dommages",
-    "certificateOfInsurance": "Certificat d'assurance",
-    "companyPolicy": "Politique de l'entreprise",
-    "methodStatement": "Énoncé de méthode",
-    "safeWorkProcedure": "Procédure de travail sécuritaire",
-    "viewDocument": "Voir le document",
-    "reread": "Relire",
-    "sign": "Signer",
-    "signDocument": "Signer le document",
-    "bySigningAcknowledge": "En signant ci-dessous, vous reconnaissez avoir lu et compris le document.",
-    "clear": "Effacer",
-    "signWithMouse": "Signez avec votre souris ou toucher",
-    "cancel": "Annuler",
-    "signing": "Signature en cours...",
-    "submitSignature": "Soumettre la signature",
-    "scope": "Portée",
-    "hazardsIdentified": "Dangers identifiés",
-    "controlMeasures": "Mesures de contrôle",
-    "personalProtectiveEquipment": "Équipement de protection individuelle (EPI)",
-    "equipmentRequired": "Équipement requis",
-    "preWorkChecks": "Vérifications avant le travail",
-    "workProcedure": "Procédure de travail",
-    "emergencyProcedures": "Procédures d'urgence",
-    "competencyRequirements": "Exigences de compétence",
-    "reviewBeforeSigning": "Examinez ce document attentivement avant de signer pour accuser réception et compréhension.",
-    "proceedToSign": "Procéder à la signature",
-    "exporting": "Exportation en cours...",
-    "exportZip": "Exporter ZIP",
-    "noDocsFound": "Aucun document trouvé",
-    "noDocsInRange": "Aucun document dans la plage de dates sélectionnée.",
-    "exportFailed": "Échec de l'exportation",
-    "exportFailedPdfs": "Impossible de générer les PDF. Veuillez réessayer.",
-    "exportPartial": "Exportation partiellement complète",
-    "exportPartialDesc": "{{successCount}} documents exportés. {{failedCount}} document(s) ont échoué.",
-    "exportComplete": "Exportation complète",
-    "exportCompleteDesc": "{{successCount}} documents {{documentType}} exportés avec succès.",
-    "exportError": "Une erreur s'est produite lors de l'exportation. Veuillez réessayer.",
-    "quizGenerated": "Quiz généré",
-    "quizGeneratedDesc": "Le quiz a été créé et est maintenant disponible pour les employés.",
-    "quizError": "Erreur",
-    "quizGenerationFailed": "Échec de la génération du quiz",
-    "documentSigned": "Document signé",
-    "signatureRecorded": "Votre signature a été enregistrée avec succès.",
-    "signFailed": "Échec de la signature du document",
-    "signatureRequired": "Signature requise",
-    "provideSignature": "Veuillez fournir votre signature avant de soumettre.",
-    "complianceDownloaded": "Rapport de conformité téléchargé avec succès",
-    "complianceFailed": "Échec du téléchargement du rapport de conformité",
-    "uploadSuccess": "Document téléchargé avec succès",
-    "uploadFailed": "Échec du téléchargement du document",
-    "selectJobType": "Veuillez sélectionner un type de travail pour cet énoncé de méthode",
-    "enterCustomJobType": "Veuillez entrer un nom de type de travail personnalisé",
-    "methodStatementUploaded": "Énoncé de méthode téléchargé avec succès",
-    "methodStatementFailed": "Échec du téléchargement de l'énoncé de méthode",
-    "deleteSuccess": "Document supprimé avec succès",
-    "deleteFailed": "Échec de la suppression du document",
-    "templatesAdded": "{{count}} procédure(s) de travail sécuritaire ajoutée(s)",
-    "templatesFailed": "Échec de l'initialisation des modèles",
-    "uploadMethodStatementDesc": "Téléchargez le document d'énoncé de méthode de votre entreprise pour un type de travail spécifique afin de satisfaire aux exigences de conformité."
+    "uploadFailed": "Échec du téléchargement"
   },
   "safety": {
     "title": "Sécurité",
@@ -2821,7 +2728,8 @@
       "enterNewSerialNumber": "Entrer un nouveau numéro de série",
       "enterSerialNumber": "Entrer le numéro de série du matériel assigné",
       "additionalInfo": "Informations supplémentaires...",
-      "selectGearType": "Sélectionner le type de matériel"
+      "selectGearType": "Sélectionner le type de matériel",
+      "itemSuffix": "ex: 18\" ou Grand ou Rouge"
     },
     "validation": {
       "typeRequired": "Type requis",
@@ -2856,123 +2764,30 @@
       "backupDevice": "Dispositif de secours",
       "lanyard": "Longe",
       "shockAbsorber": "Absorbeur de choc",
+      "highPressureHose": "Tuyau haute pression",
+      "airHose": "Tuyau d'air",
+      "cautionSigns": "Panneaux d'avertissement",
+      "cones": "Cônes",
+      "streetSigns": "Panneaux de signalisation",
+      "delineator": "Délinéateur",
+      "pressureHoseGasket": "Joint de tuyau de pression",
+      "pressureWasherWand": "Lance de nettoyeur haute pression",
+      "pulley": "Poulie",
+      "slings": "Élingues",
       "other": "Autre"
-    }
+    },
+    "itemSuffix": "Spécification de l'article (Optionnel)",
+    "itemSuffixHint": "Ajoutez une taille, couleur ou autre détail au nom de l'article",
+    "fieldValue": "Valeur sur le terrain",
+    "fieldValueDescription": "{{count}} articles avec l'équipe",
+    "fieldValueByEmployee": "Valeur sur le terrain par employé",
+    "item": "article",
+    "items": "articles"
   },
   "quotes": {
-    "title": "Devis et CRM",
-    "pageTitle": "Devis de service",
-    "pageSubtitle": "Créer et gérer les devis de service pour les bâtiments",
-    "newQuote": "Nouveau devis",
-    "searchPlaceholder": "Rechercher par numéro strata/travail ou nom du site...",
-    "floors": "étages",
-    "services": "Services",
-    "backToDashboard": "Retour au tableau de bord",
-    "backToQuotes": "Retour aux devis",
-    "open": "ouvert",
-    "allQuotes": "Tous les devis",
-    "createQuote": "Créer un devis",
-    "loading": "Chargement des devis...",
-    "noQuotesFound": "Aucun devis trouvé",
-    "noQuotesYet": "Aucun devis",
-    "tryDifferentSearch": "Essayez un autre terme de recherche",
-    "createFirstQuote": "Créez votre premier devis de service pour commencer",
-    "myQuotes": "Mes devis",
-    "download": "Télécharger",
-    "buildingInfo": "Informations du bâtiment",
-    "quoteTotal": "Total du devis",
-    "totalHours": "Heures totales",
-    "totalCost": "Coût total",
-    "totalCostCalculated": "Coût total (calculé)",
-    "estimatedTotal": "Total estimé",
-    "editQuote": "Modifier le devis",
-    "deleteQuote": "Supprimer le devis",
-    "quoteDetails": "Détails du devis",
-    "quoteNumber": "Numéro de devis",
-    "quoteDate": "Date du devis",
-    "validUntil": "Valide jusqu'au",
-    "client": "Client",
-    "building": "Bâtiment",
-    "items": "Lignes",
-    "addItem": "Ajouter une ligne",
-    "subtotal": "Sous-total",
-    "tax": "Taxe",
-    "total": "Total",
-    "notes": "Notes",
-    "terms": "Conditions générales",
-    "noQuotes": "Aucun devis trouvé",
-    "generatePdf": "Générer le PDF",
-    "sendQuote": "Envoyer le devis",
-    "status": {
-      "draft": "Brouillon",
-      "sent": "Envoyé",
-      "viewed": "Consulté",
-      "accepted": "Accepté",
-      "rejected": "Rejeté",
-      "expired": "Expiré"
-    },
-    "tabs": {
-      "list": "Tous les devis",
-      "pipeline": "Pipeline",
-      "analytics": "Analytique"
-    },
-    "pipeline": {
-      "description": "Glissez les devis entre les étapes pour suivre leur progression dans votre pipeline de ventes.",
-      "services": "services",
-      "viewDetails": "Voir les détails",
-      "dragHere": "Glissez les devis ici",
-      "stageMoved": "Devis déplacé",
-      "stageMovedDesc": "Devis déplacé vers {{stage}}",
-      "updateFailed": "Échec de la mise à jour",
-      "updateFailedDesc": "Impossible de mettre à jour l'étape du devis",
-      "stages": {
-        "draft": "Brouillon",
-        "submitted": "Soumis",
-        "review": "En révision",
-        "negotiation": "Négociation",
-        "approved": "Approuvé",
-        "won": "Gagné",
-        "lost": "Perdu"
-      }
-    },
-    "analytics": {
-      "timeRange": "Période",
-      "loading": "Chargement des analytiques...",
-      "totalQuotes": "Total des devis",
-      "won": "Gagnés",
-      "lost": "Perdus",
-      "winRate": "Taux de réussite",
-      "wonValue": "Valeur gagnée",
-      "lostValue": "Valeur perdue",
-      "pendingValue": "Valeur en attente",
-      "stageBreakdown": "Répartition par étape du pipeline",
-      "noData": "Aucune donnée analytique",
-      "noDataDesc": "Créez des devis pour voir les analytiques ici.",
-      "ranges": {
-        "week": "Semaine",
-        "month": "Mois",
-        "year": "Année",
-        "all": "Tout"
-      }
-    },
-    "email": {
-      "button": "Envoyer",
-      "title": "Envoyer le devis par courriel",
-      "recipientLabel": "Courriel du destinataire",
-      "recipientPlaceholder": "client@exemple.com",
-      "subjectLabel": "Objet",
-      "subjectPlaceholder": "Devis de service pour...",
-      "messageLabel": "Message personnel (Optionnel)",
-      "messagePlaceholder": "Ajoutez un message personnel à inclure avec le devis...",
-      "note": "Le devis sera envoyé sous forme de courriel professionnel avec une pièce jointe PDF.",
-      "send": "Envoyer le devis",
-      "sending": "Envoi en cours...",
-      "success": "Devis envoyé",
-      "successDesc": "Le devis a été envoyé avec succès avec la pièce jointe PDF.",
-      "failed": "Échec de l'envoi",
-      "failedDesc": "Impossible d'envoyer le devis par courriel",
-      "defaultSubject": "Devis de service pour"
-    }
+    "failedToLoad": "Échec du chargement du devis",
+    "failedToCreate": "Échec de la création du devis",
+    "failedToUploadPhoto": "Échec du téléchargement de la photo"
   },
   "schedule": {
     "title": "Calendrier des travaux",
@@ -3037,6 +2852,7 @@
     "timeOffRemoveFailed": "Échec de la suppression du congé.",
     "missingInfo": "Information manquante",
     "selectTimeOffFields": "Veuillez sélectionner un employé, une date de début et un type de congé.",
+    "selectType": "Sélectionner le type...",
     "invalidDateRange": "Plage de dates invalide",
     "endBeforeStart": "La date de fin ne peut pas être avant la date de début.",
     "timeOffScheduled": "Congé planifié",
@@ -3375,7 +3191,15 @@
     "failedToProcessImage": "Échec du traitement de l'image",
     "appIconUploaded": "Icône de l'application téléchargée avec succès",
     "appIconActive": "Votre icône personnalisée est maintenant active pour les nouvelles installations.",
-    "failedToUploadIcon": "Échec du téléchargement de l'icône"
+    "failedToUploadIcon": "Échec du téléchargement de l'icône",
+    "deleteAccount": "Supprimer le compte",
+    "confirmLogout": "Confirmer la déconnexion",
+    "logoutConfirmMessage": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "logout": "Se déconnecter",
+    "updateLicenseKey": "Mettre à jour la clé de licence",
+    "licenseKeyDescription": "Entrez votre nouvelle clé de licence. Ceci est requis après la mise à niveau de votre niveau.",
+    "newLicenseKey": "Nouvelle clé de licence",
+    "enterLicenseKey": "Entrez votre nouvelle clé de licence"
   },
   "subscription": {
     "title": "Abonnement",
@@ -6167,30 +5991,21 @@
     "passwordChangeFailed": "Échec du changement de mot de passe",
     "passwordChangeError": "Échec du changement de mot de passe. Veuillez réessayer.",
     "fillAllPasswordFields": "Veuillez remplir tous les champs de mot de passe.",
-    "enterBothFields": "Veuillez entrer le numéro de plan de strata et le mot de passe."
+    "enterBothFields": "Veuillez entrer le numéro de plan de strata et le mot de passe.",
+    "strataPlaceholder": "Entrez votre numéro de strata ou de travail",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "addressPlaceholder": "Commencez à taper pour rechercher...",
+    "keysReturnPlaceholder": "Sélectionnez quand retourner les clés...",
+    "currentPasswordPlaceholder": "Entrez votre mot de passe actuel",
+    "newPasswordPlaceholder": "Entrez le nouveau mot de passe (min 6 caractères)",
+    "confirmPasswordPlaceholder": "Confirmez le nouveau mot de passe"
   },
   "manageSubscription": {
-    "title": "Gerer l'Abonnement",
-    "currentPlan": "Plan Actuel",
-    "changePlan": "Changer de Plan",
-    "cancelSubscription": "Annuler l'Abonnement",
-    "billingHistory": "Historique de Facturation",
-    "paymentMethod": "Methode de Paiement",
-    "updatePayment": "Mettre a Jour le Paiement",
-    "nextBilling": "Prochaine Date de Facturation",
-    "amount": "Montant",
-    "status": "Statut",
-    "active": "Actif",
-    "cancelled": "Annule",
-    "trial": "Essai",
-    "trialEnds": "Fin de l'Essai",
-    "daysLeft": "jours restants",
-    "seats": "Sieges",
-    "addSeat": "Ajouter un Siege",
-    "removeSeat": "Supprimer un Siege",
-    "confirmCancel": "Etes-vous sur de vouloir annuler?",
-    "keepSubscription": "Garder l'Abonnement",
-    "yesCancelIt": "Oui, Annuler"
+    "failedToLoad": "Échec du chargement de l'abonnement",
+    "failedToCancel": "Échec de l'annulation de l'abonnement",
+    "failedToResume": "Échec de la reprise de l'abonnement",
+    "failedToUpdate": "Échec de la mise à jour de l'abonnement",
+    "failedToCreateCheckout": "Échec de la création de la session de paiement"
   },
   "jobBoard": {
     "title": "Offres d'Emploi",
@@ -13047,25 +12862,133 @@
     "stakeholders": {
       "owner": {
         "title": "Pour les propriétaires d'entreprise",
-        "description": "Gérez votre entreprise, votre équipe et développez-vous efficacement"
+        "description": "Gérez votre entreprise, votre équipe et développez-vous efficacement",
+        "searchPlaceholder": "Posez des questions sur la gestion d'équipe, les finances, l'analytique...",
+        "features": {
+          "teamMgmt": "Gestion d'équipe",
+          "teamMgmtDesc": "Gérez vos techniciens, suivez les certifications et gérez les tâches RH",
+          "financial": "Contrôles financiers",
+          "financialDesc": "Générez des devis, suivez la paie et surveillez les coûts des projets",
+          "analytics": "Analytique et insights",
+          "analyticsDesc": "Tableaux de bord en temps réel montrant la productivité et la rentabilité",
+          "safety": "Conformité sécurité",
+          "safetyDesc": "Suivi automatisé de la sécurité et de la documentation"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que propriétaire d'entreprise",
+          "step1": "Configurez le profil et l'image de marque de votre entreprise",
+          "step2": "Ajoutez les membres de votre équipe et attribuez des rôles",
+          "step3": "Configurez les paramètres de sécurité et de conformité",
+          "step4": "Créez votre premier projet et commencez le suivi",
+          "viewGuide": "Voir le guide de démarrage complet"
+        }
       },
       "technician": {
         "title": "Pour les techniciens",
-        "description": "Suivez votre temps, vos certifications et votre carrière"
+        "description": "Suivez votre temps, vos certifications et votre carrière",
+        "searchPlaceholder": "Posez des questions sur le suivi du temps, la journalisation IRATA, les documents de sécurité...",
+        "features": {
+          "timeTracking": "Suivi du temps",
+          "timeTrackingDesc": "Pointage GPS, enregistrez les heures manuelles lorsque l'employeur n'utilise pas OnRopePro",
+          "irataLogging": "Journalisation IRATA/SPRAT",
+          "irataLoggingDesc": "Suivez les heures pour la progression de certification - les heures manuelles comptent dans les totaux",
+          "safetyDocs": "Documentation de sécurité",
+          "safetyDocsDesc": "Complétez les inspections, signez les réunions de sécurité, signalez les incidents",
+          "jobBoard": "Tableau d'emplois",
+          "jobBoardDesc": "Trouvez de nouvelles opportunités et connectez-vous avec des employeurs"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que technicien",
+          "step1": "Créez votre profil technicien gratuit",
+          "step2": "Ajoutez vos certifications et votre expérience",
+          "step3": "Connectez-vous avec des employeurs ou enregistrez des heures indépendantes",
+          "step4": "Construisez votre portfolio professionnel",
+          "viewGuide": "Voir le guide de démarrage complet"
+        }
       },
       "buildingManager": {
         "title": "Pour les gestionnaires d'immeubles",
-        "description": "Surveillez le travail, la conformité et communiquez avec les résidents"
+        "description": "Surveillez le travail, la conformité et communiquez avec les résidents",
+        "searchPlaceholder": "Posez des questions sur les cotes de sécurité, la conformité, l'avancement...",
+        "features": {
+          "safetyRating": "Cote de sécurité de l'entreprise",
+          "safetyRatingDesc": "Consultez les cotes de sécurité et l'historique de conformité des fournisseurs",
+          "residentComm": "Communication avec les résidents",
+          "residentCommDesc": "Gérez les plaintes des résidents et les notifications de travaux",
+          "workProgress": "Avancement des travaux",
+          "workProgressDesc": "Surveillez l'avancement et l'état d'achèvement des projets",
+          "documentation": "Documentation",
+          "documentationDesc": "Accédez aux registres d'ancrage, rapports d'inspection et attestations d'assurance"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que gestionnaire d'immeuble",
+          "step1": "Créez votre compte gestionnaire d'immeuble gratuit",
+          "step2": "Connectez-vous à votre immeuble avec le code unique",
+          "step3": "Consultez les cotes de sécurité et l'historique des fournisseurs",
+          "step4": "Configurez la communication avec les résidents pour les travaux à venir",
+          "viewGuide": "Voir le guide de démarrage complet"
+        }
       },
       "propertyManager": {
         "title": "Pour les gestionnaires de propriétés",
-        "description": "Supervisez votre portefeuille et vos relations avec les fournisseurs"
+        "description": "Supervisez votre portefeuille et vos relations avec les fournisseurs",
+        "searchPlaceholder": "Posez des questions sur la gestion des fournisseurs, la supervision du portefeuille...",
+        "features": {
+          "portfolio": "Vue d'ensemble du portefeuille",
+          "portfolioDesc": "Gérez plusieurs immeubles depuis un seul tableau de bord",
+          "vendorMgmt": "Gestion des fournisseurs",
+          "vendorMgmtDesc": "Consultez et comparez tous vos fournisseurs d'accès sur corde",
+          "safetyRatings": "Cotes de sécurité",
+          "safetyRatingsDesc": "Comparez la conformité en matière de sécurité des fournisseurs dans votre portefeuille",
+          "documentation": "Documentation",
+          "documentationDesc": "Accédez aux attestations d'assurance, historique de service et documents de conformité"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que gestionnaire de propriétés",
+          "step1": "Créez votre compte gestionnaire de propriétés",
+          "step2": "Ajoutez des immeubles à votre portefeuille",
+          "step3": "Connectez-vous avec les gestionnaires d'immeubles et les fournisseurs",
+          "step4": "Surveillez la conformité dans toutes vos propriétés",
+          "viewGuide": "Voir le guide de démarrage complet"
+        }
       },
       "resident": {
         "title": "Pour les résidents",
-        "description": "Soumettez des commentaires et suivez les problèmes dans votre immeuble"
+        "description": "Soumettez des commentaires et suivez les problèmes dans votre immeuble",
+        "searchPlaceholder": "Posez des questions sur la soumission de commentaires, le suivi des problèmes...",
+        "features": {
+          "submitFeedback": "Soumettre des commentaires",
+          "submitFeedbackDesc": "Signalez les problèmes ou préoccupations directement à votre fournisseur de services",
+          "photoEvidence": "Preuves photo",
+          "photoEvidenceDesc": "Joignez des photos pour expliquer clairement les problèmes",
+          "statusUpdates": "Mises à jour de statut",
+          "statusUpdatesDesc": "Suivez quand vos commentaires ont été consultés et répondus",
+          "issueResolution": "Résolution des problèmes",
+          "issueResolutionDesc": "Voyez quand les problèmes sont marqués comme résolus avec les réponses des fournisseurs"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que résident",
+          "step1": "Accédez au portail résident avec le code de votre immeuble",
+          "step2": "Soumettez des commentaires sur les problèmes de maintenance",
+          "step3": "Suivez le statut de vos soumissions",
+          "step4": "Recevez des mises à jour lorsque les problèmes sont résolus",
+          "viewGuide": "Voir le guide de démarrage complet"
+        },
+        "userGuide": {
+          "title": "Guide utilisateur du portail résident",
+          "description": "Guide complet étape par étape pour configurer votre compte, entrer le code de votre entreprise, soumettre des commentaires et suivre vos problèmes.",
+          "viewButton": "Voir le guide utilisateur"
+        }
       }
     },
+    "backToHelpCenter": "Centre d'aide",
+    "keyFeaturesTitle": "Fonctionnalités clés pour vous",
+    "recommendedModules": "Modules recommandés",
+    "helpfulResources": "Ressources utiles",
+    "buildingManagerSearchPlaceholder": "Posez des questions sur les cotes de sécurité, la conformité, l'avancement des travaux...",
+    "technicianSearchPlaceholder": "Posez des questions sur le suivi du temps, la journalisation IRATA, les documents de sécurité...",
+    "propertyManagerSearchPlaceholder": "Posez des questions sur la gestion des fournisseurs, la supervision du portefeuille...",
+    "companyOwnerSearchPlaceholder": "Posez des questions sur la gestion d'équipe, les finances, l'analytique...",
     "categories": {
       "operations": "Opérations",
       "safety": "Sécurité",
@@ -13164,7 +13087,9 @@
   },
   "superUserTechnicians": {
     "failedToLoadTechnician": "Échec du chargement des détails du technicien",
-    "failedToUpdateTechnician": "Échec de la mise à jour du technicien"
+    "failedToUpdateTechnician": "Échec de la mise à jour du technicien",
+    "enabling": "Activation...",
+    "reEnableAccount": "Réactiver le compte"
   },
   "groundCrewJobBoard": {
     "failedToSubmitApplication": "Échec de la soumission de la candidature"
@@ -13173,21 +13098,6 @@
     "failedToLoad": "Échec du chargement des détails de l'entreprise",
     "failedToUpdate": "Échec de la mise à jour de l'entreprise"
   },
-  "documents": {
-    "uploadFailed": "Échec du téléchargement"
-  },
-  "quotes": {
-    "failedToLoad": "Échec du chargement du devis",
-    "failedToCreate": "Échec de la création du devis",
-    "failedToUploadPhoto": "Échec du téléchargement de la photo"
-  },
-  "manageSubscription": {
-    "failedToLoad": "Échec du chargement de l'abonnement",
-    "failedToCancel": "Échec de l'annulation de l'abonnement",
-    "failedToResume": "Échec de la reprise de l'abonnement",
-    "failedToUpdate": "Échec de la mise à jour de l'abonnement",
-    "failedToCreateCheckout": "Échec de la création de la session de paiement"
-  },
   "superUserJobBoard": {
     "created": "Offre d'emploi créée avec succès",
     "updated": "Offre d'emploi mise à jour avec succès",
@@ -13195,7 +13105,9 @@
     "createFailed": "Échec de la création de l'offre d'emploi",
     "updateFailed": "Échec de la mise à jour de l'offre d'emploi",
     "deleteFailed": "Échec de la suppression de l'offre d'emploi",
-    "fillRequired": "Veuillez remplir les champs obligatoires"
+    "fillRequired": "Veuillez remplir les champs obligatoires",
+    "deleteJobPosting": "Supprimer l'offre d'emploi ?",
+    "deleteConfirmMessage": "Cette action ne peut pas être annulée. L'offre d'emploi sera définitivement supprimée."
   },
   "propertyManagerQuoteDetail": {
     "messageSent": "Message envoyé",
@@ -13218,7 +13130,10 @@
   },
   "personalSafetyDocuments": {
     "inspectionDeleted": "Inspection supprimée",
-    "deleteFailed": "Échec de la suppression"
+    "deleteFailed": "Échec de la suppression",
+    "deleteInspection": "Supprimer l'inspection ?",
+    "deleteConfirmMessage": "Cette inspection sera définitivement supprimée.",
+    "newInspection": "Nouvelle inspection"
   },
   "dashboardGrid": {
     "copied": "Copié",

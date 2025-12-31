@@ -153,7 +153,7 @@ export function EmployerDocumentRequests({ technicianId, technicianName, company
                     id="requestTitle"
                     value={requestTitle}
                     onChange={(e) => setRequestTitle(e.target.value)}
-                    placeholder="e.g., Updated First Aid Certificate"
+                    placeholder={t('employerDocumentRequests.placeholders.documentTitle', 'e.g., Updated First Aid Certificate')}
                     className="mt-1.5"
                     data-testid="input-request-title"
                   />
@@ -164,7 +164,7 @@ export function EmployerDocumentRequests({ technicianId, technicianName, company
                     id="requestDetails"
                     value={requestDetails}
                     onChange={(e) => setRequestDetails(e.target.value)}
-                    placeholder="Any additional instructions or details..."
+                    placeholder={t('employerDocumentRequests.placeholders.additionalDetails', 'Any additional instructions or details...')}
                     className="mt-1.5"
                     data-testid="input-request-details"
                   />

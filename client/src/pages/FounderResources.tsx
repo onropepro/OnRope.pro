@@ -309,7 +309,7 @@ export default function FounderResources() {
                     id="name"
                     value={newResource.name}
                     onChange={(e) => setNewResource({ ...newResource, name: e.target.value })}
-                    placeholder="Resource name"
+                    placeholder={t('founderResources.resourceName', 'Resource name')}
                     data-testid="input-resource-name"
                   />
                 </div>
@@ -319,7 +319,7 @@ export default function FounderResources() {
                     id="url"
                     value={newResource.url}
                     onChange={(e) => setNewResource({ ...newResource, url: e.target.value })}
-                    placeholder="https://example.com"
+                    placeholder={t('common.placeholders.url', 'https://example.com')}
                     data-testid="input-resource-url"
                   />
                 </div>
@@ -329,7 +329,7 @@ export default function FounderResources() {
                     id="description"
                     value={newResource.description}
                     onChange={(e) => setNewResource({ ...newResource, description: e.target.value })}
-                    placeholder="Brief description"
+                    placeholder={t('founderResources.briefDescription', 'Brief description')}
                     data-testid="input-resource-description"
                   />
                 </div>

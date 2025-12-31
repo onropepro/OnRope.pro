@@ -174,7 +174,7 @@ export default function SuperUserFutureIdeas() {
         <div className="flex flex-wrap gap-3">
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-[150px]" data-testid="select-filter-status">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('common.status', 'Status')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
@@ -186,7 +186,7 @@ export default function SuperUserFutureIdeas() {
 
           <Select value={filterCategory} onValueChange={setFilterCategory}>
             <SelectTrigger className="w-[150px]" data-testid="select-filter-category">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder={t('common.category', 'Category')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
@@ -277,7 +277,7 @@ export default function SuperUserFutureIdeas() {
             <div>
               <label className="text-sm font-medium mb-1.5 block">Title</label>
               <Input
-                placeholder="Enter idea title"
+                placeholder={t('superuserFutureIdeas.enterTitle', 'Enter idea title')}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 data-testid="input-idea-title"
@@ -287,7 +287,7 @@ export default function SuperUserFutureIdeas() {
             <div>
               <label className="text-sm font-medium mb-1.5 block">Description</label>
               <Textarea
-                placeholder="Describe the idea in more detail..."
+                placeholder={t('superuserFutureIdeas.describeIdea', 'Describe the idea in more detail...')}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}

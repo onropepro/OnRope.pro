@@ -813,7 +813,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
               <FormItem>
                 <FormLabel>Property Manager Name (Optional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Smith" {...field} className="h-12" data-testid="input-property-manager" />
+                  <Input placeholder={t('common.placeholders.fullName', 'John Smith')} {...field} className="h-12" data-testid="input-property-manager" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -857,7 +857,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
               <FormItem>
                 <FormLabel>Notice Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Window Cleaning Notice" {...field} className="h-12" data-testid="input-notice-title" />
+                  <Input placeholder={t('workNotice.placeholders.noticeTitle', 'Window Cleaning Notice')} {...field} className="h-12" data-testid="input-notice-title" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -872,7 +872,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
                 <FormLabel>Notice Details</FormLabel>
                 <FormControl>
                   <Textarea 
-                    placeholder="Enter the notice details that will be shown to residents..."
+                    placeholder={t('workNotice.placeholders.noticeDetails', 'Enter the notice details that will be shown to residents...')}
                     className="min-h-32 resize-y"
                     {...field}
                     data-testid="textarea-notice-details"
@@ -891,7 +891,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
                 <FormLabel>Additional Instructions (Optional)</FormLabel>
                 <FormControl>
                   <Textarea 
-                    placeholder="Any additional instructions for residents..."
+                    placeholder={t('workNotice.placeholders.additionalInstructions', 'Any additional instructions for residents...')}
                     className="min-h-20 resize-y"
                     {...field}
                     data-testid="textarea-additional-instructions"
@@ -985,7 +985,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
                                 <>
                                   <div className="flex-1">
                                     <Input
-                                      placeholder="Elevation (e.g., North, South, East, West, Floors 1-5)"
+                                      placeholder={t('workNotice.placeholders.elevation', 'Elevation (e.g., North, South, East, West, Floors 1-5)')}
                                       value={slot.units}
                                       onChange={(e) => updateSlot(dayIndex, slotIndex, 'units', e.target.value)}
                                       className="h-8"
@@ -998,7 +998,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
                                       value={slot.startTime}
                                       onChange={(e) => updateSlot(dayIndex, slotIndex, 'startTime', e.target.value)}
                                       className="h-8 w-24"
-                                      placeholder="Start"
+                                      placeholder={t('common.start', 'Start')}
                                       data-testid={`input-slot-start-${dayIndex}-${slotIndex}`}
                                     />
                                     <span className="text-muted-foreground text-xs">to</span>
@@ -1007,7 +1007,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
                                       value={slot.endTime}
                                       onChange={(e) => updateSlot(dayIndex, slotIndex, 'endTime', e.target.value)}
                                       className="h-8 w-24"
-                                      placeholder="End"
+                                      placeholder={t('common.end', 'End')}
                                       data-testid={`input-slot-end-${dayIndex}-${slotIndex}`}
                                     />
                                     <span className="text-xs text-muted-foreground">(optional)</span>
