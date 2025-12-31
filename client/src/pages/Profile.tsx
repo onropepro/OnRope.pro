@@ -1175,9 +1175,7 @@ export default function Profile() {
   const branding = brandingData || {};
   const hasLogo = !!(branding.subscriptionActive && branding.logoUrl);
 
-  useSetHeaderConfig({
-    pageTitle: t('profile.title', 'Profile'),
-  }, [t]);
+  useSetHeaderConfig({}, []);
 
   return (
     <div className="min-h-screen bg-background pb-20">
