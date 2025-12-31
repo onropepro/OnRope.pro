@@ -1168,6 +1168,7 @@ export default function Inventory() {
       dateInService: "",
       dateOutOfService: "",
       inService: true,
+      itemSuffix: "",
     });
     setSerialEntries([]);
     setCurrentSerialNumber("");
@@ -1204,6 +1205,7 @@ export default function Inventory() {
       dateInService: item.dateInService || undefined,
       dateOutOfService: item.dateOutOfService || undefined,
       inService: item.inService,
+      itemSuffix: item.itemSuffix || undefined,
     });
     // Load serial entries from item (prefer new serialEntries, fallback to legacy serialNumbers)
     const itemSerialEntries = (item as any).serialEntries || [];
@@ -1693,7 +1695,7 @@ export default function Inventory() {
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <div>
                               <div className="font-semibold text-base flex items-center gap-2">
-                                {item.equipmentType}
+                                {item.equipmentType}{item.itemSuffix ? ` ${item.itemSuffix}` : ''}
                                 {item.inService === false && (
                                   <Badge variant="destructive" className="text-xs">
                                     {t('inventory.outOfService', 'Out of Service')}
@@ -2232,7 +2234,7 @@ export default function Inventory() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
                           <div>
-                            <div className="font-semibold mb-1">{item.equipmentType || "Gear Item"}</div>
+                            <div className="font-semibold mb-1">{item.equipmentType || "Gear Item"}{item.itemSuffix ? ` ${item.itemSuffix}` : ''}</div>
                             {item.brand && (
                               <div className="text-sm text-muted-foreground">{t('inventory.brand', 'Brand')}: {item.brand}</div>
                             )}
@@ -3061,6 +3063,29 @@ export default function Inventory() {
                   />
                 </>
               )}
+
+              {/* Item Suffix - Optional specification to append to item type */}
+              <FormField
+                control={form.control}
+                name="itemSuffix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('inventory.itemSuffix', 'Item Specification (Optional)')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder={t('inventory.placeholders.itemSuffix', 'e.g., 18" or Large or Red')} 
+                        {...field} 
+                        value={field.value || ""} 
+                        data-testid="input-item-suffix" 
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      {t('inventory.itemSuffixHint', 'Add a size, color, or other detail to the item name')}
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
@@ -4613,7 +4638,7 @@ export default function Inventory() {
                               </span>
                             </div>
                             <div>
-                              <div className="font-medium">{item.equipmentType || "Unknown"}</div>
+                              <div className="font-medium">{item.equipmentType || "Unknown"}{item.itemSuffix ? ` ${item.itemSuffix}` : ''}</div>
                               {(item.brand || item.model) && (
                                 <div className="text-xs text-muted-foreground">
                                   {[item.brand, item.model].filter(Boolean).join(" - ")}
