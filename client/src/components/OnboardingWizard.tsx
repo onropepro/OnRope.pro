@@ -302,7 +302,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                 </div>
               </div>
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">{t("onboarding.company.title", "Company Setup")}</h3>
+                <h3 className="text-xl font-semibold">{t("onboarding.company.title", "Company Setup")}</h3>
                 <p className="text-sm text-muted-foreground">{t("onboarding.company.description", "Confirm your company details")}</p>
               </div>
               <FormField
@@ -362,7 +362,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                 </div>
               </div>
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">{t("onboarding.client.title", "Add Your First Client")}</h3>
+                <h3 className="text-xl font-semibold">{t("onboarding.client.title", "Add Your First Client")}</h3>
                 <p className="text-sm text-muted-foreground">{t("onboarding.client.description", "A client is a property manager or building owner you work with")}</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -442,7 +442,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                 </div>
               </div>
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">{t("onboarding.employee.title", "Add Your First Team Member")}</h3>
+                <h3 className="text-xl font-semibold">{t("onboarding.employee.title", "Add Your First Team Member")}</h3>
                 <p className="text-sm text-muted-foreground">{t("onboarding.employee.description", "They'll receive login credentials via email")}</p>
               </div>
               <FormField
@@ -516,7 +516,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                 </div>
               </div>
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">{t("onboarding.project.title", "Create Your First Project")}</h3>
+                <h3 className="text-xl font-semibold">{t("onboarding.project.title", "Create Your First Project")}</h3>
                 <p className="text-sm text-muted-foreground mt-2">
                   {t("onboarding.project.noClient", "Projects require a client. You can create projects later from your dashboard after adding a client.")}
                 </p>
@@ -542,7 +542,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                 </div>
               </div>
               <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">{t("onboarding.project.title", "Create Your First Project")}</h3>
+                <h3 className="text-xl font-semibold">{t("onboarding.project.title", "Create Your First Project")}</h3>
                 <p className="text-sm text-muted-foreground">{t("onboarding.project.description", "A project represents a job at a specific building")}</p>
               </div>
               <FormField
@@ -625,7 +625,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
               </p>
             </div>
             <div className="space-y-3">
-              <Card className="shadow-sm bg-primary/5 border-primary/20">
+              <Card className="shadow-sm bg-muted/50">
                 <CardContent className="p-4">
                   <h4 className="font-medium mb-2">{t("onboarding.complete.nextSteps", "Recommended Next Steps")}</h4>
                   <ul className="text-sm text-muted-foreground space-y-1">
