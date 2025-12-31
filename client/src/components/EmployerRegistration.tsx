@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import { queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -80,6 +81,21 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
     billingFrequency: "monthly",
   });
   const [error, setError] = useState("");
+  const [animatedBenefitIndex, setAnimatedBenefitIndex] = useState(-1);
+
+  // Staggered animation for sidebar benefits list
+  useEffect(() => {
+    if (open) {
+      setAnimatedBenefitIndex(-1);
+      const delays = [800, 1400, 2000, 2600, 3200, 3800];
+      const timers = delays.map((delay, index) => 
+        setTimeout(() => setAnimatedBenefitIndex(index), delay)
+      );
+      return () => timers.forEach(timer => clearTimeout(timer));
+    } else {
+      setAnimatedBenefitIndex(-1);
+    }
+  }, [open]);
 
   const resetForm = () => {
     if (progressIntervalRef.current) {
@@ -320,17 +336,30 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
               </div>
             </div>
 
-            {/* Benefits - only show on welcome and company details steps */}
+            {/* Benefits - only show on welcome and company details steps (animated) */}
             {(step === "welcome" || step === "companyDetails") && (
               <div className="mt-auto">
                 <p className="text-white/60 text-xs uppercase tracking-wider mb-3">What You Get:</p>
-                <div className="space-y-3">
-                  {sidebarBenefits.map((benefit, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm">
-                      <benefit.icon className="w-4 h-4 text-white/80 mt-0.5 shrink-0" />
-                      <span className="text-white/90">{benefit.text}</span>
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  {sidebarBenefits.map((benefit, i) => {
+                    const isActive = i <= animatedBenefitIndex;
+                    return (
+                      <div key={i} className="flex items-start gap-2 text-sm">
+                        <div className={`w-4 h-4 rounded-full shrink-0 mt-0.5 flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-white border-white' : 'border border-white/40'}`}>
+                          {isActive && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <Check className="w-2.5 h-2.5 text-[#0B64A3]" />
+                            </motion.div>
+                          )}
+                        </div>
+                        <span className="text-white/90">{benefit.text}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
