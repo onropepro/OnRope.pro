@@ -3360,8 +3360,12 @@ export default function Inventory() {
                 </>
               )}
 
-              {/* All other gear types: show full details */}
-              {form.watch("equipmentType") !== "Carabiner" && form.watch("equipmentType") !== "Rope" && (
+              {/* All other gear types: show full details (exclude consumables that don't need serial/dates) */}
+              {form.watch("equipmentType") !== "Carabiner" && 
+               form.watch("equipmentType") !== "Rope" && 
+               form.watch("equipmentType") !== "Squeegee rubbers" &&
+               form.watch("equipmentType") !== "Applicators" &&
+               form.watch("equipmentType") !== "Gloves" && (
                 <>
                   {/* Serial Number Entry with Per-Item Dates */}
                   <div className="space-y-3">
