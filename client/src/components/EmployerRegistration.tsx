@@ -363,6 +363,16 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                 </div>
               </div>
             )}
+
+            {/* Billing Details info - show on payment step */}
+            {step === "payment" && (
+              <div className="mt-auto">
+                <h2 className="text-xl font-bold text-white mb-2">Billing Details</h2>
+                <p className="text-sm text-white/80">
+                  Enter your billing details to start your {TRIAL_PERIOD_DAYS}-day free trial
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Right Panel - Form content */}
@@ -567,11 +577,6 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     <ArrowLeft className="w-4 h-4" />
                     Back
                   </button>
-
-                  <h2 className="text-xl font-bold mb-1">Billing Details</h2>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Enter your billing details to start your {TRIAL_PERIOD_DAYS}-day free trial
-                  </p>
 
                   {error && (
                     <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
