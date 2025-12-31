@@ -20,6 +20,7 @@ interface GiftAddonsForm {
 }
 
 export default function CompanyDetail() {
+  const { t } = useTranslation();
   const [, params] = useRoute("/superuser/companies/:id");
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -70,8 +71,8 @@ export default function CompanyDetail() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to gift add-ons",
+        title: t("common.error"),
+        description: error.message || t("companyDetail.failedToUpdate"),
         variant: "destructive",
       });
     },
@@ -91,8 +92,8 @@ export default function CompanyDetail() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to toggle verification",
+        title: t("common.error"),
+        description: error.message || t("companyDetail.failedToUpdate"),
         variant: "destructive",
       });
     },

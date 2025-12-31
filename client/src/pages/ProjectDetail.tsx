@@ -657,11 +657,11 @@ export default function ProjectDetail() {
     if (ropeAccessTaskHours && ropeAccessTaskHours.trim() !== "") {
       const hours = parseFloat(ropeAccessTaskHours);
       if (isNaN(hours) || hours < 0 || hours > 24) {
-        toast({ title: t('projectDetail.toasts.error', 'Error'), description: "Rope access hours must be between 0 and 24", variant: "destructive" });
+        toast({ title: t('projectDetail.toasts.error', 'Error'), description: t('projectDetail.validation.ropeAccessHoursRange', 'Rope access hours must be between 0 and 24'), variant: "destructive" });
         return;
       }
       if ((hours * 4) % 1 !== 0) {
-        toast({ title: t('projectDetail.toasts.error', 'Error'), description: "Hours must be in quarter-hour increments", variant: "destructive" });
+        toast({ title: t('projectDetail.toasts.error', 'Error'), description: t('projectDetail.validation.quarterHourIncrements', 'Hours must be in quarter-hour increments'), variant: "destructive" });
         return;
       }
       validatedHours = hours;

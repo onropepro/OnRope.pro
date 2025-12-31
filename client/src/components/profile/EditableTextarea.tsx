@@ -2,6 +2,7 @@ import { Control, FieldValues, Path } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface EditableTextareaProps<T extends FieldValues> {
   isEditing: boolean;
@@ -32,10 +33,12 @@ export function EditableTextarea<T extends FieldValues>({
   required,
   disabled,
   rows = 3,
-  emptyText = "Not provided",
+  emptyText,
   testId,
   className = "",
 }: EditableTextareaProps<T>) {
+  const { t } = useTranslation();
+  const defaultEmptyText = emptyText ?? t('profile.notProvided', 'Not provided');
   const baseTestId = testId || `field-${String(name)}`;
 
   if (isEditing && control) {
@@ -81,7 +84,7 @@ export function EditableTextarea<T extends FieldValues>({
       {value ? (
         <p className="text-base whitespace-pre-wrap">{value}</p>
       ) : (
-        <p className="text-muted-foreground">{emptyText}</p>
+        <p className="text-muted-foreground">{defaultEmptyText}</p>
       )}
     </div>
   );

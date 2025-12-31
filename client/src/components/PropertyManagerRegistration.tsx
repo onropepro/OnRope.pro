@@ -97,14 +97,14 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
     onSuccess: () => {
       setStep("success");
       toast({
-        title: "Registration Complete!",
-        description: "Your property manager account has been created successfully.",
+        title: t('pmReg.toast.registrationComplete', 'Registration Complete!'),
+        description: t('pmReg.toast.accountCreated', 'Your property manager account has been created successfully.'),
       });
     },
     onError: (error: Error) => {
       setError(error.message);
       toast({
-        title: "Registration Failed",
+        title: t('pmReg.toast.registrationFailed', 'Registration Failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -113,27 +113,27 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
 
   const validateAccountDetails = (): boolean => {
     if (!data.firstName.trim()) {
-      setError("First name is required");
+      setError(t('validation.firstNameRequired', 'First name is required'));
       return false;
     }
     if (!data.lastName.trim()) {
-      setError("Last name is required");
+      setError(t('validation.lastNameRequired', 'Last name is required'));
       return false;
     }
     if (!data.propertyManagementCompany.trim()) {
-      setError("Property management company is required");
+      setError(t('pmReg.validation.companyRequired', 'Property management company is required'));
       return false;
     }
     if (!data.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      setError("Valid email is required");
+      setError(t('validation.validEmailRequired', 'Valid email is required'));
       return false;
     }
     if (!data.password || data.password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(t('validation.passwordMin6', 'Password must be at least 6 characters'));
       return false;
     }
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('validation.passwordsNoMatch', 'Passwords do not match'));
       return false;
     }
     return true;

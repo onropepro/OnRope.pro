@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import HelpSearchBar from '@/components/help/HelpSearchBar';
 import HelpChatWidget from '@/components/help/HelpChatWidget';
 import { PublicHeader } from '@/components/PublicHeader';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Module {
   slug: string;
@@ -134,11 +135,56 @@ const moduleIcons: Record<string, React.ReactNode> = {
 };
 
 export default function HelpCenter() {
+  const { t } = useLanguage();
   const { data: modulesData, isLoading } = useQuery<{ modules: Module[] }>({
     queryKey: ['/api/help/modules'],
   });
 
   const modules = modulesData?.modules || [];
+  
+  // Translated stakeholder cards
+  const translatedStakeholderCards = [
+    {
+      id: 'owner',
+      title: t('helpCenter.stakeholders.owner.title', 'For Company Owners'),
+      description: t('helpCenter.stakeholders.owner.description', 'Manage your business, team, and grow efficiently'),
+      href: '/help/for-company-owners',
+      icon: Building2,
+      color: '#0B64A3',
+    },
+    {
+      id: 'technician',
+      title: t('helpCenter.stakeholders.technician.title', 'For Technicians'),
+      description: t('helpCenter.stakeholders.technician.description', 'Track your time, certifications, and career'),
+      href: '/help/for-technicians',
+      icon: HardHat,
+      color: '#5C7A84',
+    },
+    {
+      id: 'building-manager',
+      title: t('helpCenter.stakeholders.buildingManager.title', 'For Building Managers'),
+      description: t('helpCenter.stakeholders.buildingManager.description', 'Monitor work, compliance, and communicate with residents'),
+      href: '/help/for-building-managers',
+      icon: Building2,
+      color: '#B89685',
+    },
+    {
+      id: 'property-manager',
+      title: t('helpCenter.stakeholders.propertyManager.title', 'For Property Managers'),
+      description: t('helpCenter.stakeholders.propertyManager.description', 'Oversee your portfolio and vendor relationships'),
+      href: '/help/for-property-managers',
+      icon: Users,
+      color: '#6E9075',
+    },
+    {
+      id: 'resident',
+      title: t('helpCenter.stakeholders.resident.title', 'For Residents'),
+      description: t('helpCenter.stakeholders.resident.description', 'Submit feedback and track issues at your building'),
+      href: '/help/for-residents',
+      icon: Home,
+      color: '#86A59C',
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,10 +194,10 @@ export default function HelpCenter() {
         <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
           <div className="text-center space-y-6 pt-16">
             <h1 className="text-4xl font-bold tracking-tight" data-testid="text-help-title">
-              How can we help you?
+              {t('helpCenter.title', 'How can we help you?')}
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Search our knowledge base or browse by topic
+              {t('helpCenter.subtitle', 'Search our knowledge base or browse by topic')}
             </p>
             <div className="max-w-xl mx-auto pt-4">
               <HelpSearchBar 
@@ -173,10 +219,10 @@ export default function HelpCenter() {
       <div className="max-w-6xl mx-auto px-4 py-12">
         <section className="mb-16">
           <h2 className="text-2xl font-semibold mb-6" data-testid="text-section-stakeholders">
-            Find help for your role
+            {t('helpCenter.roleSection', 'Find help for your role')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {stakeholderCards.map((card) => (
+            {translatedStakeholderCards.map((card) => (
               <Link key={card.id} href={card.href}>
                 <Card 
                   className="h-full cursor-pointer transition-shadow hover:shadow-md"
@@ -200,12 +246,12 @@ export default function HelpCenter() {
         <section className="mb-16">
           <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
             <h2 className="text-2xl font-semibold" data-testid="text-section-modules">
-              Browse by module
+              {t('helpCenter.modulesSection', 'Browse by module')}
             </h2>
             <Link href="/help/getting-started">
               <Button variant="outline" className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4" />
-                Getting Started Guide
+                {t('helpCenter.gettingStarted', 'Getting Started Guide')}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>

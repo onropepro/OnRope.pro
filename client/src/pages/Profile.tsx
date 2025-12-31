@@ -84,8 +84,8 @@ function BrandColorsSection({ user }: { user: any }) {
       setColors(colors.filter((_, i) => i !== index));
     } else {
       toast({
-        title: "Cannot remove",
-        description: "You must have at least one color",
+        title: t('profile.cannotRemove', 'Cannot remove'),
+        description: t('profile.mustHaveOneColor', 'You must have at least one color'),
         variant: "destructive"
       });
     }
@@ -103,7 +103,7 @@ function BrandColorsSection({ user }: { user: any }) {
       await apiRequest('PATCH', '/api/company/branding', {
         colors: colors,
       });
-      toast({ title: "Brand colors updated successfully" });
+      toast({ title: t('profile.brandColorsUpdated', 'Brand colors updated successfully') });
       // Invalidate BOTH user cache AND branding cache to trigger re-fetch
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/company"] });
@@ -111,8 +111,8 @@ function BrandColorsSection({ user }: { user: any }) {
       window.location.reload();
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to update colors",
+        title: t('common.error', 'Error'),
+        description: t('profile.failedToUpdateColors', 'Failed to update colors'),
         variant: "destructive"
       });
     } finally {
@@ -946,12 +946,12 @@ export default function Profile() {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "License verified successfully" });
+      toast({ title: t('profile.licenseVerified', 'License verified successfully') });
       setShowLicenseDialog(false);
       setNewLicenseKey("");
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -997,8 +997,8 @@ export default function Profile() {
         profileForm.setValue('residentLinkCode', pendingCode);
         sessionStorage.removeItem('pendingResidentCode');
         toast({
-          title: "Company code detected",
-          description: "Code has been auto-filled. Click 'Update Profile' to link your account.",
+          title: t('profile.companyCodeDetected', 'Company code detected'),
+          description: t('profile.codeAutoFilled', "Code has been auto-filled. Click 'Update Profile' to link your account."),
         });
       }
     }
@@ -1019,10 +1019,10 @@ export default function Profile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      toast({ title: "Profile updated successfully" });
+      toast({ title: t('profile.profileUpdated', 'Profile updated successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1035,14 +1035,14 @@ export default function Profile() {
     },
     onSuccess: () => {
       passwordForm.reset();
-      toast({ title: "Password changed successfully" });
+      toast({ title: t('profile.passwordChanged', 'Password changed successfully') });
     },
     onError: (error: Error) => {
       // Clear password fields on error for security - don't leave sensitive data visible
       passwordForm.setValue("currentPassword", "");
       passwordForm.setValue("newPassword", "");
       passwordForm.setValue("confirmPassword", "");
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1054,18 +1054,18 @@ export default function Profile() {
       // Close dialog and clear password on success
       setShowDeleteDialog(false);
       setDeletePassword("");
-      toast({ title: "Account deleted successfully" });
+      toast({ title: t('profile.accountDeleted', 'Account deleted successfully') });
       setLocation("/");
     },
     onError: (error: Error) => {
       // Keep dialog open so user can retry - don't clear password or close dialog
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
   const handleDeleteAccount = async () => {
     if (!deletePassword) {
-      toast({ title: "Error", description: "Please enter your password", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('profile.pleaseEnterPassword', 'Please enter your password'), variant: "destructive" });
       return;
     }
     try {
@@ -1086,7 +1086,7 @@ export default function Profile() {
       setLocation("/");
     } catch (error) {
       console.error("Logout error:", error);
-      toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('profile.failedToLogout', 'Failed to logout'), variant: "destructive" });
     }
   };
 
@@ -1892,12 +1892,12 @@ export default function Profile() {
                             }
                             
                             const data = await response.json();
-                            toast({ title: "Logo uploaded successfully" });
+                            toast({ title: t('profile.logoUploaded', 'Logo uploaded successfully') });
                             queryClient.invalidateQueries({ queryKey: ["/api/user"] });
                           } catch (error) {
                             toast({ 
-                              title: "Error", 
-                              description: error instanceof Error ? error.message : "Failed to upload logo",
+                              title: t('common.error', 'Error'), 
+                              description: error instanceof Error ? error.message : t('profile.failedToUploadLogo', 'Failed to upload logo'),
                               variant: "destructive" 
                             });
                           }
@@ -2013,7 +2013,7 @@ export default function Profile() {
                                 // Convert to blob
                                 canvas.toBlob(async (blob) => {
                                   if (!blob) {
-                                    toast({ title: "Error", description: "Failed to process image", variant: "destructive" });
+                                    toast({ title: t('common.error', 'Error'), description: t('profile.failedToProcessImage', 'Failed to process image'), variant: "destructive" });
                                     return;
                                   }
                                   
@@ -2031,12 +2031,12 @@ export default function Profile() {
                                       throw new Error('Failed to upload icon');
                                     }
                                     
-                                    toast({ title: "App icon uploaded successfully", description: "Your custom icon is now active for new app installations." });
+                                    toast({ title: t('profile.appIconUploaded', 'App icon uploaded successfully'), description: t('profile.appIconActive', 'Your custom icon is now active for new app installations.') });
                                     queryClient.invalidateQueries({ queryKey: ["/api/user"] });
                                   } catch (error) {
                                     toast({ 
-                                      title: "Error", 
-                                      description: error instanceof Error ? error.message : "Failed to upload icon",
+                                      title: t('common.error', 'Error'), 
+                                      description: error instanceof Error ? error.message : t('profile.failedToUploadIcon', 'Failed to upload icon'),
                                       variant: "destructive" 
                                     });
                                   }
@@ -2437,14 +2437,14 @@ export default function Profile() {
               }}
               data-testid="button-cancel-delete-account"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete-account"
             >
-              Delete Account
+              {t('profile.deleteAccount', 'Delete Account')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2454,15 +2454,15 @@ export default function Profile() {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogTitle>{t('profile.confirmLogout', 'Confirm Logout')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to logout?
+              {t('profile.logoutConfirmMessage', 'Are you sure you want to logout?')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-logout">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
-              Logout
+              {t('profile.logout', 'Logout')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2472,16 +2472,16 @@ export default function Profile() {
       <AlertDialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Update License Key</AlertDialogTitle>
+            <AlertDialogTitle>{t('profile.updateLicenseKey', 'Update License Key')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Enter your new license key. This is required after upgrading your tier.
+              {t('profile.licenseKeyDescription', 'Enter your new license key. This is required after upgrading your tier.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <Label htmlFor="new-license-key">New License Key</Label>
+            <Label htmlFor="new-license-key">{t('profile.newLicenseKey', 'New License Key')}</Label>
             <Input
               id="new-license-key"
-              placeholder="Enter your new license key"
+              placeholder={t('profile.enterLicenseKey', 'Enter your new license key')}
               value={newLicenseKey}
               onChange={(e) => setNewLicenseKey(e.target.value)}
               data-testid="input-new-license-key"
@@ -2492,7 +2492,7 @@ export default function Profile() {
               setShowLicenseDialog(false);
               setNewLicenseKey("");
             }}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {

@@ -1,12 +1,14 @@
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LayoutGrid } from "lucide-react";
 import { CARD_REGISTRY } from "@shared/dashboardCards";
+import { useLanguage } from "@/hooks/use-language";
 
 interface PlaceholderCardProps {
   cardId: string;
 }
 
 export function PlaceholderCard({ cardId }: PlaceholderCardProps) {
+  const { t } = useLanguage();
   const cardDef = CARD_REGISTRY.find((c) => c.id === cardId);
   
   return (
@@ -19,8 +21,8 @@ export function PlaceholderCard({ cardId }: PlaceholderCardProps) {
       </CardHeader>
       <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
         <div className="text-center text-muted-foreground">
-          <p className="text-base">{cardDef?.description || "Coming soon"}</p>
-          <p className="text-sm mt-2">This card is under development</p>
+          <p className="text-base">{cardDef?.description || t("common.comingSoon", "Coming soon")}</p>
+          <p className="text-sm mt-2">{t("common.underDevelopment", "This card is under development")}</p>
         </div>
       </CardContent>
     </div>

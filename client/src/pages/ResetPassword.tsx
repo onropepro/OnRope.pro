@@ -9,10 +9,12 @@ import { apiRequest } from "@/lib/queryClient";
 import { ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { PublicHeader } from "@/components/PublicHeader";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
+import { useLanguage } from "@/hooks/use-language";
 
 const RESIDENT_COLOR = "#86A59C";
 
 export default function ResetPassword() {
+  const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { openLogin } = useAuthPortal();
@@ -39,30 +41,29 @@ export default function ResetPassword() {
     setError("");
     
     if (!token || !email) {
-      setError("Invalid reset link. Please request a new password reset.");
+      setError(t("resetPassword.invalidLink", "Invalid reset link. Please request a new password reset."));
       return;
     }
     
-    // Validate password strength (must match backend requirements)
     if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters long");
+      setError(t("resetPassword.minLength", "Password must be at least 8 characters long"));
       return;
     }
     if (!/[A-Z]/.test(newPassword)) {
-      setError("Password must contain at least one uppercase letter");
+      setError(t("resetPassword.uppercase", "Password must contain at least one uppercase letter"));
       return;
     }
     if (!/[a-z]/.test(newPassword)) {
-      setError("Password must contain at least one lowercase letter");
+      setError(t("resetPassword.lowercase", "Password must contain at least one lowercase letter"));
       return;
     }
     if (!/[0-9]/.test(newPassword)) {
-      setError("Password must contain at least one number");
+      setError(t("resetPassword.number", "Password must contain at least one number"));
       return;
     }
     
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("resetPassword.mismatch", "Passwords do not match"));
       return;
     }
     
@@ -78,15 +79,15 @@ export default function ResetPassword() {
       if (response.ok) {
         setIsSuccess(true);
         toast({
-          title: "Password Reset Successful",
-          description: "You can now sign in with your new password.",
+          title: t("resetPassword.successTitle", "Password Reset Successful"),
+          description: t("resetPassword.successDescription", "You can now sign in with your new password."),
         });
       } else {
         const data = await response.json();
-        setError(data.message || "Failed to reset password. Please try again.");
+        setError(data.message || t("resetPassword.failed", "Failed to reset password. Please try again."));
       }
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError(t("common.somethingWentWrong", "Something went wrong. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -108,9 +109,9 @@ export default function ResetPassword() {
                   <CheckCircle2 className="w-10 h-10" style={{ color: RESIDENT_COLOR }} />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">Password Reset Complete</h1>
+                  <h1 className="text-2xl font-bold text-foreground">{t("resetPassword.completeTitle", "Password Reset Complete")}</h1>
                   <p className="text-muted-foreground mt-2">
-                    Your password has been successfully reset. You can now sign in with your new password.
+                    {t("resetPassword.completeDescription", "Your password has been successfully reset. You can now sign in with your new password.")}
                   </p>
                 </div>
                 <Button
@@ -119,26 +120,26 @@ export default function ResetPassword() {
                   style={{ backgroundColor: RESIDENT_COLOR }}
                   data-testid="button-go-to-signin"
                 >
-                  Go to Sign In
+                  {t("resetPassword.goToSignIn", "Go to Sign In")}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="text-center">
-                  <h1 className="text-2xl font-bold text-foreground">Create New Password</h1>
+                  <h1 className="text-2xl font-bold text-foreground">{t("resetPassword.createNewTitle", "Create New Password")}</h1>
                   <p className="text-muted-foreground mt-2">
-                    Enter your new password below.
+                    {t("resetPassword.createNewDescription", "Enter your new password below.")}
                   </p>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="new-password" className="text-foreground">New Password</Label>
+                    <Label htmlFor="new-password" className="text-foreground">{t("resetPassword.newPassword", "New Password")}</Label>
                     <Input
                       id="new-password"
                       type="password"
-                      placeholder="Enter new password"
+                      placeholder={t("resetPassword.enterNewPassword", "Enter new password")}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
@@ -146,16 +147,16 @@ export default function ResetPassword() {
                       data-testid="input-new-password"
                     />
                     <p className="text-xs text-muted-foreground">
-                      At least 8 characters with uppercase, lowercase, and a number
+                      {t("resetPassword.requirements", "At least 8 characters with uppercase, lowercase, and a number")}
                     </p>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-foreground">Confirm Password</Label>
+                    <Label htmlFor="confirm-password" className="text-foreground">{t("resetPassword.confirmPassword", "Confirm Password")}</Label>
                     <Input
                       id="confirm-password"
                       type="password"
-                      placeholder="Confirm new password"
+                      placeholder={t("resetPassword.confirmNewPassword", "Confirm new password")}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
@@ -182,14 +183,14 @@ export default function ResetPassword() {
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      Reset Password
+                      {t("resetPassword.resetButton", "Reset Password")}
                       <ArrowRight className="ml-2 w-4 h-4" />
                     </>
                   )}
                 </Button>
                 
                 <p className="text-center text-sm text-muted-foreground">
-                  Remember your password?{" "}
+                  {t("resetPassword.rememberPassword", "Remember your password?")}{" "}
                   <button
                     type="button"
                     onClick={() => {
@@ -199,7 +200,7 @@ export default function ResetPassword() {
                     className="font-medium text-primary hover:underline"
                     data-testid="link-back-to-signin"
                   >
-                    Sign In
+                    {t("common.signIn", "Sign In")}
                   </button>
                 </p>
               </form>

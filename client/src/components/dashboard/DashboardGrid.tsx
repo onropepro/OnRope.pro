@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
@@ -54,6 +55,7 @@ export function DashboardGrid({
   onRouteNavigate,
   branding,
 }: DashboardGridProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -77,16 +79,16 @@ export function DashboardGrid({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/layout"] });
       toast({
-        title: "Dashboard saved",
-        description: "Your dashboard layout has been saved.",
+        title: t("dashboardGrid.dashboardSaved"),
+        description: t("dashboardGrid.dashboardSavedDescription"),
       });
       setHasChanges(false);
       setIsEditMode(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Failed to save",
-        description: error.message || "Could not save your dashboard layout.",
+        title: t("dashboardGrid.failedToSave"),
+        description: error.message || t("dashboardGrid.failedToSaveDescription"),
         variant: "destructive",
       });
     },
@@ -274,7 +276,7 @@ export function DashboardGrid({
                         data-testid="badge-resident-code"
                         onClick={() => {
                           navigator.clipboard.writeText(currentUser.residentCode);
-                          toast({ title: "Copied", description: "Resident code copied to clipboard" });
+                          toast({ title: t("dashboardGrid.copied"), description: t("dashboardGrid.residentCodeCopied") });
                         }}
                       >
                         {currentUser.residentCode}
@@ -291,7 +293,7 @@ export function DashboardGrid({
                         data-testid="badge-property-manager-code"
                         onClick={() => {
                           navigator.clipboard.writeText(currentUser.propertyManagerCode);
-                          toast({ title: "Copied", description: "Property Manager code copied to clipboard" });
+                          toast({ title: t("dashboardGrid.copied"), description: t("dashboardGrid.propertyManagerCodeCopied") });
                         }}
                       >
                         {currentUser.propertyManagerCode}

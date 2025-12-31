@@ -615,7 +615,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     },
     onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", project.id, "work-notices"] });
-      toast({ title: "Work notice created", description: "The notice is now visible to residents." });
+      toast({ title: t("workNotice.created"), description: t("workNotice.createdDescription") });
       onSuccess?.();
       
       // If no template was used, ask if they want to save as template
@@ -627,7 +627,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
       }
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("workNotice.error"), description: error.message, variant: "destructive" });
     },
   });
   
@@ -637,12 +637,12 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/custom-notice-templates"] });
-      toast({ title: "Template saved", description: "You can now use this template for future notices." });
+      toast({ title: t("workNotice.templateSaved"), description: t("workNotice.templateSavedDescription") });
       setShowSaveTemplateDialog(false);
       onClose();
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("workNotice.error"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -652,12 +652,12 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", project.id, "work-notices"] });
-      toast({ title: "Work notice updated" });
+      toast({ title: t("workNotice.updated") });
       onSuccess?.();
       onClose();
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("workNotice.error"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1197,10 +1197,10 @@ export function WorkNoticeList({ projectId, project }: WorkNoticeListProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "work-notices"] });
-      toast({ title: "Work notice deleted" });
+      toast({ title: t("workNotice.deleted") });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("workNotice.error"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1211,11 +1211,11 @@ export function WorkNoticeList({ projectId, project }: WorkNoticeListProps) {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <span className="material-icons">campaign</span>
-          Work Notices
+          {t("workNotice.title")}
         </h3>
         <Button onClick={() => setShowCreateForm(true)} data-testid="button-create-work-notice">
           <span className="material-icons mr-2">add</span>
-          Create Notice
+          {t("workNotice.createNotice")}
         </Button>
       </div>
 
@@ -1227,8 +1227,8 @@ export function WorkNoticeList({ projectId, project }: WorkNoticeListProps) {
         <Card className="border-dashed">
           <CardContent className="py-8 text-center">
             <span className="material-icons text-4xl text-muted-foreground mb-2">campaign</span>
-            <p className="text-muted-foreground">No work notices yet</p>
-            <p className="text-sm text-muted-foreground">Create a notice to inform residents about upcoming work</p>
+            <p className="text-muted-foreground">{t("workNotice.noNoticesYet")}</p>
+            <p className="text-sm text-muted-foreground">{t("workNotice.noNoticesDescription")}</p>
           </CardContent>
         </Card>
       ) : (
@@ -1241,7 +1241,7 @@ export function WorkNoticeList({ projectId, project }: WorkNoticeListProps) {
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-medium truncate">{notice.noticeTitle}</h4>
                       <Badge variant={notice.isPublished ? "default" : "secondary"}>
-                        {notice.isPublished ? "Published" : "Draft"}
+                        {notice.isPublished ? t("workNotice.published") : t("workNotice.draft")}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-2">

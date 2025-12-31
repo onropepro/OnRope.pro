@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,6 +99,7 @@ function getCollaborationStatusBadge(status: string | undefined) {
 }
 
 export default function PropertyManagerQuoteDetail() {
+  const { t } = useTranslation();
   const { quoteId } = useParams<{ quoteId: string }>();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -125,10 +127,10 @@ export default function PropertyManagerQuoteDetail() {
     onSuccess: () => {
       setMessageContent("");
       refetchMessages();
-      toast({ title: "Message sent" });
+      toast({ title: t("propertyManagerQuoteDetail.messageSent") });
     },
     onError: () => {
-      toast({ title: "Failed to send message", variant: "destructive" });
+      toast({ title: t("propertyManagerQuoteDetail.sendMessageFailed"), variant: "destructive" });
     }
   });
 
@@ -140,10 +142,10 @@ export default function PropertyManagerQuoteDetail() {
       refetch();
       refetchMessages();
       queryClient.invalidateQueries({ queryKey: ['/api/property-managers/me/quotes'] });
-      toast({ title: "Quote accepted successfully" });
+      toast({ title: t("propertyManagerQuoteDetail.quoteAccepted") });
     },
     onError: () => {
-      toast({ title: "Failed to accept quote", variant: "destructive" });
+      toast({ title: t("propertyManagerQuoteDetail.acceptFailed"), variant: "destructive" });
     }
   });
 
@@ -157,10 +159,10 @@ export default function PropertyManagerQuoteDetail() {
       refetch();
       refetchMessages();
       queryClient.invalidateQueries({ queryKey: ['/api/property-managers/me/quotes'] });
-      toast({ title: "Quote declined" });
+      toast({ title: t("propertyManagerQuoteDetail.quoteDeclined") });
     },
     onError: () => {
-      toast({ title: "Failed to decline quote", variant: "destructive" });
+      toast({ title: t("propertyManagerQuoteDetail.declineFailed"), variant: "destructive" });
     }
   });
 
@@ -174,10 +176,10 @@ export default function PropertyManagerQuoteDetail() {
       setCounterOfferNotes("");
       refetch();
       refetchMessages();
-      toast({ title: "Counter-offer submitted" });
+      toast({ title: t("propertyManagerQuoteDetail.counterOfferSubmitted") });
     },
     onError: () => {
-      toast({ title: "Failed to submit counter-offer", variant: "destructive" });
+      toast({ title: t("propertyManagerQuoteDetail.counterOfferFailed"), variant: "destructive" });
     }
   });
 

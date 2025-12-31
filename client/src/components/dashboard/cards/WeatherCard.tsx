@@ -23,11 +23,18 @@ interface WeatherData {
 }
 
 function getWindSafetyLevel(windSpeed: number) {
-  if (windSpeed >= 50) return { level: "Unsafe", color: "text-red-700 dark:text-red-400", bg: "bg-red-50 dark:bg-red-950/30", badge: "bg-red-100 text-red-700" };
-  if (windSpeed >= 35) return { level: "High Risk", color: "text-orange-700 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-950/30", badge: "bg-orange-100 text-orange-700" };
-  if (windSpeed >= 20) return { level: "Caution", color: "text-yellow-700 dark:text-yellow-400", bg: "bg-yellow-50 dark:bg-yellow-950/30", badge: "bg-yellow-100 text-yellow-700" };
-  return { level: "Safe", color: "text-green-700 dark:text-green-400", bg: "bg-green-50 dark:bg-green-950/30", badge: "bg-green-100 text-green-700" };
+  if (windSpeed >= 50) return { levelKey: "unsafe", color: "text-red-700 dark:text-red-400", bg: "bg-red-50 dark:bg-red-950/30", badge: "bg-red-100 text-red-700" };
+  if (windSpeed >= 35) return { levelKey: "highRisk", color: "text-orange-700 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-950/30", badge: "bg-orange-100 text-orange-700" };
+  if (windSpeed >= 20) return { levelKey: "caution", color: "text-yellow-700 dark:text-yellow-400", bg: "bg-yellow-50 dark:bg-yellow-950/30", badge: "bg-yellow-100 text-yellow-700" };
+  return { levelKey: "safe", color: "text-green-700 dark:text-green-400", bg: "bg-green-50 dark:bg-green-950/30", badge: "bg-green-100 text-green-700" };
 }
+
+const SAFETY_LEVEL_LABELS: Record<string, string> = {
+  safe: 'Safe',
+  caution: 'Caution',
+  highRisk: 'High Risk',
+  unsafe: 'Unsafe',
+};
 
 export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
   const { t } = useTranslation();
@@ -119,10 +126,10 @@ export function WeatherCard({ branding, onRouteNavigate }: CardProps) {
               </p>
             </div>
             <Badge className={safety.badge}>
-              {safety.level === "Unsafe" || safety.level === "High Risk" ? (
+              {safety.levelKey === "unsafe" || safety.levelKey === "highRisk" ? (
                 <AlertTriangle className="w-3 h-3 mr-1" />
               ) : null}
-              {safety.level}
+              {t(`weather.safety.${safety.levelKey}`, SAFETY_LEVEL_LABELS[safety.levelKey])}
             </Badge>
           </div>
         </div>

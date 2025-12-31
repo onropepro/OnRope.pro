@@ -2,6 +2,7 @@ import { Control, FieldValues, Path } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface SelectOption {
   value: string;
@@ -32,15 +33,18 @@ export function EditableSelect<T extends FieldValues>({
   value,
   options,
   control,
-  placeholder = "Select an option",
+  placeholder,
   icon,
   helpText,
   required,
   disabled,
-  emptyText = "Not selected",
+  emptyText,
   testId,
   className = "",
 }: EditableSelectProps<T>) {
+  const { t } = useTranslation();
+  const defaultPlaceholder = placeholder ?? t('profile.selectOption', 'Select an option');
+  const defaultEmptyText = emptyText ?? t('profile.notSelected', 'Not selected');
   const baseTestId = testId || `field-${String(name)}`;
 
   if (isEditing && control) {
@@ -64,7 +68,7 @@ export function EditableSelect<T extends FieldValues>({
             >
               <FormControl>
                 <SelectTrigger data-testid={`select-${baseTestId}`}>
-                  <SelectValue placeholder={placeholder} />
+                  <SelectValue placeholder={defaultPlaceholder} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
@@ -94,7 +98,7 @@ export function EditableSelect<T extends FieldValues>({
         <span>{label}</span>
       </div>
       <p className="text-base">
-        {displayValue || <span className="text-muted-foreground">{emptyText}</span>}
+        {displayValue || <span className="text-muted-foreground">{defaultEmptyText}</span>}
       </p>
     </div>
   );

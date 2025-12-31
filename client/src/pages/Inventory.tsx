@@ -70,30 +70,37 @@ const getServiceDuration = (dateInService: string | null | undefined): string | 
   }
 };
 
-const gearTypes = [
-  { name: "Harness", icon: Shield },
-  { name: "Rope", icon: Cable },
-  { name: "Carabiner - Steel", icon: Link2 },
-  { name: "Carabiner - Aluminum", icon: Link2 },
-  { name: "Descender", icon: Gauge },
-  { name: "Ascender", icon: TrendingUp },
-  { name: "Helmet", icon: HardHat },
-  { name: "Gloves", icon: Hand },
-  { name: "Work positioning device", icon: Shield },
-  { name: "Gas powered equipment", icon: Fuel },
-  { name: "Squeegee rubbers", icon: Scissors },
-  { name: "Applicators", icon: PaintBucket },
-  { name: "Soap", icon: Droplets },
-  { name: "Suction cup", icon: CircleDot },
-  { name: "Back up device", icon: Lock },
-  { name: "Lanyard", icon: Anchor },
-  { name: "Shock absorber", icon: Zap },
-  { name: "Other", icon: MoreHorizontal }
+// Gear type keys for translation - will be translated inside component
+const gearTypeKeys = [
+  { key: "harness", defaultName: "Harness", icon: Shield },
+  { key: "rope", defaultName: "Rope", icon: Cable },
+  { key: "carabinerSteel", defaultName: "Carabiner - Steel", icon: Link2 },
+  { key: "carabinerAluminum", defaultName: "Carabiner - Aluminum", icon: Link2 },
+  { key: "descender", defaultName: "Descender", icon: Gauge },
+  { key: "ascender", defaultName: "Ascender", icon: TrendingUp },
+  { key: "helmet", defaultName: "Helmet", icon: HardHat },
+  { key: "gloves", defaultName: "Gloves", icon: Hand },
+  { key: "workPositioningDevice", defaultName: "Work positioning device", icon: Shield },
+  { key: "gasPoweredEquipment", defaultName: "Gas powered equipment", icon: Fuel },
+  { key: "squeegeeRubbers", defaultName: "Squeegee rubbers", icon: Scissors },
+  { key: "applicators", defaultName: "Applicators", icon: PaintBucket },
+  { key: "soap", defaultName: "Soap", icon: Droplets },
+  { key: "suctionCup", defaultName: "Suction cup", icon: CircleDot },
+  { key: "backupDevice", defaultName: "Back up device", icon: Lock },
+  { key: "lanyard", defaultName: "Lanyard", icon: Anchor },
+  { key: "shockAbsorber", defaultName: "Shock absorber", icon: Zap },
+  { key: "other", defaultName: "Other", icon: MoreHorizontal }
 ];
 
 export default function Inventory() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  
+  // Translated gear types
+  const gearTypes = gearTypeKeys.map(gt => ({
+    name: t(`inventory.gearTypes.${gt.key}`, gt.defaultName),
+    icon: gt.icon
+  }));
   const [, setLocation] = useLocation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);

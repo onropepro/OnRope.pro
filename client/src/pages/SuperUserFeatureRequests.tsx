@@ -28,6 +28,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function SuperUserFeatureRequests() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
@@ -61,8 +62,8 @@ export default function SuperUserFeatureRequests() {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to update status",
+        title: t("common.error"),
+        description: t("superUserFeatureRequests.failedToUpdateStatus"),
         variant: "destructive",
       });
     },
@@ -83,8 +84,8 @@ export default function SuperUserFeatureRequests() {
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to send message",
+        title: t("common.error"),
+        description: t("superUserFeatureRequests.failedToSendMessage"),
         variant: "destructive",
       });
     },

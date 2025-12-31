@@ -3,6 +3,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface EditableDateFieldProps<T extends FieldValues> {
   isEditing: boolean;
@@ -43,11 +44,13 @@ export function EditableDateField<T extends FieldValues>({
   helpText,
   required,
   disabled,
-  emptyText = "Not set",
+  emptyText,
   testId,
   className = "",
   formatDate = defaultFormatDate,
 }: EditableDateFieldProps<T>) {
+  const { t } = useTranslation();
+  const defaultEmptyText = emptyText ?? t('profile.notSet', 'Not set');
   const baseTestId = testId || `field-${String(name)}`;
   const defaultIcon = icon ?? <Calendar className="w-4 h-4" />;
 
@@ -101,7 +104,7 @@ export function EditableDateField<T extends FieldValues>({
         <span>{label}</span>
       </div>
       <p className="text-base">
-        {displayValue || <span className="text-muted-foreground">{emptyText}</span>}
+        {displayValue || <span className="text-muted-foreground">{defaultEmptyText}</span>}
       </p>
     </div>
   );

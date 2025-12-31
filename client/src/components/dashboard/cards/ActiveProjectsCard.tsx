@@ -4,16 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Briefcase, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 
-// Helper function to calculate project progress based on job type
 function calculateProjectProgress(project: any): number {
   const jobType = project.jobType || '';
   
-  // Hours-based jobs (NDT, Rock Scaling, etc.)
   const hourBasedJobs = ['ndt_inspection', 'rock_scaling', 'concrete_repair', 'sign_installation', 'overhead_protection', 'general_repairs', 'general_pressure_washing', 'ground_window_cleaning'];
   if (hourBasedJobs.includes(jobType)) {
-    // Check for overallCompletionPercentage first
     if (project.overallCompletionPercentage !== null && project.overallCompletionPercentage !== undefined) {
       return project.overallCompletionPercentage;
     }
@@ -21,22 +19,18 @@ function calculateProjectProgress(project: any): number {
     const hoursWorked = project.hoursWorked || 0;
     return estimatedHours > 0 ? Math.min(100, (hoursWorked / estimatedHours) * 100) : 0;
   } else if (jobType === 'in_suite_dryer_vent_cleaning') {
-    // Suite-based - uses completedDrops for suites completed
     const totalSuites = project.totalSuites || project.floorCount || 0;
     const suitesCompleted = project.completedDrops || 0;
     return totalSuites > 0 ? (suitesCompleted / totalSuites) * 100 : 0;
   } else if (jobType === 'parkade_pressure_cleaning') {
-    // Stall-based
     const totalStalls = project.totalStalls || project.floorCount || 0;
     const stallsCompleted = project.completedDrops || 0;
     return totalStalls > 0 ? (stallsCompleted / totalStalls) * 100 : 0;
   } else if (jobType === 'anchor_inspection') {
-    // Anchor-based
     const totalAnchors = project.totalAnchors || 0;
     const anchorsInspected = project.totalAnchorsInspected || 0;
     return totalAnchors > 0 ? (anchorsInspected / totalAnchors) * 100 : 0;
   } else {
-    // Drop-based (window cleaning, building wash, etc.)
     const totalDrops = project.totalDrops || 0;
     const completedDrops = project.completedDrops || 0;
     return totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
@@ -44,6 +38,7 @@ function calculateProjectProgress(project: any): number {
 }
 
 export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps) {
+  const { t } = useLanguage();
   const accentColor = branding?.primaryColor || "#0B64A3";
 
   const activeProjects = projects?.filter(
@@ -58,7 +53,7 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <Briefcase className="w-5 h-5" style={{ color: accentColor }} />
-            Active Projects
+            {t("dashboardCards.activeProjects.title", "Active Projects")}
           </CardTitle>
           <Badge variant="secondary" className="text-xs" data-testid="badge-active-project-count">
             {activeProjects.length}
@@ -68,7 +63,7 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
       <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
         {displayProjects.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-base text-muted-foreground">No active projects</p>
+            <p className="text-base text-muted-foreground">{t("dashboardCards.activeProjects.noProjects", "No active projects")}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -83,7 +78,7 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-base font-medium truncate">
-                      {project.buildingName || project.name || "Untitled"}
+                      {project.buildingName || project.name || t("common.untitled", "Untitled")}
                     </p>
                     <span className="text-sm text-muted-foreground whitespace-nowrap">
                       {Math.round(progress)}%
@@ -101,7 +96,7 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
                 onClick={() => onNavigate("projects")}
                 data-testid="button-view-all-projects"
               >
-                View All ({activeProjects.length})
+                {t("dashboardCards.activeProjects.viewAll", "View All")} ({activeProjects.length})
                 <ChevronRight className="w-4 h-4" />
               </Button>
             )}

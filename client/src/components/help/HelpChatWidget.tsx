@@ -3,6 +3,7 @@ import { MessageCircle, X, Send, ThumbsUp, ThumbsDown, Loader2, ExternalLink } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/use-language';
 
 function formatResponseText(text: string): JSX.Element[] {
   const elements: JSX.Element[] = [];
@@ -58,6 +59,7 @@ interface HelpChatWidgetProps {
 }
 
 export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetProps) {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(initialOpen);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -65,6 +67,8 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [userType, setUserType] = useState<string>('visitor');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const greetingMessage = t('helpCenter.chat.welcome', "Hi! I'm the OnRopePro assistant. I can help you learn about our platform, find specific features, or troubleshoot issues.\n\nWhat can I help you with today?");
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -75,10 +79,10 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
       setMessages([{
         id: 'greeting',
         role: 'assistant',
-        content: `Hi! I'm the OnRopePro assistant. I can help you learn about our platform, find specific features, or troubleshoot issues.\n\nWhat can I help you with today?`,
+        content: greetingMessage,
       }]);
     }
-  }, [isOpen, messages.length]);
+  }, [isOpen, messages.length, greetingMessage]);
   
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -123,7 +127,7 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
       setMessages(prev => [...prev, {
         id: Date.now().toString() + '-error',
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again or contact support.',
+        content: t('helpCenter.chat.error', 'Sorry, I encountered an error. Please try again.'),
       }]);
     } finally {
       setIsLoading(false);
@@ -173,8 +177,8 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
                 <MessageCircle className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-semibold">OnRopePro Assistant</h3>
-                <p className="text-xs text-blue-100">Ask me anything</p>
+                <h3 className="font-semibold">{t('helpCenter.chat.assistantName', 'OnRopePro Assistant')}</h3>
+                <p className="text-xs text-blue-100">{t('helpCenter.chat.askAnything', 'Ask me anything')}</p>
               </div>
             </div>
             <button 
@@ -189,13 +193,13 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
           
           {messages.length <= 1 && (
             <div className="p-4 border-b bg-muted/50">
-              <p className="text-sm text-muted-foreground mb-2">I am a:</p>
+              <p className="text-sm text-muted-foreground mb-2">{t('helpCenter.chat.iAm', 'I am a:')}</p>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { value: 'owner', label: 'Company Owner' },
-                  { value: 'technician', label: 'Technician' },
-                  { value: 'building-manager', label: 'Building Manager' },
-                  { value: 'visitor', label: 'Just Exploring' },
+                  { value: 'owner', label: t('helpCenter.chat.userTypes.owner', 'Company Owner') },
+                  { value: 'technician', label: t('helpCenter.chat.userTypes.technician', 'Technician') },
+                  { value: 'building-manager', label: t('helpCenter.chat.userTypes.buildingManager', 'Building Manager') },
+                  { value: 'visitor', label: t('helpCenter.chat.userTypes.visitor', 'Just Exploring') },
                 ].map(option => (
                   <button
                     key={option.value}
@@ -241,7 +245,7 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
                   
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/30">
-                      <p className="text-xs text-muted-foreground mb-2">Related articles:</p>
+                      <p className="text-xs text-muted-foreground mb-2">{t('helpCenter.chat.relatedArticles', 'Related articles:')}</p>
                       <div className="space-y-1">
                         {message.sources.map(source => (
                           <a
@@ -298,7 +302,7 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type your question..."
+                placeholder={t('helpCenter.chat.typeMessage', 'Type your message...')}
                 className="flex-1"
                 disabled={isLoading}
                 data-testid="input-help-chat"
@@ -313,7 +317,7 @@ export default function HelpChatWidget({ initialOpen = false }: HelpChatWidgetPr
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              AI-powered by OnRopePro documentation
+              {t('helpCenter.chat.aiPowered', 'AI-powered assistant')}
             </p>
           </div>
         </div>

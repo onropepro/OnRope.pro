@@ -204,16 +204,16 @@ export default function BuildingPortal() {
     },
     onSuccess: () => {
       toast({
-        title: "Instructions Saved",
-        description: "Building instructions have been updated successfully.",
+        title: t('buildingPortal.instructionsSaved', 'Instructions Saved'),
+        description: t('buildingPortal.instructionsSavedDesc', 'Building instructions have been updated successfully.'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/buildings", buildingId, "instructions"] });
       setShowInstructionsDialog(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Save Failed",
-        description: error.message || "Failed to save building instructions.",
+        title: t('buildingPortal.saveFailed', 'Save Failed'),
+        description: error.message || t('buildingPortal.saveInstructionsFailed', 'Failed to save building instructions.'),
         variant: "destructive",
       });
     },
@@ -227,14 +227,14 @@ export default function BuildingPortal() {
     onSuccess: () => {
       toast({
         title: t("common.saved"),
-        description: "Building address has been updated.",
+        description: t('buildingPortal.addressUpdated', 'Building address has been updated.'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/building/portal"] });
     },
     onError: (error: any) => {
       toast({
         title: t("common.error"),
-        description: error.message || "Failed to update building address.",
+        description: error.message || t('buildingPortal.addressUpdateFailed', 'Failed to update building address.'),
         variant: "destructive",
       });
     },
@@ -247,15 +247,15 @@ export default function BuildingPortal() {
     },
     onSuccess: () => {
       toast({
-        title: "Login Successful",
-        description: "Welcome to your building portal.",
+        title: t('buildingPortal.loginSuccessful', 'Login Successful'),
+        description: t('buildingPortal.welcomePortal', 'Welcome to your building portal.'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/building/portal"] });
     },
     onError: (error: any) => {
       toast({
-        title: "Login Failed",
-        description: error.message || "Invalid strata plan number or password.",
+        title: t('buildingPortal.loginFailed', 'Login Failed'),
+        description: error.message || t('buildingPortal.invalidCredentials', 'Invalid strata plan number or password.'),
         variant: "destructive",
       });
     },
@@ -268,8 +268,8 @@ export default function BuildingPortal() {
     },
     onSuccess: () => {
       toast({
-        title: "Password Changed",
-        description: "Your password has been updated successfully.",
+        title: t('buildingPortal.passwordChanged', 'Password Changed'),
+        description: t('buildingPortal.passwordChangedDesc', 'Your password has been updated successfully.'),
       });
       setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
       setShowChangePasswordDialog(false);
@@ -277,8 +277,8 @@ export default function BuildingPortal() {
     },
     onError: (error: any) => {
       toast({
-        title: "Password Change Failed",
-        description: error.message || "Failed to change password. Please try again.",
+        title: t('buildingPortal.passwordChangeFailed', 'Password Change Failed'),
+        description: error.message || t('buildingPortal.passwordChangeError', 'Failed to change password. Please try again.'),
         variant: "destructive",
       });
     },
@@ -288,24 +288,24 @@ export default function BuildingPortal() {
     e.preventDefault();
     if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all password fields.",
+        title: t('validation.missingInfo', 'Missing Information'),
+        description: t('buildingPortal.fillAllPasswordFields', 'Please fill in all password fields.'),
         variant: "destructive",
       });
       return;
     }
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast({
-        title: "Passwords Don't Match",
-        description: "New password and confirmation must match.",
+        title: t('validation.passwordsDontMatch', "Passwords Don't Match"),
+        description: t('validation.passwordsMustMatch', 'New password and confirmation must match.'),
         variant: "destructive",
       });
       return;
     }
     if (passwordForm.newPassword.length < 6) {
       toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long.",
+        title: t('validation.passwordTooShort', 'Password Too Short'),
+        description: t('validation.passwordMinLength', 'Password must be at least 6 characters long.'),
         variant: "destructive",
       });
       return;
@@ -317,8 +317,8 @@ export default function BuildingPortal() {
     e.preventDefault();
     if (!strataPlanNumber.trim() || !password.trim()) {
       toast({
-        title: "Missing Information",
-        description: "Please enter both strata plan number and password.",
+        title: t('validation.missingInfo', 'Missing Information'),
+        description: t('buildingPortal.enterBothFields', 'Please enter both strata plan number and password.'),
         variant: "destructive",
       });
       return;

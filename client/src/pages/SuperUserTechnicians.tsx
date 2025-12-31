@@ -119,6 +119,7 @@ interface TechnicianDetailResponse {
 }
 
 export default function SuperUserTechnicians() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [linkedFilter, setLinkedFilter] = useState<string>("all");
@@ -180,7 +181,7 @@ export default function SuperUserTechnicians() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -215,7 +216,7 @@ export default function SuperUserTechnicians() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -763,7 +764,7 @@ export default function SuperUserTechnicians() {
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => {
                                       if (selectedTechnician) {
@@ -776,7 +777,7 @@ export default function SuperUserTechnicians() {
                                     disabled={toggleAccountStatusMutation.isPending}
                                     className="bg-green-600 hover:bg-green-700"
                                   >
-                                    {toggleAccountStatusMutation.isPending ? 'Enabling...' : 'Re-enable Account'}
+                                    {toggleAccountStatusMutation.isPending ? t('superUserTechnicians.enabling', 'Enabling...') : t('superUserTechnicians.reEnableAccount', 'Re-enable Account')}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -813,7 +814,7 @@ export default function SuperUserTechnicians() {
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel onClick={() => setSuspendReason("")}>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel onClick={() => setSuspendReason("")}>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => {
                                       if (selectedTechnician && suspendReason.trim().length >= 10) {

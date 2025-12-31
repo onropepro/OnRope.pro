@@ -90,6 +90,7 @@ const EXPERIENCE_OPTIONS = [
 ];
 
 export default function SuperUserJobBoard() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
@@ -133,10 +134,10 @@ export default function SuperUserJobBoard() {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setIsCreateOpen(false);
       resetForm();
-      toast({ title: "Job posting created successfully" });
+      toast({ title: t("superUserJobBoard.created") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to create job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.createFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -149,10 +150,10 @@ export default function SuperUserJobBoard() {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setEditingJob(null);
       resetForm();
-      toast({ title: "Job posting updated successfully" });
+      toast({ title: t("superUserJobBoard.updated") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to update job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.updateFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -164,10 +165,10 @@ export default function SuperUserJobBoard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setDeleteConfirmId(null);
-      toast({ title: "Job posting deleted successfully" });
+      toast({ title: t("superUserJobBoard.deleted") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to delete job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.deleteFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -195,7 +196,7 @@ export default function SuperUserJobBoard() {
 
   const handleCreate = () => {
     if (!formData.title || !formData.description) {
-      toast({ title: "Please fill in required fields", variant: "destructive" });
+      toast({ title: t("superUserJobBoard.fillRequired"), variant: "destructive" });
       return;
     }
     createMutation.mutate({
@@ -221,7 +222,7 @@ export default function SuperUserJobBoard() {
 
   const handleUpdate = () => {
     if (!editingJob || !formData.title || !formData.description) {
-      toast({ title: "Please fill in required fields", variant: "destructive" });
+      toast({ title: t("superUserJobBoard.fillRequired"), variant: "destructive" });
       return;
     }
     updateMutation.mutate({
@@ -665,14 +666,14 @@ export default function SuperUserJobBoard() {
               setEditingJob(null);
               resetForm();
             }}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={editingJob ? handleUpdate : handleCreate}
               disabled={createMutation.isPending || updateMutation.isPending}
               data-testid="button-submit-job"
             >
-              {createMutation.isPending || updateMutation.isPending ? "Saving..." : editingJob ? "Update" : "Create"}
+              {createMutation.isPending || updateMutation.isPending ? t('common.saving', 'Saving...') : editingJob ? t('common.update', 'Update') : t('common.create', 'Create')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -682,20 +683,20 @@ export default function SuperUserJobBoard() {
       <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Job Posting?</DialogTitle>
+            <DialogTitle>{t('superUserJobBoard.deleteJobPosting', 'Delete Job Posting?')}</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. The job posting will be permanently removed.
+              {t('superUserJobBoard.deleteConfirmMessage', 'This action cannot be undone. The job posting will be permanently removed.')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>{t('common.cancel', 'Cancel')}</Button>
             <Button
               variant="destructive"
               onClick={() => deleteConfirmId && deleteMutation.mutate(deleteConfirmId)}
               disabled={deleteMutation.isPending}
               data-testid="button-confirm-delete"
             >
-              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

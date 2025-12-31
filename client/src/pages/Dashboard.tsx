@@ -2366,7 +2366,7 @@ export default function Dashboard() {
   // Search for OnRopePro technicians
   const searchOnRopeProTechnician = async () => {
     if (!onRopeProSearchValue.trim()) {
-      toast({ title: "Search value required", description: "Please enter a value to search", variant: "destructive" });
+      toast({ title: t('dashboard.toast.searchValueRequired', 'Search value required'), description: t('dashboard.toast.pleaseEnterSearchValue', 'Please enter a value to search'), variant: "destructive" });
       return;
     }
     
@@ -2390,14 +2390,14 @@ export default function Dashboard() {
         setTechnicianSearchWarning(data.warning || null);
       } else {
         toast({ 
-          title: "No technician found", 
-          description: data.message || "No unlinked technician found with that information",
+          title: t('dashboard.toast.noTechnicianFound', 'No technician found'), 
+          description: data.message || t('dashboard.toast.noUnlinkedTechnician', 'No unlinked technician found with that information'),
           variant: "default" 
         });
       }
     } catch (error: any) {
       toast({ 
-        title: "Search failed", 
+        title: t('dashboard.toast.searchFailed', 'Search failed'), 
         description: error.message, 
         variant: "destructive" 
       });
@@ -3314,7 +3314,7 @@ export default function Dashboard() {
 
   const onEndDaySubmit = async (data: EndDayFormData) => {
     if (!activeSession) {
-      toast({ title: "Error", description: "No active work session found", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('dashboard.toast.noActiveSession', 'No active work session found'), variant: "destructive" });
       return;
     }
     

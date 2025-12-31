@@ -191,14 +191,14 @@ export default function Schedule() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employee-time-off"] });
       toast({
-        title: "Time Off Removed",
-        description: "Time off entry has been removed.",
+        title: t('schedule.timeOffRemoved', 'Time Off Removed'),
+        description: t('schedule.timeOffRemovedDesc', 'Time off entry has been removed.'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to remove time off.",
+        title: t('common.error', 'Error'),
+        description: error.message || t('schedule.timeOffRemoveFailed', 'Failed to remove time off.'),
         variant: "destructive",
       });
     },
@@ -215,8 +215,8 @@ export default function Schedule() {
   const handleCreateTimeOff = async () => {
     if (!selectedEmployeeForTimeOff || !selectedTimeOffStartDate || !selectedTimeOffType) {
       toast({
-        title: "Missing Information",
-        description: "Please select an employee, start date, and time off type.",
+        title: t('schedule.missingInfo', 'Missing Information'),
+        description: t('schedule.selectTimeOffFields', 'Please select an employee, start date, and time off type.'),
         variant: "destructive",
       });
       return;
@@ -227,8 +227,8 @@ export default function Schedule() {
     
     if (endDate < startDate) {
       toast({
-        title: "Invalid Date Range",
-        description: "End date cannot be before start date.",
+        title: t('schedule.invalidDateRange', 'Invalid Date Range'),
+        description: t('schedule.endBeforeStart', 'End date cannot be before start date.'),
         variant: "destructive",
       });
       return;
@@ -256,13 +256,13 @@ export default function Schedule() {
       setTimeOffDialogOpen(false);
       resetTimeOffForm();
       toast({
-        title: "Time Off Scheduled",
-        description: `Time off has been scheduled for ${dates.length} day${dates.length > 1 ? 's' : ''}.`,
+        title: t('schedule.timeOffScheduled', 'Time Off Scheduled'),
+        description: t('schedule.timeOffScheduledDesc', 'Time off has been scheduled for {{count}} day(s).', { count: dates.length }),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to schedule some time off entries.",
+        title: t('common.error', 'Error'),
+        description: error.message || t('schedule.timeOffScheduleFailed', 'Failed to schedule some time off entries.'),
         variant: "destructive",
       });
     }
@@ -594,8 +594,8 @@ export default function Schedule() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Employee assigned",
-        description: "Team member has been assigned with specified dates",
+        title: t('schedule.employeeAssigned', 'Employee assigned'),
+        description: t('schedule.employeeAssignedDesc', 'Team member has been assigned with specified dates'),
       });
       setAssignmentDialogOpen(false);
       setSelectedEmployeeForAssignment(null);
@@ -630,8 +630,8 @@ export default function Schedule() {
         }
       }
       toast({
-        title: "Error",
-        description: "Failed to assign employee",
+        title: t('common.error', 'Error'),
+        description: t('schedule.assignFailed', 'Failed to assign employee'),
         variant: "destructive",
       });
     },

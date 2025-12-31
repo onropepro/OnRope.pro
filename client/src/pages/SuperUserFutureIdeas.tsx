@@ -37,6 +37,7 @@ const STATUSES = [
 ];
 
 export default function SuperUserFutureIdeas() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingIdea, setEditingIdea] = useState<FutureIdea | null>(null);
@@ -63,10 +64,10 @@ export default function SuperUserFutureIdeas() {
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/future-ideas"] });
       setShowAddDialog(false);
       resetForm();
-      toast({ title: "Idea added successfully" });
+      toast({ title: t("superUserFutureIdeas.ideaAdded") });
     },
     onError: () => {
-      toast({ title: "Failed to add idea", variant: "destructive" });
+      toast({ title: t("superUserFutureIdeas.addFailed"), variant: "destructive" });
     },
   });
 
@@ -78,10 +79,10 @@ export default function SuperUserFutureIdeas() {
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/future-ideas"] });
       setEditingIdea(null);
       resetForm();
-      toast({ title: "Idea updated successfully" });
+      toast({ title: t("superUserFutureIdeas.ideaUpdated") });
     },
     onError: () => {
-      toast({ title: "Failed to update idea", variant: "destructive" });
+      toast({ title: t("superUserFutureIdeas.updateFailed"), variant: "destructive" });
     },
   });
 
@@ -91,10 +92,10 @@ export default function SuperUserFutureIdeas() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/future-ideas"] });
-      toast({ title: "Idea deleted" });
+      toast({ title: t("superUserFutureIdeas.ideaDeleted") });
     },
     onError: () => {
-      toast({ title: "Failed to delete idea", variant: "destructive" });
+      toast({ title: t("superUserFutureIdeas.deleteFailed"), variant: "destructive" });
     },
   });
 
@@ -121,7 +122,7 @@ export default function SuperUserFutureIdeas() {
 
   const handleSubmit = () => {
     if (!formData.title.trim()) {
-      toast({ title: "Please enter a title", variant: "destructive" });
+      toast({ title: t("superUserFutureIdeas.enterTitle"), variant: "destructive" });
       return;
     }
     if (editingIdea) {

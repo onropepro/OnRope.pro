@@ -2,6 +2,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, ChevronRight, FolderCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 
 interface OverdueProject {
@@ -16,6 +17,7 @@ interface OverdueProjectsData {
 }
 
 export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
+  const { t } = useLanguage();
   const accentColor = branding?.primaryColor || "#0B64A3";
 
   const { data, isLoading } = useQuery<OverdueProjectsData>({
@@ -28,7 +30,7 @@ export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <AlertTriangle className="w-5 h-5" style={{ color: accentColor }} />
-            Overdue Projects
+            {t("dashboardCards.overdueProjects.title", "Overdue Projects")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0">
@@ -45,7 +47,7 @@ export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
       <CardHeader className="px-4 py-3 flex-shrink-0">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
           <AlertTriangle className="w-5 h-5" style={{ color: accentColor }} />
-          Overdue Projects
+          {t("dashboardCards.overdueProjects.title", "Overdue Projects")}
         </CardTitle>
       </CardHeader>
       <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">
@@ -55,7 +57,7 @@ export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
               <p className="text-2xl font-bold text-destructive" data-testid="text-overdue-count">
                 {data!.count}
               </p>
-              <p className="text-sm text-muted-foreground">Past due date</p>
+              <p className="text-sm text-muted-foreground">{t("common.pastDueDate", "Past due date")}</p>
             </div>
             <div className="space-y-2">
               {data!.projects.slice(0, 3).map((project) => (
@@ -66,13 +68,13 @@ export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
                 >
                   <span className="font-medium truncate flex-1">{project.name}</span>
                   <span className="text-destructive text-xs ml-2">
-                    {project.daysOverdue}d overdue
+                    {project.daysOverdue}d {t("common.overdue", "overdue")}
                   </span>
                 </div>
               ))}
               {data!.count > 3 && (
                 <p className="text-xs text-muted-foreground text-center">
-                  +{data!.count - 3} more
+                  +{data!.count - 3} {t("common.more", "more")}
                 </p>
               )}
             </div>
@@ -83,15 +85,15 @@ export function OverdueProjectsCard({ onRouteNavigate, branding }: CardProps) {
               onClick={() => onRouteNavigate("/projects")}
               data-testid="button-view-overdue"
             >
-              View Projects
+              {t("dashboardCards.overdueProjects.viewProjects", "View Projects")}
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center text-center">
             <FolderCheck className="w-10 h-10 text-muted-foreground/50 mb-2" />
-            <p className="text-base text-muted-foreground">No overdue projects</p>
-            <p className="text-sm text-muted-foreground/70">All projects on track</p>
+            <p className="text-base text-muted-foreground">{t("dashboardCards.overdueProjects.noOverdue", "No overdue projects")}</p>
+            <p className="text-sm text-muted-foreground/70">{t("dashboardCards.overdueProjects.allOnTrack", "All projects on track")}</p>
           </div>
         )}
       </CardContent>
