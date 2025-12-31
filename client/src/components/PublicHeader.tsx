@@ -304,7 +304,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               </Button>
               {showModulesMenu && (
                 <div 
-                  className="fixed top-[64px] left-0 right-0 z-50 pointer-events-none"
+                  className="fixed top-[100px] left-0 right-0 z-50 pointer-events-none"
                 >
                   <div 
                     className="bg-card border-y border-border shadow-lg py-4 w-full max-h-[calc(100vh-120px)] overflow-y-auto pointer-events-auto"
