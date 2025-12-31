@@ -225,6 +225,11 @@ export const users = pgTable("users", {
   // Activity tracking
   lastActivityAt: timestamp("last_activity_at"), // Last time user made any API request (for activity monitoring)
   
+  // Onboarding tracking (company role only)
+  onboardingCompleted: boolean("onboarding_completed").default(false), // Whether company has completed onboarding wizard
+  onboardingCompletedAt: timestamp("onboarding_completed_at"), // When onboarding was completed
+  onboardingSkippedAt: timestamp("onboarding_skipped_at"), // When onboarding was skipped (user chose to explore)
+  
   // Account suspension (SuperUser can disable accounts for fraud/misuse)
   isDisabled: boolean("is_disabled").default(false), // Whether account is suspended
   disabledAt: timestamp("disabled_at"), // When account was disabled
