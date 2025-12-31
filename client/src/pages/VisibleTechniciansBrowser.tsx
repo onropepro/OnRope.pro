@@ -185,7 +185,7 @@ interface VisibleTechnician {
   spratLicenseNumber: string | null;
   spratExpirationDate: Date | string | null;
   ropeAccessStartDate: Date | string | null;
-  resumeDocuments: any[] | null;
+  resumeDocuments: string[] | null;
   employeeCity: string | null;
   employeeProvinceState: string | null;
   employeeCountry: string | null;
@@ -730,24 +730,24 @@ export default function VisibleTechniciansBrowser() {
                 </div>
 
                 {/* Resume/CV */}
-                {selectedTech.resumeDocuments && selectedTech.resumeDocuments.length > 0 && (
+                {selectedTech.resumeDocuments && selectedTech.resumeDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                   <div className="space-y-3">
                     <h4 className="font-semibold flex items-center gap-2">
                       <FileText className="w-4 h-4" />
                       {t.resumeCV}
                     </h4>
                     <div className="space-y-2">
-                      {selectedTech.resumeDocuments.map((doc: any, index: number) => (
+                      {selectedTech.resumeDocuments.filter((u: string) => u && u.trim()).map((docUrl: string, index: number) => (
                         <a
                           key={index}
-                          href={doc.url}
+                          href={docUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 p-2 rounded-lg border hover-elevate"
                           data-testid={`link-resume-${index}`}
                         >
                           <FileText className="w-4 h-4 text-muted-foreground" />
-                          <span className="flex-1 truncate text-sm">{doc.name || `${t.resume} ${index + 1}`}</span>
+                          <span className="flex-1 truncate text-sm">{`${t.resume} ${index + 1}`}</span>
                           <Download className="w-4 h-4 text-muted-foreground" />
                         </a>
                       ))}
