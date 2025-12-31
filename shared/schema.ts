@@ -1862,6 +1862,7 @@ const validJobTypeValues = getAllJobTypeValues() as [string, ...string[]];
 export const insertProjectSchema = createInsertSchema(projects)
   .omit({
     id: true,
+    companyId: true,
     createdAt: true,
     updatedAt: true,
     status: true,
