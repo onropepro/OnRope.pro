@@ -119,6 +119,7 @@ interface TechnicianDetailResponse {
 }
 
 export default function SuperUserTechnicians() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [linkedFilter, setLinkedFilter] = useState<string>("all");
@@ -180,7 +181,7 @@ export default function SuperUserTechnicians() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -215,7 +216,7 @@ export default function SuperUserTechnicians() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -317,7 +318,7 @@ export default function SuperUserTechnicians() {
               <div className="flex flex-col sm:flex-row gap-2">
                 <Select value={linkedFilter} onValueChange={(v) => { setLinkedFilter(v); setCurrentPage(1); }}>
                   <SelectTrigger className="w-[150px]" data-testid="select-linked-filter">
-                    <SelectValue placeholder="Filter by status" />
+                    <SelectValue placeholder={t('superuserTechnicians.filterByStatus', 'Filter by status')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All</SelectItem>
@@ -328,7 +329,7 @@ export default function SuperUserTechnicians() {
                 <div className="relative">
                   <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">search</span>
                   <Input
-                    placeholder="Search by name, email, license..."
+                    placeholder={t('superuserTechnicians.searchPlaceholder', 'Search by name, email, license...')}
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
                     className="pl-9 w-full sm:w-[300px]"
@@ -763,7 +764,7 @@ export default function SuperUserTechnicians() {
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => {
                                       if (selectedTechnician) {
@@ -776,7 +777,7 @@ export default function SuperUserTechnicians() {
                                     disabled={toggleAccountStatusMutation.isPending}
                                     className="bg-green-600 hover:bg-green-700"
                                   >
-                                    {toggleAccountStatusMutation.isPending ? 'Enabling...' : 'Re-enable Account'}
+                                    {toggleAccountStatusMutation.isPending ? t('superUserTechnicians.enabling', 'Enabling...') : t('superUserTechnicians.reEnableAccount', 'Re-enable Account')}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -803,7 +804,7 @@ export default function SuperUserTechnicians() {
                                       <Label htmlFor="suspend-reason" className="text-foreground font-medium">Reason for suspension (required):</Label>
                                       <Textarea
                                         id="suspend-reason"
-                                        placeholder="Enter the reason for suspending this account (min 10 characters)..."
+                                        placeholder={t('superuserTechnicians.suspendReasonPlaceholder', 'Enter the reason for suspending this account (min 10 characters)...')}
                                         value={suspendReason}
                                         onChange={(e) => setSuspendReason(e.target.value)}
                                         className="min-h-[80px]"
@@ -813,7 +814,7 @@ export default function SuperUserTechnicians() {
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel onClick={() => setSuspendReason("")}>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel onClick={() => setSuspendReason("")}>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => {
                                       if (selectedTechnician && suspendReason.trim().length >= 10) {

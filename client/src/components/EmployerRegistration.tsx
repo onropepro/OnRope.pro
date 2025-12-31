@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import { queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -43,18 +44,19 @@ interface ProcessingStatus {
   message: string;
 }
 
-const PROCESSING_STEPS = [
-  "Verifying payment...",
-  "Creating your company account...",
-  "Setting up your dashboard...",
-  "Configuring permissions...",
-  "Finalizing setup...",
-];
-
 export function EmployerRegistration({ open, onOpenChange }: EmployerRegistrationProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  
+  const PROCESSING_STEPS = [
+    t('employerReg.processing.verifyingPayment', 'Verifying payment...'),
+    t('employerReg.processing.creatingAccount', 'Creating your company account...'),
+    t('employerReg.processing.settingUpDashboard', 'Setting up your dashboard...'),
+    t('employerReg.processing.configuringPermissions', 'Configuring permissions...'),
+    t('employerReg.processing.finalizingSetup', 'Finalizing setup...'),
+  ];
+  
   const [step, setStep] = useState<RegistrationStep>("welcome");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -80,6 +82,21 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
     billingFrequency: "monthly",
   });
   const [error, setError] = useState("");
+  const [animatedBenefitIndex, setAnimatedBenefitIndex] = useState(-1);
+
+  // Staggered animation for sidebar benefits list
+  useEffect(() => {
+    if (open) {
+      setAnimatedBenefitIndex(-1);
+      const delays = [800, 1400, 2000, 2600, 3200, 3800];
+      const timers = delays.map((delay, index) => 
+        setTimeout(() => setAnimatedBenefitIndex(index), delay)
+      );
+      return () => timers.forEach(timer => clearTimeout(timer));
+    } else {
+      setAnimatedBenefitIndex(-1);
+    }
+  }, [open]);
 
   const resetForm = () => {
     if (progressIntervalRef.current) {
@@ -134,8 +151,8 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
         queryClient.invalidateQueries({ queryKey: ["/api/user"] });
         
         toast({
-          title: "Registration Complete!",
-          description: "Your company account has been created successfully.",
+          title: t('employerReg.toast.registrationComplete', 'Registration Complete!'),
+          description: t('employerReg.toast.accountCreatedSuccess', 'Your company account has been created successfully.'),
         });
       } else {
         throw new Error(result.message || "Registration failed");
@@ -145,8 +162,8 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
       setError(err.message || "Failed to complete registration");
       setStep("payment");
       toast({
-        title: "Registration Error",
-        description: err.message || "Failed to complete registration. Please try again.",
+        title: t('employerReg.toast.registrationError', 'Registration Error'),
+        description: err.message || t('employerReg.toast.failedToComplete', 'Failed to complete registration. Please try again.'),
         variant: "destructive",
       });
     } finally {
@@ -186,14 +203,14 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
     onSuccess: () => {
       setStep("success");
       toast({
-        title: "Registration Complete!",
-        description: "Your company account has been created successfully.",
+        title: t('employerReg.toast.registrationComplete', 'Registration Complete!'),
+        description: t('employerReg.toast.accountCreatedSuccess', 'Your company account has been created successfully.'),
       });
     },
     onError: (error: Error) => {
       setError(error.message);
       toast({
-        title: "Registration Failed",
+        title: t('employerReg.toast.registrationFailed', 'Registration Failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -202,23 +219,23 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
 
   const validateCompanyDetails = (): boolean => {
     if (!data.companyName.trim()) {
-      setError("Company name is required");
+      setError(t('employerReg.errors.companyNameRequired', 'Company name is required'));
       return false;
     }
     if (!data.ownerName.trim()) {
-      setError("Owner name is required");
+      setError(t('employerReg.errors.ownerNameRequired', 'Owner name is required'));
       return false;
     }
     if (!data.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      setError("Valid email is required");
+      setError(t('employerReg.errors.validEmailRequired', 'Valid email is required'));
       return false;
     }
     if (!data.password || data.password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(t('employerReg.errors.passwordMinLength', 'Password must be at least 6 characters'));
       return false;
     }
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('employerReg.errors.passwordsMismatch', 'Passwords do not match'));
       return false;
     }
     return true;
@@ -260,27 +277,27 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
   };
 
   const sidebarBenefits = [
-    { icon: Users, text: "Access our job board and reach 1000's of qualified techs" },
-    { icon: BarChart3, text: "Real-time project tracking and budget monitoring" },
-    { icon: Clock, text: "Eliminate 4-8 hours of payroll processing per pay period" },
-    { icon: Shield, text: "Digital safety documentation for audits and compliance" },
-    { icon: Lock, text: "44 individual permission levels for complete access control" },
-    { icon: DollarSign, text: "15-20% improvement in quote accuracy" },
+    { icon: Users, text: t('employerReg.benefits.jobBoard', "Access our job board and reach 1000's of qualified techs") },
+    { icon: BarChart3, text: t('employerReg.benefits.projectTracking', "Real-time project tracking and budget monitoring") },
+    { icon: Clock, text: t('employerReg.benefits.payrollSavings', "Eliminate 4-8 hours of payroll processing per pay period") },
+    { icon: Shield, text: t('employerReg.benefits.safetyDocs', "Digital safety documentation for audits and compliance") },
+    { icon: Lock, text: t('employerReg.benefits.permissions', "44 individual permission levels for complete access control") },
+    { icon: DollarSign, text: t('employerReg.benefits.quoteAccuracy', "15-20% improvement in quote accuracy") },
   ];
 
   const welcomeBenefits = [
-    "Post jobs on our Rope Access Only Job Board",
-    "Track every project and every drop in one central dashboard",
-    "Clock in/out flows directly to payroll",
-    "Complete audit trail for safety compliance",
-    "Real-time budget vs. actual monitoring",
+    t('employerReg.welcomeBenefits.jobBoard', "Post jobs on our Rope Access Only Job Board"),
+    t('employerReg.welcomeBenefits.projectTracking', "Track every project and every drop in one central dashboard"),
+    t('employerReg.welcomeBenefits.payrollIntegration', "Clock in/out flows directly to payroll"),
+    t('employerReg.welcomeBenefits.auditTrail', "Complete audit trail for safety compliance"),
+    t('employerReg.welcomeBenefits.budgetMonitoring', "Real-time budget vs. actual monitoring"),
   ];
 
   const trialBenefits = [
-    "Full access to all features",
-    "Cancel anytime with data export",
-    "Priority support during trial",
-    "No charge until trial ends",
+    t('employerReg.trialBenefits.fullAccess', "Full access to all features"),
+    t('employerReg.trialBenefits.cancelAnytime', "Cancel anytime with data export"),
+    t('employerReg.trialBenefits.prioritySupport', "Priority support during trial"),
+    t('employerReg.trialBenefits.noCharge', "No charge until trial ends"),
   ];
 
   const monthlyPrice = PRICING.base.monthly;
@@ -294,8 +311,8 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
           <div className="hidden lg:flex lg:w-[320px] bg-[#0B64A3] text-white p-8 flex-col">
             <div className="mb-8">
               <Building2 className="w-10 h-10 mb-4" />
-              <h2 className="text-xl font-bold mb-2">Rope Access Business Management</h2>
-              <p className="text-white/80 text-sm">Everything connected. Nothing lost.</p>
+              <h2 className="text-xl font-bold mb-2">{t('employerReg.sidebar.title', 'Rope Access Business Management')}</h2>
+              <p className="text-white/80 text-sm">{t('employerReg.sidebar.subtitle', 'Everything connected. Nothing lost.')}</p>
             </div>
             
             {/* Progress Steps */}
@@ -304,34 +321,83 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 1 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
                   {getStepNumber() > 1 ? <Check className="w-4 h-4" /> : "1"}
                 </div>
-                <span className="text-sm font-medium">Account Details</span>
+                <span className="text-sm font-medium">{t('employerReg.steps.accountDetails', 'Account Details')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 2 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 2 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
                   {getStepNumber() > 2 ? <Check className="w-4 h-4" /> : "2"}
                 </div>
-                <span className="text-sm font-medium">Billing Details</span>
+                <span className="text-sm font-medium">{t('employerReg.steps.billingDetails', 'Billing Details')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 3 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${getStepNumber() >= 3 ? 'bg-white text-[#0B64A3]' : 'bg-white/20'}`}>
                   {getStepNumber() >= 3 ? <Check className="w-4 h-4" /> : "3"}
                 </div>
-                <span className="text-sm font-medium">Complete</span>
+                <span className="text-sm font-medium">{t('employerReg.steps.complete', 'Complete')}</span>
               </div>
             </div>
 
-            {/* Benefits */}
-            <div className="mt-auto">
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-3">What You Get:</p>
-              <div className="space-y-3">
-                {sidebarBenefits.map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm">
-                    <benefit.icon className="w-4 h-4 text-white/80 mt-0.5 shrink-0" />
-                    <span className="text-white/90">{benefit.text}</span>
-                  </div>
-                ))}
+            {/* Benefits - only show on welcome and company details steps (animated) */}
+            {(step === "welcome" || step === "companyDetails") && (
+              <div className="mt-auto">
+                <p className="text-white/60 text-xs uppercase tracking-wider mb-3">{t('common.whatYouGet', 'What You Get:')}</p>
+                <div className="space-y-2">
+                  {sidebarBenefits.map((benefit, i) => {
+                    const isActive = i <= animatedBenefitIndex;
+                    return (
+                      <div key={i} className="flex items-start gap-2 text-sm">
+                        <div className={`w-4 h-4 rounded-full shrink-0 mt-0.5 flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-white border-white' : 'border border-white/40'}`}>
+                          {isActive && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <Check className="w-2.5 h-2.5 text-[#0B64A3]" />
+                            </motion.div>
+                          )}
+                        </div>
+                        <span className="text-white/90">{benefit.text}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Billing Details info and Order Summary - show on payment step */}
+            {step === "payment" && (
+              <div className="mt-auto">
+                <h2 className="text-xl font-bold text-white mb-2">{t('employerReg.payment.title', 'Billing Details')}</h2>
+                <p className="text-sm text-white/80 mb-4">
+                  {t('employerReg.payment.subtitle', 'Enter your billing details to start your {{days}}-day free trial', { days: TRIAL_PERIOD_DAYS })}
+                </p>
+                
+                {/* Order Summary */}
+                <div className="bg-white/10 rounded-lg p-3 mt-4">
+                  <h3 className="font-medium text-white text-sm mb-2">{t('employerReg.payment.orderSummary', 'Order Summary')}</h3>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between gap-2">
+                      <span className="text-white/80">{t('employerReg.payment.basePlan', 'OnRopePro Base (Monthly)')}</span>
+                      <span className="text-white font-medium">${monthlyPrice}/mo</span>
+                    </div>
+                    <div className="flex justify-between text-white/60">
+                      <span>{t('employerReg.payment.billingCycle', 'Billing Cycle')}</span>
+                      <span>{t('employerReg.payment.monthly', 'Monthly')}</span>
+                    </div>
+                    <div className="border-t border-white/20 pt-1.5 mt-1.5">
+                      <div className="flex justify-between text-green-300">
+                        <span>{t('employerReg.payment.freeTrial', 'Free trial')}</span>
+                        <span>{TRIAL_PERIOD_DAYS} {t('employerReg.payment.days', 'days')}</span>
+                      </div>
+                      <p className="text-white/60 text-xs mt-1">
+                        {t('employerReg.payment.noChargeUntilTrialEnds', 'No charge until trial ends')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Panel - Form content */}
@@ -344,11 +410,11 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0B64A3]/10 border border-[#0B64A3]/20 mb-3">
                       <Building2 className="w-4 h-4 text-[#0B64A3]" />
                       <span className="text-xs font-medium text-[#0B64A3] text-center leading-tight">
-                        For Rope Access Company Owners
+                        {t('employerReg.welcome.badge', 'For Rope Access Company Owners')}
                       </span>
                     </div>
-                    <h1 className="text-3xl font-bold mb-2">{TRIAL_PERIOD_DAYS} Days Free</h1>
-                    <p className="text-muted-foreground">Full access to all features. No commitment.</p>
+                    <h1 className="text-3xl font-bold mb-2">{TRIAL_PERIOD_DAYS} {t('employerReg.payment.days', 'Days')} {t('common.free', 'Free')}</h1>
+                    <p className="text-muted-foreground">{t('employerReg.welcome.subtitle', 'Full access to all features. No commitment.')}</p>
                   </div>
 
                   {/* Benefits section - now first */}
@@ -366,7 +432,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                   {/* Trial benefits */}
                   <div className="mb-4">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1.5 font-medium">
-                      Included in your trial:
+                      {t('common.includedInTrial', 'Included in your trial:')}
                     </p>
                     <div className="space-y-1">
                       {trialBenefits.map((benefit, i) => (
@@ -383,10 +449,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                   {/* Pricing - now secondary, below features */}
                   <div className="text-center text-sm text-muted-foreground mb-4 py-3 border-t border-b border-border/50">
                     <p>
-                      After trial: <span className="font-medium text-foreground">${monthlyPrice}/month</span>
+                      {t('common.afterTrial', 'After trial:')} <span className="font-medium text-foreground">${monthlyPrice}/month</span>
                       {" "}+ ${monthlySeatPrice}/seat
                     </p>
-                    <p className="text-xs mt-1">Cancel anytime during trial. Annual plans available later.</p>
+                    <p className="text-xs mt-1">{t('common.cancelAnytimeDuringTrial', 'Cancel anytime during trial. Annual plans available later.')}</p>
                   </div>
 
                   <Button 
@@ -395,17 +461,17 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     onClick={handleContinue}
                     data-testid="button-get-started"
                   >
-                    Start Free Trial
+                    {t('employerReg.welcome.getStarted', 'Start Free Trial')}
                     <ArrowRight className="w-5 h-5" />
                   </Button>
 
                   <p className="text-center text-xs text-muted-foreground mt-4">
-                    Already have an account?{" "}
+                    {t('employerReg.welcome.haveAccount', 'Already have an account?')}{" "}
                     <button 
                       onClick={handleClose}
                       className="text-[#0B64A3] hover:underline font-medium"
                     >
-                      Sign In
+                      {t('employerReg.welcome.signIn', 'Sign In')}
                     </button>
                   </p>
                 </div>
@@ -420,11 +486,11 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     data-testid="button-back"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Back
+                    {t('employerReg.buttons.back', 'Back')}
                   </button>
 
-                  <h2 className="text-xl font-bold mb-1">Account Details</h2>
-                  <p className="text-sm text-muted-foreground mb-6">Tell us about your rope access business</p>
+                  <h2 className="text-xl font-bold mb-1">{t('employerReg.companyDetails.title', 'Account Details')}</h2>
+                  <p className="text-sm text-muted-foreground mb-6">{t('employerReg.companyDetails.step', 'Tell us about your rope access business')}</p>
 
                   {error && (
                     <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
@@ -434,10 +500,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="companyName">Company Name</Label>
+                      <Label htmlFor="companyName">{t('employerReg.companyDetails.companyName', 'Company Name')}</Label>
                       <Input
                         id="companyName"
-                        placeholder="ABC Rope Access Ltd."
+                        placeholder={t('employerReg.companyDetails.companyNamePlaceholder', 'ABC Rope Access Ltd.')}
                         value={data.companyName}
                         onChange={(e) => setData({ ...data, companyName: e.target.value })}
                         data-testid="input-company-name"
@@ -445,10 +511,10 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="ownerName">Owner Name</Label>
+                      <Label htmlFor="ownerName">{t('employerReg.companyDetails.ownerName', 'Owner Name')}</Label>
                       <Input
                         id="ownerName"
-                        placeholder="John Smith"
+                        placeholder={t('employerReg.companyDetails.ownerNamePlaceholder', 'John Smith')}
                         value={data.ownerName}
                         onChange={(e) => setData({ ...data, ownerName: e.target.value })}
                         data-testid="input-owner-name"
@@ -456,11 +522,11 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
+                      <Label htmlFor="email">{t('employerReg.companyDetails.email', 'Email Address')}</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="you@company.com"
+                        placeholder={t('employerReg.companyDetails.emailPlaceholder', 'you@company.com')}
                         value={data.email}
                         onChange={(e) => setData({ ...data, email: e.target.value })}
                         data-testid="input-email"
@@ -468,12 +534,12 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="password">{t('employerReg.companyDetails.password', 'Password')}</Label>
                       <div className="relative">
                         <Input
                           id="password"
                           type={showPassword ? "text" : "password"}
-                          placeholder="Create a secure password"
+                          placeholder={t('employerReg.companyDetails.passwordPlaceholder', 'Create a secure password')}
                           value={data.password}
                           onChange={(e) => setData({ ...data, password: e.target.value })}
                           data-testid="input-password"
@@ -489,12 +555,12 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm Password</Label>
+                      <Label htmlFor="confirmPassword">{t('employerReg.companyDetails.confirmPassword', 'Confirm Password')}</Label>
                       <div className="relative">
                         <Input
                           id="confirmPassword"
                           type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Confirm your password"
+                          placeholder={t('employerReg.companyDetails.confirmPasswordPlaceholder', 'Confirm your password')}
                           value={data.confirmPassword}
                           onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
                           data-testid="input-confirm-password"
@@ -514,12 +580,12 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       onClick={handleContinue}
                       data-testid="button-continue"
                     >
-                      Continue
+                      {t('employerReg.buttons.continue', 'Continue')}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                     <p className="text-xs text-center mt-2 text-[#ff0000]">
                       <Lock className="w-3 h-3 inline mr-1" />
-                      You won't be charged during your {TRIAL_PERIOD_DAYS}-day trial
+                      {t('employerReg.trialBenefits.noCharge', "You won't be charged during your trial")}
                     </p>
                   </div>
                 </div>
@@ -534,45 +600,14 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     data-testid="button-back"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Back
+                    {t('employerReg.buttons.back', 'Back')}
                   </button>
-
-                  <h2 className="text-xl font-bold mb-1">Billing Details</h2>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    Enter your billing details to start your {TRIAL_PERIOD_DAYS}-day free trial
-                  </p>
 
                   {error && (
                     <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
                       {error}
                     </div>
                   )}
-
-                  {/* Order Summary */}
-                  <div className="bg-muted/50 rounded-lg p-4 mb-6">
-                    <h3 className="font-medium mb-3">Order Summary</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>OnRopePro Base Plan (Monthly)</span>
-                        <span className="font-medium">
-                          ${monthlyPrice}/mo
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-muted-foreground">
-                        <span>Billing Cycle</span>
-                        <span>Monthly</span>
-                      </div>
-                      <div className="border-t pt-2 mt-2">
-                        <div className="flex justify-between text-green-600 dark:text-green-400">
-                          <span>Free trial</span>
-                          <span>{TRIAL_PERIOD_DAYS} days</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          You won't be charged until your trial ends
-                        </p>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* Stripe Embedded Checkout */}
                   <div className="border rounded-lg overflow-hidden">
@@ -591,8 +626,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                   </div>
 
                   <p className="text-xs text-center text-muted-foreground mt-4">
-                    By continuing, you agree to our Terms of Service and Privacy Policy.
-                    Your billing address will be used as your company address.
+                    {t('common.termsAgreement', 'By continuing, you agree to our Terms of Service and Privacy Policy. Your billing address will be used as your company address.')}
                   </p>
                 </div>
               )}
@@ -606,9 +640,9 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     </div>
                   </div>
                   
-                  <h2 className="text-xl font-bold mb-2">Setting up your account...</h2>
+                  <h2 className="text-xl font-bold mb-2">{t('employerReg.processing.settingUpDashboard', 'Setting up your account...')}</h2>
                   <p className="text-muted-foreground mb-6">
-                    Just a moment while we finalize everything.
+                    {t('employerReg.processing.finalizingSetup', 'Just a moment while we finalize everything.')}
                   </p>
 
                   {/* Progress indicator */}
@@ -626,19 +660,19 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
 
                   {/* Helpful tips while waiting */}
                   <div className="w-full bg-muted/50 rounded-lg p-4 text-left">
-                    <h3 className="font-medium text-sm mb-2">While you wait...</h3>
+                    <h3 className="font-medium text-sm mb-2">{t('common.whileYouWait', 'While you wait...')}</h3>
                     <ul className="text-xs text-muted-foreground space-y-1">
                       <li className="flex items-center gap-2">
                         <Check className="w-3 h-3 text-green-500" />
-                        Your payment has been confirmed
+                        {t('employerReg.processing.verifyingPayment', 'Your payment has been confirmed')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Check className="w-3 h-3 text-green-500" />
-                        {TRIAL_PERIOD_DAYS}-day free trial activated
+                        {TRIAL_PERIOD_DAYS}-{t('employerReg.payment.days', 'day')} {t('employerReg.payment.freeTrial', 'free trial')} {t('common.active', 'activated')}
                       </li>
                       <li className="flex items-center gap-2">
                         <Loader2 className="w-3 h-3 animate-spin" />
-                        Creating your workspace
+                        {t('employerReg.processing.creatingAccount', 'Creating your workspace')}
                       </li>
                     </ul>
                   </div>
@@ -652,12 +686,12 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-2">Welcome to OnRopePro!</h2>
+                  <h2 className="text-2xl font-bold mb-2">{t('employerReg.success.title', 'Welcome to OnRopePro!')}</h2>
                   <p className="text-muted-foreground mb-2">
-                    Your account for {registrationResult?.companyName || data.companyName} is ready.
+                    {t('employerReg.success.subtitle', 'Your account for {{company}} is ready.', { company: registrationResult?.companyName || data.companyName })}
                   </p>
                   <p className="text-sm text-muted-foreground mb-6">
-                    Your {TRIAL_PERIOD_DAYS}-day free trial has started. You're ready to start managing your rope access business.
+                    {t('employerReg.success.trialInfo', 'Your {{days}}-day free trial has started. You\'re ready to start managing your rope access business.', { days: TRIAL_PERIOD_DAYS })}
                   </p>
 
                   <div className="space-y-3 w-full">
@@ -669,7 +703,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       }}
                       data-testid="button-go-to-dashboard"
                     >
-                      Go to Dashboard
+                      {t('employerReg.success.goToDashboard', 'Go to Dashboard')}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                     <Button 
@@ -678,7 +712,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                       onClick={handleClose}
                       data-testid="button-close"
                     >
-                      Close
+                      {t('common.close', 'Close')}
                     </Button>
                   </div>
                 </div>

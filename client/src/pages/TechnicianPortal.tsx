@@ -536,6 +536,8 @@ const translations = {
     profileTabPayroll: "Payroll Information",
     profileTabResume: "Resume / CV",
     profileTabDocuments: "My Submitted Documents",
+    error: "Error",
+    failedToUpdateVisibility: "Failed to update visibility",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -944,6 +946,8 @@ const translations = {
     profileTabPayroll: "Informations de paie",
     profileTabResume: "CV",
     profileTabDocuments: "Mes documents soumis",
+    error: "Erreur",
+    failedToUpdateVisibility: "Échec de la mise à jour de la visibilité",
   },
   es: {
     technicianPortal: "Portal del Tecnico",
@@ -1401,6 +1405,8 @@ const translations = {
     errorEmergencyNameRequired: "El nombre del contacto de emergencia es requerido",
     errorEmergencyPhoneRequired: "El telefono del contacto de emergencia es requerido",
     errorInvalidEmergencyPhone: "Ingrese un numero valido: (xxx) xxx-xxxx",
+    error: "Error",
+    failedToUpdateVisibility: "Error al actualizar la visibilidad",
   }
 };
 
@@ -2500,10 +2506,31 @@ export default function TechnicianPortal() {
               }
               
               if (fieldsUpdated > 0) {
+                // Auto-save the OCR data to database so UI updates immediately
+                const ocrSaveData: Partial<ProfileFormData> = {};
+                if (ocrResult.data.licenseNumber) {
+                  ocrSaveData.driversLicenseNumber = ocrResult.data.licenseNumber;
+                }
+                if (ocrResult.data.expiryDate) {
+                  ocrSaveData.driversLicenseExpiry = ocrResult.data.expiryDate;
+                }
+                if (ocrResult.data.issuedDate) {
+                  ocrSaveData.driversLicenseIssuedDate = ocrResult.data.issuedDate;
+                }
+                
+                // Save immediately to database and refresh user data
+                try {
+                  await apiRequest("PATCH", "/api/technician/profile", ocrSaveData);
+                  await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                  console.log('[TechnicianPortal] OCR data auto-saved successfully');
+                } catch (saveError) {
+                  console.error('[TechnicianPortal] Failed to auto-save OCR data:', saveError);
+                }
+                
                 toast({
                   title: t.ocrSuccess || "Document Scanned",
                   description: t.ocrFieldsAutofilled?.replace('{count}', String(fieldsUpdated)) || 
-                    `${fieldsUpdated} field(s) auto-filled from your driver's license. Please verify the information.`,
+                    `${fieldsUpdated} field(s) auto-filled from your driver's license and saved automatically.`,
                 });
               }
             }
@@ -2547,10 +2574,31 @@ export default function TechnicianPortal() {
               }
               
               if (fieldsUpdated > 0) {
+                // Auto-save the OCR data to database so UI updates immediately
+                const bankOcrData: Partial<ProfileFormData> = {};
+                if (ocrResult.data.transitNumber) {
+                  bankOcrData.bankTransitNumber = ocrResult.data.transitNumber;
+                }
+                if (ocrResult.data.institutionNumber) {
+                  bankOcrData.bankInstitutionNumber = ocrResult.data.institutionNumber;
+                }
+                if (ocrResult.data.accountNumber) {
+                  bankOcrData.bankAccountNumber = ocrResult.data.accountNumber;
+                }
+                
+                // Save immediately to database and refresh user data
+                try {
+                  await apiRequest("PATCH", "/api/technician/profile", bankOcrData);
+                  await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                  console.log('[TechnicianPortal] Banking OCR data auto-saved successfully');
+                } catch (saveError) {
+                  console.error('[TechnicianPortal] Failed to auto-save banking OCR data:', saveError);
+                }
+                
                 toast({
                   title: t.ocrSuccess || "Document Scanned",
                   description: t.ocrBankFieldsAutofilled?.replace('{count}', String(fieldsUpdated)) || 
-                    `${fieldsUpdated} banking field(s) auto-filled from your void cheque. Please verify the information.`,
+                    `${fieldsUpdated} banking field(s) auto-filled and saved automatically.`,
                 });
               }
             }
@@ -2705,7 +2753,7 @@ export default function TechnicianPortal() {
               label={t.licenseNumber}
               value={isEditing ? form.watch("driversLicenseNumber") : user.driversLicenseNumber}
               control={isEditing ? form.control : undefined}
-              placeholder="Optional"
+              placeholder={i18nT('common.optional', 'Optional')}
               icon={<CreditCard className="w-4 h-4" />}
               emptyText={t.notProvided || "Not provided"}
               testId="license-number"
@@ -2886,7 +2934,7 @@ export default function TechnicianPortal() {
             label={t.firstAidType}
             value={isEditing ? form.watch("firstAidType") : user.firstAidType}
             control={isEditing ? form.control : undefined}
-            placeholder="OFA Level 1, Standard First Aid, etc."
+            placeholder={translations.technicianPortal?.placeholders?.firstAidType || "OFA Level 1, Standard First Aid, etc."}
             testId="first-aid-type"
           />
           <EditableDateField
@@ -3461,7 +3509,7 @@ export default function TechnicianPortal() {
               label="Social Insurance Number"
               value={isEditing ? form.watch("socialInsuranceNumber") : user.socialInsuranceNumber}
               control={isEditing ? form.control : undefined}
-              placeholder="Optional"
+              placeholder={i18nT('common.optional', 'Optional')}
               formatValue={(val) => maskSensitiveData(val)}
               emptyText="Not provided"
               testId="sin"
@@ -4092,7 +4140,7 @@ export default function TechnicianPortal() {
                             : (language === 'en' ? "Your profile is now hidden from employers" : "Votre profil est maintenant caché"),
                         });
                       } catch (error) {
-                        toast({ title: "Error", description: "Failed to update visibility", variant: "destructive" });
+                        toast({ title: t.error || "Error", description: t.failedToUpdateVisibility || "Failed to update visibility", variant: "destructive" });
                       }
                     }}
                     data-testid="switch-employer-visibility"

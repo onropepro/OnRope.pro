@@ -92,6 +92,8 @@ const translations = {
     rejected: "Rejected",
     withdrawn: "Withdrawn",
     refused: "Refused",
+    error: "Error",
+    failedToSubmitApplication: "Failed to submit application",
   },
   fr: {
     title: "Offres d'emploi Equipe au sol",
@@ -146,6 +148,8 @@ const translations = {
     rejected: "Rejete",
     withdrawn: "Retire",
     refused: "Refuse",
+    error: "Erreur",
+    failedToSubmitApplication: "Échec de la soumission de la candidature",
   },
   es: {
     title: "Bolsa de Trabajo para Equipo de Tierra",
@@ -200,6 +204,8 @@ const translations = {
     rejected: "Rechazado",
     withdrawn: "Retirado",
     refused: "Rechazado",
+    error: "Error",
+    failedToSubmitApplication: "Error al enviar solicitud",
   },
 };
 
@@ -276,7 +282,7 @@ export default function GroundCrewJobBoard() {
       setCoverMessage("");
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to submit application", variant: "destructive" });
+      toast({ title: t.error, description: t.failedToSubmitApplication, variant: "destructive" });
     },
   });
 

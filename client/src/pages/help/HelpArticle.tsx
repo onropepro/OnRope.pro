@@ -255,7 +255,7 @@ export default function HelpArticle() {
                           <img 
                             src={imageSrc} 
                             alt={altText}
-                            className="rounded-lg border shadow-sm w-full"
+                            className="rounded-lg border shadow-sm max-w-[50%]"
                           />
                           {altText && (
                             <figcaption className="text-sm text-muted-foreground text-center mt-2 italic">

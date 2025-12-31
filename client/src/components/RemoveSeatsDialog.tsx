@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useLanguage } from "@/hooks/use-language";
 
 interface Employee {
   id: string;
@@ -34,6 +35,7 @@ export function RemoveSeatsDialog({
   giftedSeats,
   onRemoveSuccess 
 }: RemoveSeatsDialogProps) {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -77,8 +79,8 @@ export function RemoveSeatsDialog({
       if (response.ok) {
         const data = await response.json();
         toast({
-          title: "Seats Removed",
-          description: `Successfully removed ${selectedEmployees.length} seat(s). ${data.creditAmount ? `A credit of $${data.creditAmount} has been applied to your next invoice.` : ''}`,
+          title: t("seats.seatsRemoved", "Seats Removed"),
+          description: `${t("seats.seatsRemovedSuccess", `Successfully removed ${selectedEmployees.length} seat(s).`).replace("{{count}}", String(selectedEmployees.length))} ${data.creditAmount ? t("seats.creditApplied", `A credit of $${data.creditAmount} has been applied to your next invoice.`).replace("{{amount}}", data.creditAmount) : ''}`,
         });
         setShowConfirmDialog(false);
         onOpenChange(false);
@@ -90,15 +92,15 @@ export function RemoveSeatsDialog({
       } else {
         const error = await response.json();
         toast({
-          title: "Removal Failed",
-          description: error.message || "Failed to remove seats. Please try again.",
+          title: t("seats.removalFailed", "Removal Failed"),
+          description: error.message || t("seats.removalFailedMessage", "Failed to remove seats. Please try again."),
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: "Removal Failed",
-        description: "An error occurred while processing your request. Please try again.",
+        title: t("seats.removalFailed", "Removal Failed"),
+        description: t("seats.removalErrorMessage", "An error occurred while processing your request. Please try again."),
         variant: "destructive",
       });
     } finally {
@@ -117,15 +119,15 @@ export function RemoveSeatsDialog({
 
   const getRoleName = (role: string) => {
     const roleNames: Record<string, string> = {
-      owner_ceo: 'Owner/CEO',
-      operations_manager: 'Operations Manager',
-      general_supervisor: 'General Supervisor',
-      rope_access_supervisor: 'Rope Access Supervisor',
-      rope_access_tech: 'Technician',
-      human_resources: 'HR',
-      accounting: 'Accounting',
-      account_manager: 'Account Manager',
-      supervisor: 'Supervisor',
+      owner_ceo: t("roles.ownerCeo", "Owner/CEO"),
+      operations_manager: t("roles.operationsManager", "Operations Manager"),
+      general_supervisor: t("roles.generalSupervisor", "General Supervisor"),
+      rope_access_supervisor: t("roles.ropeAccessSupervisor", "Rope Access Supervisor"),
+      rope_access_tech: t("roles.technician", "Technician"),
+      human_resources: t("roles.hr", "HR"),
+      accounting: t("roles.accounting", "Accounting"),
+      account_manager: t("roles.accountManager", "Account Manager"),
+      supervisor: t("roles.supervisor", "Supervisor"),
     };
     return roleNames[role] || role;
   };
@@ -137,36 +139,36 @@ export function RemoveSeatsDialog({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons text-destructive">person_remove</span>
-              Remove Seats
+              {t("seats.removeTitle", "Remove Seats")}
             </DialogTitle>
             <DialogDescription>
-              Select employees to suspend. Their access will be revoked, and you'll receive a prorated credit toward your next billing period.
+              {t("seats.removeDescription", "Select employees to suspend. Their access will be revoked, and you'll receive a prorated credit toward your next billing period.")}
             </DialogDescription>
           </DialogHeader>
           
           <div className="py-2 space-y-4">
             <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
               <div>
-                <p className="text-sm font-medium">Your Paid Seats</p>
+                <p className="text-sm font-medium">{t("seats.yourPaidSeats", "Your Paid Seats")}</p>
                 <p className="text-xs text-muted-foreground">
-                  {paidSeats} paid{giftedSeats > 0 ? ` + ${giftedSeats} gifted (free forever)` : ''}
+                  {paidSeats} {t("common.paid", "paid")}{giftedSeats > 0 ? ` + ${giftedSeats} ${t("common.gifted", "gifted")} (${t("common.freeForever", "free forever")})` : ''}
                 </p>
               </div>
-              <Badge variant="outline">Max removable: {maxRemovable}</Badge>
+              <Badge variant="outline">{t("seats.maxRemovable", "Max removable")}: {maxRemovable}</Badge>
             </div>
             
             {maxRemovable === 0 ? (
               <div className="text-center py-6 text-muted-foreground">
                 <span className="material-icons text-4xl mb-2">info</span>
-                <p className="text-sm">No paid seats available to remove.</p>
+                <p className="text-sm">{t("seats.noPaidSeats", "No paid seats available to remove.")}</p>
                 {giftedSeats > 0 && (
-                  <p className="text-xs mt-1">Gifted seats cannot be removed.</p>
+                  <p className="text-xs mt-1">{t("seats.giftedCannotRemove", "Gifted seats cannot be removed.")}</p>
                 )}
               </div>
             ) : (
               <>
                 <div className="text-sm text-muted-foreground">
-                  Select employees to suspend ({selectedEmployees.length}/{maxRemovable} selected):
+                  {t("seats.selectToSuspend", `Select employees to suspend (${selectedEmployees.length}/${maxRemovable} selected):`).replace("{{selected}}", String(selectedEmployees.length)).replace("{{max}}", String(maxRemovable))}
                 </div>
                 
                 <ScrollArea className="h-[250px] pr-4">
@@ -207,10 +209,10 @@ export function RemoveSeatsDialog({
                       <span className="material-icons text-amber-600 dark:text-amber-400 text-sm mt-0.5">info</span>
                       <div className="text-sm">
                         <p className="font-medium text-amber-800 dark:text-amber-200">
-                          Estimated Credit: ${creditAmount}
+                          {t("seats.estimatedCredit", "Estimated Credit")}: ${creditAmount}
                         </p>
                         <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                          Prorated credit will be applied to your next invoice. Selected employees will be moved to the Suspended section and can be reactivated later.
+                          {t("seats.creditNotice", "Prorated credit will be applied to your next invoice. Selected employees will be moved to the Suspended section and can be reactivated later.")}
                         </p>
                       </div>
                     </div>
@@ -222,7 +224,7 @@ export function RemoveSeatsDialog({
           
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={handleClose} data-testid="button-cancel-remove">
-              Cancel
+              {t("common.cancel", "Cancel")}
             </Button>
             <Button 
               variant="destructive"
@@ -231,7 +233,7 @@ export function RemoveSeatsDialog({
               data-testid="button-continue-remove"
             >
               <span className="material-icons text-sm mr-1">person_remove</span>
-              Remove {selectedEmployees.length} Seat{selectedEmployees.length !== 1 ? 's' : ''}
+              {t("seats.removeSeats", `Remove ${selectedEmployees.length} Seat${selectedEmployees.length !== 1 ? 's' : ''}`).replace("{{count}}", String(selectedEmployees.length))}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -242,28 +244,28 @@ export function RemoveSeatsDialog({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <span className="material-icons text-destructive">warning</span>
-              Confirm Seat Removal
+              {t("seats.confirmRemoval", "Confirm Seat Removal")}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3">
-                <p>You are about to remove {selectedEmployees.length} seat{selectedEmployees.length !== 1 ? 's' : ''} from your subscription.</p>
+                <p>{t("seats.confirmRemovalDescription", `You are about to remove ${selectedEmployees.length} seat${selectedEmployees.length !== 1 ? 's' : ''} from your subscription.`).replace("{{count}}", String(selectedEmployees.length))}</p>
                 
                 <div className="p-3 bg-muted rounded-lg space-y-1">
-                  <p className="text-sm font-medium">Selected employees will be suspended:</p>
+                  <p className="text-sm font-medium">{t("seats.selectedWillBeSuspended", "Selected employees will be suspended:")}</p>
                   <ul className="text-sm text-muted-foreground list-disc list-inside">
                     {selectedEmployees.map(id => {
                       const emp = activeEmployees.find(e => e.id === id);
-                      return <li key={id}>{emp?.name || 'Unknown'}</li>;
+                      return <li key={id}>{emp?.name || t("common.unknown", "Unknown")}</li>;
                     })}
                   </ul>
                 </div>
                 
                 <div className="text-sm space-y-1">
                   <p>
-                    <span className="font-medium">Credit amount:</span> ~${creditAmount} (prorated)
+                    <span className="font-medium">{t("seats.creditAmount", "Credit amount")}:</span> ~${creditAmount} ({t("seats.prorated", "prorated")})
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Suspended employees lose access immediately but can be reactivated at any time (unless they unlink from your company).
+                    {t("seats.suspendedNotice", "Suspended employees lose access immediately but can be reactivated at any time (unless they unlink from your company).")}
                   </p>
                 </div>
               </div>
@@ -271,7 +273,7 @@ export function RemoveSeatsDialog({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isRemoving} data-testid="button-cancel-confirm">
-              Cancel
+              {t("common.cancel", "Cancel")}
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleRemove}
@@ -282,12 +284,12 @@ export function RemoveSeatsDialog({
               {isRemoving ? (
                 <>
                   <span className="material-icons animate-spin text-sm mr-1">sync</span>
-                  Processing...
+                  {t("common.processing", "Processing...")}
                 </>
               ) : (
                 <>
                   <span className="material-icons text-sm mr-1">check</span>
-                  Confirm Removal
+                  {t("seats.confirmRemovalButton", "Confirm Removal")}
                 </>
               )}
             </AlertDialogAction>

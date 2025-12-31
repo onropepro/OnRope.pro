@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { MapPin, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface AddressData {
   employeeStreetAddress?: string | null;
@@ -67,6 +68,7 @@ export function EditableAddressField<T extends FieldValues>({
   className = "",
   onAddressSelect,
 }: EditableAddressFieldProps<T>) {
+  const { t } = useTranslation();
   if (isEditing && control) {
     return (
       <div className={cn("space-y-4", className)}>
@@ -216,7 +218,7 @@ export function EditableAddressField<T extends FieldValues>({
           )}
         </p>
       ) : (
-        <p className="text-muted-foreground">{labels.emptyText || "No address provided"}</p>
+        <p className="text-muted-foreground">{labels.emptyText || t('profile.noAddressProvided', 'No address provided')}</p>
       )}
     </div>
   );

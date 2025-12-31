@@ -84,8 +84,8 @@ function BrandColorsSection({ user }: { user: any }) {
       setColors(colors.filter((_, i) => i !== index));
     } else {
       toast({
-        title: "Cannot remove",
-        description: "You must have at least one color",
+        title: t('profile.cannotRemove', 'Cannot remove'),
+        description: t('profile.mustHaveOneColor', 'You must have at least one color'),
         variant: "destructive"
       });
     }
@@ -103,7 +103,7 @@ function BrandColorsSection({ user }: { user: any }) {
       await apiRequest('PATCH', '/api/company/branding', {
         colors: colors,
       });
-      toast({ title: "Brand colors updated successfully" });
+      toast({ title: t('profile.brandColorsUpdated', 'Brand colors updated successfully') });
       // Invalidate BOTH user cache AND branding cache to trigger re-fetch
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/company"] });
@@ -111,8 +111,8 @@ function BrandColorsSection({ user }: { user: any }) {
       window.location.reload();
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to update colors",
+        title: t('common.error', 'Error'),
+        description: t('profile.failedToUpdateColors', 'Failed to update colors'),
         variant: "destructive"
       });
     } finally {
@@ -584,7 +584,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
               <textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
+                placeholder={t('profile.typeMessage', 'Type your message...')}
                 className="w-full min-h-[100px] p-3 border rounded-lg bg-background resize-none focus:ring-2 focus:ring-primary/20"
                 data-testid="textarea-reply-message"
               />
@@ -639,7 +639,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
                     <FormLabel>Title</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Brief summary of your request"
+                        placeholder={t('profile.requestSummary', 'Brief summary of your request')}
                         {...field}
                         data-testid="input-request-title"
                         className="h-12"
@@ -708,7 +708,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
                     <FormControl>
                       <textarea
                         {...field}
-                        placeholder="Please describe your feature request in detail. Include any specific use cases or examples that would help us understand your needs."
+                        placeholder={t('profile.featureRequestDescription', 'Please describe your feature request in detail. Include any specific use cases or examples that would help us understand your needs.')}
                         className="w-full min-h-[150px] p-3 border rounded-lg bg-background resize-none focus:ring-2 focus:ring-primary/20"
                         data-testid="textarea-request-description"
                       />
@@ -946,12 +946,12 @@ export default function Profile() {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "License verified successfully" });
+      toast({ title: t('profile.licenseVerified', 'License verified successfully') });
       setShowLicenseDialog(false);
       setNewLicenseKey("");
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -997,8 +997,8 @@ export default function Profile() {
         profileForm.setValue('residentLinkCode', pendingCode);
         sessionStorage.removeItem('pendingResidentCode');
         toast({
-          title: "Company code detected",
-          description: "Code has been auto-filled. Click 'Update Profile' to link your account.",
+          title: t('profile.companyCodeDetected', 'Company code detected'),
+          description: t('profile.codeAutoFilled', "Code has been auto-filled. Click 'Update Profile' to link your account."),
         });
       }
     }
@@ -1019,10 +1019,10 @@ export default function Profile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      toast({ title: "Profile updated successfully" });
+      toast({ title: t('profile.profileUpdated', 'Profile updated successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1035,14 +1035,14 @@ export default function Profile() {
     },
     onSuccess: () => {
       passwordForm.reset();
-      toast({ title: "Password changed successfully" });
+      toast({ title: t('profile.passwordChanged', 'Password changed successfully') });
     },
     onError: (error: Error) => {
       // Clear password fields on error for security - don't leave sensitive data visible
       passwordForm.setValue("currentPassword", "");
       passwordForm.setValue("newPassword", "");
       passwordForm.setValue("confirmPassword", "");
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1054,18 +1054,18 @@ export default function Profile() {
       // Close dialog and clear password on success
       setShowDeleteDialog(false);
       setDeletePassword("");
-      toast({ title: "Account deleted successfully" });
+      toast({ title: t('profile.accountDeleted', 'Account deleted successfully') });
       setLocation("/");
     },
     onError: (error: Error) => {
       // Keep dialog open so user can retry - don't clear password or close dialog
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
   const handleDeleteAccount = async () => {
     if (!deletePassword) {
-      toast({ title: "Error", description: "Please enter your password", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('profile.pleaseEnterPassword', 'Please enter your password'), variant: "destructive" });
       return;
     }
     try {
@@ -1086,7 +1086,7 @@ export default function Profile() {
       setLocation("/");
     } catch (error) {
       console.error("Logout error:", error);
-      toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: t('profile.failedToLogout', 'Failed to logout'), variant: "destructive" });
     }
   };
 
@@ -1246,7 +1246,7 @@ export default function Profile() {
                             <FormControl>
                               <Input
                                 type="email"
-                                placeholder="your.email@example.com"
+                                placeholder={t('common.placeholders.email', 'your.email@example.com')}
                                 {...field}
                                 data-testid="input-email"
                                 className="h-12"
@@ -1270,7 +1270,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="e.g., 101, 1205"
+                                placeholder={t('resident.placeholders.unitNumber', 'e.g., 101, 1205')}
                                 {...field}
                                 data-testid="input-unit-number"
                                 className="h-12"
@@ -1288,7 +1288,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="e.g., 42, A-5, P1-23"
+                                placeholder={t('resident.placeholders.parkingStall', 'e.g., 42, A-5, P1-23')}
                                 {...field}
                                 data-testid="input-parking-stall"
                                 className="h-12"
@@ -1332,7 +1332,7 @@ export default function Profile() {
                           <FormLabel>Company Code {!user?.companyId && "(Required to view projects)"}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter 10-character code"
+                              placeholder={t('profile.enterCompanyCode', 'Enter 10-character code')}
                               {...field}
                               onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                               maxLength={10}
@@ -1358,7 +1358,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.companyName', 'Company Name')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Company name"
+                                placeholder={t('profile.companyNamePlaceholder', 'Company name')}
                                 {...field}
                                 data-testid="input-company-name"
                                 className="h-12"
@@ -1404,7 +1404,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.streetAddress', 'Street Address')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="123 Main St, Suite 100"
+                                placeholder={t('common.placeholders.streetAddress', '123 Main St, Suite 100')}
                                 {...field}
                                 data-testid="input-street-address"
                                 className="h-12"
@@ -1424,7 +1424,7 @@ export default function Profile() {
                               <FormLabel>{t('profile.provinceState', 'Province/State')}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="BC, ON, etc."
+                                  placeholder={t('common.placeholders.province', 'BC, ON, etc.')}
                                   {...field}
                                   data-testid="input-province"
                                   className="h-12"
@@ -1443,7 +1443,7 @@ export default function Profile() {
                               <FormLabel>{t('profile.country', 'Country')}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="Canada, USA, etc."
+                                  placeholder={t('profile.countryPlaceholder', 'Canada, USA, etc.')}
                                   {...field}
                                   data-testid="input-country"
                                   className="h-12"
@@ -1463,7 +1463,7 @@ export default function Profile() {
                             <FormLabel>{t('profile.postalZipCode', 'Postal/Zip Code')}</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="V6B 1A1, 90210, etc."
+                                placeholder={t('common.placeholders.postalCode', 'V6B 1A1, 90210, etc.')}
                                 {...field}
                                 data-testid="input-zip-code"
                                 className="h-12"
@@ -1483,7 +1483,7 @@ export default function Profile() {
                             <Select onValueChange={field.onChange} value={field.value || "America/Vancouver"}>
                               <FormControl>
                                 <SelectTrigger className="h-12" data-testid="select-timezone">
-                                  <SelectValue placeholder="Select timezone" />
+                                  <SelectValue placeholder={t('profile.selectTimezone', 'Select timezone')} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -1660,7 +1660,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter current password"
+                          placeholder={t('profile.enterCurrentPassword', 'Enter current password')}
                           {...field}
                           data-testid="input-current-password"
                           className="h-12"
@@ -1680,7 +1680,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter new password"
+                          placeholder={t('profile.enterNewPassword', 'Enter new password')}
                           {...field}
                           data-testid="input-new-password"
                           className="h-12"
@@ -1700,7 +1700,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Confirm new password"
+                          placeholder={t('profile.confirmNewPasswordPlaceholder', 'Confirm new password')}
                           {...field}
                           data-testid="input-confirm-password"
                           className="h-12"
@@ -1892,12 +1892,12 @@ export default function Profile() {
                             }
                             
                             const data = await response.json();
-                            toast({ title: "Logo uploaded successfully" });
+                            toast({ title: t('profile.logoUploaded', 'Logo uploaded successfully') });
                             queryClient.invalidateQueries({ queryKey: ["/api/user"] });
                           } catch (error) {
                             toast({ 
-                              title: "Error", 
-                              description: error instanceof Error ? error.message : "Failed to upload logo",
+                              title: t('common.error', 'Error'), 
+                              description: error instanceof Error ? error.message : t('profile.failedToUploadLogo', 'Failed to upload logo'),
                               variant: "destructive" 
                             });
                           }
@@ -2013,7 +2013,7 @@ export default function Profile() {
                                 // Convert to blob
                                 canvas.toBlob(async (blob) => {
                                   if (!blob) {
-                                    toast({ title: "Error", description: "Failed to process image", variant: "destructive" });
+                                    toast({ title: t('common.error', 'Error'), description: t('profile.failedToProcessImage', 'Failed to process image'), variant: "destructive" });
                                     return;
                                   }
                                   
@@ -2031,12 +2031,12 @@ export default function Profile() {
                                       throw new Error('Failed to upload icon');
                                     }
                                     
-                                    toast({ title: "App icon uploaded successfully", description: "Your custom icon is now active for new app installations." });
+                                    toast({ title: t('profile.appIconUploaded', 'App icon uploaded successfully'), description: t('profile.appIconActive', 'Your custom icon is now active for new app installations.') });
                                     queryClient.invalidateQueries({ queryKey: ["/api/user"] });
                                   } catch (error) {
                                     toast({ 
-                                      title: "Error", 
-                                      description: error instanceof Error ? error.message : "Failed to upload icon",
+                                      title: t('common.error', 'Error'), 
+                                      description: error instanceof Error ? error.message : t('profile.failedToUploadIcon', 'Failed to upload icon'),
                                       variant: "destructive" 
                                     });
                                   }
@@ -2153,7 +2153,7 @@ export default function Profile() {
                       <FormLabel>Name</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Your name"
+                          placeholder={t('profile.yourName', 'Your name')}
                           {...field}
                           data-testid="input-name"
                           className="h-12"
@@ -2173,7 +2173,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="your.email@example.com"
+                          placeholder={t('common.placeholders.email', 'your.email@example.com')}
                           {...field}
                           data-testid="input-email"
                           className="h-12"
@@ -2194,7 +2194,7 @@ export default function Profile() {
                           <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="e.g., 101, 1205"
+                              placeholder={t('resident.placeholders.unitNumber', 'e.g., 101, 1205')}
                               {...field}
                               data-testid="input-unit-number"
                               className="h-12"
@@ -2212,7 +2212,7 @@ export default function Profile() {
                           <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="e.g., 42, A-5, P1-23"
+                              placeholder={t('resident.placeholders.parkingStall', 'e.g., 42, A-5, P1-23')}
                               {...field}
                               data-testid="input-parking-stall"
                               className="h-12"
@@ -2255,7 +2255,7 @@ export default function Profile() {
                           <FormLabel>Company Code {!user?.companyId && "(Required to view projects)"}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter 10-character code"
+                              placeholder={t('profile.enterCompanyCode', 'Enter 10-character code')}
                               {...field}
                               onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                               maxLength={10}
@@ -2316,7 +2316,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter current password"
+                          placeholder={t('profile.enterCurrentPassword', 'Enter current password')}
                           {...field}
                           data-testid="input-current-password"
                           className="h-12"
@@ -2336,7 +2336,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter new password"
+                          placeholder={t('profile.enterNewPassword', 'Enter new password')}
                           {...field}
                           data-testid="input-new-password"
                           className="h-12"
@@ -2356,7 +2356,7 @@ export default function Profile() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Confirm new password"
+                          placeholder={t('profile.confirmNewPasswordPlaceholder', 'Confirm new password')}
                           {...field}
                           data-testid="input-confirm-password"
                           className="h-12"
@@ -2422,7 +2422,7 @@ export default function Profile() {
           <div className="py-4">
             <Input
               type="password"
-              placeholder="Enter your password"
+              placeholder={t('profile.enterPasswordToConfirm', 'Enter your password')}
               value={deletePassword}
               onChange={(e) => setDeletePassword(e.target.value)}
               className="h-12"
@@ -2437,14 +2437,14 @@ export default function Profile() {
               }}
               data-testid="button-cancel-delete-account"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete-account"
             >
-              Delete Account
+              {t('profile.deleteAccount', 'Delete Account')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2454,15 +2454,15 @@ export default function Profile() {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogTitle>{t('profile.confirmLogout', 'Confirm Logout')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to logout?
+              {t('profile.logoutConfirmMessage', 'Are you sure you want to logout?')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-logout">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
-              Logout
+              {t('profile.logout', 'Logout')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2472,16 +2472,16 @@ export default function Profile() {
       <AlertDialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Update License Key</AlertDialogTitle>
+            <AlertDialogTitle>{t('profile.updateLicenseKey', 'Update License Key')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Enter your new license key. This is required after upgrading your tier.
+              {t('profile.licenseKeyDescription', 'Enter your new license key. This is required after upgrading your tier.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <Label htmlFor="new-license-key">New License Key</Label>
+            <Label htmlFor="new-license-key">{t('profile.newLicenseKey', 'New License Key')}</Label>
             <Input
               id="new-license-key"
-              placeholder="Enter your new license key"
+              placeholder={t('profile.enterLicenseKey', 'Enter your new license key')}
               value={newLicenseKey}
               onChange={(e) => setNewLicenseKey(e.target.value)}
               data-testid="input-new-license-key"
@@ -2492,7 +2492,7 @@ export default function Profile() {
               setShowLicenseDialog(false);
               setNewLicenseKey("");
             }}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {

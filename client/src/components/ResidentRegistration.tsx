@@ -103,7 +103,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
     onError: (error: Error) => {
       setError(error.message);
       toast({
-        title: "Registration Failed",
+        title: t('residentReg.toast.registrationFailed', 'Registration Failed'),
         description: error.message,
         variant: "destructive",
       });
@@ -122,31 +122,31 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
 
   const validatePersonalDetails = () => {
     if (!data.name.trim()) {
-      setError("Full name is required");
+      setError(t('validation.fullNameRequired', 'Full name is required'));
       return false;
     }
     if (!data.email.trim()) {
-      setError("Email is required");
+      setError(t('validation.emailRequired', 'Email is required'));
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      setError("Please enter a valid email address");
+      setError(t('validation.validEmail', 'Please enter a valid email address'));
       return false;
     }
     if (!data.phoneNumber.trim()) {
-      setError("Phone number is required");
+      setError(t('validation.phoneRequired', 'Phone number is required'));
       return false;
     }
     if (!data.password) {
-      setError("Password is required");
+      setError(t('validation.passwordRequired', 'Password is required'));
       return false;
     }
     if (data.password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(t('validation.passwordMin6', 'Password must be at least 6 characters'));
       return false;
     }
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('validation.passwordsNoMatch', 'Passwords do not match'));
       return false;
     }
     return true;
@@ -154,11 +154,11 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
 
   const validateBuildingDetails = () => {
     if (!data.strataPlanNumber.trim()) {
-      setError("Strata/HOA/LMS Plan Number is required");
+      setError(t('residentReg.validation.strataRequired', 'Strata/HOA/LMS Plan Number is required'));
       return false;
     }
     if (!data.unitNumber.trim()) {
-      setError("Unit number is required");
+      setError(t('validation.unitRequired', 'Unit number is required'));
       return false;
     }
     return true;
@@ -195,19 +195,19 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
   };
 
   const welcomeBenefits = [
-    "Submit maintenance feedback with photos",
-    "Track complaint resolution in real-time",
-    "Get notified when work is scheduled",
-    "Rate completed work quality",
-    "Direct communication with property management",
-    "View building maintenance history",
+    t('residentReg.benefits.submitFeedback', 'Submit maintenance feedback with photos'),
+    t('residentReg.benefits.trackResolution', 'Track complaint resolution in real-time'),
+    t('residentReg.benefits.getNotified', 'Get notified when work is scheduled'),
+    t('residentReg.benefits.rateWork', 'Rate completed work quality'),
+    t('residentReg.benefits.directComms', 'Direct communication with property management'),
+    t('residentReg.benefits.viewHistory', 'View building maintenance history'),
   ];
 
   const featureHighlights = [
-    { title: "Photo Evidence", desc: "Upload photos of issues for faster resolution" },
-    { title: "Real-time Updates", desc: "Get notified when your complaint status changes" },
-    { title: "Quality Ratings", desc: "Rate contractors after work completion" },
-    { title: "Secure Portal", desc: "Your information is protected and private" },
+    { title: t('residentReg.features.photoEvidence', 'Photo Evidence'), desc: t('residentReg.features.photoDesc', 'Upload photos of issues for faster resolution') },
+    { title: t('residentReg.features.realTimeUpdates', 'Real-time Updates'), desc: t('residentReg.features.realTimeDesc', 'Get notified when your complaint status changes') },
+    { title: t('residentReg.features.qualityRatings', 'Quality Ratings'), desc: t('residentReg.features.qualityDesc', 'Rate contractors after work completion') },
+    { title: t('residentReg.features.securePortal', 'Secure Portal'), desc: t('residentReg.features.secureDesc', 'Your information is protected and private') },
   ];
 
   return (
@@ -223,9 +223,9 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
                 <Home className="w-10 h-10" />
-                <h2 className="text-xl font-bold">Resident Portal</h2>
+                <h2 className="text-xl font-bold">{t('residentReg.sidebar.title', 'Resident Portal')}</h2>
               </div>
-              <p className="text-white/80 text-sm">Your voice matters in building maintenance</p>
+              <p className="text-white/80 text-sm">{t('residentReg.sidebar.subtitle', 'Your voice matters in building maintenance')}</p>
             </div>
             
             {/* Progress Steps */}
@@ -234,19 +234,19 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 1 ? 'bg-white' : 'bg-white/20'}`} style={{ color: getStepNumber() >= 1 ? RESIDENT_COLOR : 'inherit' }}>
                   {getStepNumber() > 1 ? <Check className="w-3.5 h-3.5" /> : "1"}
                 </div>
-                <span className="text-sm font-medium">Personal Details</span>
+                <span className="text-sm font-medium">{t('residentReg.steps.personalDetails', 'Personal Details')}</span>
               </div>
               <div className={`flex items-center gap-3 ${getStepNumber() >= 2 ? 'text-white' : 'text-white/50'}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${getStepNumber() >= 2 ? 'bg-white' : 'bg-white/20'}`} style={{ color: getStepNumber() >= 2 ? RESIDENT_COLOR : 'inherit' }}>
                   {getStepNumber() > 2 ? <Check className="w-3.5 h-3.5" /> : "2"}
                 </div>
-                <span className="text-sm font-medium">Building Information</span>
+                <span className="text-sm font-medium">{t('residentReg.steps.buildingInfo', 'Building Information')}</span>
               </div>
             </div>
 
             {/* Feature Highlights */}
             <div className="mt-auto">
-              <p className="text-xs uppercase tracking-wider mb-3 text-white/80">What You Get</p>
+              <p className="text-xs uppercase tracking-wider mb-3 text-white/80">{t('common.whatYouGet', 'What You Get')}</p>
               <div className="space-y-3">
                 {featureHighlights.map((feature, i) => (
                   <div key={i} className="flex items-start gap-2">
@@ -345,7 +345,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         id="name"
                         value={data.name}
                         onChange={(e) => setData({ ...data, name: e.target.value })}
-                        placeholder="John Smith"
+                        placeholder={t('common.placeholders.fullName', 'John Smith')}
                         data-testid="input-name"
                       />
                     </div>
@@ -357,7 +357,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         type="email"
                         value={data.email}
                         onChange={(e) => setData({ ...data, email: e.target.value })}
-                        placeholder="john@example.com"
+                        placeholder={t('common.placeholders.email', 'john@example.com')}
                         data-testid="input-email"
                       />
                     </div>
@@ -382,7 +382,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                           type={showPassword ? "text" : "password"}
                           value={data.password}
                           onChange={(e) => setData({ ...data, password: e.target.value })}
-                          placeholder="Create a password"
+                          placeholder={t('common.placeholders.createPassword', 'Create a password')}
                           className="pr-10"
                           data-testid="input-password"
                         />
@@ -404,7 +404,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                           type={showConfirmPassword ? "text" : "password"}
                           value={data.confirmPassword}
                           onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
-                          placeholder="Confirm your password"
+                          placeholder={t('common.placeholders.confirmPassword', 'Confirm your password')}
                           className="pr-10"
                           data-testid="input-confirm-password"
                         />
@@ -459,7 +459,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         id="strata"
                         value={data.strataPlanNumber}
                         onChange={(e) => setData({ ...data, strataPlanNumber: e.target.value })}
-                        placeholder="e.g., BCS1234"
+                        placeholder={t('resident.placeholders.strataNumber', 'e.g., BCS1234')}
                         data-testid="input-strata"
                       />
                       <p className="text-xs text-muted-foreground mt-1">
@@ -473,7 +473,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         id="unit"
                         value={data.unitNumber}
                         onChange={(e) => setData({ ...data, unitNumber: e.target.value })}
-                        placeholder="e.g., 1205"
+                        placeholder={t('resident.placeholders.unitNumber', 'e.g., 1205')}
                         data-testid="input-unit"
                       />
                     </div>
@@ -484,7 +484,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         id="parking"
                         value={data.parkingStallNumber}
                         onChange={(e) => setData({ ...data, parkingStallNumber: e.target.value })}
-                        placeholder="e.g., P1-42"
+                        placeholder={t('resident.placeholders.parkingStall', 'e.g., P1-42')}
                         data-testid="input-parking"
                       />
                     </div>

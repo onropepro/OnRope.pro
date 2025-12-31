@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight, Triangle, Signpost, Disc, Wand2 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
@@ -70,30 +70,47 @@ const getServiceDuration = (dateInService: string | null | undefined): string | 
   }
 };
 
-const gearTypes = [
-  { name: "Harness", icon: Shield },
-  { name: "Rope", icon: Cable },
-  { name: "Carabiner - Steel", icon: Link2 },
-  { name: "Carabiner - Aluminum", icon: Link2 },
-  { name: "Descender", icon: Gauge },
-  { name: "Ascender", icon: TrendingUp },
-  { name: "Helmet", icon: HardHat },
-  { name: "Gloves", icon: Hand },
-  { name: "Work positioning device", icon: Shield },
-  { name: "Gas powered equipment", icon: Fuel },
-  { name: "Squeegee rubbers", icon: Scissors },
-  { name: "Applicators", icon: PaintBucket },
-  { name: "Soap", icon: Droplets },
-  { name: "Suction cup", icon: CircleDot },
-  { name: "Back up device", icon: Lock },
-  { name: "Lanyard", icon: Anchor },
-  { name: "Shock absorber", icon: Zap },
-  { name: "Other", icon: MoreHorizontal }
+// Gear type keys for translation - will be translated inside component
+const gearTypeKeys = [
+  { key: "harness", defaultName: "Harness", icon: Shield },
+  { key: "rope", defaultName: "Rope", icon: Cable },
+  { key: "carabinerSteel", defaultName: "Carabiner - Steel", icon: Link2 },
+  { key: "carabinerAluminum", defaultName: "Carabiner - Aluminum", icon: Link2 },
+  { key: "descender", defaultName: "Descender", icon: Gauge },
+  { key: "ascender", defaultName: "Ascender", icon: TrendingUp },
+  { key: "helmet", defaultName: "Helmet", icon: HardHat },
+  { key: "gloves", defaultName: "Gloves", icon: Hand },
+  { key: "workPositioningDevice", defaultName: "Work positioning device", icon: Shield },
+  { key: "gasPoweredEquipment", defaultName: "Gas powered equipment", icon: Fuel },
+  { key: "squeegeeRubbers", defaultName: "Squeegee rubbers", icon: Scissors },
+  { key: "applicators", defaultName: "Applicators", icon: PaintBucket },
+  { key: "soap", defaultName: "Soap", icon: Droplets },
+  { key: "suctionCup", defaultName: "Suction cup", icon: CircleDot },
+  { key: "backupDevice", defaultName: "Back up device", icon: Lock },
+  { key: "lanyard", defaultName: "Lanyard", icon: Anchor },
+  { key: "shockAbsorber", defaultName: "Shock absorber", icon: Zap },
+  { key: "highPressureHose", defaultName: "High pressure hose", icon: Cable },
+  { key: "airHose", defaultName: "Air hose", icon: Cable },
+  { key: "cautionSigns", defaultName: "Caution signs", icon: AlertTriangle },
+  { key: "cones", defaultName: "Cones", icon: Triangle },
+  { key: "streetSigns", defaultName: "Street signs", icon: Signpost },
+  { key: "delineator", defaultName: "Delineator", icon: Triangle },
+  { key: "pressureHoseGasket", defaultName: "Pressure hose gasket", icon: Disc },
+  { key: "pressureWasherWand", defaultName: "Pressure washer wand", icon: Wand2 },
+  { key: "pulley", defaultName: "Pulley", icon: Gauge },
+  { key: "slings", defaultName: "Slings", icon: Anchor },
+  { key: "other", defaultName: "Other", icon: MoreHorizontal }
 ];
 
 export default function Inventory() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  
+  // Translated gear types
+  const gearTypes = gearTypeKeys.map(gt => ({
+    name: t(`inventory.gearTypes.${gt.key}`, gt.defaultName),
+    icon: gt.icon
+  }));
   const [, setLocation] = useLocation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -184,6 +201,7 @@ export default function Inventory() {
   
   // Gear item detail dialog state
   const [showItemDetailDialog, setShowItemDetailDialog] = useState(false);
+  const [showFieldValueBreakdown, setShowFieldValueBreakdown] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState<GearItem | null>(null);
   const [detailDialogSource, setDetailDialogSource] = useState<"myGear" | "manageGear">("manageGear");
 
@@ -259,6 +277,16 @@ export default function Inventory() {
   // Fetch all gear assignments
   const { data: assignmentsData } = useQuery<{ assignments: GearAssignment[] }>({
     queryKey: ["/api/gear-assignments"],
+  });
+
+  // Fetch field value (value of gear currently assigned to employees, excluding consumables)
+  const { data: fieldValueData } = useQuery<{ 
+    totalFieldValue: number; 
+    totalItemCount: number;
+    employeeBreakdown: { employeeId: string; name: string; value: number; itemCount: number }[] 
+  }>({
+    queryKey: ["/api/gear/field-value"],
+    enabled: canViewFinancials,
   });
 
   // Fetch active employees for dropdown
@@ -1161,6 +1189,7 @@ export default function Inventory() {
       dateInService: "",
       dateOutOfService: "",
       inService: true,
+      itemSuffix: "",
     });
     setSerialEntries([]);
     setCurrentSerialNumber("");
@@ -1197,6 +1226,7 @@ export default function Inventory() {
       dateInService: item.dateInService || undefined,
       dateOutOfService: item.dateOutOfService || undefined,
       inService: item.inService,
+      itemSuffix: item.itemSuffix || undefined,
     });
     // Load serial entries from item (prefer new serialEntries, fallback to legacy serialNumbers)
     const itemSerialEntries = (item as any).serialEntries || [];
@@ -1686,7 +1716,7 @@ export default function Inventory() {
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <div>
                               <div className="font-semibold text-base flex items-center gap-2">
-                                {item.equipmentType}
+                                {item.equipmentType}{item.itemSuffix ? ` ${item.itemSuffix}` : ''}
                                 {item.inService === false && (
                                   <Badge variant="destructive" className="text-xs">
                                     {t('inventory.outOfService', 'Out of Service')}
@@ -2047,35 +2077,78 @@ export default function Inventory() {
           <TabsContent value="manage" className="space-y-4">
             {/* Total Inventory Value Card - Only visible to users with financial permissions */}
             {canViewFinancials && (
-              <div className="grid grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <span className="material-icons text-lg">inventory_2</span>
-                      {t('inventory.totalItems', 'Total Items')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">{totalAllItems}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t('inventory.itemsInInventory', 'Items in inventory')}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <span className="material-icons text-lg">attach_money</span>
-                      {t('inventory.totalValue', 'Total Value')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">${totalAllValue.toFixed(2)}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t('inventory.allInventoryValue', 'All inventory value')}
-                    </p>
-                  </CardContent>
-                </Card>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <span className="material-icons text-lg">inventory_2</span>
+                        {t('inventory.totalItems', 'Total Items')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">{totalAllItems}</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('inventory.itemsInInventory', 'Items in inventory')}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <span className="material-icons text-lg">attach_money</span>
+                        {t('inventory.totalValue', 'Total Value')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">${totalAllValue.toFixed(2)}</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('inventory.allInventoryValue', 'All inventory value')}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card className="hover-elevate cursor-pointer" onClick={() => setShowFieldValueBreakdown(!showFieldValueBreakdown)} data-testid="card-field-value">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        {t('inventory.fieldValue', 'Value in Field')}
+                        {showFieldValueBreakdown ? <ChevronDown className="h-4 w-4 ml-auto" /> : <ChevronRight className="h-4 w-4 ml-auto" />}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">${(fieldValueData?.totalFieldValue ?? 0).toFixed(2)}</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('inventory.fieldValueDescription', '{{count}} items with crew', { count: fieldValueData?.totalItemCount ?? 0 })}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                {showFieldValueBreakdown && fieldValueData?.employeeBreakdown && fieldValueData.employeeBreakdown.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        {t('inventory.fieldValueByEmployee', 'Field Value by Employee')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-2">
+                        {fieldValueData.employeeBreakdown.map((emp) => (
+                          <div key={emp.employeeId} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                            <div>
+                              <span className="font-medium">{emp.name}</span>
+                              <span className="text-xs text-muted-foreground ml-2">
+                                ({emp.itemCount} {emp.itemCount === 1 ? t('inventory.item', 'item') : t('inventory.items', 'items')})
+                              </span>
+                            </div>
+                            <span className="font-semibold text-primary">${emp.value.toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
 
@@ -2225,7 +2298,7 @@ export default function Inventory() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
                           <div>
-                            <div className="font-semibold mb-1">{item.equipmentType || "Gear Item"}</div>
+                            <div className="font-semibold mb-1">{item.equipmentType || "Gear Item"}{item.itemSuffix ? ` ${item.itemSuffix}` : ''}</div>
                             {item.brand && (
                               <div className="text-sm text-muted-foreground">{t('inventory.brand', 'Brand')}: {item.brand}</div>
                             )}
@@ -3055,6 +3128,29 @@ export default function Inventory() {
                 </>
               )}
 
+              {/* Item Suffix - Optional specification to append to item type */}
+              <FormField
+                control={form.control}
+                name="itemSuffix"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('inventory.itemSuffix', 'Item Specification (Optional)')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder={t('inventory.placeholders.itemSuffix', 'e.g., 18" or Large or Red')} 
+                        {...field} 
+                        value={field.value || ""} 
+                        data-testid="input-item-suffix" 
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      {t('inventory.itemSuffixHint', 'Add a size, color, or other detail to the item name')}
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="quantity"
@@ -3101,7 +3197,7 @@ export default function Inventory() {
                                 type="number"
                                 min="0"
                                 step="0.01"
-                                placeholder="e.g., 400"
+                                placeholder={t('inventory.placeholders.ropeLength', 'e.g., 400')}
                                 {...field}
                                 value={field.value || ""}
                                 data-testid="input-rope-length"
@@ -3123,7 +3219,7 @@ export default function Inventory() {
                                 type="number"
                                 min="0"
                                 step="0.01"
-                                placeholder="e.g., 1.45"
+                                placeholder={t('inventory.placeholders.pricePerFoot', 'e.g., 1.45')}
                                 {...field}
                                 value={field.value || ""}
                                 data-testid="input-price-per-feet"
@@ -4606,7 +4702,7 @@ export default function Inventory() {
                               </span>
                             </div>
                             <div>
-                              <div className="font-medium">{item.equipmentType || "Unknown"}</div>
+                              <div className="font-medium">{item.equipmentType || "Unknown"}{item.itemSuffix ? ` ${item.itemSuffix}` : ''}</div>
                               {(item.brand || item.model) && (
                                 <div className="text-xs text-muted-foreground">
                                   {[item.brand, item.model].filter(Boolean).join(" - ")}
@@ -4732,7 +4828,7 @@ export default function Inventory() {
                               <Label htmlFor="self-assign-serial">Serial Number</Label>
                               <Input
                                 id="self-assign-serial"
-                                placeholder="Enter new serial number"
+                                placeholder={t('inventory.enterNewSerial', 'Enter new serial number')}
                                 value={selfAssignSerialNumber}
                                 onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
                                 data-testid="input-self-assign-serial-number"
@@ -4786,7 +4882,7 @@ export default function Inventory() {
                           <Label htmlFor="self-assign-serial">Serial Number</Label>
                           <Input
                             id="self-assign-serial"
-                            placeholder="Enter serial number"
+                            placeholder={t('inventory.enterSerial', 'Enter serial number')}
                             value={selfAssignSerialNumber}
                             onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
                             data-testid="input-self-assign-serial-number"
@@ -4882,7 +4978,7 @@ export default function Inventory() {
               <Label htmlFor="edit-my-serial">Serial Number</Label>
               <Input
                 id="edit-my-serial"
-                placeholder="Enter serial number"
+                placeholder={t('inventory.enterSerial', 'Enter serial number')}
                 value={editMySerialNumber}
                 onChange={(e) => setEditMySerialNumber(e.target.value)}
                 data-testid="input-edit-my-serial"
@@ -5163,7 +5259,7 @@ export default function Inventory() {
                 <Label htmlFor="damage-description">Damage Description *</Label>
                 <Textarea
                   id="damage-description"
-                  placeholder="Describe the damage in detail..."
+                  placeholder={t('inventory.describeDamage', 'Describe the damage in detail...')}
                   value={damageDescription}
                   onChange={(e) => setDamageDescription(e.target.value)}
                   className="min-h-[100px]"
@@ -5176,7 +5272,7 @@ export default function Inventory() {
                 <Label htmlFor="damage-location">Location on Equipment</Label>
                 <Input
                   id="damage-location"
-                  placeholder="e.g., Left shoulder strap, buckle area..."
+                  placeholder={t('inventory.placeholders.damageLocation', 'e.g., Left shoulder strap, buckle area...')}
                   value={damageLocation}
                   onChange={(e) => setDamageLocation(e.target.value)}
                   data-testid="input-damage-location"
@@ -5218,7 +5314,7 @@ export default function Inventory() {
                 <Label htmlFor="corrective-action">Corrective Action Taken</Label>
                 <Textarea
                   id="corrective-action"
-                  placeholder="Describe any repairs or actions taken..."
+                  placeholder={t('inventory.describeRepairs', 'Describe any repairs or actions taken...')}
                   value={correctiveAction}
                   onChange={(e) => setCorrectiveAction(e.target.value)}
                   data-testid="textarea-corrective-action"
@@ -5249,7 +5345,7 @@ export default function Inventory() {
                       <Label htmlFor="retirement-reason">Retirement Reason *</Label>
                       <Textarea
                         id="retirement-reason"
-                        placeholder="Explain why this equipment needs to be retired..."
+                        placeholder={t('inventory.explainRetirement', 'Explain why this equipment needs to be retired...')}
                         value={retirementReason}
                         onChange={(e) => setRetirementReason(e.target.value)}
                         className="min-h-[80px]"
@@ -5265,7 +5361,7 @@ export default function Inventory() {
                 <Label htmlFor="damage-notes">Additional Notes</Label>
                 <Textarea
                   id="damage-notes"
-                  placeholder="Any other relevant information..."
+                  placeholder={t('inventory.otherInfo', 'Any other relevant information...')}
                   value={damageNotes}
                   onChange={(e) => setDamageNotes(e.target.value)}
                   data-testid="textarea-damage-notes"

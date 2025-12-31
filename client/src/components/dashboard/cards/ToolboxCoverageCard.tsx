@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ClipboardList, ChevronRight, AlertCircle, CheckCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { canViewSafetyDocuments } from "@/lib/permissions";
+import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
 
 interface ToolboxData {
@@ -13,6 +14,7 @@ interface ToolboxData {
 }
 
 export function ToolboxCoverageCard({ currentUser, onRouteNavigate, branding }: CardProps) {
+  const { t } = useLanguage();
   const hasAccess = canViewSafetyDocuments(currentUser) || currentUser?.role === "company";
   const accentColor = branding?.primaryColor || "#0B64A3";
 
@@ -27,11 +29,11 @@ export function ToolboxCoverageCard({ currentUser, onRouteNavigate, branding }: 
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ClipboardList className="w-5 h-5" style={{ color: accentColor }} />
-            Toolbox Coverage
+            {t("dashboardCards.toolboxCoverage.title", "Toolbox Coverage")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0 flex items-center justify-center">
-          <p className="text-base text-muted-foreground">No access</p>
+          <p className="text-base text-muted-foreground">{t("common.noAccess", "No access")}</p>
         </CardContent>
       </div>
     );
@@ -43,7 +45,7 @@ export function ToolboxCoverageCard({ currentUser, onRouteNavigate, branding }: 
         <CardHeader className="px-4 py-3 flex-shrink-0">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ClipboardList className="w-5 h-5" style={{ color: accentColor }} />
-            Toolbox Coverage
+            {t("dashboardCards.toolboxCoverage.title", "Toolbox Coverage")}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4 flex-1 min-h-0">
@@ -62,11 +64,11 @@ export function ToolboxCoverageCard({ currentUser, onRouteNavigate, branding }: 
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <ClipboardList className="w-5 h-5" style={{ color: accentColor }} />
-            Toolbox Coverage
+            {t("dashboardCards.toolboxCoverage.title", "Toolbox Coverage")}
           </CardTitle>
           {needsMeeting && (
             <Badge variant="destructive" className="text-xs" data-testid="badge-toolbox-alert">
-              Overdue
+              {t("common.overdueLabel", "Overdue")}
             </Badge>
           )}
         </div>
@@ -78,11 +80,14 @@ export function ToolboxCoverageCard({ currentUser, onRouteNavigate, branding }: 
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-5 h-5 text-amber-600" />
                 <p className="text-base font-medium text-amber-700 dark:text-amber-400">
-                  Meeting Required
+                  {t("dashboardCards.toolboxCoverage.required", "Meeting Required")}
                 </p>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {daysSince === 999 ? "No meetings on record" : `${daysSince} days since last meeting`}
+                {daysSince === 999 
+                  ? t("dashboardCards.toolboxCoverage.noRecords", "No meetings on record") 
+                  : t("dashboardCards.toolboxCoverage.daysSince", "{{count}} days since last meeting").replace("{{count}}", daysSince.toString())
+                }
               </p>
             </div>
           ) : (
@@ -90,16 +95,16 @@ export function ToolboxCoverageCard({ currentUser, onRouteNavigate, branding }: 
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
                 <p className="text-base font-medium text-green-700 dark:text-green-400">
-                  Up to Date
+                  {t("common.upToDate", "Up to Date")}
                 </p>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Last meeting {daysSince} day{daysSince !== 1 ? "s" : ""} ago
+                {t("dashboardCards.toolboxCoverage.lastMeeting", "Last meeting {{count}} day(s) ago").replace("{{count}}", daysSince.toString())}
               </p>
             </div>
           )}
           <p className="text-sm text-muted-foreground">
-            {toolboxData?.totalMeetingsThisMonth || 0} meetings this month
+            {toolboxData?.totalMeetingsThisMonth || 0} {t("dashboardCards.toolboxCoverage.meetingsThisMonth", "meetings this month")}
           </p>
           <Button
             variant="ghost"
@@ -108,7 +113,7 @@ export function ToolboxCoverageCard({ currentUser, onRouteNavigate, branding }: 
             onClick={() => onRouteNavigate("/safety")}
             data-testid="button-view-toolbox-meetings"
           >
-            View Meetings
+            {t("dashboardCards.toolboxCoverage.viewMeetings", "View Meetings")}
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>

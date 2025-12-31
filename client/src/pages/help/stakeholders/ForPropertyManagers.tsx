@@ -1,4 +1,5 @@
 import { Link } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Users, 
@@ -25,6 +26,7 @@ interface HelpArticle {
 }
 
 export default function ForPropertyManagers() {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<{ articles: HelpArticle[] }>({
     queryKey: ['/api/help/articles', { stakeholder: 'property-manager' }],
     queryFn: async () => {
@@ -39,23 +41,23 @@ export default function ForPropertyManagers() {
   const keyFeatures = [
     {
       icon: Building2,
-      title: 'Portfolio Overview',
-      description: 'Manage multiple buildings from a single dashboard',
+      title: t('helpCenter.stakeholders.propertyManager.features.portfolio', 'Portfolio Overview'),
+      description: t('helpCenter.stakeholders.propertyManager.features.portfolioDesc', 'Manage multiple buildings from a single dashboard'),
     },
     {
       icon: Users,
-      title: 'Vendor Management',
-      description: 'View and compare all your rope access vendors',
+      title: t('helpCenter.stakeholders.propertyManager.features.vendorMgmt', 'Vendor Management'),
+      description: t('helpCenter.stakeholders.propertyManager.features.vendorMgmtDesc', 'View and compare all your rope access vendors'),
     },
     {
       icon: Shield,
-      title: 'Safety Ratings',
-      description: 'Compare vendor safety compliance across your portfolio',
+      title: t('helpCenter.stakeholders.propertyManager.features.safetyRatings', 'Safety Ratings'),
+      description: t('helpCenter.stakeholders.propertyManager.features.safetyRatingsDesc', 'Compare vendor safety compliance across your portfolio'),
     },
     {
       icon: FileText,
-      title: 'Documentation',
-      description: 'Access COIs, service history, and compliance documents',
+      title: t('helpCenter.stakeholders.propertyManager.features.documentation', 'Documentation'),
+      description: t('helpCenter.stakeholders.propertyManager.features.documentationDesc', 'Access COIs, service history, and compliance documents'),
     },
   ];
 
@@ -69,7 +71,7 @@ export default function ForPropertyManagers() {
             <Link href="/help">
               <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Help Center
+                {t('helpCenter.backToHelpCenter', 'Help Center')}
               </Button>
             </Link>
           </div>
@@ -80,10 +82,10 @@ export default function ForPropertyManagers() {
             </div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight" data-testid="text-stakeholder-title">
-                For Property Managers
+                {t('helpCenter.stakeholders.propertyManager.title', 'For Property Managers')}
               </h1>
               <p className="text-xl text-white/80">
-                Oversee your portfolio and vendor relationships
+                {t('helpCenter.stakeholders.propertyManager.description', 'Oversee your portfolio and vendor relationships')}
               </p>
             </div>
           </div>
@@ -91,7 +93,7 @@ export default function ForPropertyManagers() {
           <div className="max-w-xl mt-6">
             <HelpSearchBar 
               size="large" 
-              placeholder="Ask about vendor management, portfolio oversight..."
+              placeholder={t('helpCenter.stakeholders.propertyManager.searchPlaceholder', 'Ask about vendor management, portfolio oversight...')}
               stakeholderColor="#6E9075"
             />
           </div>
@@ -105,7 +107,7 @@ export default function ForPropertyManagers() {
       <div className="bg-background relative z-0">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Key Features for You</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.keyFeaturesTitle', 'Key Features for You')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
@@ -124,7 +126,7 @@ export default function ForPropertyManagers() {
         </section>
         
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Recommended Modules</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.recommendedModules', 'Recommended Modules')}</h2>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -145,28 +147,28 @@ export default function ForPropertyManagers() {
         </section>
         
         <section className="bg-[#6E9075]/10 dark:bg-[#6E9075]/20 rounded-lg p-8">
-          <h2 className="text-xl font-semibold mb-4">Getting Started as a Property Manager</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('helpCenter.stakeholders.propertyManager.gettingStarted.title', 'Getting Started as a Property Manager')}</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#6E9075] text-white flex items-center justify-center text-sm shrink-0">1</div>
-              <p>Create your free Property Manager account</p>
+              <p>{t('helpCenter.stakeholders.propertyManager.gettingStarted.step1', 'Create your Property Manager account')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#6E9075] text-white flex items-center justify-center text-sm shrink-0">2</div>
-              <p>Add buildings to your portfolio</p>
+              <p>{t('helpCenter.stakeholders.propertyManager.gettingStarted.step2', 'Add buildings to your portfolio')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#6E9075] text-white flex items-center justify-center text-sm shrink-0">3</div>
-              <p>Connect with rope access vendors</p>
+              <p>{t('helpCenter.stakeholders.propertyManager.gettingStarted.step3', 'Connect with building managers and vendors')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#6E9075] text-white flex items-center justify-center text-sm shrink-0">4</div>
-              <p>Monitor vendor safety ratings and service history</p>
+              <p>{t('helpCenter.stakeholders.propertyManager.gettingStarted.step4', 'Monitor compliance across your properties')}</p>
             </div>
           </div>
           <div className="mt-6">
             <Link href="/help/getting-started">
-              <Button className="bg-[#6E9075]">View Full Getting Started Guide</Button>
+              <Button className="bg-[#6E9075]">{t('helpCenter.stakeholders.propertyManager.gettingStarted.viewGuide', 'View Full Getting Started Guide')}</Button>
             </Link>
           </div>
         </section>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -67,6 +68,7 @@ function formatFileSize(bytes: number): string {
 }
 
 export function EmployerDocumentRequests({ technicianId, technicianName, companyId }: EmployerDocumentRequestsProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [showRequestDialog, setShowRequestDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
@@ -94,19 +96,19 @@ export function EmployerDocumentRequests({ technicianId, technicianName, company
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/companies", companyId, "document-requests", technicianId] });
-      toast({ title: "Document request sent" });
+      toast({ title: t("employerDocumentRequests.requestSent") });
       setShowRequestDialog(false);
       setRequestTitle("");
       setRequestDetails("");
     },
     onError: () => {
-      toast({ title: "Failed to send request", variant: "destructive" });
+      toast({ title: t("employerDocumentRequests.sendFailed"), variant: "destructive" });
     },
   });
 
   const handleSubmitRequest = () => {
     if (!requestTitle.trim()) {
-      toast({ title: "Title is required", variant: "destructive" });
+      toast({ title: t("employerDocumentRequests.titleRequired"), variant: "destructive" });
       return;
     }
     createRequestMutation.mutate({
@@ -151,7 +153,7 @@ export function EmployerDocumentRequests({ technicianId, technicianName, company
                     id="requestTitle"
                     value={requestTitle}
                     onChange={(e) => setRequestTitle(e.target.value)}
-                    placeholder="e.g., Updated First Aid Certificate"
+                    placeholder={t('employerDocumentRequests.placeholders.documentTitle', 'e.g., Updated First Aid Certificate')}
                     className="mt-1.5"
                     data-testid="input-request-title"
                   />
@@ -162,7 +164,7 @@ export function EmployerDocumentRequests({ technicianId, technicianName, company
                     id="requestDetails"
                     value={requestDetails}
                     onChange={(e) => setRequestDetails(e.target.value)}
-                    placeholder="Any additional instructions or details..."
+                    placeholder={t('employerDocumentRequests.placeholders.additionalDetails', 'Any additional instructions or details...')}
                     className="mt-1.5"
                     data-testid="input-request-details"
                   />

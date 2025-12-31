@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { 
   Building2, 
   ArrowLeft, 
@@ -25,6 +26,7 @@ interface HelpArticle {
 }
 
 export default function ForBuildingManagers() {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<{ articles: HelpArticle[] }>({
     queryKey: ['/api/help/articles', { stakeholder: 'building-manager' }],
     queryFn: async () => {
@@ -39,23 +41,23 @@ export default function ForBuildingManagers() {
   const keyFeatures = [
     {
       icon: Shield,
-      title: 'Company Safety Rating',
-      description: 'View vendor safety ratings and compliance history',
+      title: t('helpCenter.stakeholders.buildingManager.features.safetyRating', 'Company Safety Rating'),
+      description: t('helpCenter.stakeholders.buildingManager.features.safetyRatingDesc', 'View vendor safety ratings and compliance history'),
     },
     {
       icon: MessageSquare,
-      title: 'Resident Communication',
-      description: 'Manage resident complaints and work notifications',
+      title: t('helpCenter.stakeholders.buildingManager.features.residentComm', 'Resident Communication'),
+      description: t('helpCenter.stakeholders.buildingManager.features.residentCommDesc', 'Manage resident complaints and work notifications'),
     },
     {
       icon: Eye,
-      title: 'Work Progress',
-      description: 'Monitor project progress and completion status',
+      title: t('helpCenter.stakeholders.buildingManager.features.workProgress', 'Work Progress'),
+      description: t('helpCenter.stakeholders.buildingManager.features.workProgressDesc', 'Monitor project progress and completion status'),
     },
     {
       icon: FileCheck,
-      title: 'Documentation',
-      description: 'Access anchor logs, inspection reports, and COIs',
+      title: t('helpCenter.stakeholders.buildingManager.features.documentation', 'Documentation'),
+      description: t('helpCenter.stakeholders.buildingManager.features.documentationDesc', 'Access anchor logs, inspection reports, and COIs'),
     },
   ];
 
@@ -69,7 +71,7 @@ export default function ForBuildingManagers() {
             <Link href="/help">
               <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Help Center
+                {t('helpCenter.backToHelpCenter', 'Help Center')}
               </Button>
             </Link>
           </div>
@@ -80,10 +82,10 @@ export default function ForBuildingManagers() {
             </div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight" data-testid="text-stakeholder-title">
-                For Building Managers
+                {t('helpCenter.stakeholders.buildingManager.title', 'For Building Managers')}
               </h1>
               <p className="text-xl text-white/80">
-                Monitor work, compliance, and communicate with residents
+                {t('helpCenter.stakeholders.buildingManager.description', 'Monitor work, compliance, and communicate with residents')}
               </p>
             </div>
           </div>
@@ -91,7 +93,7 @@ export default function ForBuildingManagers() {
           <div className="max-w-xl mt-6">
             <HelpSearchBar 
               size="large" 
-              placeholder="Ask about safety ratings, compliance, work progress..."
+              placeholder={t('helpCenter.buildingManagerSearchPlaceholder', 'Ask about safety ratings, compliance, work progress...')}
               stakeholderColor="#B89685"
             />
           </div>
@@ -105,7 +107,7 @@ export default function ForBuildingManagers() {
       <div className="bg-background relative z-0">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Key Features for You</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.keyFeaturesTitle', 'Key Features for You')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
@@ -124,7 +126,7 @@ export default function ForBuildingManagers() {
         </section>
         
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Recommended Modules</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.recommendedModules', 'Recommended Modules')}</h2>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -145,28 +147,28 @@ export default function ForBuildingManagers() {
         </section>
         
         <section className="bg-[#B89685]/10 dark:bg-[#B89685]/20 rounded-lg p-8">
-          <h2 className="text-xl font-semibold mb-4">Getting Started as a Building Manager</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('helpCenter.stakeholders.buildingManager.gettingStarted.title', 'Getting Started as a Building Manager')}</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#B89685] text-white flex items-center justify-center text-sm shrink-0">1</div>
-              <p>Create your free Building Manager account</p>
+              <p>{t('helpCenter.stakeholders.buildingManager.gettingStarted.step1', 'Create your free Building Manager account')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#B89685] text-white flex items-center justify-center text-sm shrink-0">2</div>
-              <p>Connect to your building using the unique building code</p>
+              <p>{t('helpCenter.stakeholders.buildingManager.gettingStarted.step2', 'Connect to your building using the unique building code')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#B89685] text-white flex items-center justify-center text-sm shrink-0">3</div>
-              <p>View vendor safety ratings and work history</p>
+              <p>{t('helpCenter.stakeholders.buildingManager.gettingStarted.step3', 'View vendor safety ratings and work history')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#B89685] text-white flex items-center justify-center text-sm shrink-0">4</div>
-              <p>Set up resident communication for upcoming work</p>
+              <p>{t('helpCenter.stakeholders.buildingManager.gettingStarted.step4', 'Set up resident communication for upcoming work')}</p>
             </div>
           </div>
           <div className="mt-6">
             <Link href="/help/getting-started">
-              <Button className="bg-[#B89685]">View Full Getting Started Guide</Button>
+              <Button className="bg-[#B89685]">{t('helpCenter.stakeholders.buildingManager.gettingStarted.viewGuide', 'View Full Getting Started Guide')}</Button>
             </Link>
           </div>
         </section>

@@ -1,4 +1,5 @@
 import { Link } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Home, 
@@ -27,6 +28,7 @@ interface HelpArticle {
 }
 
 export default function ForResidents() {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<{ articles: HelpArticle[] }>({
     queryKey: ['/api/help/articles', { stakeholder: 'resident' }],
     queryFn: async () => {
@@ -41,23 +43,23 @@ export default function ForResidents() {
   const keyFeatures = [
     {
       icon: MessageSquare,
-      title: 'Submit Feedback',
-      description: 'Report issues or concerns directly to your building service provider',
+      title: t('helpCenter.stakeholders.resident.features.submitFeedback', 'Submit Feedback'),
+      description: t('helpCenter.stakeholders.resident.features.submitFeedbackDesc', 'Report issues or concerns directly to your building service provider'),
     },
     {
       icon: Camera,
-      title: 'Photo Evidence',
-      description: 'Attach photos to help explain issues clearly',
+      title: t('helpCenter.stakeholders.resident.features.photoEvidence', 'Photo Evidence'),
+      description: t('helpCenter.stakeholders.resident.features.photoEvidenceDesc', 'Attach photos to help explain issues clearly'),
     },
     {
       icon: Bell,
-      title: 'Status Updates',
-      description: 'Track when your feedback has been viewed and responded to',
+      title: t('helpCenter.stakeholders.resident.features.statusUpdates', 'Status Updates'),
+      description: t('helpCenter.stakeholders.resident.features.statusUpdatesDesc', 'Track when your feedback has been viewed and responded to'),
     },
     {
       icon: CheckCircle,
-      title: 'Issue Resolution',
-      description: 'See when issues are marked as resolved with vendor responses',
+      title: t('helpCenter.stakeholders.resident.features.issueResolution', 'Issue Resolution'),
+      description: t('helpCenter.stakeholders.resident.features.issueResolutionDesc', 'See when issues are marked as resolved with vendor responses'),
     },
   ];
 
@@ -71,7 +73,7 @@ export default function ForResidents() {
             <Link href="/help">
               <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Help Center
+                {t('helpCenter.backToHelpCenter', 'Help Center')}
               </Button>
             </Link>
           </div>
@@ -82,10 +84,10 @@ export default function ForResidents() {
             </div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight" data-testid="text-stakeholder-title">
-                For Residents
+                {t('helpCenter.stakeholders.resident.title', 'For Residents')}
               </h1>
               <p className="text-xl text-white/80">
-                Submit feedback and track issues at your building
+                {t('helpCenter.stakeholders.resident.description', 'Submit feedback and track issues at your building')}
               </p>
             </div>
           </div>
@@ -93,7 +95,7 @@ export default function ForResidents() {
           <div className="max-w-xl mt-6">
             <HelpSearchBar 
               size="large" 
-              placeholder="Ask about submitting feedback, tracking issues..."
+              placeholder={t('helpCenter.stakeholders.resident.searchPlaceholder', 'Ask about submitting feedback, tracking issues...')}
               stakeholderColor="#86A59C"
             />
           </div>
@@ -107,7 +109,7 @@ export default function ForResidents() {
       <div className="bg-background relative z-0">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Key Features for You</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.keyFeaturesTitle', 'Key Features for You')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
@@ -126,7 +128,7 @@ export default function ForResidents() {
         </section>
         
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Helpful Resources</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.helpfulResources', 'Helpful Resources')}</h2>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -150,13 +152,13 @@ export default function ForResidents() {
                   <BookOpen className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-base">Resident Portal User Guide</CardTitle>
+                  <CardTitle className="text-base">{t('helpCenter.stakeholders.resident.userGuide.title', 'Resident Portal User Guide')}</CardTitle>
                   <CardDescription className="mt-1">
-                    Complete step-by-step guide for setting up your account, entering your company code, submitting feedback, and tracking your issues.
+                    {t('helpCenter.stakeholders.resident.userGuide.description', 'Complete step-by-step guide for setting up your account, entering your company code, submitting feedback, and tracking your issues.')}
                   </CardDescription>
                   <Link href="/help/modules/resident-portal">
                     <Button className="bg-[#86A59C] hover:bg-[#6B8A80] gap-2 mt-3" size="sm" data-testid="button-user-guide">
-                      View User Guide
+                      {t('helpCenter.stakeholders.resident.userGuide.viewButton', 'View User Guide')}
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   </Link>
@@ -167,28 +169,28 @@ export default function ForResidents() {
         </section>
         
         <section className="bg-[#86A59C]/10 dark:bg-[#86A59C]/20 rounded-lg p-8 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Getting Started as a Resident</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('helpCenter.stakeholders.resident.gettingStarted.title', 'Getting Started as a Resident')}</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#86A59C] text-white flex items-center justify-center text-sm shrink-0">1</div>
-              <p>Get your building access code from your property manager or strata council</p>
+              <p>{t('helpCenter.stakeholders.resident.gettingStarted.step1', 'Access the resident portal using your building code')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#86A59C] text-white flex items-center justify-center text-sm shrink-0">2</div>
-              <p>Visit the Resident Portal and enter your vendor code and building number</p>
+              <p>{t('helpCenter.stakeholders.resident.gettingStarted.step2', 'Submit feedback about maintenance issues')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#86A59C] text-white flex items-center justify-center text-sm shrink-0">3</div>
-              <p>Submit feedback about work quality or issues with photos</p>
+              <p>{t('helpCenter.stakeholders.resident.gettingStarted.step3', 'Track the status of your submissions')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-[#86A59C] text-white flex items-center justify-center text-sm shrink-0">4</div>
-              <p>Track your submission status and receive responses from the vendor</p>
+              <p>{t('helpCenter.stakeholders.resident.gettingStarted.step4', 'Receive updates when issues are resolved')}</p>
             </div>
           </div>
           <div className="mt-6">
             <Link href="/help/modules/resident-portal">
-              <Button className="bg-[#86A59C] hover:bg-[#6B8A80]" data-testid="button-learn-resident-portal">Learn More About Resident Portal</Button>
+              <Button className="bg-[#86A59C] hover:bg-[#6B8A80]" data-testid="button-learn-resident-portal">{t('helpCenter.stakeholders.resident.gettingStarted.viewGuide', 'View Full Getting Started Guide')}</Button>
             </Link>
           </div>
         </section>

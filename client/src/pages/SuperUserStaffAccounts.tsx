@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +83,7 @@ const defaultFormData: StaffFormData = {
 
 export default function SuperUserStaffAccounts() {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -98,13 +100,13 @@ export default function SuperUserStaffAccounts() {
       return await response.json();
     },
     onSuccess: () => {
-      toast({ title: "Success", description: "Staff account created successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('staffAccounts.created', 'Staff account created successfully') });
       setCreateDialogOpen(false);
       setFormData(defaultFormData);
       queryClient.invalidateQueries({ queryKey: ['/api/staff-accounts'] });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message || "Failed to create staff account", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message || t('staffAccounts.createFailed', 'Failed to create staff account'), variant: "destructive" });
     },
   });
 
@@ -114,14 +116,14 @@ export default function SuperUserStaffAccounts() {
       return await response.json();
     },
     onSuccess: () => {
-      toast({ title: "Success", description: "Staff account updated successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('staffAccounts.updated', 'Staff account updated successfully') });
       setEditDialogOpen(false);
       setSelectedAccount(null);
       setFormData(defaultFormData);
       queryClient.invalidateQueries({ queryKey: ['/api/staff-accounts'] });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message || "Failed to update staff account", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message || t('staffAccounts.updateFailed', 'Failed to update staff account'), variant: "destructive" });
     },
   });
 
@@ -131,13 +133,13 @@ export default function SuperUserStaffAccounts() {
       return await response.json();
     },
     onSuccess: () => {
-      toast({ title: "Success", description: "Staff account deleted successfully" });
+      toast({ title: t('common.success', 'Success'), description: t('staffAccounts.deleted', 'Staff account deleted successfully') });
       setDeleteDialogOpen(false);
       setSelectedAccount(null);
       queryClient.invalidateQueries({ queryKey: ['/api/staff-accounts'] });
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message || "Failed to delete staff account", variant: "destructive" });
+      toast({ title: t('common.error', 'Error'), description: error.message || t('staffAccounts.deleteFailed', 'Failed to delete staff account'), variant: "destructive" });
     },
   });
 
@@ -179,7 +181,7 @@ export default function SuperUserStaffAccounts() {
 
   const handleCreate = () => {
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
-      toast({ title: "Validation Error", description: "Please fill in all required fields", variant: "destructive" });
+      toast({ title: t('staffAccounts.validationError', 'Validation Error'), description: t('staffAccounts.fillRequired', 'Please fill in all required fields'), variant: "destructive" });
       return;
     }
     createMutation.mutate(formData);
@@ -207,13 +209,13 @@ export default function SuperUserStaffAccounts() {
   const staffAccounts = staffData?.staffAccounts || [];
 
   return (
-    <SuperUserLayout title="Staff Accounts">
+    <SuperUserLayout title={t('staffAccounts.title', 'Staff Accounts')}>
       <div className="p-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Staff Accounts</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t('staffAccounts.title', 'Staff Accounts')}</h2>
             <p className="text-sm text-muted-foreground">
-              Manage internal staff accounts for platform administration
+              {t('staffAccounts.subtitle', 'Manage internal staff accounts for platform administration')}
             </p>
           </div>
           <Button 
@@ -331,7 +333,7 @@ export default function SuperUserStaffAccounts() {
                   id="firstName"
                   value={formData.firstName}
                   onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                  placeholder="John"
+                  placeholder={t('common.firstName', 'John')}
                   data-testid="input-firstName"
                 />
               </div>
@@ -341,7 +343,7 @@ export default function SuperUserStaffAccounts() {
                   id="lastName"
                   value={formData.lastName}
                   onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                  placeholder="Doe"
+                  placeholder={t('common.lastName', 'Doe')}
                   data-testid="input-lastName"
                 />
               </div>
@@ -353,7 +355,7 @@ export default function SuperUserStaffAccounts() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="john@example.com"
+                placeholder={t('common.placeholders.email', 'john@example.com')}
                 data-testid="input-email"
               />
             </div>
@@ -364,7 +366,7 @@ export default function SuperUserStaffAccounts() {
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                placeholder="Enter a secure password"
+                placeholder={t('superuserStaff.enterSecurePassword', 'Enter a secure password')}
                 data-testid="input-password"
               />
             </div>
@@ -374,7 +376,7 @@ export default function SuperUserStaffAccounts() {
                 id="role"
                 value={formData.role}
                 onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                placeholder="e.g., Admin, Developer, Support"
+                placeholder={t('superuserStaff.placeholders.role', 'e.g., Admin, Developer, Support')}
                 data-testid="input-role"
               />
             </div>
@@ -476,7 +478,7 @@ export default function SuperUserStaffAccounts() {
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                placeholder="Leave blank to keep current password"
+                placeholder={t('superuserStaff.leaveBlankPassword', 'Leave blank to keep current password')}
                 data-testid="input-edit-password"
               />
             </div>
@@ -486,7 +488,7 @@ export default function SuperUserStaffAccounts() {
                 id="edit-role"
                 value={formData.role}
                 onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                placeholder="e.g., Admin, Developer, Support"
+                placeholder={t('superuserStaff.placeholders.role', 'e.g., Admin, Developer, Support')}
                 data-testid="input-edit-role"
               />
             </div>
@@ -538,14 +540,14 @@ export default function SuperUserStaffAccounts() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button 
               onClick={handleUpdate} 
               disabled={updateMutation.isPending}
               data-testid="button-submit-edit"
             >
-              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+              {updateMutation.isPending ? t('common.saving', 'Saving...') : t('common.saveChanges', 'Save Changes')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -554,21 +556,21 @@ export default function SuperUserStaffAccounts() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Staff Account</AlertDialogTitle>
+            <AlertDialogTitle>{t('staffAccounts.deleteTitle', 'Delete Staff Account')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the staff account for{' '}
+              {t('staffAccounts.deleteConfirm', 'Are you sure you want to delete the staff account for')}{' '}
               <strong>{selectedAccount?.firstName} {selectedAccount?.lastName}</strong>?
-              This action cannot be undone.
+              {t('common.cannotBeUndone', 'This action cannot be undone.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => selectedAccount && deleteMutation.mutate(selectedAccount.id)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
-              {deleteMutation.isPending ? 'Deleting...' : 'Delete Account'}
+              {deleteMutation.isPending ? t('common.deleting', 'Deleting...') : t('staffAccounts.deleteAccount', 'Delete Account')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

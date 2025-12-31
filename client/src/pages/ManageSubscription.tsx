@@ -64,6 +64,7 @@ const TIER_LIMITS: Record<string, { projects: number; seats: number }> = {
 };
 
 export default function ManageSubscription() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [cancelTarget, setCancelTarget] = useState<'subscription' | 'whitelabel' | 'seats' | null>(null);
@@ -96,7 +97,7 @@ export default function ManageSubscription() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -118,7 +119,7 @@ export default function ManageSubscription() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -140,7 +141,7 @@ export default function ManageSubscription() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -162,7 +163,7 @@ export default function ManageSubscription() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });
@@ -199,7 +200,7 @@ export default function ManageSubscription() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: error.message,
         variant: "destructive",
       });

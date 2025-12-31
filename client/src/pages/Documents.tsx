@@ -2280,8 +2280,8 @@ function DateRangeExport({
     
     if (docsInRange.length === 0) {
       toast({
-        title: "No documents found",
-        description: "There are no documents in the selected date range.",
+        title: t('documents.noDocsFound', 'No documents found'),
+        description: t('documents.noDocsInRange', 'There are no documents in the selected date range.'),
         variant: "destructive",
       });
       return;
@@ -2310,8 +2310,8 @@ function DateRangeExport({
 
       if (successCount === 0) {
         toast({
-          title: "Export failed",
-          description: "Could not generate any PDFs. Please try again.",
+          title: t('documents.exportFailed', 'Export failed'),
+          description: t('documents.exportFailedPdfs', 'Could not generate any PDFs. Please try again.'),
           variant: "destructive",
         });
         return;
@@ -2339,21 +2339,21 @@ function DateRangeExport({
 
       if (failedCount > 0) {
         toast({
-          title: "Export partially complete",
-          description: `Exported ${successCount} documents. ${failedCount} document(s) failed to generate.`,
+          title: t('documents.exportPartial', 'Export partially complete'),
+          description: t('documents.exportPartialDesc', 'Exported {{successCount}} documents. {{failedCount}} document(s) failed to generate.', { successCount, failedCount }),
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Export complete",
-          description: `Successfully exported ${successCount} ${documentType.toLowerCase()} documents.`,
+          title: t('documents.exportComplete', 'Export complete'),
+          description: t('documents.exportCompleteDesc', 'Successfully exported {{successCount}} {{documentType}} documents.', { successCount, documentType: documentType.toLowerCase() }),
         });
       }
     } catch (error) {
       console.error('Export error:', error);
       toast({
-        title: "Export failed",
-        description: "There was an error generating the export. Please try again.",
+        title: t('documents.exportFailed', 'Export failed'),
+        description: t('documents.exportError', 'There was an error generating the export. Please try again.'),
         variant: "destructive",
       });
     } finally {
@@ -2422,12 +2422,12 @@ function DateRangeExport({
         {dateRange.isExporting ? (
           <>
             <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-            Exporting...
+            {t('documents.exporting', 'Exporting...')}
           </>
         ) : (
           <>
             <Package className="h-3 w-3 mr-2" />
-            Export ZIP
+            {t('documents.exportZip', 'Export ZIP')}
           </>
         )}
       </Button>
@@ -2658,15 +2658,15 @@ export default function Documents() {
       setPendingSwpReview(null);
       setIsViewSWPDialogOpen(false);
       toast({
-        title: "Document Signed",
-        description: "Your signature has been recorded successfully.",
+        title: t('documents.documentSigned', 'Document Signed'),
+        description: t('documents.signatureRecorded', 'Your signature has been recorded successfully.'),
       });
     },
     onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to sign document",
+        title: t('common.error', 'Error'),
+        description: error.message || t('documents.signFailed', 'Failed to sign document'),
       });
     },
   });
@@ -2698,8 +2698,8 @@ export default function Documents() {
     if (swpSignatureRef.current.isEmpty()) {
       toast({
         variant: "destructive",
-        title: "Signature Required",
-        description: "Please provide your signature before submitting.",
+        title: t('documents.signatureRequired', 'Signature Required'),
+        description: t('documents.provideSignature', 'Please provide your signature before submitting.'),
       });
       return;
     }
@@ -4926,13 +4926,13 @@ export default function Documents() {
       doc.save(`Document_Compliance_Report_${dateStr}.pdf`);
       
       toast({
-        title: "Success",
-        description: "Compliance report downloaded successfully",
+        title: t('common.success', 'Success'),
+        description: t('documents.complianceDownloaded', 'Compliance report downloaded successfully'),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to download compliance report",
+        title: t('common.error', 'Error'),
+        description: error.message || t('documents.complianceFailed', 'Failed to download compliance report'),
         variant: "destructive",
       });
     } finally {
@@ -4969,8 +4969,8 @@ export default function Documents() {
       }
 
       toast({
-        title: "Success",
-        description: `Document uploaded successfully`,
+        title: t('common.success', 'Success'),
+        description: t('documents.uploadSuccess', 'Document uploaded successfully'),
       });
 
       queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
@@ -4979,8 +4979,8 @@ export default function Documents() {
       queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to upload document",
+        title: t('common.error', 'Error'),
+        description: error.message || t('documents.uploadFailed', 'Failed to upload document'),
         variant: "destructive",
       });
     } finally {
@@ -4992,8 +4992,8 @@ export default function Documents() {
   const handleMethodStatementUpload = async (file: File, jobType: string, customJobTypeName?: string) => {
     if (!jobType) {
       toast({
-        title: "Error",
-        description: "Please select a job type for this method statement",
+        title: t('common.error', 'Error'),
+        description: t('documents.selectJobType', 'Please select a job type for this method statement'),
         variant: "destructive",
       });
       return;
@@ -5002,8 +5002,8 @@ export default function Documents() {
     // If job type is "other", require custom job type name
     if (jobType === 'other' && !customJobTypeName?.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a custom job type name",
+        title: t('common.error', 'Error'),
+        description: t('documents.enterCustomJobType', 'Please enter a custom job type name'),
         variant: "destructive",
       });
       return;
@@ -5038,8 +5038,8 @@ export default function Documents() {
       }
 
       toast({
-        title: "Success",
-        description: `Method statement uploaded successfully`,
+        title: t('common.success', 'Success'),
+        description: t('documents.methodStatementUploaded', 'Method statement uploaded successfully'),
       });
 
       setShowMethodStatementUploadDialog(false);
@@ -5049,8 +5049,8 @@ export default function Documents() {
       queryClient.invalidateQueries({ queryKey: ["/api/csr"] });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to upload method statement",
+        title: t('common.error', 'Error'),
+        description: error.message || t('documents.methodStatementFailed', 'Failed to upload method statement'),
         variant: "destructive",
       });
     } finally {
@@ -5083,8 +5083,8 @@ export default function Documents() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Document deleted successfully",
+        title: t('common.success', 'Success'),
+        description: t('documents.deleteSuccess', 'Document deleted successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
       queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
@@ -5092,8 +5092,8 @@ export default function Documents() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete document",
+        title: t('common.error', 'Error'),
+        description: error.message || t('documents.deleteFailed', 'Failed to delete document'),
         variant: "destructive",
       });
     },
@@ -5108,8 +5108,8 @@ export default function Documents() {
     onSuccess: (data) => {
       if (data.documents?.length > 0) {
         toast({
-          title: "Success",
-          description: `Added ${data.documents.length} safe work procedure(s)`,
+          title: t('common.success', 'Success'),
+          description: t('documents.templatesAdded', 'Added {{count}} safe work procedure(s)', { count: data.documents.length }),
         });
         queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
         queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
@@ -5118,8 +5118,8 @@ export default function Documents() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to initialize templates",
+        title: t('common.error', 'Error'),
+        description: error.message || t('documents.templatesFailed', 'Failed to initialize templates'),
         variant: "destructive",
       });
     },
@@ -5178,8 +5178,8 @@ export default function Documents() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to add practice template",
+        title: t("common.error"),
+        description: error.message || t("documents.uploadFailed"),
         variant: "destructive",
       });
     },
@@ -7571,7 +7571,7 @@ export default function Documents() {
                 }
               }}>
                 <SelectTrigger data-testid="select-method-statement-job-type">
-                  <SelectValue placeholder="Select job type for this method statement" />
+                  <SelectValue placeholder={t('documents.selectJobType', 'Select job type for this method statement')} />
                 </SelectTrigger>
                 <SelectContent>
                   {STANDARD_JOB_TYPES.map((jobType) => (
@@ -7599,7 +7599,7 @@ export default function Documents() {
                 <Label>Custom Job Type Name *</Label>
                 <Input
                   type="text"
-                  placeholder="Enter custom job type name"
+                  placeholder={t('documents.enterCustomJobType', 'Enter custom job type name')}
                   value={methodStatementCustomJobType}
                   onChange={(e) => setMethodStatementCustomJobType(e.target.value)}
                   data-testid="input-custom-job-type"

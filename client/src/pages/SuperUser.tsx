@@ -49,6 +49,7 @@ interface MetricsData {
 }
 
 export default function SuperUser() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [giftDialogOpen, setGiftDialogOpen] = useState(false);
   const [showSuccessInfo, setShowSuccessInfo] = useState<GiftCompanyResponse | null>(null);
@@ -99,7 +100,7 @@ export default function SuperUser() {
     onSuccess: (data) => {
       setShowSuccessInfo(data);
       toast({
-        title: "Account Created",
+        title: t('superUser.accountCreated', 'Account Created'),
         description: data.message,
       });
       setFormData({ companyName: '', email: '', password: '', tier: 'onropepro', licenseKey: generateLicenseKey('onropepro') });
@@ -107,8 +108,8 @@ export default function SuperUser() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to create company account",
+        title: t('common.error', 'Error'),
+        description: error.message || t('superUser.createFailed', 'Failed to create company account'),
         variant: "destructive",
       });
     },
@@ -275,10 +276,10 @@ export default function SuperUser() {
                     if (response.ok) {
                       window.location.href = "/dashboard";
                     } else {
-                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                      toast({ title: t('common.failed', 'Failed'), description: result.message, variant: "destructive" });
                     }
                   } catch (error) {
-                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                    toast({ title: t('common.error', 'Error'), description: t('common.networkError', 'Network error'), variant: "destructive" });
                   }
                 }}
                 data-testid="button-quick-login-testcom"
@@ -300,10 +301,10 @@ export default function SuperUser() {
                     if (response.ok) {
                       window.location.href = "/dashboard";
                     } else {
-                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                      toast({ title: t('common.failed', 'Failed'), description: result.message, variant: "destructive" });
                     }
                   } catch (error) {
-                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                    toast({ title: t('common.error', 'Error'), description: t('common.networkError', 'Network error'), variant: "destructive" });
                   }
                 }}
                 data-testid="button-quick-login-tester"
@@ -325,10 +326,10 @@ export default function SuperUser() {
                     if (response.ok) {
                       window.location.href = "/dashboard";
                     } else {
-                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                      toast({ title: t('common.failed', 'Failed'), description: result.message, variant: "destructive" });
                     }
                   } catch (error) {
-                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                    toast({ title: t('common.error', 'Error'), description: t('common.networkError', 'Network error'), variant: "destructive" });
                   }
                 }}
                 data-testid="button-quick-login-employee"
@@ -350,10 +351,10 @@ export default function SuperUser() {
                     if (response.ok) {
                       window.location.href = "/resident-dashboard";
                     } else {
-                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                      toast({ title: t('common.failed', 'Failed'), description: result.message, variant: "destructive" });
                     }
                   } catch (error) {
-                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                    toast({ title: t('common.error', 'Error'), description: t('common.networkError', 'Network error'), variant: "destructive" });
                   }
                 }}
                 data-testid="button-quick-login-resident"
@@ -375,10 +376,10 @@ export default function SuperUser() {
                     if (response.ok) {
                       window.location.href = "/pm-dashboard";
                     } else {
-                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                      toast({ title: t('common.failed', 'Failed'), description: result.message, variant: "destructive" });
                     }
                   } catch (error) {
-                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                    toast({ title: t('common.error', 'Error'), description: t('common.networkError', 'Network error'), variant: "destructive" });
                   }
                 }}
                 data-testid="button-quick-login-property-manager"
@@ -400,10 +401,10 @@ export default function SuperUser() {
                     if (response.ok) {
                       window.location.href = "/superuser";
                     } else {
-                      toast({ title: "Failed", description: result.message, variant: "destructive" });
+                      toast({ title: t('common.failed', 'Failed'), description: result.message, variant: "destructive" });
                     }
                   } catch (error) {
-                    toast({ title: "Error", description: "Network error", variant: "destructive" });
+                    toast({ title: t('common.error', 'Error'), description: t('common.networkError', 'Network error'), variant: "destructive" });
                   }
                 }}
                 data-testid="button-quick-login-superuser"
@@ -484,7 +485,7 @@ export default function SuperUser() {
                 <Label htmlFor="companyName">Company Name</Label>
                 <Input
                   id="companyName"
-                  placeholder="e.g., ABC Rope Access Ltd."
+                  placeholder={t('superuser.placeholders.companyName', 'e.g., ABC Rope Access Ltd.')}
                   value={formData.companyName}
                   onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                   required
@@ -497,7 +498,7 @@ export default function SuperUser() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@company.com"
+                  placeholder={t('common.placeholders.adminEmail', 'admin@company.com')}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
@@ -510,7 +511,7 @@ export default function SuperUser() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a secure password"
+                  placeholder={t('superuser.createSecurePassword', 'Create a secure password')}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
@@ -526,7 +527,7 @@ export default function SuperUser() {
                   onValueChange={handleTierChange}
                 >
                   <SelectTrigger data-testid="select-tier">
-                    <SelectValue placeholder="Select plan" />
+                    <SelectValue placeholder={t('superuser.selectPlan', 'Select plan')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="onropepro" data-testid="option-tier-onropepro">

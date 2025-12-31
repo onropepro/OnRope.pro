@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
 import { ChevronRight, Home } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface BreadcrumbItem {
   label: string;
@@ -11,6 +12,8 @@ interface HelpBreadcrumbProps {
 }
 
 export default function HelpBreadcrumb({ items }: HelpBreadcrumbProps) {
+  const { t } = useLanguage();
+
   return (
     <nav 
       aria-label="Breadcrumb" 
@@ -19,7 +22,7 @@ export default function HelpBreadcrumb({ items }: HelpBreadcrumbProps) {
     >
       <Link href="/help" className="flex items-center gap-1 hover:text-foreground transition-colors">
         <Home className="h-4 w-4" />
-        <span>Help</span>
+        <span>{t('helpBreadcrumb.help', 'Help')}</span>
       </Link>
       
       {items.map((item, index) => (

@@ -1,4 +1,5 @@
 import { Link } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { 
   HardHat, 
@@ -25,6 +26,7 @@ interface HelpArticle {
 }
 
 export default function ForTechnicians() {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<{ articles: HelpArticle[] }>({
     queryKey: ['/api/help/articles', { stakeholder: 'technician' }],
     queryFn: async () => {
@@ -39,23 +41,23 @@ export default function ForTechnicians() {
   const keyFeatures = [
     {
       icon: Clock,
-      title: 'Time Tracking',
-      description: 'Clock in/out with GPS, log manual hours when employer doesn\'t use OnRopePro, track your total',
+      title: t('helpCenter.stakeholders.technician.features.timeTracking', 'Time Tracking'),
+      description: t('helpCenter.stakeholders.technician.features.timeTrackingDesc', 'Clock in/out with GPS, log manual hours when employer doesn\'t use OnRopePro, track your total'),
     },
     {
       icon: Award,
-      title: 'IRATA/SPRAT Logging',
-      description: 'Track hours for certification progression - manual hours count toward totals, previous hours are reference only',
+      title: t('helpCenter.stakeholders.technician.features.irataLogging', 'IRATA/SPRAT Logging'),
+      description: t('helpCenter.stakeholders.technician.features.irataLoggingDesc', 'Track hours for certification progression - manual hours count toward totals, previous hours are reference only'),
     },
     {
       icon: FileText,
-      title: 'Safety Documentation',
-      description: 'Complete inspections, sign toolbox meetings, report incidents',
+      title: t('helpCenter.stakeholders.technician.features.safetyDocs', 'Safety Documentation'),
+      description: t('helpCenter.stakeholders.technician.features.safetyDocsDesc', 'Complete inspections, sign toolbox meetings, report incidents'),
     },
     {
       icon: MapPin,
-      title: 'Job Board',
-      description: 'Find new opportunities and connect with employers',
+      title: t('helpCenter.stakeholders.technician.features.jobBoard', 'Job Board'),
+      description: t('helpCenter.stakeholders.technician.features.jobBoardDesc', 'Find new opportunities and connect with employers'),
     },
   ];
 
@@ -69,7 +71,7 @@ export default function ForTechnicians() {
             <Link href="/help">
               <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Help Center
+                {t('helpCenter.backToHelpCenter', 'Help Center')}
               </Button>
             </Link>
           </div>
@@ -80,10 +82,10 @@ export default function ForTechnicians() {
             </div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight" data-testid="text-stakeholder-title">
-                For Technicians
+                {t('helpCenter.stakeholders.technician.title', 'For Technicians')}
               </h1>
               <p className="text-xl text-white/80">
-                Track your time, certifications, and career progression
+                {t('helpCenter.stakeholders.technician.description', 'Track your time, certifications, and career progression')}
               </p>
             </div>
           </div>
@@ -91,7 +93,7 @@ export default function ForTechnicians() {
           <div className="max-w-xl mt-6">
             <HelpSearchBar 
               size="large" 
-              placeholder="Ask about time tracking, IRATA logging, safety docs..."
+              placeholder={t('helpCenter.stakeholders.technician.searchPlaceholder', 'Ask about time tracking, IRATA logging, safety docs...')}
               stakeholderColor="#5C7A84"
             />
           </div>
@@ -105,7 +107,7 @@ export default function ForTechnicians() {
       <div className="bg-background relative z-0">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Key Features for You</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.keyFeaturesTitle', 'Key Features for You')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
@@ -124,7 +126,7 @@ export default function ForTechnicians() {
         </section>
         
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Recommended Modules</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.recommendedModules', 'Recommended Modules')}</h2>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -145,28 +147,28 @@ export default function ForTechnicians() {
         </section>
         
         <section className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-8">
-          <h2 className="text-xl font-semibold mb-4">Getting Started as a Technician</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('helpCenter.stakeholders.technician.gettingStarted.title', 'Getting Started as a Technician')}</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm shrink-0">1</div>
-              <p>Complete your profile with certifications and experience</p>
+              <p>{t('helpCenter.stakeholders.technician.gettingStarted.step1', 'Create your free Technician profile')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm shrink-0">2</div>
-              <p>Connect with your employer using the connection code</p>
+              <p>{t('helpCenter.stakeholders.technician.gettingStarted.step2', 'Add your certifications and experience')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm shrink-0">3</div>
-              <p>Learn how to clock in/out and track your hours</p>
+              <p>{t('helpCenter.stakeholders.technician.gettingStarted.step3', 'Connect with employers or log independent hours')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-sm shrink-0">4</div>
-              <p>Start logging IRATA tasks for certification progression</p>
+              <p>{t('helpCenter.stakeholders.technician.gettingStarted.step4', 'Build your professional portfolio')}</p>
             </div>
           </div>
           <div className="mt-6">
             <Link href="/help/getting-started">
-              <Button className="bg-amber-600">View Full Getting Started Guide</Button>
+              <Button className="bg-amber-600">{t('helpCenter.stakeholders.technician.gettingStarted.viewGuide', 'View Full Getting Started Guide')}</Button>
             </Link>
           </div>
         </section>

@@ -381,7 +381,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                           id="firstName"
                           value={data.firstName}
                           onChange={(e) => setData({ ...data, firstName: e.target.value })}
-                          placeholder="John"
+                          placeholder={t('common.placeholders.firstName', 'John')}
                           data-testid="input-first-name"
                         />
                       </div>
@@ -391,7 +391,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                           id="lastName"
                           value={data.lastName}
                           onChange={(e) => setData({ ...data, lastName: e.target.value })}
-                          placeholder="Smith"
+                          placeholder={t('common.placeholders.lastName', 'Smith')}
                           data-testid="input-last-name"
                         />
                       </div>
@@ -404,7 +404,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                         type="email"
                         value={data.email}
                         onChange={(e) => setData({ ...data, email: e.target.value })}
-                        placeholder="john@example.com"
+                        placeholder={t('common.placeholders.email', 'john@example.com')}
                         data-testid="input-email"
                       />
                     </div>
@@ -430,7 +430,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                             type={showPassword ? "text" : "password"}
                             value={data.password}
                             onChange={(e) => setData({ ...data, password: e.target.value })}
-                            placeholder="Min 8 characters"
+                            placeholder={t('common.placeholders.minCharacters', 'Min 8 characters')}
                             className="pr-10"
                             data-testid="input-password"
                           />
@@ -452,7 +452,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                             type={showConfirmPassword ? "text" : "password"}
                             value={data.confirmPassword}
                             onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
-                            placeholder="Re-enter password"
+                            placeholder={t('common.placeholders.reenterPassword', 'Re-enter password')}
                             className="pr-10"
                             data-testid="input-confirm-password"
                           />

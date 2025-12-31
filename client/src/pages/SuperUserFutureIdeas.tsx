@@ -37,6 +37,7 @@ const STATUSES = [
 ];
 
 export default function SuperUserFutureIdeas() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingIdea, setEditingIdea] = useState<FutureIdea | null>(null);
@@ -63,10 +64,10 @@ export default function SuperUserFutureIdeas() {
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/future-ideas"] });
       setShowAddDialog(false);
       resetForm();
-      toast({ title: "Idea added successfully" });
+      toast({ title: t("superUserFutureIdeas.ideaAdded") });
     },
     onError: () => {
-      toast({ title: "Failed to add idea", variant: "destructive" });
+      toast({ title: t("superUserFutureIdeas.addFailed"), variant: "destructive" });
     },
   });
 
@@ -78,10 +79,10 @@ export default function SuperUserFutureIdeas() {
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/future-ideas"] });
       setEditingIdea(null);
       resetForm();
-      toast({ title: "Idea updated successfully" });
+      toast({ title: t("superUserFutureIdeas.ideaUpdated") });
     },
     onError: () => {
-      toast({ title: "Failed to update idea", variant: "destructive" });
+      toast({ title: t("superUserFutureIdeas.updateFailed"), variant: "destructive" });
     },
   });
 
@@ -91,10 +92,10 @@ export default function SuperUserFutureIdeas() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/superuser/future-ideas"] });
-      toast({ title: "Idea deleted" });
+      toast({ title: t("superUserFutureIdeas.ideaDeleted") });
     },
     onError: () => {
-      toast({ title: "Failed to delete idea", variant: "destructive" });
+      toast({ title: t("superUserFutureIdeas.deleteFailed"), variant: "destructive" });
     },
   });
 
@@ -121,7 +122,7 @@ export default function SuperUserFutureIdeas() {
 
   const handleSubmit = () => {
     if (!formData.title.trim()) {
-      toast({ title: "Please enter a title", variant: "destructive" });
+      toast({ title: t("superUserFutureIdeas.enterTitle"), variant: "destructive" });
       return;
     }
     if (editingIdea) {
@@ -173,7 +174,7 @@ export default function SuperUserFutureIdeas() {
         <div className="flex flex-wrap gap-3">
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-[150px]" data-testid="select-filter-status">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t('common.status', 'Status')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
@@ -185,7 +186,7 @@ export default function SuperUserFutureIdeas() {
 
           <Select value={filterCategory} onValueChange={setFilterCategory}>
             <SelectTrigger className="w-[150px]" data-testid="select-filter-category">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder={t('common.category', 'Category')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
@@ -276,7 +277,7 @@ export default function SuperUserFutureIdeas() {
             <div>
               <label className="text-sm font-medium mb-1.5 block">Title</label>
               <Input
-                placeholder="Enter idea title"
+                placeholder={t('superuserFutureIdeas.enterTitle', 'Enter idea title')}
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 data-testid="input-idea-title"
@@ -286,7 +287,7 @@ export default function SuperUserFutureIdeas() {
             <div>
               <label className="text-sm font-medium mb-1.5 block">Description</label>
               <Textarea
-                placeholder="Describe the idea in more detail..."
+                placeholder={t('superuserFutureIdeas.describeIdea', 'Describe the idea in more detail...')}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}

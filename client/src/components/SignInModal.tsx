@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { ArrowRight, Loader2 } from "lucide-react";
+import { useLanguage } from "@/hooks/use-language";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
@@ -30,6 +31,7 @@ export function SignInModal({
   onClose,
   buttonColor = "#0B64A3"
 }: SignInModalProps) {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -57,7 +59,7 @@ export function SignInModal({
       const result = await response.json();
 
       if (!response.ok) {
-        form.setError("identifier", { message: result.message || "Login failed" });
+        form.setError("identifier", { message: result.message || t("signIn.loginFailed", "Login failed") });
         return;
       }
 
@@ -69,7 +71,7 @@ export function SignInModal({
       
       if (!userResponse.ok) {
         form.setError("identifier", { 
-          message: "Failed to verify account status. Please try again." 
+          message: t("signIn.verifyFailed", "Failed to verify account status. Please try again.")
         });
         return;
       }
@@ -78,8 +80,8 @@ export function SignInModal({
       const user = userDataResult.user;
       
       toast({
-        title: "Welcome back!",
-        description: `Logged in as ${user.name || user.companyName}`,
+        title: t("signIn.welcomeBack", "Welcome back!"),
+        description: `${t("signIn.loggedInAs", "Logged in as")} ${user.name || user.companyName}`,
       });
       
       // Role-based redirect
@@ -107,7 +109,7 @@ export function SignInModal({
           setLocation("/dashboard");
       }
     } catch (error) {
-      form.setError("identifier", { message: "An error occurred. Please try again." });
+      form.setError("identifier", { message: t("signIn.errorOccurred", "An error occurred. Please try again.") });
     }
   };
 
@@ -156,12 +158,12 @@ export function SignInModal({
                         name="identifier"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email Address</FormLabel>
+                            <FormLabel>{t("signIn.emailAddress", "Email Address")}</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
                                 type="email"
-                                placeholder="you@example.com"
+                                placeholder={t("signIn.emailPlaceholder", "you@example.com")}
                                 data-testid="input-signin-email"
                               />
                             </FormControl>
@@ -174,12 +176,12 @@ export function SignInModal({
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>{t("signIn.password", "Password")}</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
                                 type="password"
-                                placeholder="Your password"
+                                placeholder={t("signIn.passwordPlaceholder", "Your password")}
                                 data-testid="input-signin-password"
                               />
                             </FormControl>
@@ -200,7 +202,7 @@ export function SignInModal({
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <>
-                          Sign In
+                          {t("signIn.signInButton", "Sign In")}
                           <ArrowRight className="ml-2 w-4 h-4" />
                         </>
                       )}
@@ -217,19 +219,19 @@ export function SignInModal({
                         className="text-sm text-muted-foreground hover:underline"
                         data-testid="link-signin-forgot-password"
                       >
-                        Forgot Password?
+                        {t("signIn.forgotPassword", "Forgot Password?")}
                       </button>
                     </div>
                     
                     <div className="text-center text-sm text-muted-foreground">
-                      Do not have an account?{" "}
+                      {t("signIn.noAccount", "Do not have an account?")}{" "}
                       <button
                         type="button"
                         className="font-medium hover:underline"
                         style={{ color: buttonColor }}
                         data-testid="link-signin-create-account"
                       >
-                        Create Account
+                        {t("signIn.createAccount", "Create Account")}
                       </button>
                     </div>
                   </form>
@@ -237,15 +239,15 @@ export function SignInModal({
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold mb-2">Reset Your Password</h3>
+                    <h3 className="font-semibold mb-2">{t("signIn.resetPassword", "Reset Your Password")}</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Enter your email and we'll send you a link to reset your password.
+                      {t("signIn.resetDescription", "Enter your email and we'll send you a link to reset your password.")}
                     </p>
                   </div>
                   <form onSubmit={handleForgotPassword} className="space-y-4">
                     <Input
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder={t("signIn.emailPlaceholder", "your@email.com")}
                       value={forgotPasswordEmail}
                       onChange={(e) => setForgotPasswordEmail(e.target.value)}
                       data-testid="input-forgot-password-email"
@@ -260,12 +262,12 @@ export function SignInModal({
                       {isResettingPassword ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        "Send Reset Link"
+                        t("signIn.sendResetLink", "Send Reset Link")
                       )}
                     </Button>
                     {resetSuccess && (
                       <p className="text-sm text-green-600 text-center">
-                        Check your email for the reset link.
+                        {t("signIn.checkEmail", "Check your email for the reset link.")}
                       </p>
                     )}
                   </form>
@@ -278,7 +280,7 @@ export function SignInModal({
                     className="text-sm text-muted-foreground hover:underline w-full text-center"
                     data-testid="link-forgot-password-back"
                   >
-                    Back to Sign In
+                    {t("signIn.backToSignIn", "Back to Sign In")}
                   </button>
                 </div>
               )}
