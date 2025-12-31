@@ -320,18 +320,20 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
               </div>
             </div>
 
-            {/* Benefits */}
-            <div className="mt-auto">
-              <p className="text-white/60 text-xs uppercase tracking-wider mb-3">What You Get:</p>
-              <div className="space-y-3">
-                {sidebarBenefits.map((benefit, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm">
-                    <benefit.icon className="w-4 h-4 text-white/80 mt-0.5 shrink-0" />
-                    <span className="text-white/90">{benefit.text}</span>
-                  </div>
-                ))}
+            {/* Benefits - only show on welcome and company details steps */}
+            {(step === "welcome" || step === "companyDetails") && (
+              <div className="mt-auto">
+                <p className="text-white/60 text-xs uppercase tracking-wider mb-3">What You Get:</p>
+                <div className="space-y-3">
+                  {sidebarBenefits.map((benefit, i) => (
+                    <div key={i} className="flex items-start gap-2 text-sm">
+                      <benefit.icon className="w-4 h-4 text-white/80 mt-0.5 shrink-0" />
+                      <span className="text-white/90">{benefit.text}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Panel - Form content */}
