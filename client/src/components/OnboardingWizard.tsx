@@ -275,16 +275,25 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
   
   const canCreateProject = !!createdClientId;
 
-  // Reset employee state when entering the employee step
+  // Reset form state when entering certain steps
   useEffect(() => {
-    if (currentStep === "employee") {
+    if (currentStep === "client") {
+      // Reset client form to prevent browser autofill contamination
+      clientForm.reset({
+        firstName: "",
+        lastName: "",
+        company: "",
+        phoneNumber: "",
+        email: "",
+      });
+    } else if (currentStep === "employee") {
       setEmployeeMode("select");
       setSearchType("email");
       setSearchValue("");
       setFoundTechnician(null);
       setSearchMessage(null);
     }
-  }, [currentStep]);
+  }, [currentStep, clientForm]);
 
   // Search for existing technician
   const searchTechnician = async () => {
@@ -488,7 +497,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                     <FormItem>
                       <FormLabel>{t("onboarding.client.firstName", "First Name")}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="John" data-testid="input-client-first-name" />
+                        <Input {...field} placeholder="John" autoComplete="given-name" data-testid="input-client-first-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -501,7 +510,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                     <FormItem>
                       <FormLabel>{t("onboarding.client.lastName", "Last Name")}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Smith" data-testid="input-client-last-name" />
+                        <Input {...field} placeholder="Smith" autoComplete="family-name" data-testid="input-client-last-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -515,7 +524,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                   <FormItem>
                     <FormLabel>{t("onboarding.client.company", "Company (Optional)")}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="ABC Property Management" data-testid="input-client-company" />
+                      <Input {...field} placeholder="ABC Property Management" autoComplete="organization" data-testid="input-client-company" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
