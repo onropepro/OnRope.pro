@@ -782,23 +782,23 @@
     "deleting": "Suppression...",
     "edit": "Modifier",
     "add": "Ajouter",
-    "create": "Creer",
+    "create": "Créer",
     "createNew": "Créer nouveau",
-    "update": "Mettre a jour",
+    "update": "Mettre à jour",
     "submit": "Soumettre",
     "confirm": "Confirmer",
     "close": "Fermer",
     "continue": "Continuer",
     "back": "Retour",
     "next": "Suivant",
-    "previous": "Precedent",
+    "previous": "Précédent",
     "search": "Rechercher",
     "filter": "Filtrer",
     "clear": "Effacer",
-    "reset": "Reinitialiser",
+    "reset": "Réinitialiser",
     "view": "Voir",
-    "download": "Telecharger",
-    "upload": "Televerser",
+    "download": "Télécharger",
+    "upload": "Téléverser",
     "preview": "Aperçu",
     "print": "Imprimer",
     "export": "Exporter",
@@ -807,10 +807,10 @@
     "yes": "Oui",
     "no": "Non",
     "ok": "OK",
-    "done": "Termine",
+    "done": "Terminé",
     "actions": "Actions",
     "status": "Statut",
-    "details": "Details",
+    "details": "Détails",
     "description": "Description",
     "notes": "Notes",
     "date": "Date",
@@ -827,18 +827,18 @@
     "optional": "Optionnel",
     "all": "Tout",
     "none": "Aucun",
-    "select": "Selectionner",
+    "select": "Sélectionner",
     "selectOption": "Selectionnez une option",
-    "noResults": "Aucun resultat trouve",
+    "noResults": "Aucun résultat trouvé",
     "noData": "Aucune donnee disponible",
     "error": "Erreur",
-    "success": "Succes",
+    "success": "Succès",
     "warning": "Avertissement",
     "info": "Info",
     "active": "Actif",
     "inactive": "Inactif",
     "pending": "En attente",
-    "completed": "Termine",
+    "completed": "Terminé",
     "draft": "Brouillon",
     "approved": "Approuvé",
     "rejected": "Rejeté",
@@ -868,8 +868,8 @@
     "end": "Fin",
     "more": "Plus",
     "less": "Moins",
-    "showMore": "Afficher plus",
-    "showLess": "Afficher moins",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
     "seeAll": "Voir tout",
     "viewAll": "Voir tout",
     "unknownBuilding": "Bâtiment inconnu",
@@ -882,7 +882,7 @@
     "language": "Langue",
     "english": "Anglais",
     "french": "Français",
-    "settings": "Parametres",
+    "settings": "Paramètres",
     "profile": "Profil",
     "account": "Compte",
     "logout": "Deconnexion",
@@ -910,8 +910,8 @@
     "totalFloorsInBuilding": "Total d'étages dans le bâtiment",
     "note": "Note",
     "retry": "Reessayer",
-    "enabled": "Active",
-    "disabled": "Desactive",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
     "orContinueWith": "Ou continuer avec",
     "alreadyHaveAccount": "Vous avez deja un compte?",
     "dontHaveAccount": "Vous n'avez pas de compte?",
@@ -922,7 +922,17 @@
     "support": "Support",
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialite",
-    "copyright": "Tous droits reserves"
+    "copyright": "Tous droits reserves",
+    "processing": "Traitement...",
+    "selected": "Sélectionné",
+    "failed": "Échoué",
+    "expired": "Expiré",
+    "tryAgain": "Réessayer",
+    "preferences": "Préférences",
+    "options": "Options",
+    "chooseFiles": "Choisir des fichiers",
+    "takePhoto": "Prendre une photo",
+    "documentsUploaded": "documents téléversés"
   },
   "auth": {
     "welcomeBack": "Bon retour",
@@ -2972,7 +2982,8 @@
         "noResponses": "Aucune réponse pour le moment",
         "anonymous": "Anonyme"
       },
-      "close": "Fermer"
+      "close": "Fermer",
+      "loading": "Loading project details..."
     },
     "feedbackDetails": {
       "noSubject": "Sans objet",
@@ -5009,10 +5020,10 @@
     }
   },
   "pricing": {
-    "title": "Tarification et Abonnements",
+    "title": "Tarification",
     "header": "Tarification Simple et Transparente",
-    "subtitle": "Choisissez le plan parfait pour votre entreprise d'acces par corde. Tous les prix en USD ou CAD (meme tarif).",
-    "enterprise": "Besoin de quelque chose de personnalise? Contactez notre equipe commerciale pour des solutions entreprise.",
+    "subtitle": "Choisissez le plan qui convient à votre entreprise",
+    "enterprise": "Entreprise",
     "period": "/mois (USD/CAD)",
     "description": "Plateforme complete de gestion d'acces par corde pour toute votre operation",
     "allInclusive": "Plateforme Tout-Inclus",
@@ -5034,18 +5045,7 @@
         "description": "Personnalisez la plateforme avec votre marque et vos couleurs"
       }
     },
-    "features": {
-      "unlimitedProjects": "Projets Illimites",
-      "employeeManagement": "Gestion des Employes",
-      "advancedScheduling": "Planification Avancee",
-      "prioritySupport": "Support Prioritaire",
-      "inventoryTracking": "Suivi d'Inventaire",
-      "safetyForms": "Formulaires de Securite et Conformite",
-      "crmQuotes": "Suite CRM et Devis",
-      "analytics": "Analytiques et Rapports Avances",
-      "gpsTracking": "Suivi GPS du Temps",
-      "residentPortal": "Portail Residents"
-    },
+    "features": "Fonctionnalités",
     "faq": {
       "title": "Questions Frequemment Posees",
       "upgrade": {
@@ -5433,7 +5433,30 @@
         "changelog": "Journal des Modifications",
         "signIn": "Connexion"
       }
-    }
+    },
+    "monthly": "Mensuel",
+    "annually": "Annuel",
+    "savePercent": "Économisez {{percent}}%",
+    "perMonth": "/mois",
+    "perYear": "/an",
+    "startFreeTrial": "Essai gratuit",
+    "contactSales": "Contacter les ventes",
+    "currentPlan": "Plan actuel",
+    "allFeatures": "Toutes les fonctionnalités incluses",
+    "mostPopular": "Le plus populaire",
+    "starter": "Débutant",
+    "professional": "Professionnel",
+    "unlimitedUsers": "Utilisateurs illimités",
+    "prioritySupport": "Support prioritaire",
+    "customBranding": "Marque personnalisée",
+    "advancedAnalytics": "Analytiques avancées",
+    "apiAccess": "Accès API",
+    "dedicatedManager": "Gestionnaire de compte dédié",
+    "freeTrialDays": "Essai gratuit de {{days}} jours",
+    "noCardRequired": "Aucune carte de crédit requise",
+    "moneyBackGuarantee": "Garantie de remboursement de {{days}} jours",
+    "questionsTitle": "Des questions?",
+    "questionsSubtitle": "Contactez notre équipe de vente"
   },
   "technicianPortal": {
     "title": "Portail Technicien",
@@ -6079,12 +6102,240 @@
         "feature3": {
           "title": "Acces mobile",
           "description": "Les techniciens voient leur horaire sur n importe quel appareil."
+        },
+        "subtitle": "Everything you need to schedule crews confidently and prevent conflicts before they happen.",
+        "conflictEngine": {
+          "title": "Conflict Detection Engine",
+          "desc1": "Before any assignment is created, the system checks for existing assignments, approved time-off, and date overlaps.",
+          "desc2": "Conflicts display detailed warnings. You can override if necessary, but you cannot accidentally create scheduling disasters."
+        },
+        "projectCalendar": {
+          "title": "Project Calendar (Job Calendar)",
+          "desc1": "View all projects on a timeline with color-coded blocks. See multi-day spans at a glance. Identify gaps in scheduling.",
+          "desc2": "View projects even if no one is assigned yet. Month, week, and day views available."
+        },
+        "resourceTimeline": {
+          "title": "Resource Timeline (Employee Calendar)",
+          "desc1": "Each row represents one employee. Horizontal bars show where they are assigned. Gaps are visually obvious.",
+          "desc2": "Time-off displayed inline. See workload distribution across your entire crew instantly."
+        },
+        "dragDrop": {
+          "title": "Drag-and-Drop Assignment",
+          "desc1": "Select an employee from the panel. Drag onto the project calendar at the desired date. System highlights valid drop zones.",
+          "desc2": "Confirm the date range in the popup. Assignment created with conflict checking automatic."
+        },
+        "timeOff": {
+          "title": "Time-Off Management",
+          "desc1": "10 leave types including vacation, sick leave, personal, bereavement, and medical. Employees submit requests. Managers approve or deny with reason.",
+          "desc2": "Approved time-off automatically blocks scheduling for those dates."
+        },
+        "permissions": {
+          "title": "Permission-Based Visibility",
+          "desc1": "Company owners control who sees what. Enable schedule visibility for technicians. Give managers access to full schedule or just their crews.",
+          "desc2": "Granular permissions for viewing, editing, and approving."
         }
       },
       "cta": {
         "title": "Pret a organiser votre horaire?",
         "subtitle": "Eliminez les conflits de planification. Commencez votre essai gratuit de 60 jours.",
         "trialButton": "Commencer votre essai gratuit de 60 jours"
+      },
+      "stakeholders": {
+        "title": "Who Benefits",
+        "subtitle": "The scheduling module helps everyone in the organization.",
+        "owners": {
+          "title": "For Company Owners",
+          "benefit1Title": "Stop the Monday morning scramble.",
+          "benefit1Desc": "Conflict detection catches double-bookings before they happen. No more 6am phone calls. No more pulling people from other buildings to cover mistakes.",
+          "benefit2Title": "Protect first-day starts.",
+          "benefit2Desc1": "The most important days are properly staffed because you can see conflicts before they're created.",
+          "benefit2Desc2": "One saved contract renewal pays for the software for years.",
+          "benefit3Title": "See everything in one place.",
+          "benefit3Desc": "Who's working where. Who's on vacation. Where the gaps are. Visual clarity instead of spreadsheet guessing."
+        },
+        "ops": {
+          "title": "For Operations Managers",
+          "benefit1Title": "Balance workloads across your crew.",
+          "benefit1Desc1": "Resource Timeline shows each employee's schedule on a single row.",
+          "benefit1Desc2": "See who's booked solid and who has gaps. Distribute work fairly.",
+          "benefit2Title": "Plan without driving to sites.",
+          "benefit2Desc1": "Stop going project to project to see where people are.",
+          "benefit2Desc2": "See crew distribution from your desk.",
+          "benefit3Title": "Handle time-off requests properly.",
+          "benefit3Desc1": "Employees submit requests. You approve or deny with reason.",
+          "benefit3Desc2": "Approved requests automatically block scheduling."
+        },
+        "technicians": {
+          "title": "For Technicians",
+          "benefit1Title": "Know where you're going before Monday.",
+          "benefit1Desc1": "Permission-based schedule visibility lets you see your upcoming assignments through the app.",
+          "benefit1Desc2": "No more waiting until Monday morning to find out your location.",
+          "benefit2Title": "Schedule changes reach you.",
+          "benefit2Desc1": "When your assignment changes, the updated schedule is visible immediately.",
+          "benefit2Desc2": "Fewer wasted trips to the wrong building."
+        },
+        "buildingMgrs": {
+          "title": "For Building Managers",
+          "benefit1Title": "Your crews show up when scheduled.",
+          "benefit1Desc1": "Conflict prevention and visual scheduling help rope access companies ensure first days are properly staffed.",
+          "benefit1Desc2": "Fewer no-shows mean fewer embarrassing calls to residents.",
+          "benefit2Title": "Instant answers to schedule questions.",
+          "benefit2Desc": "\"Is your crew on-site today?\" The company owner can answer immediately because they see exactly which buildings have crews scheduled."
+        },
+        "propertyMgrs": {
+          "title": "For Property Managers",
+          "benefitTitle": "Reliable contractor coordination.",
+          "benefitDesc": "When the rope access company confirms a start date, you can trust that their crew scheduling actually supports it. Professional operations use professional systems."
+        }
+      },
+      "problemsSolved": {
+        "title": "Problems Solved",
+        "expandAll": "Expand All",
+        "collapseAll": "Collapse All",
+        "forOwners": "For Company Owners",
+        "forOps": "For Operations Managers",
+        "forTechs": "For Technicians",
+        "forBM": "For Building Managers",
+        "painLabel": "The Pain:",
+        "exampleLabel": "Real Example:",
+        "solutionLabel": "Solution:",
+        "benefitLabel": "Benefit:",
+        "owner1": {
+          "trigger": "\"Next thing you know, Dave is booked at two places to start two new projects on Monday.\"",
+          "pain": "Friday afternoon rushing to fill spots for next week. Golf tournament in an hour. You're throwing names right, left, center. Dave gets booked on two jobs starting the same day. You don't catch it until Sunday night when you're reviewing the schedule.",
+          "example": "Now you have to call your ops manager during his family barbecue to change everything. The stress cascades through the organization.",
+          "solution": "Automatic conflict detection prevents the double-booking in the first place. The moment you try to assign Dave to a second project on the same day, the system displays a warning with details about his existing assignment.",
+          "benefit": "The conflict cannot be created accidentally. Zero Sunday night surprises. Zero Monday morning scrambles."
+        },
+        "owner2": {
+          "trigger": "\"You don't show up on the first day, especially on a new contract. It's just bad news all around.\"",
+          "pain": "The property manager is waiting. Building manager has keys ready. Residents got notices in the elevator two weeks ago. Everyone expects you on December 15th.",
+          "example": "Double-booking means pulling people from other buildings to cover. Now you're behind everywhere. Techs working alone (safety violation). And the client who was waiting? They remember.",
+          "solution": "Visual calendar shows all project start dates with assigned technicians. Resource Timeline reveals if critical first days are understaffed. You can see at a glance whether your most important days are properly covered.",
+          "benefit": "The contract renewal you protect pays for the software. One saved $30,000 annual contract covers years of subscription fees."
+        },
+        "owner3": {
+          "trigger": "\"A guy would book two weeks vacation and then Jeff would just forget and book him at a building.\"",
+          "pain": "Approved vacation sitting in an email or a text. Then forgotten when scheduling next week. Monday morning: \"Where's Dave?\" \"He's in Mexico.\"",
+          "example": "Pull people from other buildings. Again. The vacation that was approved two months ago creates chaos because nobody remembered to check before scheduling.",
+          "solution": "Approved time-off automatically blocks scheduling for those dates. When you try to assign someone on approved vacation, the system displays a conflict warning. The employee appears as unavailable in the drag-and-drop panel.",
+          "benefit": "The vacation you approved two months ago still protects that employee from being scheduled. Zero \"he's in Mexico\" surprises."
+        },
+        "ops1": {
+          "trigger": "\"I had to go from project to project and look at the guys on the rope and take notes of where they're at compared to yesterday.\"",
+          "pain": "No single view of crew workload. Some techs overworked, others sitting idle. You don't know until you're physically visiting each site.",
+          "example": "Imbalanced assignments burn out your best people while newer techs don't get enough experience. Driving between sites just to understand who's where.",
+          "solution": "Resource Timeline shows each employee's schedule on a single row. See who's booked solid versus who has gaps. Visual representation of workload across your entire crew.",
+          "benefit": "Make proactive decisions about workload distribution before anyone gets burned out. Balance assignments from your desk instead of driving between sites."
+        },
+        "tech1": {
+          "trigger": "\"They would be told on Monday, go to this address. You go to this address.\"",
+          "pain": "No visibility into your own schedule. You find out Monday morning where you're supposed to be. Hard to plan your week. Hard to plan your life.",
+          "example": "Show up expecting to work at one building, then get redirected mid-morning. Wasted driving time. Confusion about what gear to bring.",
+          "solution": "Permission-based schedule visibility. If the employer enables it, you see your upcoming assignments through the app. You know where you're going before Monday.",
+          "benefit": "Changes are visible immediately. Plan your commute. Pack the right gear. Fewer wasted trips to the wrong building."
+        },
+        "bm1": {
+          "trigger": "\"You don't show up on the first day where everybody's waiting for you. It's just bad news all around.\"",
+          "pain": "You prepared for the rope access crew. Notices went to residents. Keys are ready. Access arranged. They don't show up.",
+          "example": "Your phone starts ringing. Angry residents. You look incompetent to your board. The contractor's scheduling failure becomes your reputation problem.",
+          "solution": "OnRopePro's conflict prevention helps rope access companies ensure first days are properly staffed. Professional systems create reliable contractors.",
+          "benefit": "Your reputation protected. Work with companies that operate like professionals and show up when they say they will."
+        }
+      },
+      "connectedModules": {
+        "title": "Connected Modules",
+        "subtitle": "The Scheduling module connects seamlessly with other OnRopePro modules. Data flows automatically, eliminating duplicate entry.",
+        "projectMgmt": {
+          "title": "Project Management",
+          "item1": "Calendar entries generate from project dates",
+          "item2": "Schedule updates when project dates change",
+          "item3": "No separate systems to maintain"
+        },
+        "employeeMgmt": {
+          "title": "Employee Management",
+          "item1": "Active employees appear in scheduling panel",
+          "item2": "Deactivated employees removed from options",
+          "item3": "Permissions controlled through Employee settings"
+        },
+        "timeTracking": {
+          "title": "Time Tracking",
+          "item1": "Work sessions link to scheduled projects",
+          "item2": "Compare scheduled vs actual hours worked",
+          "item3": "Identify projects running over or under"
+        },
+        "payroll": {
+          "title": "Payroll",
+          "item1": "Scheduled projects feed payroll calculations",
+          "item2": "Technician assignments connect to job costing",
+          "item3": "Hours categorized automatically for processing"
+        }
+      },
+      "results": {
+        "title": "Measurable Results",
+        "subtitle": "Real improvements you can expect when scheduling actually works.",
+        "timeSaved": {
+          "value": "8+ hours",
+          "description": "Saved monthly on duplicate data entry. 30-45 minutes per project saved. For 20 projects per month: 8+ hours reclaimed."
+        },
+        "zeroEmergencies": {
+          "value": "Zero",
+          "description": "Monday morning emergencies from double-booking. Zero 6am phone calls. Zero Sunday barbecue interruptions."
+        },
+        "contractsProtected": {
+          "value": "$30K+",
+          "description": "Contract renewals protected. First-day no-shows kill renewals. One saved annual contract pays for the software for years."
+        },
+        "morale": {
+          "value": "Improved",
+          "description": "Team morale. Calm Monday mornings. Reduced stress. Technicians know their schedule in advance. Managers plan instead of react."
+        }
+      },
+      "faqs": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Common questions about scheduling and calendar functionality.",
+        "q1": {
+          "question": "Can technicians see their own schedule?",
+          "answer": "Yes, if you enable the permission. Company owners control whether technicians can view their own upcoming assignments. You can also enable viewing the full team schedule for supervisors and managers."
+        },
+        "q2": {
+          "question": "What happens if I try to assign someone who's on vacation?",
+          "answer": "The system displays a conflict warning showing the approved time-off dates. You see the warning before the assignment is created. You can override if necessary, but you cannot accidentally schedule someone during approved vacation."
+        },
+        "q3": {
+          "question": "Can I still make scheduling decisions if there's a conflict?",
+          "answer": "Yes. Conflict warnings display details and give you the option to proceed or cancel. The system prevents accidents, not decisions. You remain in control."
+        },
+        "q4": {
+          "question": "How does the calendar connect to projects?",
+          "answer": "When you create a project with date range and assigned employees, calendar entries generate automatically. Change the project dates and the calendar updates. One system, one truth."
+        },
+        "q5": {
+          "question": "What time-off types are supported?",
+          "answer": "10 leave types: vacation, sick leave, personal leave, bereavement, jury duty, medical leave, family emergency, unpaid leave, training/development, and military leave. Each displays distinctly on the calendar."
+        },
+        "q6": {
+          "question": "Can I see both projects and employees in one view?",
+          "answer": "The dual calendar system provides two complementary views. Project Calendar shows all jobs on a timeline. Resource Timeline shows employee workloads by row. Use both together for complete visibility."
+        },
+        "q7": {
+          "question": "How does drag-and-drop work?",
+          "answer": "Select an employee from the panel. Drag onto the project calendar at the desired date. System highlights valid drop zones. Confirm date range in the popup. Assignment created with automatic conflict checking."
+        },
+        "q8": {
+          "question": "What if someone calls in sick last minute?",
+          "answer": "You can update their status to sick leave for the current day. The Resource Timeline immediately shows them as unavailable. You can then see who's available to cover based on their current assignments."
+        },
+        "q9": {
+          "question": "Is there mobile access for viewing schedules?",
+          "answer": "Yes. The schedule is viewable through the mobile app. Technicians with schedule visibility permissions can check their assignments from their phone."
+        }
+      },
+      "finalCta": {
+        "title": "Ready to Stop the Chaos?",
+        "description": "Join rope access companies who've eliminated Monday morning scheduling disasters.",
+        "ctaTrial": "Start Free Trial",
+        "ctaContact": "Contact Sales"
       }
     },
     "quoting": {
@@ -6095,7 +6346,8 @@
         "description": "Vos techniciens capturent les détails du site sans voir vos prix. Vous transformez leurs données en soumissions précises et professionnelles avec des calculs de main-d'œuvre automatiques.",
         "descriptionBold": "Pas de tableurs. Pas d'erreurs de calcul. Pas d'exposition des prix.",
         "ctaTrial": "Commencez votre essai gratuit de 60 jours",
-        "ctaFaqs": "Trouver des réponses"
+        "ctaFaqs": "Trouver des réponses",
+        "descriptionEnd": " that calculate labor hours automatically. Your technicians gather site data without seeing pricing. You review and approve quotes before they leave the system."
       },
       "stats": {
         "quoteSpeed": "Création de soumissions plus rapide",
@@ -6546,6 +6798,30 @@
         "progressTracking": {
           "title": "Suivi de progression en temps réel",
           "description": "Les résidents voient quelle élévation est travaillée et le pourcentage d'achèvement global. Ils se servent eux-mêmes des informations de statut au lieu d'appeler pour demander « quand ferez-vous ma fenêtre ? »"
+        },
+        "feature1": {
+          "title": "QR Code Access",
+          "description": "Residents register by scanning a QR code posted in the elevator or common area. One scan links them to your company's portal for their building."
+        },
+        "feature2": {
+          "title": "Photo Evidence",
+          "description": "Residents attach photos to their feedback. Before-and-after documentation. Proof of issues. Evidence that protects both parties."
+        },
+        "feature3": {
+          "title": "Internal vs. Visible Messages",
+          "description": "Staff toggle between internal notes (private coordination) and visible replies (resident sees). Yellow/red indicator prevents accidental visibility."
+        },
+        "feature4": {
+          "title": "5-Day Submission Window",
+          "description": "Residents can submit feedback for 5 business days after project completion. Long enough to notice issues. Short enough to limit scope creep."
+        },
+        "feature5": {
+          "title": "Auto-Filled Contact Info",
+          "description": "Name, unit number, phone number auto-fill from resident profile. No manual entry errors. No incomplete submissions."
+        },
+        "feature6": {
+          "title": "White-Label Ready",
+          "description": "Your company branding. Your colors. Your logo. Residents see a professional portal that represents your business."
         }
       },
       "results": {
@@ -6568,6 +6844,26 @@
         "differentiation": {
           "title": "Différenciation concurrentielle",
           "description": "Lors des présentations d'offres, démontrer le portail résidents et les métriques de temps de résolution vous sépare des concurrents qui gèrent les plaintes par téléphone et courriel. Vous montrez un système. Ils décrivent un processus. Les systèmes gagnent."
+        },
+        "stat1": {
+          "value": "$1,200",
+          "label": "Average return visit cost",
+          "description": "Equipment loading, travel time, rigging for one unit, labor, derigging, return trip. One prevented return visit per month pays for everything."
+        },
+        "stat2": {
+          "value": "70%",
+          "label": "Reduction in complaint phone calls",
+          "description": "When residents can check status and submit feedback online, they stop calling. Your phone rings for actual emergencies, not status requests."
+        },
+        "stat3": {
+          "value": "24hr",
+          "label": "Average resolution time",
+          "description": "Same-day visibility means same-day action. Issues that used to take a week now resolve in hours."
+        },
+        "stat4": {
+          "value": "100%",
+          "label": "Documentation coverage",
+          "description": "Every complaint. Every response. Every resolution. Complete audit trail that protects your reputation and proves your professionalism."
         }
       },
       "integration": {
@@ -6588,6 +6884,10 @@
         "employeeManagement": {
           "title": "Module de gestion des employés",
           "description": "Le personnel reçoit des permissions pour répondre aux commentaires. À mesure que le système évolue, la performance pourrait être suivie par la qualité des réponses, créant une responsabilisation au niveau individuel."
+        },
+        "propertyManagerPortal": {
+          "title": "Property Manager Portal",
+          "description": "Property managers see the same feedback their residents submit, with full communication history. They can observe vendor responsiveness without needing to be in the communication loop."
         }
       },
       "impact": {
@@ -6664,7 +6964,9 @@
         "description": "La cote de sécurité de l'entreprise transforme la paperasse éparpillée et les bonnes intentions en un seul chiffre vérifiable. Les gestionnaires immobiliers la voient en comparant les fournisseurs. Les techniciens la voient en évaluant les offres d'emploi.",
         "descriptionStrong": "Vous la voyez en construisant une culture qui protège vos employés et votre entreprise.",
         "ctaTrial": "Commencez votre essai gratuit de 60 jours",
-        "ctaFaq": "Trouver des réponses"
+        "ctaFaq": "Trouver des réponses",
+        "tagline": "The CSR aggregates harness inspections, document acknowledgments, project compliance, and safety culture into one defensible metric.",
+        "ctaFaqs": "Read FAQs"
       },
       "stats": {
         "auditTimeValue": "5 min",
@@ -6681,7 +6983,9 @@
         "intro": "Chaque entreprise d'accès sur corde dit qu'elle est sécuritaire. Chacune d'entre elles.",
         "paragraph1": "Mais quand WorkSafe se présente et demande des preuves, la plupart des opérateurs fouillent dans les classeurs, les boîtes à gants des camions et les fils de messages texte à la recherche de documentation qui peut ou non exister. Quand un gestionnaire immobilier demande quel fournisseur est le plus sécuritaire, il compare des arguments marketing, pas des preuves. Quand un technicien décide d'accepter un emploi, il mise sa vie sur la parole de l'employeur.",
         "highlight": "La sécurité sans mesure n'est qu'un espoir. Et l'espoir n'est pas une stratégie quand quelqu'un est suspendu à 40 étages.",
-        "solution": "La cote de sécurité de l'entreprise d'OnRopePro change la conversation. Au lieu de « nous sommes sécuritaires », vous obtenez un chiffre : 87 %. Au lieu de formulaires éparpillés, vous obtenez un tableau de bord unique montrant exactement où vous en êtes et ce qui nécessite attention. Au lieu de deviner, vous savez."
+        "solution": "La cote de sécurité de l'entreprise d'OnRopePro change la conversation. Au lieu de « nous sommes sécuritaires », vous obtenez un chiffre : 87 %. Au lieu de formulaires éparpillés, vous obtenez un tableau de bord unique montrant exactement où vous en êtes et ce qui nécessite attention. Au lieu de deviner, vous savez.",
+        "scenario": "\"We're safe\" isn't evidence. It's a claim.",
+        "howDifferent": "How is any of this different from what your competitors say?"
       },
       "features": {
         "title": "Ce que fait le module CSE",
@@ -6717,6 +7021,22 @@
           "item2": "Documentation de projet incomplète (jusqu'à 25 %)",
           "item3": "Inspections de harnais non complétées avant le travail (jusqu'à 25 %)",
           "item4": "Reconnaissances d'employés non signées (jusqu'à 5 %)"
+        },
+        "baseline": {
+          "title": "Company Document Baseline",
+          "description": "Upload your Certificate of Insurance, Health & Safety Manual, and Company Policy to establish your baseline. Missing or expired documents trigger immediate penalties."
+        },
+        "projectDocs": {
+          "title": "Project Documents Penalty",
+          "description": "Each project requires four safety documents: Anchor Inspection, Rope Access Plan, Toolbox Meeting, and FLHA. Missing documents on any project reduce your score proportionally."
+        },
+        "harness": {
+          "title": "Harness Inspection Penalty",
+          "description": "Technicians must complete harness inspections before work sessions. The penalty is calculated as percentage of missed inspections against total work sessions over time."
+        },
+        "acknowledgment": {
+          "title": "Employee Document Acknowledgment",
+          "description": "When you add Safe Work Procedures or Practices, your score decreases until employees sign. This ensures documents are actually reviewed, not just uploaded."
         }
       },
       "stakeholders": {
@@ -7151,6 +7471,19 @@
             "description": "Courriel au gestionnaire d'immeuble. Transfert au fournisseur. Perdu dans une boîte de réception.",
             "solution": "Soumettez via le portail. Le statut passe de Ouvert à Accusé réception à Résolu. Photos du travail corrigé jointes. Sachez exactement où en est votre problème."
           }
+        },
+        "residentSection": {
+          "title": "For Residents",
+          "problem1": {
+            "quote": "\"I don't know if anyone even saw my complaint.\"",
+            "description": "You submitted feedback two weeks ago. Is it being worked on? Did it get lost? Nobody responds.",
+            "solution": "Submit once. See \"Viewed\" timestamp. Track status from Open to Acknowledged to Resolved. Photo documentation proves the issue."
+          },
+          "problem2": {
+            "quote": "\"I have to call the building manager for every update.\"",
+            "description": "\"When will they do my side?\" \"Did they get my message?\" Phone tag wastes everyone's time.",
+            "solution": "Portal shows real-time progress. Your elevation. Your feedback. No calls required."
+          }
         }
       },
       "measurableResults": {
@@ -7199,6 +7532,10 @@
         "analyticsReporting": {
           "title": "Analytique et rapports",
           "description": "Chaque rapport filtre selon le niveau de permission de l'utilisateur. Les tableaux de bord montrent uniquement les données autorisées. Pas d'exposition accidentelle."
+        },
+        "safety": {
+          "title": "Safety Compliance",
+          "description": "Safety documentation access is permission-controlled. Everyone sees their own inspections. Only designated roles access company-wide safety reports."
         }
       },
       "businessImpact": {
@@ -7257,13 +7594,18 @@
       "cta": {
         "title": "Prêt à reprendre le contrôle ?",
         "subtitle": "Déléguez sans exposer. Protégez sans microgérer. Grandissez sans vous inquiéter de qui voit quoi.",
-        "trialButton": "Commencez votre essai gratuit de 60 jours"
+        "trialButton": "Commencez votre essai gratuit de 60 jours",
+        "subtitleLine2": "Full access. No credit card. Real data stays private from day one.",
+        "ctaTrial": "Start Your 60-Day Trial",
+        "ctaFaqs": "Find Answers"
       },
       "footer": {
         "tagline": "Logiciel de gestion pour travaux sur cordes",
         "pricing": "Tarifs",
         "changelog": "Journal des modifications",
-        "signIn": "Connexion"
+        "signIn": "Connexion",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfService": "Terms of Service"
       }
     },
     "payroll": {
@@ -7293,7 +7635,37 @@
       },
       "features": {
         "title": "Du pointage à l'export de paie",
-        "subtitle": "Le module Paie & Finances transforme les données de sessions de travail dispersées en feuilles de temps organisées et exportables sans intervention manuelle."
+        "subtitle": "Le module Paie & Finances transforme les données de sessions de travail dispersées en feuilles de temps organisées et exportables sans intervention manuelle.",
+        "card1": {
+          "title": "Automatic Aggregation",
+          "headline": "Every GPS-verified clock-in flows directly into timesheets.",
+          "description": "The system calculates hours, applies overtime rules, and groups everything by pay period.",
+          "listTitle": "What gets automated:",
+          "item1": "Regular hour totals by employee",
+          "item2": "Overtime calculation (daily and weekly triggers)",
+          "item3": "Pay period grouping (weekly, bi-weekly, semi-monthly, monthly)",
+          "item4": "Project attribution per work session"
+        },
+        "card2": {
+          "title": "Job Costing Visibility",
+          "headline": "Know exactly how many hours went to each building.",
+          "description": "Stop underbidding jobs because you can finally see where time actually goes.",
+          "listTitle": "What gets tracked:",
+          "item1": "Hours per project per employee",
+          "item2": "Billable vs non-billable breakdown",
+          "item3": "Project labor cost totals",
+          "item4": "Historical comparison across pay periods"
+        },
+        "card3": {
+          "title": "Export-Ready Output",
+          "headline": "Generate CSV files for QuickBooks, ADP, Gusto, or any payroll software.",
+          "description": "PDF reports for records. No re-keying data.",
+          "listTitle": "What gets exported:",
+          "item1": "Employee-by-employee timesheets",
+          "item2": "Project cost breakdowns",
+          "item3": "Overtime summaries",
+          "item4": "Complete audit trails"
+        }
       },
       "benefits": {
         "title": "Qui bénéficie de ce module",
@@ -10937,6 +11309,10 @@
         "propertyManagerInterface": {
           "name": "Portail gestionnaire immobilier",
           "desc": "Tableaux de bord en temps réel et exports de conformité pour les gestionnaires"
+        },
+        "personalSafetyRating": {
+          "name": "Personal Safety Rating",
+          "desc": "Portable technician safety score that follows you across employers"
         }
       },
       "seeAllCta": "Voir toutes les fonctionnalités et tarifs"
@@ -11882,5 +12258,133 @@
       "learnPsr": "En savoir plus sur le PSR",
       "freeNote": "Gratuit pour les techniciens. Toujours. 14 jours d'essai pour les entreprises. Pas de carte de crédit requise."
     }
+  },
+  "signIn": {
+    "title": "Connexion",
+    "emailAddress": "Adresse courriel",
+    "password": "Mot de passe",
+    "emailPlaceholder": "vous@exemple.com",
+    "passwordPlaceholder": "Votre mot de passe",
+    "signInButton": "Se connecter",
+    "forgotPassword": "Mot de passe oublié?",
+    "noAccount": "Vous n'avez pas de compte?",
+    "createAccount": "Créer un compte",
+    "resetPassword": "Réinitialiser votre mot de passe",
+    "resetDescription": "Entrez votre courriel et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "sendResetLink": "Envoyer le lien",
+    "checkEmail": "Vérifiez votre courriel pour le lien de réinitialisation.",
+    "backToSignIn": "Retour à la connexion",
+    "welcomeBack": "Bon retour!",
+    "loggedInAs": "Connecté en tant que",
+    "loginFailed": "Échec de connexion",
+    "verifyFailed": "Échec de vérification du compte. Veuillez réessayer.",
+    "errorOccurred": "Une erreur est survenue. Veuillez réessayer.",
+    "emailRequired": "Le courriel est requis",
+    "passwordRequired": "Le mot de passe est requis"
+  },
+  "documentUploader": {
+    "tooManyDocuments": "Trop de documents",
+    "maxDocumentsMessage": "Vous ne pouvez téléverser que {{max}} documents maximum",
+    "uploadSuccess": "Succès",
+    "documentsUploaded": "{{count}} document(s) téléversé(s)",
+    "uploadFailed": "Échec du téléversement",
+    "uploadFailedMessage": "Échec du téléversement d'un ou plusieurs documents",
+    "takePhoto": "Prendre une photo",
+    "chooseFiles": "Choisir des fichiers",
+    "documentsCount": "{{current}} / {{max}} documents téléversés"
+  },
+  "seats": {
+    "purchaseTitle": "Acheter des sièges employés",
+    "purchaseDescriptionEmpty": "Vous n'avez pas encore acheté de sièges employés. Chaque siège vous permet d'ajouter un membre à votre équipe.",
+    "purchaseDescriptionFull": "Vous avez utilisé tous vos {{count}} sièges employés. Achetez des sièges supplémentaires pour ajouter plus de membres.",
+    "freeTrialNotice": "Essai gratuit - Avis de facturation",
+    "trialBillingInfo": "Vous êtes actuellement en essai gratuit de 30 jours. Voici ce que sera votre facture mensuelle à la fin de votre essai:",
+    "currentBillingInfo": "Voici votre abonnement mensuel actuel et ce qu'il sera après l'ajout de sièges:",
+    "currentMonthlyBill": "Facture mensuelle actuelle",
+    "baseSubscription": "Abonnement de base",
+    "giftedSeats": "Sièges offerts (gratuits)",
+    "paidSeats": "Sièges payants",
+    "whiteLabelBranding": "Marque blanche",
+    "currentTotal": "Total actuel",
+    "addingNow": "Ajout maintenant",
+    "newSeats": "Nouveaux sièges",
+    "projectedCost": "Coût mensuel prévu après l'essai:",
+    "newMonthlyTotal": "Nouveau total mensuel:",
+    "additionalSeats": "Sièges supplémentaires",
+    "perSeatMonth": "par siège/mois",
+    "seatsProratedNotice": "Les sièges sont facturés mensuellement et au prorata de votre cycle de facturation.",
+    "addSeats": "Ajouter {{count}} siège(s)",
+    "confirmPurchase": "Confirmer l'achat",
+    "confirmPurchaseDescription": "Vous êtes sur le point d'acheter {{count}} siège(s) supplémentaire(s).",
+    "proratedCharge": "Un montant au prorata sera facturé sur votre méthode de paiement.",
+    "seatsPurchased": "Sièges achetés",
+    "seatsAddedSuccess": "{{count}} siège(s) ajouté(s) avec succès.",
+    "purchaseFailed": "Échec de l'achat",
+    "purchaseFailedMessage": "Échec de l'achat des sièges. Veuillez réessayer.",
+    "purchaseErrorMessage": "Une erreur est survenue. Veuillez réessayer.",
+    "removeTitle": "Retirer des sièges",
+    "removeDescription": "Sélectionnez les employés à suspendre. Leur accès sera révoqué et vous recevrez un crédit au prorata.",
+    "yourPaidSeats": "Vos sièges payants",
+    "paidPlusGifted": "{{paid}} payants + {{gifted}} offerts (gratuits à vie)",
+    "maxRemovable": "Maximum retirable",
+    "noPaidSeats": "Aucun siège payant à retirer.",
+    "giftedCannotRemove": "Les sièges offerts ne peuvent pas être retirés.",
+    "selectToSuspend": "Sélectionnez les employés à suspendre ({{selected}}/{{max}} sélectionnés):",
+    "estimatedCredit": "Crédit estimé",
+    "creditNotice": "Le crédit au prorata sera appliqué à votre prochaine facture.",
+    "removeSeats": "Retirer {{count}} siège(s)",
+    "confirmRemoval": "Confirmer le retrait",
+    "confirmRemovalDescription": "Vous êtes sur le point de retirer {{count}} siège(s).",
+    "selectedWillBeSuspended": "Les employés sélectionnés seront suspendus:",
+    "creditAmount": "Montant du crédit",
+    "prorated": "au prorata",
+    "suspendedNotice": "Les employés suspendus perdent l'accès immédiatement mais peuvent être réactivés.",
+    "seatsRemoved": "Sièges retirés",
+    "seatsRemovedSuccess": "{{count}} siège(s) retiré(s) avec succès.",
+    "creditApplied": "Un crédit de {{amount}}$ a été appliqué à votre prochaine facture.",
+    "removalFailed": "Échec du retrait",
+    "removalFailedMessage": "Échec du retrait des sièges. Veuillez réessayer.",
+    "removalErrorMessage": "Une erreur est survenue. Veuillez réessayer.",
+    "confirmRemovalButton": "Confirmer le retrait"
+  },
+  "resetPassword": {
+    "title": "Réinitialiser le mot de passe",
+    "subtitle": "Entrez votre courriel pour recevoir un lien de réinitialisation",
+    "email": "Adresse courriel",
+    "emailPlaceholder": "votre@courriel.com",
+    "sendLink": "Envoyer le lien",
+    "sending": "Envoi...",
+    "backToLogin": "Retour à la connexion",
+    "successTitle": "Vérifiez votre courriel",
+    "successMessage": "Si un compte existe avec ce courriel, vous recevrez un lien de réinitialisation.",
+    "errorTitle": "Erreur",
+    "errorMessage": "Échec de l'envoi du lien. Veuillez réessayer.",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "resetButton": "Réinitialiser",
+    "resetting": "Réinitialisation...",
+    "resetSuccess": "Mot de passe réinitialisé avec succès",
+    "resetError": "Échec de la réinitialisation"
+  },
+  "help": {
+    "title": "Centre d'aide",
+    "searchPlaceholder": "Rechercher de l'aide...",
+    "gettingStarted": "Pour commencer",
+    "guides": "Guides",
+    "faq": "FAQ",
+    "contact": "Contacter le support",
+    "backToHelp": "Retour à l'aide",
+    "relatedArticles": "Articles connexes",
+    "wasHelpful": "Cet article vous a-t-il été utile?",
+    "thankYou": "Merci pour votre retour!",
+    "forTechnicians": "Pour les techniciens",
+    "forResidents": "Pour les résidents",
+    "forPropertyManagers": "Pour les gestionnaires immobiliers",
+    "forBuildingManagers": "Pour les gestionnaires d'immeubles",
+    "forCompanyOwners": "Pour les propriétaires d'entreprise",
+    "roiCalculator": "Calculateur de ROI",
+    "featureFinder": "Recherche de fonctionnalités",
+    "noResults": "Aucun article trouvé",
+    "tryDifferentSearch": "Essayez un autre terme de recherche"
   }
 }

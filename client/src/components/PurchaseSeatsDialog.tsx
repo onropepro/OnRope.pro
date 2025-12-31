@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/hooks/use-language";
 
 interface PurchaseSeatsDialogProps {
   open: boolean;
@@ -31,6 +32,7 @@ export function PurchaseSeatsDialog({
   giftedSeats = 0,
   hasWhitelabelBranding = false
 }: PurchaseSeatsDialogProps) {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -40,11 +42,9 @@ export function PurchaseSeatsDialog({
   const BASE_SUBSCRIPTION = 99.00;
   const WHITELABEL_PRICE = 49.95;
   
-  // Cost of new seats being added
   const newSeatsCost = quantity * SEAT_PRICE;
   const totalPrice = newSeatsCost.toFixed(2);
   
-  // Full new monthly total (current bill + new seats)
   const currentPaidSeatsCost = paidSeats * SEAT_PRICE;
   const whitelabelCost = hasWhitelabelBranding ? WHITELABEL_PRICE : 0;
   const currentMonthlyTotal = BASE_SUBSCRIPTION + currentPaidSeatsCost + whitelabelCost;
@@ -57,8 +57,8 @@ export function PurchaseSeatsDialog({
       if (response.ok) {
         const data = await response.json();
         toast({
-          title: "Seats Purchased",
-          description: `Successfully added ${data.seatsAdded} seat(s) to your subscription.`,
+          title: t("seats.seatsPurchased", "Seats Purchased"),
+          description: t("seats.seatsAddedSuccess", `Successfully added ${data.seatsAdded} seat(s) to your subscription.`).replace("{{count}}", String(data.seatsAdded)),
         });
         setShowConfirmDialog(false);
         onOpenChange(false);
@@ -67,15 +67,15 @@ export function PurchaseSeatsDialog({
       } else {
         const error = await response.json();
         toast({
-          title: "Purchase Failed",
-          description: error.message || "Failed to purchase seats. Please try again.",
+          title: t("seats.purchaseFailed", "Purchase Failed"),
+          description: error.message || t("seats.purchaseFailedMessage", "Failed to purchase seats. Please try again."),
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: "Purchase Failed",
-        description: "An error occurred while processing your purchase. Please try again.",
+        title: t("seats.purchaseFailed", "Purchase Failed"),
+        description: t("seats.purchaseErrorMessage", "An error occurred while processing your purchase. Please try again."),
         variant: "destructive",
       });
     } finally {
@@ -95,16 +95,15 @@ export function PurchaseSeatsDialog({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons text-primary">group_add</span>
-              Purchase Employee Seats
+              {t("seats.purchaseTitle", "Purchase Employee Seats")}
             </DialogTitle>
             <DialogDescription>
               {currentSeats === 0 
-                ? "You haven't purchased any employee seats yet. Each seat allows you to add one team member to your company."
-                : `You've used all ${currentSeats} of your employee seats. Purchase additional seats to add more team members.`}
+                ? t("seats.purchaseDescriptionEmpty", "You haven't purchased any employee seats yet. Each seat allows you to add one team member to your company.")
+                : t("seats.purchaseDescriptionFull", `You've used all ${currentSeats} of your employee seats. Purchase additional seats to add more team members.`).replace("{{count}}", String(currentSeats))}
             </DialogDescription>
           </DialogHeader>
           
-          {/* Billing Summary - shows current bill + what's being added */}
           {(() => {
             return (
               <div className={`p-4 rounded-lg border ${isTrialing ? 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800' : 'bg-muted/50 border-border'}`}>
@@ -115,66 +114,63 @@ export function PurchaseSeatsDialog({
                   <div className="flex-1">
                     {isTrialing && (
                       <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
-                        Free Trial - Billing Notice
+                        {t("seats.freeTrialNotice", "Free Trial - Billing Notice")}
                       </p>
                     )}
                     <p className={`text-sm mb-3 ${isTrialing ? 'text-amber-800 dark:text-amber-200' : 'text-muted-foreground'}`}>
                       {isTrialing 
-                        ? <>You're currently on a <strong>30-day free trial</strong>. Here's what your monthly bill will be when your trial ends:</>
-                        : <>Here's your current monthly subscription and what it will be after adding seats:</>
+                        ? <>{t("seats.trialBillingInfo", "You're currently on a 30-day free trial. Here's what your monthly bill will be when your trial ends:")}</>
+                        : <>{t("seats.currentBillingInfo", "Here's your current monthly subscription and what it will be after adding seats:")}</>
                       }
                     </p>
                     <div className={`rounded-md p-3 border ${isTrialing ? 'bg-white dark:bg-amber-900 border-amber-200 dark:border-amber-700' : 'bg-background border-border'}`}>
-                      {/* Current Monthly Bill Section */}
                       <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isTrialing ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
-                        Current Monthly Bill
+                        {t("seats.currentMonthlyBill", "Current Monthly Bill")}
                       </p>
                       <div className="flex justify-between items-center text-sm mb-1">
-                        <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>Base subscription:</span>
+                        <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>{t("seats.baseSubscription", "Base subscription")}:</span>
                         <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>$99.00</span>
                       </div>
                       {giftedSeats > 0 && (
                         <div className="flex justify-between items-center text-sm mb-1">
-                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>Gifted seats (free):</span>
-                          <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>{giftedSeats} seats</span>
+                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>{t("seats.giftedSeats", "Gifted seats (free)")}:</span>
+                          <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>{giftedSeats} {t("common.seats", "seats")}</span>
                         </div>
                       )}
                       {paidSeats > 0 && (
                         <div className="flex justify-between items-center text-sm mb-1">
-                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>Paid seats ({paidSeats}):</span>
+                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>{t("seats.paidSeats", "Paid seats")} ({paidSeats}):</span>
                           <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>${currentPaidSeatsCost.toFixed(2)}</span>
                         </div>
                       )}
                       {hasWhitelabelBranding && (
                         <div className="flex justify-between items-center text-sm mb-1">
-                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>White Label Branding:</span>
+                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>{t("seats.whiteLabelBranding", "White Label Branding")}:</span>
                           <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>${WHITELABEL_PRICE.toFixed(2)}</span>
                         </div>
                       )}
                       <div className={`flex justify-between items-center text-sm pt-1 border-t mt-1 ${isTrialing ? 'border-amber-200 dark:border-amber-700' : 'border-border'}`}>
-                        <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>Current total:</span>
-                        <span className={`font-semibold ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>${currentMonthlyTotal.toFixed(2)}/mo</span>
+                        <span className={`font-medium ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>{t("seats.currentTotal", "Current total")}:</span>
+                        <span className={`font-semibold ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>${currentMonthlyTotal.toFixed(2)}/{t("common.mo", "mo")}</span>
                       </div>
                       
-                      {/* Adding Section */}
                       <div className={`mt-3 pt-3 border-t ${isTrialing ? 'border-amber-200 dark:border-amber-700' : 'border-border'}`}>
                         <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isTrialing ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground'}`}>
-                          Adding Now
+                          {t("seats.addingNow", "Adding Now")}
                         </p>
                         <div className="flex justify-between items-center text-sm">
-                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>New seats ({quantity}):</span>
+                          <span className={isTrialing ? 'text-amber-700 dark:text-amber-300' : 'text-muted-foreground'}>{t("seats.newSeats", "New seats")} ({quantity}):</span>
                           <span className={`font-medium text-primary`}>+${newSeatsCost.toFixed(2)}</span>
                         </div>
                       </div>
                       
-                      {/* New Total */}
                       <div className={`border-t pt-2 mt-3 ${isTrialing ? 'border-amber-200 dark:border-amber-700' : 'border-border'}`}>
                         <div className="flex justify-between items-center">
                           <span className={`font-semibold ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-foreground'}`}>
-                            {isTrialing ? 'Projected monthly cost after trial:' : 'New monthly total:'}
+                            {isTrialing ? t("seats.projectedCost", "Projected monthly cost after trial:") : t("seats.newMonthlyTotal", "New monthly total:")}
                           </span>
                           <span className={`font-bold text-lg ${isTrialing ? 'text-amber-900 dark:text-amber-100' : 'text-primary'}`}>
-                            ${newMonthlyTotal.toFixed(2)}/mo
+                            ${newMonthlyTotal.toFixed(2)}/{t("common.mo", "mo")}
                           </span>
                         </div>
                       </div>
@@ -189,8 +185,8 @@ export function PurchaseSeatsDialog({
             <div className="p-4 bg-muted/50 rounded-lg space-y-4">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="font-medium">Additional Seats</p>
-                  <p className="text-sm text-muted-foreground">$34.95 per seat/month</p>
+                  <p className="font-medium">{t("seats.additionalSeats", "Additional Seats")}</p>
+                  <p className="text-sm text-muted-foreground">$34.95 {t("seats.perSeatMonth", "per seat/month")}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button 
@@ -226,12 +222,12 @@ export function PurchaseSeatsDialog({
                 </div>
               </div>
               <div className="border-t pt-3 flex items-center justify-between gap-2">
-                <p className="font-medium">New Monthly Total</p>
-                <p className="font-bold text-xl text-primary">${newMonthlyTotal.toFixed(2)}/month</p>
+                <p className="font-medium">{t("seats.newMonthlyTotal", "New Monthly Total")}</p>
+                <p className="font-bold text-xl text-primary">${newMonthlyTotal.toFixed(2)}/{t("common.month", "month")}</p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Seats are billed monthly and prorated based on your billing cycle. You will be charged a prorated amount for the remainder of this billing period.
+              {t("seats.seatsProratedNotice", "Seats are billed monthly and prorated based on your billing cycle. You will be charged a prorated amount for the remainder of this billing period.")}
             </p>
           </div>
           <DialogFooter className="gap-2">
@@ -240,14 +236,14 @@ export function PurchaseSeatsDialog({
               onClick={handleClose}
               data-testid="button-cancel-purchase-seats"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </Button>
             <Button 
               onClick={() => setShowConfirmDialog(true)}
               data-testid="button-confirm-purchase-seats"
             >
               <span className="material-icons text-sm mr-1">shopping_cart</span>
-              Add {quantity} Seat{quantity > 1 ? 's' : ''} (+${totalPrice}/mo)
+              {t("seats.addSeats", `Add ${quantity} Seat${quantity > 1 ? 's' : ''}`).replace("{{count}}", String(quantity))} (+${totalPrice}/{t("common.mo", "mo")})
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -258,15 +254,15 @@ export function PurchaseSeatsDialog({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <span className="material-icons text-primary">verified</span>
-              Confirm Seat Purchase
+              {t("seats.confirmPurchase", "Confirm Seat Purchase")}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
-              <p>You are about to purchase <strong>{quantity} additional seat{quantity > 1 ? 's' : ''}</strong> for your subscription.</p>
+              <p>{t("seats.confirmPurchaseDescription", `You are about to purchase ${quantity} additional seat${quantity > 1 ? 's' : ''} for your subscription.`).replace("{{count}}", String(quantity))}</p>
               <p className="text-lg font-semibold text-foreground">
-                Total: ${totalPrice}/month
+                {t("common.total", "Total")}: ${totalPrice}/{t("common.month", "month")}
               </p>
               <p className="text-sm">
-                A prorated amount will be charged to your payment method on file for the remainder of this billing period.
+                {t("seats.proratedCharge", "A prorated amount will be charged to your payment method on file for the remainder of this billing period.")}
               </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -276,7 +272,7 @@ export function PurchaseSeatsDialog({
               disabled={isPurchasing}
               data-testid="button-cancel-confirm-purchase"
             >
-              Cancel
+              {t("common.cancel", "Cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handlePurchase}
@@ -286,12 +282,12 @@ export function PurchaseSeatsDialog({
               {isPurchasing ? (
                 <>
                   <span className="material-icons animate-spin text-sm mr-1">sync</span>
-                  Processing...
+                  {t("common.processing", "Processing...")}
                 </>
               ) : (
                 <>
                   <span className="material-icons text-sm mr-1">check</span>
-                  Purchase ${totalPrice}
+                  {t("common.purchase", "Purchase")} ${totalPrice}
                 </>
               )}
             </AlertDialogAction>
