@@ -959,7 +959,42 @@
     "underDevelopment": "This card is under development",
     "emp": "emp",
     "employees": "employees",
-    "unknownDate": "Unknown date"
+    "unknownDate": "Unknown date",
+    "toast": {
+      "documentSigned": "Document Signed",
+      "signatureRequired": "Signature Required",
+      "noDocumentsFound": "No documents found",
+      "exportFailed": "Export failed",
+      "exportPartiallyComplete": "Export partially complete",
+      "exportComplete": "Export complete",
+      "pdfDownloaded": "PDF Downloaded",
+      "templateAdded": "Template Added",
+      "documentDeleted": "Document deleted successfully",
+      "documentUploaded": "Document uploaded successfully",
+      "complianceReportDownloaded": "Compliance report downloaded successfully",
+      "failedToSign": "Failed to sign document",
+      "failedToUpload": "Failed to upload document",
+      "failedToDelete": "Failed to delete document",
+      "failedToDownload": "Failed to download compliance report",
+      "failedToGeneratePdfs": "Could not generate any PDFs. Please try again.",
+      "selectJobType": "Please select a job type for this method statement",
+      "enterCustomJobType": "Please enter a custom job type name",
+      "provideSignature": "Please provide your signature before submitting.",
+      "signatureRecorded": "Your signature has been recorded successfully.",
+      "noDocsInRange": "There are no documents in the selected date range.",
+      "exportedDocs": "Successfully exported {{count}} {{type}} documents.",
+      "exportedPartial": "Exported {{success}} documents. {{failed}} document(s) failed to generate."
+    }
+  },
+  "services": {
+    "windowCleaning": "Window Cleaning",
+    "dryerVentCleaning": "Exterior Dryer Vent Cleaning",
+    "buildingWash": "Building Wash - Pressure washing",
+    "generalPressureWashing": "General Pressure Washing",
+    "gutterCleaning": "Gutter Cleaning",
+    "parkade": "Parkade Cleaning",
+    "groundWindows": "Ground Windows",
+    "inSuite": "In-Suite Dryer Vent"
   },
   "auth": {
     "welcomeBack": "Welcome Back",

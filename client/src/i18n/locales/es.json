@@ -1035,7 +1035,42 @@
     "underDevelopment": "Esta tarjeta está en desarrollo",
     "emp": "emp",
     "employees": "empleados",
-    "unknownDate": "Fecha desconocida"
+    "unknownDate": "Fecha desconocida",
+    "toast": {
+      "documentSigned": "Documento firmado",
+      "signatureRequired": "Se requiere firma",
+      "noDocumentsFound": "No se encontraron documentos",
+      "exportFailed": "Error en la exportación",
+      "exportPartiallyComplete": "Exportación parcialmente completa",
+      "exportComplete": "Exportación completa",
+      "pdfDownloaded": "PDF descargado",
+      "templateAdded": "Plantilla agregada",
+      "documentDeleted": "Documento eliminado con éxito",
+      "documentUploaded": "Documento cargado con éxito",
+      "complianceReportDownloaded": "Informe de cumplimiento descargado con éxito",
+      "failedToSign": "Error al firmar el documento",
+      "failedToUpload": "Error al cargar el documento",
+      "failedToDelete": "Error al eliminar el documento",
+      "failedToDownload": "Error al descargar el informe de cumplimiento",
+      "failedToGeneratePdfs": "No se pudieron generar los PDF. Por favor inténtelo de nuevo.",
+      "selectJobType": "Por favor seleccione un tipo de trabajo para esta declaración de método",
+      "enterCustomJobType": "Por favor ingrese un nombre de tipo de trabajo personalizado",
+      "provideSignature": "Por favor proporcione su firma antes de enviar.",
+      "signatureRecorded": "Su firma ha sido registrada con éxito.",
+      "noDocsInRange": "No hay documentos en el rango de fechas seleccionado.",
+      "exportedDocs": "Se exportaron {{count}} documentos {{type}} con éxito.",
+      "exportedPartial": "Se exportaron {{success}} documentos. {{failed}} documento(s) no se pudieron generar."
+    }
+  },
+  "services": {
+    "windowCleaning": "Limpieza de ventanas",
+    "dryerVentCleaning": "Limpieza de conducto de secadora exterior",
+    "buildingWash": "Lavado de edificio - Lavado a presión",
+    "generalPressureWashing": "Lavado a presión general",
+    "gutterCleaning": "Limpieza de canaletas",
+    "parkade": "Limpieza de estacionamiento",
+    "groundWindows": "Ventanas a nivel del suelo",
+    "inSuite": "Conducto de secadora interior"
   },
   "auth": {
     "welcomeBack": "Welcome Back",

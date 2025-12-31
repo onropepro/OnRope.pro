@@ -970,7 +970,42 @@
     "underDevelopment": "Cette carte est en développement",
     "emp": "emp",
     "employees": "employés",
-    "unknownDate": "Date inconnue"
+    "unknownDate": "Date inconnue",
+    "toast": {
+      "documentSigned": "Document signé",
+      "signatureRequired": "Signature requise",
+      "noDocumentsFound": "Aucun document trouvé",
+      "exportFailed": "Échec de l'exportation",
+      "exportPartiallyComplete": "Exportation partiellement terminée",
+      "exportComplete": "Exportation terminée",
+      "pdfDownloaded": "PDF téléchargé",
+      "templateAdded": "Modèle ajouté",
+      "documentDeleted": "Document supprimé avec succès",
+      "documentUploaded": "Document téléversé avec succès",
+      "complianceReportDownloaded": "Rapport de conformité téléchargé avec succès",
+      "failedToSign": "Échec de la signature du document",
+      "failedToUpload": "Échec du téléversement du document",
+      "failedToDelete": "Échec de la suppression du document",
+      "failedToDownload": "Échec du téléchargement du rapport de conformité",
+      "failedToGeneratePdfs": "Impossible de générer les PDF. Veuillez réessayer.",
+      "selectJobType": "Veuillez sélectionner un type de travail pour cet énoncé de méthode",
+      "enterCustomJobType": "Veuillez entrer un nom de type de travail personnalisé",
+      "provideSignature": "Veuillez fournir votre signature avant de soumettre.",
+      "signatureRecorded": "Votre signature a été enregistrée avec succès.",
+      "noDocsInRange": "Il n'y a aucun document dans la plage de dates sélectionnée.",
+      "exportedDocs": "{{count}} documents {{type}} exportés avec succès.",
+      "exportedPartial": "{{success}} documents exportés. {{failed}} document(s) n'ont pas pu être générés."
+    }
+  },
+  "services": {
+    "windowCleaning": "Nettoyage de vitres",
+    "dryerVentCleaning": "Nettoyage de conduit de sécheuse extérieur",
+    "buildingWash": "Lavage de bâtiment - Lavage à pression",
+    "generalPressureWashing": "Lavage à pression général",
+    "gutterCleaning": "Nettoyage de gouttières",
+    "parkade": "Nettoyage de stationnement",
+    "groundWindows": "Fenêtres au sol",
+    "inSuite": "Conduit de sécheuse intérieur"
   },
   "auth": {
     "welcomeBack": "Bon retour",
