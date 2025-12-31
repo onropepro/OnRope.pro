@@ -2842,7 +2842,12 @@
       "other": "Otro"
     },
     "itemSuffix": "Especificación del artículo (Opcional)",
-    "itemSuffixHint": "Agregue un tamaño, color u otro detalle al nombre del artículo"
+    "itemSuffixHint": "Agregue un tamaño, color u otro detalle al nombre del artículo",
+    "fieldValue": "Valor en campo",
+    "fieldValueDescription": "{{count}} artículos con el equipo",
+    "fieldValueByEmployee": "Valor en campo por empleado",
+    "item": "artículo",
+    "items": "artículos"
   },
   "quotes": {
     "failedToLoad": "Error al cargar cotización",

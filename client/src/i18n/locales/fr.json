@@ -2777,7 +2777,12 @@
       "other": "Autre"
     },
     "itemSuffix": "Spécification de l'article (Optionnel)",
-    "itemSuffixHint": "Ajoutez une taille, couleur ou autre détail au nom de l'article"
+    "itemSuffixHint": "Ajoutez une taille, couleur ou autre détail au nom de l'article",
+    "fieldValue": "Valeur sur le terrain",
+    "fieldValueDescription": "{{count}} articles avec l'équipe",
+    "fieldValueByEmployee": "Valeur sur le terrain par employé",
+    "item": "article",
+    "items": "articles"
   },
   "quotes": {
     "failedToLoad": "Échec du chargement du devis",

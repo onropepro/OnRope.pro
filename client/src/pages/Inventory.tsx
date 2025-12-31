@@ -201,6 +201,7 @@ export default function Inventory() {
   
   // Gear item detail dialog state
   const [showItemDetailDialog, setShowItemDetailDialog] = useState(false);
+  const [showFieldValueBreakdown, setShowFieldValueBreakdown] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState<GearItem | null>(null);
   const [detailDialogSource, setDetailDialogSource] = useState<"myGear" | "manageGear">("manageGear");
 
@@ -276,6 +277,16 @@ export default function Inventory() {
   // Fetch all gear assignments
   const { data: assignmentsData } = useQuery<{ assignments: GearAssignment[] }>({
     queryKey: ["/api/gear-assignments"],
+  });
+
+  // Fetch field value (value of gear currently assigned to employees, excluding consumables)
+  const { data: fieldValueData } = useQuery<{ 
+    totalFieldValue: number; 
+    totalItemCount: number;
+    employeeBreakdown: { employeeId: string; name: string; value: number; itemCount: number }[] 
+  }>({
+    queryKey: ["/api/gear/field-value"],
+    enabled: canViewFinancials,
   });
 
   // Fetch active employees for dropdown
@@ -2066,35 +2077,78 @@ export default function Inventory() {
           <TabsContent value="manage" className="space-y-4">
             {/* Total Inventory Value Card - Only visible to users with financial permissions */}
             {canViewFinancials && (
-              <div className="grid grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <span className="material-icons text-lg">inventory_2</span>
-                      {t('inventory.totalItems', 'Total Items')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">{totalAllItems}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t('inventory.itemsInInventory', 'Items in inventory')}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <span className="material-icons text-lg">attach_money</span>
-                      {t('inventory.totalValue', 'Total Value')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">${totalAllValue.toFixed(2)}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t('inventory.allInventoryValue', 'All inventory value')}
-                    </p>
-                  </CardContent>
-                </Card>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <span className="material-icons text-lg">inventory_2</span>
+                        {t('inventory.totalItems', 'Total Items')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">{totalAllItems}</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('inventory.itemsInInventory', 'Items in inventory')}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <span className="material-icons text-lg">attach_money</span>
+                        {t('inventory.totalValue', 'Total Value')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">${totalAllValue.toFixed(2)}</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('inventory.allInventoryValue', 'All inventory value')}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card className="hover-elevate cursor-pointer" onClick={() => setShowFieldValueBreakdown(!showFieldValueBreakdown)} data-testid="card-field-value">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        {t('inventory.fieldValue', 'Value in Field')}
+                        {showFieldValueBreakdown ? <ChevronDown className="h-4 w-4 ml-auto" /> : <ChevronRight className="h-4 w-4 ml-auto" />}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">${(fieldValueData?.totalFieldValue ?? 0).toFixed(2)}</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('inventory.fieldValueDescription', '{{count}} items with crew', { count: fieldValueData?.totalItemCount ?? 0 })}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                {showFieldValueBreakdown && fieldValueData?.employeeBreakdown && fieldValueData.employeeBreakdown.length > 0 && (
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        {t('inventory.fieldValueByEmployee', 'Field Value by Employee')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-2">
+                        {fieldValueData.employeeBreakdown.map((emp) => (
+                          <div key={emp.employeeId} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                            <div>
+                              <span className="font-medium">{emp.name}</span>
+                              <span className="text-xs text-muted-foreground ml-2">
+                                ({emp.itemCount} {emp.itemCount === 1 ? t('inventory.item', 'item') : t('inventory.items', 'items')})
+                              </span>
+                            </div>
+                            <span className="font-semibold text-primary">${emp.value.toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
 

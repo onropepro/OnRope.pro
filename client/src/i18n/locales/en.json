@@ -2724,7 +2724,12 @@
       "other": "Other"
     },
     "itemSuffix": "Item Specification (Optional)",
-    "itemSuffixHint": "Add a size, color, or other detail to the item name"
+    "itemSuffixHint": "Add a size, color, or other detail to the item name",
+    "fieldValue": "Value in Field",
+    "fieldValueDescription": "{{count}} items with crew",
+    "fieldValueByEmployee": "Field Value by Employee",
+    "item": "item",
+    "items": "items"
   },
   "quotes": {
     "failedToLoad": "Failed to load quote",
