@@ -2649,7 +2649,27 @@
     "adding": "Ajout en cours...",
     "type": "Type",
     "notInUse": "Non utilisé",
-    "gearItem": "Article de matériel"
+    "gearItem": "Article de matériel",
+    "gearTypes": {
+      "harness": "Harnais",
+      "rope": "Corde",
+      "carabinerSteel": "Mousqueton - Acier",
+      "carabinerAluminum": "Mousqueton - Aluminium",
+      "descender": "Descendeur",
+      "ascender": "Bloqueur",
+      "helmet": "Casque",
+      "gloves": "Gants",
+      "workPositioningDevice": "Dispositif de positionnement",
+      "gasPoweredEquipment": "Équipement à essence",
+      "squeegeeRubbers": "Raclettes",
+      "applicators": "Applicateurs",
+      "soap": "Savon",
+      "suctionCup": "Ventouse",
+      "backupDevice": "Dispositif de secours",
+      "lanyard": "Longe",
+      "shockAbsorber": "Absorbeur de choc",
+      "other": "Autre"
+    }
   },
   "quotes": {
     "title": "Devis et CRM",
@@ -12651,5 +12671,130 @@
     "workSessions": "sessions de travail",
     "incidents": "incidents",
     "noEmployeePSR": "Aucune donnée PSR d'employé disponible"
+  },
+  "search": {
+    "placeholder": "Demandez n'importe quoi...",
+    "unavailable": "Recherche non disponible",
+    "tryAgain": "Veuillez réessayer dans un moment.",
+    "tryAsking": "Essayez de demander"
+  },
+  "pwa": {
+    "installApp": "Installer l'application",
+    "title": "Installer OnRopePro",
+    "description": "Installez cette application sur votre appareil pour un accès rapide",
+    "gotIt": "Compris",
+    "ios": {
+      "title": "Sur iPhone / iPad :",
+      "step1": "Appuyez sur le bouton Partager (carré avec flèche)",
+      "step2": "Faites défiler et appuyez sur « Sur l'écran d'accueil »",
+      "step3": "Appuyez sur « Ajouter » pour confirmer"
+    },
+    "android": {
+      "title": "Sur Android :",
+      "step1": "Appuyez sur le menu (trois points en haut à droite)",
+      "step2": "Appuyez sur « Ajouter à l'écran d'accueil » ou « Installer l'application »",
+      "step3": "Appuyez sur « Installer » ou « Ajouter » pour confirmer"
+    },
+    "desktop": {
+      "title": "Sur ordinateur (Chrome/Edge) :",
+      "step1": "Recherchez l'icône d'installation dans la barre d'adresse",
+      "step2": "Ou ouvrez le menu du navigateur et sélectionnez « Installer OnRopePro »",
+      "step3": "Cliquez sur « Installer » pour confirmer"
+    }
+  },
+  "weather": {
+    "safety": {
+      "safe": "Sûr",
+      "caution": "Prudence",
+      "highRisk": "Risque élevé",
+      "unsafe": "Dangereux"
+    },
+    "gusts": "Rafales",
+    "now": "Maintenant",
+    "title": "Météo",
+    "unavailable": "Météo non disponible"
+  },
+  "helpCenter": {
+    "title": "Comment pouvons-nous vous aider ?",
+    "subtitle": "Recherchez dans notre base de connaissances ou parcourez par sujet",
+    "roleSection": "Trouvez de l'aide pour votre rôle",
+    "modulesSection": "Parcourir par module",
+    "gettingStarted": "Guide de démarrage",
+    "search": {
+      "placeholder": "Posez une question ou recherchez de l'aide sur les projets, la sécurité, la planification...",
+      "label": "Rechercher",
+      "resultsFound": "{{count}} résultats trouvés",
+      "viewAll": "Voir tous les résultats"
+    },
+    "chat": {
+      "greeting": "Je suis là pour vous aider ! Laissez-moi trouver une réponse pour vous...",
+      "error": "Désolé, j'ai rencontré une erreur. Veuillez réessayer.",
+      "followUp": "Posez une question de suivi...",
+      "aiChat": "Chat IA",
+      "ask": "Demander",
+      "relatedArticles": "Articles connexes :",
+      "aiPowered": "Assistant propulsé par IA",
+      "close": "Fermer le chat",
+      "welcome": "Bonjour ! Je suis l'assistant OnRopePro. Je peux vous aider à découvrir notre plateforme, trouver des fonctionnalités spécifiques ou résoudre des problèmes.\n\nQue puis-je faire pour vous aujourd'hui ?",
+      "typeMessage": "Tapez votre message...",
+      "feedbackThanks": "Merci pour votre retour !",
+      "assistantName": "Assistant OnRopePro",
+      "askAnything": "Demandez-moi n'importe quoi",
+      "iAm": "Je suis :",
+      "userTypes": {
+        "owner": "Propriétaire d'entreprise",
+        "technician": "Technicien",
+        "buildingManager": "Gestionnaire d'immeuble",
+        "visitor": "Je découvre"
+      }
+    },
+    "stakeholders": {
+      "owner": {
+        "title": "Pour les propriétaires d'entreprise",
+        "description": "Gérez votre entreprise, votre équipe et développez-vous efficacement"
+      },
+      "technician": {
+        "title": "Pour les techniciens",
+        "description": "Suivez votre temps, vos certifications et votre carrière"
+      },
+      "buildingManager": {
+        "title": "Pour les gestionnaires d'immeubles",
+        "description": "Surveillez le travail, la conformité et communiquez avec les résidents"
+      },
+      "propertyManager": {
+        "title": "Pour les gestionnaires de propriétés",
+        "description": "Supervisez votre portefeuille et vos relations avec les fournisseurs"
+      },
+      "resident": {
+        "title": "Pour les résidents",
+        "description": "Soumettez des commentaires et suivez les problèmes dans votre immeuble"
+      }
+    },
+    "categories": {
+      "operations": "Opérations",
+      "safety": "Sécurité",
+      "team": "Équipe",
+      "financial": "Finances & Ventes",
+      "communication": "Communication"
+    }
+  },
+  "roles": {
+    "admin": "Administrateur",
+    "technician": "Technicien",
+    "groundCrew": "Équipe au sol",
+    "groundCrewSupervisor": "Superviseur équipe au sol",
+    "operationsManager": "Directeur des opérations",
+    "officeAdmin": "Administrateur de bureau",
+    "safetyOfficer": "Agent de sécurité",
+    "projectManager": "Chef de projet",
+    "estimator": "Estimateur",
+    "accountant": "Comptable",
+    "foreman": "Contremaître",
+    "supervisor": "Superviseur",
+    "superUser": "Super utilisateur",
+    "staff": "Personnel",
+    "resident": "Résident",
+    "propertyManager": "Gestionnaire de propriété",
+    "buildingManager": "Gestionnaire d'immeuble"
   }
 }

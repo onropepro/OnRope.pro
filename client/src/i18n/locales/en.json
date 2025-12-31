@@ -2596,7 +2596,27 @@
     "adding": "Adding...",
     "type": "Type",
     "notInUse": "Not in use",
-    "gearItem": "Gear Item"
+    "gearItem": "Gear Item",
+    "gearTypes": {
+      "harness": "Harness",
+      "rope": "Rope",
+      "carabinerSteel": "Carabiner - Steel",
+      "carabinerAluminum": "Carabiner - Aluminum",
+      "descender": "Descender",
+      "ascender": "Ascender",
+      "helmet": "Helmet",
+      "gloves": "Gloves",
+      "workPositioningDevice": "Work positioning device",
+      "gasPoweredEquipment": "Gas powered equipment",
+      "squeegeeRubbers": "Squeegee rubbers",
+      "applicators": "Applicators",
+      "soap": "Soap",
+      "suctionCup": "Suction cup",
+      "backupDevice": "Back up device",
+      "lanyard": "Lanyard",
+      "shockAbsorber": "Shock absorber",
+      "other": "Other"
+    }
   },
   "quotes": {
     "title": "Quote/Pipeline",
@@ -9024,5 +9044,130 @@
     "workSessions": "work sessions",
     "incidents": "incidents",
     "noEmployeePSR": "No employee PSR data available"
+  },
+  "search": {
+    "placeholder": "Ask anything...",
+    "unavailable": "Search unavailable",
+    "tryAgain": "Please try again in a moment.",
+    "tryAsking": "Try asking"
+  },
+  "pwa": {
+    "installApp": "Install App",
+    "title": "Install OnRopePro",
+    "description": "Install this app on your device for quick access",
+    "gotIt": "Got it",
+    "ios": {
+      "title": "On iPhone / iPad:",
+      "step1": "Tap the Share button (square with arrow)",
+      "step2": "Scroll down and tap \"Add to Home Screen\"",
+      "step3": "Tap \"Add\" to confirm"
+    },
+    "android": {
+      "title": "On Android:",
+      "step1": "Tap the menu (three dots in top right)",
+      "step2": "Tap \"Add to Home screen\" or \"Install app\"",
+      "step3": "Tap \"Install\" or \"Add\" to confirm"
+    },
+    "desktop": {
+      "title": "On Desktop (Chrome/Edge):",
+      "step1": "Look for the install icon in the address bar",
+      "step2": "Or open browser menu and select \"Install OnRopePro\"",
+      "step3": "Click \"Install\" to confirm"
+    }
+  },
+  "weather": {
+    "safety": {
+      "safe": "Safe",
+      "caution": "Caution",
+      "highRisk": "High Risk",
+      "unsafe": "Unsafe"
+    },
+    "gusts": "Gusts",
+    "now": "Now",
+    "title": "Weather",
+    "unavailable": "Weather unavailable"
+  },
+  "helpCenter": {
+    "title": "How can we help you?",
+    "subtitle": "Search our knowledge base or browse by topic",
+    "roleSection": "Find help for your role",
+    "modulesSection": "Browse by module",
+    "gettingStarted": "Getting Started Guide",
+    "search": {
+      "placeholder": "Ask a question or search for help with projects, safety, scheduling...",
+      "label": "Search",
+      "resultsFound": "{{count}} results found",
+      "viewAll": "View all results"
+    },
+    "chat": {
+      "greeting": "I'm here to help! Let me find an answer for you...",
+      "error": "Sorry, I encountered an error. Please try again.",
+      "followUp": "Ask a follow-up question...",
+      "aiChat": "AI Chat",
+      "ask": "Ask",
+      "relatedArticles": "Related articles:",
+      "aiPowered": "AI-powered assistant",
+      "close": "Close chat",
+      "welcome": "Hi! I'm the OnRopePro assistant. I can help you learn about our platform, find specific features, or troubleshoot issues.\n\nWhat can I help you with today?",
+      "typeMessage": "Type your message...",
+      "feedbackThanks": "Thanks for your feedback!",
+      "assistantName": "OnRopePro Assistant",
+      "askAnything": "Ask me anything",
+      "iAm": "I am a:",
+      "userTypes": {
+        "owner": "Company Owner",
+        "technician": "Technician",
+        "buildingManager": "Building Manager",
+        "visitor": "Just Exploring"
+      }
+    },
+    "stakeholders": {
+      "owner": {
+        "title": "For Company Owners",
+        "description": "Manage your business, team, and grow efficiently"
+      },
+      "technician": {
+        "title": "For Technicians",
+        "description": "Track your time, certifications, and career"
+      },
+      "buildingManager": {
+        "title": "For Building Managers",
+        "description": "Monitor work, compliance, and communicate with residents"
+      },
+      "propertyManager": {
+        "title": "For Property Managers",
+        "description": "Oversee your portfolio and vendor relationships"
+      },
+      "resident": {
+        "title": "For Residents",
+        "description": "Submit feedback and track issues at your building"
+      }
+    },
+    "categories": {
+      "operations": "Operations",
+      "safety": "Safety",
+      "team": "Team",
+      "financial": "Financial & Sales",
+      "communication": "Communication"
+    }
+  },
+  "roles": {
+    "admin": "Admin",
+    "technician": "Technician",
+    "groundCrew": "Ground Crew",
+    "groundCrewSupervisor": "Ground Crew Supervisor",
+    "operationsManager": "Operations Manager",
+    "officeAdmin": "Office Admin",
+    "safetyOfficer": "Safety Officer",
+    "projectManager": "Project Manager",
+    "estimator": "Estimator",
+    "accountant": "Accountant",
+    "foreman": "Foreman",
+    "supervisor": "Supervisor",
+    "superUser": "Super User",
+    "staff": "Staff",
+    "resident": "Resident",
+    "propertyManager": "Property Manager",
+    "buildingManager": "Building Manager"
   }
 }

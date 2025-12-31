@@ -48,28 +48,58 @@ export function getSafeVariant(variant: string | undefined): HeaderVariant {
   return isValidVariant(variant) ? variant : 'employer';
 }
 
-function getRoleDisplayName(role: string | undefined): string {
-  if (!role) return '';
-  const roleMap: Record<string, string> = {
-    company: 'Admin',
-    rope_access_tech: 'Technician',
-    ground_crew: 'Ground Crew',
-    ground_crew_supervisor: 'Ground Crew Supervisor',
-    operations_manager: 'Operations Manager',
-    office_admin: 'Office Admin',
-    safety_officer: 'Safety Officer',
-    project_manager: 'Project Manager',
-    estimator: 'Estimator',
-    accountant: 'Accountant',
-    foreman: 'Foreman',
-    supervisor: 'Supervisor',
-    superuser: 'Super User',
-    staff: 'Staff',
-    resident: 'Resident',
-    property_manager: 'Property Manager',
-    building_manager: 'Building Manager',
+// Role key mapping for translations - used by getRoleDisplayName
+const roleKeys: Record<string, string> = {
+  company: 'admin',
+  rope_access_tech: 'technician',
+  ground_crew: 'groundCrew',
+  ground_crew_supervisor: 'groundCrewSupervisor',
+  operations_manager: 'operationsManager',
+  office_admin: 'officeAdmin',
+  safety_officer: 'safetyOfficer',
+  project_manager: 'projectManager',
+  estimator: 'estimator',
+  accountant: 'accountant',
+  foreman: 'foreman',
+  supervisor: 'supervisor',
+  superuser: 'superUser',
+  staff: 'staff',
+  resident: 'resident',
+  property_manager: 'propertyManager',
+  building_manager: 'buildingManager',
+};
+
+const roleDefaults: Record<string, string> = {
+  company: 'Admin',
+  rope_access_tech: 'Technician',
+  ground_crew: 'Ground Crew',
+  ground_crew_supervisor: 'Ground Crew Supervisor',
+  operations_manager: 'Operations Manager',
+  office_admin: 'Office Admin',
+  safety_officer: 'Safety Officer',
+  project_manager: 'Project Manager',
+  estimator: 'Estimator',
+  accountant: 'Accountant',
+  foreman: 'Foreman',
+  supervisor: 'Supervisor',
+  superuser: 'Super User',
+  staff: 'Staff',
+  resident: 'Resident',
+  property_manager: 'Property Manager',
+  building_manager: 'Building Manager',
+};
+
+// Hook-friendly version of getRoleDisplayName
+function useRoleDisplayName() {
+  const { t } = useTranslation();
+  return (role: string | undefined): string => {
+    if (!role) return '';
+    const key = roleKeys[role];
+    if (key) {
+      return t(`roles.${key}`, roleDefaults[role] || role);
+    }
+    return role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
-  return roleMap[role] || role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
 function LicenseExpiryWarningBanner({ employees, onReviewClick }: { employees: any[]; onReviewClick: () => void }) {
@@ -259,6 +289,7 @@ export function UnifiedDashboardHeader({
   brandingCompanyName,
 }: UnifiedDashboardHeaderProps) {
   const { t } = useTranslation();
+  const getRoleDisplayName = useRoleDisplayName();
   const [, setLocation] = useLocation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 

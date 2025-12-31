@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useLanguage } from "@/hooks/use-language";
 
 interface InstallPWAButtonProps {
   stakeholderColor?: string | null;
@@ -17,6 +18,7 @@ interface InstallPWAButtonProps {
 }
 
 export function InstallPWAButton({ stakeholderColor, useDarkText = false, className, showAsMenuItem = false }: InstallPWAButtonProps) {
+  const { t } = useLanguage();
   const [showDialog, setShowDialog] = useState(false);
 
   // Determine text/border styling based on background color contrast
@@ -34,7 +36,7 @@ export function InstallPWAButton({ stakeholderColor, useDarkText = false, classN
           data-testid="button-install-app-mobile"
         >
           <Download className="h-4 w-4" />
-          Install App
+          {t('pwa.installApp', 'Install App')}
         </button>
         
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
@@ -42,44 +44,44 @@ export function InstallPWAButton({ stakeholderColor, useDarkText = false, classN
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Download className="h-5 w-5" />
-                Install OnRopePro
+                {t('pwa.title', 'Install OnRopePro')}
               </DialogTitle>
               <DialogDescription>
-                Install this app on your device for quick access
+                {t('pwa.description', 'Install this app on your device for quick access')}
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-6 py-4">
               <div className="space-y-3">
-                <h4 className="font-semibold text-sm">On iPhone / iPad:</h4>
+                <h4 className="font-semibold text-sm">{t('pwa.ios.title', 'On iPhone / iPad:')}</h4>
                 <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                  <li>Tap the <strong>Share</strong> button (square with arrow)</li>
-                  <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
-                  <li>Tap <strong>"Add"</strong> to confirm</li>
+                  <li>{t('pwa.ios.step1', 'Tap the Share button (square with arrow)')}</li>
+                  <li>{t('pwa.ios.step2', 'Scroll down and tap "Add to Home Screen"')}</li>
+                  <li>{t('pwa.ios.step3', 'Tap "Add" to confirm')}</li>
                 </ol>
               </div>
 
               <div className="space-y-3">
-                <h4 className="font-semibold text-sm">On Android:</h4>
+                <h4 className="font-semibold text-sm">{t('pwa.android.title', 'On Android:')}</h4>
                 <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                  <li>Tap the <strong>menu</strong> (three dots in top right)</li>
-                  <li>Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></li>
-                  <li>Tap <strong>"Install"</strong> or <strong>"Add"</strong> to confirm</li>
+                  <li>{t('pwa.android.step1', 'Tap the menu (three dots in top right)')}</li>
+                  <li>{t('pwa.android.step2', 'Tap "Add to Home screen" or "Install app"')}</li>
+                  <li>{t('pwa.android.step3', 'Tap "Install" or "Add" to confirm')}</li>
                 </ol>
               </div>
 
               <div className="space-y-3">
-                <h4 className="font-semibold text-sm">On Desktop (Chrome/Edge):</h4>
+                <h4 className="font-semibold text-sm">{t('pwa.desktop.title', 'On Desktop (Chrome/Edge):')}</h4>
                 <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                  <li>Look for the <strong>install icon</strong> in the address bar</li>
-                  <li>Or open browser menu and select <strong>"Install OnRopePro"</strong></li>
-                  <li>Click <strong>"Install"</strong> to confirm</li>
+                  <li>{t('pwa.desktop.step1', 'Look for the install icon in the address bar')}</li>
+                  <li>{t('pwa.desktop.step2', 'Or open browser menu and select "Install OnRopePro"')}</li>
+                  <li>{t('pwa.desktop.step3', 'Click "Install" to confirm')}</li>
                 </ol>
               </div>
             </div>
 
             <Button onClick={() => setShowDialog(false)} className="w-full">
-              Got it
+              {t('pwa.gotIt', 'Got it')}
             </Button>
           </DialogContent>
         </Dialog>
@@ -104,44 +106,44 @@ export function InstallPWAButton({ stakeholderColor, useDarkText = false, classN
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Download className="h-5 w-5" />
-              Install OnRopePro
+              {t('pwa.title', 'Install OnRopePro')}
             </DialogTitle>
             <DialogDescription>
-              Install this app on your device for quick access
+              {t('pwa.description', 'Install this app on your device for quick access')}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6 py-4">
             <div className="space-y-3">
-              <h4 className="font-semibold text-sm">On iPhone / iPad:</h4>
+              <h4 className="font-semibold text-sm">{t('pwa.ios.title', 'On iPhone / iPad:')}</h4>
               <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                <li>Tap the <strong>Share</strong> button (square with arrow)</li>
-                <li>Scroll down and tap <strong>"Add to Home Screen"</strong></li>
-                <li>Tap <strong>"Add"</strong> to confirm</li>
+                <li>{t('pwa.ios.step1', 'Tap the Share button (square with arrow)')}</li>
+                <li>{t('pwa.ios.step2', 'Scroll down and tap "Add to Home Screen"')}</li>
+                <li>{t('pwa.ios.step3', 'Tap "Add" to confirm')}</li>
               </ol>
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-semibold text-sm">On Android:</h4>
+              <h4 className="font-semibold text-sm">{t('pwa.android.title', 'On Android:')}</h4>
               <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                <li>Tap the <strong>menu</strong> (three dots in top right)</li>
-                <li>Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></li>
-                <li>Tap <strong>"Install"</strong> or <strong>"Add"</strong> to confirm</li>
+                <li>{t('pwa.android.step1', 'Tap the menu (three dots in top right)')}</li>
+                <li>{t('pwa.android.step2', 'Tap "Add to Home screen" or "Install app"')}</li>
+                <li>{t('pwa.android.step3', 'Tap "Install" or "Add" to confirm')}</li>
               </ol>
             </div>
 
             <div className="space-y-3">
-              <h4 className="font-semibold text-sm">On Desktop (Chrome/Edge):</h4>
+              <h4 className="font-semibold text-sm">{t('pwa.desktop.title', 'On Desktop (Chrome/Edge):')}</h4>
               <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                <li>Look for the <strong>install icon</strong> in the address bar</li>
-                <li>Or open browser menu and select <strong>"Install OnRopePro"</strong></li>
-                <li>Click <strong>"Install"</strong> to confirm</li>
+                <li>{t('pwa.desktop.step1', 'Look for the install icon in the address bar')}</li>
+                <li>{t('pwa.desktop.step2', 'Or open browser menu and select "Install OnRopePro"')}</li>
+                <li>{t('pwa.desktop.step3', 'Click "Install" to confirm')}</li>
               </ol>
             </div>
           </div>
 
           <Button onClick={() => setShowDialog(false)} className="w-full">
-            Got it
+            {t('pwa.gotIt', 'Got it')}
           </Button>
         </DialogContent>
       </Dialog>

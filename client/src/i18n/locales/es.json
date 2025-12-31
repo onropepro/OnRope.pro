@@ -2714,7 +2714,27 @@
     "adding": "Adding...",
     "type": "Type",
     "notInUse": "Not in use",
-    "gearItem": "Gear Item"
+    "gearItem": "Gear Item",
+    "gearTypes": {
+      "harness": "Arnés",
+      "rope": "Cuerda",
+      "carabinerSteel": "Mosquetón - Acero",
+      "carabinerAluminum": "Mosquetón - Aluminio",
+      "descender": "Descensor",
+      "ascender": "Ascensor",
+      "helmet": "Casco",
+      "gloves": "Guantes",
+      "workPositioningDevice": "Dispositivo de posicionamiento",
+      "gasPoweredEquipment": "Equipo a gasolina",
+      "squeegeeRubbers": "Gomas de rasqueta",
+      "applicators": "Aplicadores",
+      "soap": "Jabón",
+      "suctionCup": "Ventosa",
+      "backupDevice": "Dispositivo de respaldo",
+      "lanyard": "Eslinga",
+      "shockAbsorber": "Absorbedor de impacto",
+      "other": "Otro"
+    }
   },
   "quotes": {
     "title": "Quote/Pipeline",
@@ -12499,5 +12519,130 @@
     "workSessions": "sesiones de trabajo",
     "incidents": "incidentes",
     "noEmployeePSR": "No hay datos PSR de empleados disponibles"
+  },
+  "search": {
+    "placeholder": "Pregunta lo que quieras...",
+    "unavailable": "Búsqueda no disponible",
+    "tryAgain": "Por favor, inténtelo de nuevo en un momento.",
+    "tryAsking": "Intenta preguntar"
+  },
+  "pwa": {
+    "installApp": "Instalar aplicación",
+    "title": "Instalar OnRopePro",
+    "description": "Instala esta aplicación en tu dispositivo para acceso rápido",
+    "gotIt": "Entendido",
+    "ios": {
+      "title": "En iPhone / iPad:",
+      "step1": "Toca el botón Compartir (cuadrado con flecha)",
+      "step2": "Desplázate hacia abajo y toca \"Añadir a pantalla de inicio\"",
+      "step3": "Toca \"Añadir\" para confirmar"
+    },
+    "android": {
+      "title": "En Android:",
+      "step1": "Toca el menú (tres puntos en la esquina superior derecha)",
+      "step2": "Toca \"Añadir a pantalla de inicio\" o \"Instalar aplicación\"",
+      "step3": "Toca \"Instalar\" o \"Añadir\" para confirmar"
+    },
+    "desktop": {
+      "title": "En escritorio (Chrome/Edge):",
+      "step1": "Busca el icono de instalación en la barra de direcciones",
+      "step2": "O abre el menú del navegador y selecciona \"Instalar OnRopePro\"",
+      "step3": "Haz clic en \"Instalar\" para confirmar"
+    }
+  },
+  "weather": {
+    "safety": {
+      "safe": "Seguro",
+      "caution": "Precaución",
+      "highRisk": "Alto riesgo",
+      "unsafe": "Peligroso"
+    },
+    "gusts": "Ráfagas",
+    "now": "Ahora",
+    "title": "Clima",
+    "unavailable": "Clima no disponible"
+  },
+  "helpCenter": {
+    "title": "¿Cómo podemos ayudarte?",
+    "subtitle": "Busca en nuestra base de conocimientos o navega por tema",
+    "roleSection": "Encuentra ayuda para tu rol",
+    "modulesSection": "Navegar por módulo",
+    "gettingStarted": "Guía de inicio",
+    "search": {
+      "placeholder": "Haz una pregunta o busca ayuda sobre proyectos, seguridad, programación...",
+      "label": "Buscar",
+      "resultsFound": "{{count}} resultados encontrados",
+      "viewAll": "Ver todos los resultados"
+    },
+    "chat": {
+      "greeting": "¡Estoy aquí para ayudarte! Déjame encontrar una respuesta para ti...",
+      "error": "Lo siento, ocurrió un error. Por favor, inténtalo de nuevo.",
+      "followUp": "Haz una pregunta de seguimiento...",
+      "aiChat": "Chat IA",
+      "ask": "Preguntar",
+      "relatedArticles": "Artículos relacionados:",
+      "aiPowered": "Asistente con IA",
+      "close": "Cerrar chat",
+      "welcome": "¡Hola! Soy el asistente de OnRopePro. Puedo ayudarte a conocer nuestra plataforma, encontrar funciones específicas o resolver problemas.\n\n¿En qué puedo ayudarte hoy?",
+      "typeMessage": "Escribe tu mensaje...",
+      "feedbackThanks": "¡Gracias por tu opinión!",
+      "assistantName": "Asistente OnRopePro",
+      "askAnything": "Pregúntame lo que quieras",
+      "iAm": "Yo soy:",
+      "userTypes": {
+        "owner": "Propietario de empresa",
+        "technician": "Técnico",
+        "buildingManager": "Administrador de edificio",
+        "visitor": "Solo explorando"
+      }
+    },
+    "stakeholders": {
+      "owner": {
+        "title": "Para propietarios de empresas",
+        "description": "Gestiona tu negocio, equipo y crece eficientemente"
+      },
+      "technician": {
+        "title": "Para técnicos",
+        "description": "Registra tu tiempo, certificaciones y carrera"
+      },
+      "buildingManager": {
+        "title": "Para administradores de edificios",
+        "description": "Supervisa el trabajo, el cumplimiento y comunícate con los residentes"
+      },
+      "propertyManager": {
+        "title": "Para administradores de propiedades",
+        "description": "Supervisa tu cartera y relaciones con proveedores"
+      },
+      "resident": {
+        "title": "Para residentes",
+        "description": "Envía comentarios y sigue los problemas en tu edificio"
+      }
+    },
+    "categories": {
+      "operations": "Operaciones",
+      "safety": "Seguridad",
+      "team": "Equipo",
+      "financial": "Finanzas y Ventas",
+      "communication": "Comunicación"
+    }
+  },
+  "roles": {
+    "admin": "Administrador",
+    "technician": "Técnico",
+    "groundCrew": "Equipo de tierra",
+    "groundCrewSupervisor": "Supervisor de equipo de tierra",
+    "operationsManager": "Gerente de operaciones",
+    "officeAdmin": "Administrador de oficina",
+    "safetyOfficer": "Oficial de seguridad",
+    "projectManager": "Gerente de proyecto",
+    "estimator": "Estimador",
+    "accountant": "Contador",
+    "foreman": "Capataz",
+    "supervisor": "Supervisor",
+    "superUser": "Super usuario",
+    "staff": "Personal",
+    "resident": "Residente",
+    "propertyManager": "Administrador de propiedades",
+    "buildingManager": "Administrador de edificio"
   }
 }
