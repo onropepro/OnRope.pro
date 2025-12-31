@@ -1,8 +1,10 @@
-# Translation Audit Plan
+# Comprehensive Translation Audit Plan
 
 ## Executive Summary
 
-This document provides a comprehensive audit of translation coverage across the OnRopePro application. The platform supports three languages: English (EN), French (FR), and Spanish (ES).
+This document provides a **deep audit** of translation coverage across the entire OnRopePro application. The platform supports three languages: English (EN), French (FR), and Spanish (ES).
+
+**Total Files Audited:** 276 files (134 pages + 142 components)
 
 ---
 
@@ -16,278 +18,412 @@ This document provides a comprehensive audit of translation coverage across the 
 | French (FR) | 8,486 | 228 keys missing from EN |
 | Spanish (ES) | 8,312 | 347 keys missing from EN |
 
-**Note:** FR and ES have more total keys than EN, indicating orphaned/duplicate keys that should be cleaned up.
+### Missing Keys by Section
+
+**French (228 keys missing):**
+| Section | Missing Keys |
+|---------|-------------|
+| `modules.*` | 225 keys (scheduling stakeholders, inventory, projects) |
+| `home.*` | 2 keys |
+| `propertyManager.*` | 1 key |
+
+**Spanish (347 keys missing):**
+| Section | Missing Keys |
+|---------|-------------|
+| `modules.*` | 345 keys (scheduling stakeholders, inventory, safety) |
+| `home.*` | 2 keys |
 
 ---
 
-## Issues Identified
+## COMPLETE FILE AUDIT
 
-### 1. Missing Translation Keys
+### Category 1: Pages Without ANY Translation System (21 pages)
 
-#### French (228 keys missing)
+These pages have **zero translation infrastructure** - all text is hardcoded English:
 
-| Section | Missing Keys | Priority |
-|---------|-------------|----------|
-| `modules.*` | 225 keys | HIGH |
-| `home.*` | 2 keys | MEDIUM |
-| `propertyManager.*` | 1 key | LOW |
+#### Main Application Pages (10)
+| Page | Account Type | User Impact | Priority |
+|------|--------------|-------------|----------|
+| `Pricing.tsx` | Public | HIGH - Sales conversion | CRITICAL |
+| `ResetPassword.tsx` | All Users | HIGH - Account recovery | CRITICAL |
+| `Employer.tsx` | Employer | HIGH - Core functionality | CRITICAL |
+| `CRMLanding.tsx` | Public | MEDIUM - Marketing | HIGH |
+| `TechnicianJobBoardLanding.tsx` | Public | MEDIUM - Marketing | HIGH |
+| `PropertyManagerQuoteDetail.tsx` | Property Manager | MEDIUM - Core feature | HIGH |
+| `SuperUserStaffAccounts.tsx` | SuperUser | LOW - Internal only | MEDIUM |
+| `ConnectionsGuide.tsx` | Help | LOW - Documentation | LOW |
+| `DashboardCustomizationGuide.tsx` | Help | LOW - Documentation | LOW |
+| `PSRGuide.tsx` | Help | LOW - Documentation | LOW |
 
-**Specific Missing Areas in French:**
-- `modules.scheduling.stakeholders.*` - Full stakeholder section
-- `modules.inventory.*` - Inventory module
-- `modules.projects.*` - Project management module
-- `propertyManager.projectDetails.loading`
-
-#### Spanish (347 keys missing)
-
-| Section | Missing Keys | Priority |
-|---------|-------------|----------|
-| `modules.*` | 345 keys | HIGH |
-| `home.*` | 2 keys | MEDIUM |
-
-**Specific Missing Areas in Spanish:**
-- `modules.scheduling.stakeholders.*` - Full stakeholder section
-- `modules.inventory.*` - Inventory module
-- `modules.projects.*` - Project management module
-- `modules.safety.*` - Safety compliance module
-
----
-
-### 2. Pages Without Translation System (Hardcoded Strings)
-
-The following **10 pages** do not use the translation system at all:
-
-| Page | Account Type | Priority |
-|------|--------------|----------|
-| `ConnectionsGuide.tsx` | Employer | LOW (Help docs) |
-| `CRMLanding.tsx` | Public | MEDIUM |
-| `DashboardCustomizationGuide.tsx` | Employer | LOW (Help docs) |
-| `Employer.tsx` | Employer | HIGH |
-| `Pricing.tsx` | Public | HIGH |
-| `PropertyManagerQuoteDetail.tsx` | Property Manager | MEDIUM |
-| `PSRGuide.tsx` | Employer | LOW (Help docs) |
-| `ResetPassword.tsx` | All | HIGH |
-| `SuperUserStaffAccounts.tsx` | SuperUser | MEDIUM |
-| `TechnicianJobBoardLanding.tsx` | Public | MEDIUM |
+#### Help Center Pages (11)
+| Page | User Impact | Priority |
+|------|-------------|----------|
+| `help/HelpCenter.tsx` | HIGH - Main help hub | HIGH |
+| `help/HelpArticle.tsx` | HIGH - Article display | HIGH |
+| `help/HelpSearch.tsx` | MEDIUM - Search | MEDIUM |
+| `help/FeatureFinder.tsx` | MEDIUM - Discovery | MEDIUM |
+| `help/GettingStarted.tsx` | HIGH - Onboarding | HIGH |
+| `help/tools/ROICalculator.tsx` | MEDIUM - Sales tool | MEDIUM |
+| `help/stakeholders/ForTechnicians.tsx` | HIGH - User-facing | HIGH |
+| `help/stakeholders/ForResidents.tsx` | HIGH - User-facing | HIGH |
+| `help/stakeholders/ForPropertyManagers.tsx` | HIGH - User-facing | HIGH |
+| `help/stakeholders/ForBuildingManagers.tsx` | HIGH - User-facing | HIGH |
+| `help/stakeholders/ForCompanyOwners.tsx` | HIGH - User-facing | HIGH |
 
 ---
 
-### 3. Components Without Translation System
+### Category 2: Components Without Translation System (75 components)
 
-**27 components** do not use translations:
+#### Dashboard Cards (21 cards) - ALL NEED TRANSLATIONS
+| Component | Content Type | Priority |
+|-----------|-------------|----------|
+| `ActiveWorkersCard.tsx` | Dynamic data labels | HIGH |
+| `CertificationAlertsCard.tsx` | Alert messages | HIGH |
+| `ExpiringCertsCard.tsx` | Warning text | HIGH |
+| `HarnessStatusCard.tsx` | Status labels | HIGH |
+| `MyPerformanceCard.tsx` | Performance metrics | HIGH |
+| `MyScheduleCard.tsx` | Schedule labels | HIGH |
+| `NewFeedbackCard.tsx` | Notification text | MEDIUM |
+| `NotClockedInCard.tsx` | Status message | HIGH |
+| `OutstandingQuotesCard.tsx` | Business metrics | MEDIUM |
+| `OverdueProjectsCard.tsx` | Alert messages | HIGH |
+| `OvertimeAlertCard.tsx` | Warning text | HIGH |
+| `PayPeriodCard.tsx` | Payroll labels | HIGH |
+| `PendingApprovalsCard.tsx` | Action items | MEDIUM |
+| `PlaceholderCard.tsx` | Placeholder text | LOW |
+| `TodayScheduleCard.tsx` | Schedule text | HIGH |
+| `ToolboxCoverageCard.tsx` | Safety metrics | HIGH |
+| `SafetyRatingCard.tsx` | Safety labels | HIGH |
+| `TodaysHoursCard.tsx` | Time tracking | HIGH |
+| `WeekAtGlanceCard.tsx` | Weekly summary | MEDIUM |
+| `MyTimeCard.tsx` | Time display | HIGH |
+| `ActiveProjectsCard.tsx` | Project info | HIGH |
 
-| Component | Usage Context | Priority |
-|-----------|---------------|----------|
-| `ActiveSessionBadge.tsx` | Employer Dashboard | MEDIUM |
-| `AddressAutocomplete.tsx` | Forms | LOW (minimal text) |
-| `ChangelogGuideLayout.tsx` | Changelog | LOW |
-| `ChangelogLayout.tsx` | Changelog | LOW |
-| `ClientExcelImport.tsx` | Employer | MEDIUM |
-| `CSRBadge.tsx` | Dashboard | LOW |
-| `DashboardLayout.tsx` | Layout | LOW |
-| `DocumentUploader.tsx` | All users | HIGH |
-| `EmbeddedCheckout.tsx` | Payments | MEDIUM |
-| `EmployerDocumentRequests.tsx` | Employer | MEDIUM |
-| `ErrorBoundary.tsx` | All | LOW |
-| `HighRiseBuilding.tsx` | Visualization | LOW (no text) |
-| `InstallPWAButton.tsx` | All | MEDIUM |
-| `ParkadeView.tsx` | Visualization | LOW (no text) |
-| `ProtectedRoute.tsx` | Auth | LOW (no visible text) |
-| `PurchaseSeatsDialog.tsx` | Employer | HIGH |
-| `RegistrationEmbeddedCheckout.tsx` | Registration | MEDIUM |
-| `RemoveSeatsDialog.tsx` | Employer | HIGH |
-| `ResidentSlidingSignup.tsx` | Resident | HIGH |
-| `SessionDetailsDialog.tsx` | Employer | MEDIUM |
-| `SignInModal.tsx` | All | HIGH |
-| `SiteFooter.tsx` | All | MEDIUM |
-| `StatsCard.tsx` | Dashboard | LOW |
-| `SubscriptionManagement.tsx` | Employer | HIGH |
-| `SubscriptionRenewalBadge.tsx` | Employer | MEDIUM |
-| `SuperUserLayout.tsx` | SuperUser | LOW |
-| `VerticalBuildingProgress.tsx` | Visualization | LOW (no text) |
+#### Dashboard Infrastructure (5 components)
+| Component | Priority |
+|-----------|----------|
+| `CardSkeleton.tsx` | LOW (no visible text) |
+| `DashboardSearch.tsx` | HIGH (search placeholder) |
+| `cardRegistry.tsx` | MEDIUM (card names) |
+| `DashboardCard.tsx` | MEDIUM (wrapper labels) |
+| `DashboardGrid.tsx` | LOW |
 
----
+#### Profile Components (7 components) - ALL NEED TRANSLATIONS
+| Component | Content Type | Priority |
+|-----------|-------------|----------|
+| `EditableAddressField.tsx` | Form labels | HIGH |
+| `EditableDateField.tsx` | Date labels | HIGH |
+| `EditableField.tsx` | Field labels | HIGH |
+| `EditableSelect.tsx` | Select options | HIGH |
+| `EditableSwitch.tsx` | Toggle labels | HIGH |
+| `EditableTextarea.tsx` | Text labels | HIGH |
+| `ProfilePhotoUploader.tsx` | Upload text | HIGH |
 
-### 4. Inline Translation Objects (Not Using Locale Files)
+#### Help Components (5 components)
+| Component | Priority |
+|-----------|----------|
+| `HelpBreadcrumb.tsx` | HIGH |
+| `HelpNav.tsx` | HIGH |
+| `HelpSearchBar.tsx` | HIGH |
+| `HelpArticleCard.tsx` | HIGH |
+| `HelpChatWidget.tsx` | HIGH |
 
-Several pages define translations inline rather than using the centralized locale files. These work for multi-language but are harder to maintain:
-
-| Page | Current Pattern | Recommendation |
-|------|-----------------|----------------|
-| `TechnicianPortal.tsx` | Inline `translations` object | Move to locale files |
-| `GroundCrewPortal.tsx` | Inline `translations` object | Move to locale files |
-| `TechnicianJobBoard.tsx` | Inline `translations` object | Move to locale files |
-| `TechnicianApplications.tsx` | Inline `translations` object | Move to locale files |
-| `TechnicianLoggedHours.tsx` | Inline `translations` object | Move to locale files |
-| `TechnicianResume.tsx` | Inline `translations` object | Move to locale files |
-| `VisibleTechniciansBrowser.tsx` | Inline `translations` object | Move to locale files |
-
----
-
-### 5. Hardcoded Strings in Translated Pages
-
-Even pages that use translations have some hardcoded English strings:
-
-**Common Issues:**
-- Guide/documentation pages with hardcoded navigation labels ("Dashboard", "Projects", "Employees", etc.)
-- Form validation messages
-- Error messages
-- Button labels in some dialogs
-- Quotes.tsx has `"Edit"` and `"Configure"` hardcoded
-- SuperUserJobBoard.tsx has `"Deleting..."` and `"Delete"` hardcoded
-
----
-
-## Remediation Plan by Priority
-
-### Phase 1: Critical (User-Facing Public Pages)
-
-**Priority: HIGH | Effort: 2-3 days**
-
-1. **Add translations to high-priority pages:**
-   - `Pricing.tsx`
-   - `ResetPassword.tsx`
-   - `Employer.tsx`
-
-2. **Add translations to critical components:**
-   - `SignInModal.tsx`
-   - `DocumentUploader.tsx`
-   - `PurchaseSeatsDialog.tsx`
-   - `RemoveSeatsDialog.tsx`
-   - `SubscriptionManagement.tsx`
-   - `ResidentSlidingSignup.tsx`
-
-3. **Fill missing locale keys:**
-   - Add 228 missing French keys
-   - Add 347 missing Spanish keys
+#### Core UI Components (27 components)
+| Component | Priority | Notes |
+|-----------|----------|-------|
+| `DocumentUploader.tsx` | CRITICAL | Used across all account types |
+| `SignInModal.tsx` | CRITICAL | Authentication flow |
+| `SubscriptionManagement.tsx` | CRITICAL | Payment flow |
+| `PurchaseSeatsDialog.tsx` | CRITICAL | Payment flow |
+| `RemoveSeatsDialog.tsx` | CRITICAL | Payment flow |
+| `ResidentSlidingSignup.tsx` | CRITICAL | Registration flow |
+| `SiteFooter.tsx` | HIGH | Present on all pages |
+| `InstallPWAButton.tsx` | HIGH | Mobile experience |
+| `ActiveSessionBadge.tsx` | HIGH | Status indicator |
+| `ClientExcelImport.tsx` | MEDIUM | Import feature |
+| `EmbeddedCheckout.tsx` | MEDIUM | Checkout flow |
+| `EmployerDocumentRequests.tsx` | MEDIUM | Document requests |
+| `SessionDetailsDialog.tsx` | MEDIUM | Session info |
+| `SubscriptionRenewalBadge.tsx` | MEDIUM | Renewal notice |
+| `RegistrationEmbeddedCheckout.tsx` | MEDIUM | Registration |
+| `ErrorBoundary.tsx` | LOW | Error fallback |
+| `ProtectedRoute.tsx` | LOW | No visible text |
+| `DashboardLayout.tsx` | LOW | Layout wrapper |
+| `SuperUserLayout.tsx` | LOW | Layout wrapper |
+| `ChangelogLayout.tsx` | LOW | Layout |
+| `ChangelogGuideLayout.tsx` | LOW | Layout |
+| `CSRBadge.tsx` | LOW | Badge display |
+| `StatsCard.tsx` | LOW | Generic stats |
+| `AddressAutocomplete.tsx` | LOW | Minimal text |
+| `HighRiseBuilding.tsx` | LOW | Visual only |
+| `ParkadeView.tsx` | LOW | Visual only |
+| `VerticalBuildingProgress.tsx` | LOW | Visual only |
 
 ---
 
-### Phase 2: User Portals (Account-Specific Pages)
+### Category 3: Pages With Mixed Translations (Partial Coverage)
 
-**Priority: MEDIUM | Effort: 3-4 days**
+These pages HAVE translation hooks but contain **significant hardcoded English strings**:
 
-1. **Property Manager Portal:**
-   - `PropertyManagerQuoteDetail.tsx`
-
-2. **SuperUser/Admin:**
-   - `SuperUserStaffAccounts.tsx`
-
-3. **Landing Pages:**
-   - `CRMLanding.tsx`
-   - `TechnicianJobBoardLanding.tsx`
-
-4. **Components:**
-   - `ActiveSessionBadge.tsx`
-   - `ClientExcelImport.tsx`
-   - `EmbeddedCheckout.tsx`
-   - `EmployerDocumentRequests.tsx`
-   - `InstallPWAButton.tsx`
-   - `RegistrationEmbeddedCheckout.tsx`
-   - `SessionDetailsDialog.tsx`
-   - `SiteFooter.tsx`
-   - `SubscriptionRenewalBadge.tsx`
-
----
-
-### Phase 3: Help Documentation & Guides
-
-**Priority: LOW | Effort: 2-3 days**
-
-1. **Guide Pages:**
-   - `ConnectionsGuide.tsx`
-   - `DashboardCustomizationGuide.tsx`
-   - `PSRGuide.tsx`
-
-2. **Refactor inline translations to locale files:**
-   - All pages using inline `translations` objects
-
----
-
-### Phase 4: Cleanup & Maintenance
-
-**Priority: LOW | Effort: 1-2 days**
-
-1. **Remove orphaned keys from FR/ES files:**
-   - ~1,972 extra keys in French
-   - ~1,917 extra keys in Spanish
-
-2. **Audit hardcoded strings in guide pages:**
-   - Navigation labels
-   - UI element names in documentation
+#### Landing & Marketing Pages (Hardcoded String Count)
+| Page | Hardcoded Strings | Priority |
+|------|-------------------|----------|
+| `ProjectManagementLanding.tsx` | 37 | HIGH |
+| `UserAccessLanding.tsx` | 36 | HIGH |
+| `WorkSessionLanding.tsx` | 36 | HIGH |
+| `ProjectsGuide.tsx` | 35 | MEDIUM |
+| `CSRGuide.tsx` | 35 | MEDIUM |
+| `ResidentPortalGuide.tsx` | 33 | MEDIUM |
+| `InventoryGuide.tsx` | 32 | MEDIUM |
+| `TimeTrackingGuide.tsx` | 30 | MEDIUM |
+| `CSRLanding.tsx` | 29 | HIGH |
+| `EmployeeManagementLanding.tsx` | 29 | HIGH |
+| `TechnicianRegistrationGuide.tsx` | 27 | MEDIUM |
+| `SchedulingGuide.tsx` | 25 | MEDIUM |
+| `SchedulingCalendarLanding.tsx` | 25 | HIGH |
+| `SafetyComplianceLanding.tsx` | 25 | HIGH |
+| `IRATATaskLoggingLanding.tsx` | 24 | MEDIUM |
+| `PropertyManagerGuide.tsx` | 20 | MEDIUM |
+| `QuotingSalesLanding.tsx` | 19 | HIGH |
+| `SafetyGuide.tsx` | 19 | MEDIUM |
+| `PayrollGuide.tsx` | 19 | MEDIUM |
+| `EmployerJobBoardLanding.tsx` | 19 | HIGH |
+| `DocumentManagementGuide.tsx` | 18 | MEDIUM |
+| `EmployeeManagementGuide.tsx` | 18 | MEDIUM |
+| `IRATALoggingGuide.tsx` | 18 | MEDIUM |
+| `JobBoardGuide.tsx` | 17 | MEDIUM |
+| `GearInventoryLanding.tsx` | 17 | MEDIUM |
+| `UserAccessGuide.tsx` | 17 | MEDIUM |
+| `BrandingGuide.tsx` | 15 | MEDIUM |
+| `QuotingGuide.tsx` | 14 | MEDIUM |
+| `PayrollFinancialLanding.tsx` | 14 | MEDIUM |
+| `WhiteLabelBrandingLanding.tsx` | 12 | MEDIUM |
 
 ---
 
-## Account Type Coverage Matrix
+### Category 4: Pages Using Inline Translations (Should Migrate to Locale Files)
 
-| Account Type | Pages Needing Translation | Components Needing Translation |
-|--------------|--------------------------|-------------------------------|
-| **Public/Unauthenticated** | Pricing.tsx, CRMLanding.tsx, TechnicianJobBoardLanding.tsx | SignInModal.tsx, SiteFooter.tsx |
-| **Employer** | Employer.tsx | DocumentUploader.tsx, PurchaseSeatsDialog.tsx, RemoveSeatsDialog.tsx, SubscriptionManagement.tsx, ClientExcelImport.tsx, EmployerDocumentRequests.tsx, SessionDetailsDialog.tsx |
-| **Technician** | (Uses inline translations - move to locale files) | InstallPWAButton.tsx |
-| **Ground Crew** | (Uses inline translations - move to locale files) | InstallPWAButton.tsx |
-| **Resident** | - | ResidentSlidingSignup.tsx |
-| **Property Manager** | PropertyManagerQuoteDetail.tsx | - |
-| **Building Manager** | - | - |
-| **SuperUser** | SuperUserStaffAccounts.tsx | - |
-| **All Users** | ResetPassword.tsx | DocumentUploader.tsx, InstallPWAButton.tsx |
+These pages have their own `translations` object instead of using centralized locale files:
 
----
-
-## Implementation Guidelines
-
-### Adding Translations to a Page
-
-1. Import the translation hook:
-```typescript
-import { useLanguage } from "@/hooks/use-language";
-```
-
-2. Get the translation function:
-```typescript
-const { t } = useLanguage();
-```
-
-3. Replace hardcoded strings:
-```typescript
-// Before
-<Button>Save</Button>
-
-// After
-<Button>{t("common.save")}</Button>
-```
-
-4. Add keys to all three locale files:
-- `client/src/i18n/locales/en.json`
-- `client/src/i18n/locales/fr.json`
-- `client/src/i18n/locales/es.json`
-
-### Adding Translations to a Component
-
-Same pattern as pages, but consider:
-- Components may receive translated strings as props from parent pages
-- Keep translation keys organized by feature/component section
+| Page | Account Type | Migration Effort |
+|------|--------------|------------------|
+| `TechnicianPortal.tsx` | Technician | HIGH (large file) |
+| `GroundCrewPortal.tsx` | Ground Crew | HIGH (large file) |
+| `TechnicianJobBoard.tsx` | Technician | MEDIUM |
+| `TechnicianApplications.tsx` | Technician | MEDIUM |
+| `TechnicianLoggedHours.tsx` | Technician | MEDIUM |
+| `TechnicianResume.tsx` | Technician | LOW |
+| `VisibleTechniciansBrowser.tsx` | Employer | MEDIUM |
 
 ---
 
-## Summary
+### Category 5: Hardcoded Toast/Alert Messages (18 pages)
 
-| Category | Count | Status |
-|----------|-------|--------|
-| Pages without translations | 10 | Needs work |
-| Components without translations | 27 | Needs work |
-| Keys missing in French | 228 | Needs work |
-| Keys missing in Spanish | 347 | Needs work |
-| Orphaned keys in FR/ES | ~3,889 | Cleanup needed |
-| Pages with inline translations | 7 | Should migrate |
+These pages have hardcoded `toast()` calls with English titles/descriptions:
 
-**Estimated Total Effort:** 8-12 days for full remediation
+| Page | Approximate Issues |
+|------|-------------------|
+| `Dashboard.tsx` | 5+ hardcoded toasts |
+| `Documents.tsx` | 15+ hardcoded toasts |
+| `Profile.tsx` | 12+ hardcoded toasts |
+| `Quotes.tsx` | 3+ hardcoded toasts |
+| `Schedule.tsx` | 2+ hardcoded toasts |
+| `ManageSubscription.tsx` | 5+ hardcoded toasts |
+| `CompanyDetail.tsx` | 2+ hardcoded toasts |
+| `CompleteRegistration.tsx` | 2+ hardcoded toasts |
+| `FounderResources.tsx` | 3+ hardcoded toasts |
+| `GroundCrewJobBoard.tsx` | 1+ hardcoded toasts |
+| `GroundCrewPortal.tsx` | 4+ hardcoded toasts |
+| `SuperUserFeatureRequests.tsx` | 1+ hardcoded toasts |
+| `SuperUserStaffAccounts.tsx` | 2+ hardcoded toasts |
+| `SuperUserTasks.tsx` | 2+ hardcoded toasts |
+| `SuperUserTechnicians.tsx` | 1+ hardcoded toasts |
+| `SuperUser.tsx` | 1+ hardcoded toasts |
+| `TechnicianLoggedHours.tsx` | 2+ hardcoded toasts |
+| `TechnicianPortal.tsx` | 3+ hardcoded toasts |
 
 ---
 
-## Next Steps
+### Category 6: Hardcoded Placeholders & Form Labels
 
-1. Approve this audit plan
-2. Prioritize which phases to tackle first
-3. Begin implementation with Phase 1 (Critical)
-4. Test in all three languages after each phase
+Many pages have hardcoded `placeholder=""` and form labels:
+
+**BuildingPortal.tsx** - 20+ hardcoded placeholders:
+- "Enter your strata or job number"
+- "Enter your password"
+- "Start typing to search..."
+- "e.g., John Smith"
+- "e.g., (604) 555-1234"
+- And many more...
+
+**Dashboard.tsx** - 10+ hardcoded placeholders in forms
+
+**Changelog.tsx** - Entire changelog is hardcoded English (70+ entries)
+
+---
+
+## ACCOUNT TYPE BREAKDOWN
+
+### Employer Account
+| Category | Files Affected |
+|----------|----------------|
+| No translations | `Employer.tsx` |
+| Partial translations | `Dashboard.tsx`, `Documents.tsx`, `Profile.tsx`, `Quotes.tsx`, `Schedule.tsx`, `Inventory.tsx`, `Payroll.tsx` |
+| Missing components | `DocumentUploader.tsx`, `PurchaseSeatsDialog.tsx`, `RemoveSeatsDialog.tsx`, `SubscriptionManagement.tsx`, `ClientExcelImport.tsx`, `EmployerDocumentRequests.tsx`, `SessionDetailsDialog.tsx` |
+| Dashboard cards | ALL 21 cards need translations |
+
+### Technician Account
+| Category | Files Affected |
+|----------|----------------|
+| Inline translations (not centralized) | `TechnicianPortal.tsx`, `TechnicianJobBoard.tsx`, `TechnicianApplications.tsx`, `TechnicianLoggedHours.tsx`, `TechnicianResume.tsx` |
+| No translations | `TechnicianJobBoardLanding.tsx` |
+| Missing components | `InstallPWAButton.tsx` |
+
+### Ground Crew Account
+| Category | Files Affected |
+|----------|----------------|
+| Inline translations (not centralized) | `GroundCrewPortal.tsx`, `GroundCrewJobBoard.tsx` |
+| Missing components | `InstallPWAButton.tsx` |
+
+### Resident Account
+| Category | Files Affected |
+|----------|----------------|
+| Partial translations | `ResidentDashboard.tsx`, `ResidentLanding.tsx` |
+| Missing components | `ResidentSlidingSignup.tsx` |
+| No translations | `help/stakeholders/ForResidents.tsx` |
+
+### Property Manager Account
+| Category | Files Affected |
+|----------|----------------|
+| No translations | `PropertyManagerQuoteDetail.tsx` |
+| Partial translations | `PropertyManager.tsx`, `PropertyManagerSettings.tsx` |
+| No translations | `help/stakeholders/ForPropertyManagers.tsx` |
+
+### Building Manager Account
+| Category | Files Affected |
+|----------|----------------|
+| Partial translations | `BuildingPortal.tsx` (20+ hardcoded placeholders) |
+| No translations | `help/stakeholders/ForBuildingManagers.tsx` |
+
+### SuperUser Account
+| Category | Files Affected |
+|----------|----------------|
+| No translations | `SuperUserStaffAccounts.tsx` |
+| Partial translations | `SuperUser.tsx`, `SuperUserBuildings.tsx`, `SuperUserMetrics.tsx`, `SuperUserTechnicians.tsx`, `SuperUserJobBoard.tsx`, `SuperUserTasks.tsx`, `SuperUserFeatureRequests.tsx`, `SuperUserFutureIdeas.tsx`, `SuperUserGoalsOverview.tsx` |
+
+### Public/Unauthenticated
+| Category | Files Affected |
+|----------|----------------|
+| No translations | `Pricing.tsx`, `ResetPassword.tsx`, `CRMLanding.tsx`, `TechnicianJobBoardLanding.tsx` |
+| Partial translations | `Login.tsx`, `Register.tsx`, `TechnicianLogin.tsx`, `HomePage.tsx` |
+| Missing components | `SignInModal.tsx`, `SiteFooter.tsx` |
+| Help Center | ALL 11 help pages need translations |
+
+---
+
+## REMEDIATION PHASES
+
+### Phase 1: Authentication & Critical User Flows (3-4 days)
+**Impact: All users**
+
+1. **SignInModal.tsx** - Used for login everywhere
+2. **ResetPassword.tsx** - Account recovery
+3. **Pricing.tsx** - Sales conversion
+4. **DocumentUploader.tsx** - Used across all account types
+5. **SubscriptionManagement.tsx** - Payment flow
+6. **PurchaseSeatsDialog.tsx** - Payment
+7. **RemoveSeatsDialog.tsx** - Payment
+8. **ResidentSlidingSignup.tsx** - Resident registration
+9. Add 228 missing French keys
+10. Add 347 missing Spanish keys
+
+### Phase 2: Dashboard Cards (2-3 days)
+**Impact: All authenticated users**
+
+All 21 dashboard cards need translations:
+- ActiveWorkersCard, CertificationAlertsCard, ExpiringCertsCard, HarnessStatusCard, MyPerformanceCard, MyScheduleCard, NewFeedbackCard, NotClockedInCard, OutstandingQuotesCard, OverdueProjectsCard, OvertimeAlertCard, PayPeriodCard, PendingApprovalsCard, TodayScheduleCard, ToolboxCoverageCard, SafetyRatingCard, TodaysHoursCard, WeekAtGlanceCard, MyTimeCard, ActiveProjectsCard
+- Plus: DashboardSearch.tsx, cardRegistry.tsx, DashboardCard.tsx
+
+### Phase 3: Core Feature Pages (4-5 days)
+**Impact: Employer, Technician, Property Manager**
+
+1. **Employer.tsx** - Core employer page
+2. **PropertyManagerQuoteDetail.tsx** - Quote viewing
+3. **SuperUserStaffAccounts.tsx** - Staff management
+4. Profile components (7 files)
+5. Fix hardcoded toasts in major pages:
+   - Dashboard.tsx, Documents.tsx, Profile.tsx, Quotes.tsx, Schedule.tsx
+
+### Phase 4: Migrate Inline Translations (3-4 days)
+**Impact: Technician, Ground Crew, Employer**
+
+Move inline `translations` objects to centralized locale files:
+1. TechnicianPortal.tsx (largest)
+2. GroundCrewPortal.tsx (large)
+3. TechnicianJobBoard.tsx
+4. TechnicianApplications.tsx
+5. TechnicianLoggedHours.tsx
+6. TechnicianResume.tsx
+7. VisibleTechniciansBrowser.tsx
+
+### Phase 5: Help Center & Documentation (3-4 days)
+**Impact: All users seeking help**
+
+1. Help Center infrastructure (5 components)
+2. HelpCenter.tsx, HelpArticle.tsx, HelpSearch.tsx
+3. GettingStarted.tsx, FeatureFinder.tsx
+4. ROICalculator.tsx
+5. All 5 stakeholder pages (ForTechnicians, ForResidents, etc.)
+
+### Phase 6: Landing Pages & Marketing (4-5 days)
+**Impact: Potential customers**
+
+Fix hardcoded strings in all 30+ landing/guide pages:
+- CRMLanding.tsx, TechnicianJobBoardLanding.tsx (no translations)
+- All other landing pages with 10+ hardcoded strings
+
+### Phase 7: Form Placeholders & Minor Components (2-3 days)
+
+1. BuildingPortal.tsx - 20+ hardcoded placeholders
+2. Dashboard.tsx - 10+ hardcoded placeholders
+3. All remaining components with minimal text
+4. Changelog.tsx - 70+ changelog entries (consider if needed)
+
+### Phase 8: Cleanup (1-2 days)
+
+1. Remove ~1,972 orphaned keys from French
+2. Remove ~1,917 orphaned keys from Spanish
+3. Audit for any remaining hardcoded strings
+4. Test all three languages end-to-end
+
+---
+
+## SUMMARY STATISTICS
+
+| Category | Count |
+|----------|-------|
+| Pages without any translations | 21 |
+| Components without translations | 75 |
+| Pages with partial translations (10+ hardcoded) | 30+ |
+| Pages with inline translations (need migration) | 7 |
+| Pages with hardcoded toast messages | 18 |
+| Dashboard cards needing translations | 21 |
+| Profile components needing translations | 7 |
+| Help components needing translations | 5 |
+| Missing French locale keys | 228 |
+| Missing Spanish locale keys | 347 |
+| Orphaned French keys | ~1,972 |
+| Orphaned Spanish keys | ~1,917 |
+
+**Total Estimated Effort: 22-30 days for complete remediation**
+
+---
+
+## PRIORITY ORDER FOR IMMEDIATE ACTION
+
+1. **CRITICAL (Week 1):** SignInModal, ResetPassword, Pricing, DocumentUploader, Subscription dialogs
+2. **HIGH (Week 2):** All 21 dashboard cards, core missing locale keys
+3. **HIGH (Week 3):** Employer.tsx, Profile components, PropertyManagerQuoteDetail
+4. **MEDIUM (Week 4):** Help Center, stakeholder pages, inline translation migration
+5. **MEDIUM (Week 5):** Landing pages, toast messages
+6. **LOW (Week 6):** Form placeholders, cleanup, orphaned keys
