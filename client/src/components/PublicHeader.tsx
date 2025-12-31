@@ -314,7 +314,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                   <div className="max-w-6xl mx-auto px-6"><div className="flex gap-6">
                     {/* Column 1: Operations (5 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-operations">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-operations">
                         <Settings className="w-4 h-4 text-blue-600" />
                         <span className="font-semibold text-sm text-foreground">Operations</span>
                       </div>
@@ -387,7 +387,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
                     {/* Column 2: Safety (4 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-safety">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-safety">
                         <HeartPulse className="w-4 h-4 text-red-600" />
                         <span className="font-semibold text-sm text-foreground">Safety</span>
                       </div>
@@ -447,7 +447,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
                     {/* Column 3: Team (4 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-team">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-team">
                         <Users className="w-4 h-4 text-violet-600" />
                         <span className="font-semibold text-sm text-foreground">Team</span>
                       </div>
@@ -507,7 +507,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
                     {/* Column 4: Financial & Sales (3 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-financial-sales">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-financial-sales">
                         <Wallet className="w-4 h-4 text-emerald-600" />
                         <span className="font-semibold text-sm text-foreground">Financial & Sales</span>
                       </div>
@@ -554,7 +554,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
                     {/* Column 5: Communication (2 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-communication">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-2.5 pb-1 border-b border-border/75" data-testid="menu-category-communication">
                         <MessageSquare className="w-4 h-4 text-rose-600" />
                         <span className="font-semibold text-sm text-foreground">Communication</span>
                       </div>
