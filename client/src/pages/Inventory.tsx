@@ -3360,8 +3360,12 @@ export default function Inventory() {
                 </>
               )}
 
-              {/* All other gear types: show full details */}
-              {form.watch("equipmentType") !== "Carabiner" && form.watch("equipmentType") !== "Rope" && (
+              {/* All other gear types: show full details (exclude consumables that don't need serial/dates) */}
+              {form.watch("equipmentType") !== "Carabiner" && 
+               form.watch("equipmentType") !== "Rope" && 
+               form.watch("equipmentType") !== "Squeegee rubbers" &&
+               form.watch("equipmentType") !== "Applicators" &&
+               form.watch("equipmentType") !== "Gloves" && (
                 <>
                   {/* Serial Number Entry with Per-Item Dates */}
                   <div className="space-y-3">
@@ -3477,6 +3481,50 @@ export default function Inventory() {
                               {...field}
                               value={field.value || ""}
                               data-testid="input-price"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </>
+              )}
+
+              {/* Consumables (Squeegee rubbers, Applicators, Gloves): show price but not serial/dates */}
+              {(form.watch("equipmentType") === "Squeegee rubbers" ||
+                form.watch("equipmentType") === "Applicators" ||
+                form.watch("equipmentType") === "Gloves") && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('inventory.notes', 'Notes')}</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder={t('inventory.placeholders.additionalInfo', 'Additional information...')} {...field} value={field.value || ""} data-testid="textarea-notes" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {canViewFinancials && (
+                    <FormField
+                      control={form.control}
+                      name="itemPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('inventory.price', 'Price')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder={t('inventory.placeholders.price', '0.00')}
+                              {...field}
+                              value={field.value || ""}
+                              data-testid="input-price-consumable"
                             />
                           </FormControl>
                           <FormMessage />
