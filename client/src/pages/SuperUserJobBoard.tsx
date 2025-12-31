@@ -90,6 +90,7 @@ const EXPERIENCE_OPTIONS = [
 ];
 
 export default function SuperUserJobBoard() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
@@ -133,10 +134,10 @@ export default function SuperUserJobBoard() {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setIsCreateOpen(false);
       resetForm();
-      toast({ title: "Job posting created successfully" });
+      toast({ title: t("superUserJobBoard.created") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to create job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.createFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -149,10 +150,10 @@ export default function SuperUserJobBoard() {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setEditingJob(null);
       resetForm();
-      toast({ title: "Job posting updated successfully" });
+      toast({ title: t("superUserJobBoard.updated") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to update job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.updateFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -164,10 +165,10 @@ export default function SuperUserJobBoard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/job-postings"] });
       setDeleteConfirmId(null);
-      toast({ title: "Job posting deleted successfully" });
+      toast({ title: t("superUserJobBoard.deleted") });
     },
     onError: (error: any) => {
-      toast({ title: "Failed to delete job posting", description: error.message, variant: "destructive" });
+      toast({ title: t("superUserJobBoard.deleteFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -195,7 +196,7 @@ export default function SuperUserJobBoard() {
 
   const handleCreate = () => {
     if (!formData.title || !formData.description) {
-      toast({ title: "Please fill in required fields", variant: "destructive" });
+      toast({ title: t("superUserJobBoard.fillRequired"), variant: "destructive" });
       return;
     }
     createMutation.mutate({
@@ -221,7 +222,7 @@ export default function SuperUserJobBoard() {
 
   const handleUpdate = () => {
     if (!editingJob || !formData.title || !formData.description) {
-      toast({ title: "Please fill in required fields", variant: "destructive" });
+      toast({ title: t("superUserJobBoard.fillRequired"), variant: "destructive" });
       return;
     }
     updateMutation.mutate({

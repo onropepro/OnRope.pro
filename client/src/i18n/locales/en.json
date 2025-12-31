@@ -1501,7 +1501,12 @@
       "error": "Error",
       "uploadFailed": "Upload failed",
       "logoutFailed": "Failed to logout",
-      "noActiveSession": "No active work session found"
+      "noActiveSession": "No active work session found",
+      "searchValueRequired": "Search value required",
+      "pleaseEnterSearchValue": "Please enter a value to search",
+      "noTechnicianFound": "No technician found",
+      "noUnlinkedTechnician": "No unlinked technician found with that information",
+      "searchFailed": "Search failed"
     },
     "workSession": {
       "locationNotAvailable": "Location Not Available",
@@ -3295,7 +3300,24 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "notSet": "Not set",
-    "noAddressProvided": "No address provided"
+    "noAddressProvided": "No address provided",
+    "brandColorsUpdated": "Brand colors updated successfully",
+    "failedToUpdateColors": "Failed to update colors",
+    "cannotRemove": "Cannot remove",
+    "mustHaveOneColor": "You must have at least one color",
+    "licenseVerified": "License verified successfully",
+    "companyCodeDetected": "Company code detected",
+    "codeAutoFilled": "Code has been auto-filled. Click 'Update Profile' to link your account.",
+    "passwordChanged": "Password changed successfully",
+    "accountDeleted": "Account deleted successfully",
+    "pleaseEnterPassword": "Please enter your password",
+    "failedToLogout": "Failed to logout",
+    "logoUploaded": "Logo uploaded successfully",
+    "failedToUploadLogo": "Failed to upload logo",
+    "failedToProcessImage": "Failed to process image",
+    "appIconUploaded": "App icon uploaded successfully",
+    "appIconActive": "Your custom icon is now active for new app installations.",
+    "failedToUploadIcon": "Failed to upload icon"
   },
   "subscription": {
     "title": "Subscription",
@@ -5078,6 +5100,10 @@
       "projectDeleted": "Project deleted successfully",
       "commentPosted": "Comment posted successfully",
       "irataTasksLogged": "IRATA / SPRAT tasks logged successfully"
+    },
+    "validation": {
+      "ropeAccessHoursRange": "Rope access hours must be between 0 and 24",
+      "quarterHourIncrements": "Hours must be in quarter-hour increments"
     }
   },
   "roi": {
@@ -9499,5 +9525,90 @@
     "onlyAssigneeToggle": "Only the assignee can complete or uncomplete this task",
     "missingFields": "Missing fields",
     "fillRequiredFields": "Please fill in title, section, and assignee"
+  },
+  "superUserFeatureRequests": {
+    "failedToUpdateStatus": "Failed to update status",
+    "failedToSendMessage": "Failed to send message"
+  },
+  "superUserTechnicians": {
+    "failedToLoadTechnician": "Failed to load technician details",
+    "failedToUpdateTechnician": "Failed to update technician"
+  },
+  "groundCrewJobBoard": {
+    "failedToSubmitApplication": "Failed to submit application"
+  },
+  "companyDetail": {
+    "failedToLoad": "Failed to load company details",
+    "failedToUpdate": "Failed to update company"
+  },
+  "documents": {
+    "uploadFailed": "Upload failed"
+  },
+  "quotes": {
+    "failedToLoad": "Failed to load quote",
+    "failedToCreate": "Failed to create quote",
+    "failedToUploadPhoto": "Failed to upload photo"
+  },
+  "manageSubscription": {
+    "failedToLoad": "Failed to load subscription",
+    "failedToCancel": "Failed to cancel subscription",
+    "failedToResume": "Failed to resume subscription",
+    "failedToUpdate": "Failed to update subscription",
+    "failedToCreateCheckout": "Failed to create checkout session"
+  },
+  "superUserJobBoard": {
+    "created": "Job posting created successfully",
+    "updated": "Job posting updated successfully",
+    "deleted": "Job posting deleted successfully",
+    "createFailed": "Failed to create job posting",
+    "updateFailed": "Failed to update job posting",
+    "deleteFailed": "Failed to delete job posting",
+    "fillRequired": "Please fill in required fields"
+  },
+  "propertyManagerQuoteDetail": {
+    "messageSent": "Message sent",
+    "sendMessageFailed": "Failed to send message",
+    "quoteAccepted": "Quote accepted successfully",
+    "acceptFailed": "Failed to accept quote",
+    "quoteDeclined": "Quote declined",
+    "declineFailed": "Failed to decline quote",
+    "counterOfferSubmitted": "Counter-offer submitted",
+    "counterOfferFailed": "Failed to submit counter-offer"
+  },
+  "superUserFutureIdeas": {
+    "ideaAdded": "Idea added successfully",
+    "addFailed": "Failed to add idea",
+    "ideaUpdated": "Idea updated successfully",
+    "updateFailed": "Failed to update idea",
+    "ideaDeleted": "Idea deleted",
+    "deleteFailed": "Failed to delete idea",
+    "enterTitle": "Please enter a title"
+  },
+  "personalSafetyDocuments": {
+    "inspectionDeleted": "Inspection deleted",
+    "deleteFailed": "Delete failed"
+  },
+  "dashboardGrid": {
+    "copied": "Copied",
+    "residentCodeCopied": "Resident code copied to clipboard",
+    "propertyManagerCodeCopied": "Property Manager code copied to clipboard",
+    "dashboardSaved": "Dashboard saved",
+    "dashboardSavedDescription": "Your dashboard layout has been saved.",
+    "failedToSave": "Failed to save",
+    "failedToSaveDescription": "Could not save your dashboard layout."
+  },
+  "employerDocumentRequests": {
+    "requestSent": "Document request sent",
+    "sendFailed": "Failed to send request",
+    "titleRequired": "Title is required"
+  },
+  "workNotice": {
+    "created": "Work notice created",
+    "createdDescription": "The notice is now visible to residents.",
+    "error": "Error",
+    "templateSaved": "Template saved",
+    "templateSavedDescription": "You can now use this template for future notices.",
+    "updated": "Work notice updated",
+    "deleted": "Work notice deleted"
   }
 }

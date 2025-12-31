@@ -5178,8 +5178,8 @@ export default function Documents() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to add practice template",
+        title: t("common.error"),
+        description: error.message || t("documents.uploadFailed"),
         variant: "destructive",
       });
     },

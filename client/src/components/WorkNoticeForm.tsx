@@ -615,7 +615,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     },
     onSuccess: (_response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", project.id, "work-notices"] });
-      toast({ title: "Work notice created", description: "The notice is now visible to residents." });
+      toast({ title: t("workNotice.created"), description: t("workNotice.createdDescription") });
       onSuccess?.();
       
       // If no template was used, ask if they want to save as template
@@ -627,7 +627,7 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
       }
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("workNotice.error"), description: error.message, variant: "destructive" });
     },
   });
   
@@ -637,12 +637,12 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/custom-notice-templates"] });
-      toast({ title: "Template saved", description: "You can now use this template for future notices." });
+      toast({ title: t("workNotice.templateSaved"), description: t("workNotice.templateSavedDescription") });
       setShowSaveTemplateDialog(false);
       onClose();
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("workNotice.error"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -652,12 +652,12 @@ export function WorkNoticeForm({ project, existingNotice, onClose, onSuccess }: 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", project.id, "work-notices"] });
-      toast({ title: "Work notice updated" });
+      toast({ title: t("workNotice.updated") });
       onSuccess?.();
       onClose();
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("workNotice.error"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1197,10 +1197,10 @@ export function WorkNoticeList({ projectId, project }: WorkNoticeListProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "work-notices"] });
-      toast({ title: "Work notice deleted" });
+      toast({ title: t("workNotice.deleted") });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("workNotice.error"), description: error.message, variant: "destructive" });
     },
   });
 

@@ -57,6 +57,7 @@ const inspectionFormSchema = z.object({
 type InspectionFormData = z.infer<typeof inspectionFormSchema>;
 
 export default function PersonalSafetyDocuments() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -228,11 +229,11 @@ export default function PersonalSafetyDocuments() {
       return apiRequest("DELETE", `/api/personal-harness-inspections/${id}`);
     },
     onSuccess: () => {
-      toast({ title: "Inspection deleted" });
+      toast({ title: t("personalSafetyDocuments.inspectionDeleted") });
       queryClient.invalidateQueries({ queryKey: ["/api/personal-harness-inspections"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+      toast({ title: t("personalSafetyDocuments.deleteFailed"), description: error.message, variant: "destructive" });
     },
   });
 

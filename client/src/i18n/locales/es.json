@@ -1617,9 +1617,14 @@
       "greatWorkLocation": "Great work today! Location recorded.",
       "greatWorkNoLocation": "Great work today! (Location not recorded)",
       "error": "Error",
-      "uploadFailed": "Upload failed",
-      "logoutFailed": "Failed to logout",
-      "noActiveSession": "No active work session found"
+      "uploadFailed": "Error al subir",
+      "logoutFailed": "Error al cerrar sesión",
+      "noActiveSession": "No se encontró sesión de trabajo activa",
+      "searchValueRequired": "Se requiere valor de búsqueda",
+      "pleaseEnterSearchValue": "Por favor ingresa un valor para buscar",
+      "noTechnicianFound": "No se encontró técnico",
+      "noUnlinkedTechnician": "No se encontró técnico no vinculado con esa información",
+      "searchFailed": "Error en la búsqueda"
     },
     "workSession": {
       "locationNotAvailable": "Location Not Available",
@@ -3413,7 +3418,24 @@
     "enabled": "Habilitado",
     "disabled": "Deshabilitado",
     "notSet": "No establecido",
-    "noAddressProvided": "No se proporcionó dirección"
+    "noAddressProvided": "No se proporcionó dirección",
+    "brandColorsUpdated": "Colores de marca actualizados con éxito",
+    "failedToUpdateColors": "Error al actualizar los colores",
+    "cannotRemove": "No se puede eliminar",
+    "mustHaveOneColor": "Debe tener al menos un color",
+    "licenseVerified": "Licencia verificada con éxito",
+    "companyCodeDetected": "Código de empresa detectado",
+    "codeAutoFilled": "El código se ha rellenado automáticamente. Haz clic en 'Actualizar perfil' para vincular tu cuenta.",
+    "passwordChanged": "Contraseña cambiada con éxito",
+    "accountDeleted": "Cuenta eliminada con éxito",
+    "pleaseEnterPassword": "Por favor ingresa tu contraseña",
+    "failedToLogout": "Error al cerrar sesión",
+    "logoUploaded": "Logo subido con éxito",
+    "failedToUploadLogo": "Error al subir el logo",
+    "failedToProcessImage": "Error al procesar la imagen",
+    "appIconUploaded": "Icono de la aplicación subido con éxito",
+    "appIconActive": "Tu icono personalizado está activo para nuevas instalaciones.",
+    "failedToUploadIcon": "Error al subir el icono"
   },
   "subscription": {
     "title": "Subscription",
@@ -5195,7 +5217,11 @@
       "projectReopened": "Project reopened successfully",
       "projectDeleted": "Project deleted successfully",
       "commentPosted": "Comment posted successfully",
-      "irataTasksLogged": "IRATA / SPRAT tasks logged successfully"
+      "irataTasksLogged": "Tareas IRATA / SPRAT registradas con éxito"
+    },
+    "validation": {
+      "ropeAccessHoursRange": "Las horas de acceso con cuerdas deben estar entre 0 y 24",
+      "quarterHourIncrements": "Las horas deben ser en incrementos de cuarto de hora"
     }
   },
   "roi": {
@@ -12974,5 +13000,90 @@
     "onlyAssigneeToggle": "Solo el asignado puede completar o reabrir esta tarea",
     "missingFields": "Campos faltantes",
     "fillRequiredFields": "Por favor complete el título, la sección y el asignado"
+  },
+  "superUserFeatureRequests": {
+    "failedToUpdateStatus": "Error al actualizar el estado",
+    "failedToSendMessage": "Error al enviar mensaje"
+  },
+  "superUserTechnicians": {
+    "failedToLoadTechnician": "Error al cargar detalles del técnico",
+    "failedToUpdateTechnician": "Error al actualizar técnico"
+  },
+  "groundCrewJobBoard": {
+    "failedToSubmitApplication": "Error al enviar solicitud"
+  },
+  "companyDetail": {
+    "failedToLoad": "Error al cargar detalles de la empresa",
+    "failedToUpdate": "Error al actualizar empresa"
+  },
+  "documents": {
+    "uploadFailed": "Error de carga"
+  },
+  "quotes": {
+    "failedToLoad": "Error al cargar cotización",
+    "failedToCreate": "Error al crear cotización",
+    "failedToUploadPhoto": "Error al subir foto"
+  },
+  "manageSubscription": {
+    "failedToLoad": "Error al cargar suscripción",
+    "failedToCancel": "Error al cancelar suscripción",
+    "failedToResume": "Error al reanudar suscripción",
+    "failedToUpdate": "Error al actualizar suscripción",
+    "failedToCreateCheckout": "Error al crear sesión de pago"
+  },
+  "superUserJobBoard": {
+    "created": "Oferta de trabajo creada exitosamente",
+    "updated": "Oferta de trabajo actualizada exitosamente",
+    "deleted": "Oferta de trabajo eliminada exitosamente",
+    "createFailed": "Error al crear oferta de trabajo",
+    "updateFailed": "Error al actualizar oferta de trabajo",
+    "deleteFailed": "Error al eliminar oferta de trabajo",
+    "fillRequired": "Por favor complete los campos requeridos"
+  },
+  "propertyManagerQuoteDetail": {
+    "messageSent": "Mensaje enviado",
+    "sendMessageFailed": "Error al enviar mensaje",
+    "quoteAccepted": "Cotización aceptada exitosamente",
+    "acceptFailed": "Error al aceptar cotización",
+    "quoteDeclined": "Cotización rechazada",
+    "declineFailed": "Error al rechazar cotización",
+    "counterOfferSubmitted": "Contraoferta enviada",
+    "counterOfferFailed": "Error al enviar contraoferta"
+  },
+  "superUserFutureIdeas": {
+    "ideaAdded": "Idea agregada exitosamente",
+    "addFailed": "Error al agregar idea",
+    "ideaUpdated": "Idea actualizada exitosamente",
+    "updateFailed": "Error al actualizar idea",
+    "ideaDeleted": "Idea eliminada",
+    "deleteFailed": "Error al eliminar idea",
+    "enterTitle": "Por favor ingrese un título"
+  },
+  "personalSafetyDocuments": {
+    "inspectionDeleted": "Inspección eliminada",
+    "deleteFailed": "Error al eliminar"
+  },
+  "dashboardGrid": {
+    "copied": "Copiado",
+    "residentCodeCopied": "Código de residente copiado al portapapeles",
+    "propertyManagerCodeCopied": "Código de administrador de propiedades copiado al portapapeles",
+    "dashboardSaved": "Panel guardado",
+    "dashboardSavedDescription": "El diseño de su panel ha sido guardado.",
+    "failedToSave": "Error al guardar",
+    "failedToSaveDescription": "No se pudo guardar el diseño de su panel."
+  },
+  "employerDocumentRequests": {
+    "requestSent": "Solicitud de documento enviada",
+    "sendFailed": "Error al enviar la solicitud",
+    "titleRequired": "El título es requerido"
+  },
+  "workNotice": {
+    "created": "Aviso de trabajo creado",
+    "createdDescription": "El aviso ahora es visible para los residentes.",
+    "error": "Error",
+    "templateSaved": "Plantilla guardada",
+    "templateSavedDescription": "Ahora puede usar esta plantilla para futuros avisos.",
+    "updated": "Aviso de trabajo actualizado",
+    "deleted": "Aviso de trabajo eliminado"
   }
 }

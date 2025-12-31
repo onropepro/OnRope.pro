@@ -1554,7 +1554,12 @@
       "error": "Erreur",
       "uploadFailed": "Échec du téléversement",
       "logoutFailed": "Échec de la déconnexion",
-      "noActiveSession": "Aucune session de travail active trouvée"
+      "noActiveSession": "Aucune session de travail active trouvée",
+      "searchValueRequired": "Valeur de recherche requise",
+      "pleaseEnterSearchValue": "Veuillez entrer une valeur à rechercher",
+      "noTechnicianFound": "Aucun technicien trouvé",
+      "noUnlinkedTechnician": "Aucun technicien non lié trouvé avec ces informations",
+      "searchFailed": "Échec de la recherche"
     },
     "workSession": {
       "locationNotAvailable": "Position non disponible",
@@ -3348,7 +3353,24 @@
     "enabled": "Activé",
     "disabled": "Désactivé",
     "notSet": "Non défini",
-    "noAddressProvided": "Aucune adresse fournie"
+    "noAddressProvided": "Aucune adresse fournie",
+    "brandColorsUpdated": "Couleurs de marque mises à jour avec succès",
+    "failedToUpdateColors": "Échec de la mise à jour des couleurs",
+    "cannotRemove": "Impossible de supprimer",
+    "mustHaveOneColor": "Vous devez avoir au moins une couleur",
+    "licenseVerified": "Licence vérifiée avec succès",
+    "companyCodeDetected": "Code d'entreprise détecté",
+    "codeAutoFilled": "Le code a été automatiquement rempli. Cliquez sur 'Mettre à jour le profil' pour lier votre compte.",
+    "passwordChanged": "Mot de passe modifié avec succès",
+    "accountDeleted": "Compte supprimé avec succès",
+    "pleaseEnterPassword": "Veuillez entrer votre mot de passe",
+    "failedToLogout": "Échec de la déconnexion",
+    "logoUploaded": "Logo téléchargé avec succès",
+    "failedToUploadLogo": "Échec du téléchargement du logo",
+    "failedToProcessImage": "Échec du traitement de l'image",
+    "appIconUploaded": "Icône de l'application téléchargée avec succès",
+    "appIconActive": "Votre icône personnalisée est maintenant active pour les nouvelles installations.",
+    "failedToUploadIcon": "Échec du téléchargement de l'icône"
   },
   "subscription": {
     "title": "Abonnement",
@@ -5139,6 +5161,10 @@
       "projectDeleted": "Projet supprimé avec succès",
       "commentPosted": "Commentaire publié avec succès",
       "irataTasksLogged": "Tâches IRATA / SPRAT enregistrées avec succès"
+    },
+    "validation": {
+      "ropeAccessHoursRange": "Les heures d'accès sur corde doivent être entre 0 et 24",
+      "quarterHourIncrements": "Les heures doivent être en incréments de quart d'heure"
     }
   },
   "roi": {
@@ -13126,5 +13152,90 @@
     "onlyAssigneeToggle": "Seul l'assigné peut terminer ou rouvrir cette tâche",
     "missingFields": "Champs manquants",
     "fillRequiredFields": "Veuillez remplir le titre, la section et l'assigné"
+  },
+  "superUserFeatureRequests": {
+    "failedToUpdateStatus": "Échec de la mise à jour du statut",
+    "failedToSendMessage": "Échec de l'envoi du message"
+  },
+  "superUserTechnicians": {
+    "failedToLoadTechnician": "Échec du chargement des détails du technicien",
+    "failedToUpdateTechnician": "Échec de la mise à jour du technicien"
+  },
+  "groundCrewJobBoard": {
+    "failedToSubmitApplication": "Échec de la soumission de la candidature"
+  },
+  "companyDetail": {
+    "failedToLoad": "Échec du chargement des détails de l'entreprise",
+    "failedToUpdate": "Échec de la mise à jour de l'entreprise"
+  },
+  "documents": {
+    "uploadFailed": "Échec du téléchargement"
+  },
+  "quotes": {
+    "failedToLoad": "Échec du chargement du devis",
+    "failedToCreate": "Échec de la création du devis",
+    "failedToUploadPhoto": "Échec du téléchargement de la photo"
+  },
+  "manageSubscription": {
+    "failedToLoad": "Échec du chargement de l'abonnement",
+    "failedToCancel": "Échec de l'annulation de l'abonnement",
+    "failedToResume": "Échec de la reprise de l'abonnement",
+    "failedToUpdate": "Échec de la mise à jour de l'abonnement",
+    "failedToCreateCheckout": "Échec de la création de la session de paiement"
+  },
+  "superUserJobBoard": {
+    "created": "Offre d'emploi créée avec succès",
+    "updated": "Offre d'emploi mise à jour avec succès",
+    "deleted": "Offre d'emploi supprimée avec succès",
+    "createFailed": "Échec de la création de l'offre d'emploi",
+    "updateFailed": "Échec de la mise à jour de l'offre d'emploi",
+    "deleteFailed": "Échec de la suppression de l'offre d'emploi",
+    "fillRequired": "Veuillez remplir les champs obligatoires"
+  },
+  "propertyManagerQuoteDetail": {
+    "messageSent": "Message envoyé",
+    "sendMessageFailed": "Échec de l'envoi du message",
+    "quoteAccepted": "Devis accepté avec succès",
+    "acceptFailed": "Échec de l'acceptation du devis",
+    "quoteDeclined": "Devis refusé",
+    "declineFailed": "Échec du refus du devis",
+    "counterOfferSubmitted": "Contre-offre soumise",
+    "counterOfferFailed": "Échec de la soumission de la contre-offre"
+  },
+  "superUserFutureIdeas": {
+    "ideaAdded": "Idée ajoutée avec succès",
+    "addFailed": "Échec de l'ajout de l'idée",
+    "ideaUpdated": "Idée mise à jour avec succès",
+    "updateFailed": "Échec de la mise à jour de l'idée",
+    "ideaDeleted": "Idée supprimée",
+    "deleteFailed": "Échec de la suppression de l'idée",
+    "enterTitle": "Veuillez entrer un titre"
+  },
+  "personalSafetyDocuments": {
+    "inspectionDeleted": "Inspection supprimée",
+    "deleteFailed": "Échec de la suppression"
+  },
+  "dashboardGrid": {
+    "copied": "Copié",
+    "residentCodeCopied": "Code résident copié dans le presse-papiers",
+    "propertyManagerCodeCopied": "Code gestionnaire immobilier copié dans le presse-papiers",
+    "dashboardSaved": "Tableau de bord enregistré",
+    "dashboardSavedDescription": "La disposition de votre tableau de bord a été enregistrée.",
+    "failedToSave": "Échec de l'enregistrement",
+    "failedToSaveDescription": "Impossible d'enregistrer la disposition de votre tableau de bord."
+  },
+  "employerDocumentRequests": {
+    "requestSent": "Demande de document envoyée",
+    "sendFailed": "Échec de l'envoi de la demande",
+    "titleRequired": "Le titre est requis"
+  },
+  "workNotice": {
+    "created": "Avis de travaux créé",
+    "createdDescription": "L'avis est maintenant visible pour les résidents.",
+    "error": "Erreur",
+    "templateSaved": "Modèle enregistré",
+    "templateSavedDescription": "Vous pouvez maintenant utiliser ce modèle pour les futurs avis.",
+    "updated": "Avis de travaux mis à jour",
+    "deleted": "Avis de travaux supprimé"
   }
 }

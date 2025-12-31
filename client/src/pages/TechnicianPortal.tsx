@@ -536,6 +536,8 @@ const translations = {
     profileTabPayroll: "Payroll Information",
     profileTabResume: "Resume / CV",
     profileTabDocuments: "My Submitted Documents",
+    error: "Error",
+    failedToUpdateVisibility: "Failed to update visibility",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -944,6 +946,8 @@ const translations = {
     profileTabPayroll: "Informations de paie",
     profileTabResume: "CV",
     profileTabDocuments: "Mes documents soumis",
+    error: "Erreur",
+    failedToUpdateVisibility: "Échec de la mise à jour de la visibilité",
   },
   es: {
     technicianPortal: "Portal del Tecnico",
@@ -1401,6 +1405,8 @@ const translations = {
     errorEmergencyNameRequired: "El nombre del contacto de emergencia es requerido",
     errorEmergencyPhoneRequired: "El telefono del contacto de emergencia es requerido",
     errorInvalidEmergencyPhone: "Ingrese un numero valido: (xxx) xxx-xxxx",
+    error: "Error",
+    failedToUpdateVisibility: "Error al actualizar la visibilidad",
   }
 };
 
@@ -4092,7 +4098,7 @@ export default function TechnicianPortal() {
                             : (language === 'en' ? "Your profile is now hidden from employers" : "Votre profil est maintenant caché"),
                         });
                       } catch (error) {
-                        toast({ title: "Error", description: "Failed to update visibility", variant: "destructive" });
+                        toast({ title: t.error || "Error", description: t.failedToUpdateVisibility || "Failed to update visibility", variant: "destructive" });
                       }
                     }}
                     data-testid="switch-employer-visibility"

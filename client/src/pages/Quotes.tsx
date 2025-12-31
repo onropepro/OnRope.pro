@@ -644,8 +644,8 @@ export default function Quotes() {
     onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to create quote",
+        title: t("common.error"),
+        description: error.message || t("quotes.failedToCreate"),
       });
     },
   });
@@ -821,8 +821,8 @@ export default function Quotes() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update quote",
+        title: t("common.error"),
+        description: error.message || t("quotes.failedToCreate"),
         variant: "destructive",
       });
     },
