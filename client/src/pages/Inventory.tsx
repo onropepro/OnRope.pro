@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight, Triangle, Signpost, Disc, Wand2 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
@@ -89,6 +89,16 @@ const gearTypeKeys = [
   { key: "backupDevice", defaultName: "Back up device", icon: Lock },
   { key: "lanyard", defaultName: "Lanyard", icon: Anchor },
   { key: "shockAbsorber", defaultName: "Shock absorber", icon: Zap },
+  { key: "highPressureHose", defaultName: "High pressure hose", icon: Cable },
+  { key: "airHose", defaultName: "Air hose", icon: Cable },
+  { key: "cautionSigns", defaultName: "Caution signs", icon: AlertTriangle },
+  { key: "cones", defaultName: "Cones", icon: Triangle },
+  { key: "streetSigns", defaultName: "Street signs", icon: Signpost },
+  { key: "delineator", defaultName: "Delineator", icon: Triangle },
+  { key: "pressureHoseGasket", defaultName: "Pressure hose gasket", icon: Disc },
+  { key: "pressureWasherWand", defaultName: "Pressure washer wand", icon: Wand2 },
+  { key: "pulley", defaultName: "Pulley", icon: Gauge },
+  { key: "slings", defaultName: "Slings", icon: Anchor },
   { key: "other", defaultName: "Other", icon: MoreHorizontal }
 ];
 
