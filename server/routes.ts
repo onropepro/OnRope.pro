@@ -27256,6 +27256,82 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+
+  // Onboarding endpoints for new employers
+  app.post("/api/onboarding/complete", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      await storage.updateUser(user.id, {
+        onboardingCompleted: true,
+        onboardingCompletedAt: new Date(),
+      });
+
+      res.json({ success: true, message: "Onboarding completed" });
+    } catch (error) {
+      console.error("Complete onboarding error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/onboarding/skip", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      await storage.updateUser(user.id, {
+        onboardingCompleted: true,
+        onboardingSkippedAt: new Date(),
+      });
+
+      res.json({ success: true, message: "Onboarding skipped" });
+    } catch (error) {
+      console.error("Skip onboarding error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/company/profile", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const profileSchema = z.object({
+        companyName: z.string().min(1).max(255).optional(),
+        timezone: z.string().max(100).optional(),
+      });
+      
+      const parseResult = profileSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "Invalid request data", errors: parseResult.error.errors });
+      }
+      
+      const updates: Partial<{ companyName: string; timezone: string }> = {};
+      
+      if (parseResult.data.companyName !== undefined) {
+        updates.companyName = parseResult.data.companyName;
+      }
+      if (parseResult.data.timezone !== undefined) {
+        updates.timezone = parseResult.data.timezone || "America/Vancouver";
+      }
+
+      await storage.updateUser(user.id, updates);
+      
+      const updatedUser = await storage.getUserById(user.id);
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Update company profile error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Start background workers
