@@ -314,12 +314,12 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                   <div className="max-w-6xl mx-auto px-6"><div className="flex gap-6">
                     {/* Column 1: Operations (5 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-0.5" data-testid="menu-category-operations">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-operations">
                         <Settings className="w-4 h-4 text-blue-600" />
                         <span className="font-semibold text-sm text-foreground">Operations</span>
                       </div>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/project-management");
                           setShowModulesMenu(false);
@@ -332,7 +332,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/work-session-time-tracking");
                           setShowModulesMenu(false);
@@ -345,7 +345,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/scheduling-calendar");
                           setShowModulesMenu(false);
@@ -358,7 +358,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/gear-inventory");
                           setShowModulesMenu(false);
@@ -371,7 +371,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/white-label-branding");
                           setShowModulesMenu(false);
@@ -387,12 +387,12 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
                     {/* Column 2: Safety (4 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-0.5" data-testid="menu-category-safety">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-safety">
                         <HeartPulse className="w-4 h-4 text-red-600" />
                         <span className="font-semibold text-sm text-foreground">Safety</span>
                       </div>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/safety-compliance");
                           setShowModulesMenu(false);
@@ -405,7 +405,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/company-safety-rating");
                           setShowModulesMenu(false);
@@ -418,7 +418,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/irata-sprat-task-logging");
                           setShowModulesMenu(false);
@@ -431,7 +431,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/document-management");
                           setShowModulesMenu(false);
@@ -447,12 +447,12 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
                     {/* Column 3: Team (4 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-0.5" data-testid="menu-category-team">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-team">
                         <Users className="w-4 h-4 text-violet-600" />
                         <span className="font-semibold text-sm text-foreground">Team</span>
                       </div>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/employee-management");
                           setShowModulesMenu(false);
@@ -465,7 +465,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/technician-passport");
                           setShowModulesMenu(false);
@@ -478,7 +478,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/employer-job-board");
                           setShowModulesMenu(false);
@@ -491,7 +491,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/user-access-authentication");
                           setShowModulesMenu(false);
@@ -507,12 +507,12 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
                     {/* Column 4: Financial & Sales (3 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-0.5" data-testid="menu-category-financial-sales">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-financial-sales">
                         <Wallet className="w-4 h-4 text-emerald-600" />
                         <span className="font-semibold text-sm text-foreground">Financial & Sales</span>
                       </div>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/payroll-financial");
                           setShowModulesMenu(false);
@@ -525,7 +525,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/quoting-sales-pipeline");
                           setShowModulesMenu(false);
@@ -538,7 +538,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/client-relationship-management");
                           setShowModulesMenu(false);
@@ -554,12 +554,12 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
                     {/* Column 5: Communication (2 items) */}
                     <div className="flex-1 flex flex-col">
-                      <div className="flex items-center gap-2 px-2 py-1 mb-0.5" data-testid="menu-category-communication">
+                      <div className="flex items-center gap-2 px-2 py-1 mb-1 pb-1 border-b border-border/50" data-testid="menu-category-communication">
                         <MessageSquare className="w-4 h-4 text-rose-600" />
                         <span className="font-semibold text-sm text-foreground">Communication</span>
                       </div>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/resident-portal");
                           setShowModulesMenu(false);
@@ -572,7 +572,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                         </div>
                       </button>
                       <button
-                        className="flex items-start py-1.5 px-2 rounded-md hover-elevate transition-colors text-left group"
+                        className="flex items-start p-2 rounded-md hover-elevate transition-colors text-left group"
                         onClick={() => {
                           setLocation("/modules/property-manager-interface");
                           setShowModulesMenu(false);
