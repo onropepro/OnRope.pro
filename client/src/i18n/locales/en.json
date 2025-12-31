@@ -826,7 +826,7 @@
     "info": "Info",
     "active": "Active",
     "inactive": "Inactive",
-    "pending": "Pending",
+    "pending": "pending",
     "completed": "Completed",
     "draft": "Draft",
     "approved": "Approved",
@@ -937,7 +937,29 @@
     "perJob": "per job",
     "viewDetails": "View Details",
     "noActivityThisMonth": "No activity this month",
-    "completeSessionsForStats": "Complete work sessions to see your stats"
+    "completeSessionsForStats": "Complete work sessions to see your stats",
+    "noAccess": "No access",
+    "expiringSoon": "Expiring Soon",
+    "needAttention": "need attention",
+    "overdueLabel": "Overdue",
+    "dueToday": "Due Today",
+    "dueThisWeek": "Due This Week",
+    "inspectionRequired": "Inspection required",
+    "scheduleInspection": "Schedule inspection",
+    "clockedIn": "Clocked In",
+    "offDuty": "Off Duty",
+    "allCaughtUp": "You're all caught up",
+    "value": "Value",
+    "activeNow": "Active now",
+    "sessions": "Sessions",
+    "upToDate": "Up to Date",
+    "jobs": "jobs",
+    "job": "job",
+    "comingSoon": "Coming soon",
+    "underDevelopment": "This card is under development",
+    "emp": "emp",
+    "employees": "employees",
+    "unknownDate": "Unknown date"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -8819,14 +8841,20 @@
       "title": "Certification Alerts",
       "expiring": "Expiring",
       "expired": "Expired",
-      "viewAll": "View All"
+      "viewAll": "View All Certifications",
+      "allUpToDate": "All certifications up to date",
+      "requireRenewal": "Require immediate renewal",
+      "within60Days": "Within 60 days"
     },
     "harnessStatus": {
       "title": "Harness Status",
       "needsInspection": "Needs Inspection",
       "upToDate": "Up to Date",
       "noHarnesses": "No harness data",
-      "viewInventory": "View Inventory"
+      "viewInventory": "View Inventory",
+      "allInspected": "All harnesses inspected",
+      "pastInspection": "Past inspection date",
+      "viewInspections": "View Inspections"
     },
     "myPerformance": {
       "title": "My Performance",
@@ -8845,20 +8873,25 @@
       "title": "New Feedback",
       "unread": "Unread",
       "noFeedback": "No new feedback",
-      "viewAll": "View All"
+      "viewAll": "View All",
+      "unreadItems": "Unread items"
     },
     "notClockedIn": {
       "title": "Not Clocked In",
       "expected": "Expected on site",
-      "allClockedIn": "All expected workers clocked in",
-      "viewDetails": "View Details"
+      "allClockedIn": "All scheduled employees clocked in",
+      "viewDetails": "View Details",
+      "scheduled": "Scheduled but not started",
+      "noMissing": "No missing check-ins"
     },
     "outstandingQuotes": {
       "title": "Outstanding Quotes",
       "pending": "Pending",
       "totalValue": "Total Value",
       "noQuotes": "No outstanding quotes",
-      "viewQuotes": "View Quotes"
+      "viewQuotes": "View Quotes",
+      "sentThisWeek": "quotes sent this week",
+      "viewAll": "View All Quotes"
     },
     "overdueProjects": {
       "title": "Overdue Projects",
@@ -8871,15 +8904,23 @@
       "title": "Overtime Alert",
       "approaching": "Approaching OT",
       "inOvertime": "In Overtime",
-      "noAlerts": "No overtime alerts",
-      "viewDetails": "View Details"
+      "noAlerts": "No overtime alerts this period",
+      "viewDetails": "View Details",
+      "exceeding": "Exceeding OT",
+      "over40": "Already over 40 hours",
+      "within5": "Within 5 hours of limit",
+      "totalOT": "Total OT this period"
     },
     "payPeriod": {
       "title": "Pay Period",
       "currentPeriod": "Current Period",
       "daysRemaining": "days remaining",
       "totalHours": "Total Hours",
-      "viewPayroll": "View Payroll"
+      "viewPayroll": "View Payroll",
+      "currentTitle": "Current Pay Period",
+      "estCost": "Est. Labor Cost",
+      "employeesWithHours": "employees with hours",
+      "noData": "No pay period data available"
     },
     "pendingApprovals": {
       "title": "Pending Approvals",
@@ -8892,32 +8933,47 @@
       "title": "Toolbox Coverage",
       "coverage": "Coverage",
       "thisWeek": "This Week",
-      "viewMeetings": "View Meetings"
+      "viewMeetings": "View Meetings",
+      "required": "Meeting Required",
+      "noRecords": "No meetings on record",
+      "daysSince": "{{count}} days since last meeting",
+      "lastMeeting": "Last meeting {{count}} day(s) ago",
+      "meetingsThisMonth": "meetings this month"
     },
     "safetyRating": {
       "title": "Safety Rating",
       "companyScore": "Company Score",
       "trend": "Trend",
-      "viewDetails": "View Details"
+      "viewDetails": "View Details",
+      "titlePlural": "Safety Ratings",
+      "companySafety": "Company Safety",
+      "workforceSafety": "Workforce Safety"
     },
     "todaysHours": {
       "title": "Today's Hours",
       "hoursLogged": "Hours Logged",
       "clockIn": "Clock In",
       "clockOut": "Clock Out",
-      "onBreak": "On Break"
+      "onBreak": "On Break",
+      "companyWide": "Company-wide total",
+      "viewLogged": "View Logged Hours",
+      "noHours": "No hours logged today",
+      "willAppear": "Work sessions will appear here"
     },
     "weekAtGlance": {
       "title": "Week at a Glance",
       "scheduledHours": "Scheduled Hours",
       "actualHours": "Actual Hours",
-      "projects": "Projects"
+      "projects": "Projects",
+      "openSchedule": "Open Schedule"
     },
     "myTime": {
-      "title": "My Time",
+      "title": "My Time Today",
       "hoursThisWeek": "Hours This Week",
       "breaksTaken": "Breaks Taken",
-      "viewTimesheet": "View Timesheet"
+      "viewTimesheet": "View My Timesheet",
+      "workingOn": "Working on",
+      "hoursToday": "Hours today"
     },
     "activeProjects": {
       "title": "Active Projects",
@@ -8933,5 +8989,40 @@
       "title": "Coming Soon",
       "description": "This feature is under development"
     }
+  },
+  "safetyRating": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "warning": "Warning",
+    "critical": "Critical",
+    "csrTitle": "Company Safety Rating (CSR)",
+    "currentRating": "Current Rating",
+    "whatIsCSR": "What is CSR?",
+    "csrDescription": "The Company Safety Rating measures your company's overall safety compliance based on:",
+    "harnessInspections": "Harness inspections",
+    "toolboxMeetings": "Toolbox meetings",
+    "flhaCompliance": "FLHA compliance",
+    "incidentReports": "Incident reports",
+    "reputationNote": "This rating affects your company's reputation with property managers and clients.",
+    "ratingHistory": "Rating History",
+    "noChanges": "No rating changes recorded yet",
+    "wssTitle": "Workforce Safety Score Details",
+    "workforceSafetyScore": "Workforce Safety Score",
+    "whatIsWSS": "What is WSS?",
+    "wssDescription": "The Workforce Safety Score is the average of all employee Personal Safety Ratings (PSR). Each employee's PSR is calculated from 4 components (25% each):",
+    "certsStatus": "Certifications status",
+    "safetyDocs": "Safety documents",
+    "quizzesPassed": "Safety quizzes passed",
+    "workHistory": "Work history",
+    "educationalNote": "This is an educational metric only and does not affect your CSR.",
+    "employeePSR": "Employee PSR Breakdown",
+    "certs": "Certs",
+    "docs": "Docs",
+    "quizzes": "Quizzes",
+    "work": "Work",
+    "recentInspections": "recent inspections",
+    "workSessions": "work sessions",
+    "incidents": "incidents",
+    "noEmployeePSR": "No employee PSR data available"
   }
 }

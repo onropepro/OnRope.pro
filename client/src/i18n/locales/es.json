@@ -900,7 +900,7 @@
     "info": "Información",
     "active": "Activo",
     "inactive": "Inactivo",
-    "pending": "Pendiente",
+    "pending": "pendiente",
     "completed": "Completado",
     "draft": "Draft",
     "approved": "Approved",
@@ -934,9 +934,9 @@
     "showMore": "Ver más",
     "showLess": "Ver menos",
     "seeAll": "Ver todo",
-    "viewAll": "View All",
+    "viewAll": "Ver todo",
     "unknownBuilding": "Unknown Building",
-    "unknown": "Unknown",
+    "unknown": "Desconocido",
     "employee": "Employee",
     "you": "You",
     "remove": "Quitar",
@@ -1013,7 +1013,29 @@
     "perJob": "por trabajo",
     "viewDetails": "Ver detalles",
     "noActivityThisMonth": "Sin actividad este mes",
-    "completeSessionsForStats": "Complete sesiones para ver sus estadísticas"
+    "completeSessionsForStats": "Complete sesiones para ver sus estadísticas",
+    "noAccess": "Sin acceso",
+    "expiringSoon": "Expira pronto",
+    "needAttention": "requieren atención",
+    "overdueLabel": "Vencido",
+    "dueToday": "Vence hoy",
+    "dueThisWeek": "Vence esta semana",
+    "inspectionRequired": "Inspección requerida",
+    "scheduleInspection": "Programar inspección",
+    "clockedIn": "Fichado",
+    "offDuty": "Fuera de servicio",
+    "allCaughtUp": "Estás al día",
+    "value": "Valor",
+    "activeNow": "Activos ahora",
+    "sessions": "Sesiones",
+    "upToDate": "Actualizado",
+    "jobs": "trabajos",
+    "job": "trabajo",
+    "comingSoon": "Próximamente",
+    "underDevelopment": "Esta tarjeta está en desarrollo",
+    "emp": "emp",
+    "employees": "empleados",
+    "unknownDate": "Fecha desconocida"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -12294,14 +12316,20 @@
       "title": "Alertas de Certificación",
       "expiring": "Por vencer",
       "expired": "Vencidas",
-      "viewAll": "Ver Todo"
+      "viewAll": "Ver Todas las Certificaciones",
+      "allUpToDate": "Todas las certificaciones actualizadas",
+      "requireRenewal": "Renovación inmediata requerida",
+      "within60Days": "Dentro de 60 días"
     },
     "harnessStatus": {
       "title": "Estado de Arneses",
       "needsInspection": "Inspección Requerida",
       "upToDate": "Al Día",
       "noHarnesses": "Sin datos de arneses",
-      "viewInventory": "Ver inventario"
+      "viewInventory": "Ver inventario",
+      "allInspected": "Todos los arneses inspeccionados",
+      "pastInspection": "Fecha de inspección pasada",
+      "viewInspections": "Ver Inspecciones"
     },
     "myPerformance": {
       "title": "Mi Rendimiento",
@@ -12317,23 +12345,28 @@
       "viewSchedule": "Ver horario"
     },
     "newFeedback": {
-      "title": "Nuevos Comentarios",
+      "title": "Nueva Retroalimentación",
       "unread": "Sin leer",
       "noFeedback": "Sin nuevos comentarios",
-      "viewAll": "Ver Todo"
+      "viewAll": "Ver Todo",
+      "unreadItems": "Elementos no leídos"
     },
     "notClockedIn": {
-      "title": "Sin Fichar",
+      "title": "No Fichados",
       "expected": "Esperados en sitio",
-      "allClockedIn": "Todos los trabajadores esperados han fichado",
-      "viewDetails": "Ver detalles"
+      "allClockedIn": "Todos los empleados programados fichados",
+      "viewDetails": "Ver detalles",
+      "scheduled": "Programados pero no iniciados",
+      "noMissing": "Sin fichajes faltantes"
     },
     "outstandingQuotes": {
       "title": "Cotizaciones Pendientes",
       "pending": "Pendientes",
       "totalValue": "Valor Total",
       "noQuotes": "Sin cotizaciones pendientes",
-      "viewQuotes": "Ver cotizaciones"
+      "viewQuotes": "Ver cotizaciones",
+      "sentThisWeek": "cotizaciones enviadas esta semana",
+      "viewAll": "Ver Todas las Cotizaciones"
     },
     "overdueProjects": {
       "title": "Proyectos Atrasados",
@@ -12346,15 +12379,23 @@
       "title": "Alerta Horas Extra",
       "approaching": "Acercándose a HE",
       "inOvertime": "En Horas Extra",
-      "noAlerts": "Sin alertas",
-      "viewDetails": "Ver detalles"
+      "noAlerts": "Sin alertas de horas extra este período",
+      "viewDetails": "Ver detalles",
+      "exceeding": "Excediendo HE",
+      "over40": "Ya más de 40 horas",
+      "within5": "A 5 horas del límite",
+      "totalOT": "Total HE este período"
     },
     "payPeriod": {
       "title": "Período de Pago",
       "currentPeriod": "Período Actual",
       "daysRemaining": "días restantes",
       "totalHours": "Horas Totales",
-      "viewPayroll": "Ver nómina"
+      "viewPayroll": "Ver Nómina",
+      "currentTitle": "Período de Pago Actual",
+      "estCost": "Costo Laboral Est.",
+      "employeesWithHours": "empleados con horas",
+      "noData": "No hay datos de período de pago disponibles"
     },
     "pendingApprovals": {
       "title": "Aprobaciones Pendientes",
@@ -12367,32 +12408,47 @@
       "title": "Cobertura Toolbox",
       "coverage": "Cobertura",
       "thisWeek": "Esta Semana",
-      "viewMeetings": "Ver reuniones"
+      "viewMeetings": "Ver Reuniones",
+      "required": "Reunión Requerida",
+      "noRecords": "Sin reuniones registradas",
+      "daysSince": "{{count}} días desde la última reunión",
+      "lastMeeting": "Última reunión hace {{count}} día(s)",
+      "meetingsThisMonth": "reuniones este mes"
     },
     "safetyRating": {
-      "title": "Puntuación Seguridad",
+      "title": "Calificación de Seguridad",
       "companyScore": "Puntuación Empresa",
       "trend": "Tendencia",
-      "viewDetails": "Ver detalles"
+      "viewDetails": "Ver detalles",
+      "titlePlural": "Calificaciones de Seguridad",
+      "companySafety": "Seguridad de la Empresa",
+      "workforceSafety": "Seguridad del Personal"
     },
     "todaysHours": {
       "title": "Horas de Hoy",
       "hoursLogged": "Horas Registradas",
       "clockIn": "Fichar entrada",
       "clockOut": "Fichar salida",
-      "onBreak": "En descanso"
+      "onBreak": "En descanso",
+      "companyWide": "Total de la empresa",
+      "viewLogged": "Ver Horas Registradas",
+      "noHours": "Sin horas registradas hoy",
+      "willAppear": "Las sesiones de trabajo aparecerán aquí"
     },
     "weekAtGlance": {
       "title": "Semana de un Vistazo",
       "scheduledHours": "Horas Programadas",
       "actualHours": "Horas Reales",
-      "projects": "Proyectos"
+      "projects": "Proyectos",
+      "openSchedule": "Abrir Horario"
     },
     "myTime": {
-      "title": "Mi Tiempo",
+      "title": "Mi Tiempo Hoy",
       "hoursThisWeek": "Horas Esta Semana",
       "breaksTaken": "Descansos Tomados",
-      "viewTimesheet": "Ver hoja de tiempo"
+      "viewTimesheet": "Ver Mi Hoja de Tiempo",
+      "workingOn": "Trabajando en",
+      "hoursToday": "Horas hoy"
     },
     "activeProjects": {
       "title": "Proyectos Activos",
@@ -12408,5 +12464,40 @@
       "title": "Próximamente",
       "description": "Esta función está en desarrollo"
     }
+  },
+  "safetyRating": {
+    "excellent": "Excelente",
+    "good": "Bueno",
+    "warning": "Advertencia",
+    "critical": "Crítico",
+    "csrTitle": "Calificación de Seguridad de la Empresa (CSR)",
+    "currentRating": "Calificación Actual",
+    "whatIsCSR": "¿Qué es CSR?",
+    "csrDescription": "La Calificación de Seguridad de la Empresa mide el cumplimiento general de seguridad de su empresa basado en:",
+    "harnessInspections": "Inspecciones de arneses",
+    "toolboxMeetings": "Reuniones toolbox",
+    "flhaCompliance": "Cumplimiento FLHA",
+    "incidentReports": "Informes de incidentes",
+    "reputationNote": "Esta calificación afecta la reputación de su empresa con los administradores de propiedades y clientes.",
+    "ratingHistory": "Historial de Calificaciones",
+    "noChanges": "Aún no se han registrado cambios en la calificación",
+    "wssTitle": "Detalles de la Puntuación de Seguridad del Personal",
+    "workforceSafetyScore": "Puntuación de Seguridad del Personal",
+    "whatIsWSS": "¿Qué es WSS?",
+    "wssDescription": "La Puntuación de Seguridad del Personal es el promedio de todas las Calificaciones de Seguridad Personal (PSR) de los empleados. El PSR de cada empleado se calcula a partir de 4 componentes (25% cada uno):",
+    "certsStatus": "Estado de certificaciones",
+    "safetyDocs": "Documentos de seguridad",
+    "quizzesPassed": "Pruebas de seguridad aprobadas",
+    "workHistory": "Historial de trabajo",
+    "educationalNote": "Esta es una métrica educativa únicamente y no afecta su CSR.",
+    "employeePSR": "Desglose PSR por Empleado",
+    "certs": "Certs",
+    "docs": "Docs",
+    "quizzes": "Pruebas",
+    "work": "Trabajo",
+    "recentInspections": "inspecciones recientes",
+    "workSessions": "sesiones de trabajo",
+    "incidents": "incidentes",
+    "noEmployeePSR": "No hay datos PSR de empleados disponibles"
   }
 }

@@ -837,7 +837,7 @@
     "info": "Info",
     "active": "Actif",
     "inactive": "Inactif",
-    "pending": "En attente",
+    "pending": "en attente",
     "completed": "Terminé",
     "draft": "Brouillon",
     "approved": "Approuvé",
@@ -948,7 +948,29 @@
     "perJob": "par travail",
     "viewDetails": "Voir les détails",
     "noActivityThisMonth": "Aucune activité ce mois",
-    "completeSessionsForStats": "Complétez des sessions pour voir vos stats"
+    "completeSessionsForStats": "Complétez des sessions pour voir vos stats",
+    "noAccess": "Pas d'accès",
+    "expiringSoon": "Expire bientôt",
+    "needAttention": "requièrent attention",
+    "overdueLabel": "En retard",
+    "dueToday": "Dû aujourd'hui",
+    "dueThisWeek": "Dû cette semaine",
+    "inspectionRequired": "Inspection requise",
+    "scheduleInspection": "Planifier l'inspection",
+    "clockedIn": "Pointé",
+    "offDuty": "Hors service",
+    "allCaughtUp": "Vous êtes à jour",
+    "value": "Valeur",
+    "activeNow": "Actifs maintenant",
+    "sessions": "Sessions",
+    "upToDate": "À jour",
+    "jobs": "travaux",
+    "job": "travail",
+    "comingSoon": "Bientôt disponible",
+    "underDevelopment": "Cette carte est en développement",
+    "emp": "emp",
+    "employees": "employés",
+    "unknownDate": "Date inconnue"
   },
   "auth": {
     "welcomeBack": "Bon retour",
@@ -12443,17 +12465,23 @@
       "more": "de plus"
     },
     "certificationAlerts": {
-      "title": "Alertes Certification",
+      "title": "Alertes de Certification",
       "expiring": "Expirantes",
       "expired": "Expirées",
-      "viewAll": "Voir Tout"
+      "viewAll": "Voir Toutes les Certifications",
+      "allUpToDate": "Toutes les certifications à jour",
+      "requireRenewal": "Renouvellement immédiat requis",
+      "within60Days": "Dans 60 jours"
     },
     "harnessStatus": {
       "title": "État des Harnais",
       "needsInspection": "Inspection Requise",
       "upToDate": "À Jour",
       "noHarnesses": "Aucune donnée de harnais",
-      "viewInventory": "Voir l'inventaire"
+      "viewInventory": "Voir l'inventaire",
+      "allInspected": "Tous les harnais inspectés",
+      "pastInspection": "Date d'inspection dépassée",
+      "viewInspections": "Voir les Inspections"
     },
     "myPerformance": {
       "title": "Ma Performance",
@@ -12471,21 +12499,26 @@
     "newFeedback": {
       "title": "Nouveaux Commentaires",
       "unread": "Non lus",
-      "noFeedback": "Aucun nouveau commentaire",
-      "viewAll": "Voir Tout"
+      "noFeedback": "Pas de nouveaux commentaires",
+      "viewAll": "Voir Tout",
+      "unreadItems": "Éléments non lus"
     },
     "notClockedIn": {
       "title": "Non Pointés",
       "expected": "Attendus sur site",
-      "allClockedIn": "Tous les travailleurs attendus sont pointés",
-      "viewDetails": "Voir les détails"
+      "allClockedIn": "Tous les employés prévus ont pointé",
+      "viewDetails": "Voir les détails",
+      "scheduled": "Programmés mais pas commencés",
+      "noMissing": "Aucun pointage manquant"
     },
     "outstandingQuotes": {
       "title": "Devis en Attente",
       "pending": "En attente",
       "totalValue": "Valeur Totale",
       "noQuotes": "Aucun devis en attente",
-      "viewQuotes": "Voir les devis"
+      "viewQuotes": "Voir les devis",
+      "sentThisWeek": "devis envoyés cette semaine",
+      "viewAll": "Voir Tous les Devis"
     },
     "overdueProjects": {
       "title": "Projets en Retard",
@@ -12495,18 +12528,26 @@
       "viewProjects": "Voir les projets"
     },
     "overtimeAlert": {
-      "title": "Alerte Heures Sup.",
+      "title": "Alerte Heures Sup",
       "approaching": "Approchant les HS",
       "inOvertime": "En Heures Sup.",
-      "noAlerts": "Aucune alerte",
-      "viewDetails": "Voir les détails"
+      "noAlerts": "Aucune alerte heures sup cette période",
+      "viewDetails": "Voir les détails",
+      "exceeding": "Dépassant les HS",
+      "over40": "Déjà plus de 40 heures",
+      "within5": "À 5 heures de la limite",
+      "totalOT": "Total HS cette période"
     },
     "payPeriod": {
       "title": "Période de Paie",
       "currentPeriod": "Période Actuelle",
       "daysRemaining": "jours restants",
       "totalHours": "Heures Totales",
-      "viewPayroll": "Voir la paie"
+      "viewPayroll": "Voir la Paie",
+      "currentTitle": "Période de Paie Actuelle",
+      "estCost": "Coût Main-d'oeuvre Est.",
+      "employeesWithHours": "employés avec des heures",
+      "noData": "Aucune donnée de période de paie disponible"
     },
     "pendingApprovals": {
       "title": "Approbations en Attente",
@@ -12519,32 +12560,47 @@
       "title": "Couverture Toolbox",
       "coverage": "Couverture",
       "thisWeek": "Cette Semaine",
-      "viewMeetings": "Voir les réunions"
+      "viewMeetings": "Voir les Réunions",
+      "required": "Réunion Requise",
+      "noRecords": "Aucune réunion enregistrée",
+      "daysSince": "{{count}} jours depuis la dernière réunion",
+      "lastMeeting": "Dernière réunion il y a {{count}} jour(s)",
+      "meetingsThisMonth": "réunions ce mois"
     },
     "safetyRating": {
-      "title": "Score Sécurité",
+      "title": "Note de Sécurité",
       "companyScore": "Score Entreprise",
       "trend": "Tendance",
-      "viewDetails": "Voir les détails"
+      "viewDetails": "Voir les détails",
+      "titlePlural": "Notes de Sécurité",
+      "companySafety": "Sécurité de l'Entreprise",
+      "workforceSafety": "Sécurité du Personnel"
     },
     "todaysHours": {
       "title": "Heures d'Aujourd'hui",
       "hoursLogged": "Heures Enregistrées",
       "clockIn": "Pointer l'entrée",
       "clockOut": "Pointer la sortie",
-      "onBreak": "En pause"
+      "onBreak": "En pause",
+      "companyWide": "Total à l'échelle de l'entreprise",
+      "viewLogged": "Voir les Heures Enregistrées",
+      "noHours": "Aucune heure enregistrée aujourd'hui",
+      "willAppear": "Les sessions de travail apparaîtront ici"
     },
     "weekAtGlance": {
       "title": "Semaine en un Coup d'Oeil",
       "scheduledHours": "Heures Prévues",
       "actualHours": "Heures Réelles",
-      "projects": "Projets"
+      "projects": "Projets",
+      "openSchedule": "Ouvrir le Calendrier"
     },
     "myTime": {
-      "title": "Mon Temps",
+      "title": "Mon Temps Aujourd'hui",
       "hoursThisWeek": "Heures Cette Semaine",
       "breaksTaken": "Pauses Prises",
-      "viewTimesheet": "Voir la feuille de temps"
+      "viewTimesheet": "Voir Ma Feuille de Temps",
+      "workingOn": "Travaillant sur",
+      "hoursToday": "Heures aujourd'hui"
     },
     "activeProjects": {
       "title": "Projets Actifs",
@@ -12560,5 +12616,40 @@
       "title": "Bientôt Disponible",
       "description": "Cette fonctionnalité est en développement"
     }
+  },
+  "safetyRating": {
+    "excellent": "Excellent",
+    "good": "Bon",
+    "warning": "Attention",
+    "critical": "Critique",
+    "csrTitle": "Note de Sécurité de l'Entreprise (CSR)",
+    "currentRating": "Note Actuelle",
+    "whatIsCSR": "Qu'est-ce que le CSR?",
+    "csrDescription": "La Note de Sécurité de l'Entreprise mesure la conformité globale de votre entreprise en matière de sécurité basée sur:",
+    "harnessInspections": "Inspections de harnais",
+    "toolboxMeetings": "Réunions toolbox",
+    "flhaCompliance": "Conformité FLHA",
+    "incidentReports": "Rapports d'incidents",
+    "reputationNote": "Cette note affecte la réputation de votre entreprise auprès des gestionnaires immobiliers et des clients.",
+    "ratingHistory": "Historique des Notes",
+    "noChanges": "Aucun changement de note enregistré",
+    "wssTitle": "Détails du Score de Sécurité du Personnel",
+    "workforceSafetyScore": "Score de Sécurité du Personnel",
+    "whatIsWSS": "Qu'est-ce que le WSS?",
+    "wssDescription": "Le Score de Sécurité du Personnel est la moyenne de toutes les Notes de Sécurité Personnelle (PSR) des employés. Le PSR de chaque employé est calculé à partir de 4 composantes (25% chacune):",
+    "certsStatus": "Statut des certifications",
+    "safetyDocs": "Documents de sécurité",
+    "quizzesPassed": "Quiz de sécurité réussis",
+    "workHistory": "Historique de travail",
+    "educationalNote": "Il s'agit d'une métrique éducative uniquement et n'affecte pas votre CSR.",
+    "employeePSR": "Détail PSR par Employé",
+    "certs": "Certs",
+    "docs": "Docs",
+    "quizzes": "Quiz",
+    "work": "Travail",
+    "recentInspections": "inspections récentes",
+    "workSessions": "sessions de travail",
+    "incidents": "incidents",
+    "noEmployeePSR": "Aucune donnée PSR d'employé disponible"
   }
 }
