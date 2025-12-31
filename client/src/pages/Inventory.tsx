@@ -3108,7 +3108,7 @@ export default function Inventory() {
                                 type="number"
                                 min="0"
                                 step="0.01"
-                                placeholder="e.g., 400"
+                                placeholder={t('inventory.placeholders.ropeLength', 'e.g., 400')}
                                 {...field}
                                 value={field.value || ""}
                                 data-testid="input-rope-length"
@@ -3130,7 +3130,7 @@ export default function Inventory() {
                                 type="number"
                                 min="0"
                                 step="0.01"
-                                placeholder="e.g., 1.45"
+                                placeholder={t('inventory.placeholders.pricePerFoot', 'e.g., 1.45')}
                                 {...field}
                                 value={field.value || ""}
                                 data-testid="input-price-per-feet"
@@ -4739,7 +4739,7 @@ export default function Inventory() {
                               <Label htmlFor="self-assign-serial">Serial Number</Label>
                               <Input
                                 id="self-assign-serial"
-                                placeholder="Enter new serial number"
+                                placeholder={t('inventory.enterNewSerial', 'Enter new serial number')}
                                 value={selfAssignSerialNumber}
                                 onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
                                 data-testid="input-self-assign-serial-number"
@@ -4793,7 +4793,7 @@ export default function Inventory() {
                           <Label htmlFor="self-assign-serial">Serial Number</Label>
                           <Input
                             id="self-assign-serial"
-                            placeholder="Enter serial number"
+                            placeholder={t('inventory.enterSerial', 'Enter serial number')}
                             value={selfAssignSerialNumber}
                             onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
                             data-testid="input-self-assign-serial-number"
@@ -4889,7 +4889,7 @@ export default function Inventory() {
               <Label htmlFor="edit-my-serial">Serial Number</Label>
               <Input
                 id="edit-my-serial"
-                placeholder="Enter serial number"
+                placeholder={t('inventory.enterSerial', 'Enter serial number')}
                 value={editMySerialNumber}
                 onChange={(e) => setEditMySerialNumber(e.target.value)}
                 data-testid="input-edit-my-serial"
@@ -5170,7 +5170,7 @@ export default function Inventory() {
                 <Label htmlFor="damage-description">Damage Description *</Label>
                 <Textarea
                   id="damage-description"
-                  placeholder="Describe the damage in detail..."
+                  placeholder={t('inventory.describeDamage', 'Describe the damage in detail...')}
                   value={damageDescription}
                   onChange={(e) => setDamageDescription(e.target.value)}
                   className="min-h-[100px]"
@@ -5183,7 +5183,7 @@ export default function Inventory() {
                 <Label htmlFor="damage-location">Location on Equipment</Label>
                 <Input
                   id="damage-location"
-                  placeholder="e.g., Left shoulder strap, buckle area..."
+                  placeholder={t('inventory.placeholders.damageLocation', 'e.g., Left shoulder strap, buckle area...')}
                   value={damageLocation}
                   onChange={(e) => setDamageLocation(e.target.value)}
                   data-testid="input-damage-location"
@@ -5225,7 +5225,7 @@ export default function Inventory() {
                 <Label htmlFor="corrective-action">Corrective Action Taken</Label>
                 <Textarea
                   id="corrective-action"
-                  placeholder="Describe any repairs or actions taken..."
+                  placeholder={t('inventory.describeRepairs', 'Describe any repairs or actions taken...')}
                   value={correctiveAction}
                   onChange={(e) => setCorrectiveAction(e.target.value)}
                   data-testid="textarea-corrective-action"
@@ -5256,7 +5256,7 @@ export default function Inventory() {
                       <Label htmlFor="retirement-reason">Retirement Reason *</Label>
                       <Textarea
                         id="retirement-reason"
-                        placeholder="Explain why this equipment needs to be retired..."
+                        placeholder={t('inventory.explainRetirement', 'Explain why this equipment needs to be retired...')}
                         value={retirementReason}
                         onChange={(e) => setRetirementReason(e.target.value)}
                         className="min-h-[80px]"
@@ -5272,7 +5272,7 @@ export default function Inventory() {
                 <Label htmlFor="damage-notes">Additional Notes</Label>
                 <Textarea
                   id="damage-notes"
-                  placeholder="Any other relevant information..."
+                  placeholder={t('inventory.otherInfo', 'Any other relevant information...')}
                   value={damageNotes}
                   onChange={(e) => setDamageNotes(e.target.value)}
                   data-testid="textarea-damage-notes"

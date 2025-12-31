@@ -1,4 +1,5 @@
 import { Link } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { 
   Building2, 
@@ -29,6 +30,7 @@ interface HelpArticle {
 }
 
 export default function ForCompanyOwners() {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<{ articles: HelpArticle[] }>({
     queryKey: ['/api/help/articles', { stakeholder: 'owner' }],
     queryFn: async () => {
@@ -43,23 +45,23 @@ export default function ForCompanyOwners() {
   const keyFeatures = [
     {
       icon: Users,
-      title: 'Team Management',
-      description: 'Manage your technicians, track certifications, and handle HR tasks',
+      title: t('helpCenter.stakeholders.owner.features.teamMgmt', 'Team Management'),
+      description: t('helpCenter.stakeholders.owner.features.teamMgmtDesc', 'Manage your technicians, track certifications, and handle HR tasks'),
     },
     {
       icon: DollarSign,
-      title: 'Financial Controls',
-      description: 'Generate quotes, track payroll, and monitor project costs',
+      title: t('helpCenter.stakeholders.owner.features.financial', 'Financial Controls'),
+      description: t('helpCenter.stakeholders.owner.features.financialDesc', 'Generate quotes, track payroll, and monitor project costs'),
     },
     {
       icon: BarChart3,
-      title: 'Analytics & Insights',
-      description: 'Real-time dashboards showing productivity and profitability',
+      title: t('helpCenter.stakeholders.owner.features.analytics', 'Analytics & Insights'),
+      description: t('helpCenter.stakeholders.owner.features.analyticsDesc', 'Real-time dashboards showing productivity and profitability'),
     },
     {
       icon: Shield,
-      title: 'Safety Compliance',
-      description: 'Automated safety tracking and documentation',
+      title: t('helpCenter.stakeholders.owner.features.safety', 'Safety Compliance'),
+      description: t('helpCenter.stakeholders.owner.features.safetyDesc', 'Automated safety tracking and documentation'),
     },
   ];
 
@@ -73,7 +75,7 @@ export default function ForCompanyOwners() {
             <Link href="/help">
               <Button variant="ghost" size="sm" className="text-white/80 hover:text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Help Center
+                {t('helpCenter.backToHelpCenter', 'Help Center')}
               </Button>
             </Link>
           </div>
@@ -84,10 +86,10 @@ export default function ForCompanyOwners() {
             </div>
             <div>
               <h1 className="text-4xl font-bold tracking-tight" data-testid="text-stakeholder-title">
-                For Company Owners
+                {t('helpCenter.stakeholders.owner.title', 'For Company Owners')}
               </h1>
               <p className="text-xl text-blue-100">
-                Manage your business, team, and grow efficiently
+                {t('helpCenter.stakeholders.owner.description', 'Manage your business, team, and grow efficiently')}
               </p>
             </div>
           </div>
@@ -95,7 +97,7 @@ export default function ForCompanyOwners() {
           <div className="max-w-xl mt-6">
             <HelpSearchBar 
               size="large" 
-              placeholder="Ask about team management, financials, analytics..."
+              placeholder={t('helpCenter.stakeholders.owner.searchPlaceholder', 'Ask about team management, financials, analytics...')}
               stakeholderColor="#0B64A3"
             />
           </div>
@@ -109,7 +111,7 @@ export default function ForCompanyOwners() {
       <div className="bg-background relative z-0">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Key Features for You</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.keyFeaturesTitle', 'Key Features for You')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {keyFeatures.map((feature, index) => (
               <Card key={index}>
@@ -128,7 +130,7 @@ export default function ForCompanyOwners() {
         </section>
         
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Recommended Modules</h2>
+          <h2 className="text-2xl font-semibold mb-6">{t('helpCenter.recommendedModules', 'Recommended Modules')}</h2>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -149,28 +151,28 @@ export default function ForCompanyOwners() {
         </section>
         
         <section className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-8">
-          <h2 className="text-xl font-semibold mb-4">Getting Started as an Owner</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('helpCenter.stakeholders.owner.gettingStarted.title', 'Getting Started as a Company Owner')}</h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shrink-0">1</div>
-              <p>Set up your company profile with branding and contact information</p>
+              <p>{t('helpCenter.stakeholders.owner.gettingStarted.step1', 'Set up your company profile and branding')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shrink-0">2</div>
-              <p>Add your team members and set their roles and permissions</p>
+              <p>{t('helpCenter.stakeholders.owner.gettingStarted.step2', 'Add your team members and assign roles')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shrink-0">3</div>
-              <p>Create your first project and assign technicians</p>
+              <p>{t('helpCenter.stakeholders.owner.gettingStarted.step3', 'Configure safety and compliance settings')}</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm shrink-0">4</div>
-              <p>Configure safety documentation and compliance settings</p>
+              <p>{t('helpCenter.stakeholders.owner.gettingStarted.step4', 'Create your first project and start tracking')}</p>
             </div>
           </div>
           <div className="mt-6">
             <Link href="/help/getting-started">
-              <Button>View Full Getting Started Guide</Button>
+              <Button>{t('helpCenter.stakeholders.owner.gettingStarted.viewGuide', 'View Full Getting Started Guide')}</Button>
             </Link>
           </div>
         </section>

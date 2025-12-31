@@ -339,7 +339,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                           id="firstName"
                           value={data.firstName}
                           onChange={(e) => setData({ ...data, firstName: e.target.value })}
-                          placeholder="John"
+                          placeholder={t('common.placeholders.firstName', 'John')}
                           data-testid="input-first-name"
                         />
                       </div>
@@ -349,7 +349,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                           id="lastName"
                           value={data.lastName}
                           onChange={(e) => setData({ ...data, lastName: e.target.value })}
-                          placeholder="Smith"
+                          placeholder={t('common.placeholders.lastName', 'Smith')}
                           data-testid="input-last-name"
                         />
                       </div>
@@ -361,7 +361,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                         id="propertyManagementCompany"
                         value={data.propertyManagementCompany}
                         onChange={(e) => setData({ ...data, propertyManagementCompany: e.target.value })}
-                        placeholder="ABC Property Management"
+                        placeholder={t('common.placeholders.company', 'ABC Property Management')}
                         data-testid="input-company"
                       />
                     </div>
@@ -373,7 +373,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                         type="email"
                         value={data.email}
                         onChange={(e) => setData({ ...data, email: e.target.value })}
-                        placeholder="you@company.com"
+                        placeholder={t('common.placeholders.companyEmail', 'you@company.com')}
                         data-testid="input-email"
                       />
                     </div>
@@ -399,7 +399,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                           type={showPassword ? "text" : "password"}
                           value={data.password}
                           onChange={(e) => setData({ ...data, password: e.target.value })}
-                          placeholder="Minimum 6 characters"
+                          placeholder={t('common.placeholders.minSixChars', 'Minimum 6 characters')}
                           className="pr-10"
                           data-testid="input-password"
                         />
@@ -422,7 +422,7 @@ export function PropertyManagerRegistration({ open, onOpenChange }: PropertyMana
                           type={showConfirmPassword ? "text" : "password"}
                           value={data.confirmPassword}
                           onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
-                          placeholder="Re-enter password"
+                          placeholder={t('common.placeholders.reenterPassword', 'Re-enter password')}
                           className="pr-10"
                           data-testid="input-confirm-password"
                         />

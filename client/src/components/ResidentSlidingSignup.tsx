@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,7 @@ type Step =
 const STEPS: Step[] = ["name", "email", "phone", "strata", "unit", "parking", "password"];
 
 export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSlidingSignupProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState<Step>("name");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -235,7 +237,7 @@ export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSliding
               <div className="flex gap-2">
                 <Input
                   id="name"
-                  placeholder="John Smith"
+                  placeholder={t('common.placeholders.fullName', 'John Smith')}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   onKeyDown={handleKeyDown}
@@ -263,7 +265,7 @@ export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSliding
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t('common.placeholders.email', 'you@example.com')}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   onKeyDown={handleKeyDown}
@@ -291,7 +293,7 @@ export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSliding
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="604-123-4567"
+                  placeholder={t('common.placeholders.phone', '604-123-4567')}
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   onKeyDown={handleKeyDown}
@@ -318,7 +320,7 @@ export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSliding
               <div className="flex gap-2">
                 <Input
                   id="strata"
-                  placeholder="LMS1234"
+                  placeholder={t('resident.placeholders.strataNumber', 'LMS1234')}
                   value={formData.strataPlanNumber}
                   onChange={(e) => setFormData({ ...formData, strataPlanNumber: e.target.value })}
                   onKeyDown={handleKeyDown}
@@ -345,7 +347,7 @@ export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSliding
               <div className="flex gap-2">
                 <Input
                   id="unit"
-                  placeholder="101"
+                  placeholder={t('resident.placeholders.unitNumber', '101')}
                   value={formData.unitNumber}
                   onChange={(e) => setFormData({ ...formData, unitNumber: e.target.value })}
                   onKeyDown={handleKeyDown}
@@ -372,7 +374,7 @@ export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSliding
               <div className="flex gap-2">
                 <Input
                   id="parking"
-                  placeholder="P1-25"
+                  placeholder={t('resident.placeholders.parkingStall', 'P1-25')}
                   value={formData.parkingStallNumber}
                   onChange={(e) => setFormData({ ...formData, parkingStallNumber: e.target.value })}
                   onKeyDown={handleKeyDown}
@@ -398,7 +400,7 @@ export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSliding
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder={t('common.placeholders.createPassword', 'Create a password')}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   onKeyDown={handleKeyDown}
@@ -413,7 +415,7 @@ export function ResidentSlidingSignup({ onClose, onShowSignIn }: ResidentSliding
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="Confirm your password"
+                  placeholder={t('common.placeholders.confirmPassword', 'Confirm your password')}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   onKeyDown={handleKeyDown}

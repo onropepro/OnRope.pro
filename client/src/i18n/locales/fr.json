@@ -1110,6 +1110,19 @@
       "noDocsInRange": "Il n'y a aucun document dans la plage de dates sélectionnée.",
       "exportedDocs": "{{count}} documents {{type}} exportés avec succès.",
       "exportedPartial": "{{success}} documents exportés. {{failed}} document(s) n'ont pas pu être générés."
+    },
+    "placeholders": {
+      "email": "votre.courriel@exemple.com",
+      "phone": "p.ex., (604) 555-1234",
+      "url": "https://exemple.com",
+      "strataPlan": "p.ex., LMS1234",
+      "streetAddress": "123 Rue Principale, Bureau 100",
+      "province": "QC, ON, etc.",
+      "postalCode": "H2X 1Y4, etc.",
+      "fullName": "p.ex., Jean Dupont",
+      "hours": "p.ex., 6.5",
+      "location": "p.ex., Montréal, QC",
+      "adminEmail": "admin@entreprise.com"
     }
   },
   "services": {
@@ -2972,7 +2985,9 @@
       "failed": "Échec de l'envoi",
       "failedDesc": "Impossible d'envoyer le devis par courriel",
       "defaultSubject": "Devis de service pour"
-    }
+    },
+    "submitQuote": "Soumettre le devis",
+    "submitConfirmMessage": "Êtes-vous sûr de vouloir soumettre ce devis ? Une fois soumis, il sera envoyé à la direction pour examen."
   },
   "schedule": {
     "title": "Calendrier des travaux",
@@ -3037,6 +3052,7 @@
     "timeOffRemoveFailed": "Échec de la suppression du congé.",
     "missingInfo": "Information manquante",
     "selectTimeOffFields": "Veuillez sélectionner un employé, une date de début et un type de congé.",
+    "selectType": "Sélectionner le type...",
     "invalidDateRange": "Plage de dates invalide",
     "endBeforeStart": "La date de fin ne peut pas être avant la date de début.",
     "timeOffScheduled": "Congé planifié",
@@ -3375,7 +3391,15 @@
     "failedToProcessImage": "Échec du traitement de l'image",
     "appIconUploaded": "Icône de l'application téléchargée avec succès",
     "appIconActive": "Votre icône personnalisée est maintenant active pour les nouvelles installations.",
-    "failedToUploadIcon": "Échec du téléchargement de l'icône"
+    "failedToUploadIcon": "Échec du téléchargement de l'icône",
+    "deleteAccount": "Supprimer le compte",
+    "confirmLogout": "Confirmer la déconnexion",
+    "logoutConfirmMessage": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "logout": "Se déconnecter",
+    "updateLicenseKey": "Mettre à jour la clé de licence",
+    "licenseKeyDescription": "Entrez votre nouvelle clé de licence. Ceci est requis après la mise à niveau de votre niveau.",
+    "newLicenseKey": "Nouvelle clé de licence",
+    "enterLicenseKey": "Entrez votre nouvelle clé de licence"
   },
   "subscription": {
     "title": "Abonnement",
@@ -6167,7 +6191,14 @@
     "passwordChangeFailed": "Échec du changement de mot de passe",
     "passwordChangeError": "Échec du changement de mot de passe. Veuillez réessayer.",
     "fillAllPasswordFields": "Veuillez remplir tous les champs de mot de passe.",
-    "enterBothFields": "Veuillez entrer le numéro de plan de strata et le mot de passe."
+    "enterBothFields": "Veuillez entrer le numéro de plan de strata et le mot de passe.",
+    "strataPlaceholder": "Entrez votre numéro de strata ou de travail",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "addressPlaceholder": "Commencez à taper pour rechercher...",
+    "keysReturnPlaceholder": "Sélectionnez quand retourner les clés...",
+    "currentPasswordPlaceholder": "Entrez votre mot de passe actuel",
+    "newPasswordPlaceholder": "Entrez le nouveau mot de passe (min 6 caractères)",
+    "confirmPasswordPlaceholder": "Confirmez le nouveau mot de passe"
   },
   "manageSubscription": {
     "title": "Gerer l'Abonnement",
@@ -13047,25 +13078,133 @@
     "stakeholders": {
       "owner": {
         "title": "Pour les propriétaires d'entreprise",
-        "description": "Gérez votre entreprise, votre équipe et développez-vous efficacement"
+        "description": "Gérez votre entreprise, votre équipe et développez-vous efficacement",
+        "searchPlaceholder": "Posez des questions sur la gestion d'équipe, les finances, l'analytique...",
+        "features": {
+          "teamMgmt": "Gestion d'équipe",
+          "teamMgmtDesc": "Gérez vos techniciens, suivez les certifications et gérez les tâches RH",
+          "financial": "Contrôles financiers",
+          "financialDesc": "Générez des devis, suivez la paie et surveillez les coûts des projets",
+          "analytics": "Analytique et insights",
+          "analyticsDesc": "Tableaux de bord en temps réel montrant la productivité et la rentabilité",
+          "safety": "Conformité sécurité",
+          "safetyDesc": "Suivi automatisé de la sécurité et de la documentation"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que propriétaire d'entreprise",
+          "step1": "Configurez le profil et l'image de marque de votre entreprise",
+          "step2": "Ajoutez les membres de votre équipe et attribuez des rôles",
+          "step3": "Configurez les paramètres de sécurité et de conformité",
+          "step4": "Créez votre premier projet et commencez le suivi",
+          "viewGuide": "Voir le guide de démarrage complet"
+        }
       },
       "technician": {
         "title": "Pour les techniciens",
-        "description": "Suivez votre temps, vos certifications et votre carrière"
+        "description": "Suivez votre temps, vos certifications et votre carrière",
+        "searchPlaceholder": "Posez des questions sur le suivi du temps, la journalisation IRATA, les documents de sécurité...",
+        "features": {
+          "timeTracking": "Suivi du temps",
+          "timeTrackingDesc": "Pointage GPS, enregistrez les heures manuelles lorsque l'employeur n'utilise pas OnRopePro",
+          "irataLogging": "Journalisation IRATA/SPRAT",
+          "irataLoggingDesc": "Suivez les heures pour la progression de certification - les heures manuelles comptent dans les totaux",
+          "safetyDocs": "Documentation de sécurité",
+          "safetyDocsDesc": "Complétez les inspections, signez les réunions de sécurité, signalez les incidents",
+          "jobBoard": "Tableau d'emplois",
+          "jobBoardDesc": "Trouvez de nouvelles opportunités et connectez-vous avec des employeurs"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que technicien",
+          "step1": "Créez votre profil technicien gratuit",
+          "step2": "Ajoutez vos certifications et votre expérience",
+          "step3": "Connectez-vous avec des employeurs ou enregistrez des heures indépendantes",
+          "step4": "Construisez votre portfolio professionnel",
+          "viewGuide": "Voir le guide de démarrage complet"
+        }
       },
       "buildingManager": {
         "title": "Pour les gestionnaires d'immeubles",
-        "description": "Surveillez le travail, la conformité et communiquez avec les résidents"
+        "description": "Surveillez le travail, la conformité et communiquez avec les résidents",
+        "searchPlaceholder": "Posez des questions sur les cotes de sécurité, la conformité, l'avancement...",
+        "features": {
+          "safetyRating": "Cote de sécurité de l'entreprise",
+          "safetyRatingDesc": "Consultez les cotes de sécurité et l'historique de conformité des fournisseurs",
+          "residentComm": "Communication avec les résidents",
+          "residentCommDesc": "Gérez les plaintes des résidents et les notifications de travaux",
+          "workProgress": "Avancement des travaux",
+          "workProgressDesc": "Surveillez l'avancement et l'état d'achèvement des projets",
+          "documentation": "Documentation",
+          "documentationDesc": "Accédez aux registres d'ancrage, rapports d'inspection et attestations d'assurance"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que gestionnaire d'immeuble",
+          "step1": "Créez votre compte gestionnaire d'immeuble gratuit",
+          "step2": "Connectez-vous à votre immeuble avec le code unique",
+          "step3": "Consultez les cotes de sécurité et l'historique des fournisseurs",
+          "step4": "Configurez la communication avec les résidents pour les travaux à venir",
+          "viewGuide": "Voir le guide de démarrage complet"
+        }
       },
       "propertyManager": {
         "title": "Pour les gestionnaires de propriétés",
-        "description": "Supervisez votre portefeuille et vos relations avec les fournisseurs"
+        "description": "Supervisez votre portefeuille et vos relations avec les fournisseurs",
+        "searchPlaceholder": "Posez des questions sur la gestion des fournisseurs, la supervision du portefeuille...",
+        "features": {
+          "portfolio": "Vue d'ensemble du portefeuille",
+          "portfolioDesc": "Gérez plusieurs immeubles depuis un seul tableau de bord",
+          "vendorMgmt": "Gestion des fournisseurs",
+          "vendorMgmtDesc": "Consultez et comparez tous vos fournisseurs d'accès sur corde",
+          "safetyRatings": "Cotes de sécurité",
+          "safetyRatingsDesc": "Comparez la conformité en matière de sécurité des fournisseurs dans votre portefeuille",
+          "documentation": "Documentation",
+          "documentationDesc": "Accédez aux attestations d'assurance, historique de service et documents de conformité"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que gestionnaire de propriétés",
+          "step1": "Créez votre compte gestionnaire de propriétés",
+          "step2": "Ajoutez des immeubles à votre portefeuille",
+          "step3": "Connectez-vous avec les gestionnaires d'immeubles et les fournisseurs",
+          "step4": "Surveillez la conformité dans toutes vos propriétés",
+          "viewGuide": "Voir le guide de démarrage complet"
+        }
       },
       "resident": {
         "title": "Pour les résidents",
-        "description": "Soumettez des commentaires et suivez les problèmes dans votre immeuble"
+        "description": "Soumettez des commentaires et suivez les problèmes dans votre immeuble",
+        "searchPlaceholder": "Posez des questions sur la soumission de commentaires, le suivi des problèmes...",
+        "features": {
+          "submitFeedback": "Soumettre des commentaires",
+          "submitFeedbackDesc": "Signalez les problèmes ou préoccupations directement à votre fournisseur de services",
+          "photoEvidence": "Preuves photo",
+          "photoEvidenceDesc": "Joignez des photos pour expliquer clairement les problèmes",
+          "statusUpdates": "Mises à jour de statut",
+          "statusUpdatesDesc": "Suivez quand vos commentaires ont été consultés et répondus",
+          "issueResolution": "Résolution des problèmes",
+          "issueResolutionDesc": "Voyez quand les problèmes sont marqués comme résolus avec les réponses des fournisseurs"
+        },
+        "gettingStarted": {
+          "title": "Premiers pas en tant que résident",
+          "step1": "Accédez au portail résident avec le code de votre immeuble",
+          "step2": "Soumettez des commentaires sur les problèmes de maintenance",
+          "step3": "Suivez le statut de vos soumissions",
+          "step4": "Recevez des mises à jour lorsque les problèmes sont résolus",
+          "viewGuide": "Voir le guide de démarrage complet"
+        },
+        "userGuide": {
+          "title": "Guide utilisateur du portail résident",
+          "description": "Guide complet étape par étape pour configurer votre compte, entrer le code de votre entreprise, soumettre des commentaires et suivre vos problèmes.",
+          "viewButton": "Voir le guide utilisateur"
+        }
       }
     },
+    "backToHelpCenter": "Centre d'aide",
+    "keyFeaturesTitle": "Fonctionnalités clés pour vous",
+    "recommendedModules": "Modules recommandés",
+    "helpfulResources": "Ressources utiles",
+    "buildingManagerSearchPlaceholder": "Posez des questions sur les cotes de sécurité, la conformité, l'avancement des travaux...",
+    "technicianSearchPlaceholder": "Posez des questions sur le suivi du temps, la journalisation IRATA, les documents de sécurité...",
+    "propertyManagerSearchPlaceholder": "Posez des questions sur la gestion des fournisseurs, la supervision du portefeuille...",
+    "companyOwnerSearchPlaceholder": "Posez des questions sur la gestion d'équipe, les finances, l'analytique...",
     "categories": {
       "operations": "Opérations",
       "safety": "Sécurité",
@@ -13164,7 +13303,9 @@
   },
   "superUserTechnicians": {
     "failedToLoadTechnician": "Échec du chargement des détails du technicien",
-    "failedToUpdateTechnician": "Échec de la mise à jour du technicien"
+    "failedToUpdateTechnician": "Échec de la mise à jour du technicien",
+    "enabling": "Activation...",
+    "reEnableAccount": "Réactiver le compte"
   },
   "groundCrewJobBoard": {
     "failedToSubmitApplication": "Échec de la soumission de la candidature"
@@ -13195,7 +13336,9 @@
     "createFailed": "Échec de la création de l'offre d'emploi",
     "updateFailed": "Échec de la mise à jour de l'offre d'emploi",
     "deleteFailed": "Échec de la suppression de l'offre d'emploi",
-    "fillRequired": "Veuillez remplir les champs obligatoires"
+    "fillRequired": "Veuillez remplir les champs obligatoires",
+    "deleteJobPosting": "Supprimer l'offre d'emploi ?",
+    "deleteConfirmMessage": "Cette action ne peut pas être annulée. L'offre d'emploi sera définitivement supprimée."
   },
   "propertyManagerQuoteDetail": {
     "messageSent": "Message envoyé",
@@ -13218,7 +13361,10 @@
   },
   "personalSafetyDocuments": {
     "inspectionDeleted": "Inspection supprimée",
-    "deleteFailed": "Échec de la suppression"
+    "deleteFailed": "Échec de la suppression",
+    "deleteInspection": "Supprimer l'inspection ?",
+    "deleteConfirmMessage": "Cette inspection sera définitivement supprimée.",
+    "newInspection": "Nouvelle inspection"
   },
   "dashboardGrid": {
     "copied": "Copié",

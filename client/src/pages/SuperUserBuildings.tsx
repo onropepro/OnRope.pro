@@ -216,6 +216,7 @@ interface BuildingDetailsData {
 }
 
 export default function SuperUserBuildings() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -816,7 +817,7 @@ export default function SuperUserBuildings() {
                     Building: {selectedBuilding?.buildingName || selectedBuilding?.strataPlanNumber}
                   </p>
                   <Input
-                    placeholder="New password (optional)"
+                    placeholder={t('superuserBuildings.newPasswordPlaceholder', 'New password (optional)')}
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -979,7 +980,7 @@ export default function SuperUserBuildings() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by strata/job number, site name, address, or city..."
+              placeholder={t('superuserBuildings.searchPlaceholder', 'Search by strata/job number, site name, address, or city...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"

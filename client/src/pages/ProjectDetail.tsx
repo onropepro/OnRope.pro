@@ -4654,7 +4654,7 @@ export default function ProjectDetail() {
                 min="0"
                 max="24"
                 step="0.25"
-                placeholder="e.g., 6.5"
+                placeholder={t('common.placeholders.hours', 'e.g., 6.5')}
                 value={ropeAccessTaskHours}
                 onChange={(e) => setRopeAccessTaskHours(e.target.value)}
                 data-testid="input-irata-rope-access-hours"

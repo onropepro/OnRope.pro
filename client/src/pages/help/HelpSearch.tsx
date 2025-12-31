@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearch } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Loader2, Search, ArrowLeft } from 'lucide-react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ interface SearchResponse {
 }
 
 export default function HelpSearch() {
+  const { t } = useTranslation();
   const searchString = useSearch();
   const params = new URLSearchParams(searchString);
   const query = params.get('q') || '';
@@ -57,7 +59,7 @@ export default function HelpSearch() {
             <HelpBreadcrumb items={[{ label: 'Search Results' }]} />
           </div>
           <div className="max-w-2xl">
-            <HelpSearchBar placeholder="Search again..." />
+            <HelpSearchBar placeholder={t('helpCenter.searchAgain', 'Search again...')} />
           </div>
         </div>
       </div>

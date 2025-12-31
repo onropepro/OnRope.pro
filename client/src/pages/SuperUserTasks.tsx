@@ -444,7 +444,7 @@ export default function SuperUserTasks() {
                 <Filter className="h-4 w-4 text-muted-foreground" />
                 <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
                   <SelectTrigger className="w-[140px]" data-testid="filter-assignee">
-                    <SelectValue placeholder="All assignees" />
+                    <SelectValue placeholder={t('superuserTasks.allAssignees', 'All assignees')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All assignees</SelectItem>
@@ -561,7 +561,7 @@ export default function SuperUserTasks() {
               <Label htmlFor="title">Title</Label>
               <Input
                 id="title"
-                placeholder="What needs to be done?"
+                placeholder={t('superuserTasks.titlePlaceholder', 'What needs to be done?')}
                 value={taskForm.title}
                 onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
                 data-testid="input-task-title"
@@ -571,7 +571,7 @@ export default function SuperUserTasks() {
               <Label htmlFor="description">Description (optional)</Label>
               <Textarea
                 id="description"
-                placeholder="Add more details..."
+                placeholder={t('superuserTasks.descriptionPlaceholder', 'Add more details...')}
                 value={taskForm.description}
                 onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
                 data-testid="input-task-description"
@@ -582,7 +582,7 @@ export default function SuperUserTasks() {
                 <Label>Section</Label>
                 <Select value={taskForm.section} onValueChange={(v) => setTaskForm({ ...taskForm, section: v })}>
                   <SelectTrigger data-testid="select-section">
-                    <SelectValue placeholder="Select section" />
+                    <SelectValue placeholder={t('superuserTasks.selectSection', 'Select section')} />
                   </SelectTrigger>
                   <SelectContent>
                     {SECTIONS.map((section) => (
@@ -595,7 +595,7 @@ export default function SuperUserTasks() {
                 <Label>Assignee</Label>
                 <Select value={taskForm.assignee} onValueChange={(v) => setTaskForm({ ...taskForm, assignee: v })}>
                   <SelectTrigger data-testid="select-assignee">
-                    <SelectValue placeholder="Assign to" />
+                    <SelectValue placeholder={t('superuserTasks.assignTo', 'Assign to')} />
                   </SelectTrigger>
                   <SelectContent>
                     {ASSIGNEES.map((name) => (
@@ -932,7 +932,7 @@ export default function SuperUserTasks() {
                     </div>
                     <div className="flex-1 flex gap-2">
                       <Input
-                        placeholder="Add a comment..."
+                        placeholder={t('superuserTasks.addComment', 'Add a comment...')}
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         onKeyDown={(e) => {

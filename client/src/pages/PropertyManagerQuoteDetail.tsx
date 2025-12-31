@@ -430,7 +430,7 @@ export default function PropertyManagerQuoteDetail() {
           {!isQuoteClosed && (
             <div className="flex gap-2">
               <Textarea
-                placeholder="Type your message..."
+                placeholder={t('propertyManagerQuote.typeMessage', 'Type your message...')}
                 value={messageContent}
                 onChange={(e) => setMessageContent(e.target.value)}
                 className="flex-1"
@@ -457,7 +457,7 @@ export default function PropertyManagerQuoteDetail() {
             </DialogDescription>
           </DialogHeader>
           <Textarea
-            placeholder="Reason for declining..."
+            placeholder={t('propertyManagerQuote.reasonForDeclining', 'Reason for declining...')}
             value={declineReason}
             onChange={(e) => setDeclineReason(e.target.value)}
             data-testid="input-decline-reason"
@@ -491,7 +491,7 @@ export default function PropertyManagerQuoteDetail() {
               <label className="text-sm font-medium mb-1 block">Your Counter-Offer Amount</label>
               <Input
                 type="number"
-                placeholder="Enter amount"
+                placeholder={t('propertyManagerQuote.enterAmount', 'Enter amount')}
                 value={counterOfferAmount}
                 onChange={(e) => setCounterOfferAmount(e.target.value)}
                 data-testid="input-counter-offer-amount"
@@ -500,7 +500,7 @@ export default function PropertyManagerQuoteDetail() {
             <div>
               <label className="text-sm font-medium mb-1 block">Notes (optional)</label>
               <Textarea
-                placeholder="Additional notes or justification..."
+                placeholder={t('propertyManagerQuote.additionalNotes', 'Additional notes or justification...')}
                 value={counterOfferNotes}
                 onChange={(e) => setCounterOfferNotes(e.target.value)}
                 data-testid="input-counter-offer-notes"

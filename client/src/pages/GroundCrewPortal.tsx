@@ -1265,7 +1265,7 @@ export default function GroundCrewPortal() {
           label={t.licenseNumber}
           value={user.driversLicenseNumber}
           control={isEditing ? form.control : undefined}
-          placeholder="Optional"
+          placeholder={t.optional || "Optional"}
           testId="license-number"
         />
         <EditableDateField
@@ -1342,7 +1342,7 @@ export default function GroundCrewPortal() {
           label={t.firstAidType}
           value={user.firstAidType}
           control={isEditing ? form.control : undefined}
-          placeholder="OFA Level 1, Standard First Aid, etc."
+          placeholder={t.firstAidPlaceholder || "OFA Level 1, Standard First Aid, etc."}
           testId="first-aid-type"
         />
         <EditableDateField
@@ -1996,7 +1996,7 @@ export default function GroundCrewPortal() {
                                   {...field} 
                                   value={isEditing ? field.value : maskSensitiveData(field.value)}
                                   disabled={!isEditing} 
-                                  placeholder="XXX-XXX-XXX" 
+                                  placeholder={t.sinPlaceholder || "XXX-XXX-XXX"} 
                                   data-testid="input-sin" 
                                 />
                               </FormControl>
@@ -2016,7 +2016,7 @@ export default function GroundCrewPortal() {
                                   {...field} 
                                   value={isEditing ? field.value : maskSensitiveData(field.value)}
                                   disabled={!isEditing} 
-                                  placeholder="XXXXX" 
+                                  placeholder={t.transitPlaceholder || "XXXXX"} 
                                   data-testid="input-bank-transit" 
                                 />
                               </FormControl>
@@ -2034,7 +2034,7 @@ export default function GroundCrewPortal() {
                                   {...field} 
                                   value={isEditing ? field.value : maskSensitiveData(field.value)}
                                   disabled={!isEditing} 
-                                  placeholder="XXX" 
+                                  placeholder={t.institutionPlaceholder || "XXX"} 
                                   data-testid="input-bank-institution" 
                                 />
                               </FormControl>
@@ -2052,7 +2052,7 @@ export default function GroundCrewPortal() {
                                   {...field} 
                                   value={isEditing ? field.value : maskSensitiveData(field.value)}
                                   disabled={!isEditing} 
-                                  placeholder="XXXXXXX" 
+                                  placeholder={t.accountPlaceholder || "XXXXXXX"} 
                                   data-testid="input-bank-account" 
                                 />
                               </FormControl>

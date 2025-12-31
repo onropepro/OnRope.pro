@@ -2588,7 +2588,7 @@ export default function Quotes() {
                           <FormControl>
                             <AddressAutocomplete
                               value={field.value}
-                              placeholder="Start typing address..."
+                              placeholder={t('quotes.startTypingAddress', 'Start typing address...')}
                               data-testid="input-edit-building-address"
                               onSelect={(address) => {
                                 field.onChange(address.formatted);
@@ -2647,7 +2647,7 @@ export default function Quotes() {
                       }}
                     >
                       <SelectTrigger className="h-12" data-testid="select-edit-client">
-                        <SelectValue placeholder="Select from client list..." />
+                        <SelectValue placeholder={t('quotes.selectFromClientList', 'Select from client list...')} />
                       </SelectTrigger>
                       <SelectContent>
                         {clients.length === 0 ? (
@@ -2686,7 +2686,7 @@ export default function Quotes() {
                           <FormControl>
                             <AddressAutocomplete
                               value={field.value || ""}
-                              placeholder="Start typing address..."
+                              placeholder={t('quotes.startTypingAddress', 'Start typing address...')}
                               data-testid="input-edit-strata-manager-address"
                               onSelect={(address) => {
                                 field.onChange(address.formatted);
@@ -3550,7 +3550,7 @@ export default function Quotes() {
                         </PopoverTrigger>
                         <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
                           <Command>
-                            <CommandInput placeholder="Search clients..." />
+                            <CommandInput placeholder={t('quotes.searchClients', 'Search clients...')} />
                             <CommandList>
                               <CommandEmpty>No clients found.</CommandEmpty>
                               <CommandGroup>
@@ -3629,7 +3629,7 @@ export default function Quotes() {
                               }}
                             >
                               <SelectTrigger className="h-12" data-testid="select-property">
-                                <SelectValue placeholder="Select a property to autofill building details..." />
+                                <SelectValue placeholder={t('quotes.selectPropertyToAutofill', 'Select a property to autofill building details...')} />
                               </SelectTrigger>
                               <SelectContent>
                                 {properties.map((prop: any, idx: number) => (
@@ -3708,7 +3708,7 @@ export default function Quotes() {
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="e.g., Oceanview Towers"
+                            placeholder={t('quotes.placeholders.buildingName', 'e.g., Oceanview Towers')}
                             className="h-12"
                             data-testid="input-building-name"
                           />
@@ -3727,7 +3727,7 @@ export default function Quotes() {
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="e.g., LMS1234"
+                            placeholder={t('common.placeholders.strataPlan', 'e.g., LMS1234')}
                             className="h-12"
                             data-testid="input-strata-plan"
                           />
@@ -3746,7 +3746,7 @@ export default function Quotes() {
                         <FormControl>
                           <AddressAutocomplete
                             value={field.value}
-                            placeholder="Start typing address..."
+                            placeholder={t('quotes.startTypingAddress', 'Start typing address...')}
                             data-testid="input-building-address"
                             onSelect={(address) => {
                               field.onChange(address.formatted);
@@ -3778,7 +3778,7 @@ export default function Quotes() {
                             {...field}
                             type="number"
                             min="1"
-                            placeholder="e.g., 20"
+                            placeholder={t('quotes.placeholders.floorCount', 'e.g., 20')}
                             className="h-12"
                             data-testid="input-floor-count"
                           />
@@ -3797,7 +3797,7 @@ export default function Quotes() {
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="e.g., John Smith"
+                            placeholder={t('common.placeholders.fullName', 'e.g., John Smith')}
                             className="h-12"
                             data-testid="input-manager-name"
                           />
@@ -3816,7 +3816,7 @@ export default function Quotes() {
                         <FormControl>
                           <AddressAutocomplete
                             value={field.value}
-                            placeholder="Start typing address..."
+                            placeholder={t('quotes.startTypingAddress', 'Start typing address...')}
                             data-testid="input-manager-address"
                             onSelect={(address) => {
                               field.onChange(address.formatted);
@@ -3928,7 +3928,7 @@ export default function Quotes() {
                     {customAdjustments.map((adj, index) => (
                       <div key={adj.id} className="flex items-center gap-2 p-3 bg-muted/30 rounded-md border border-border">
                         <Input
-                          placeholder="Fee name (e.g., Equipment Rental)"
+                          placeholder={t('quotes.feeNamePlaceholder', 'Fee name (e.g., Equipment Rental)')}
                           value={adj.name}
                           onChange={(e) => {
                             const updated = [...customAdjustments];
@@ -4210,7 +4210,7 @@ export default function Quotes() {
                             <FormControl>
                               <Input
                                 {...field}
-                                placeholder="e.g., Roof Inspection, Caulking, etc."
+                                placeholder={t('quotes.placeholders.customService', 'e.g., Roof Inspection, Caulking, etc.')}
                                 className="h-12"
                                 data-testid="input-custom-service-name"
                               />
@@ -4628,7 +4628,7 @@ export default function Quotes() {
                         <FormControl>
                           <Textarea
                             {...field}
-                            placeholder="Add any specific notes, scope details, or special requirements for this service..."
+                            placeholder={t('quotes.serviceNotesPlaceholder', 'Add any specific notes, scope details, or special requirements for this service...')}
                             className="min-h-[100px] resize-none"
                             data-testid="input-service-description"
                           />

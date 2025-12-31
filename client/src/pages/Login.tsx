@@ -256,7 +256,7 @@ export default function Login() {
                           <Input 
                             {...field} 
                             type="password"
-                            placeholder="Enter your password"
+                            placeholder={t('login.passwordPlaceholder', 'Enter your password')}
                             autoComplete="current-password"
                             data-testid="input-login-password"
                           />

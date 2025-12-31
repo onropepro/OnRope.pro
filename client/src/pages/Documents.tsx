@@ -7571,7 +7571,7 @@ export default function Documents() {
                 }
               }}>
                 <SelectTrigger data-testid="select-method-statement-job-type">
-                  <SelectValue placeholder="Select job type for this method statement" />
+                  <SelectValue placeholder={t('documents.selectJobType', 'Select job type for this method statement')} />
                 </SelectTrigger>
                 <SelectContent>
                   {STANDARD_JOB_TYPES.map((jobType) => (
@@ -7599,7 +7599,7 @@ export default function Documents() {
                 <Label>Custom Job Type Name *</Label>
                 <Input
                   type="text"
-                  placeholder="Enter custom job type name"
+                  placeholder={t('documents.enterCustomJobType', 'Enter custom job type name')}
                   value={methodStatementCustomJobType}
                   onChange={(e) => setMethodStatementCustomJobType(e.target.value)}
                   data-testid="input-custom-job-type"

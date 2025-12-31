@@ -446,7 +446,7 @@ export default function SuperUserJobBoard() {
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g., Senior Rope Access Technician"
+                placeholder={t('jobBoard.placeholders.jobTitle', 'e.g., Senior Rope Access Technician')}
                 data-testid="input-job-title"
               />
             </div>
@@ -457,7 +457,7 @@ export default function SuperUserJobBoard() {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe the role and responsibilities..."
+                placeholder={t('jobBoard.describeRole', 'Describe the role and responsibilities...')}
                 rows={4}
                 data-testid="input-job-description"
               />
@@ -469,7 +469,7 @@ export default function SuperUserJobBoard() {
                 id="requirements"
                 value={formData.requirements}
                 onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-                placeholder="List the qualifications and requirements..."
+                placeholder={t('jobBoard.listRequirements', 'List the qualifications and requirements...')}
                 rows={3}
                 data-testid="input-job-requirements"
               />
@@ -482,7 +482,7 @@ export default function SuperUserJobBoard() {
                   id="location"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder="e.g., Vancouver, BC"
+                  placeholder={t('common.placeholders.location', 'e.g., Vancouver, BC')}
                   data-testid="input-job-location"
                 />
               </div>
@@ -571,7 +571,7 @@ export default function SuperUserJobBoard() {
                 <Label htmlFor="requiredIrataLevel">Required IRATA Level</Label>
                 <Select value={formData.requiredIrataLevel} onValueChange={(v) => setFormData({ ...formData, requiredIrataLevel: v })}>
                   <SelectTrigger data-testid="select-irata-level">
-                    <SelectValue placeholder="Not Required" />
+                    <SelectValue placeholder={t('jobBoard.notRequired', 'Not Required')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CERT_LEVELS.map((t) => (
@@ -584,7 +584,7 @@ export default function SuperUserJobBoard() {
                 <Label htmlFor="requiredSpratLevel">Required SPRAT Level</Label>
                 <Select value={formData.requiredSpratLevel} onValueChange={(v) => setFormData({ ...formData, requiredSpratLevel: v })}>
                   <SelectTrigger data-testid="select-sprat-level">
-                    <SelectValue placeholder="Not Required" />
+                    <SelectValue placeholder={t('jobBoard.notRequired', 'Not Required')} />
                   </SelectTrigger>
                   <SelectContent>
                     {CERT_LEVELS.map((t) => (
@@ -623,7 +623,7 @@ export default function SuperUserJobBoard() {
                 <Label htmlFor="workDays">Work Days</Label>
                 <Select value={formData.workDays} onValueChange={(v) => setFormData({ ...formData, workDays: v })}>
                   <SelectTrigger data-testid="select-work-days">
-                    <SelectValue placeholder="Select schedule" />
+                    <SelectValue placeholder={t('jobBoard.selectSchedule', 'Select schedule')} />
                   </SelectTrigger>
                   <SelectContent>
                     {WORK_DAYS_OPTIONS.map((t) => (
@@ -636,7 +636,7 @@ export default function SuperUserJobBoard() {
                 <Label htmlFor="experienceRequired">Experience Required</Label>
                 <Select value={formData.experienceRequired} onValueChange={(v) => setFormData({ ...formData, experienceRequired: v })}>
                   <SelectTrigger data-testid="select-experience">
-                    <SelectValue placeholder="Select experience level" />
+                    <SelectValue placeholder={t('jobBoard.selectExperience', 'Select experience level')} />
                   </SelectTrigger>
                   <SelectContent>
                     {EXPERIENCE_OPTIONS.map((t) => (
@@ -653,7 +653,7 @@ export default function SuperUserJobBoard() {
                 id="benefits"
                 value={formData.benefits}
                 onChange={(e) => setFormData({ ...formData, benefits: e.target.value })}
-                placeholder="Health insurance, dental, vision, 401k, PTO, etc."
+                placeholder={t('jobBoard.benefitsPlaceholder', 'Health insurance, dental, vision, 401k, PTO, etc.')}
                 rows={3}
                 data-testid="textarea-benefits"
               />

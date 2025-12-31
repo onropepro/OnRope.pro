@@ -333,7 +333,7 @@ export default function SuperUserStaffAccounts() {
                   id="firstName"
                   value={formData.firstName}
                   onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                  placeholder="John"
+                  placeholder={t('common.firstName', 'John')}
                   data-testid="input-firstName"
                 />
               </div>
@@ -343,7 +343,7 @@ export default function SuperUserStaffAccounts() {
                   id="lastName"
                   value={formData.lastName}
                   onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                  placeholder="Doe"
+                  placeholder={t('common.lastName', 'Doe')}
                   data-testid="input-lastName"
                 />
               </div>
@@ -355,7 +355,7 @@ export default function SuperUserStaffAccounts() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="john@example.com"
+                placeholder={t('common.placeholders.email', 'john@example.com')}
                 data-testid="input-email"
               />
             </div>
@@ -366,7 +366,7 @@ export default function SuperUserStaffAccounts() {
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                placeholder="Enter a secure password"
+                placeholder={t('superuserStaff.enterSecurePassword', 'Enter a secure password')}
                 data-testid="input-password"
               />
             </div>
@@ -376,7 +376,7 @@ export default function SuperUserStaffAccounts() {
                 id="role"
                 value={formData.role}
                 onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                placeholder="e.g., Admin, Developer, Support"
+                placeholder={t('superuserStaff.placeholders.role', 'e.g., Admin, Developer, Support')}
                 data-testid="input-role"
               />
             </div>
@@ -478,7 +478,7 @@ export default function SuperUserStaffAccounts() {
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                placeholder="Leave blank to keep current password"
+                placeholder={t('superuserStaff.leaveBlankPassword', 'Leave blank to keep current password')}
                 data-testid="input-edit-password"
               />
             </div>
@@ -488,7 +488,7 @@ export default function SuperUserStaffAccounts() {
                 id="edit-role"
                 value={formData.role}
                 onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                placeholder="e.g., Admin, Developer, Support"
+                placeholder={t('superuserStaff.placeholders.role', 'e.g., Admin, Developer, Support')}
                 data-testid="input-edit-role"
               />
             </div>

@@ -345,7 +345,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         id="name"
                         value={data.name}
                         onChange={(e) => setData({ ...data, name: e.target.value })}
-                        placeholder="John Smith"
+                        placeholder={t('common.placeholders.fullName', 'John Smith')}
                         data-testid="input-name"
                       />
                     </div>
@@ -357,7 +357,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         type="email"
                         value={data.email}
                         onChange={(e) => setData({ ...data, email: e.target.value })}
-                        placeholder="john@example.com"
+                        placeholder={t('common.placeholders.email', 'john@example.com')}
                         data-testid="input-email"
                       />
                     </div>
@@ -382,7 +382,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                           type={showPassword ? "text" : "password"}
                           value={data.password}
                           onChange={(e) => setData({ ...data, password: e.target.value })}
-                          placeholder="Create a password"
+                          placeholder={t('common.placeholders.createPassword', 'Create a password')}
                           className="pr-10"
                           data-testid="input-password"
                         />
@@ -404,7 +404,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                           type={showConfirmPassword ? "text" : "password"}
                           value={data.confirmPassword}
                           onChange={(e) => setData({ ...data, confirmPassword: e.target.value })}
-                          placeholder="Confirm your password"
+                          placeholder={t('common.placeholders.confirmPassword', 'Confirm your password')}
                           className="pr-10"
                           data-testid="input-confirm-password"
                         />
@@ -459,7 +459,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         id="strata"
                         value={data.strataPlanNumber}
                         onChange={(e) => setData({ ...data, strataPlanNumber: e.target.value })}
-                        placeholder="e.g., BCS1234"
+                        placeholder={t('resident.placeholders.strataNumber', 'e.g., BCS1234')}
                         data-testid="input-strata"
                       />
                       <p className="text-xs text-muted-foreground mt-1">
@@ -473,7 +473,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         id="unit"
                         value={data.unitNumber}
                         onChange={(e) => setData({ ...data, unitNumber: e.target.value })}
-                        placeholder="e.g., 1205"
+                        placeholder={t('resident.placeholders.unitNumber', 'e.g., 1205')}
                         data-testid="input-unit"
                       />
                     </div>
@@ -484,7 +484,7 @@ export function ResidentRegistration({ open, onOpenChange }: ResidentRegistratio
                         id="parking"
                         value={data.parkingStallNumber}
                         onChange={(e) => setData({ ...data, parkingStallNumber: e.target.value })}
-                        placeholder="e.g., P1-42"
+                        placeholder={t('resident.placeholders.parkingStall', 'e.g., P1-42')}
                         data-testid="input-parking"
                       />
                     </div>

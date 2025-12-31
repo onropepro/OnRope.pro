@@ -2711,7 +2711,7 @@ export default function TechnicianPortal() {
               label={t.licenseNumber}
               value={isEditing ? form.watch("driversLicenseNumber") : user.driversLicenseNumber}
               control={isEditing ? form.control : undefined}
-              placeholder="Optional"
+              placeholder={i18nT('common.optional', 'Optional')}
               icon={<CreditCard className="w-4 h-4" />}
               emptyText={t.notProvided || "Not provided"}
               testId="license-number"
@@ -2892,7 +2892,7 @@ export default function TechnicianPortal() {
             label={t.firstAidType}
             value={isEditing ? form.watch("firstAidType") : user.firstAidType}
             control={isEditing ? form.control : undefined}
-            placeholder="OFA Level 1, Standard First Aid, etc."
+            placeholder={translations.technicianPortal?.placeholders?.firstAidType || "OFA Level 1, Standard First Aid, etc."}
             testId="first-aid-type"
           />
           <EditableDateField
@@ -3467,7 +3467,7 @@ export default function TechnicianPortal() {
               label="Social Insurance Number"
               value={isEditing ? form.watch("socialInsuranceNumber") : user.socialInsuranceNumber}
               control={isEditing ? form.control : undefined}
-              placeholder="Optional"
+              placeholder={i18nT('common.optional', 'Optional')}
               formatValue={(val) => maskSensitiveData(val)}
               emptyText="Not provided"
               testId="sin"

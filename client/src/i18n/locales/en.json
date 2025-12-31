@@ -1099,6 +1099,19 @@
       "noDocsInRange": "There are no documents in the selected date range.",
       "exportedDocs": "Successfully exported {{count}} {{type}} documents.",
       "exportedPartial": "Exported {{success}} documents. {{failed}} document(s) failed to generate."
+    },
+    "placeholders": {
+      "email": "your.email@example.com",
+      "phone": "e.g., (604) 555-1234",
+      "url": "https://example.com",
+      "strataPlan": "e.g., LMS1234",
+      "streetAddress": "123 Main St, Suite 100",
+      "province": "BC, ON, etc.",
+      "postalCode": "V6B 1A1, 90210, etc.",
+      "fullName": "e.g., John Smith",
+      "hours": "e.g., 6.5",
+      "location": "e.g., Vancouver, BC",
+      "adminEmail": "admin@company.com"
     }
   },
   "services": {
@@ -2919,7 +2932,9 @@
       "failed": "Send failed",
       "failedDesc": "Failed to send quote email",
       "defaultSubject": "Service Quote for"
-    }
+    },
+    "submitQuote": "Submit Quote",
+    "submitConfirmMessage": "Are you sure you want to submit this quote? Once submitted, it will be sent to management for review."
   },
   "schedule": {
     "title": "Job Schedule",
@@ -2984,6 +2999,7 @@
     "timeOffRemoveFailed": "Failed to remove time off.",
     "missingInfo": "Missing Information",
     "selectTimeOffFields": "Please select an employee, start date, and time off type.",
+    "selectType": "Select type...",
     "invalidDateRange": "Invalid Date Range",
     "endBeforeStart": "End date cannot be before start date.",
     "timeOffScheduled": "Time Off Scheduled",
@@ -3322,7 +3338,15 @@
     "failedToProcessImage": "Failed to process image",
     "appIconUploaded": "App icon uploaded successfully",
     "appIconActive": "Your custom icon is now active for new app installations.",
-    "failedToUploadIcon": "Failed to upload icon"
+    "failedToUploadIcon": "Failed to upload icon",
+    "deleteAccount": "Delete Account",
+    "confirmLogout": "Confirm Logout",
+    "logoutConfirmMessage": "Are you sure you want to logout?",
+    "logout": "Logout",
+    "updateLicenseKey": "Update License Key",
+    "licenseKeyDescription": "Enter your new license key. This is required after upgrading your tier.",
+    "newLicenseKey": "New License Key",
+    "enterLicenseKey": "Enter your new license key"
   },
   "subscription": {
     "title": "Subscription",
@@ -7581,7 +7605,14 @@
     "passwordChangeFailed": "Password Change Failed",
     "passwordChangeError": "Failed to change password. Please try again.",
     "fillAllPasswordFields": "Please fill in all password fields.",
-    "enterBothFields": "Please enter both strata plan number and password."
+    "enterBothFields": "Please enter both strata plan number and password.",
+    "strataPlaceholder": "Enter your strata or job number",
+    "passwordPlaceholder": "Enter your password",
+    "addressPlaceholder": "Start typing to search...",
+    "keysReturnPlaceholder": "Select when to return keys...",
+    "currentPasswordPlaceholder": "Enter your current password",
+    "newPasswordPlaceholder": "Enter new password (min 6 characters)",
+    "confirmPasswordPlaceholder": "Confirm new password"
   },
   "manageSubscription": {
     "title": "Manage Subscription",
@@ -9420,25 +9451,133 @@
     "stakeholders": {
       "owner": {
         "title": "For Company Owners",
-        "description": "Manage your business, team, and grow efficiently"
+        "description": "Manage your business, team, and grow efficiently",
+        "searchPlaceholder": "Ask about team management, financials, analytics...",
+        "features": {
+          "teamMgmt": "Team Management",
+          "teamMgmtDesc": "Manage your technicians, track certifications, and handle HR tasks",
+          "financial": "Financial Controls",
+          "financialDesc": "Generate quotes, track payroll, and monitor project costs",
+          "analytics": "Analytics & Insights",
+          "analyticsDesc": "Real-time dashboards showing productivity and profitability",
+          "safety": "Safety Compliance",
+          "safetyDesc": "Automated safety tracking and documentation"
+        },
+        "gettingStarted": {
+          "title": "Getting Started as a Company Owner",
+          "step1": "Set up your company profile and branding",
+          "step2": "Add your team members and assign roles",
+          "step3": "Configure safety and compliance settings",
+          "step4": "Create your first project and start tracking",
+          "viewGuide": "View Full Getting Started Guide"
+        }
       },
       "technician": {
         "title": "For Technicians",
-        "description": "Track your time, certifications, and career"
+        "description": "Track your time, certifications, and career",
+        "searchPlaceholder": "Ask about time tracking, IRATA logging, safety docs...",
+        "features": {
+          "timeTracking": "Time Tracking",
+          "timeTrackingDesc": "Clock in/out with GPS, log manual hours when employer doesn't use OnRopePro, track your total",
+          "irataLogging": "IRATA/SPRAT Logging",
+          "irataLoggingDesc": "Track hours for certification progression - manual hours count toward totals, previous hours are reference only",
+          "safetyDocs": "Safety Documentation",
+          "safetyDocsDesc": "Complete inspections, sign toolbox meetings, report incidents",
+          "jobBoard": "Job Board",
+          "jobBoardDesc": "Find new opportunities and connect with employers"
+        },
+        "gettingStarted": {
+          "title": "Getting Started as a Technician",
+          "step1": "Create your free Technician profile",
+          "step2": "Add your certifications and experience",
+          "step3": "Connect with employers or log independent hours",
+          "step4": "Build your professional portfolio",
+          "viewGuide": "View Full Getting Started Guide"
+        }
       },
       "buildingManager": {
         "title": "For Building Managers",
-        "description": "Monitor work, compliance, and communicate with residents"
+        "description": "Monitor work, compliance, and communicate with residents",
+        "searchPlaceholder": "Ask about safety ratings, compliance, work progress...",
+        "features": {
+          "safetyRating": "Company Safety Rating",
+          "safetyRatingDesc": "View vendor safety ratings and compliance history",
+          "residentComm": "Resident Communication",
+          "residentCommDesc": "Manage resident complaints and work notifications",
+          "workProgress": "Work Progress",
+          "workProgressDesc": "Monitor project progress and completion status",
+          "documentation": "Documentation",
+          "documentationDesc": "Access anchor logs, inspection reports, and COIs"
+        },
+        "gettingStarted": {
+          "title": "Getting Started as a Building Manager",
+          "step1": "Create your free Building Manager account",
+          "step2": "Connect to your building using the unique building code",
+          "step3": "View vendor safety ratings and work history",
+          "step4": "Set up resident communication for upcoming work",
+          "viewGuide": "View Full Getting Started Guide"
+        }
       },
       "propertyManager": {
         "title": "For Property Managers",
-        "description": "Oversee your portfolio and vendor relationships"
+        "description": "Oversee your portfolio and vendor relationships",
+        "searchPlaceholder": "Ask about vendor management, portfolio oversight...",
+        "features": {
+          "portfolio": "Portfolio Overview",
+          "portfolioDesc": "Manage multiple buildings from a single dashboard",
+          "vendorMgmt": "Vendor Management",
+          "vendorMgmtDesc": "View and compare all your rope access vendors",
+          "safetyRatings": "Safety Ratings",
+          "safetyRatingsDesc": "Compare vendor safety compliance across your portfolio",
+          "documentation": "Documentation",
+          "documentationDesc": "Access COIs, service history, and compliance documents"
+        },
+        "gettingStarted": {
+          "title": "Getting Started as a Property Manager",
+          "step1": "Create your Property Manager account",
+          "step2": "Add buildings to your portfolio",
+          "step3": "Connect with building managers and vendors",
+          "step4": "Monitor compliance across your properties",
+          "viewGuide": "View Full Getting Started Guide"
+        }
       },
       "resident": {
         "title": "For Residents",
-        "description": "Submit feedback and track issues at your building"
+        "description": "Submit feedback and track issues at your building",
+        "searchPlaceholder": "Ask about submitting feedback, tracking issues...",
+        "features": {
+          "submitFeedback": "Submit Feedback",
+          "submitFeedbackDesc": "Report issues or concerns directly to your building service provider",
+          "photoEvidence": "Photo Evidence",
+          "photoEvidenceDesc": "Attach photos to help explain issues clearly",
+          "statusUpdates": "Status Updates",
+          "statusUpdatesDesc": "Track when your feedback has been viewed and responded to",
+          "issueResolution": "Issue Resolution",
+          "issueResolutionDesc": "See when issues are marked as resolved with vendor responses"
+        },
+        "gettingStarted": {
+          "title": "Getting Started as a Resident",
+          "step1": "Access the resident portal using your building code",
+          "step2": "Submit feedback about maintenance issues",
+          "step3": "Track the status of your submissions",
+          "step4": "Receive updates when issues are resolved",
+          "viewGuide": "View Full Getting Started Guide"
+        },
+        "userGuide": {
+          "title": "Resident Portal User Guide",
+          "description": "Complete step-by-step guide for setting up your account, entering your company code, submitting feedback, and tracking your issues.",
+          "viewButton": "View User Guide"
+        }
       }
     },
+    "backToHelpCenter": "Help Center",
+    "keyFeaturesTitle": "Key Features for You",
+    "recommendedModules": "Recommended Modules",
+    "helpfulResources": "Helpful Resources",
+    "buildingManagerSearchPlaceholder": "Ask about safety ratings, compliance, work progress...",
+    "technicianSearchPlaceholder": "Ask about time tracking, IRATA logging, safety docs...",
+    "propertyManagerSearchPlaceholder": "Ask about vendor management, portfolio oversight...",
+    "companyOwnerSearchPlaceholder": "Ask about team management, financials, analytics...",
     "categories": {
       "operations": "Operations",
       "safety": "Safety",
@@ -9537,7 +9676,9 @@
   },
   "superUserTechnicians": {
     "failedToLoadTechnician": "Failed to load technician details",
-    "failedToUpdateTechnician": "Failed to update technician"
+    "failedToUpdateTechnician": "Failed to update technician",
+    "enabling": "Enabling...",
+    "reEnableAccount": "Re-enable Account"
   },
   "groundCrewJobBoard": {
     "failedToSubmitApplication": "Failed to submit application"
@@ -9568,7 +9709,9 @@
     "createFailed": "Failed to create job posting",
     "updateFailed": "Failed to update job posting",
     "deleteFailed": "Failed to delete job posting",
-    "fillRequired": "Please fill in required fields"
+    "fillRequired": "Please fill in required fields",
+    "deleteJobPosting": "Delete Job Posting?",
+    "deleteConfirmMessage": "This action cannot be undone. The job posting will be permanently removed."
   },
   "propertyManagerQuoteDetail": {
     "messageSent": "Message sent",
@@ -9591,7 +9734,10 @@
   },
   "personalSafetyDocuments": {
     "inspectionDeleted": "Inspection deleted",
-    "deleteFailed": "Delete failed"
+    "deleteFailed": "Delete failed",
+    "deleteInspection": "Delete Inspection?",
+    "deleteConfirmMessage": "This will permanently delete this inspection record.",
+    "newInspection": "New Inspection"
   },
   "dashboardGrid": {
     "copied": "Copied",
