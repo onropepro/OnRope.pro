@@ -1327,7 +1327,7 @@ export default function Schedule() {
         </TabsList>
 
         <TabsContent value="job-schedule" className="mt-4">
-          <div className={`bg-card rounded-lg shadow-premium p-6 transition-all duration-300 ${isCalendarFullscreen ? 'fixed inset-0 z-[90] overflow-auto' : ''}`}>
+          <div className={`bg-card rounded-lg shadow-premium p-6 transition-all duration-300 ${isCalendarFullscreen ? 'fixed inset-0 z-[200] overflow-auto' : ''}`}>
             {/* Fullscreen Toggle Button - Very Prominent */}
             <div className="flex items-center justify-end mb-4">
               <Button
