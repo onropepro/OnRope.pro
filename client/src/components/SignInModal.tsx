@@ -62,14 +62,14 @@ export function SignInModal({
         const buildingResponse = await fetch("/api/building/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ strataNumber: data.identifier, password: data.password }),
+          body: JSON.stringify({ strataPlanNumber: data.identifier.toUpperCase().replace(/\s+/g, ''), password: data.password }),
           credentials: "include",
         });
         
         const buildingResult = await buildingResponse.json();
         
         if (!buildingResponse.ok) {
-          form.setError("identifier", { message: result.message || t("signIn.loginFailed", "Login failed") });
+          form.setError("identifier", { message: buildingResult.message || result.message || t("signIn.loginFailed", "Login failed") });
           return;
         }
         
