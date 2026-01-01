@@ -9608,5 +9608,47 @@
       "signIn": "Sign In Now",
       "learnMore": "Learn More"
     }
+  },
+  "footer": {
+    "platform": {
+      "title": "PLATFORM",
+      "projectManagement": "Project Management",
+      "schedulingCalendar": "Scheduling & Calendar",
+      "safetyCompliance": "Safety & Compliance",
+      "employeeManagement": "Employee Management",
+      "crmClientPortal": "CRM & Client Portal",
+      "quotingSales": "Quoting & Sales"
+    },
+    "technicians": {
+      "title": "TECHNICIANS",
+      "passportLogbook": "Passport & Logbook",
+      "jobBoard": "Job Board",
+      "personalSafetyRating": "Personal Safety Rating",
+      "groundCrew": "Ground Crew",
+      "irataTaskLogging": "IRATA Task Logging"
+    },
+    "stakeholders": {
+      "title": "STAKEHOLDERS",
+      "forEmployers": "For Employers",
+      "forTechnicians": "For Technicians",
+      "forPropertyManagers": "For Property Managers",
+      "forBuildingManagers": "For Building Managers",
+      "forResidents": "For Residents"
+    },
+    "resources": {
+      "title": "RESOURCES",
+      "helpCenter": "Help Center",
+      "gettingStarted": "Getting Started",
+      "featureFinder": "Feature Finder",
+      "pricing": "Pricing",
+      "safetyStandards": "Safety Standards"
+    },
+    "legal": {
+      "title": "LEGAL",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy"
+    },
+    "allRightsReserved": "All rights reserved."
   }
 }
