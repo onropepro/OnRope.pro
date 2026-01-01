@@ -405,9 +405,9 @@ function Router() {
             </ProtectedRoute>
           </Route>
           <Route path="/manage-subscription">
-            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
               <ManageSubscription />
-            </ProtectedRoute>
+            </WithDashboardLayout>
           </Route>
           <Route path="/harness-inspection">
             <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
