@@ -49,18 +49,32 @@ export function SignInModal({
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await fetch("/api/login", {
+      let response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
         credentials: "include",
       });
 
-      const result = await response.json();
+      let result = await response.json();
 
       if (!response.ok) {
-        form.setError("identifier", { message: result.message || t("signIn.loginFailed", "Login failed") });
-        return;
+        const buildingResponse = await fetch("/api/building/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ strataNumber: data.identifier, password: data.password }),
+          credentials: "include",
+        });
+        
+        const buildingResult = await buildingResponse.json();
+        
+        if (!buildingResponse.ok) {
+          form.setError("identifier", { message: result.message || t("signIn.loginFailed", "Login failed") });
+          return;
+        }
+        
+        response = buildingResponse;
+        result = buildingResult;
       }
 
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
