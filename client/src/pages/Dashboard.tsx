@@ -3857,6 +3857,7 @@ export default function Dashboard() {
             harnessInspections={harnessInspections}
             onNavigate={handleTabChange}
             onRouteNavigate={setLocation}
+            onCreateProject={() => setShowProjectDialog(true)}
             branding={branding}
           />
         )}
