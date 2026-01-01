@@ -181,9 +181,14 @@ export default function BuildingManagerLanding() {
               </Button>
             </div>
 
-            <p className="text-sm text-blue-100/80">
-              {t('buildingManagerLanding.hero.autoAccount', 'Your account is created automatically when a vendor starts a project on your building.')}
-            </p>
+            <div className="bg-white/10 rounded-lg p-4 max-w-2xl mx-auto mt-4">
+              <p className="text-base text-white font-medium mb-2">
+                {t('buildingManagerLanding.hero.freeAccount', 'Building Manager accounts are always free.')}
+              </p>
+              <p className="text-sm text-blue-100">
+                {t('buildingManagerLanding.hero.autoAccountDetails', 'Your account is created automatically when a rope access company starts a project on your building. Your login is your strata/plan number (e.g., LMS1234). You\'ll receive your password from the vendor or can use your strata number as the initial password.')}
+              </p>
+            </div>
           </div>
         </div>
 
