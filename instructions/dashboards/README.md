@@ -78,6 +78,7 @@ Users create a single portable account that connects to multiple entities:
 | [resident-dashboard-instructions-v1.0.md](./resident-dashboard-instructions-v1.0.md) | Building Residents | PRODUCTION-READY | Feedback submission and project tracking |
 | [ground-crew-passport-instructions-v1.0.md](./ground-crew-passport-instructions-v1.0.md) | Ground Crew Workers | PRODUCTION-READY | Passport (personal) - similar to technician but distinct role |
 | [property-manager-dashboard-instructions-v1.0.md](./property-manager-dashboard-instructions-v1.0.md) | Property Managers | PRODUCTION-READY | Vendor oversight and building management |
+| [building-manager-dashboard-instructions-v1.0.md](./building-manager-dashboard-instructions-v1.0.md) | Building Managers | PRODUCTION-READY | Building portal with project progress and building instructions |
 
 **Note**: SuperUser dashboard documentation is out of scope for this series (internal platform management only).
 
@@ -188,9 +189,8 @@ The `UnifiedDashboardHeader` component (639 lines) provides a consistent header 
 | Ground Crew | `/ground-crew-portal` | `client/src/pages/GroundCrewPortal.tsx` | ~2,381 |
 | Resident | `/resident-dashboard` | `client/src/pages/ResidentDashboard.tsx` | ~2,089 |
 | Property Manager | `/property-manager` | `client/src/pages/PropertyManager.tsx` | ~2,794 |
+| Building Manager | `/building-portal` | `client/src/pages/BuildingPortal.tsx` | ~1,627 |
 | SuperUser | `/superuser` | `client/src/pages/SuperUser.tsx` | - |
-
-**Note**: Building Manager currently uses integrated features within Property Manager or other dashboards rather than a separate dedicated page.
 
 ---
 
