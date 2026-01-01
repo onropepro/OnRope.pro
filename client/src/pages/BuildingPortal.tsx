@@ -17,6 +17,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
 import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users, Download, Megaphone, MapPin, Home, Settings, Bell } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { loadLogoAsBase64 } from "@/lib/pdfBranding";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
@@ -109,6 +110,7 @@ export default function BuildingPortal() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<BuildingTabType>('overview');
+  const [selectedProject, setSelectedProject] = useState<ProjectHistoryItem | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
@@ -675,7 +677,12 @@ export default function BuildingPortal() {
                       .map((project) => {
                         const progress = getProjectProgress(project);
                         return (
-                          <div key={project.id} className="p-4 border rounded-lg" data-testid={`card-active-project-${project.id}`}>
+                          <div 
+                            key={project.id} 
+                            className="p-4 border rounded-lg cursor-pointer hover-elevate transition-all" 
+                            data-testid={`card-active-project-${project.id}`}
+                            onClick={() => setSelectedProject(project)}
+                          >
                             <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
                               <div>
                                 <h4 className="font-semibold">{getJobTypeName(project)}</h4>
@@ -1104,6 +1111,117 @@ export default function BuildingPortal() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Project Progress Dialog */}
+      <Dialog open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              {selectedProject && (selectedProject.customJobType || 
+                (selectedProject.jobType === 'window_cleaning' ? 'Window Cleaning' :
+                 selectedProject.jobType === 'facade_inspection' ? 'Facade Inspection' :
+                 selectedProject.jobType === 'painting' ? 'Painting' :
+                 selectedProject.jobType === 'caulking' ? 'Caulking' :
+                 selectedProject.jobType === 'power_washing' ? 'Power Washing' :
+                 selectedProject.jobType === 'balcony_repairs' ? 'Balcony Repairs' :
+                 selectedProject.jobType === 'glass_replacement' ? 'Glass Replacement' :
+                 selectedProject.jobType === 'lighting' ? 'Lighting' :
+                 selectedProject.jobType === 'signage' ? 'Signage' :
+                 selectedProject.jobType === 'other' ? 'Other' :
+                 selectedProject.jobType)
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {t('buildingPortal.projectProgressDesc', 'Building elevation progress by direction')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedProject && selectedProject.progressType === 'drops' && (
+            <div className="py-6">
+              <HighRiseBuilding
+                floors={25}
+                totalDropsNorth={selectedProject.totalDropsNorth || 0}
+                totalDropsEast={selectedProject.totalDropsEast || 0}
+                totalDropsSouth={selectedProject.totalDropsSouth || 0}
+                totalDropsWest={selectedProject.totalDropsWest || 0}
+                completedDropsNorth={selectedProject.completedDropsNorth || 0}
+                completedDropsEast={selectedProject.completedDropsEast || 0}
+                completedDropsSouth={selectedProject.completedDropsSouth || 0}
+                completedDropsWest={selectedProject.completedDropsWest || 0}
+              />
+            </div>
+          )}
+          
+          {selectedProject && selectedProject.progressType !== 'drops' && (
+            <div className="py-6 text-center">
+              <div className="space-y-4">
+                <div className="text-lg font-semibold">
+                  {selectedProject.progressType === 'suites' && t('buildingPortal.suitesProgress', 'Suites Progress')}
+                  {selectedProject.progressType === 'stalls' && t('buildingPortal.stallsProgress', 'Stalls Progress')}
+                  {selectedProject.progressType === 'hours' && t('buildingPortal.hoursProgress', 'Hours Progress')}
+                </div>
+                <div className="flex flex-col items-center gap-4">
+                  {selectedProject.progressType === 'suites' && (
+                    <>
+                      <div className="text-4xl font-bold text-primary">
+                        {selectedProject.completedSuites || 0} / {selectedProject.totalSuites || 0}
+                      </div>
+                      <Progress 
+                        value={selectedProject.totalSuites ? ((selectedProject.completedSuites || 0) / selectedProject.totalSuites) * 100 : 0} 
+                        className="h-4 w-64"
+                      />
+                    </>
+                  )}
+                  {selectedProject.progressType === 'stalls' && (
+                    <>
+                      <div className="text-4xl font-bold text-primary">
+                        {selectedProject.completedStalls || 0} / {selectedProject.totalStalls || 0}
+                      </div>
+                      <Progress 
+                        value={selectedProject.totalStalls ? ((selectedProject.completedStalls || 0) / selectedProject.totalStalls) * 100 : 0} 
+                        className="h-4 w-64"
+                      />
+                    </>
+                  )}
+                  {selectedProject.progressType === 'hours' && (
+                    <>
+                      <div className="text-4xl font-bold text-primary">
+                        {selectedProject.loggedHours || 0} / {selectedProject.estimatedHours || 0} {t('common.hours', 'hours')}
+                      </div>
+                      <Progress 
+                        value={selectedProject.estimatedHours ? ((selectedProject.loggedHours || 0) / selectedProject.estimatedHours) * 100 : 0} 
+                        className="h-4 w-64"
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {selectedProject && (
+            <div className="border-t pt-4 space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span>{selectedProject.companyName}</span>
+              </div>
+              {selectedProject.companyPhone && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Phone className="h-4 w-4" />
+                  <span>{selectedProject.companyPhone}</span>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedProject(null)}>
+              {t('common.close', 'Close')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
