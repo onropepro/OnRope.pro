@@ -3939,7 +3939,7 @@ export default function ProjectDetail() {
                       id="calendarColor"
                       name="calendarColor"
                       type="color" 
-                      defaultValue={project.calendarColor || "#3b82f6"}
+                      defaultValue={project.calendarColor?.startsWith('#') ? project.calendarColor : "#3b82f6"}
                       data-testid="input-edit-calendar-color"
                       className="h-12 w-20 cursor-pointer"
                     />
