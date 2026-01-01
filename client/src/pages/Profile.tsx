@@ -16,6 +16,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { SubscriptionManagement } from "@/components/SubscriptionManagement";
+import { LoggedHoursContent } from "@/pages/MyLoggedHours";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { QRCodeSVG } from 'qrcode.react';
@@ -1595,43 +1596,6 @@ export default function Profile() {
             </Form>
               </div>
                 </div>
-
-                {/* Right Column - Quick Actions */}
-                <div className="space-y-6">
-              {/* Quick Actions - Glass-morphism container */}
-              <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
-                {/* Header with icon */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="h-12 w-12 rounded-full bg-violet-500/20 flex items-center justify-center">
-                    <span className="material-icons text-violet-500">apps</span>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">{t('profile.quickActions', 'Quick Actions')}</h2>
-                    <p className="text-sm text-muted-foreground">{t('profile.additionalSettings', 'Additional settings and tools')}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {/* My Logged Hours */}
-                  <div 
-                    className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover-elevate active-elevate-2 cursor-pointer border border-border/50" 
-                    onClick={() => setLocation("/my-logged-hours")} 
-                    data-testid="card-my-logged-hours"
-                  >
-                    <div className="p-3 bg-violet-500/10 rounded-xl">
-                      <span className="material-icons text-violet-500">assignment</span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</p>
-                      <p className="text-sm text-muted-foreground">{t('dashboard.cards.myLoggedHours.description', 'IRATA logbook')}</p>
-                    </div>
-                    <span className="material-icons text-muted-foreground">chevron_right</span>
-                  </div>
-
-                </div>
-              </div>
-
-                </div>
               </div>
             </TabsContent>
 
@@ -1974,6 +1938,155 @@ export default function Profile() {
               <FeatureRequestsSection userId={user.id} userName={user.name || user.email || "Company Owner"} />
             </TabsContent>
           </Tabs>
+        ) : user?.role === "rope_access_tech" ? (
+          <Tabs defaultValue="profile" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="profile" data-testid="tab-profile">{t('profile.title', 'Profile')}</TabsTrigger>
+              <TabsTrigger value="logged-hours" data-testid="tab-logged-hours">{t('profile.loggedHours', 'Logged Hours')}</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="profile" className="mt-4 space-y-6">
+              {/* Profile Information Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('profile.profileInformation', 'Profile Information')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Form {...profileForm}>
+                    <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
+                      <FormField
+                        control={profileForm.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('common.name', 'Name')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder={t('profile.yourName', 'Your name')}
+                                {...field}
+                                data-testid="input-name"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={profileForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('common.email', 'Email')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                placeholder={t('common.placeholders.email', 'your.email@example.com')}
+                                {...field}
+                                data-testid="input-email"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button type="submit" className="w-full h-12" disabled={updateProfileMutation.isPending} data-testid="button-save-profile">
+                        {updateProfileMutation.isPending ? t('common.saving', 'Saving...') : t('profile.saveChanges', 'Save Changes')}
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+
+              {/* Change Password Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('profile.changePassword', 'Change Password')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Form {...passwordForm}>
+                    <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+                      <FormField
+                        control={passwordForm.control}
+                        name="currentPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.currentPassword', 'Current Password')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder={t('profile.enterCurrentPassword', 'Enter current password')}
+                                {...field}
+                                data-testid="input-current-password"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={passwordForm.control}
+                        name="newPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.newPassword', 'New Password')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder={t('profile.enterNewPassword', 'Enter new password')}
+                                {...field}
+                                data-testid="input-new-password"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={passwordForm.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('profile.confirmNewPassword', 'Confirm New Password')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder={t('profile.confirmNewPasswordPlaceholder', 'Confirm new password')}
+                                {...field}
+                                data-testid="input-confirm-password"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button
+                        type="submit"
+                        className="w-full h-12"
+                        data-testid="button-change-password"
+                        disabled={changePasswordMutation.isPending}
+                      >
+                        {changePasswordMutation.isPending ? t('common.changing', 'Changing...') : t('profile.changePassword', 'Change Password')}
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="logged-hours" className="mt-4">
+              <LoggedHoursContent />
+            </TabsContent>
+          </Tabs>
         ) : (
           <>
             {/* Non-company users - regular layout without tabs */}
@@ -2218,27 +2331,6 @@ export default function Profile() {
             </Form>
           </CardContent>
         </Card>
-
-        <Separator />
-
-        {/* My Logged Hours - IRATA Logbook (only for rope access technicians, not ground crew) */}
-        {user?.role === 'rope_access_tech' && (
-          <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={() => setLocation("/my-logged-hours")} data-testid="card-my-logged-hours">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-violet-500/10 rounded-xl">
-                  <span className="material-icons text-violet-500">assignment</span>
-                </div>
-                <div className="flex-1">
-                  <CardTitle className="text-lg">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</CardTitle>
-                  <CardDescription>{t('dashboard.cards.myLoggedHours.description', 'IRATA logbook')}</CardDescription>
-                </div>
-                <span className="material-icons text-muted-foreground">chevron_right</span>
-              </div>
-            </CardHeader>
-          </Card>
-        )}
-
           </>
         )}
       </div>
