@@ -204,6 +204,18 @@ export const PROJECT_CREATION_TOUR_STEPS: TourStep[] = [
     appContext: "Technicians get one-tap navigation to the site. The address is captured in every work session for audit verification."
   },
   {
+    fieldSelector: '[data-testid="button-category-rope_access"]',
+    title: "Job Category Selection",
+    explanation: "Choose from 3 job categories: Rope Access (window cleaning, caulking, etc.), General Maintenance (parkade, pressure washing), or Other Services. Each category has specific job types with tailored progress tracking.",
+    appContext: "The category you select determines which fields appear below. Rope access jobs track drops, parkade jobs track stalls, anchor jobs track inspection counts."
+  },
+  {
+    fieldSelector: '[data-testid="button-job-type-window_cleaning"]',
+    title: "Job Type Selection",
+    explanation: "Select the specific type of work being performed. Each job type has its own progress tracking method - window cleaning tracks drops, parkade cleaning tracks stalls, anchor inspection tracks anchor counts.",
+    appContext: "Job types appear in analytics reports and help forecast labor costs. Custom job types can be created if your work doesn't fit the predefined options."
+  },
+  {
     fieldSelector: '[data-testid="switch-requires-elevation"]',
     title: "Work at Height Toggle",
     explanation: "Enable this for rope access or any elevated work requiring fall protection. This unlocks safety compliance features specific to height work.",
@@ -222,9 +234,9 @@ export const PROJECT_CREATION_TOUR_STEPS: TourStep[] = [
     appContext: "Compare scheduled vs actual hours in analytics. The system flags projects at risk of missing deadlines."
   },
   {
-    fieldSelector: '[data-testid="input-drops-north"]',
+    fieldSelector: '[data-testid="input-total-drops-north"]',
     title: "Drops per Elevation",
-    explanation: "Enter the number of rope drops for each building side (North, East, South, West). This is static building data that carries over to future projects.",
+    explanation: "Enter the number of rope drops for each building side (North, East, South, West). This is static building data that carries over to future projects when you save the client.",
     appContext: "Powers the Building Portal progress tracking. Technicians log completed drops which updates the visual progress bars in real-time."
   },
   {
@@ -232,5 +244,29 @@ export const PROJECT_CREATION_TOUR_STEPS: TourStep[] = [
     title: "Daily Drop Target",
     explanation: "Expected drops your crew should complete per day. This helps measure daily productivity and forecast project completion.",
     appContext: "Used in performance analytics. If technicians end early, they select a valid reason (weather, access issues, etc.) which is tracked separately."
+  },
+  {
+    fieldSelector: '[data-testid="input-calendar-color"]',
+    title: "Calendar Color",
+    explanation: "Choose a color for this project on the visual calendar. Each project gets a unique color for easy identification when viewing the schedule.",
+    appContext: "Consistent colors across all calendar views help quickly identify projects. Your company's brand colors are available as options."
+  },
+  {
+    fieldSelector: '[data-testid="checkbox-assign-employee-1"]',
+    title: "Assign Employees",
+    explanation: "Select which team members will work on this project. Assigned employees see this project in their technician portal and can clock in/out when on site.",
+    appContext: "The scheduling system checks for conflicts - you'll be warned if someone is already booked elsewhere. Employees must accept their assignment notification."
+  },
+  {
+    fieldSelector: '[data-testid="input-rope-access-plan"]',
+    title: "Rope Access Plan (PDF)",
+    explanation: "Upload the fall protection or rope access plan document for this project. This is optional but recommended for safety compliance and audit readiness.",
+    appContext: "Technicians can view this document before starting work. Required by some clients and useful for WorkSafeBC/OSHA compliance documentation."
+  },
+  {
+    fieldSelector: '[data-testid="input-anchor-certificate"]',
+    title: "Anchor Inspection Certificate",
+    explanation: "Upload the anchor inspection certificate PDF. This confirms the building's anchor points have been certified for rope access work.",
+    appContext: "Shows as a status indicator on the project card. Missing certificates are flagged so you can ensure compliance before work begins."
   }
 ];
