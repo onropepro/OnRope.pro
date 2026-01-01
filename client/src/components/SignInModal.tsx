@@ -48,9 +48,7 @@ export function SignInModal({
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    console.log("[SignInModal] onSubmit called with:", { identifier: data.identifier, password: "***" });
     try {
-      console.log("[SignInModal] Attempting primary login to /api/login...");
       let response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,14 +56,10 @@ export function SignInModal({
         credentials: "include",
       });
       
-      console.log("[SignInModal] Primary login response status:", response.status);
       let result = await response.json();
-      console.log("[SignInModal] Primary login result:", result);
 
       if (!response.ok) {
-        console.log("[SignInModal] Primary login failed, trying building login...");
-        console.log("[SignInModal] Sending to /api/building/login:", { strataPlanNumber: data.identifier.toUpperCase().replace(/\s+/g, ''), password: "***" });
-        
+        // Try building login as fallback for strata numbers
         try {
           const buildingResponse = await fetch("/api/building/login", {
             method: "POST",
@@ -74,9 +68,7 @@ export function SignInModal({
             credentials: "include",
           });
           
-          console.log("[SignInModal] Building login response status:", buildingResponse.status);
           const buildingResult = await buildingResponse.json();
-          console.log("[SignInModal] Building login result:", buildingResult);
           
           if (!buildingResponse.ok) {
             form.setError("identifier", { message: buildingResult.message || result.message || t("signIn.loginFailed", "Login failed") });
@@ -86,7 +78,6 @@ export function SignInModal({
           response = buildingResponse;
           result = buildingResult;
         } catch (buildingError) {
-          console.error("[SignInModal] Building login fetch error:", buildingError);
           form.setError("identifier", { message: result.message || t("signIn.loginFailed", "Login failed") });
           return;
         }
