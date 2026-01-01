@@ -10140,16 +10140,14 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
             projectInfo.totalDropsSouth = project.totalDropsSouth || 0;
             projectInfo.totalDropsWest = project.totalDropsWest || 0;
             
-            // Calculate completed drops from drop logs table
-            const projectDropLogs = await storage.getDropLogsByProject(project.id);
-            const completedNorth = projectDropLogs.reduce((sum, log) => sum + (log.dropsCompletedNorth || 0), 0);
-            const completedEast = projectDropLogs.reduce((sum, log) => sum + (log.dropsCompletedEast || 0), 0);
-            const completedSouth = projectDropLogs.reduce((sum, log) => sum + (log.dropsCompletedSouth || 0), 0);
-            const completedWest = projectDropLogs.reduce((sum, log) => sum + (log.dropsCompletedWest || 0), 0);
-            projectInfo.completedDropsNorth = completedNorth;
-            projectInfo.completedDropsEast = completedEast;
-            projectInfo.completedDropsSouth = completedSouth;
-            projectInfo.completedDropsWest = completedWest;
+            // Get completed drops from all sources (drop_logs + work_sessions + adjustments)
+            // This uses the same calculation as the employer dashboard for consistency
+            const progress = await storage.getProjectProgress(project.id);
+            projectInfo.completedDropsNorth = progress.north;
+            projectInfo.completedDropsEast = progress.east;
+            projectInfo.completedDropsSouth = progress.south;
+            projectInfo.completedDropsWest = progress.west;
+            projectInfo.completedDrops = progress.total;
             
             // Get progress info based on job type
             if (project.progressType === 'drops') {
