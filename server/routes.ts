@@ -14400,7 +14400,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         dailyDropTarget: isNonDropJob ? 0 : req.body.dailyDropTarget,
       });
       
-      const project = await storage.createProject(projectData);
+      const project = await storage.createProject({ ...projectData, companyId });
       
       // Auto-create building in global SuperUser database if strata number exists
       if (project.strataPlanNumber) {
