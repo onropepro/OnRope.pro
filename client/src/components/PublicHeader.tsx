@@ -152,7 +152,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
     { id: "technician", label: t('navigation.technician', 'Rope Access Technician / Ground Crew'), href: "/technician" },
     { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
     { id: "resident", label: t('navigation.resident', 'Resident'), href: "/resident" },
-    { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-portal" },
+    { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-manager" },
   ];
 
   return (
@@ -745,7 +745,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
             <Button
               variant="ghost"
               className={`text-sm font-medium ${activeNav === "building-manager" ? "text-primary" : ""}`}
-              onClick={() => setLocation("/building-portal")}
+              onClick={() => setLocation("/building-manager")}
               onMouseEnter={() => {
                 setShowModulesMenu(false);
                 setShowTechnicianMenu(false);
