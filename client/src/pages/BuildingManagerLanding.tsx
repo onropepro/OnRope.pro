@@ -44,7 +44,7 @@ export default function BuildingManagerLanding() {
   const [faqOpen, setFaqOpen] = useState<string[]>([]);
 
   const handleSignIn = () => {
-    setLocation("/login?tab=strata");
+    openLogin();
   };
 
   const whatWeDoCards = [
