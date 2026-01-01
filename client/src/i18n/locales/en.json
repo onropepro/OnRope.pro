@@ -2742,6 +2742,8 @@
     "title": "Job Schedule",
     "subtitle": "Manage scheduled jobs and employee assignments",
     "loading": "Loading...",
+    "fullscreen": "Full Screen Calendar",
+    "exitFullscreen": "Exit Full Screen",
     "accessDenied": "Access Denied",
     "accessDeniedMessage": "You don't have permission to view the Job Schedule. Please contact your administrator to request access.",
     "returnToDashboard": "Return to Dashboard",

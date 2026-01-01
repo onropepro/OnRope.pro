@@ -2860,6 +2860,8 @@
     "title": "Calendario de trabajos",
     "subtitle": "Gestione trabajos programados y asignaciones de empleados",
     "loading": "Cargando...",
+    "fullscreen": "Calendario a pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
     "accessDenied": "Acceso denegado",
     "accessDeniedMessage": "No tiene permiso para ver el calendario de trabajos. Por favor contacte a su administrador para solicitar acceso.",
     "returnToDashboard": "Volver al panel",

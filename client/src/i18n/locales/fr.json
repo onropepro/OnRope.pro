@@ -2795,6 +2795,8 @@
     "title": "Calendrier des travaux",
     "subtitle": "Gérer les travaux planifiés et les affectations d'employés",
     "loading": "Chargement...",
+    "fullscreen": "Calendrier plein écran",
+    "exitFullscreen": "Quitter le plein écran",
     "accessDenied": "Accès refusé",
     "accessDeniedMessage": "Vous n'avez pas la permission de consulter le calendrier des travaux. Veuillez contacter votre administrateur pour demander l'accès.",
     "returnToDashboard": "Retourner au tableau de bord",
