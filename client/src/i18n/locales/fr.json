@@ -874,6 +874,7 @@
     "language": "Langue"
   },
   "common": {
+    "helpMeGetStarted": "Aidez-moi à commencer",
     "startFreeTrial": "Commencer votre essai gratuit de 30 jours",
     "signIn": "Se Connecter",
     "loading": "Chargement...",
