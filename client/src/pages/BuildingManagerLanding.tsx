@@ -34,8 +34,8 @@ import {
   Search
 } from "lucide-react";
 
-const BUILDING_MANAGER_COLOR = "#B89685";
-const BUILDING_MANAGER_GRADIENT_END = "#9A7B6C";
+const BUILDING_MANAGER_COLOR = "#3B7A9E";
+const BUILDING_MANAGER_GRADIENT_END = "#2C5F7D";
 
 export default function BuildingManagerLanding() {
   const { t } = useTranslation();
@@ -151,10 +151,10 @@ export default function BuildingManagerLanding() {
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
               {t('buildingManagerLanding.hero.title', 'Stop Chasing Updates.')}<br />
-              <span className="text-orange-100">{t('buildingManagerLanding.hero.titleHighlight', 'See Everything In Real-Time.')}</span>
+              <span className="text-blue-100">{t('buildingManagerLanding.hero.titleHighlight', 'See Everything In Real-Time.')}</span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-orange-100 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
               {t('buildingManagerLanding.hero.subtitle', 'Know exactly where every job stands without driving site to site or relying on yesterday\'s phone call.')}<br />
               <strong>{t('buildingManagerLanding.hero.subtitleStrong', 'One portal for all your building maintenance projects.')}</strong>
             </p>
@@ -162,7 +162,7 @@ export default function BuildingManagerLanding() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
                 size="lg" 
-                className="bg-white hover:bg-orange-50"
+                className="bg-white hover:bg-blue-50"
                 style={{ color: BUILDING_MANAGER_COLOR }}
                 onClick={handleSignIn}
                 data-testid="button-hero-sign-in"
@@ -181,7 +181,7 @@ export default function BuildingManagerLanding() {
               </Button>
             </div>
 
-            <p className="text-sm text-orange-100/80">
+            <p className="text-sm text-blue-100/80">
               {t('buildingManagerLanding.hero.autoAccount', 'Your account is created automatically when a vendor starts a project on your building.')}
             </p>
           </div>
