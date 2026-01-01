@@ -9141,13 +9141,18 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
   // Create or update building instructions
   app.post("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
+      // Sanitize integer fields - convert empty strings to null
+      const sanitizedBody = {
+        ...req.body,
+        tradeParkingSpots: req.body.tradeParkingSpots === "" ? null : (req.body.tradeParkingSpots ? parseInt(req.body.tradeParkingSpots, 10) : null),
+      };
       const { buildingId } = req.params;
 
       // SuperUser can update any building
       if (req.session.userId === 'superuser') {
         const instructions = await storage.upsertBuildingInstructions({
           buildingId,
-          ...req.body,
+          ...sanitizedBody,
           createdByUserId: 'superuser',
           createdByRole: 'superuser',
         });
@@ -9160,7 +9165,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         if (req.session.buildingId === buildingId) {
           const instructions = await storage.upsertBuildingInstructions({
             buildingId,
-            ...req.body,
+            ...sanitizedBody,
             createdByUserId: null, // Building managers don't have user IDs
             createdByRole: 'building_manager',
           });
@@ -9192,7 +9197,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
           if (hasProjectForBuilding) {
             const instructions = await storage.upsertBuildingInstructions({
               buildingId,
-              ...req.body,
+              ...sanitizedBody,
               createdByUserId: user.id,
               createdByRole: 'company',
             });
