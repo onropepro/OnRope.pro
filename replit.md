@@ -53,9 +53,11 @@ When adding guided tours to dialogs or forms, follow this exact implementation p
 ```
 
 **Placement:**
-- Place the button AFTER `<DialogDescription>` in the `<DialogHeader>`
+- Place the button AFTER `<DialogDescription>` but OUTSIDE `<DialogHeader>` (inside a wrapper div)
 - The `<GuidedFormTour>` component renders inline immediately after the button
 - Never use icon-only "?" buttons - always include full text
+
+**Reference Implementation:** See project creation dialog in `Dashboard.tsx` (line ~3929)
 
 **Tour Component:**
 ```tsx
@@ -71,8 +73,6 @@ When adding guided tours to dialogs or forms, follow this exact implementation p
 - Even simple steps need comprehensive help - not all users are familiar with the UI
 - Source tour content from actual documentation files in `server/help-content/modules/`
 - Each step should have: `fieldSelector`, `title`, `explanation`, and `appContext`
-
-**Reference Implementation:** See project creation dialog in `Dashboard.tsx` (line ~3929)
 
 ## External Dependencies
 *   **Database:** PostgreSQL

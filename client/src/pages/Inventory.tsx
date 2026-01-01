@@ -2891,11 +2891,13 @@ export default function Inventory() {
         if (!open) setIsGearTourActive(false);
       }}>
         <DialogContent data-testid="dialog-add-item" className="max-w-2xl flex flex-col max-h-[90vh]" ref={addDialogRef}>
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
-            <DialogDescription>
-              {addItemStep === 1 ? t('inventory.dialog.chooseGearType', "Choose the type of gear you're adding") : t('inventory.dialog.fillItemInfo', 'Fill in the item information')}
-            </DialogDescription>
+          <div className="flex-shrink-0">
+            <DialogHeader>
+              <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
+              <DialogDescription>
+                {addItemStep === 1 ? t('inventory.dialog.chooseGearType', "Choose the type of gear you're adding") : t('inventory.dialog.fillItemInfo', 'Fill in the item information')}
+              </DialogDescription>
+            </DialogHeader>
             
             <Button 
               variant="outline" 
@@ -2913,9 +2915,8 @@ export default function Inventory() {
               steps={gearInventoryTourSteps}
               isActive={isGearTourActive}
               onClose={() => setIsGearTourActive(false)}
-              containerRef={addDialogRef}
             />
-          </DialogHeader>
+          </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleAddItem)} className="flex flex-col flex-1 min-h-0 space-y-4">
               
