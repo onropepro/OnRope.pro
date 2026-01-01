@@ -9650,5 +9650,15 @@
       "cookiePolicy": "Cookie Policy"
     },
     "allRightsReserved": "All rights reserved."
+  },
+  "directions": {
+    "north": "North",
+    "east": "East",
+    "south": "South",
+    "west": "West"
+  },
+  "highRiseBuilding": {
+    "totalDropsComplete": "Total Drops Complete",
+    "exceededWarning": "Some elevations have more drops than planned"
   }
 }

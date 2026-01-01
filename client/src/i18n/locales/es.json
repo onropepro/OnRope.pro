@@ -13197,5 +13197,53 @@
       "cookiePolicy": "Política de Cookies"
     },
     "allRightsReserved": "Todos los derechos reservados."
+  },
+  "jobTypes": {
+    "window_cleaning": "Limpieza de Ventanas",
+    "dryer_vent_cleaning": "Limpieza de Conductos de Secadora",
+    "dryer_vent_cleaning_exterior": "Conductos de Secadora Exterior",
+    "building_wash": "Lavado de Edificio",
+    "building_wash_pressure": "Lavado de Edificio - Alta Presión",
+    "general_pressure_washing": "Lavado a Presión General",
+    "gutter_cleaning": "Limpieza de Canalones",
+    "in_suite_dryer_vent_cleaning": "Conductos de Secadora Interior",
+    "parkade_pressure_cleaning": "Limpieza de Estacionamiento",
+    "ground_window_cleaning": "Limpieza de Ventanas en Planta",
+    "rescue_standby": "Equipo de Rescate",
+    "painting": "Pintura",
+    "caulking": "Sellado",
+    "inspection": "Inspección",
+    "facade_inspection": "Inspección de Fachada",
+    "other": "Otro",
+    "ndt_visual_inspection": "Inspección Visual (VT)",
+    "ndt_ultrasonic_testing": "Prueba Ultrasónica (UT)",
+    "ndt_magnetic_particle": "Prueba de Partículas Magnéticas (MT)",
+    "ndt_dye_penetrant": "Prueba de Líquidos Penetrantes (PT)",
+    "ndt_radiographic": "Prueba Radiográfica (RT)",
+    "ndt_eddy_current": "Prueba de Corrientes Parásitas (ET)",
+    "ndt_thermographic": "Inspección Termográfica",
+    "ndt_acoustic_emission": "Prueba de Emisión Acústica (AE)",
+    "ndt_phased_array": "Ultrasonido de Matriz Fásica (PAUT)",
+    "ndt_time_of_flight": "Difracción de Tiempo de Vuelo (TOFD)",
+    "ndt_other": "Otro END",
+    "power_washing": "Lavado a Presión",
+    "balcony_repairs": "Reparaciones de Balcón",
+    "glass_replacement": "Reemplazo de Vidrios",
+    "lighting": "Iluminación",
+    "signage": "Señalización",
+    "signage_installation": "Instalación de Señalización",
+    "building_maintenance": "Mantenimiento de Edificio",
+    "light_replacement": "Reemplazo de Iluminación",
+    "pressure_washing": "Lavado a Presión"
+  },
+  "directions": {
+    "north": "Norte",
+    "east": "Este",
+    "south": "Sur",
+    "west": "Oeste"
+  },
+  "highRiseBuilding": {
+    "totalDropsComplete": "Bajadas Totales Completadas",
+    "exceededWarning": "Algunas elevaciones tienen más bajadas de las planificadas"
   }
 }

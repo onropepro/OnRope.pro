@@ -326,7 +326,7 @@ export default function BuildingPortal() {
         return (
           <Badge variant="outline" className="bg-success-600/10 text-success-600 dark:text-success-500 border-success-600/30">
             <CheckCircle className="w-3 h-3 mr-1" />
-            Completed
+            {t('buildingPortal.completed', 'Completed')}
           </Badge>
         );
       case "active":
@@ -334,14 +334,14 @@ export default function BuildingPortal() {
         return (
           <Badge variant="outline" className="bg-action-600/10 text-action-600 dark:text-action-400 border-action-600/30">
             <Clock className="w-3 h-3 mr-1" />
-            In Progress
+            {t('buildingPortal.active', 'In Progress')}
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="outline" className="bg-warning-600/10 text-warning-600 dark:text-warning-500 border-warning-600/30">
             <AlertCircle className="w-3 h-3 mr-1" />
-            Pending
+            {t('common.pending', 'Pending')}
           </Badge>
         );
       default:
@@ -355,19 +355,7 @@ export default function BuildingPortal() {
 
   const getJobTypeName = (project: ProjectHistoryItem) => {
     if (project.customJobType) return project.customJobType;
-    const jobTypeNames: Record<string, string> = {
-      window_cleaning: "Window Cleaning",
-      facade_inspection: "Facade Inspection",
-      painting: "Painting",
-      caulking: "Caulking",
-      pressure_washing: "Pressure Washing",
-      building_maintenance: "Building Maintenance",
-      gutter_cleaning: "Gutter Cleaning",
-      light_replacement: "Light Replacement",
-      signage_installation: "Signage Installation",
-      other: "Other",
-    };
-    return jobTypeNames[project.jobType] || project.jobType;
+    return t(`jobTypes.${project.jobType}`, project.jobType);
   };
 
   const getProjectProgress = (project: ProjectHistoryItem): { completed: number; total: number; label: string; hasProgress: boolean } | null => {
@@ -1120,19 +1108,7 @@ export default function BuildingPortal() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5" />
-              {selectedProject && (selectedProject.customJobType || 
-                (selectedProject.jobType === 'window_cleaning' ? 'Window Cleaning' :
-                 selectedProject.jobType === 'facade_inspection' ? 'Facade Inspection' :
-                 selectedProject.jobType === 'painting' ? 'Painting' :
-                 selectedProject.jobType === 'caulking' ? 'Caulking' :
-                 selectedProject.jobType === 'power_washing' ? 'Power Washing' :
-                 selectedProject.jobType === 'balcony_repairs' ? 'Balcony Repairs' :
-                 selectedProject.jobType === 'glass_replacement' ? 'Glass Replacement' :
-                 selectedProject.jobType === 'lighting' ? 'Lighting' :
-                 selectedProject.jobType === 'signage' ? 'Signage' :
-                 selectedProject.jobType === 'other' ? 'Other' :
-                 selectedProject.jobType)
-              )}
+              {selectedProject && getJobTypeName(selectedProject)}
             </DialogTitle>
             <DialogDescription>
               {t('buildingPortal.projectProgressDesc', 'Building elevation progress by direction')}

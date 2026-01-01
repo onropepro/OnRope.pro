@@ -10102,18 +10102,22 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
             projectInfo.companyEmail = company?.email || null;
             projectInfo.notes = project.notes || null;
             projectInfo.scheduledDates = project.scheduledDates || [];
+            projectInfo.floorCount = project.floorCount || 25;
+            
+            // Always include drop progress data for building elevation view
+            projectInfo.totalDrops = project.totalDrops || 0;
+            projectInfo.totalDropsNorth = project.totalDropsNorth || 0;
+            projectInfo.totalDropsEast = project.totalDropsEast || 0;
+            projectInfo.totalDropsSouth = project.totalDropsSouth || 0;
+            projectInfo.totalDropsWest = project.totalDropsWest || 0;
+            projectInfo.completedDropsNorth = project.completedDropsNorth || 0;
+            projectInfo.completedDropsEast = project.completedDropsEast || 0;
+            projectInfo.completedDropsSouth = project.completedDropsSouth || 0;
+            projectInfo.completedDropsWest = project.completedDropsWest || 0;
             
             // Get progress info based on job type
             if (project.progressType === 'drops') {
               projectInfo.progressType = 'drops';
-              projectInfo.totalDropsNorth = project.totalDropsNorth;
-              projectInfo.totalDropsEast = project.totalDropsEast;
-              projectInfo.totalDropsSouth = project.totalDropsSouth;
-              projectInfo.totalDropsWest = project.totalDropsWest;
-              projectInfo.completedDropsNorth = project.completedDropsNorth;
-              projectInfo.completedDropsEast = project.completedDropsEast;
-              projectInfo.completedDropsSouth = project.completedDropsSouth;
-              projectInfo.completedDropsWest = project.completedDropsWest;
             } else if (project.progressType === 'suites') {
               projectInfo.progressType = 'suites';
               projectInfo.totalSuites = project.totalSuites;
