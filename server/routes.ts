@@ -1967,6 +1967,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = await storage.getUserByRopeAccessLicense(identifier);
       }
       
+      // Also check for building strata number (for building manager login)
+      if (!user) {
+        const normalizedStrata = identifier.toUpperCase().replace(/\s+/g, '');
+        const building = await storage.verifyBuildingPassword(normalizedStrata, password);
+        if (building) {
+          req.session.userId = building.id;
+          req.session.role = 'building';
+          req.session.buildingId = building.id;
+          req.session.strataPlanNumber = building.strataPlanNumber;
+          await new Promise((resolve, reject) => {
+            req.session.save((err) => {
+              if (err) reject(err);
+              else resolve();
+            });
+          });
+          const { passwordHash, ...buildingData } = building;
+          return res.json({
+            message: 'Login successful',
+            user: {
+              id: building.id,
+              role: 'building_manager',
+              name: building.buildingName || building.strataPlanNumber,
+              strataPlanNumber: building.strataPlanNumber,
+              buildingName: building.buildingName,
+            }
+          });
+        }
+      }
+      
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
