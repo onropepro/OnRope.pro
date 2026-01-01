@@ -59,22 +59,33 @@ export function SignInModal({
       let result = await response.json();
 
       if (!response.ok) {
-        const buildingResponse = await fetch("/api/building/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ strataPlanNumber: data.identifier.toUpperCase().replace(/\s+/g, ''), password: data.password }),
-          credentials: "include",
-        });
+        console.log("[SignInModal] Primary login failed, trying building login...");
+        console.log("[SignInModal] Sending to /api/building/login:", { strataPlanNumber: data.identifier.toUpperCase().replace(/\s+/g, ''), password: "***" });
         
-        const buildingResult = await buildingResponse.json();
-        
-        if (!buildingResponse.ok) {
-          form.setError("identifier", { message: buildingResult.message || result.message || t("signIn.loginFailed", "Login failed") });
+        try {
+          const buildingResponse = await fetch("/api/building/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ strataPlanNumber: data.identifier.toUpperCase().replace(/\s+/g, ''), password: data.password }),
+            credentials: "include",
+          });
+          
+          console.log("[SignInModal] Building login response status:", buildingResponse.status);
+          const buildingResult = await buildingResponse.json();
+          console.log("[SignInModal] Building login result:", buildingResult);
+          
+          if (!buildingResponse.ok) {
+            form.setError("identifier", { message: buildingResult.message || result.message || t("signIn.loginFailed", "Login failed") });
+            return;
+          }
+          
+          response = buildingResponse;
+          result = buildingResult;
+        } catch (buildingError) {
+          console.error("[SignInModal] Building login fetch error:", buildingError);
+          form.setError("identifier", { message: result.message || t("signIn.loginFailed", "Login failed") });
           return;
         }
-        
-        response = buildingResponse;
-        result = buildingResult;
       }
 
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
