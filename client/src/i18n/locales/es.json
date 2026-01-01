@@ -937,6 +937,8 @@
     "safetyRating": "Calificacion de Seguridad"
   },
   "common": {
+    "startFreeTrial": "Comienza tu prueba gratuita de 30 días",
+    "signIn": "Iniciar Sesión",
     "loading": "Cargando...",
     "generating": "Generating...",
     "save": "Guardar",

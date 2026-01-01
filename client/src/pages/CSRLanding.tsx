@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { FreeTrialButton } from "@/components/FreeTrialButton";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
@@ -74,10 +75,11 @@ export default function CSRLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
-                {t('modules.csr.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              <FreeTrialButton 
+                className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+                onClick={() => setShowRegistration(true)} 
+                testId="button-hero-trial"
+              />
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-hero-signin">
                 {t('modules.csr.hero.signIn', 'Sign In')}
               </Button>
@@ -1051,10 +1053,11 @@ export default function CSRLanding() {
             {t('modules.csr.cta.descriptionLine2', 'Full access. No credit card. Real compliance data from day one.')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
-              {t('modules.csr.cta.startTrial', 'Start Your Free 60-Day Trial')}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
+            <FreeTrialButton 
+              className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+              onClick={() => setShowRegistration(true)} 
+              testId="button-cta-trial"
+            />
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-guide">
               <Link href="/guides/csr">
                 {t('modules.csr.cta.readGuide', 'Read the Full Guide')}

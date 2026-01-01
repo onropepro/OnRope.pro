@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
+import { FreeTrialButton } from "@/components/FreeTrialButton";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
@@ -109,10 +110,11 @@ export default function WhiteLabelBrandingLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-hero-trial">
-                {t('modules.whiteLabel.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              <FreeTrialButton 
+                className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+                onClick={() => setShowRegistration(true)} 
+                testId="button-hero-trial"
+              />
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-hero-signin">
                 Sign In
               </Button>
@@ -1132,10 +1134,11 @@ export default function WhiteLabelBrandingLanding() {
             {t('modules.whiteLabel.cta.subtitle', 'Join the rope access companies who have already elevated their brand presence. Start your 60-day free trial today.')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-final-cta">
-              {t('modules.whiteLabel.cta.trialButton', 'Start Your Free 60-Day Trial')}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
+            <FreeTrialButton 
+              className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+              onClick={() => setShowRegistration(true)} 
+              testId="button-final-cta"
+            />
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-final-changelog">
               <Link href="/changelog/branding">
                 {t('modules.whiteLabel.cta.documentationButton', 'View Documentation')}

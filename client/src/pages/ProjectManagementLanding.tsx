@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { PublicHeader } from "@/components/PublicHeader";
+import { FreeTrialButton } from "@/components/FreeTrialButton";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
@@ -90,10 +91,11 @@ export default function ProjectManagementLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
-                {t('modules.projects.hero.ctaTrial', 'Start Your Free 60-Day Trial')}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              <FreeTrialButton 
+                className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+                onClick={() => setShowRegistration(true)} 
+                testId="button-cta-trial"
+              />
               <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={openLogin} data-testid="button-cta-signin">
                 {t('login.header.signIn', 'Sign In')}
               </Button>
@@ -1262,10 +1264,11 @@ export default function ProjectManagementLanding() {
             <p className="font-medium text-white">{t('modules.projects.cta.desc3', 'Your brain stops being the database. The system carries the cognitive load. Your mental bandwidth goes to growing the business instead of tracking the business.')}</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-white text-[#0B64A3] hover:bg-blue-50" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial-bottom">
-              {t('modules.projects.cta.trialButton', 'Start Your Free 60-Day Trial')}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
+            <FreeTrialButton 
+              className="bg-white text-[#0B64A3] hover:bg-blue-50" 
+              onClick={() => setShowRegistration(true)} 
+              testId="button-cta-trial-bottom"
+            />
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-modules">
               <Link href="/modules">
                 {t('modules.projects.cta.modulesButton', 'Explore All Modules')}

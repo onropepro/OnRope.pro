@@ -2,7 +2,7 @@
 **System**: OnRopePro - Rope Access Management Platform  
 **Domain**: Ground Crew Passport & Employment  
 **Version**: 1.0  
-**Last Updated**: December 27, 2024  
+**Last Updated**: January 1, 2026  
 **Status**: PRODUCTION-READY  
 **Safety Critical**: Indirect - Tracks employment and personal safety documents
 
@@ -82,8 +82,8 @@ The Ground Crew **Passport** is the personal portable profile for ground-based s
 
 | Feature | Ground Crew | Technician |
 |---------|-------------|------------|
-| Portal File | `GroundCrewPortal.tsx` (~2K lines) | `TechnicianPortal.tsx` (~6.4K lines) |
-| Brand Color | Forest Green `#5D7B6F` | Rust `#AB4521` |
+| Portal File | `GroundCrewPortal.tsx` (~2,381 lines) | `TechnicianPortal.tsx` (~6,588 lines) |
+| Brand Color | Forest Green `#5D7B6F` | Blue-Gray `#5C7A84` |
 | IRATA/SPRAT Certification | No | Yes |
 | Rope Access Hours Logging | No | Yes |
 | Safety Rating (PSR) | No | Yes |
@@ -157,7 +157,7 @@ Ground crew portal excludes:
 
 ### Primary File
 ```
-client/src/pages/GroundCrewPortal.tsx (~2,070 lines)
+client/src/pages/GroundCrewPortal.tsx (~2,381 lines)
 ```
 
 ### Navigation Groups
@@ -228,8 +228,26 @@ Same as Technician Portal: English, French, Spanish
 
 ### Desktop Layout
 - **Fixed sidebar** (left): Ground crew-branded (#5D7B6F) using `DashboardSidebar` with `variant="ground-crew"`
-- **Header bar** (top): `DashboardSearch` component (visible on md+ screens), `LanguageDropdown`, profile button, logout
+- **Header bar** (top): Uses `UnifiedDashboardHeader` with `variant="ground-crew"`, includes `DashboardSearch` (visible on md+ screens), `LanguageDropdown`, profile button, logout
 - **Main content area**: Tab-specific content (`home`, `profile`, `invitations`, `more`)
+
+### useInlineActions Pattern
+
+GroundCrewPortal uses the same `useInlineActions` pattern as TechnicianPortal to provide custom navigation handlers to `UnifiedDashboardHeader`:
+
+```typescript
+const { inlineActions } = useInlineActions({
+  onProfileClick: () => setActiveTab('profile'),
+  onSettingsClick: () => setActiveTab('more'),
+});
+
+<UnifiedDashboardHeader
+  variant="ground-crew"
+  inlineActions={inlineActions}
+/>
+```
+
+This allows the header dropdown to navigate to internal tabs rather than external routes.
 
 ### Common Workflows
 
@@ -277,3 +295,4 @@ describe('Ground Crew Portal', () => {
 
 - **v1.0** (December 25, 2024): Initial documentation
 - **v1.1** (December 26, 2024): Added suspendedAt field documentation, Active/Inactive terminology, dashboard access control invariant
+- **v1.2** (January 1, 2026): Updated file line count (~2,381), documented useInlineActions pattern for UnifiedDashboardHeader, updated technician comparison color

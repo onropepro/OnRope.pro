@@ -6,6 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useState } from "react";
 import { Link } from "wouter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { FreeTrialButton } from "@/components/FreeTrialButton";
 import { SoftwareReplaces, MODULE_SOFTWARE_MAPPING } from "@/components/SoftwareReplaces";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
@@ -84,10 +85,11 @@ export default function CRMLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="bg-white text-[#0B64A3] border-white" onClick={() => setShowRegistration(true)} data-testid="button-cta-trial">
-                Start Your Free 60-Day Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              <FreeTrialButton 
+                className="bg-white text-[#0B64A3] border-white" 
+                onClick={() => setShowRegistration(true)} 
+                testId="button-cta-trial"
+              />
               <Button size="lg" variant="outline" className="border-white/40 text-white bg-white/10" onClick={openLogin} data-testid="button-cta-signin">
                 Sign In
               </Button>
@@ -736,10 +738,11 @@ export default function CRMLanding() {
               You didn't start a rope access company to manage spreadsheets. The CRM gives you back the time to run an actual business.
             </p>
             <div className="pt-4">
-              <Button size="lg" className="bg-[#0B64A3] text-white hover:bg-[#0369A1]" onClick={() => setShowRegistration(true)} data-testid="button-final-cta">
-                Start Your Free 60-Day Trial
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
+              <FreeTrialButton 
+                className="bg-[#0B64A3] text-white hover:bg-[#0369A1]" 
+                onClick={() => setShowRegistration(true)} 
+                testId="button-final-cta"
+              />
             </div>
           </CardContent>
         </Card>
