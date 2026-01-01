@@ -3857,7 +3857,12 @@ export default function Dashboard() {
             harnessInspections={harnessInspections}
             onNavigate={handleTabChange}
             onRouteNavigate={setLocation}
-            onCreateProject={() => setShowProjectDialog(true)}
+            onCreateProject={() => {
+              // Navigate to projects tab and open dialog
+              handleTabChange("projects");
+              // Small delay to ensure tab content is rendered before opening dialog
+              setTimeout(() => setShowProjectDialog(true), 50);
+            }}
             branding={branding}
           />
         )}
