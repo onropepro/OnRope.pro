@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, X, Lightbulb, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Lightbulb } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export interface TourStep {
@@ -36,12 +35,10 @@ export function GuidedFormTour({
     const container = containerRef?.current || document;
     if (!container) return;
 
-    // Remove highlight from all elements
     document.querySelectorAll('.tour-highlight-active').forEach(el => {
       el.classList.remove('tour-highlight-active');
     });
 
-    // Find and highlight the current field
     const element = container.querySelector(step.fieldSelector);
     if (element) {
       element.classList.add('tour-highlight-active');
@@ -50,29 +47,22 @@ export function GuidedFormTour({
   }, [isActive, step, containerRef]);
 
   useEffect(() => {
-    // Add the highlight styles to the document
     const styleId = 'guided-tour-styles';
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style');
       style.id = styleId;
       style.textContent = `
         .tour-highlight-active {
-          box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 20px 4px hsl(var(--primary) / 0.3) !important;
+          box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 16px 2px hsl(var(--primary) / 0.25) !important;
           border-radius: 8px;
           position: relative;
           z-index: 10;
-          animation: tour-pulse 2s ease-in-out infinite;
-        }
-        @keyframes tour-pulse {
-          0%, 100% { box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 20px 4px hsl(var(--primary) / 0.3); }
-          50% { box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 30px 8px hsl(var(--primary) / 0.4); }
         }
       `;
       document.head.appendChild(style);
     }
 
     return () => {
-      // Clean up highlights when component unmounts
       document.querySelectorAll('.tour-highlight-active').forEach(el => {
         el.classList.remove('tour-highlight-active');
       });
@@ -88,7 +78,6 @@ export function GuidedFormTour({
       setCurrentStep(0);
       setTimeout(highlightCurrentField, 100);
     } else {
-      // Clean up all highlights when tour closes
       document.querySelectorAll('.tour-highlight-active').forEach(el => {
         el.classList.remove('tour-highlight-active');
       });
@@ -111,87 +100,78 @@ export function GuidedFormTour({
 
   if (!isActive || !step) return null;
 
-  // Render inline within the dialog - no portal needed
   return (
-    <Card
-      className="mt-4 border-primary/30 bg-primary/5"
+    <div 
+      className="mt-3 p-3 rounded-lg border border-primary/20 bg-primary/5"
       data-testid="tour-tooltip"
     >
-      <CardContent className="p-4">
-        {/* Header with step indicator */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Badge variant="default" className="text-xs">
-              {t('common.step', 'Step')} {currentStep + 1} / {steps.length}
-            </Badge>
-            <h4 className="font-semibold">{step.title}</h4>
-          </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-7 w-7"
-            onClick={onClose}
-            data-testid="button-close-tour"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+      {/* Top row: Step badge, title, and close button */}
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant="default" className="text-xs shrink-0">
+            {currentStep + 1}/{steps.length}
+          </Badge>
+          <span className="font-medium text-sm">{step.title}</span>
         </div>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-6 w-6 shrink-0"
+          onClick={onClose}
+          data-testid="button-close-tour"
+        >
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      </div>
 
-        {/* Main explanation */}
-        <p className="text-sm text-muted-foreground mb-3">{step.explanation}</p>
-
-        {/* App context tip */}
+      {/* Content row: Explanation and context tip side by side on larger screens */}
+      <div className="flex flex-col sm:flex-row gap-2 text-xs mb-2">
+        <p className="text-muted-foreground flex-1">{step.explanation}</p>
         {step.appContext && (
-          <div className="flex items-start gap-2 p-3 rounded-md bg-amber-500/10 border border-amber-500/20 mb-4">
-            <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-amber-700 dark:text-amber-300">{step.appContext}</p>
+          <div className="flex items-start gap-1.5 p-2 rounded bg-amber-500/10 border border-amber-500/20 sm:max-w-[45%]">
+            <Lightbulb className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+            <span className="text-amber-700 dark:text-amber-300">{step.appContext}</span>
           </div>
         )}
+      </div>
 
-        {/* Instruction to interact */}
-        <div className="flex items-center gap-2 p-2 rounded-md bg-primary/10 border border-primary/20 mb-4">
-          <ChevronRight className="h-4 w-4 text-primary" />
-          <p className="text-xs text-primary font-medium">
-            {t('tour.interactPrompt', 'Fill in the highlighted field above, then click Next to continue.')}
-          </p>
-        </div>
+      {/* Navigation row: Compact buttons */}
+      <div className="flex items-center justify-between gap-2 pt-2 border-t border-primary/10">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handlePrevious}
+          disabled={currentStep === 0}
+          className="h-7 px-2 text-xs"
+          data-testid="button-tour-previous"
+        >
+          <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+          {t('common.back', 'Back')}
+        </Button>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between gap-2 pt-3 border-t">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePrevious}
-            disabled={currentStep === 0}
-            data-testid="button-tour-previous"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            {t('common.back', 'Back')}
-          </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClose}
+          className="h-7 px-2 text-xs text-muted-foreground"
+          data-testid="button-tour-skip"
+        >
+          {t('common.endTour', 'End Tour')}
+        </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-muted-foreground"
-            data-testid="button-tour-skip"
-          >
-            {t('common.endTour', 'End Tour')}
-          </Button>
-
-          <Button
-            size="sm"
-            onClick={handleNext}
-            data-testid="button-tour-next"
-          >
-            {currentStep === steps.length - 1 
-              ? t('common.finish', 'Finish') 
-              : t('common.next', 'Next')}
-            {currentStep < steps.length - 1 && <ArrowRight className="h-4 w-4 ml-1" />}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        <Button
+          size="sm"
+          onClick={handleNext}
+          className="h-7 px-3 text-xs"
+          data-testid="button-tour-next"
+        >
+          {currentStep === steps.length - 1 
+            ? t('common.finish', 'Finish') 
+            : t('common.next', 'Next')}
+          {currentStep < steps.length - 1 && <ArrowRight className="h-3.5 w-3.5 ml-1" />}
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -199,55 +179,55 @@ export const PROJECT_CREATION_TOUR_STEPS: TourStep[] = [
   {
     fieldSelector: '[data-testid="button-client-strata-search"]',
     title: "Quick Fill from Client",
-    explanation: "Choose an existing client from your database to auto-fill building details.",
-    appContext: "Linking to a client enables quick access to their history, quotes, and contact info from the project."
+    explanation: "Choose an existing client to auto-fill building details.",
+    appContext: "Links to client history, quotes, and contact info."
   },
   {
     fieldSelector: '[data-testid="input-strata-plan-number"]',
     title: "Strata / Job Number",
-    explanation: "Enter the strata plan number or your internal job reference number.",
-    appContext: "This ID appears on invoices, work orders, and helps technicians identify the job site."
+    explanation: "Enter the strata plan number or job reference.",
+    appContext: "Appears on invoices, work orders, and helps technicians identify the site."
   },
   {
     fieldSelector: '[data-testid="input-building-name"]',
     title: "Building Name",
-    explanation: "The name of the building or property where work will be performed.",
-    appContext: "Shown to technicians in their app and used in all client communications."
+    explanation: "Name of the building where work will be performed.",
+    appContext: "Shown to technicians and used in all client communications."
   },
   {
     fieldSelector: '[data-testid="input-building-address"]',
     title: "Building Address",
     explanation: "Full street address for the job site.",
-    appContext: "Enables GPS navigation for technicians and powers the map view in scheduling."
+    appContext: "Enables GPS navigation and powers the map view in scheduling."
   },
   {
     fieldSelector: '[data-testid="switch-requires-elevation"]',
     title: "Work at Height",
-    explanation: "Toggle on if this job requires rope access or elevated work.",
-    appContext: "Enables safety compliance features: gear tracking, harness inspections, and IRATA certification verification."
+    explanation: "Toggle on for rope access or elevated work.",
+    appContext: "Enables gear tracking, harness inspections, and IRATA verification."
   },
   {
     fieldSelector: '[data-testid="input-start-date"]',
     title: "Start Date",
-    explanation: "When work is scheduled to begin on this project.",
-    appContext: "Appears on the Job Schedule calendar and triggers technician notifications."
+    explanation: "When work is scheduled to begin.",
+    appContext: "Shows on the Job Schedule calendar and triggers notifications."
   },
   {
     fieldSelector: '[data-testid="input-end-date"]',
     title: "End Date",
     explanation: "Target completion date for the project.",
-    appContext: "Used to calculate project timeline, appears in reports, and triggers deadline reminders."
+    appContext: "Used for timeline calculations and deadline reminders."
   },
   {
     fieldSelector: '[data-testid="input-drops-north"]',
     title: "Total Drops (North)",
-    explanation: "Number of rope drops on the north elevation of the building.",
-    appContext: "Drops power the progress bars in Building Portal and help calculate daily targets for your crew."
+    explanation: "Number of rope drops on the north elevation.",
+    appContext: "Powers Building Portal progress bars and daily targets."
   },
   {
     fieldSelector: '[data-testid="input-daily-target"]',
     title: "Daily Drop Target",
-    explanation: "How many drops should the crew aim to complete each day.",
-    appContext: "Shown to technicians and used to calculate if the project is on schedule."
+    explanation: "How many drops should the crew complete each day.",
+    appContext: "Shown to technicians to track if project is on schedule."
   }
 ];
