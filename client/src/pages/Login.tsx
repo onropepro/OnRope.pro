@@ -389,11 +389,7 @@ export default function Login() {
                 <Button 
                   variant="outline" 
                   className="gap-2"
-                  onClick={() => {
-                    setLoginMethod("strata");
-                    form.setValue("identifier", "");
-                    form.clearErrors();
-                  }}
+                  onClick={() => setLocation("/building-manager")}
                   data-testid="button-building-portal"
                 >
                   <Building2 className="w-4 h-4" />
