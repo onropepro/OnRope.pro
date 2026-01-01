@@ -304,14 +304,16 @@ export default function Schedule() {
       const startDate = assignment.startDate || job.startDate;
       const endDate = assignment.endDate || job.endDate;
       
+      // Use job color, then project's calendar color, then default
+      const eventColor = job.color || job.project?.calendarColor || defaultJobColor;
       return {
         id: `${job.id}-${assignment.employee.id}`,
         resourceId: assignment.employee.id,
         title: job.project?.buildingName || job.title,
         start: startDate,
         end: endDate,
-        backgroundColor: job.color || defaultJobColor,
-        borderColor: job.color || defaultJobColor,
+        backgroundColor: eventColor,
+        borderColor: eventColor,
         extendedProps: {
           job,
           employee: assignment.employee,
@@ -413,7 +415,8 @@ export default function Schedule() {
   // Create separate event blocks for each day in multi-day jobs
   // Uses timezone-safe date utilities to prevent date shifting
   const events: EventInput[] = jobs.flatMap((job) => {
-    const color = job.color || defaultJobColor;
+    // Use job color, then project's calendar color, then default
+    const color = job.color || job.project?.calendarColor || defaultJobColor;
     // Use project dates if job is linked to a project, otherwise use job dates
     const rawStartDate = job.project?.startDate || job.startDate;
     const rawEndDate = job.project?.endDate || job.endDate;
@@ -931,13 +934,14 @@ export default function Schedule() {
         // Use assignment-specific dates
         const startStr = toLocalDateString(assignment.startDate);
         const endStr = toLocalDateString(assignment.endDate);
+        const eventColor = job.color || job.project?.calendarColor || defaultJobColor;
         return [{
           id: `${job.id}-${currentUser.id}`,
           title: job.project?.buildingName || job.title,
           start: startStr,
           end: nextDateOnly(endStr),
-          backgroundColor: job.color || defaultJobColor,
-          borderColor: job.color || defaultJobColor,
+          backgroundColor: eventColor,
+          borderColor: eventColor,
           extendedProps: {
             jobId: job.id,
             projectId: job.projectId,
@@ -948,13 +952,14 @@ export default function Schedule() {
         }];
       }
       // Fallback to job dates
+      const fallbackColor = job.color || job.project?.calendarColor || defaultJobColor;
       return [{
         id: job.id,
         title: job.project?.buildingName || job.title,
         start: job.startDate,
         end: nextDateOnly(job.endDate),
-        backgroundColor: job.color || defaultJobColor,
-        borderColor: job.color || defaultJobColor,
+        backgroundColor: fallbackColor,
+        borderColor: fallbackColor,
         extendedProps: {
           jobId: job.id,
           projectId: job.projectId,
@@ -1047,7 +1052,7 @@ export default function Schedule() {
                     >
                       <div 
                         className="w-3 h-12 rounded-full flex-shrink-0" 
-                        style={{ backgroundColor: job.color || defaultJobColor }}
+                        style={{ backgroundColor: job.color || job.project?.calendarColor || defaultJobColor }}
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{job.project?.buildingName || job.title}</p>
@@ -1782,7 +1787,7 @@ export default function Schedule() {
                                       <div 
                                         className={`rounded font-medium text-white truncate cursor-pointer hover-elevate ${timeOff ? 'opacity-60' : ''} ${isMonthView ? 'px-0.5 py-0.5 text-[8px]' : 'px-2 py-1.5 text-xs'}`}
                                         style={{ 
-                                          backgroundColor: job.color || defaultJobColor,
+                                          backgroundColor: job.color || job.project?.calendarColor || defaultJobColor,
                                           filter: 'saturate(0.85) brightness(1.05)'
                                         }}
                                         onClick={() => {
