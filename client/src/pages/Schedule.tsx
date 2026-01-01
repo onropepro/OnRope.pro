@@ -1630,15 +1630,15 @@ export default function Schedule() {
                 </div>
               </div>
               
-              {/* Action button (full width on mobile) */}
+              {/* Action button - compact but visible */}
               <Button 
-                variant="outline"
+                variant="default"
                 size="sm"
                 onClick={() => setTimeOffDialogOpen(true)}
                 data-testid="button-schedule-time-off"
-                className="w-full md:w-auto md:absolute md:top-0 md:right-0"
+                className="md:absolute md:top-0 md:right-0 gap-1.5 shadow-md"
               >
-                <Calendar className="h-4 w-4 mr-2" />
+                <Calendar className="h-3.5 w-3.5" />
                 {t('schedule.scheduleTimeOff', 'Schedule Time Off')}
               </Button>
             </div>
