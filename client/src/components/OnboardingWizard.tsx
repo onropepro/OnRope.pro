@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -528,12 +529,10 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                       <Input 
                         {...field} 
                         placeholder="ABC Property Management" 
-                        autoComplete="new-password" 
+                        autoComplete="off" 
                         data-1p-ignore="true" 
                         data-lpignore="true" 
                         data-testid="input-client-company"
-                        type="text"
-                        name={`company_name_${Math.random().toString(36).substring(7)}`}
                       />
                     </FormControl>
                     <FormMessage />
@@ -968,6 +967,10 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
+        <VisuallyHidden>
+          <DialogTitle>Onboarding Wizard</DialogTitle>
+          <DialogDescription>Complete the onboarding steps to set up your account</DialogDescription>
+        </VisuallyHidden>
         <DialogHeader>
           {currentStep !== "welcome" && currentStep !== "complete" && (
             <div className="space-y-2">
