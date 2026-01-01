@@ -1754,8 +1754,6 @@ export default function Profile() {
                     <span className="material-icons text-muted-foreground">chevron_right</span>
                   </div>
 
-                  {/* Language Preference */}
-                  <LanguagePreferenceCard />
                 </div>
               </div>
 
@@ -2398,10 +2396,6 @@ export default function Profile() {
           </Card>
         )}
 
-        <Separator />
-
-        {/* Language Preference for non-company users */}
-        <LanguagePreferenceCard />
           </>
         )}
       </div>
