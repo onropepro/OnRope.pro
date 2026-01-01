@@ -186,7 +186,7 @@ export default function BuildingManagerLanding() {
                 {t('buildingManagerLanding.hero.freeAccount', 'Building Manager accounts are always free.')}
               </p>
               <p className="text-sm text-blue-100">
-                {t('buildingManagerLanding.hero.autoAccountDetails', 'Your account is created automatically when a rope access company starts a project on your building. Your login is your strata/plan number (e.g., LMS1234). You\'ll receive your password from the vendor or can use your strata number as the initial password.')}
+                {t('buildingManagerLanding.hero.autoAccountDetails', 'Your account is created automatically when a rope access company using OnRopePro starts a project on your building. Your login is your strata/plan number (e.g., LMS1234). You\'ll receive your password from the vendor or can use your strata number as the initial password.')}
               </p>
             </div>
           </div>
