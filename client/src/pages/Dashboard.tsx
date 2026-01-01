@@ -5112,8 +5112,9 @@ export default function Dashboard() {
                                 progressPercent = total > 0 ? (completed / total) * 100 : 0;
                               }
 
-                              // Create subtle tint style from project calendar color
-                              const tintStyle = project.calendarColor ? {
+                              // Create subtle tint style from project calendar color (only if explicitly set)
+                              const hasCustomColor = project.calendarColor && project.calendarColor.trim() !== '';
+                              const tintStyle = hasCustomColor ? {
                                 background: `linear-gradient(135deg, ${project.calendarColor}08 0%, ${project.calendarColor}03 100%)`
                               } : {};
 
@@ -5254,8 +5255,9 @@ export default function Dashboard() {
                         unitLabel = t('dashboard.projects.drops', 'drops');
                       }
 
-                      // Create subtle tint style from project calendar color
-                      const tintStyle = project.calendarColor ? {
+                      // Create subtle tint style from project calendar color (only if explicitly set)
+                      const hasCustomColor = project.calendarColor && project.calendarColor.trim() !== '';
+                      const tintStyle = hasCustomColor ? {
                         background: `linear-gradient(135deg, ${project.calendarColor}08 0%, ${project.calendarColor}03 100%)`
                       } : {};
 
