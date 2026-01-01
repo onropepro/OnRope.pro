@@ -77,7 +77,7 @@ import { DocumentReviews } from "@/components/DocumentReviews";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
-import { ProjectCreationWizard } from "@/components/ProjectCreationWizard";
+import { GuidedFormTour, PROJECT_CREATION_TOUR_STEPS } from "@/components/GuidedFormTour";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -1261,7 +1261,7 @@ export default function Dashboard() {
   
   // Project conflict detection state
   const [projectConflictDialogOpen, setProjectConflictDialogOpen] = useState(false);
-  const [projectWizardOpen, setProjectWizardOpen] = useState(false);
+  const [projectTourActive, setProjectTourActive] = useState(false);
   const [projectPendingConflicts, setProjectPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>>([]);
   const [pendingProjectData, setPendingProjectData] = useState<any>(null);
   const [selectedInspection, setSelectedInspection] = useState<any>(null);
@@ -3816,12 +3816,10 @@ export default function Dashboard() {
         currentUser={user}
       />
       
-      <ProjectCreationWizard
-        open={projectWizardOpen}
-        onOpenChange={setProjectWizardOpen}
-        onSuccess={() => {
-          queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-        }}
+      <GuidedFormTour
+        steps={PROJECT_CREATION_TOUR_STEPS}
+        isActive={projectTourActive}
+        onClose={() => setProjectTourActive(false)}
       />
 
       {/* Main Content - sidebar and header are now provided by DashboardLayout wrapper */}
@@ -3931,7 +3929,7 @@ export default function Dashboard() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => setProjectWizardOpen(true)}
+                        onClick={() => setProjectTourActive(true)}
                         className="mt-3 gap-2"
                         data-testid="button-help-get-started"
                       >
