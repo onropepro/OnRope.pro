@@ -5264,7 +5264,7 @@ export default function Dashboard() {
                       return (
                         <Card 
                           key={project.id} 
-                          className="group relative shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" 
+                          className={`group relative shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${hasCustomColor ? '!bg-transparent' : ''}`}
                           style={tintStyle}
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
