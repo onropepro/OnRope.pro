@@ -3,9 +3,8 @@ import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, X, Lightbulb, HelpCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, X, Lightbulb, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { cn } from "@/lib/utils";
 
 export interface TourStep {
   fieldSelector: string;
@@ -30,7 +29,6 @@ export function GuidedFormTour({
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number; width: number } | null>(null);
 
   const step = steps[currentStep];
 
@@ -45,15 +43,44 @@ export function GuidedFormTour({
       const rect = element.getBoundingClientRect();
       setHighlightRect(rect);
 
-      const tooltipTop = rect.bottom + 8;
-      const tooltipLeft = rect.left;
-      const tooltipWidth = Math.min(rect.width, 400);
-
-      setTooltipPosition({ top: tooltipTop, left: tooltipLeft, width: tooltipWidth });
-
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Add visual highlight class to the element
+      element.classList.add('tour-highlight-active');
+      
+      // Remove highlight from all other elements
+      container.querySelectorAll('.tour-highlight-active').forEach(el => {
+        if (el !== element) {
+          el.classList.remove('tour-highlight-active');
+        }
+      });
     }
   }, [isActive, step, containerSelector]);
+
+  useEffect(() => {
+    // Add the highlight styles to the document
+    const styleId = 'guided-tour-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        .tour-highlight-active {
+          box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 20px 4px hsl(var(--primary) / 0.3) !important;
+          border-radius: 8px;
+          position: relative;
+          z-index: 10;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    return () => {
+      // Clean up highlights when component unmounts
+      document.querySelectorAll('.tour-highlight-active').forEach(el => {
+        el.classList.remove('tour-highlight-active');
+      });
+    };
+  }, []);
 
   useEffect(() => {
     updateHighlight();
@@ -78,6 +105,11 @@ export function GuidedFormTour({
     if (isActive) {
       setCurrentStep(0);
       setTimeout(updateHighlight, 100);
+    } else {
+      // Clean up all highlights when tour closes
+      document.querySelectorAll('.tour-highlight-active').forEach(el => {
+        el.classList.remove('tour-highlight-active');
+      });
     }
   }, [isActive, updateHighlight]);
 
@@ -97,104 +129,94 @@ export function GuidedFormTour({
 
   if (!isActive || !step) return null;
 
+  // Position the tooltip card at fixed position at bottom of viewport
+  // This ensures it never overlaps with dropdowns or form fields
   return createPortal(
-    <>
-      {highlightRect && (
-        <div
-          className="fixed pointer-events-none z-[9998]"
-          style={{
-            top: highlightRect.top - 4,
-            left: highlightRect.left - 4,
-            width: highlightRect.width + 8,
-            height: highlightRect.height + 8,
-            boxShadow: '0 0 0 4000px rgba(0, 0, 0, 0.5)',
-            borderRadius: '8px',
-            border: '2px solid hsl(var(--primary))',
-            backgroundColor: 'transparent',
-          }}
-        />
-      )}
+    <Card
+      className="fixed z-[9999] shadow-xl border-primary/30 bg-card/95 backdrop-blur-sm"
+      style={{
+        bottom: 16,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'min(500px, calc(100vw - 32px))',
+      }}
+      data-testid="tour-tooltip"
+    >
+      <CardContent className="p-4">
+        {/* Header with step indicator */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Badge variant="default" className="text-xs">
+              {t('common.step', 'Step')} {currentStep + 1} / {steps.length}
+            </Badge>
+            <h4 className="font-semibold">{step.title}</h4>
+          </div>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-7 w-7"
+            onClick={onClose}
+            data-testid="button-close-tour"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
 
-      {tooltipPosition && (
-        <Card
-          className="fixed z-[9999] shadow-xl border-primary/20"
-          style={{
-            top: tooltipPosition.top,
-            left: tooltipPosition.left,
-            width: Math.max(tooltipPosition.width, 320),
-            maxWidth: 'calc(100vw - 32px)',
-          }}
-          data-testid="tour-tooltip"
-        >
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="p-2 rounded-md bg-primary/10">
-                <HelpCircle className="h-4 w-4 text-primary" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold text-sm">{step.title}</h4>
-                  <Badge variant="outline" className="text-xs">
-                    {currentStep + 1} / {steps.length}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">{step.explanation}</p>
-              </div>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-6 w-6 -mt-1 -mr-1"
-                onClick={onClose}
-                data-testid="button-close-tour"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+        {/* Main explanation */}
+        <p className="text-sm text-muted-foreground mb-3">{step.explanation}</p>
 
-            {step.appContext && (
-              <div className="flex items-start gap-2 p-2 rounded-md bg-amber-500/10 border border-amber-500/20 mb-3">
-                <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-amber-700 dark:text-amber-300">{step.appContext}</p>
-              </div>
-            )}
+        {/* App context tip */}
+        {step.appContext && (
+          <div className="flex items-start gap-2 p-3 rounded-md bg-amber-500/10 border border-amber-500/20 mb-4">
+            <Lightbulb className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-amber-700 dark:text-amber-300">{step.appContext}</p>
+          </div>
+        )}
 
-            <div className="flex items-center justify-between gap-2 pt-2 border-t">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePrevious}
-                disabled={currentStep === 0}
-                data-testid="button-tour-previous"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                {t('common.back', 'Back')}
-              </Button>
+        {/* Instruction to interact */}
+        <div className="flex items-center gap-2 p-2 rounded-md bg-primary/5 border border-primary/10 mb-4">
+          <ChevronRight className="h-4 w-4 text-primary" />
+          <p className="text-xs text-primary font-medium">
+            {t('tour.interactPrompt', 'Fill in the highlighted field above, then click Next to continue.')}
+          </p>
+        </div>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClose}
-                className="text-muted-foreground"
-                data-testid="button-tour-skip"
-              >
-                {t('common.skip', 'Skip Tour')}
-              </Button>
+        {/* Navigation */}
+        <div className="flex items-center justify-between gap-2 pt-3 border-t">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+            data-testid="button-tour-previous"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            {t('common.back', 'Back')}
+          </Button>
 
-              <Button
-                size="sm"
-                onClick={handleNext}
-                data-testid="button-tour-next"
-              >
-                {currentStep === steps.length - 1 
-                  ? t('common.done', 'Done') 
-                  : t('common.next', 'Next')}
-                {currentStep < steps.length - 1 && <ArrowRight className="h-4 w-4 ml-1" />}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </>,
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="text-muted-foreground"
+            data-testid="button-tour-skip"
+          >
+            {t('common.endTour', 'End Tour')}
+          </Button>
+
+          <Button
+            size="sm"
+            onClick={handleNext}
+            data-testid="button-tour-next"
+          >
+            {currentStep === steps.length - 1 
+              ? t('common.finish', 'Finish') 
+              : t('common.next', 'Next')}
+            {currentStep < steps.length - 1 && <ArrowRight className="h-4 w-4 ml-1" />}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>,
     document.body
   );
 }
