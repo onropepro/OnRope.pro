@@ -1328,9 +1328,9 @@ export default function Schedule() {
         </TabsList>
 
         <TabsContent value="job-schedule" className="mt-4">
-          <div className={`bg-card rounded-lg shadow-premium transition-all duration-300 ${isCalendarFullscreen ? 'fixed inset-0 z-[200] overflow-auto pt-16' : 'p-6'}`}>
+          <div className={`transition-all duration-300 ${isCalendarFullscreen ? 'fixed inset-0 z-[250] overflow-auto bg-background p-6 pt-20' : 'bg-card rounded-lg shadow-premium p-6'}`}>
             {/* Fullscreen Toggle Button - Very Prominent */}
-            <div className={`flex items-center justify-end mb-4 ${isCalendarFullscreen ? 'fixed top-4 right-4 z-[210]' : ''}`}>
+            <div className={`flex items-center justify-end mb-4 ${isCalendarFullscreen ? 'fixed top-4 right-4 z-[260]' : ''}`}>
               <Button
                 variant="default"
                 size="lg"
@@ -1554,10 +1554,10 @@ export default function Schedule() {
 
         <TabsContent value="employee-schedule" className="mt-4">
           <div 
-            className={`rounded-lg border bg-card relative transition-all duration-300 ${isTimelineFullscreen ? 'fixed inset-0 z-[200] overflow-auto pt-16' : 'p-4 md:p-6'}`}
+            className={`transition-all duration-300 ${isTimelineFullscreen ? 'fixed inset-0 z-[250] overflow-auto bg-background p-6 pt-20' : 'rounded-lg border bg-card p-4 md:p-6 relative'}`}
           >
             {/* Fullscreen Toggle Button - Same as Job Schedule calendar */}
-            <div className={`flex items-center justify-end mb-4 ${isTimelineFullscreen ? 'fixed top-4 right-4 z-[210]' : ''}`}>
+            <div className={`flex items-center justify-end mb-4 ${isTimelineFullscreen ? 'fixed top-4 right-4 z-[260]' : ''}`}>
               <Button
                 variant="default"
                 size="lg"
