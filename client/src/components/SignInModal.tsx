@@ -48,15 +48,19 @@ export function SignInModal({
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    console.log("[SignInModal] onSubmit called with:", { identifier: data.identifier, password: "***" });
     try {
+      console.log("[SignInModal] Attempting primary login to /api/login...");
       let response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
         credentials: "include",
       });
-
+      
+      console.log("[SignInModal] Primary login response status:", response.status);
       let result = await response.json();
+      console.log("[SignInModal] Primary login result:", result);
 
       if (!response.ok) {
         console.log("[SignInModal] Primary login failed, trying building login...");
@@ -187,8 +191,8 @@ export function SignInModal({
                             <FormControl>
                               <Input
                                 {...field}
-                                type="email"
-                                placeholder={t("signIn.emailPlaceholder", "you@example.com")}
+                                type="text"
+                                placeholder={t("signIn.emailPlaceholder", "email or strata #")}
                                 data-testid="input-signin-email"
                               />
                             </FormControl>
