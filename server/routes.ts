@@ -11087,19 +11087,12 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
           });
         }
         
-        // PLUS technician - add via employer_connections
-        const newConnection = {
+        // PLUS technician - add via technicianEmployerConnections table
+        await db.insert(technicianEmployerConnections).values({
+          technicianId,
           companyId,
-          companyName,
-          hourlyRate: hourlyRate || null,
-          isSalary: isSalary || false,
-          salary: salary || null,
-          connectedAt: new Date().toISOString(),
-        };
-        
-        const updatedConnections = [...existingConnections, newConnection];
-        await storage.updateUser(technicianId, {
-          employerConnections: updatedConnections,
+          isPrimary: false,
+          status: "active",
         });
         
         console.log(`[Technician-Link] PLUS technician ${technicianId} (${technician.name}) connected to additional employer ${companyId} (${companyName})`);
