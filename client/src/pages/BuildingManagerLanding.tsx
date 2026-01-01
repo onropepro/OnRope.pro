@@ -150,13 +150,13 @@ export default function BuildingManagerLanding() {
             </Badge>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              {t('buildingManagerLanding.hero.title', 'Stop Chasing Updates.')}<br />
-              <span className="text-blue-100">{t('buildingManagerLanding.hero.titleHighlight', 'See Everything In Real-Time.')}</span>
+              {t('buildingManagerLanding.hero.title', 'Your Building. Your Visibility.')}<br />
+              <span className="text-blue-100">{t('buildingManagerLanding.hero.titleHighlight', 'No More Chasing Contractors.')}</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              {t('buildingManagerLanding.hero.subtitle', 'Know exactly where every job stands without driving site to site or relying on yesterday\'s phone call.')}<br />
-              <strong>{t('buildingManagerLanding.hero.subtitleStrong', 'One portal for all your building maintenance projects.')}</strong>
+              {t('buildingManagerLanding.hero.subtitle', 'See exactly what\'s happening with rope access work on your building - without waiting for callbacks or status emails.')}<br />
+              <strong>{t('buildingManagerLanding.hero.subtitleStrong', 'Real-time progress. Resident feedback. Complete documentation.')}</strong>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -257,7 +257,7 @@ export default function BuildingManagerLanding() {
           
           <div className="prose prose-lg dark:prose-invert max-w-none text-center">
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              {t('buildingManagerLanding.problem.p1', 'You manage a building. Rope access work is scheduled. You need to know what\'s happening.')}
+              {t('buildingManagerLanding.problem.p1', 'You\'re responsible for everything that happens in your building. When rope access work is scheduled, you need to know what\'s going on.')}
             </p>
             
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
@@ -265,7 +265,7 @@ export default function BuildingManagerLanding() {
             </p>
             
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              {t('buildingManagerLanding.problem.p3', 'You drive to the site to check progress yourself. You call the office looking for a project manager. You wonder if they\'re on schedule, if residents have complained, if safety protocols are being followed.')}
+              {t('buildingManagerLanding.problem.p3', 'You walk outside to check progress yourself. You call the office looking for a project manager. You wonder if they\'re on schedule, if residents have complained, if safety protocols are being followed.')}
             </p>
             
             <p className="text-xl font-semibold text-foreground mb-6">
