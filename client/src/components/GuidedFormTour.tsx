@@ -204,15 +204,9 @@ export const PROJECT_CREATION_TOUR_STEPS: TourStep[] = [
     appContext: "Technicians get one-tap navigation to the site. The address is captured in every work session for audit verification."
   },
   {
-    fieldSelector: '[data-testid="button-category-rope_access"]',
-    title: "Job Category Selection",
-    explanation: "Choose from 3 job categories: Rope Access (window cleaning, caulking, etc.), General Maintenance (parkade, pressure washing), or Other Services. Each category has specific job types with tailored progress tracking.",
-    appContext: "The category you select determines which fields appear below. Rope access jobs track drops, parkade jobs track stalls, anchor jobs track inspection counts."
-  },
-  {
     fieldSelector: '[data-testid="button-job-type-window_cleaning"]',
     title: "Job Type Selection",
-    explanation: "Select the specific type of work being performed. Each job type has its own progress tracking method - window cleaning tracks drops, parkade cleaning tracks stalls, anchor inspection tracks anchor counts.",
+    explanation: "Select the type of work being performed. Each job type has its own progress tracking - window cleaning tracks drops, parkade cleaning tracks stalls, anchor inspection tracks anchor counts, and others track hours.",
     appContext: "Job types appear in analytics reports and help forecast labor costs. Custom job types can be created if your work doesn't fit the predefined options."
   },
   {
