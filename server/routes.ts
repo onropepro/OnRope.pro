@@ -14620,6 +14620,13 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       if (req.body.dropsAdjustmentSouth !== undefined) allowedUpdates.dropsAdjustmentSouth = req.body.dropsAdjustmentSouth;
       if (req.body.dropsAdjustmentWest !== undefined) allowedUpdates.dropsAdjustmentWest = req.body.dropsAdjustmentWest;
       
+      
+      // Add calendar color for project card tinting and calendar display
+      if (req.body.calendarColor !== undefined) allowedUpdates.calendarColor = req.body.calendarColor;
+      
+      // Add coordinates from address autocomplete
+      if (req.body.latitude !== undefined) allowedUpdates.latitude = req.body.latitude;
+      if (req.body.longitude !== undefined) allowedUpdates.longitude = req.body.longitude;
       const updatedProject = await storage.updateProject(id, allowedUpdates);
       
       // Auto-sync scheduled job if project dates are updated
