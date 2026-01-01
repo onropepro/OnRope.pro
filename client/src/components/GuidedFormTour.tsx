@@ -181,56 +181,56 @@ export function GuidedFormTour({
 export const PROJECT_CREATION_TOUR_STEPS: TourStep[] = [
   {
     fieldSelector: '[data-testid="button-client-strata-search"]',
-    title: "Quick Fill from Client",
-    explanation: "Choose an existing client to auto-fill building details.",
-    appContext: "Links to client history, quotes, and contact info."
+    title: "Quick Fill from Client Database",
+    explanation: "Select an existing client to auto-populate building details like address, floor count, and drop targets. You can also enter details manually if the client isn't in your database yet.",
+    appContext: "One-time client entry saves 20+ hours monthly. Building specs auto-fill into every future project for this client."
   },
   {
     fieldSelector: '[data-testid="input-strata-plan-number"]',
-    title: "Strata / Job Number",
-    explanation: "Enter the strata plan number or job reference.",
-    appContext: "Appears on invoices, work orders, and helps technicians identify the site."
+    title: "Strata Plan Number / Job Number",
+    explanation: "Enter the unique building identifier (LMS, EMS, VIS) or your internal job reference number. This becomes the project's primary identifier throughout the system.",
+    appContext: "Used for resident portal access codes, quote generation, and linking projects to CRM building records."
   },
   {
     fieldSelector: '[data-testid="input-building-name"]',
     title: "Building Name",
-    explanation: "Name of the building where work will be performed.",
-    appContext: "Shown to technicians and used in all client communications."
+    explanation: "Enter the display name for this building. This is how the project appears in all calendar views, work session logs, and team communications.",
+    appContext: "Technicians see this name when clocking in. It appears on safety forms, toolbox meeting records, and all project documentation."
   },
   {
     fieldSelector: '[data-testid="input-building-address"]',
     title: "Building Address",
-    explanation: "Full street address for the job site.",
-    appContext: "Enables GPS navigation and powers the map view in scheduling."
+    explanation: "Full street address including city and postal code. This powers GPS-verified clock-in/out and appears on all project documentation.",
+    appContext: "Technicians get one-tap navigation to the site. The address is captured in every work session for audit verification."
   },
   {
     fieldSelector: '[data-testid="switch-requires-elevation"]',
-    title: "Work at Height",
-    explanation: "Toggle on for rope access or elevated work.",
-    appContext: "Enables gear tracking, harness inspections, and IRATA verification."
+    title: "Work at Height Toggle",
+    explanation: "Enable this for rope access or any elevated work requiring fall protection. This unlocks safety compliance features specific to height work.",
+    appContext: "Enables harness inspection requirements, IRATA/SPRAT certification verification, and equipment checkout tracking for this project."
   },
   {
     fieldSelector: '[data-testid="input-start-date"]',
-    title: "Start Date",
-    explanation: "When work is scheduled to begin.",
-    appContext: "Shows on the Job Schedule calendar and triggers notifications."
+    title: "Project Start Date",
+    explanation: "When work is scheduled to begin. This date appears on the visual calendar and resource timeline for crew assignment planning.",
+    appContext: "The scheduling system uses this to detect conflicts and prevent double-booking. Technicians see their assignments in their portal."
   },
   {
     fieldSelector: '[data-testid="input-end-date"]',
-    title: "End Date",
-    explanation: "Target completion date for the project.",
-    appContext: "Used for timeline calculations and deadline reminders."
+    title: "Target End Date",
+    explanation: "Expected project completion date. Used to calculate project timeline and track if work is progressing on schedule.",
+    appContext: "Compare scheduled vs actual hours in analytics. The system flags projects at risk of missing deadlines."
   },
   {
     fieldSelector: '[data-testid="input-drops-north"]',
-    title: "Total Drops (North)",
-    explanation: "Number of rope drops on the north elevation.",
-    appContext: "Powers Building Portal progress bars and daily targets."
+    title: "Drops per Elevation",
+    explanation: "Enter the number of rope drops for each building side (North, East, South, West). This is static building data that carries over to future projects.",
+    appContext: "Powers the Building Portal progress tracking. Technicians log completed drops which updates the visual progress bars in real-time."
   },
   {
     fieldSelector: '[data-testid="input-daily-target"]',
     title: "Daily Drop Target",
-    explanation: "How many drops should the crew complete each day.",
-    appContext: "Shown to technicians to track if project is on schedule."
+    explanation: "Expected drops your crew should complete per day. This helps measure daily productivity and forecast project completion.",
+    appContext: "Used in performance analytics. If technicians end early, they select a valid reason (weather, access issues, etc.) which is tracked separately."
   }
 ];
