@@ -69,20 +69,23 @@ export function GuidedFormTour({
     };
   }, []);
 
+  // Highlight the current field whenever step changes
   useEffect(() => {
-    highlightCurrentField();
-  }, [highlightCurrentField, currentStep]);
+    if (isActive) {
+      highlightCurrentField();
+    }
+  }, [currentStep, isActive]);
 
+  // Reset to step 0 only when tour is activated
   useEffect(() => {
     if (isActive) {
       setCurrentStep(0);
-      setTimeout(highlightCurrentField, 100);
     } else {
       document.querySelectorAll('.tour-highlight-active').forEach(el => {
         el.classList.remove('tour-highlight-active');
       });
     }
-  }, [isActive, highlightCurrentField]);
+  }, [isActive]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
