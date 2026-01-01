@@ -61,6 +61,16 @@ export default function Login() {
     }
   }, [userData, isCheckingAuth, authError]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "strata" || tab === "license" || tab === "email") {
+      setLoginMethod(tab);
+      form.setValue("identifier", "");
+      form.clearErrors();
+    }
+  }, []);
+
   const redirectBasedOnRole = (role: string) => {
     switch (role) {
       case "resident":
