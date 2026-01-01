@@ -863,6 +863,8 @@
     "language": "Language"
   },
   "common": {
+    "startFreeTrial": "Start Your Free 30-Day Trial",
+    "signIn": "Sign In",
     "loading": "Loading...",
     "generating": "Generating...",
     "save": "Save",

@@ -874,6 +874,8 @@
     "language": "Langue"
   },
   "common": {
+    "startFreeTrial": "Commencer votre essai gratuit de 30 jours",
+    "signIn": "Connexion",
     "loading": "Chargement...",
     "generating": "Génération en cours...",
     "save": "Enregistrer",
