@@ -194,11 +194,13 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
         }),
         credentials: "include",
       });
+      
+      const result = await response.json();
+      
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Registration failed");
+        throw new Error(result.message || "Registration failed");
       }
-      return response.json();
+      return result;
     },
     onSuccess: () => {
       setStep("success");

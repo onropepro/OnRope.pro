@@ -525,7 +525,16 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                   <FormItem>
                     <FormLabel>{t("onboarding.client.company", "Company (Optional)")}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="ABC Property Management" autoComplete="off" data-1p-ignore="true" data-lpignore="true" data-testid="input-client-company" />
+                      <Input 
+                        {...field} 
+                        placeholder="ABC Property Management" 
+                        autoComplete="new-password" 
+                        data-1p-ignore="true" 
+                        data-lpignore="true" 
+                        data-testid="input-client-company"
+                        type="text"
+                        name={`company_name_${Math.random().toString(36).substring(7)}`}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
