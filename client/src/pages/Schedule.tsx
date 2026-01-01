@@ -93,6 +93,7 @@ export default function Schedule() {
   
   // Fullscreen calendar mode
   const [isCalendarFullscreen, setIsCalendarFullscreen] = useState(false);
+  const [isTimelineFullscreen, setIsTimelineFullscreen] = useState(false);
   
   // Time off dialog state
   const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
@@ -1553,8 +1554,31 @@ export default function Schedule() {
 
         <TabsContent value="employee-schedule" className="mt-4">
           <div 
-            className="rounded-lg border bg-card p-4 md:p-6 relative"
+            className={`rounded-lg border bg-card relative transition-all duration-300 ${isTimelineFullscreen ? 'fixed inset-0 z-[200] overflow-auto pt-16' : 'p-4 md:p-6'}`}
           >
+            {/* Fullscreen Toggle Button - Same as Job Schedule calendar */}
+            <div className={`flex items-center justify-end mb-4 ${isTimelineFullscreen ? 'fixed top-4 right-4 z-[210]' : ''}`}>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => setIsTimelineFullscreen(!isTimelineFullscreen)}
+                className="gap-2 font-bold shadow-lg"
+                data-testid="button-fullscreen-timeline"
+              >
+                {isTimelineFullscreen ? (
+                  <>
+                    <Minimize2 className="w-5 h-5" />
+                    {t('schedule.exitFullscreen', 'Exit Full Screen')}
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="w-5 h-5" />
+                    {t('schedule.fullscreen', 'Full Screen Calendar')}
+                  </>
+                )}
+              </Button>
+            </div>
+            
             {/* Timeline Navigation Header - Mobile optimized */}
             <div className="flex flex-col gap-3 mb-4 md:mb-6 relative z-10">
               {/* View mode toggle */}
@@ -1630,19 +1654,17 @@ export default function Schedule() {
                 </div>
               </div>
               
-              {/* Action button - compact but visible, positioned top-right */}
-              <div className="absolute top-0 right-0">
-                <Button 
-                  variant="default"
-                  size="sm"
-                  onClick={() => setTimeOffDialogOpen(true)}
-                  data-testid="button-schedule-time-off"
-                  className="gap-1.5 shadow-md"
-                >
-                  <Calendar className="h-3.5 w-3.5" />
-                  {t('schedule.scheduleTimeOff', 'Schedule Time Off')}
-                </Button>
-              </div>
+              {/* Action button - next to navigation */}
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => setTimeOffDialogOpen(true)}
+                data-testid="button-schedule-time-off"
+                className="gap-1.5"
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                {t('schedule.scheduleTimeOff', 'Schedule Time Off')}
+              </Button>
             </div>
 
             {/* Day Headers + Employee Rows - Scrollable on mobile */}
