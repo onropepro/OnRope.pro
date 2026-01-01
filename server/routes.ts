@@ -9141,10 +9141,34 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
   // Create or update building instructions
   app.post("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
-      // Sanitize integer fields - convert empty strings to null
+      // Comprehensive sanitization: convert empty strings to null for all fields
+      // This prevents database errors when empty form fields are submitted
+      const sanitizeValue = (value, isInteger = false) => {
+        if (value === "" || value === undefined || value === null) return null;
+        if (isInteger) {
+          const parsed = parseInt(String(value), 10);
+          return isNaN(parsed) ? null : parsed;
+        }
+        return String(value).trim() || null;
+      };
+      
       const sanitizedBody = {
-        ...req.body,
-        tradeParkingSpots: req.body.tradeParkingSpots === "" ? null : (req.body.tradeParkingSpots ? parseInt(req.body.tradeParkingSpots, 10) : null),
+        buildingAccess: sanitizeValue(req.body.buildingAccess),
+        keysAndFob: sanitizeValue(req.body.keysAndFob),
+        keysReturnPolicy: sanitizeValue(req.body.keysReturnPolicy),
+        roofAccess: sanitizeValue(req.body.roofAccess),
+        specialRequests: sanitizeValue(req.body.specialRequests),
+        buildingManagerName: sanitizeValue(req.body.buildingManagerName),
+        buildingManagerPhone: sanitizeValue(req.body.buildingManagerPhone),
+        conciergeNames: sanitizeValue(req.body.conciergeNames),
+        conciergePhone: sanitizeValue(req.body.conciergePhone),
+        conciergeHours: sanitizeValue(req.body.conciergeHours),
+        maintenanceName: sanitizeValue(req.body.maintenanceName),
+        maintenancePhone: sanitizeValue(req.body.maintenancePhone),
+        councilMemberUnits: sanitizeValue(req.body.councilMemberUnits),
+        tradeParkingInstructions: sanitizeValue(req.body.tradeParkingInstructions),
+        tradeParkingSpots: sanitizeValue(req.body.tradeParkingSpots, true),
+        tradeWashroomLocation: sanitizeValue(req.body.tradeWashroomLocation),
       };
       const { buildingId } = req.params;
 
