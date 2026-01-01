@@ -1630,17 +1630,19 @@ export default function Schedule() {
                 </div>
               </div>
               
-              {/* Action button - compact but visible */}
-              <Button 
-                variant="default"
-                size="sm"
-                onClick={() => setTimeOffDialogOpen(true)}
-                data-testid="button-schedule-time-off"
-                className="md:absolute md:top-0 md:right-0 gap-1.5 shadow-md"
-              >
-                <Calendar className="h-3.5 w-3.5" />
-                {t('schedule.scheduleTimeOff', 'Schedule Time Off')}
-              </Button>
+              {/* Action button - compact but visible, positioned top-right */}
+              <div className="absolute top-0 right-0">
+                <Button 
+                  variant="default"
+                  size="sm"
+                  onClick={() => setTimeOffDialogOpen(true)}
+                  data-testid="button-schedule-time-off"
+                  className="gap-1.5 shadow-md"
+                >
+                  <Calendar className="h-3.5 w-3.5" />
+                  {t('schedule.scheduleTimeOff', 'Schedule Time Off')}
+                </Button>
+              </div>
             </div>
 
             {/* Day Headers + Employee Rows - Scrollable on mobile */}
