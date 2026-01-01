@@ -19,7 +19,7 @@ const STAKEHOLDER_COLORS = {
   technician: "#5C7A84",
   "property-manager": "#6E9075", 
   resident: "#86A59C",
-  "building-manager": "#B89685", // Warm Taupe per design guidelines
+  "building-manager": "#3B7A9E", // Teal Blue matching landing page
   "ground-crew": "#5D7B6F",
   employer: "#0B64A3", // Ocean Blue for employer - matches hero gradients
   safety: "#193A63", // Navy Blue for safety manifesto page
