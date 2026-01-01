@@ -218,7 +218,14 @@ export default function Inventory() {
   const hasInventoryAccess = canAccessInventory(currentUser);
 
   // Gear inventory tour steps based on gear-inventory.md documentation
-  const gearInventoryTourSteps: TourStep[] = [
+  const gearInventoryTourSteps: TourStep[] = addItemStep === 1 ? [
+    {
+      fieldSelector: '[data-testid="card-type-harness"]',
+      title: t('gearTour.selectType.title', 'Select Equipment Type'),
+      explanation: t('gearTour.selectType.explanation', 'Choose the type of equipment you want to add to your inventory. The system includes all standard rope access gear: harnesses, ropes, carabiners, descenders, ascenders, helmets, and more.'),
+      appContext: t('gearTour.selectType.context', 'Each type has pre-populated manufacturer models to speed up entry. Select "Other" for custom equipment.')
+    }
+  ] : [
     {
       fieldSelector: '[data-testid="input-catalog-search"]',
       title: t('gearTour.catalog.title', 'Equipment Catalog'),
@@ -2887,18 +2894,16 @@ export default function Inventory() {
           <DialogHeader className="flex-shrink-0">
             <div className="flex items-center justify-between gap-2">
               <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
-              {addItemStep === 2 && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setIsGearTourActive(!isGearTourActive)}
-                  className={isGearTourActive ? "text-primary" : "text-muted-foreground"}
-                  data-testid="button-toggle-gear-tour"
-                  title={t('common.toggleHelpGuide', 'Toggle help guide')}
-                >
-                  <HelpCircle className="h-5 w-5" />
-                </Button>
-              )}
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setIsGearTourActive(!isGearTourActive)}
+                className={isGearTourActive ? "text-primary" : "text-muted-foreground"}
+                data-testid="button-toggle-gear-tour"
+                title={t('common.toggleHelpGuide', 'Toggle help guide')}
+              >
+                <HelpCircle className="h-5 w-5" />
+              </Button>
             </div>
             <DialogDescription>
               {addItemStep === 1 ? t('inventory.dialog.chooseGearType', "Choose the type of gear you're adding") : t('inventory.dialog.fillItemInfo', 'Fill in the item information')}
@@ -3626,15 +3631,13 @@ export default function Inventory() {
             </form>
           </Form>
 
-          {/* Guided Tour for Step 2 */}
-          {addItemStep === 2 && (
-            <GuidedFormTour
-              steps={gearInventoryTourSteps}
-              isActive={isGearTourActive}
-              onClose={() => setIsGearTourActive(false)}
-              containerRef={addDialogRef}
-            />
-          )}
+          {/* Guided Tour */}
+          <GuidedFormTour
+            steps={gearInventoryTourSteps}
+            isActive={isGearTourActive}
+            onClose={() => setIsGearTourActive(false)}
+            containerRef={addDialogRef}
+          />
         </DialogContent>
       </Dialog>
 
