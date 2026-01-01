@@ -14645,6 +14645,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
               endDate: new Date(updatedProject.endDate),
               title: jobTitle,
               location: updatedProject.buildingAddress || null,
+              color: updatedProject.calendarColor || "#3b82f6",
             });
           } else {
             // Create new scheduled job for this project
@@ -14659,6 +14660,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
               endDate: new Date(updatedProject.endDate),
               status: "upcoming",
               location: updatedProject.buildingAddress || null,
+              color: updatedProject.calendarColor || "#3b82f6",
               color: updatedProject.calendarColor || "#3b82f6",
               estimatedHours: updatedProject.estimatedHours || null,
               actualHours: null,
