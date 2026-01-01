@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLocation } from "wouter";
 import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
@@ -54,9 +55,9 @@ const getTaskIcon = (taskId: string): string => {
   return icons[taskId] || "assignment";
 };
 
-// Exportable content component for use in tabs
-export function LoggedHoursContent() {
+export default function MyLoggedHours() {
   const { t } = useTranslation();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showBaselineDialog, setShowBaselineDialog] = useState(false);
   const [baselineInput, setBaselineInput] = useState("");
@@ -311,9 +312,13 @@ export function LoggedHoursContent() {
   const sortedProjects = Object.entries(groupedByProject)
     .sort(([, a], [, b]) => b.totalHours - a.totalHours);
 
+  // Use default header config to show consistent unified header with search bar
+  // Must be called before any conditional returns to maintain hook order
+  useSetHeaderConfig({}, []);
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="text-lg font-medium">{t('loggedHours.loading', 'Loading your logged hours...')}</div>
         </div>
@@ -322,8 +327,9 @@ export function LoggedHoursContent() {
   }
 
   return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="min-h-screen bg-background pb-20">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card className="bg-primary/5 border-primary/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -711,6 +717,7 @@ export function LoggedHoursContent() {
             </CardContent>
           </Card>
         )}
+      </div>
 
       <Dialog open={showBaselineDialog} onOpenChange={setShowBaselineDialog}>
         <DialogContent>
@@ -904,19 +911,6 @@ export function LoggedHoursContent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
-  );
-}
-
-// Default export wraps the content with full page layout
-export default function MyLoggedHours() {
-  useSetHeaderConfig({}, []);
-  
-  return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <LoggedHoursContent />
-      </div>
     </div>
   );
 }
