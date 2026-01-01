@@ -2892,22 +2892,29 @@ export default function Inventory() {
       }}>
         <DialogContent data-testid="dialog-add-item" className="max-w-2xl flex flex-col max-h-[90vh]" ref={addDialogRef}>
           <DialogHeader className="flex-shrink-0">
-            <div className="flex items-center justify-between gap-2">
-              <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setIsGearTourActive(!isGearTourActive)}
-                className={isGearTourActive ? "text-primary" : "text-muted-foreground"}
-                data-testid="button-toggle-gear-tour"
-                title={t('common.toggleHelpGuide', 'Toggle help guide')}
-              >
-                <HelpCircle className="h-5 w-5" />
-              </Button>
-            </div>
+            <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
             <DialogDescription>
               {addItemStep === 1 ? t('inventory.dialog.chooseGearType', "Choose the type of gear you're adding") : t('inventory.dialog.fillItemInfo', 'Fill in the item information')}
             </DialogDescription>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsGearTourActive(true)}
+              className="mt-3 gap-2"
+              data-testid="button-help-get-started-inventory"
+            >
+              <span className="material-icons text-base">help_outline</span>
+              {t('common.helpMeGetStarted', 'Help me get started')}
+            </Button>
+            
+            {/* Guided tour - renders inline when active */}
+            <GuidedFormTour
+              steps={gearInventoryTourSteps}
+              isActive={isGearTourActive}
+              onClose={() => setIsGearTourActive(false)}
+              containerRef={addDialogRef}
+            />
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleAddItem)} className="flex flex-col flex-1 min-h-0 space-y-4">
@@ -3631,13 +3638,6 @@ export default function Inventory() {
             </form>
           </Form>
 
-          {/* Guided Tour */}
-          <GuidedFormTour
-            steps={gearInventoryTourSteps}
-            isActive={isGearTourActive}
-            onClose={() => setIsGearTourActive(false)}
-            containerRef={addDialogRef}
-          />
         </DialogContent>
       </Dialog>
 

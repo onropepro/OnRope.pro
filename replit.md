@@ -33,6 +33,47 @@ The platform utilizes a React 18 frontend (TypeScript, Wouter), a Node.js Expres
 *   **Linkable Team Member Roles:** Rope access tech and ground crew roles can be searched by email, linked to companies, and sent team invitations.
 *   **API Development Process:** All API changes must follow a strict process: database schema check, endpoint pattern matching, post-implementation testing, and log verification. Common field name gotchas and role groups for access control are specified.
 
+## UI Patterns
+
+### "Help Me Get Started" Guided Tour Pattern
+When adding guided tours to dialogs or forms, follow this exact implementation pattern for consistency:
+
+**Button Design:**
+```tsx
+<Button 
+  variant="outline" 
+  size="sm"
+  onClick={() => setTourActive(true)}
+  className="mt-3 gap-2"
+  data-testid="button-help-get-started-[feature-name]"
+>
+  <span className="material-icons text-base">help_outline</span>
+  {t('common.helpMeGetStarted', 'Help me get started')}
+</Button>
+```
+
+**Placement:**
+- Place the button AFTER `<DialogDescription>` in the `<DialogHeader>`
+- The `<GuidedFormTour>` component renders inline immediately after the button
+- Never use icon-only "?" buttons - always include full text
+
+**Tour Component:**
+```tsx
+<GuidedFormTour
+  steps={tourSteps}
+  isActive={isTourActive}
+  onClose={() => setTourActive(false)}
+  containerRef={dialogRef}
+/>
+```
+
+**Tour Steps:**
+- Even simple steps need comprehensive help - not all users are familiar with the UI
+- Source tour content from actual documentation files in `server/help-content/modules/`
+- Each step should have: `fieldSelector`, `title`, `explanation`, and `appContext`
+
+**Reference Implementation:** See project creation dialog in `Dashboard.tsx` (line ~3929)
+
 ## External Dependencies
 *   **Database:** PostgreSQL
 *   **Frontend Framework:** React 18
