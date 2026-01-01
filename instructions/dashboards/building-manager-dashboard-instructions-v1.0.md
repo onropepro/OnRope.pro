@@ -147,9 +147,10 @@ View work notices published for the building:
 
 ## Technical Implementation
 
-### Primary File
+### Primary Files
 ```
-client/src/pages/BuildingPortal.tsx (~1,627 lines)
+client/src/pages/BuildingPortal.tsx (~1,100 lines)
+client/src/pages/Login.tsx (unified login with "Strata #" tab)
 ```
 
 ### Route
@@ -169,17 +170,26 @@ client/src/pages/BuildingPortal.tsx (~1,627 lines)
 
 ### Authentication Flow
 
+Building managers authenticate through the **unified login page** (`/login`) using the "Strata #" tab:
+
 ```typescript
-// Login mutation
-const loginMutation = useMutation({
-  mutationFn: async (data: { strataPlanNumber: string; password: string }) => {
-    const response = await apiRequest("POST", "/api/building/login", data);
-    return response.json();
-  },
-  onSuccess: () => {
-    refetchPortal(); // Load portal data after successful login
+// Login.tsx - Strata tab handling
+if (loginMethod === "strata") {
+  const response = await fetch("/api/building/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ strataPlanNumber: data.identifier, password: data.password }),
+    credentials: "include",
+  });
+  // On success, redirect to /building-portal
+}
+
+// BuildingPortal.tsx - Authentication redirect
+useEffect(() => {
+  if (needsLogin && !isLoadingPortal) {
+    setLocation("/login"); // Redirect to unified login
   }
-});
+}, [needsLogin, isLoadingPortal, setLocation]);
 ```
 
 ### State Management
@@ -200,16 +210,44 @@ const { data: portalData, isLoading, error, refetch } = useQuery<PortalData>({
 
 ### Layout
 
-The Building Portal uses a **standalone layout** (no sidebar) with:
-- Header with building name and logout button
-- Card-based content sections
-- Responsive design for mobile access
+The Building Portal uses the **unified dashboard layout** with:
+- `DashboardSidebar` (variant="building-manager") for navigation
+- `UnifiedDashboardHeader` (variant="building-manager") for top bar
+- Tab-based content sections: overview, projects, notices, instructions, settings
+- Responsive design for mobile access with collapsible sidebar
+
+### Navigation Structure
+
+The sidebar uses NavGroup configuration for tab-based navigation:
+
+```typescript
+const buildingNavGroups: NavGroup[] = [
+  {
+    id: 'main',
+    label: 'Main',
+    items: [
+      { id: 'overview', label: 'Overview', icon: Home },
+      { id: 'projects', label: 'Project History', icon: History },
+      { id: 'notices', label: 'Work Notices', icon: Megaphone },
+    ],
+  },
+  {
+    id: 'management',
+    label: 'Management',
+    items: [
+      { id: 'instructions', label: 'Building Instructions', icon: FileText },
+      { id: 'settings', label: 'Settings', icon: Settings },
+    ],
+  },
+];
+```
 
 ### Key UI Components
 
 | Component | Purpose |
 |-----------|---------|
-| Login Card | Strata number + password form |
+| DashboardSidebar | Tab navigation with building-manager variant |
+| UnifiedDashboardHeader | Top bar with logout, language selector |
 | Password Warning Banner | Alerts when password hasn't been changed |
 | Building Info Card | Displays building details |
 | Active Projects Section | Shows ongoing work with progress |
@@ -220,8 +258,9 @@ The Building Portal uses a **standalone layout** (no sidebar) with:
 ### Visual Design
 
 - **Brand Color**: #B89685 (Taupe) - matches `building-manager` variant in DashboardSidebar
-- **No sidebar**: Standalone page design
-- **Card-based layout**: Information organized in distinct cards
+- **Unified Dashboard Layout**: Consistent with other stakeholder portals
+- **Card-based content**: Information organized in distinct cards
+- **Mobile-first**: Collapsible sidebar for mobile devices
 
 ---
 
