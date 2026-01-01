@@ -1139,68 +1139,49 @@ export default function BuildingPortal() {
             </DialogDescription>
           </DialogHeader>
           
-          {selectedProject && selectedProject.progressType === 'drops' && (
-            <div className="py-6">
-              <HighRiseBuilding
-                floors={25}
-                totalDropsNorth={selectedProject.totalDropsNorth || 0}
-                totalDropsEast={selectedProject.totalDropsEast || 0}
-                totalDropsSouth={selectedProject.totalDropsSouth || 0}
-                totalDropsWest={selectedProject.totalDropsWest || 0}
-                completedDropsNorth={selectedProject.completedDropsNorth || 0}
-                completedDropsEast={selectedProject.completedDropsEast || 0}
-                completedDropsSouth={selectedProject.completedDropsSouth || 0}
-                completedDropsWest={selectedProject.completedDropsWest || 0}
-              />
-            </div>
-          )}
-          
-          {selectedProject && selectedProject.progressType !== 'drops' && (
-            <div className="py-6 text-center">
-              <div className="space-y-4">
-                <div className="text-lg font-semibold">
-                  {selectedProject.progressType === 'suites' && t('buildingPortal.suitesProgress', 'Suites Progress')}
-                  {selectedProject.progressType === 'stalls' && t('buildingPortal.stallsProgress', 'Stalls Progress')}
-                  {selectedProject.progressType === 'hours' && t('buildingPortal.hoursProgress', 'Hours Progress')}
-                </div>
-                <div className="flex flex-col items-center gap-4">
-                  {selectedProject.progressType === 'suites' && (
-                    <>
-                      <div className="text-4xl font-bold text-primary">
-                        {selectedProject.completedSuites || 0} / {selectedProject.totalSuites || 0}
-                      </div>
-                      <Progress 
-                        value={selectedProject.totalSuites ? ((selectedProject.completedSuites || 0) / selectedProject.totalSuites) * 100 : 0} 
-                        className="h-4 w-64"
-                      />
-                    </>
-                  )}
-                  {selectedProject.progressType === 'stalls' && (
-                    <>
-                      <div className="text-4xl font-bold text-primary">
-                        {selectedProject.completedStalls || 0} / {selectedProject.totalStalls || 0}
-                      </div>
-                      <Progress 
-                        value={selectedProject.totalStalls ? ((selectedProject.completedStalls || 0) / selectedProject.totalStalls) * 100 : 0} 
-                        className="h-4 w-64"
-                      />
-                    </>
-                  )}
-                  {selectedProject.progressType === 'hours' && (
-                    <>
-                      <div className="text-4xl font-bold text-primary">
-                        {selectedProject.loggedHours || 0} / {selectedProject.estimatedHours || 0} {t('common.hours', 'hours')}
-                      </div>
-                      <Progress 
-                        value={selectedProject.estimatedHours ? ((selectedProject.loggedHours || 0) / selectedProject.estimatedHours) * 100 : 0} 
-                        className="h-4 w-64"
-                      />
-                    </>
-                  )}
+          {selectedProject && (() => {
+            const totalDrops = selectedProject.totalDrops || 0;
+            const totalDropsNorth = selectedProject.totalDropsNorth ?? Math.floor(totalDrops / 4) + (totalDrops % 4 > 0 ? 1 : 0);
+            const totalDropsEast = selectedProject.totalDropsEast ?? Math.floor(totalDrops / 4) + (totalDrops % 4 > 1 ? 1 : 0);
+            const totalDropsSouth = selectedProject.totalDropsSouth ?? Math.floor(totalDrops / 4) + (totalDrops % 4 > 2 ? 1 : 0);
+            const totalDropsWest = selectedProject.totalDropsWest ?? Math.floor(totalDrops / 4);
+            const completedDropsNorth = selectedProject.completedDropsNorth || 0;
+            const completedDropsEast = selectedProject.completedDropsEast || 0;
+            const completedDropsSouth = selectedProject.completedDropsSouth || 0;
+            const completedDropsWest = selectedProject.completedDropsWest || 0;
+            const totalCompleted = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
+            const totalAll = totalDropsNorth + totalDropsEast + totalDropsSouth + totalDropsWest;
+            const progressPercent = totalAll > 0 ? Math.round((totalCompleted / totalAll) * 100) : 0;
+            
+            return (
+              <div className="py-6 space-y-6">
+                <HighRiseBuilding
+                  floors={selectedProject.floorCount || 25}
+                  totalDropsNorth={totalDropsNorth}
+                  totalDropsEast={totalDropsEast}
+                  totalDropsSouth={totalDropsSouth}
+                  totalDropsWest={totalDropsWest}
+                  completedDropsNorth={completedDropsNorth}
+                  completedDropsEast={completedDropsEast}
+                  completedDropsSouth={completedDropsSouth}
+                  completedDropsWest={completedDropsWest}
+                  customColors={["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]}
+                  className="mb-4"
+                />
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t('projectDetail.progress.title', 'Overall Progress')}</span>
+                    <span className="font-medium">{progressPercent}%</span>
+                  </div>
+                  <Progress value={progressPercent} className="h-2" />
+                  <p className="text-xs text-muted-foreground text-center">
+                    {totalCompleted} {t('common.of', 'of')} {totalAll} {t('projectDetail.progress.dropsCompleted', 'drops completed')}
+                  </p>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
           
           {selectedProject && (
             <div className="border-t pt-4 space-y-2">
