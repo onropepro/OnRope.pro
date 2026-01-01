@@ -2,7 +2,7 @@
 **System**: OnRopePro - Rope Access Management Platform  
 **Domain**: Property Management & Vendor Oversight  
 **Version**: 1.0  
-**Last Updated**: December 25, 2024  
+**Last Updated**: January 1, 2026  
 **Status**: PRODUCTION-READY  
 **Safety Critical**: No - Vendor oversight, not direct safety operations
 
@@ -133,8 +133,10 @@ Property managers cannot:
 
 ### Primary File
 ```
-client/src/pages/PropertyManager.tsx (~2,795 lines)
+client/src/pages/PropertyManager.tsx (~2,794 lines)
 ```
+
+**Note on Header**: PropertyManager does NOT use `UnifiedDashboardHeader`. It implements a custom header that shows vendor connection context and multi-vendor navigation. This is an **intentional architectural decision** documented in [shared-dashboard-components-v1.0.md](./shared-dashboard-components-v1.0.md).
 
 ### Key Data Types
 
@@ -262,3 +264,4 @@ describe('Property Manager Access', () => {
 ## Version History
 
 - **v1.0** (December 25, 2024): Initial documentation
+- **v1.1** (January 1, 2026): Clarified custom header exception (does not use UnifiedDashboardHeader), updated file line count
