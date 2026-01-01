@@ -1976,7 +1976,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           req.session.role = 'building';
           req.session.buildingId = building.id;
           req.session.strataPlanNumber = building.strataPlanNumber;
-          await new Promise((resolve, reject) => {
+          await new Promise<void>((resolve, reject) => {
             req.session.save((err) => {
               if (err) reject(err);
               else resolve();
@@ -5543,6 +5543,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
             email: staffAccount.email,
             role: 'staff',
             permissions: staffAccount.permissions,
+          }
+        });
+      }
+      
+      // Handle Building Manager session
+      if (req.session.role === 'building') {
+        const building = await storage.getBuildingById(req.session.buildingId || req.session.userId!);
+        if (!building) {
+          return res.status(404).json({ message: "Building not found" });
+        }
+        
+        return res.json({
+          user: {
+            id: building.id,
+            name: building.buildingName || building.strataPlanNumber,
+            fullName: building.buildingName || building.strataPlanNumber,
+            email: building.strataPlanNumber,
+            role: 'building_manager',
+            strataPlanNumber: building.strataPlanNumber,
+            buildingName: building.buildingName,
+            buildingId: building.id,
           }
         });
       }
