@@ -182,7 +182,7 @@ export const PROJECT_CREATION_TOUR_STEPS: TourStep[] = [
   {
     fieldSelector: '[data-testid="button-client-strata-search"]',
     title: "Quick Fill from Client Database",
-    explanation: "Select an existing client to auto-populate building details like address, floor count, and drop targets. You can also enter details manually if the client isn't in your database yet.",
+    explanation: "Select an existing client to auto-populate building details like address, floor count, and drop targets. If the client isn't in your database yet, enter details manually - after saving the project, you'll be prompted to save them as a new client.",
     appContext: "One-time client entry saves 20+ hours monthly. Building specs auto-fill into every future project for this client."
   },
   {
