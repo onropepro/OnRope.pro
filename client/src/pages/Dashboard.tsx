@@ -3816,12 +3816,6 @@ export default function Dashboard() {
         currentUser={user}
       />
       
-      <GuidedFormTour
-        steps={PROJECT_CREATION_TOUR_STEPS}
-        isActive={projectTourActive}
-        onClose={() => setProjectTourActive(false)}
-      />
-
       {/* Main Content - sidebar and header are now provided by DashboardLayout wrapper */}
       <div className="flex-1 flex flex-col page-gradient min-h-screen">
       {/* Read-Only Mode Banner - Shows on all tabs */}
@@ -3936,6 +3930,13 @@ export default function Dashboard() {
                         <span className="material-icons text-base">help_outline</span>
                         {t('dashboard.projects.helpMeGetStarted', 'Help me get started')}
                       </Button>
+                      
+                      {/* Guided tour - renders inline when active */}
+                      <GuidedFormTour
+                        steps={PROJECT_CREATION_TOUR_STEPS}
+                        isActive={projectTourActive}
+                        onClose={() => setProjectTourActive(false)}
+                      />
                     </div>
                     <div className="overflow-y-auto flex-1 p-6">
                       <Form {...projectForm}>

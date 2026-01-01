@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,45 +16,38 @@ interface GuidedFormTourProps {
   steps: TourStep[];
   isActive: boolean;
   onClose: () => void;
-  containerSelector?: string;
+  containerRef?: React.RefObject<HTMLElement>;
 }
 
 export function GuidedFormTour({ 
   steps, 
   isActive, 
   onClose,
-  containerSelector = "[role='dialog']"
+  containerRef
 }: GuidedFormTourProps) {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
-  const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
 
   const step = steps[currentStep];
 
-  const updateHighlight = useCallback(() => {
+  const highlightCurrentField = useCallback(() => {
     if (!isActive || !step) return;
 
-    const container = document.querySelector(containerSelector);
+    const container = containerRef?.current || document;
     if (!container) return;
 
+    // Remove highlight from all elements
+    document.querySelectorAll('.tour-highlight-active').forEach(el => {
+      el.classList.remove('tour-highlight-active');
+    });
+
+    // Find and highlight the current field
     const element = container.querySelector(step.fieldSelector);
     if (element) {
-      const rect = element.getBoundingClientRect();
-      setHighlightRect(rect);
-
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Add visual highlight class to the element
       element.classList.add('tour-highlight-active');
-      
-      // Remove highlight from all other elements
-      container.querySelectorAll('.tour-highlight-active').forEach(el => {
-        if (el !== element) {
-          el.classList.remove('tour-highlight-active');
-        }
-      });
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, [isActive, step, containerSelector]);
+  }, [isActive, step, containerRef]);
 
   useEffect(() => {
     // Add the highlight styles to the document
@@ -69,6 +61,11 @@ export function GuidedFormTour({
           border-radius: 8px;
           position: relative;
           z-index: 10;
+          animation: tour-pulse 2s ease-in-out infinite;
+        }
+        @keyframes tour-pulse {
+          0%, 100% { box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 20px 4px hsl(var(--primary) / 0.3); }
+          50% { box-shadow: 0 0 0 3px hsl(var(--primary)), 0 0 30px 8px hsl(var(--primary) / 0.4); }
         }
       `;
       document.head.appendChild(style);
@@ -83,35 +80,20 @@ export function GuidedFormTour({
   }, []);
 
   useEffect(() => {
-    updateHighlight();
-
-    window.addEventListener('resize', updateHighlight);
-    window.addEventListener('scroll', updateHighlight, true);
-
-    const observer = new MutationObserver(updateHighlight);
-    const container = document.querySelector(containerSelector);
-    if (container) {
-      observer.observe(container, { childList: true, subtree: true, attributes: true });
-    }
-
-    return () => {
-      window.removeEventListener('resize', updateHighlight);
-      window.removeEventListener('scroll', updateHighlight, true);
-      observer.disconnect();
-    };
-  }, [updateHighlight, containerSelector]);
+    highlightCurrentField();
+  }, [highlightCurrentField, currentStep]);
 
   useEffect(() => {
     if (isActive) {
       setCurrentStep(0);
-      setTimeout(updateHighlight, 100);
+      setTimeout(highlightCurrentField, 100);
     } else {
       // Clean up all highlights when tour closes
       document.querySelectorAll('.tour-highlight-active').forEach(el => {
         el.classList.remove('tour-highlight-active');
       });
     }
-  }, [isActive, updateHighlight]);
+  }, [isActive, highlightCurrentField]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -129,17 +111,10 @@ export function GuidedFormTour({
 
   if (!isActive || !step) return null;
 
-  // Position the tooltip card at fixed position at bottom of viewport
-  // This ensures it never overlaps with dropdowns or form fields
-  return createPortal(
+  // Render inline within the dialog - no portal needed
+  return (
     <Card
-      className="fixed z-[9999] shadow-xl border-primary/30 bg-card/95 backdrop-blur-sm"
-      style={{
-        bottom: 16,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 'min(500px, calc(100vw - 32px))',
-      }}
+      className="mt-4 border-primary/30 bg-primary/5"
       data-testid="tour-tooltip"
     >
       <CardContent className="p-4">
@@ -174,7 +149,7 @@ export function GuidedFormTour({
         )}
 
         {/* Instruction to interact */}
-        <div className="flex items-center gap-2 p-2 rounded-md bg-primary/5 border border-primary/10 mb-4">
+        <div className="flex items-center gap-2 p-2 rounded-md bg-primary/10 border border-primary/20 mb-4">
           <ChevronRight className="h-4 w-4 text-primary" />
           <p className="text-xs text-primary font-medium">
             {t('tour.interactPrompt', 'Fill in the highlighted field above, then click Next to continue.')}
@@ -216,8 +191,7 @@ export function GuidedFormTour({
           </Button>
         </div>
       </CardContent>
-    </Card>,
-    document.body
+    </Card>
   );
 }
 
