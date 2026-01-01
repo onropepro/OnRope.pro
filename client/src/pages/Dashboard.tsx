@@ -5112,10 +5112,16 @@ export default function Dashboard() {
                                 progressPercent = total > 0 ? (completed / total) * 100 : 0;
                               }
 
+                              // Create subtle tint style from project calendar color
+                              const tintStyle = project.calendarColor ? {
+                                background: `linear-gradient(135deg, ${project.calendarColor}08 0%, ${project.calendarColor}03 100%)`
+                              } : {};
+
                               return (
                                 <TableRow 
                                   key={project.id}
                                   className="cursor-pointer"
+                                  style={tintStyle}
                                   onClick={() => setLocation(`/projects/${project.id}`)}
                                   data-testid={`project-row-${project.id}`}
                                 >
@@ -5248,10 +5254,16 @@ export default function Dashboard() {
                         unitLabel = t('dashboard.projects.drops', 'drops');
                       }
 
+                      // Create subtle tint style from project calendar color
+                      const tintStyle = project.calendarColor ? {
+                        background: `linear-gradient(135deg, ${project.calendarColor}08 0%, ${project.calendarColor}03 100%)`
+                      } : {};
+
                       return (
                         <Card 
                           key={project.id} 
-                          className="group relative shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer" 
+                          className="group relative shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" 
+                          style={tintStyle}
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >
