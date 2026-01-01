@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown, Maximize2, Minimize2 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { ScheduledJobWithAssignments, User, EmployeeTimeOff } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
@@ -90,6 +90,9 @@ export default function Schedule() {
   const hasEditPermission = canEditSchedule(currentUser);
 
   // ALL HOOKS MUST BE DEFINED BEFORE ANY EARLY RETURNS (React rules of hooks)
+  
+  // Fullscreen calendar mode
+  const [isCalendarFullscreen, setIsCalendarFullscreen] = useState(false);
   
   // Time off dialog state
   const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
@@ -1324,7 +1327,30 @@ export default function Schedule() {
         </TabsList>
 
         <TabsContent value="job-schedule" className="mt-4">
-          <div className="bg-card rounded-lg shadow-premium p-6">
+          <div className={`bg-card rounded-lg shadow-premium p-6 transition-all duration-300 ${isCalendarFullscreen ? 'fixed inset-0 z-[90] overflow-auto' : ''}`}>
+            {/* Fullscreen Toggle Button - Very Prominent */}
+            <div className="flex items-center justify-end mb-4">
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => setIsCalendarFullscreen(!isCalendarFullscreen)}
+                className="gap-2 font-bold shadow-lg"
+                data-testid="button-fullscreen-calendar"
+              >
+                {isCalendarFullscreen ? (
+                  <>
+                    <Minimize2 className="w-5 h-5" />
+                    {t('schedule.exitFullscreen', 'Exit Full Screen')}
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="w-5 h-5" />
+                    {t('schedule.fullscreen', 'Full Screen Calendar')}
+                  </>
+                )}
+              </Button>
+            </div>
+            
             {activeEmployeeId && (
               <div className="mb-4 p-3 bg-primary/10 border-2 border-primary rounded-lg">
                 <p className="text-sm font-semibold text-primary">
