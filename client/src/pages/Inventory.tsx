@@ -2890,8 +2890,8 @@ export default function Inventory() {
         setShowAddDialog(open);
         if (!open) setIsGearTourActive(false);
       }}>
-        <DialogContent data-testid="dialog-add-item" className="max-w-2xl flex flex-col max-h-[90vh]" ref={addDialogRef}>
-          <div className="flex-shrink-0">
+        <DialogContent data-testid="dialog-add-item" className="max-w-2xl p-0 max-h-[90vh] flex flex-col gap-0" ref={addDialogRef}>
+          <div className="p-6 border-b bg-card flex-shrink-0">
             <DialogHeader>
               <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
               <DialogDescription>
@@ -2917,8 +2917,9 @@ export default function Inventory() {
               onClose={() => setIsGearTourActive(false)}
             />
           </div>
+          <div className="overflow-y-auto flex-1 p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleAddItem)} className="flex flex-col flex-1 min-h-0 space-y-4">
+            <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-4">
               
               {addItemStep === 1 && (
                 <>
@@ -2927,7 +2928,7 @@ export default function Inventory() {
                     name="equipmentType"
                     render={({ field }) => (
                       <FormItem>
-                        <div className="grid grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto p-1">
+                        <div className="grid grid-cols-3 gap-3">
                           {gearTypes.map((type) => {
                             const IconComponent = type.icon;
                             return (
@@ -3638,7 +3639,7 @@ export default function Inventory() {
               )}
             </form>
           </Form>
-
+          </div>
         </DialogContent>
       </Dialog>
 
