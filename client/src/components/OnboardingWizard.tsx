@@ -524,7 +524,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                   <FormItem>
                     <FormLabel>{t("onboarding.client.company", "Company (Optional)")}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="ABC Property Management" autoComplete="organization" data-testid="input-client-company" />
+                      <Input {...field} placeholder="ABC Property Management" autoComplete="off" data-1p-ignore="true" data-lpignore="true" data-testid="input-client-company" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
