@@ -14594,6 +14594,48 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       if (req.body.dropsAdjustmentWest !== undefined) allowedUpdates.dropsAdjustmentWest = req.body.dropsAdjustmentWest;
       
       const updatedProject = await storage.updateProject(id, allowedUpdates);
+      
+      // Auto-sync scheduled job if project dates are updated
+      if (updatedProject.startDate && updatedProject.endDate) {
+        try {
+          // Check if a scheduled job already exists for this project
+          const existingJobs = await storage.getScheduledJobsByCompany(companyId!);
+          const projectJob = existingJobs.find(job => job.projectId === updatedProject.id);
+          
+          const jobTitle = updatedProject.buildingName || (updatedProject.strataPlanNumber ? `${updatedProject.strataPlanNumber} - ${updatedProject.jobType.replace(/_/g, " ")}` : updatedProject.jobType.replace(/_/g, " "));
+          
+          if (projectJob) {
+            // Update existing scheduled job dates
+            await storage.updateScheduledJob(projectJob.id, {
+              startDate: new Date(updatedProject.startDate),
+              endDate: new Date(updatedProject.endDate),
+              title: jobTitle,
+              location: updatedProject.buildingAddress || null,
+            });
+          } else {
+            // Create new scheduled job for this project
+            await storage.createScheduledJob({
+              companyId: companyId!,
+              projectId: updatedProject.id,
+              title: jobTitle,
+              description: `Auto-scheduled from project update`,
+              jobType: updatedProject.jobType,
+              customJobType: updatedProject.customJobType || null,
+              startDate: new Date(updatedProject.startDate),
+              endDate: new Date(updatedProject.endDate),
+              status: "upcoming",
+              location: updatedProject.buildingAddress || null,
+              color: updatedProject.calendarColor || "#3b82f6",
+              estimatedHours: updatedProject.estimatedHours || null,
+              actualHours: null,
+              notes: null,
+              createdBy: currentUser.id,
+            });
+          }
+        } catch (scheduleError) {
+          console.error("[Schedule] Failed to auto-sync scheduled job:", scheduleError);
+        }
+      }
       res.json({ project: updatedProject });
     } catch (error) {
       console.error("Update project error:", error);
