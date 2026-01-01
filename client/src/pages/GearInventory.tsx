@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { hasFinancialAccess } from "@/lib/permissions";
 import { UnifiedDashboardHeader } from "@/components/UnifiedDashboardHeader";
+import { GuidedFormTour, TourStep } from "@/components/GuidedFormTour";
+import { HelpCircle } from "lucide-react";
 
 const gearFormSchema = z.object({
   brand: z.string().optional(),
@@ -33,6 +35,8 @@ export default function GearInventory() {
   const [, setLocation] = useLocation();
   const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTourActive, setIsTourActive] = useState(false);
+  const dialogContentRef = useRef<HTMLDivElement>(null);
 
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
@@ -47,6 +51,64 @@ export default function GearInventory() {
     { id: "ascender", name: t('gearInventory.ascender.name', 'Ascender'), icon: "arrow_upward", description: t('gearInventory.ascender.description', 'Ascending device') },
     { id: "steel_carabiner", name: t('gearInventory.steelCarabiner.name', 'Steel Carabiner'), icon: "link", description: t('gearInventory.steelCarabiner.description', 'Steel locking carabiner') },
     { id: "aluminum_carabiner", name: t('gearInventory.aluminumCarabiner.name', 'Aluminum Carabiner'), icon: "link", description: t('gearInventory.aluminumCarabiner.description', 'Aluminum locking carabiner') },
+  ];
+
+  // Tour steps based on gear-inventory.md documentation
+  const gearTourSteps: TourStep[] = [
+    {
+      fieldSelector: '[data-testid="input-brand"]',
+      title: t('gearTour.brand.title', 'Brand / Manufacturer'),
+      explanation: t('gearTour.brand.explanation', 'Enter the manufacturer name (e.g., Petzl, CMC, Rock Exotica, Skylotec, ISC, Kong). The system includes pre-populated models from major rope access equipment manufacturers.'),
+      appContext: t('gearTour.brand.context', 'Accurate brand info helps with warranty claims, parts ordering, and manufacturer recall tracking.')
+    },
+    {
+      fieldSelector: '[data-testid="input-model"]',
+      title: t('gearTour.model.title', 'Model Name'),
+      explanation: t('gearTour.model.explanation', 'Specify the exact model (e.g., Avao Bod, I\'D S, Rig). If your model isn\'t listed, use "Other" to add custom gear to the shared equipment database.'),
+      appContext: t('gearTour.model.context', 'All companies benefit from the expanded catalog when you add new models.')
+    },
+    {
+      fieldSelector: '[data-testid="input-serial"]',
+      title: t('gearTour.serial.title', 'Serial Number'),
+      explanation: t('gearTour.serial.explanation', 'Optional metadata for tracking individual units. Serial numbers are useful for warranty claims, inspection history, and identifying specific items.'),
+      appContext: t('gearTour.serial.context', 'The Golden Rule: Serial numbers have NO effect on availability. Availability = Quantity - Assigned.')
+    },
+    {
+      fieldSelector: '[data-testid="input-date-of-manufacture"]',
+      title: t('gearTour.manufacture.title', 'Date of Manufacture'),
+      explanation: t('gearTour.manufacture.explanation', 'Found on the equipment label. This date is critical for calculating service life. Typical service life: 5 years for hard gear, 10 years for soft gear (harnesses, ropes).'),
+      appContext: t('gearTour.manufacture.context', 'Service life calculations are guidelines only. Actual replacement depends on usage intensity, conditions, and inspection results.')
+    },
+    {
+      fieldSelector: '[data-testid="input-date-in-service"]',
+      title: t('gearTour.inServiceDate.title', 'Date In Service'),
+      explanation: t('gearTour.inServiceDate.explanation', 'When this equipment was first put into active use. For new gear, this is when it was issued. For used gear, enter the original in-service date if known.'),
+      appContext: t('gearTour.inServiceDate.context', 'IRATA/SPRAT and manufacturer requirements often reference in-service date for inspection intervals.')
+    },
+    {
+      fieldSelector: '[data-testid="input-date-out-of-service"]',
+      title: t('gearTour.outOfService.title', 'Date Out of Service'),
+      explanation: t('gearTour.outOfService.explanation', 'Leave blank for active equipment. Set this date when retiring gear due to age, damage, or inspection failure. Equipment with this date set will be marked as retired.'),
+      appContext: t('gearTour.outOfService.context', 'Retired equipment stays in records for audit trail and proof of proper disposal.')
+    },
+    {
+      fieldSelector: '[data-testid="checkbox-in-service"]',
+      title: t('gearTour.inService.title', 'In Service Status'),
+      explanation: t('gearTour.inService.explanation', 'Toggle this to quickly mark equipment as active or inactive. Unchecking removes the item from available inventory without deleting the record.'),
+      appContext: t('gearTour.inService.context', 'Use this for temporary removal (e.g., sent for inspection/repair) without losing history.')
+    },
+    {
+      fieldSelector: '[data-testid="input-quantity"]',
+      title: t('gearTour.quantity.title', 'Total Quantity Owned'),
+      explanation: t('gearTour.quantity.explanation', 'How many of this exact item your company owns. This is the key to the slot-based availability system: Available = Quantity - Assigned.'),
+      appContext: t('gearTour.quantity.context', 'Example: 10 harnesses owned, 4 assigned to employees = 6 available for new assignments.')
+    },
+    ...(canViewPrice ? [{
+      fieldSelector: '[data-testid="input-item-price"]',
+      title: t('gearTour.price.title', 'Unit Price'),
+      explanation: t('gearTour.price.explanation', 'Purchase price per unit. This field is only visible to users with financial access permissions. Used for asset valuation and replacement budgeting.'),
+      appContext: t('gearTour.price.context', 'Track equipment costs for insurance documentation and capital planning.')
+    }] : [])
   ];
 
   const form = useForm<GearFormData>({
@@ -133,10 +195,25 @@ export default function GearInventory() {
       </div>
 
       {/* Equipment Form Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+      <Dialog open={isDialogOpen} onOpenChange={(open) => {
+        setIsDialogOpen(open);
+        if (!open) setIsTourActive(false);
+      }}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" ref={dialogContentRef}>
           <DialogHeader>
-            <DialogTitle>{selectedEquipmentData?.name}</DialogTitle>
+            <div className="flex items-center justify-between gap-2">
+              <DialogTitle>{selectedEquipmentData?.name}</DialogTitle>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setIsTourActive(!isTourActive)}
+                className={isTourActive ? "text-primary" : "text-muted-foreground"}
+                data-testid="button-toggle-gear-tour"
+                title={t('common.toggleHelpGuide', 'Toggle help guide')}
+              >
+                <HelpCircle className="h-5 w-5" />
+              </Button>
+            </div>
             <DialogDescription>
               {t('gearInventory.dialog.description', 'Enter equipment details (all fields are optional)')}
             </DialogDescription>
@@ -299,6 +376,14 @@ export default function GearInventory() {
               </div>
             </form>
           </Form>
+
+          {/* Guided Tour */}
+          <GuidedFormTour
+            steps={gearTourSteps}
+            isActive={isTourActive}
+            onClose={() => setIsTourActive(false)}
+            containerRef={dialogContentRef}
+          />
         </DialogContent>
       </Dialog>
     </div>
