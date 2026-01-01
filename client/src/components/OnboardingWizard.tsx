@@ -345,10 +345,11 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
         description: t("onboarding.invitationSent", "Team invitation sent successfully"),
       });
       setCurrentStep("project");
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.message || t("onboarding.linkFailed", "Failed to send team invitation");
       toast({
         title: t("onboarding.error", "Error"),
-        description: t("onboarding.linkFailed", "Failed to send team invitation"),
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
