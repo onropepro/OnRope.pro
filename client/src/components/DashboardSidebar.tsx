@@ -33,6 +33,8 @@ import {
   User as UserIcon,
   Mail,
   BarChart3,
+  PanelLeftClose,
+  PanelLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -112,6 +114,10 @@ export interface DashboardSidebarProps {
   mobileOpen?: boolean;
   /** Callback when mobile sidebar open state changes */
   onMobileOpenChange?: (open: boolean) => void;
+  /** External control for desktop sidebar collapsed state */
+  desktopCollapsed?: boolean;
+  /** Callback when desktop sidebar collapsed state changes */
+  onDesktopCollapsedChange?: (collapsed: boolean) => void;
 }
 
 export function DashboardSidebar({
@@ -131,11 +137,36 @@ export function DashboardSidebar({
   headerContent,
   mobileOpen,
   onMobileOpenChange,
+  desktopCollapsed,
+  onDesktopCollapsedChange,
 }: DashboardSidebarProps) {
   const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const [internalOpen, setInternalOpen] = useState(false);
   const [customizeDialogOpen, setCustomizeDialogOpen] = useState(false);
+  const [internalDesktopCollapsed, setInternalDesktopCollapsed] = useState(() => {
+    try {
+      const stored = localStorage.getItem('sidebar-desktop-collapsed');
+      return stored === 'true';
+    } catch {
+      return false;
+    }
+  });
+  
+  // Use external control if provided, otherwise use internal state for desktop collapsed
+  const isDesktopCollapsed = desktopCollapsed !== undefined ? desktopCollapsed : internalDesktopCollapsed;
+  const setDesktopCollapsed = (collapsed: boolean) => {
+    if (onDesktopCollapsedChange) {
+      onDesktopCollapsedChange(collapsed);
+    } else {
+      setInternalDesktopCollapsed(collapsed);
+      try {
+        localStorage.setItem('sidebar-desktop-collapsed', String(collapsed));
+      } catch {
+        // Ignore storage errors
+      }
+    }
+  };
   
   // Technician context for checking active employer connections
   const technicianContext = useTechnicianContext();
@@ -510,28 +541,46 @@ export function DashboardSidebar({
   const sidebarContent = (
     <>
       {/* Logo Header - h-14 (56px) */}
-      <div className="h-14 flex items-center justify-center px-4 border-b border-slate-100 dark:border-slate-800 relative">
-        {whitelabelBrandingActive && brandingLogoUrl ? (
-          <img
-            src={brandingLogoUrl}
-            alt="Company Logo"
-            className="h-8 w-auto max-w-[180px] object-contain"
-            data-testid="img-sidebar-logo"
-          />
-        ) : (
-          <div className="flex items-center justify-center" data-testid="sidebar-default-logo">
-            <img
-              src={onRopeProLogo}
-              alt="OnRopePro"
-              className="h-10 w-auto object-contain"
-            />
-          </div>
+      <div className="h-14 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800">
+        {!isDesktopCollapsed && (
+          <>
+            {whitelabelBrandingActive && brandingLogoUrl ? (
+              <img
+                src={brandingLogoUrl}
+                alt="Company Logo"
+                className="h-8 w-auto max-w-[140px] object-contain"
+                data-testid="img-sidebar-logo"
+              />
+            ) : (
+              <div className="flex items-center justify-center" data-testid="sidebar-default-logo">
+                <img
+                  src={onRopeProLogo}
+                  alt="OnRopePro"
+                  className="h-10 w-auto object-contain"
+                />
+              </div>
+            )}
+          </>
         )}
+        {/* Sidebar toggle button - desktop only */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "hidden lg:flex shrink-0",
+            isDesktopCollapsed && "mx-auto"
+          )}
+          onClick={() => setDesktopCollapsed(!isDesktopCollapsed)}
+          title={isDesktopCollapsed ? t("dashboard.sidebar.showSidebar", "Show Sidebar") : t("dashboard.sidebar.hideSidebar", "Hide Sidebar")}
+          data-testid="button-sidebar-toggle-desktop"
+        >
+          {isDesktopCollapsed ? <PanelLeft className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
+        </Button>
         {/* Close button for mobile */}
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden absolute right-2"
+          className="lg:hidden shrink-0"
           onClick={() => setIsOpen(false)}
           data-testid="button-sidebar-close"
         >
@@ -540,177 +589,187 @@ export function DashboardSidebar({
       </div>
 
 
-      {/* Optional Header Content (e.g., user info card) */}
-      {headerContent && (
-        <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
-          {headerContent}
-        </div>
-      )}
+      {/* Content hidden when desktop sidebar is collapsed */}
+      {!isDesktopCollapsed && (
+        <>
+          {/* Optional Header Content (e.g., user info card) */}
+          {headerContent && (
+            <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+              {headerContent}
+            </div>
+          )}
 
-      {/* Dashboard Primary Link */}
-      {showDashboardLink && (
-        <div className="px-3 pb-2">
-          <button
-            onClick={() => { onTabChange("home"); setIsOpen(false); }}
-            data-testid="sidebar-nav-dashboard"
-            className={cn(
-              "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
-              isDashboardActive 
-                ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
-                : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-            )}
-          >
-            {variant === "technician" && (currentUser as any)?.photoUrl ? (
-              <Avatar className="h-4 w-4 shrink-0">
-                <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
-                <AvatarFallback className="text-[8px]">
-                  {((currentUser as any).name || "U").charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-            ) : (
-              <CarabinerIcon className="h-4 w-4 shrink-0" />
-            )}
-            <span>{resolvedDashboardLabel}</span>
-          </button>
-        </div>
-      )}
-
-      {/* Navigation Groups - Scrollable */}
-      <nav className="flex-1 overflow-y-auto px-3 py-1">
-        {filteredGroups.map((group) => {
-          const isCollapsed = collapsedGroups.has(group.id);
-          
-          return (
-            <Collapsible
-              key={group.id}
-              open={!isCollapsed}
-              onOpenChange={() => toggleGroupCollapse(group.id)}
-              className="mb-3"
-            >
-              {/* Group Header with Toggle */}
-              <CollapsibleTrigger
-                className="w-full flex items-center justify-between px-3 py-1.5 group"
-                data-testid={`sidebar-group-toggle-${group.id}`}
+          {/* Dashboard Primary Link */}
+          {showDashboardLink && (
+            <div className="px-3 pb-2">
+              <button
+                onClick={() => { onTabChange("home"); setIsOpen(false); }}
+                data-testid="sidebar-nav-dashboard"
+                className={cn(
+                  "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
+                  isDashboardActive 
+                    ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                )}
               >
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  {group.label}
-                </span>
-                <ChevronDown 
-                  className={cn(
-                    "h-3.5 w-3.5 text-slate-400 transition-transform duration-200",
-                    isCollapsed && "-rotate-90"
-                  )}
-                />
-              </CollapsibleTrigger>
+                {variant === "technician" && (currentUser as any)?.photoUrl ? (
+                  <Avatar className="h-4 w-4 shrink-0">
+                    <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
+                    <AvatarFallback className="text-[8px]">
+                      {((currentUser as any).name || "U").charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <CarabinerIcon className="h-4 w-4 shrink-0" />
+                )}
+                <span>{resolvedDashboardLabel}</span>
+              </button>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Navigation Groups and Footer - hidden when desktop collapsed */}
+      {!isDesktopCollapsed && (
+        <>
+          {/* Navigation Groups - Scrollable */}
+          <nav className="flex-1 overflow-y-auto px-3 py-1">
+            {filteredGroups.map((group) => {
+              const isCollapsed = collapsedGroups.has(group.id);
               
-              {/* Group Items - Collapsible */}
-              <CollapsibleContent>
-                <div className="space-y-0.5 pt-0.5">
-                  {group.items.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = isActiveItem(item);
+              return (
+                <Collapsible
+                  key={group.id}
+                  open={!isCollapsed}
+                  onOpenChange={() => toggleGroupCollapse(group.id)}
+                  className="mb-3"
+                >
+                  {/* Group Header with Toggle */}
+                  <CollapsibleTrigger
+                    className="w-full flex items-center justify-between px-3 py-1.5 group"
+                    data-testid={`sidebar-group-toggle-${group.id}`}
+                  >
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                      {group.label}
+                    </span>
+                    <ChevronDown 
+                      className={cn(
+                        "h-3.5 w-3.5 text-slate-400 transition-transform duration-200",
+                        isCollapsed && "-rotate-90"
+                      )}
+                    />
+                  </CollapsibleTrigger>
+                  
+                  {/* Group Items - Collapsible */}
+                  <CollapsibleContent>
+                    <div className="space-y-0.5 pt-0.5">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = isActiveItem(item);
 
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => handleItemClick(item)}
-                        data-testid={`sidebar-nav-${item.id}`}
-                        className={cn(
-                          "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
-                          isActive 
-                            ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
-                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-                        )}
-                      >
-                        {item.useProfilePhoto && (currentUser as any)?.photoUrl ? (
-                          <Avatar className="h-4 w-4 shrink-0">
-                            <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
-                            <AvatarFallback className="text-[8px]">
-                              {((currentUser as any).name || "U").charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                        ) : (
-                          <Icon className="h-4 w-4 shrink-0" />
-                        )}
-                        <span className="flex-1 text-left truncate">{item.label}</span>
-                        {item.badge !== undefined && item.badge > 0 && (
-                          <span
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => handleItemClick(item)}
+                            data-testid={`sidebar-nav-${item.id}`}
                             className={cn(
-                              "flex items-center justify-center rounded-full text-sm font-medium h-5 min-w-5 px-1.5",
-                              item.badgeType === "alert" 
-                                ? "bg-rose-500 text-white"
-                                : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                              "w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium transition-colors",
+                              isActive 
+                                ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+                                : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                             )}
-                            data-testid={`badge-${item.id}-count`}
                           >
-                            {item.badge}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          );
-        })}
-      </nav>
+                            {item.useProfilePhoto && (currentUser as any)?.photoUrl ? (
+                              <Avatar className="h-4 w-4 shrink-0">
+                                <AvatarImage src={(currentUser as any).photoUrl} alt={(currentUser as any).name || "Profile"} />
+                                <AvatarFallback className="text-[8px]">
+                                  {((currentUser as any).name || "U").charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            ) : (
+                              <Icon className="h-4 w-4 shrink-0" />
+                            )}
+                            <span className="flex-1 text-left truncate">{item.label}</span>
+                            {item.badge !== undefined && item.badge > 0 && (
+                              <span
+                                className={cn(
+                                  "flex items-center justify-center rounded-full text-sm font-medium h-5 min-w-5 px-1.5",
+                                  item.badgeType === "alert" 
+                                    ? "bg-rose-500 text-white"
+                                    : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+                                )}
+                                data-testid={`badge-${item.id}-count`}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              );
+            })}
+          </nav>
 
-      {/* Footer - Settings and Help */}
-      <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
-        <div className="space-y-0.5">
-          {/* Go to My Passport - shown in Work Dashboard for technicians */}
-          {variant !== "technician" && (currentUser?.role === 'rope_access_tech' || currentUser?.role === 'ground_crew') && (
-            <button
-              onClick={() => { setLocation("/technician-portal"); setIsOpen(false); }}
-              data-testid="sidebar-nav-my-passport"
-              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              <UserIcon className="h-4 w-4 shrink-0" />
-              <span>{t("dashboard.sidebar.myPassport", "Go to My Passport")}</span>
-            </button>
-          )}
-          {/* Settings button - hidden for technician variant (they have Profile in main nav) */}
-          {variant !== "technician" && (
-            <button
-              onClick={() => { setLocation("/profile"); setIsOpen(false); }}
-              data-testid="sidebar-nav-settings"
-              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-            >
-              <Settings className="h-4 w-4 shrink-0" />
-              <span>{t("dashboard.sidebar.settings", "Settings")}</span>
-            </button>
-          )}
-          {/* Go to Work Dashboard - shown only for technicians with active company connections */}
-          {hasActiveEmployerConnection && (
-            <button
-              onClick={() => { setLocation("/dashboard"); setIsOpen(false); }}
-              data-testid="sidebar-nav-work-dashboard"
-              className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              <CarabinerIcon className="h-4 w-4 shrink-0" />
-              <span>{t("dashboard.sidebar.workDashboard", "Go to Work Dashboard")}</span>
-            </button>
-          )}
-          <button
-            onClick={() => { setLocation("/help"); setIsOpen(false); }}
-            data-testid="sidebar-nav-help"
-            className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-          >
-            <HelpCircle className="h-4 w-4 shrink-0" />
-            <span>{t("dashboard.sidebar.help", "Help Center")}</span>
-          </button>
-          {/* Customize Sidebar button */}
-          <button
-            onClick={() => setCustomizeDialogOpen(true)}
-            data-testid="sidebar-nav-customize"
-            className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-          >
-            <SlidersHorizontal className="h-4 w-4 shrink-0" />
-            <span>{t("dashboard.sidebar.customize", "Customize")}</span>
-          </button>
-        </div>
-      </div>
+          {/* Footer - Settings and Help */}
+          <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
+            <div className="space-y-0.5">
+              {/* Go to My Passport - shown in Work Dashboard for technicians */}
+              {variant !== "technician" && (currentUser?.role === 'rope_access_tech' || currentUser?.role === 'ground_crew') && (
+                <button
+                  onClick={() => { setLocation("/technician-portal"); setIsOpen(false); }}
+                  data-testid="sidebar-nav-my-passport"
+                  className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  <UserIcon className="h-4 w-4 shrink-0" />
+                  <span>{t("dashboard.sidebar.myPassport", "Go to My Passport")}</span>
+                </button>
+              )}
+              {/* Settings button - hidden for technician variant (they have Profile in main nav) */}
+              {variant !== "technician" && (
+                <button
+                  onClick={() => { setLocation("/profile"); setIsOpen(false); }}
+                  data-testid="sidebar-nav-settings"
+                  className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+                >
+                  <Settings className="h-4 w-4 shrink-0" />
+                  <span>{t("dashboard.sidebar.settings", "Settings")}</span>
+                </button>
+              )}
+              {/* Go to Work Dashboard - shown only for technicians with active company connections */}
+              {hasActiveEmployerConnection && (
+                <button
+                  onClick={() => { setLocation("/dashboard"); setIsOpen(false); }}
+                  data-testid="sidebar-nav-work-dashboard"
+                  className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  <CarabinerIcon className="h-4 w-4 shrink-0" />
+                  <span>{t("dashboard.sidebar.workDashboard", "Go to Work Dashboard")}</span>
+                </button>
+              )}
+              <button
+                onClick={() => { setLocation("/help"); setIsOpen(false); }}
+                data-testid="sidebar-nav-help"
+                className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+              >
+                <HelpCircle className="h-4 w-4 shrink-0" />
+                <span>{t("dashboard.sidebar.help", "Help Center")}</span>
+              </button>
+              {/* Customize Sidebar button */}
+              <button
+                onClick={() => setCustomizeDialogOpen(true)}
+                data-testid="sidebar-nav-customize"
+                className="w-full flex items-center gap-2.5 py-1.5 px-3 rounded-md text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+              >
+                <SlidersHorizontal className="h-4 w-4 shrink-0" />
+                <span>{t("dashboard.sidebar.customize", "Customize")}</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 
@@ -741,11 +800,13 @@ export function DashboardSidebar({
       {/* Sidebar - Fixed on desktop, slide-in on mobile */}
       <aside 
         className={cn(
-          "fixed h-full left-0 top-0 z-[95] w-60 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-700/80 flex flex-col transition-transform duration-200",
+          "fixed h-full left-0 top-0 z-[95] bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-700/80 flex flex-col transition-all duration-200",
           "lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          isDesktopCollapsed ? "lg:w-14 w-60" : "w-60"
         )}
         data-testid="dashboard-sidebar"
+        data-collapsed={isDesktopCollapsed}
       >
         {sidebarContent}
       </aside>
