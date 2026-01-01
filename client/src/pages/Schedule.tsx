@@ -1483,28 +1483,23 @@ export default function Schedule() {
                     }}
                   >
                     <div className="fc-event-title-container">
-                      {job.project?.buildingName && (
-                        <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                          {job.project.buildingName}
-                        </div>
-                      )}
-                      <div style={{ fontSize: '0.875rem', opacity: 0.9, marginTop: '1px' }}>
-                        {job.project?.strataPlanNumber || job.title}
+                      <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.8rem' }}>
+                        {job.project?.buildingName || job.title}
                       </div>
                       {employeesForThisDay && employeesForThisDay.length > 0 && (
-                        <div style={{ fontSize: '0.875rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.4, marginTop: '4px' }}>
+                        <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3, marginTop: '2px' }}>
                           {employeesForThisDay.map((assignment: any, idx: number) => (
                             <div key={idx} style={{ 
-                              fontWeight: 600, 
-                              backgroundColor: 'rgba(255,255,255,0.3)',
-                              padding: '3px 8px',
-                              borderRadius: '4px',
-                              marginTop: '3px',
+                              fontWeight: 500, 
+                              backgroundColor: 'rgba(255,255,255,0.25)',
+                              padding: '1px 5px',
+                              borderRadius: '3px',
+                              marginTop: '2px',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '5px'
+                              gap: '3px'
                             }}>
-                              <UserIcon style={{ width: '14px', height: '14px', flexShrink: 0 }} />
+                              <UserIcon style={{ width: '11px', height: '11px', flexShrink: 0 }} />
                               <span>{assignment.employee.name}</span>
                             </div>
                           ))}
