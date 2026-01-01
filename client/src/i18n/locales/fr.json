@@ -875,7 +875,7 @@
   },
   "common": {
     "startFreeTrial": "Commencer votre essai gratuit de 30 jours",
-    "signIn": "Connexion",
+    "signIn": "Se Connecter",
     "loading": "Chargement...",
     "generating": "Génération en cours...",
     "save": "Enregistrer",
@@ -996,7 +996,6 @@
     "logout": "Deconnexion",
     "login": "Connexion",
     "register": "S'enregistrer",
-    "signIn": "Se Connecter",
     "signUp": "S'inscrire",
     "signOut": "Se deconnecter",
     "free": "Gratuit",
@@ -13166,5 +13165,75 @@
     "published": "Publié",
     "draft": "Brouillon",
     "preview": "Aperçu en tant que Résident"
+  },
+  "buildingManagerLanding": {
+    "hero": {
+      "badge": "Pour les gestionnaires d'immeubles",
+      "title": "Votre immeuble. Votre visibilité.",
+      "titleHighlight": "Fini de courir après les entrepreneurs.",
+      "subtitle": "Voyez exactement ce qui se passe avec les travaux d'accès par corde sur votre immeuble - sans attendre les rappels ou les courriels de statut.",
+      "subtitleStrong": "Progrès en temps réel. Commentaires des résidents. Documentation complète.",
+      "signIn": "Se connecter au portail",
+      "learnMore": "En savoir plus",
+      "freeAccount": "Les comptes de gestionnaire d'immeuble sont toujours gratuits.",
+      "autoAccountDetails": "Votre compte est créé automatiquement lorsqu'une entreprise d'accès par corde utilisant OnRopePro commence un projet sur votre immeuble. Votre identifiant et mot de passe initial sont tous deux votre numéro de strata/plan (ex. LMS1234)."
+    },
+    "problem": {
+      "title": "Le problème",
+      "statement": "Vous êtes responsable de l'entretien de l'immeuble...",
+      "p1": "Mais vous ne savez jamais quand les travaux ont vraiment lieu.",
+      "p2": "Les mises à jour de statut nécessitent des appels téléphoniques sans fin.",
+      "p3": "Les plaintes des résidents se perdent entre les parties.",
+      "solution": "OnRopePro change tout."
+    },
+    "connections": {
+      "title": "Restez connecté à votre immeuble",
+      "subtitle": "Tout ce que vous devez savoir, quand vous devez le savoir",
+      "progress": {
+        "title": "Progrès en temps réel",
+        "description": "Suivez l'avancement des travaux sur votre immeuble avec un suivi visuel par élévation"
+      },
+      "feedback": {
+        "title": "Commentaires des résidents",
+        "description": "Voyez ce que les résidents disent des travaux en temps réel"
+      },
+      "history": {
+        "title": "Historique complet",
+        "description": "Accédez à l'historique complet des projets et à la documentation à tout moment"
+      },
+      "documentation": {
+        "title": "Documentation",
+        "description": "Tous les documents de sécurité et avis de travaux en un seul endroit"
+      }
+    },
+    "faqs": {
+      "title": "Questions fréquemment posées",
+      "q1": {
+        "question": "Comment puis-je accéder au portail de l'immeuble?",
+        "answer": "Votre compte est créé automatiquement lorsqu'une entreprise d'accès par corde utilisant OnRopePro commence un projet sur votre immeuble. Vous recevrez vos identifiants par courriel, ou vous pouvez vous connecter en utilisant votre numéro de strata/plan comme nom d'utilisateur et mot de passe."
+      },
+      "q2": {
+        "question": "Que puis-je voir dans le portail de l'immeuble?",
+        "answer": "Vous pouvez voir l'avancement des travaux en temps réel, les commentaires des résidents, les avis de travaux, l'historique des projets et toute la documentation de sécurité. Vous pouvez également mettre à jour les instructions d'accès à l'immeuble pour les techniciens."
+      },
+      "q3": {
+        "question": "Puis-je communiquer avec l'entreprise d'accès par corde?",
+        "answer": "Oui! Vous pouvez voir les coordonnées de l'entreprise, accéder aux plaintes des résidents qui ont été soumises et consulter les avis de travaux. L'entreprise peut voir vos instructions d'accès à l'immeuble et vos exigences spéciales."
+      },
+      "q4": {
+        "question": "Comment mettre à jour les instructions d'accès à l'immeuble?",
+        "answer": "Dans la section Instructions de l'immeuble, vous pouvez mettre à jour les codes d'accès, les informations sur les clés électroniques, les détails d'accès au toit et toute demande spéciale. Ces informations sont partagées avec les techniciens travaillant sur votre immeuble."
+      },
+      "q5": {
+        "question": "Les informations de mon immeuble sont-elles sécurisées?",
+        "answer": "Absolument. Toutes les données sont chiffrées et accessibles uniquement aux utilisateurs autorisés. Les gestionnaires d'immeubles ne peuvent voir que les projets associés à leur immeuble spécifique. Nous vous recommandons de changer votre mot de passe par défaut immédiatement après votre première connexion."
+      }
+    },
+    "cta": {
+      "title": "Prêt à prendre le contrôle?",
+      "subtitle": "Connectez-vous à votre portail d'immeuble et restez connecté à l'entretien de votre immeuble.",
+      "signIn": "Se connecter maintenant",
+      "learnMore": "En savoir plus"
+    }
   }
 }

@@ -444,10 +444,12 @@ export function DashboardSidebar({
     // Call onClick first if provided (e.g., tab changes)
     if (item.onClick) {
       item.onClick();
-    }
-    // Then navigate if href is provided
-    if (item.href) {
+    } else if (item.href) {
+      // Navigate if href is provided
       setLocation(item.href);
+    } else {
+      // Default: call onTabChange with item.id for tab-based navigation
+      onTabChange(item.id);
     }
     // Close mobile sidebar after navigation
     setIsOpen(false);

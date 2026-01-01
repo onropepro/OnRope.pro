@@ -1059,7 +1059,6 @@
     "logout": "Cerrar Sesion",
     "login": "Iniciar Sesion",
     "register": "Registrarse",
-    "signIn": "Iniciar Sesión",
     "signUp": "Registrarse",
     "signOut": "Cerrar Sesion",
     "free": "Gratis",
@@ -13014,5 +13013,75 @@
     "published": "Publicado",
     "draft": "Borrador",
     "preview": "Vista previa como Residente"
+  },
+  "buildingManagerLanding": {
+    "hero": {
+      "badge": "Para administradores de edificios",
+      "title": "Tu edificio. Tu visibilidad.",
+      "titleHighlight": "No más perseguir contratistas.",
+      "subtitle": "Ve exactamente qué está pasando con el trabajo de acceso por cuerda en tu edificio - sin esperar llamadas o correos de estado.",
+      "subtitleStrong": "Progreso en tiempo real. Comentarios de residentes. Documentación completa.",
+      "signIn": "Iniciar sesión en el portal",
+      "learnMore": "Saber más",
+      "freeAccount": "Las cuentas de administrador de edificios son siempre gratuitas.",
+      "autoAccountDetails": "Tu cuenta se crea automáticamente cuando una empresa de acceso por cuerda que usa OnRopePro comienza un proyecto en tu edificio. Tu usuario y contraseña inicial son ambos tu número de strata/plan (ej. LMS1234)."
+    },
+    "problem": {
+      "title": "El problema",
+      "statement": "Eres responsable del mantenimiento del edificio...",
+      "p1": "Pero nunca sabes cuándo realmente se está realizando el trabajo.",
+      "p2": "Las actualizaciones de estado requieren llamadas telefónicas interminables.",
+      "p3": "Las quejas de los residentes se pierden entre las partes.",
+      "solution": "OnRopePro lo cambia todo."
+    },
+    "connections": {
+      "title": "Mantente conectado a tu edificio",
+      "subtitle": "Todo lo que necesitas saber, cuando necesitas saberlo",
+      "progress": {
+        "title": "Progreso en tiempo real",
+        "description": "Observa el progreso del trabajo en tu edificio con seguimiento visual por elevación"
+      },
+      "feedback": {
+        "title": "Comentarios de residentes",
+        "description": "Ve lo que los residentes dicen sobre el trabajo en tiempo real"
+      },
+      "history": {
+        "title": "Historial completo",
+        "description": "Accede al historial completo de proyectos y documentación en cualquier momento"
+      },
+      "documentation": {
+        "title": "Documentación",
+        "description": "Todos los documentos de seguridad y avisos de trabajo en un solo lugar"
+      }
+    },
+    "faqs": {
+      "title": "Preguntas frecuentes",
+      "q1": {
+        "question": "¿Cómo obtengo acceso al portal del edificio?",
+        "answer": "Tu cuenta se crea automáticamente cuando una empresa de acceso por cuerda que usa OnRopePro comienza un proyecto en tu edificio. Recibirás credenciales de acceso por correo electrónico, o puedes iniciar sesión usando tu número de strata/plan como nombre de usuario y contraseña."
+      },
+      "q2": {
+        "question": "¿Qué puedo ver en el portal del edificio?",
+        "answer": "Puedes ver el progreso del trabajo en tiempo real, comentarios de residentes, avisos de trabajo, historial de proyectos y toda la documentación de seguridad. También puedes actualizar las instrucciones de acceso al edificio para los técnicos."
+      },
+      "q3": {
+        "question": "¿Puedo comunicarme con la empresa de acceso por cuerda?",
+        "answer": "¡Sí! Puedes ver la información de contacto de la empresa, acceder a las quejas de los residentes que se han enviado y revisar los avisos de trabajo. La empresa puede ver tus instrucciones de acceso al edificio y requisitos especiales."
+      },
+      "q4": {
+        "question": "¿Cómo actualizo las instrucciones de acceso al edificio?",
+        "answer": "En la sección de Instrucciones del edificio, puedes actualizar códigos de acceso, información de llaves electrónicas, detalles de acceso al techo y cualquier solicitud especial. Esta información se comparte con los técnicos que trabajan en tu edificio."
+      },
+      "q5": {
+        "question": "¿Está segura la información de mi edificio?",
+        "answer": "Absolutamente. Todos los datos están cifrados y solo son accesibles para usuarios autorizados. Los administradores de edificios solo pueden ver proyectos asociados con su edificio específico. Recomendamos cambiar tu contraseña predeterminada inmediatamente después del primer inicio de sesión."
+      }
+    },
+    "cta": {
+      "title": "¿Listo para tomar el control?",
+      "subtitle": "Inicia sesión en tu portal del edificio y mantente conectado al mantenimiento de tu edificio.",
+      "signIn": "Iniciar sesión ahora",
+      "learnMore": "Saber más"
+    }
   }
 }
