@@ -10,7 +10,8 @@ import type { CardProps } from "../cardRegistry";
 function isReadOnly(user: any): boolean {
   if (!user) return true;
   const role = user.role?.toLowerCase();
-  if (role === 'owner' || role === 'superuser') return false;
+  // Company owners, owners, and superusers can always create
+  if (role === 'company' || role === 'owner' || role === 'superuser') return false;
   const permissions = user.permissions || [];
   return permissions.includes('read_only') || permissions.length === 0;
 }
