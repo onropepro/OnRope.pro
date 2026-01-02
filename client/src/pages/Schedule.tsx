@@ -1529,8 +1529,9 @@ export default function Schedule() {
                           {employeesForThisDay.map((assignment: any, idx: number) => (
                             <div key={idx} style={{ 
                               fontWeight: 500, 
-                              backgroundColor: jobColor,
-                              color: 'white',
+                              backgroundColor: 'transparent',
+                              color: 'hsl(var(--foreground))',
+                              border: `1px solid ${jobColor}`,
                               padding: '1px 5px',
                               borderRadius: '3px',
                               marginTop: '2px',
@@ -1538,7 +1539,7 @@ export default function Schedule() {
                               alignItems: 'center',
                               gap: '3px'
                             }}>
-                              <UserIcon style={{ width: '11px', height: '11px', flexShrink: 0 }} />
+                              <UserIcon style={{ width: '11px', height: '11px', flexShrink: 0, color: jobColor }} />
                               <span>{assignment.employee.name}</span>
                             </div>
                           ))}
