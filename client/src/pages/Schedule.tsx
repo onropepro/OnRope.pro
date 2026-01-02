@@ -2925,7 +2925,7 @@ function JobDetailDialog({
     
     setIsAssigningMultiple(true);
     let successCount = 0;
-    let errorCount = 0;
+    let conflictDetected = false;
     
     // Assign all selected employees sequentially
     for (const employee of selectedEmployees) {
@@ -2937,26 +2937,30 @@ function JobDetailDialog({
           endDate: assignmentDates.endDate,
         });
         successCount++;
-      } catch (error) {
-        errorCount++;
-        // Individual errors are handled by the mutation's onError
+      } catch (error: any) {
+        // Check if this is a conflict error - the mutation's onError will show the dialog
+        if (error?.message?.startsWith('409:')) {
+          conflictDetected = true;
+          break; // Stop processing, let the conflict dialog handle it
+        }
+        // For other errors, continue to next employee
       }
     }
     
     setIsAssigningMultiple(false);
+    
+    // Don't reset state if conflict dialog is being shown
+    if (conflictDetected) {
+      return; // The conflict dialog will handle the user's next action
+    }
+    
     setSelectedEmployees([]);
     setShowAssignEmployees(false);
     
-    if (successCount > 0 && errorCount === 0) {
+    if (successCount > 0) {
       toast({
         title: t('schedule.assignmentsCreated', 'Employees assigned'),
         description: t('schedule.multipleAssigned', '{{count}} team member(s) have been assigned to this job', { count: successCount }),
-      });
-    } else if (successCount > 0 && errorCount > 0) {
-      toast({
-        title: t('schedule.partialSuccess', 'Partial success'),
-        description: t('schedule.someAssigned', '{{success}} assigned, {{errors}} failed', { success: successCount, errors: errorCount }),
-        variant: "destructive",
       });
     }
   };
