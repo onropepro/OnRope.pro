@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown, Maximize2, Minimize2 } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown, Maximize2, Minimize2, X } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { ScheduledJobWithAssignments, User, EmployeeTimeOff } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
@@ -2642,7 +2642,6 @@ function JobDetailDialog({
   const { toast } = useToast();
   const [showAssignEmployees, setShowAssignEmployees] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [assignmentDates, setAssignmentDates] = useState<{ startDate: string; endDate: string }>({
     startDate: "",
@@ -2714,7 +2713,6 @@ function JobDetailDialog({
         title: t('schedule.assignmentCreated', 'Employee assigned'),
         description: t('schedule.assignmentCreated', 'Team member has been assigned to this job'),
       });
-      setAssignDialogOpen(false);
       setSelectedEmployee(null);
       setShowAssignEmployees(false);
     },
@@ -2803,13 +2801,7 @@ function JobDetailDialog({
     const endDate = String(job.endDate).split('T')[0];
     console.log("Setting dates:", startDate, endDate);
     setAssignmentDates({ startDate, endDate });
-    console.log("Opening dialog");
-    // Close the job detail dialog first so the sheet appears on top
-    onOpenChange(false);
-    // Use setTimeout to ensure dialog closes before sheet opens
-    setTimeout(() => {
-      setAssignDialogOpen(true);
-    }, 100);
+    // Keep inline - no dialog/sheet needed
   };
 
   const handleSaveAssignment = () => {
@@ -2886,128 +2878,156 @@ function JobDetailDialog({
                 variant={showAssignEmployees ? "outline" : "default"}
                 size="default"
                 onClick={() => {
-                  console.log("Manage/assign button clicked");
-                  // For testing: open dialog directly when there are employees
-                  if (employees.length > 0 && !showAssignEmployees) {
-                    const firstUnassigned = employees.find(emp => {
-                      const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
-                                        job.assignedEmployees?.some(assigned => assigned.id === emp.id);
-                      return !isAssigned;
-                    });
-                    if (firstUnassigned) {
-                      console.log("Opening dialog with first unassigned employee:", firstUnassigned.name);
-                      handleAssignEmployee(firstUnassigned);
-                      return;
-                    }
-                  }
+                  setSelectedEmployee(null); // Reset selection when toggling
                   setShowAssignEmployees(!showAssignEmployees);
                 }}
                 data-testid="button-assign-employees"
                 className="gap-2"
               >
                 <Users className="w-4 h-4" />
-                {showAssignEmployees ? t('schedule.cancel', 'Cancel') : t('schedule.assignEmployee', 'Manage/assign employee to job')}
+                {showAssignEmployees ? t('schedule.cancel', 'Cancel') : t('schedule.assignEmployee', 'Assign Employee')}
               </Button>
             </div>
             
-            {showAssignEmployees ? (
-              <div className="space-y-3">
-                <div className="border rounded-md p-4 max-h-64 overflow-y-auto">
-                  {(() => {
-                    if (employees.length === 0) {
-                      return <p className="text-sm text-muted-foreground">{t('schedule.availableEmployees', 'No employees available')}</p>;
-                    }
-                    
-                    const unassignedEmployees = employees.filter(emp => {
-                      const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
-                                        job.assignedEmployees?.some(assigned => assigned.id === emp.id);
-                      return !isAssigned;
-                    });
-                    
-                    if (unassignedEmployees.length === 0) {
-                      return <p className="text-sm text-muted-foreground">{t('schedule.allAssigned', 'All employees are already assigned to this job')}</p>;
-                    }
-                    
-                    return (
-                      <div className="grid grid-cols-1 gap-2">
-                        {unassignedEmployees.map((employee) => (
-                          <Button
-                            key={employee.id}
-                            variant="outline"
-                            className="w-full justify-start"
-                            onClick={() => {
-                              console.log("Button clicked for employee:", employee.name);
-                              handleAssignEmployee(employee);
-                            }}
-                            data-testid={`button-assign-${employee.id}`}
-                          >
-                            <UserCheck className="w-4 h-4 mr-2" />
-                            {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
-                          </Button>
-                        ))}
+            {/* Show currently assigned employees with remove buttons */}
+            {job.employeeAssignments && job.employeeAssignments.length > 0 && (
+              <div className="space-y-2 mb-4">
+                <h4 className="text-xs text-muted-foreground uppercase tracking-wide">{t('schedule.currentlyAssigned', 'Currently Assigned')}</h4>
+                {job.employeeAssignments.map((assignment) => (
+                  <div key={assignment.assignmentId} className="flex items-center justify-between border rounded-md p-3">
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{assignment.employee.name} {assignment.employee.role && `(${assignment.employee.role.replace(/_/g, ' ')})`}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {assignment.startDate && assignment.endDate ? (
+                          <>
+                            {formatLocalDate(assignment.startDate)} - {formatLocalDate(assignment.endDate)}
+                          </>
+                        ) : (
+                          <span>{t('schedule.allDay', 'Entire job duration')}</span>
+                        )}
                       </div>
-                    );
-                  })()}
-                </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => unassignEmployeeMutation.mutate({ 
+                        jobId: job.id, 
+                        assignmentId: assignment.assignmentId 
+                      })}
+                      disabled={unassignEmployeeMutation.isPending}
+                      data-testid={`button-remove-assignment-${assignment.employee.id}`}
+                    >
+                      <UserX className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
               </div>
-            ) : (
-              <>
-                {job.employeeAssignments && job.employeeAssignments.length > 0 ? (
-                  <div className="space-y-2">
-                    {job.employeeAssignments.map((assignment) => (
-                      <div key={assignment.assignmentId} className="flex items-center justify-between border rounded-md p-3">
-                        <div className="flex-1">
-                          <div className="font-medium text-sm">{assignment.employee.name} {assignment.employee.role && `(${assignment.employee.role.replace(/_/g, ' ')})`}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {assignment.startDate && assignment.endDate ? (
-                              <>
-                                {formatLocalDate(assignment.startDate)} - {formatLocalDate(assignment.endDate)}
-                              </>
-                            ) : (
-                              <span>{t('schedule.allDay', 'Entire job duration')}</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              setSelectedEmployee(assignment.employee);
-                              const startDate = assignment.startDate 
-                                ? String(assignment.startDate).split('T')[0]
-                                : String(job.startDate).split('T')[0];
-                              const endDate = assignment.endDate
-                                ? String(assignment.endDate).split('T')[0]
-                                : String(job.endDate).split('T')[0];
-                              setAssignmentDates({ startDate, endDate });
-                              setAssignDialogOpen(true);
-                            }}
-                            data-testid={`button-edit-assignment-${assignment.employee.id}`}
-                          >
-                            <Edit2 className="w-3 h-3" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => unassignEmployeeMutation.mutate({ 
-                              jobId: job.id, 
-                              assignmentId: assignment.assignmentId 
-                            })}
-                            data-testid={`button-remove-assignment-${assignment.employee.id}`}
-                          >
-                            <UserX className="w-3 h-3" />
-                          </Button>
-                        </div>
+            )}
+            
+            {/* Inline employee assignment section */}
+            {showAssignEmployees && (
+              <div className="space-y-3 border rounded-md p-4">
+                {selectedEmployee ? (
+                  /* Show date selection for selected employee */
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-sm">
+                        {t('schedule.assigningEmployee', 'Assigning')}: {selectedEmployee.name}
                       </div>
-                    ))}
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        onClick={() => setSelectedEmployee(null)}
+                        data-testid="button-cancel-employee-selection"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="inline-start-date" className="text-xs">{t('schedule.startDate', 'Start Date')}</Label>
+                        <Input
+                          id="inline-start-date"
+                          type="date"
+                          value={assignmentDates.startDate}
+                          onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
+                          min={String(job.startDate).split('T')[0]}
+                          max={String(job.endDate).split('T')[0]}
+                          data-testid="input-assignment-start-date"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="inline-end-date" className="text-xs">{t('schedule.endDate', 'End Date')}</Label>
+                        <Input
+                          id="inline-end-date"
+                          type="date"
+                          value={assignmentDates.endDate}
+                          onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
+                          min={assignmentDates.startDate || String(job.startDate).split('T')[0]}
+                          max={String(job.endDate).split('T')[0]}
+                          data-testid="input-assignment-end-date"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <Button
+                      onClick={handleSaveAssignment}
+                      disabled={assignEmployeeMutation.isPending}
+                      className="w-full"
+                      data-testid="button-confirm-assignment"
+                    >
+                      {assignEmployeeMutation.isPending ? t('schedule.assigning', 'Assigning...') : t('schedule.confirmAssignment', 'Confirm Assignment')}
+                    </Button>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {t('schedule.noAssignments', 'No team members assigned yet')}
-                  </p>
+                  /* Show list of available employees to assign */
+                  <div>
+                    <h4 className="text-xs text-muted-foreground uppercase tracking-wide mb-2">{t('schedule.selectEmployee', 'Select Employee to Assign')}</h4>
+                    {(() => {
+                      if (employees.length === 0) {
+                        return <p className="text-sm text-muted-foreground">{t('schedule.noEmployeesAvailable', 'No employees available')}</p>;
+                      }
+                      
+                      const unassignedEmployees = employees.filter(emp => {
+                        const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
+                                          job.assignedEmployees?.some(assigned => assigned.id === emp.id);
+                        return !isAssigned;
+                      });
+                      
+                      if (unassignedEmployees.length === 0) {
+                        return <p className="text-sm text-muted-foreground">{t('schedule.allAssigned', 'All employees are already assigned to this job')}</p>;
+                      }
+                      
+                      return (
+                        <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+                          {unassignedEmployees.map((employee) => (
+                            <Button
+                              key={employee.id}
+                              variant="outline"
+                              className="w-full justify-start"
+                              onClick={() => handleAssignEmployee(employee)}
+                              data-testid={`button-select-employee-${employee.id}`}
+                            >
+                              <UserCheck className="w-4 h-4 mr-2" />
+                              {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                            </Button>
+                          ))}
+                        </div>
+                      );
+                    })()}
+                  </div>
                 )}
-              </>
+              </div>
+            )}
+            
+            {/* Empty state when not assigning and no employees assigned */}
+            {!showAssignEmployees && (!job.employeeAssignments || job.employeeAssignments.length === 0) && (
+              <p className="text-sm text-muted-foreground">
+                {t('schedule.noAssignments', 'No team members assigned yet')}
+              </p>
             )}
           </div>
 
@@ -3078,62 +3098,6 @@ function JobDetailDialog({
       </AlertDialogContent>
     </AlertDialog>
 
-    {job && (
-      <Sheet open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
-        <SheetContent className="z-[60]">
-          <SheetHeader>
-            <SheetTitle>{t('schedule.assignEmployee', 'Assign Employee to Job')}</SheetTitle>
-            <SheetDescription>
-              {t('schedule.assignEmployee', 'Specify the date range when')} {selectedEmployee?.name} {t('schedule.assignEmployee', 'will work on this job')}
-            </SheetDescription>
-          </SheetHeader>
-          
-          <div className="space-y-4 mt-6">
-            <div>
-              <Label htmlFor="assign-start-date">{t('schedule.startDate', 'Start Date')}</Label>
-              <Input
-                id="assign-start-date"
-                type="date"
-                value={assignmentDates.startDate}
-                onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
-                min={String(job.startDate).split('T')[0]}
-                max={String(job.endDate).split('T')[0]}
-                data-testid="input-assignment-start-date"
-              />
-            </div>
-            <div>
-              <Label htmlFor="assign-end-date">{t('schedule.endDate', 'End Date')}</Label>
-              <Input
-                id="assign-end-date"
-                type="date"
-                value={assignmentDates.endDate}
-                onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
-                min={assignmentDates.startDate || String(job.startDate).split('T')[0]}
-                max={String(job.endDate).split('T')[0]}
-                data-testid="input-assignment-end-date"
-              />
-            </div>
-          </div>
-          
-          <SheetFooter className="mt-6">
-            <Button
-              variant="outline"
-              onClick={() => setAssignDialogOpen(false)}
-              data-testid="button-cancel-assignment"
-            >
-              {t('schedule.cancel', 'Cancel')}
-            </Button>
-            <Button
-              onClick={handleSaveAssignment}
-              disabled={assignEmployeeMutation.isPending}
-              data-testid="button-save-assignment"
-            >
-              {assignEmployeeMutation.isPending ? t('schedule.assignEmployee', 'Assigning...') : t('schedule.assignEmployee', 'Assign Employee')}
-            </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-    )}
 
     <DoubleBookingWarningDialog
       open={conflictDialogOpen}
