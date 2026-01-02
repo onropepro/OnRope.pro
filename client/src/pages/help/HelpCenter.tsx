@@ -76,44 +76,44 @@ const stakeholderCards = [
   },
 ];
 
-// Category configuration matching mega menu colors
-const categoryConfig: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
+// Category configuration matching mega menu colors - returns translation keys
+const getCategoryConfig = (t: (key: string, fallback: string) => string): Record<string, { icon: React.ReactNode; label: string; color: string }> => ({
   operations: { 
     icon: <Briefcase className="h-5 w-5" />, 
-    label: 'Operations', 
+    label: t('helpCenter.categories.operations', 'Operations'), 
     color: 'text-blue-600' 
   },
   safety: { 
     icon: <Shield className="h-5 w-5" />, 
-    label: 'Safety', 
+    label: t('helpCenter.categories.safety', 'Safety'), 
     color: 'text-red-600' 
   },
   hr: { 
     icon: <Users className="h-5 w-5" />, 
-    label: 'Team', 
+    label: t('helpCenter.categories.team', 'Team'), 
     color: 'text-violet-600' 
   },
   team: { 
     icon: <Users className="h-5 w-5" />, 
-    label: 'Team', 
+    label: t('helpCenter.categories.team', 'Team'), 
     color: 'text-violet-600' 
   },
   financial: { 
     icon: <DollarSign className="h-5 w-5" />, 
-    label: 'Financial & Sales', 
+    label: t('helpCenter.categories.financial', 'Financial & Sales'), 
     color: 'text-emerald-600' 
   },
   communication: { 
     icon: <MessageSquare className="h-5 w-5" />, 
-    label: 'Communication', 
+    label: t('helpCenter.categories.communication', 'Communication'), 
     color: 'text-rose-600' 
   },
   customization: { 
     icon: <Palette className="h-5 w-5" />, 
-    label: 'Operations', 
+    label: t('helpCenter.categories.operations', 'Operations'), 
     color: 'text-blue-600' 
   },
-};
+});
 
 const moduleIcons: Record<string, React.ReactNode> = {
   'project-management': <ClipboardList className="h-5 w-5" />,
@@ -142,6 +142,7 @@ export default function HelpCenter() {
   });
 
   const modules = modulesData?.modules || [];
+  const categoryConfig = getCategoryConfig(t);
   
   // Translated stakeholder cards
   const translatedStakeholderCards = [
@@ -288,56 +289,56 @@ export default function HelpCenter() {
         
         <section className="mb-16">
           <h2 className="text-2xl font-semibold mb-6" data-testid="text-section-popular">
-            Popular topics
+            {t('helpCenter.popularTopics', 'Popular topics')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <TopicCard 
-              title="How to create a project" 
-              description="Learn the basics of setting up your first project"
+              title={t('helpCenter.topics.createProject.title', 'How to create a project')}
+              description={t('helpCenter.topics.createProject.description', 'Learn the basics of setting up your first project')}
               href="/help/modules/project-management"
             />
             <TopicCard 
-              title="Time tracking and GPS" 
-              description="Track billable hours and technician locations"
+              title={t('helpCenter.topics.timeTracking.title', 'Time tracking and GPS')}
+              description={t('helpCenter.topics.timeTracking.description', 'Track billable hours and technician locations')}
               href="/help/modules/time-tracking"
             />
             <TopicCard 
-              title="Safety inspections" 
-              description="Complete harness inspections and safety documentation"
+              title={t('helpCenter.topics.safetyInspections.title', 'Safety inspections')}
+              description={t('helpCenter.topics.safetyInspections.description', 'Complete harness inspections and safety documentation')}
               href="/help/modules/safety-compliance"
             />
             <TopicCard 
-              title="IRATA certification logging" 
-              description="Log work hours for certification progression"
+              title={t('helpCenter.topics.irataCertification.title', 'IRATA certification logging')}
+              description={t('helpCenter.topics.irataCertification.description', 'Log work hours for certification progression')}
               href="/help/modules/irata-sprat-logging"
             />
             <TopicCard 
-              title="Scheduling technicians" 
-              description="Assign technicians to projects efficiently"
+              title={t('helpCenter.topics.scheduling.title', 'Scheduling technicians')}
+              description={t('helpCenter.topics.scheduling.description', 'Assign technicians to projects efficiently')}
               href="/help/modules/scheduling"
             />
             <TopicCard 
-              title="ROI Calculator" 
-              description="Calculate your potential savings with OnRopePro"
+              title={t('helpCenter.topics.roiCalculator.title', 'ROI Calculator')}
+              description={t('helpCenter.topics.roiCalculator.description', 'Calculate your potential savings with OnRopePro')}
               href="/help/tools/roi-calculator"
             />
             <TopicCard 
-              title="Dashboard Customization" 
-              description="Personalize your dashboard with widgets and layouts"
+              title={t('helpCenter.topics.dashboardCustomization.title', 'Dashboard Customization')}
+              description={t('helpCenter.topics.dashboardCustomization.description', 'Personalize your dashboard with widgets and layouts')}
               href="/help/modules/dashboard-customization"
             />
             <TopicCard 
-              title="How To Install the App" 
-              description="Add OnRopePro to your home screen for quick access"
+              title={t('helpCenter.topics.installApp.title', 'How To Install the App')}
+              description={t('helpCenter.topics.installApp.description', 'Add OnRopePro to your home screen for quick access')}
               href="/help/modules/install-app"
             />
           </div>
         </section>
         
         <section className="bg-muted/50 rounded-lg p-8 text-center">
-          <h2 className="text-xl font-semibold mb-2">Still need help?</h2>
+          <h2 className="text-xl font-semibold mb-2">{t('helpCenter.stillNeedHelp', 'Still need help?')}</h2>
           <p className="text-muted-foreground mb-4">
-            Our AI assistant can answer your questions instantly
+            {t('helpCenter.aiAssistantPrompt', 'Our AI assistant can answer your questions instantly')}
           </p>
           <Button 
             onClick={() => {
@@ -347,7 +348,7 @@ export default function HelpCenter() {
             data-testid="button-open-chat-cta"
           >
             <MessageSquare className="h-4 w-4 mr-2" />
-            Chat with AI Assistant
+            {t('helpCenter.chatWithAI', 'Chat with AI Assistant')}
           </Button>
         </section>
       </div>

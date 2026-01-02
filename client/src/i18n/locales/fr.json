@@ -13335,6 +13335,52 @@
     "roleSection": "Trouvez de l'aide pour votre rôle",
     "modulesSection": "Parcourir par module",
     "gettingStarted": "Guide de démarrage",
+    "searchPlaceholder": "Posez une question ou recherchez de l'aide sur les projets, la sécurité, la planification...",
+    "popularTopics": "Sujets populaires",
+    "stillNeedHelp": "Besoin d'aide supplémentaire ?",
+    "aiAssistantPrompt": "Notre assistant IA peut répondre à vos questions instantanément",
+    "chatWithAI": "Discuter avec l'assistant IA",
+    "categories": {
+      "operations": "Opérations",
+      "safety": "Sécurité",
+      "team": "Équipe",
+      "financial": "Finance et ventes",
+      "communication": "Communication"
+    },
+    "topics": {
+      "createProject": {
+        "title": "Comment créer un projet",
+        "description": "Apprenez les bases de la configuration de votre premier projet"
+      },
+      "timeTracking": {
+        "title": "Suivi du temps et GPS",
+        "description": "Suivez les heures facturables et les emplacements des techniciens"
+      },
+      "safetyInspections": {
+        "title": "Inspections de sécurité",
+        "description": "Complétez les inspections de harnais et la documentation de sécurité"
+      },
+      "irataCertification": {
+        "title": "Journalisation de certification IRATA",
+        "description": "Enregistrez les heures de travail pour la progression de certification"
+      },
+      "scheduling": {
+        "title": "Planification des techniciens",
+        "description": "Assignez efficacement les techniciens aux projets"
+      },
+      "roiCalculator": {
+        "title": "Calculateur de ROI",
+        "description": "Calculez vos économies potentielles avec OnRopePro"
+      },
+      "dashboardCustomization": {
+        "title": "Personnalisation du tableau de bord",
+        "description": "Personnalisez votre tableau de bord avec des widgets et des mises en page"
+      },
+      "installApp": {
+        "title": "Comment installer l'application",
+        "description": "Ajoutez OnRopePro à votre écran d'accueil pour un accès rapide"
+      }
+    },
     "search": {
       "placeholder": "Posez une question ou recherchez de l'aide sur les projets, la sécurité, la planification...",
       "label": "Rechercher",

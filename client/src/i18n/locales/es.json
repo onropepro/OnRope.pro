@@ -13163,6 +13163,52 @@
     "roleSection": "Encuentra ayuda para tu rol",
     "modulesSection": "Navegar por módulo",
     "gettingStarted": "Guía de inicio",
+    "searchPlaceholder": "Haz una pregunta o busca ayuda sobre proyectos, seguridad, programación...",
+    "popularTopics": "Temas populares",
+    "stillNeedHelp": "¿Necesitas más ayuda?",
+    "aiAssistantPrompt": "Nuestro asistente de IA puede responder tus preguntas al instante",
+    "chatWithAI": "Chatear con asistente IA",
+    "categories": {
+      "operations": "Operaciones",
+      "safety": "Seguridad",
+      "team": "Equipo",
+      "financial": "Finanzas y ventas",
+      "communication": "Comunicación"
+    },
+    "topics": {
+      "createProject": {
+        "title": "Cómo crear un proyecto",
+        "description": "Aprende los conceptos básicos para configurar tu primer proyecto"
+      },
+      "timeTracking": {
+        "title": "Seguimiento de tiempo y GPS",
+        "description": "Registra horas facturables y ubicaciones de técnicos"
+      },
+      "safetyInspections": {
+        "title": "Inspecciones de seguridad",
+        "description": "Completa inspecciones de arnés y documentación de seguridad"
+      },
+      "irataCertification": {
+        "title": "Registro de certificación IRATA",
+        "description": "Registra horas de trabajo para la progresión de certificación"
+      },
+      "scheduling": {
+        "title": "Programación de técnicos",
+        "description": "Asigna técnicos a proyectos eficientemente"
+      },
+      "roiCalculator": {
+        "title": "Calculadora de ROI",
+        "description": "Calcula tus ahorros potenciales con OnRopePro"
+      },
+      "dashboardCustomization": {
+        "title": "Personalización del panel",
+        "description": "Personaliza tu panel con widgets y diseños"
+      },
+      "installApp": {
+        "title": "Cómo instalar la aplicación",
+        "description": "Agrega OnRopePro a tu pantalla de inicio para acceso rápido"
+      }
+    },
     "search": {
       "placeholder": "Haz una pregunta o busca ayuda sobre proyectos, seguridad, programación...",
       "label": "Buscar",
