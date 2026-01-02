@@ -54,6 +54,7 @@ interface WorkSession {
   employeeRole: string | null;
   projectName: string | null;
   projectAddress: string | null;
+  dailyDropTarget: number | null;
 }
 
 interface ProjectGroup {
@@ -259,8 +260,8 @@ export function WorkSessionsExplorer({ branding }: WorkSessionsExplorerProps) {
             doc.text(`${projectData.projectName} (${projectData.sessions.length} sessions, ${formatDuration(projectData.totalHours)})`, margin + 5, yPos);
             yPos += 6;
 
-            const headers = ['Date', 'Employee', 'Clock In', 'Clock Out', 'Hours', 'Drops'];
-            const colWidths = [25, 45, 25, 25, 22, 23];
+            const headers = ['Date', 'Employee', 'Clock In', 'Clock Out', 'Hours', 'Drops', 'Status'];
+            const colWidths = [22, 38, 22, 22, 18, 18, 25];
 
             doc.setFillColor(240, 240, 240);
             doc.rect(margin, yPos - 4, pageWidth - margin * 2, 7, 'F');
@@ -297,12 +298,25 @@ export function WorkSessionsExplorer({ branding }: WorkSessionsExplorerProps) {
                                  (session.dropsCompletedSouth || 0) + 
                                  (session.dropsCompletedWest || 0);
               
+              // Determine target met status
+              const dailyTarget = session.dailyDropTarget || 0;
+              let targetStatus = '-';
+              if (dailyTarget > 0) {
+                if (totalDrops >= dailyTarget) {
+                  targetStatus = 'Met';
+                } else if (session.shortfallReason) {
+                  targetStatus = 'Valid Reason';
+                } else {
+                  targetStatus = 'Below';
+                }
+              }
+              
               xPos = margin + 2;
               doc.text(workDate, xPos, yPos);
               xPos += colWidths[0];
               
               const employeeName = session.employeeName || 'Unknown';
-              doc.text(employeeName.substring(0, 18), xPos, yPos);
+              doc.text(employeeName.substring(0, 15), xPos, yPos);
               xPos += colWidths[1];
               
               doc.text(clockIn, xPos, yPos);
@@ -315,6 +329,18 @@ export function WorkSessionsExplorer({ branding }: WorkSessionsExplorerProps) {
               xPos += colWidths[4];
               
               doc.text(totalDrops > 0 ? totalDrops.toString() : '-', xPos, yPos);
+              xPos += colWidths[5];
+              
+              // Set color based on status
+              if (targetStatus === 'Met') {
+                doc.setTextColor(34, 139, 34); // Green
+              } else if (targetStatus === 'Valid Reason') {
+                doc.setTextColor(218, 165, 32); // Yellow/Gold
+              } else if (targetStatus === 'Below') {
+                doc.setTextColor(220, 53, 69); // Red
+              }
+              doc.text(targetStatus, xPos, yPos);
+              doc.setTextColor(40, 40, 40); // Reset color
               yPos += 5;
             }
 

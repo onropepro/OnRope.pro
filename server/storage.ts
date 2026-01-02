@@ -1425,6 +1425,7 @@ export class Storage {
       employeeRole: users.role,
       projectName: projects.buildingName,
       projectAddress: projects.buildingAddress,
+      dailyDropTarget: projects.dailyDropTarget,
     })
       .from(workSessions)
       .leftJoin(users, eq(workSessions.employeeId, users.id))
