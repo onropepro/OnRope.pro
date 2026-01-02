@@ -545,11 +545,13 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                     <FormLabel>{t("onboarding.client.company", "Company (Optional)")}</FormLabel>
                     <FormControl>
                       <Input 
-                        {...field} 
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        ref={field.ref}
                         placeholder="ABC Property Management" 
-                        autoComplete="off" 
-                        data-1p-ignore="true" 
-                        data-lpignore="true" 
+                        autoComplete="new-password"
                         data-testid="input-client-company"
                       />
                     </FormControl>
