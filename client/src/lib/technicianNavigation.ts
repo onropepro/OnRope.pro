@@ -19,13 +19,14 @@ type Language = 'en' | 'fr' | 'es';
 export interface TechnicianNavOptions {
   pendingInvitationsCount?: number;
   unreadFeedbackCount?: number;
+  hasPlusAccess?: boolean;
 }
 
 export function getTechnicianNavGroups(
   language: Language,
   options?: TechnicianNavOptions
 ): NavGroup[] {
-  const { pendingInvitationsCount = 0, unreadFeedbackCount = 0 } = options || {};
+  const { pendingInvitationsCount = 0, unreadFeedbackCount = 0, hasPlusAccess = false } = options || {};
   
   return [
     {
@@ -81,6 +82,7 @@ export function getTechnicianNavGroups(
           icon: Eye,
           href: "/technician-portal?tab=visibility",
           isVisible: () => true,
+          requiresPlus: !hasPlusAccess,
         },
         {
           id: "invitations",

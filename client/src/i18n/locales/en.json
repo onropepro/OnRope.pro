@@ -863,6 +863,7 @@
     "language": "Language"
   },
   "common": {
+    "helpMeGetStarted": "Help me get started",
     "startFreeTrial": "Start Your Free 30-Day Trial",
     "signIn": "Sign In",
     "loading": "Loading...",
@@ -985,7 +986,6 @@
     "logout": "Logout",
     "login": "Login",
     "register": "Register",
-    "signIn": "Sign In",
     "signUp": "Sign Up",
     "signOut": "Sign Out",
     "password": "Password",
@@ -2742,6 +2742,8 @@
     "title": "Job Schedule",
     "subtitle": "Manage scheduled jobs and employee assignments",
     "loading": "Loading...",
+    "fullscreen": "Full Screen Calendar",
+    "exitFullscreen": "Exit Full Screen",
     "accessDenied": "Access Denied",
     "accessDeniedMessage": "You don't have permission to view the Job Schedule. Please contact your administrator to request access.",
     "returnToDashboard": "Return to Dashboard",
@@ -9539,5 +9541,127 @@
     "published": "Published",
     "draft": "Draft",
     "preview": "Preview as Resident"
+  },
+  "buildingManagerLanding": {
+    "hero": {
+      "badge": "For Building Managers",
+      "title": "Your Building. Your Visibility.",
+      "titleHighlight": "No More Chasing Contractors.",
+      "subtitle": "See exactly what's happening with rope access work on your building - without waiting for callbacks or status emails.",
+      "subtitleStrong": "Real-time progress. Resident feedback. Complete documentation.",
+      "signIn": "Sign In to Portal",
+      "learnMore": "Learn More",
+      "freeAccount": "Building Manager accounts are always free.",
+      "autoAccountDetails": "Your account is created automatically when a rope access company using OnRopePro starts a project on your building. Your login and initial password are both your strata/plan number (e.g., LMS1234)."
+    },
+    "problem": {
+      "title": "The Problem",
+      "statement": "You're responsible for building maintenance...",
+      "p1": "But you never know when work is actually happening.",
+      "p2": "Status updates require endless phone calls.",
+      "p3": "Resident complaints get lost between parties.",
+      "solution": "OnRopePro changes everything."
+    },
+    "connections": {
+      "title": "Stay Connected to Your Building",
+      "subtitle": "Everything you need to know, when you need to know it",
+      "progress": {
+        "title": "Real-Time Progress",
+        "description": "Watch work progress on your building with visual elevation tracking"
+      },
+      "feedback": {
+        "title": "Resident Feedback",
+        "description": "See what residents are saying about the work in real-time"
+      },
+      "history": {
+        "title": "Complete History",
+        "description": "Access full project history and documentation anytime"
+      },
+      "documentation": {
+        "title": "Documentation",
+        "description": "All safety documents and work notices in one place"
+      }
+    },
+    "faqs": {
+      "title": "Frequently Asked Questions",
+      "q1": {
+        "question": "How do I get access to the Building Portal?",
+        "answer": "Your account is created automatically when a rope access company using OnRopePro starts a project on your building. You'll receive access credentials via email, or you can log in using your strata/plan number as both username and password."
+      },
+      "q2": {
+        "question": "What can I see in the Building Portal?",
+        "answer": "You can view real-time work progress, resident feedback, work notices, project history, and all safety documentation. You can also update building access instructions for technicians."
+      },
+      "q3": {
+        "question": "Can I communicate with the rope access company?",
+        "answer": "Yes! You can view company contact information, access resident complaints that have been submitted, and review work notices. The vendor company can see your building access instructions and special requirements."
+      },
+      "q4": {
+        "question": "How do I update building access instructions?",
+        "answer": "In the Building Instructions section, you can update access codes, key fob information, roof access details, and any special requests. This information is shared with technicians working on your building."
+      },
+      "q5": {
+        "question": "Is my building information secure?",
+        "answer": "Absolutely. All data is encrypted and only accessible to authorized users. Building managers can only see projects associated with their specific building. We recommend changing your password from the default immediately after first login."
+      }
+    },
+    "cta": {
+      "title": "Ready to Take Control?",
+      "subtitle": "Sign in to your Building Portal and stay connected to your building maintenance.",
+      "signIn": "Sign In Now",
+      "learnMore": "Learn More"
+    }
+  },
+  "footer": {
+    "platform": {
+      "title": "PLATFORM",
+      "projectManagement": "Project Management",
+      "schedulingCalendar": "Scheduling & Calendar",
+      "safetyCompliance": "Safety & Compliance",
+      "employeeManagement": "Employee Management",
+      "crmClientPortal": "CRM & Client Portal",
+      "quotingSales": "Quoting & Sales"
+    },
+    "technicians": {
+      "title": "TECHNICIANS",
+      "passportLogbook": "Passport & Logbook",
+      "jobBoard": "Job Board",
+      "personalSafetyRating": "Personal Safety Rating",
+      "groundCrew": "Ground Crew",
+      "irataTaskLogging": "IRATA Task Logging"
+    },
+    "stakeholders": {
+      "title": "STAKEHOLDERS",
+      "forEmployers": "For Employers",
+      "forTechnicians": "For Technicians",
+      "forPropertyManagers": "For Property Managers",
+      "forBuildingManagers": "For Building Managers",
+      "forResidents": "For Residents"
+    },
+    "resources": {
+      "title": "RESOURCES",
+      "helpCenter": "Help Center",
+      "gettingStarted": "Getting Started",
+      "featureFinder": "Feature Finder",
+      "pricing": "Pricing",
+      "safetyStandards": "Safety Standards"
+    },
+    "legal": {
+      "title": "LEGAL",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "cookiePolicy": "Cookie Policy"
+    },
+    "allRightsReserved": "All rights reserved."
+  },
+  "directions": {
+    "north": "North",
+    "east": "East",
+    "south": "South",
+    "west": "West"
+  },
+  "highRiseBuilding": {
+    "totalDropsComplete": "Total Drops Complete",
+    "exceededWarning": "Some elevations have more drops than planned"
   }
 }

@@ -51,6 +51,7 @@ import {
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
+import { PlusRequiredGate } from "@/components/PlusRequiredGate";
 import { format } from "date-fns";
 import type { JobPosting, User, JobApplication } from "@shared/schema";
 
@@ -718,60 +719,10 @@ export default function TechnicianJobBoard() {
         <main className="px-4 sm:px-6 py-6 space-y-6">
         {/* PLUS Required Gate */}
         {user && !(user as any).hasPlusAccess && (
-          <Card className="border-amber-500/50 bg-gradient-to-r from-amber-500/10 to-transparent">
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <div className="p-4 rounded-full bg-amber-500/20">
-                  <Lock className="w-8 h-8 text-amber-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold flex items-center justify-center gap-2">
-                    <Star className="w-5 h-5 text-amber-500" />
-                    {t.plusRequired}
-                  </h2>
-                  <p className="text-muted-foreground mt-1">{t.plusRequiredDesc}</p>
-                </div>
-                
-                <div className="bg-muted/50 rounded-lg p-4 w-full max-w-md">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    <Gift className="w-4 h-4 text-primary" />
-                    {t.plusBenefits}
-                  </h3>
-                  <ul className="text-sm text-left space-y-2">
-                    {t.plusBenefitsList.map((benefit, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        <span>{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {user?.referralCode && (
-                  <div className="bg-card border rounded-lg p-4 w-full max-w-md">
-                    <h4 className="font-medium mb-2">{t.yourReferralCode}</h4>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 bg-muted px-3 py-2 rounded font-mono text-lg tracking-wider">
-                        {user.referralCode}
-                      </code>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          navigator.clipboard.writeText(user.referralCode || "");
-                          toast({ title: t.codeCopied });
-                        }}
-                        data-testid="button-copy-referral-code"
-                      >
-                        {t.copyCode}
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">{t.shareCode}</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <PlusRequiredGate 
+            referralCode={user?.referralCode} 
+            language={language as 'en' | 'fr' | 'es'} 
+          />
         )}
 
         {/* Main content - only shown for PLUS users */}

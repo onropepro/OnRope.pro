@@ -77,6 +77,7 @@ import { DocumentReviews } from "@/components/DocumentReviews";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { GuidedFormTour, PROJECT_CREATION_TOUR_STEPS } from "@/components/GuidedFormTour";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
 
@@ -1260,6 +1261,7 @@ export default function Dashboard() {
   
   // Project conflict detection state
   const [projectConflictDialogOpen, setProjectConflictDialogOpen] = useState(false);
+  const [projectTourActive, setProjectTourActive] = useState(false);
   const [projectPendingConflicts, setProjectPendingConflicts] = useState<Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>>([]);
   const [pendingProjectData, setPendingProjectData] = useState<any>(null);
   const [selectedInspection, setSelectedInspection] = useState<any>(null);
@@ -3813,7 +3815,7 @@ export default function Dashboard() {
         onComplete={() => setShowOnboardingWizard(false)}
         currentUser={user}
       />
-
+      
       {/* Main Content - sidebar and header are now provided by DashboardLayout wrapper */}
       <div className="flex-1 flex flex-col page-gradient min-h-screen">
       {/* Read-Only Mode Banner - Shows on all tabs */}
@@ -3855,6 +3857,12 @@ export default function Dashboard() {
             harnessInspections={harnessInspections}
             onNavigate={handleTabChange}
             onRouteNavigate={setLocation}
+            onCreateProject={() => {
+              // Navigate to projects tab and open dialog
+              handleTabChange("projects");
+              // Small delay to ensure tab content is rendered before opening dialog
+              setTimeout(() => setShowProjectDialog(true), 50);
+            }}
             branding={branding}
           />
         )}
@@ -3918,6 +3926,23 @@ export default function Dashboard() {
                         <DialogTitle className="text-xl">{t('dashboard.projects.createTitle', 'Create New Project')}</DialogTitle>
                         <DialogDescription>{t('dashboard.projects.createDescription', 'Add a new building maintenance project')}</DialogDescription>
                       </DialogHeader>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setProjectTourActive(true)}
+                        className="mt-3 gap-2"
+                        data-testid="button-help-get-started"
+                      >
+                        <span className="material-icons text-base">help_outline</span>
+                        {t('dashboard.projects.helpMeGetStarted', 'Help me get started')}
+                      </Button>
+                      
+                      {/* Guided tour - renders inline when active */}
+                      <GuidedFormTour
+                        steps={PROJECT_CREATION_TOUR_STEPS}
+                        isActive={projectTourActive}
+                        onClose={() => setProjectTourActive(false)}
+                      />
                     </div>
                     <div className="overflow-y-auto flex-1 p-6">
                       <Form {...projectForm}>
@@ -5087,10 +5112,17 @@ export default function Dashboard() {
                                 progressPercent = total > 0 ? (completed / total) * 100 : 0;
                               }
 
+                              // Create tint style from project calendar color (only if explicitly set) - 30% opacity
+                              const hasCustomColor = project.calendarColor && project.calendarColor.trim() !== '';
+                              const tintStyle = hasCustomColor ? {
+                                background: `linear-gradient(135deg, ${project.calendarColor}4D 0%, ${project.calendarColor}1A 100%)`
+                              } : {};
+
                               return (
                                 <TableRow 
                                   key={project.id}
                                   className="cursor-pointer"
+                                  style={tintStyle}
                                   onClick={() => setLocation(`/projects/${project.id}`)}
                                   data-testid={`project-row-${project.id}`}
                                 >
@@ -5223,10 +5255,17 @@ export default function Dashboard() {
                         unitLabel = t('dashboard.projects.drops', 'drops');
                       }
 
+                      // Create tint style from project calendar color (only if explicitly set) - 30% opacity
+                      const hasCustomColor = project.calendarColor && project.calendarColor.trim() !== '';
+                      const tintStyle = hasCustomColor ? {
+                        background: `linear-gradient(135deg, ${project.calendarColor}4D 0%, ${project.calendarColor}1A 100%)`
+                      } : {};
+
                       return (
                         <Card 
                           key={project.id} 
-                          className="group relative shadow-sm hover:shadow-md hover:bg-muted/50 transition-all duration-200 cursor-pointer" 
+                          className={`group relative shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${hasCustomColor ? '!bg-transparent' : ''}`}
+                          style={tintStyle}
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >

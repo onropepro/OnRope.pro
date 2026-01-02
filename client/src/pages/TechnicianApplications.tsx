@@ -29,6 +29,7 @@ import {
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
+import { PlusRequiredGate } from "@/components/PlusRequiredGate";
 import { format } from "date-fns";
 import type { JobPosting, JobApplication } from "@shared/schema";
 
@@ -481,16 +482,10 @@ export default function TechnicianApplications() {
           </div>
 
           {!user?.hasPlusAccess ? (
-            <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
-              <CardContent className="p-6 text-center">
-                <Lock className="w-12 h-12 mx-auto text-amber-500 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">{t.plusRequired}</h3>
-                <p className="text-muted-foreground mb-4">{t.plusRequiredDesc}</p>
-                <Button onClick={() => setLocation("/technician-portal?tab=referrals")} data-testid="button-unlock-plus">
-                  {t.unlockWithReferral}
-                </Button>
-              </CardContent>
-            </Card>
+            <PlusRequiredGate 
+              referralCode={user?.referralCode} 
+              language={language as 'en' | 'fr' | 'es'} 
+            />
           ) : isLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />

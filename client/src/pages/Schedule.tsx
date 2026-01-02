@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown, Maximize2, Minimize2 } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { ScheduledJobWithAssignments, User, EmployeeTimeOff } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
@@ -90,6 +90,10 @@ export default function Schedule() {
   const hasEditPermission = canEditSchedule(currentUser);
 
   // ALL HOOKS MUST BE DEFINED BEFORE ANY EARLY RETURNS (React rules of hooks)
+  
+  // Fullscreen calendar mode
+  const [isCalendarFullscreen, setIsCalendarFullscreen] = useState(false);
+  const [isTimelineFullscreen, setIsTimelineFullscreen] = useState(false);
   
   // Time off dialog state
   const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
@@ -300,14 +304,16 @@ export default function Schedule() {
       const startDate = assignment.startDate || job.startDate;
       const endDate = assignment.endDate || job.endDate;
       
+      // Use job color, then project's calendar color, then default
+      const eventColor = job.color || job.project?.calendarColor || defaultJobColor;
       return {
         id: `${job.id}-${assignment.employee.id}`,
         resourceId: assignment.employee.id,
         title: job.project?.buildingName || job.title,
         start: startDate,
         end: endDate,
-        backgroundColor: job.color || defaultJobColor,
-        borderColor: job.color || defaultJobColor,
+        backgroundColor: eventColor,
+        borderColor: eventColor,
         extendedProps: {
           job,
           employee: assignment.employee,
@@ -409,7 +415,8 @@ export default function Schedule() {
   // Create separate event blocks for each day in multi-day jobs
   // Uses timezone-safe date utilities to prevent date shifting
   const events: EventInput[] = jobs.flatMap((job) => {
-    const color = job.color || defaultJobColor;
+    // Use job color, then project's calendar color, then default
+    const color = job.color || job.project?.calendarColor || defaultJobColor;
     // Use project dates if job is linked to a project, otherwise use job dates
     const rawStartDate = job.project?.startDate || job.startDate;
     const rawEndDate = job.project?.endDate || job.endDate;
@@ -440,10 +447,12 @@ export default function Schedule() {
         start: startDateStr,
         end: nextDateOnly(startDateStr),
         allDay: true,
-        backgroundColor: color,
+        backgroundColor: 'transparent',
         borderColor: color,
+        order: startDateStr,
         extendedProps: {
           job,
+          jobColor: color,
           employeesForThisDay,
         },
       }];
@@ -474,10 +483,12 @@ export default function Schedule() {
         start: currentDateStr,
         end: nextDateOnly(currentDateStr),
         allDay: true,
-        backgroundColor: color,
+        backgroundColor: 'transparent',
         borderColor: color,
+        order: startDateStr,
         extendedProps: {
           job,
+          jobColor: color,
           employeesForThisDay,
         },
       });
@@ -927,13 +938,14 @@ export default function Schedule() {
         // Use assignment-specific dates
         const startStr = toLocalDateString(assignment.startDate);
         const endStr = toLocalDateString(assignment.endDate);
+        const eventColor = job.color || job.project?.calendarColor || defaultJobColor;
         return [{
           id: `${job.id}-${currentUser.id}`,
           title: job.project?.buildingName || job.title,
           start: startStr,
           end: nextDateOnly(endStr),
-          backgroundColor: job.color || defaultJobColor,
-          borderColor: job.color || defaultJobColor,
+          backgroundColor: eventColor,
+          borderColor: eventColor,
           extendedProps: {
             jobId: job.id,
             projectId: job.projectId,
@@ -944,13 +956,14 @@ export default function Schedule() {
         }];
       }
       // Fallback to job dates
+      const fallbackColor = job.color || job.project?.calendarColor || defaultJobColor;
       return [{
         id: job.id,
         title: job.project?.buildingName || job.title,
         start: job.startDate,
         end: nextDateOnly(job.endDate),
-        backgroundColor: job.color || defaultJobColor,
-        borderColor: job.color || defaultJobColor,
+        backgroundColor: fallbackColor,
+        borderColor: fallbackColor,
         extendedProps: {
           jobId: job.id,
           projectId: job.projectId,
@@ -1043,7 +1056,7 @@ export default function Schedule() {
                     >
                       <div 
                         className="w-3 h-12 rounded-full flex-shrink-0" 
-                        style={{ backgroundColor: job.color || defaultJobColor }}
+                        style={{ backgroundColor: job.color || job.project?.calendarColor || defaultJobColor }}
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{job.project?.buildingName || job.title}</p>
@@ -1324,7 +1337,30 @@ export default function Schedule() {
         </TabsList>
 
         <TabsContent value="job-schedule" className="mt-4">
-          <div className="bg-card rounded-lg shadow-premium p-6">
+          <div className={`transition-all duration-300 ${isCalendarFullscreen ? 'fixed inset-0 z-[250] overflow-auto bg-background p-6 pt-20' : 'bg-card rounded-lg shadow-premium p-6'}`}>
+            {/* Fullscreen Toggle Button - Very Prominent */}
+            <div className={`flex items-center justify-end mb-4 ${isCalendarFullscreen ? 'fixed top-4 right-4 z-[260]' : ''}`}>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => setIsCalendarFullscreen(!isCalendarFullscreen)}
+                className="gap-2 font-bold shadow-lg"
+                data-testid="button-fullscreen-calendar"
+              >
+                {isCalendarFullscreen ? (
+                  <>
+                    <Minimize2 className="w-5 h-5" />
+                    {t('schedule.exitFullscreen', 'Exit Full Screen')}
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="w-5 h-5" />
+                    {t('schedule.fullscreen', 'Full Screen Calendar')}
+                  </>
+                )}
+              </Button>
+            </div>
+            
             {activeEmployeeId && (
               <div className="mb-4 p-3 bg-primary/10 border-2 border-primary rounded-lg">
                 <p className="text-sm font-semibold text-primary">
@@ -1370,11 +1406,12 @@ export default function Schedule() {
               }
               
               .schedule-calendar-wrapper .fc-event {
-                border-radius: 6px;
-                border: none;
-                padding: 4px 8px;
+                border-radius: 4px;
+                border: 1px solid hsl(var(--border));
+                background: transparent;
+                padding: 0;
                 font-size: 0.875rem;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
               }
               
               .schedule-calendar-wrapper .fc-event-title {
@@ -1420,6 +1457,8 @@ export default function Schedule() {
               displayEventTime={false}
               displayEventEnd={false}
               eventDisplay="block"
+              eventOrder="order,title"
+              eventOrderStrict={true}
               data-testid="calendar"
               eventDidMount={(info) => {
                 if (info.event.extendedProps.isTimeOff) {
@@ -1461,6 +1500,7 @@ export default function Schedule() {
                 }
 
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+                const jobColor = eventInfo.event.extendedProps.jobColor || job.color || job.project?.calendarColor || defaultJobColor;
                 const employeesForThisDay = eventInfo.event.extendedProps.employeesForThisDay || [];
                 const isHighlighted = activeEmployeeId !== null;
                 const currentlyAssigned = job.assignedEmployees?.some(e => e.id === activeEmployeeId);
@@ -1470,41 +1510,40 @@ export default function Schedule() {
                   <div 
                     className="fc-event-main-frame" 
                     style={{ 
-                      padding: '2px 4px', 
+                      padding: '2px 4px 2px 8px', 
                       overflow: 'hidden',
                       backgroundColor: isDropTarget 
-                        ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.3)' : 'rgba(34, 197, 94, 0.3)')
+                        ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.15)' : 'rgba(34, 197, 94, 0.15)')
                         : isHighlighted 
-                          ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)')
-                          : undefined,
+                          ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.08)' : 'rgba(34, 197, 94, 0.08)')
+                          : 'hsl(var(--card))',
+                      borderLeft: `4px solid ${jobColor}`,
+                      borderRadius: '4px',
                       outline: isDropTarget ? '3px solid rgba(14, 165, 233, 1)' : isHighlighted ? '2px dashed rgba(14, 165, 233, 0.5)' : undefined,
                       outlineOffset: '-2px',
-                      cursor: isHighlighted ? 'pointer' : 'pointer',
+                      cursor: 'pointer',
                     }}
                   >
                     <div className="fc-event-title-container">
-                      {job.project?.buildingName && (
-                        <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                          {job.project.buildingName}
-                        </div>
-                      )}
-                      <div style={{ fontSize: '0.875rem', opacity: 0.9, marginTop: '1px' }}>
-                        {job.project?.strataPlanNumber || job.title}
+                      <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.8rem', color: 'hsl(var(--foreground))' }}>
+                        {job.project?.buildingName || job.title}
                       </div>
                       {employeesForThisDay && employeesForThisDay.length > 0 && (
-                        <div style={{ fontSize: '0.875rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.4, marginTop: '4px' }}>
+                        <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3, marginTop: '2px' }}>
                           {employeesForThisDay.map((assignment: any, idx: number) => (
                             <div key={idx} style={{ 
-                              fontWeight: 600, 
-                              backgroundColor: 'rgba(255,255,255,0.3)',
-                              padding: '3px 8px',
-                              borderRadius: '4px',
-                              marginTop: '3px',
+                              fontWeight: 500, 
+                              backgroundColor: 'transparent',
+                              color: 'hsl(var(--foreground))',
+                              border: `1px solid ${jobColor}`,
+                              padding: '1px 5px',
+                              borderRadius: '3px',
+                              marginTop: '2px',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '5px'
+                              gap: '3px'
                             }}>
-                              <UserIcon style={{ width: '14px', height: '14px', flexShrink: 0 }} />
+                              <UserIcon style={{ width: '11px', height: '11px', flexShrink: 0, color: jobColor }} />
                               <span>{assignment.employee.name}</span>
                             </div>
                           ))}
@@ -1532,8 +1571,31 @@ export default function Schedule() {
 
         <TabsContent value="employee-schedule" className="mt-4">
           <div 
-            className="rounded-lg border bg-card p-4 md:p-6 relative"
+            className={`transition-all duration-300 ${isTimelineFullscreen ? 'fixed inset-0 z-[250] overflow-auto bg-background p-6 pt-20' : 'rounded-lg border bg-card p-4 md:p-6 relative'}`}
           >
+            {/* Fullscreen Toggle Button - Same as Job Schedule calendar */}
+            <div className={`flex items-center justify-end mb-4 ${isTimelineFullscreen ? 'fixed top-4 right-4 z-[260]' : ''}`}>
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => setIsTimelineFullscreen(!isTimelineFullscreen)}
+                className="gap-2 font-bold shadow-lg"
+                data-testid="button-fullscreen-timeline"
+              >
+                {isTimelineFullscreen ? (
+                  <>
+                    <Minimize2 className="w-5 h-5" />
+                    {t('schedule.exitFullscreen', 'Exit Full Screen')}
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="w-5 h-5" />
+                    {t('schedule.fullscreen', 'Full Screen Calendar')}
+                  </>
+                )}
+              </Button>
+            </div>
+            
             {/* Timeline Navigation Header - Mobile optimized */}
             <div className="flex flex-col gap-3 mb-4 md:mb-6 relative z-10">
               {/* View mode toggle */}
@@ -1609,15 +1671,15 @@ export default function Schedule() {
                 </div>
               </div>
               
-              {/* Action button (full width on mobile) */}
+              {/* Action button - next to navigation */}
               <Button 
                 variant="outline"
                 size="sm"
                 onClick={() => setTimeOffDialogOpen(true)}
                 data-testid="button-schedule-time-off"
-                className="w-full md:w-auto md:absolute md:top-0 md:right-0"
+                className="gap-1.5"
               >
-                <Calendar className="h-4 w-4 mr-2" />
+                <Calendar className="h-3.5 w-3.5" />
                 {t('schedule.scheduleTimeOff', 'Schedule Time Off')}
               </Button>
             </div>
@@ -1737,7 +1799,7 @@ export default function Schedule() {
                                       <div 
                                         className={`rounded font-medium text-white truncate cursor-pointer hover-elevate ${timeOff ? 'opacity-60' : ''} ${isMonthView ? 'px-0.5 py-0.5 text-[8px]' : 'px-2 py-1.5 text-xs'}`}
                                         style={{ 
-                                          backgroundColor: job.color || defaultJobColor,
+                                          backgroundColor: job.color || job.project?.calendarColor || defaultJobColor,
                                           filter: 'saturate(0.85) brightness(1.05)'
                                         }}
                                         onClick={() => {
@@ -2742,7 +2804,12 @@ function JobDetailDialog({
     console.log("Setting dates:", startDate, endDate);
     setAssignmentDates({ startDate, endDate });
     console.log("Opening dialog");
-    setAssignDialogOpen(true);
+    // Close the job detail dialog first so the sheet appears on top
+    onOpenChange(false);
+    // Use setTimeout to ensure dialog closes before sheet opens
+    setTimeout(() => {
+      setAssignDialogOpen(true);
+    }, 100);
   };
 
   const handleSaveAssignment = () => {
@@ -3013,7 +3080,7 @@ function JobDetailDialog({
 
     {job && (
       <Sheet open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
-        <SheetContent>
+        <SheetContent className="z-[60]">
           <SheetHeader>
             <SheetTitle>{t('schedule.assignEmployee', 'Assign Employee to Job')}</SheetTitle>
             <SheetDescription>

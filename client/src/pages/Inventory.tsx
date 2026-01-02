@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { useLocation } from "wouter";
@@ -18,7 +18,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight, Triangle, Signpost, Disc, Wand2 } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, Zap, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench, Search, ChevronDown, ChevronRight, Triangle, Signpost, Disc, Wand2, HelpCircle } from "lucide-react";
+import { GuidedFormTour, TourStep } from "@/components/GuidedFormTour";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
@@ -114,6 +115,8 @@ export default function Inventory() {
   const [, setLocation] = useLocation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [isGearTourActive, setIsGearTourActive] = useState(false);
+  const addDialogRef = useRef<HTMLDivElement>(null);
   const [editingItem, setEditingItem] = useState<GearItem | null>(null);
   type SerialNumberEntry = {
     serialNumber: string;
@@ -213,6 +216,65 @@ export default function Inventory() {
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
   const hasInventoryAccess = canAccessInventory(currentUser);
+
+  // Gear inventory tour steps based on gear-inventory.md documentation
+  const gearInventoryTourSteps: TourStep[] = addItemStep === 1 ? [
+    {
+      fieldSelector: '[data-testid="card-type-harness"]',
+      title: t('gearTour.selectType.title', 'Select Equipment Type'),
+      explanation: t('gearTour.selectType.explanation', 'Choose the type of equipment you want to add to your inventory. The system includes all standard rope access gear: harnesses, ropes, carabiners, descenders, ascenders, helmets, and more.'),
+      appContext: t('gearTour.selectType.context', 'Each type has pre-populated manufacturer models to speed up entry. Select "Other" for custom equipment.')
+    }
+  ] : [
+    {
+      fieldSelector: '[data-testid="input-catalog-search"]',
+      title: t('gearTour.catalog.title', 'Equipment Catalog'),
+      explanation: t('gearTour.catalog.explanation', 'Search our pre-populated catalog of industry-standard equipment from major manufacturers like Petzl, CMC, Rock Exotica, Skylotec, ISC, and Kong.'),
+      appContext: t('gearTour.catalog.context', 'Select from the catalog for quick entry, or use "Other" to add custom gear to the shared database.')
+    },
+    {
+      fieldSelector: '[data-testid="input-brand"]',
+      title: t('gearTour.brand.title', 'Brand / Manufacturer'),
+      explanation: t('gearTour.brand.explanation', 'Enter the manufacturer name. This is auto-filled when selecting from the catalog but can be edited for custom entries.'),
+      appContext: t('gearTour.brand.context', 'Accurate brand info helps with warranty claims, parts ordering, and manufacturer recall tracking.')
+    },
+    {
+      fieldSelector: '[data-testid="input-model"]',
+      title: t('gearTour.model.title', 'Model Name'),
+      explanation: t('gearTour.model.explanation', 'Specify the exact model name. When adding custom models via "Other", your additions benefit all companies using the platform.'),
+      appContext: t('gearTour.model.context', 'The equipment catalog grows as companies add new models.')
+    },
+    {
+      fieldSelector: '[data-testid="input-quantity"]',
+      title: t('gearTour.quantity.title', 'Total Quantity Owned'),
+      explanation: t('gearTour.quantity.explanation', 'How many of this exact item your company owns. This is the key to the slot-based availability system: Available = Quantity - Assigned.'),
+      appContext: t('gearTour.quantity.context', 'Example: 10 harnesses owned, 4 assigned to employees = 6 available for new assignments.')
+    },
+    {
+      fieldSelector: '[data-testid="input-current-serial"]',
+      title: t('gearTour.serial.title', 'Serial Number (Optional)'),
+      explanation: t('gearTour.serial.explanation', 'Add serial numbers to track individual units. Useful for warranty claims, inspection history, and identifying specific items.'),
+      appContext: t('gearTour.serial.context', 'The Golden Rule: Serial numbers have NO effect on availability. Availability = Quantity - Assigned.')
+    },
+    {
+      fieldSelector: '[data-testid="input-current-date-manufacture"]',
+      title: t('gearTour.manufacture.title', 'Date of Manufacture'),
+      explanation: t('gearTour.manufacture.explanation', 'Found on the equipment label. Critical for service life calculations. Typical: 5 years for hard gear, 10 years for soft gear.'),
+      appContext: t('gearTour.manufacture.context', 'Service life calculations are guidelines. Actual replacement depends on usage and inspection results.')
+    },
+    {
+      fieldSelector: '[data-testid="input-current-date-service"]',
+      title: t('gearTour.inService.title', 'Date In Service'),
+      explanation: t('gearTour.inService.explanation', 'When this equipment was first put into active use. IRATA/SPRAT and manufacturer requirements often reference in-service date.'),
+      appContext: t('gearTour.inService.context', 'For new gear, this is when it was issued. For used gear, enter the original in-service date if known.')
+    },
+    ...(canViewFinancials ? [{
+      fieldSelector: '[data-testid="input-price"]',
+      title: t('gearTour.price.title', 'Unit Price'),
+      explanation: t('gearTour.price.explanation', 'Purchase price per unit. Only visible to users with financial access. Used for asset valuation and replacement budgeting.'),
+      appContext: t('gearTour.price.context', 'Track equipment costs for insurance documentation and capital planning.')
+    }] : [])
+  ];
 
   // Set default tab based on user role - company owners go directly to manage gear
   useEffect(() => {
@@ -2824,16 +2886,40 @@ export default function Inventory() {
       </div>
 
       {/* Add Item Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent data-testid="dialog-add-item" className="max-w-2xl flex flex-col max-h-[90vh]">
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
-            <DialogDescription>
-              {addItemStep === 1 ? t('inventory.dialog.chooseGearType', "Choose the type of gear you're adding") : t('inventory.dialog.fillItemInfo', 'Fill in the item information')}
-            </DialogDescription>
-          </DialogHeader>
+      <Dialog open={showAddDialog} onOpenChange={(open) => {
+        setShowAddDialog(open);
+        if (!open) setIsGearTourActive(false);
+      }}>
+        <DialogContent data-testid="dialog-add-item" className="max-w-2xl p-0 max-h-[90vh] flex flex-col gap-0" ref={addDialogRef}>
+          <div className="p-6 border-b bg-card flex-shrink-0">
+            <DialogHeader>
+              <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
+              <DialogDescription>
+                {addItemStep === 1 ? t('inventory.dialog.chooseGearType', "Choose the type of gear you're adding") : t('inventory.dialog.fillItemInfo', 'Fill in the item information')}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsGearTourActive(true)}
+              className="mt-3 gap-2"
+              data-testid="button-help-get-started-inventory"
+            >
+              <span className="material-icons text-base">help_outline</span>
+              {t('common.helpMeGetStarted', 'Help me get started')}
+            </Button>
+            
+            {/* Guided tour - renders inline when active */}
+            <GuidedFormTour
+              steps={gearInventoryTourSteps}
+              isActive={isGearTourActive}
+              onClose={() => setIsGearTourActive(false)}
+            />
+          </div>
+          <div className="overflow-y-auto flex-1 p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleAddItem)} className="flex flex-col flex-1 min-h-0 space-y-4">
+            <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-4">
               
               {addItemStep === 1 && (
                 <>
@@ -2842,7 +2928,7 @@ export default function Inventory() {
                     name="equipmentType"
                     render={({ field }) => (
                       <FormItem>
-                        <div className="grid grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto p-1">
+                        <div className="grid grid-cols-3 gap-3">
                           {gearTypes.map((type) => {
                             const IconComponent = type.icon;
                             return (
@@ -3553,6 +3639,7 @@ export default function Inventory() {
               )}
             </form>
           </Form>
+          </div>
         </DialogContent>
       </Dialog>
 

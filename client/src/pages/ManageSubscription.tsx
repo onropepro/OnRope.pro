@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { useSetHeaderConfig } from "@/components/DashboardLayout";
 import { 
-  ArrowLeft,
   CreditCard, 
   AlertCircle, 
   Crown,
@@ -207,9 +207,15 @@ export default function ManageSubscription() {
     },
   });
 
+  // Set header config for unified dashboard header
+  useSetHeaderConfig({
+    pageTitle: t('subscription.manageSubscription', 'Manage Subscription'),
+    pageDescription: t('subscription.manageDescription', 'View and manage your subscription and add-ons'),
+  }, [t]);
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex items-center justify-center p-12">
         <div className="text-center">
           <div className="text-lg font-medium">Loading subscription details...</div>
         </div>
@@ -219,27 +225,16 @@ export default function ManageSubscription() {
 
   if (!subscriptionData) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-4xl mx-auto">
-          <Button
-            variant="ghost"
-            onClick={() => setLocation("/profile")}
-            className="mb-6"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Profile
-          </Button>
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center">
-                <AlertCircle className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <h2 className="text-xl font-semibold mb-2">No Active Subscription</h2>
-                <p className="text-muted-foreground">You don't have an active subscription.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="p-6 max-w-4xl mx-auto">
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <AlertCircle className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <h2 className="text-xl font-semibold mb-2">No Active Subscription</h2>
+              <p className="text-muted-foreground">You don't have an active subscription.</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -250,25 +245,8 @@ export default function ManageSubscription() {
   const renewalDate = formatTimestampDate(subscriptionData.currentPeriodEnd);
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => setLocation("/profile")}
-            className="mb-4"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Profile
-          </Button>
-          <h1 className="text-3xl font-bold">Manage Subscription</h1>
-          <p className="text-muted-foreground mt-2">
-            View and manage your subscription and add-ons
-          </p>
-        </div>
-
+    <div className="p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Main Subscription */}
         <Card className="mb-6" data-testid="card-main-subscription">
           <CardHeader>

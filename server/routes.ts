@@ -1967,6 +1967,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = await storage.getUserByRopeAccessLicense(identifier);
       }
       
+      // Also check for building strata number (for building manager login)
+      if (!user) {
+        const normalizedStrata = identifier.toUpperCase().replace(/\s+/g, '');
+        const building = await storage.verifyBuildingPassword(normalizedStrata, password);
+        if (building) {
+          req.session.userId = building.id;
+          req.session.role = 'building';
+          req.session.buildingId = building.id;
+          req.session.strataPlanNumber = building.strataPlanNumber;
+          await new Promise<void>((resolve, reject) => {
+            req.session.save((err) => {
+              if (err) reject(err);
+              else resolve();
+            });
+          });
+          const { passwordHash, ...buildingData } = building;
+          return res.json({
+            message: 'Login successful',
+            user: {
+              id: building.id,
+              role: 'building_manager',
+              name: building.buildingName || building.strataPlanNumber,
+              strataPlanNumber: building.strataPlanNumber,
+              buildingName: building.buildingName,
+            }
+          });
+        }
+      }
+      
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -5557,6 +5586,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Handle Building Manager session
+      if (req.session.role === 'building') {
+        const building = await storage.getBuildingById(req.session.buildingId || req.session.userId!);
+        if (!building) {
+          return res.status(404).json({ message: "Building not found" });
+        }
+        
+        return res.json({
+          user: {
+            id: building.id,
+            name: building.buildingName || building.strataPlanNumber,
+            fullName: building.buildingName || building.strataPlanNumber,
+            email: building.strataPlanNumber,
+            role: 'building_manager',
+            strataPlanNumber: building.strataPlanNumber,
+            buildingName: building.buildingName,
+            buildingId: building.id,
+          }
+        });
+      }
+      
       let user = await storage.getUserById(req.session.userId!);
       
       if (!user) {
@@ -9130,13 +9180,42 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
   // Create or update building instructions
   app.post("/api/buildings/:buildingId/instructions", async (req: Request, res: Response) => {
     try {
+      // Comprehensive sanitization: convert empty strings to null for all fields
+      // This prevents database errors when empty form fields are submitted
+      const sanitizeValue = (value, isInteger = false) => {
+        if (value === "" || value === undefined || value === null) return null;
+        if (isInteger) {
+          const parsed = parseInt(String(value), 10);
+          return isNaN(parsed) ? null : parsed;
+        }
+        return String(value).trim() || null;
+      };
+      
+      const sanitizedBody = {
+        buildingAccess: sanitizeValue(req.body.buildingAccess),
+        keysAndFob: sanitizeValue(req.body.keysAndFob),
+        keysReturnPolicy: sanitizeValue(req.body.keysReturnPolicy),
+        roofAccess: sanitizeValue(req.body.roofAccess),
+        specialRequests: sanitizeValue(req.body.specialRequests),
+        buildingManagerName: sanitizeValue(req.body.buildingManagerName),
+        buildingManagerPhone: sanitizeValue(req.body.buildingManagerPhone),
+        conciergeNames: sanitizeValue(req.body.conciergeNames),
+        conciergePhone: sanitizeValue(req.body.conciergePhone),
+        conciergeHours: sanitizeValue(req.body.conciergeHours),
+        maintenanceName: sanitizeValue(req.body.maintenanceName),
+        maintenancePhone: sanitizeValue(req.body.maintenancePhone),
+        councilMemberUnits: sanitizeValue(req.body.councilMemberUnits),
+        tradeParkingInstructions: sanitizeValue(req.body.tradeParkingInstructions),
+        tradeParkingSpots: sanitizeValue(req.body.tradeParkingSpots, true),
+        tradeWashroomLocation: sanitizeValue(req.body.tradeWashroomLocation),
+      };
       const { buildingId } = req.params;
 
       // SuperUser can update any building
       if (req.session.userId === 'superuser') {
         const instructions = await storage.upsertBuildingInstructions({
           buildingId,
-          ...req.body,
+          ...sanitizedBody,
           createdByUserId: 'superuser',
           createdByRole: 'superuser',
         });
@@ -9149,7 +9228,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         if (req.session.buildingId === buildingId) {
           const instructions = await storage.upsertBuildingInstructions({
             buildingId,
-            ...req.body,
+            ...sanitizedBody,
             createdByUserId: null, // Building managers don't have user IDs
             createdByRole: 'building_manager',
           });
@@ -9181,7 +9260,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
           if (hasProjectForBuilding) {
             const instructions = await storage.upsertBuildingInstructions({
               buildingId,
-              ...req.body,
+              ...sanitizedBody,
               createdByUserId: user.id,
               createdByRole: 'company',
             });
@@ -10091,18 +10170,27 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
             projectInfo.companyEmail = company?.email || null;
             projectInfo.notes = project.notes || null;
             projectInfo.scheduledDates = project.scheduledDates || [];
+            projectInfo.floorCount = project.floorCount || 25;
+            
+            // Always include drop progress data for building elevation view
+            projectInfo.totalDrops = project.totalDrops || 0;
+            projectInfo.totalDropsNorth = project.totalDropsNorth || 0;
+            projectInfo.totalDropsEast = project.totalDropsEast || 0;
+            projectInfo.totalDropsSouth = project.totalDropsSouth || 0;
+            projectInfo.totalDropsWest = project.totalDropsWest || 0;
+            
+            // Get completed drops from all sources (drop_logs + work_sessions + adjustments)
+            // This uses the same calculation as the employer dashboard for consistency
+            const progress = await storage.getProjectProgress(project.id);
+            projectInfo.completedDropsNorth = progress.north;
+            projectInfo.completedDropsEast = progress.east;
+            projectInfo.completedDropsSouth = progress.south;
+            projectInfo.completedDropsWest = progress.west;
+            projectInfo.completedDrops = progress.total;
             
             // Get progress info based on job type
             if (project.progressType === 'drops') {
               projectInfo.progressType = 'drops';
-              projectInfo.totalDropsNorth = project.totalDropsNorth;
-              projectInfo.totalDropsEast = project.totalDropsEast;
-              projectInfo.totalDropsSouth = project.totalDropsSouth;
-              projectInfo.totalDropsWest = project.totalDropsWest;
-              projectInfo.completedDropsNorth = project.completedDropsNorth;
-              projectInfo.completedDropsEast = project.completedDropsEast;
-              projectInfo.completedDropsSouth = project.completedDropsSouth;
-              projectInfo.completedDropsWest = project.completedDropsWest;
             } else if (project.progressType === 'suites') {
               projectInfo.progressType = 'suites';
               projectInfo.totalSuites = project.totalSuites;
@@ -14378,7 +14466,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         dailyDropTarget: isNonDropJob ? 0 : req.body.dailyDropTarget,
       });
       
-      const project = await storage.createProject(projectData);
+      const project = await storage.createProject({ ...projectData, companyId });
       
       // Auto-create building in global SuperUser database if strata number exists
       if (project.strataPlanNumber) {
@@ -14571,7 +14659,58 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       if (req.body.dropsAdjustmentSouth !== undefined) allowedUpdates.dropsAdjustmentSouth = req.body.dropsAdjustmentSouth;
       if (req.body.dropsAdjustmentWest !== undefined) allowedUpdates.dropsAdjustmentWest = req.body.dropsAdjustmentWest;
       
+      
+      // Add calendar color for project card tinting and calendar display
+      if (req.body.calendarColor !== undefined) allowedUpdates.calendarColor = req.body.calendarColor;
+      
+      // Add coordinates from address autocomplete
+      if (req.body.latitude !== undefined) allowedUpdates.latitude = req.body.latitude;
+      if (req.body.longitude !== undefined) allowedUpdates.longitude = req.body.longitude;
       const updatedProject = await storage.updateProject(id, allowedUpdates);
+      
+      // Auto-sync scheduled job if project dates are updated
+      if (updatedProject.startDate && updatedProject.endDate) {
+        try {
+          // Check if a scheduled job already exists for this project
+          const existingJobs = await storage.getScheduledJobsByCompany(companyId!);
+          const projectJob = existingJobs.find(job => job.projectId === updatedProject.id);
+          
+          const jobTitle = updatedProject.buildingName || (updatedProject.strataPlanNumber ? `${updatedProject.strataPlanNumber} - ${updatedProject.jobType.replace(/_/g, " ")}` : updatedProject.jobType.replace(/_/g, " "));
+          
+          if (projectJob) {
+            // Update existing scheduled job dates
+            await storage.updateScheduledJob(projectJob.id, {
+              startDate: new Date(updatedProject.startDate),
+              endDate: new Date(updatedProject.endDate),
+              title: jobTitle,
+              location: updatedProject.buildingAddress || null,
+              color: updatedProject.calendarColor || "#3b82f6",
+            });
+          } else {
+            // Create new scheduled job for this project
+            await storage.createScheduledJob({
+              companyId: companyId!,
+              projectId: updatedProject.id,
+              title: jobTitle,
+              description: `Auto-scheduled from project update`,
+              jobType: updatedProject.jobType,
+              customJobType: updatedProject.customJobType || null,
+              startDate: new Date(updatedProject.startDate),
+              endDate: new Date(updatedProject.endDate),
+              status: "upcoming",
+              location: updatedProject.buildingAddress || null,
+              color: updatedProject.calendarColor || "#3b82f6",
+              color: updatedProject.calendarColor || "#3b82f6",
+              estimatedHours: updatedProject.estimatedHours || null,
+              actualHours: null,
+              notes: null,
+              createdBy: currentUser.id,
+            });
+          }
+        } catch (scheduleError) {
+          console.error("[Schedule] Failed to auto-sync scheduled job:", scheduleError);
+        }
+      }
       res.json({ project: updatedProject });
     } catch (error) {
       console.error("Update project error:", error);

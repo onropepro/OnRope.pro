@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { PlusRequiredGate } from "@/components/PlusRequiredGate";
 import { UnifiedDashboardHeader } from "@/components/UnifiedDashboardHeader";
 import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 
@@ -1951,6 +1952,7 @@ export default function TechnicianPortal() {
   const technicianNavGroups = getTechnicianNavGroups(language as 'en' | 'fr' | 'es', {
     pendingInvitationsCount: pendingInvitations.length,
     unreadFeedbackCount: totalUnreadFeedback,
+    hasPlusAccess: user?.hasPlusAccess || false,
   });
   
   // Mark all feedback as read when the dialog opens
@@ -4070,8 +4072,15 @@ export default function TechnicianPortal() {
         {/* MY VISIBILITY TAB - What employers see and visibility settings */}
         {activeTab === 'visibility' && user && (
           <>
-            {/* Employer Profile - Glass-morphism container matching Resident Profile style */}
-            {(user.role === 'rope_access_tech' || user.role === 'company') && (
+            {/* Plus Access Required Gate */}
+            {!user.hasPlusAccess ? (
+              <PlusRequiredGate 
+                referralCode={user?.referralCode} 
+                language={language as 'en' | 'fr' | 'es'} 
+              />
+            ) : (
+            /* Employer Profile - Glass-morphism container matching Resident Profile style */
+            (user.role === 'rope_access_tech' || user.role === 'company') && (
               <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
                 {/* Header with title and edit button */}
                 <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
@@ -4391,17 +4400,26 @@ export default function TechnicianPortal() {
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {user.resumeDocuments.filter((u: string) => u && u.trim()).map((doc: string, index: number) => (
-                          <Badge key={index} variant="outline" className="gap-1" data-testid={`badge-resume-${index}`}>
-                            <FileText className="w-3 h-3" />
-                            Resume {index + 1}
-                          </Badge>
+                          <a 
+                            key={index}
+                            href={doc} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="cursor-pointer"
+                            data-testid={`link-resume-${index}`}
+                          >
+                            <Badge variant="outline" className="gap-1 cursor-pointer hover-elevate" data-testid={`badge-resume-${index}`}>
+                              <FileText className="w-3 h-3" />
+                              Resume {index + 1}
+                            </Badge>
+                          </a>
                         ))}
                       </div>
                     </div>
                   )}
                 </div>
               </div>
-            )}
+            ))}
           </>
         )}
         

@@ -597,6 +597,8 @@ This pattern allows the header's profile dropdown to navigate to tabs within the
 - Project/building context for residents
 - Vendor connection context for property managers
 
+**BuildingPortal** (`/building-portal`) uses a **standalone layout** with no sidebar. It has its own login flow using strata plan number credentials. See [building-manager-dashboard-instructions-v1.0.md](./building-manager-dashboard-instructions-v1.0.md) for details.
+
 These are **intentional architectural decisions** documented here as SSOT.
 
 ---

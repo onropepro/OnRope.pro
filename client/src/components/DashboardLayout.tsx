@@ -128,6 +128,16 @@ function DashboardLayoutInner({
   // Mobile sidebar state - controlled by DashboardLayout for all variants
   const [mobileOpen, setMobileOpen] = useState(false);
   
+  // Desktop sidebar collapsed state
+  const [desktopCollapsed, setDesktopCollapsed] = useState(() => {
+    try {
+      const stored = localStorage.getItem('sidebar-desktop-collapsed');
+      return stored === 'true';
+    } catch {
+      return false;
+    }
+  });
+  
   // Safely map DashboardVariant to HeaderVariant with runtime validation
   const headerVariant: HeaderVariant = getSafeVariant(variant);
 
@@ -150,9 +160,18 @@ function DashboardLayoutInner({
         headerContent={headerContent}
         mobileOpen={mobileOpen}
         onMobileOpenChange={setMobileOpen}
+        desktopCollapsed={desktopCollapsed}
+        onDesktopCollapsedChange={(collapsed) => {
+          setDesktopCollapsed(collapsed);
+          try {
+            localStorage.setItem('sidebar-desktop-collapsed', String(collapsed));
+          } catch {
+            // Ignore storage errors
+          }
+        }}
       />
       
-      <main className="lg:pl-60 min-h-screen flex flex-col">
+      <main className={`min-h-screen flex flex-col transition-all duration-200 ${desktopCollapsed ? 'lg:pl-14' : 'lg:pl-60'}`}>
         <UnifiedDashboardHeader
           variant={headerVariant}
           currentUser={currentUser}

@@ -187,99 +187,6 @@ function BrandColorsSection({ user }: { user: any }) {
   );
 }
 
-function LanguagePreferenceCard() {
-  const { t, i18n } = useTranslation();
-  const { toast } = useToast();
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const { data: userData } = useQuery<{ user: any }>({
-    queryKey: ["/api/user"],
-  });
-
-  const currentLanguage = i18n.language || userData?.user?.preferredLanguage || 'en';
-
-  const handleLanguageChange = async (language: string) => {
-    try {
-      setIsUpdating(true);
-      await i18n.changeLanguage(language);
-      localStorage.setItem('i18nextLng', language);
-      
-      await apiRequest('PATCH', '/api/user/language', { language });
-      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      
-      toast({
-        title: language === 'en' ? "Language Updated" : "Langue mise à jour",
-        description: language === 'en' 
-          ? "Your language preference has been saved." 
-          : "Votre préférence de langue a été enregistrée.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update language preference",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <span className="material-icons text-xl">language</span>
-          {t('profile.languagePreference', 'Language Preference')}
-        </CardTitle>
-        <CardDescription>
-          {t('profile.languageDescription', 'Choose your preferred language for the application')}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            <Button
-              variant={currentLanguage === 'en' ? 'default' : 'outline'}
-              className="h-14 flex flex-col items-center justify-center gap-1"
-              onClick={() => handleLanguageChange('en')}
-              disabled={isUpdating}
-              data-testid="button-language-english"
-            >
-              <span className="text-lg">English</span>
-              <span className="text-xs opacity-70">English</span>
-            </Button>
-            <Button
-              variant={currentLanguage === 'fr' ? 'default' : 'outline'}
-              className="h-14 flex flex-col items-center justify-center gap-1"
-              onClick={() => handleLanguageChange('fr')}
-              disabled={isUpdating}
-              data-testid="button-language-french"
-            >
-              <span className="text-lg">Français</span>
-              <span className="text-xs opacity-70">French</span>
-            </Button>
-            <Button
-              variant={currentLanguage === 'es' ? 'default' : 'outline'}
-              className="h-14 flex flex-col items-center justify-center gap-1"
-              onClick={() => handleLanguageChange('es')}
-              disabled={isUpdating}
-              data-testid="button-language-spanish"
-            >
-              <span className="text-lg">Español</span>
-              <span className="text-xs opacity-70">Spanish</span>
-            </Button>
-          </div>
-          {isUpdating && (
-            <div className="text-center text-sm text-muted-foreground">
-              {t('common.loading', 'Loading...')}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 // Feature Request Category Options
 const FEATURE_CATEGORIES = [
   { value: 'feature', label: 'New Feature' },
@@ -898,9 +805,7 @@ export default function Profile() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const [deletePassword, setDeletePassword] = useState("");
 
   const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -1045,37 +950,6 @@ export default function Profile() {
       toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
-
-  const deleteAccountMutation = useMutation({
-    mutationFn: async (password: string) => {
-      return apiRequest("DELETE", "/api/user/account", { password });
-    },
-    onSuccess: () => {
-      // Close dialog and clear password on success
-      setShowDeleteDialog(false);
-      setDeletePassword("");
-      toast({ title: t('profile.accountDeleted', 'Account deleted successfully') });
-      setLocation("/");
-    },
-    onError: (error: Error) => {
-      // Keep dialog open so user can retry - don't clear password or close dialog
-      toast({ title: t('common.error', 'Error'), description: error.message, variant: "destructive" });
-    },
-  });
-
-  const handleDeleteAccount = async () => {
-    if (!deletePassword) {
-      toast({ title: t('common.error', 'Error'), description: t('profile.pleaseEnterPassword', 'Please enter your password'), variant: "destructive" });
-      return;
-    }
-    try {
-      await deleteAccountMutation.mutateAsync(deletePassword);
-      // Only close dialog and clear password on success (handled in onSuccess callback)
-    } catch (error) {
-      // Keep dialog open and password visible so user can retry
-      // Error toast is shown by onError callback
-    }
-  };
 
   const confirmLogout = async () => {
     try {
@@ -1722,7 +1596,7 @@ export default function Profile() {
               </div>
                 </div>
 
-                {/* Right Column - Quick Actions & Danger Zone */}
+                {/* Right Column - Quick Actions */}
                 <div className="space-y-6">
               {/* Quick Actions - Glass-morphism container */}
               <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
@@ -1754,42 +1628,9 @@ export default function Profile() {
                     <span className="material-icons text-muted-foreground">chevron_right</span>
                   </div>
 
-                  {/* Language Preference */}
-                  <LanguagePreferenceCard />
                 </div>
               </div>
 
-              {/* Danger Zone - Glass-morphism container */}
-              <div className="bg-red-500/5 backdrop-blur-sm rounded-2xl border border-red-500/20 shadow-xl p-6">
-                {/* Header with icon */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="h-12 w-12 rounded-full bg-red-500/20 flex items-center justify-center">
-                    <span className="material-icons text-red-500">warning</span>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-red-600 dark:text-red-400">{t('profile.dangerZone', 'Danger Zone')}</h2>
-                    <p className="text-sm text-muted-foreground">{t('profile.irreversibleActions', 'Irreversible account actions')}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Permanently delete your company account and all associated data. This action cannot be undone.
-                  </p>
-                  <p className="text-sm text-red-600 dark:text-red-400 font-medium">
-                    Warning: This will delete all employees, projects, work sessions, drop logs, and feedback.
-                  </p>
-                  <Button
-                    variant="destructive"
-                    className="w-full h-12"
-                    onClick={() => setShowDeleteDialog(true)}
-                    data-testid="button-delete-account"
-                  >
-                    <span className="material-icons mr-2">delete_forever</span>
-                    Delete Company Account
-                  </Button>
-                </div>
-              </div>
                 </div>
               </div>
             </TabsContent>
@@ -2398,55 +2239,9 @@ export default function Profile() {
           </Card>
         )}
 
-        <Separator />
-
-        {/* Language Preference for non-company users */}
-        <LanguagePreferenceCard />
           </>
         )}
       </div>
-
-      {/* Delete Account Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Company Account</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete your company account, all employees, projects, work sessions, drop logs, and feedback. This action cannot be undone.
-              
-              Please enter your password to confirm.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="py-4">
-            <Input
-              type="password"
-              placeholder={t('profile.enterPasswordToConfirm', 'Enter your password')}
-              value={deletePassword}
-              onChange={(e) => setDeletePassword(e.target.value)}
-              className="h-12"
-              data-testid="input-delete-password"
-            />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setShowDeleteDialog(false);
-                setDeletePassword("");
-              }}
-              data-testid="button-cancel-delete-account"
-            >
-              {t('common.cancel', 'Cancel')}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteAccount}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              data-testid="button-confirm-delete-account"
-            >
-              {t('profile.deleteAccount', 'Delete Account')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       {/* Logout Confirmation Dialog */}
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>

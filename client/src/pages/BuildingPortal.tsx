@@ -15,11 +15,16 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
-import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users, Download, Megaphone, MapPin } from "lucide-react";
+import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft, KeyRound, DoorOpen, Phone, User, Wrench, FileText, Pencil, Save, Copy, Users, Download, Megaphone, MapPin, Home, Settings, Bell } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { loadLogoAsBase64 } from "@/lib/pdfBranding";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { DashboardSidebar, type NavGroup } from "@/components/DashboardSidebar";
+import { UnifiedDashboardHeader } from "@/components/UnifiedDashboardHeader";
 import type { BuildingInstructions } from "@shared/schema";
+
+type BuildingTabType = 'overview' | 'projects' | 'instructions' | 'notices' | 'settings';
 
 interface BuildingData {
   id: string;
@@ -104,8 +109,9 @@ export default function BuildingPortal() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [strataPlanNumber, setStrataPlanNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const [activeTab, setActiveTab] = useState<BuildingTabType>('overview');
+  const [selectedProject, setSelectedProject] = useState<ProjectHistoryItem | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
   const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
@@ -313,49 +319,14 @@ export default function BuildingPortal() {
     changePasswordMutation.mutate(passwordForm);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!strataPlanNumber.trim() || !password.trim()) {
-      toast({
-        title: t('validation.missingInfo', 'Missing Information'),
-        description: t('buildingPortal.enterBothFields', 'Please enter both strata plan number and password.'),
-        variant: "destructive",
-      });
-      return;
-    }
-    loginMutation.mutate({ strataPlanNumber: strataPlanNumber.trim(), password });
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      queryClient.clear();
-      setStrataPlanNumber("");
-      setPassword("");
-      toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out.",
-      });
-      refetchPortal();
-    } catch (error) {
-      toast({
-        title: "Logout Failed",
-        description: "An error occurred while logging out.",
-        variant: "destructive",
-      });
-    }
-  };
-
+  
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
         return (
           <Badge variant="outline" className="bg-success-600/10 text-success-600 dark:text-success-500 border-success-600/30">
             <CheckCircle className="w-3 h-3 mr-1" />
-            Completed
+            {t('buildingPortal.completed', 'Completed')}
           </Badge>
         );
       case "active":
@@ -363,14 +334,14 @@ export default function BuildingPortal() {
         return (
           <Badge variant="outline" className="bg-action-600/10 text-action-600 dark:text-action-400 border-action-600/30">
             <Clock className="w-3 h-3 mr-1" />
-            In Progress
+            {t('buildingPortal.active', 'In Progress')}
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="outline" className="bg-warning-600/10 text-warning-600 dark:text-warning-500 border-warning-600/30">
             <AlertCircle className="w-3 h-3 mr-1" />
-            Pending
+            {t('common.pending', 'Pending')}
           </Badge>
         );
       default:
@@ -384,19 +355,7 @@ export default function BuildingPortal() {
 
   const getJobTypeName = (project: ProjectHistoryItem) => {
     if (project.customJobType) return project.customJobType;
-    const jobTypeNames: Record<string, string> = {
-      window_cleaning: "Window Cleaning",
-      facade_inspection: "Facade Inspection",
-      painting: "Painting",
-      caulking: "Caulking",
-      pressure_washing: "Pressure Washing",
-      building_maintenance: "Building Maintenance",
-      gutter_cleaning: "Gutter Cleaning",
-      light_replacement: "Light Replacement",
-      signage_installation: "Signage Installation",
-      other: "Other",
-    };
-    return jobTypeNames[project.jobType] || project.jobType;
+    return t(`jobTypes.${project.jobType}`, project.jobType);
   };
 
   const getProjectProgress = (project: ProjectHistoryItem): { completed: number; total: number; label: string; hasProgress: boolean } | null => {
@@ -427,10 +386,63 @@ export default function BuildingPortal() {
     }
   };
 
+  // Navigation groups for the building manager sidebar
+  const buildingNavGroups: NavGroup[] = [
+    {
+      id: 'main',
+      label: t('buildingPortal.nav.main', 'Main'),
+      items: [
+        {
+          id: 'overview',
+          label: t('buildingPortal.nav.overview', 'Overview'),
+          icon: Home,
+          isVisible: () => true,
+        },
+        {
+          id: 'projects',
+          label: t('buildingPortal.nav.projects', 'Project History'),
+          icon: History,
+          isVisible: () => true,
+        },
+        {
+          id: 'notices',
+          label: t('buildingPortal.nav.notices', 'Work Notices'),
+          icon: Megaphone,
+          isVisible: () => true,
+        },
+      ],
+    },
+    {
+      id: 'management',
+      label: t('buildingPortal.nav.management', 'Management'),
+      items: [
+        {
+          id: 'instructions',
+          label: t('buildingPortal.nav.instructions', 'Building Instructions'),
+          icon: FileText,
+          isVisible: () => true,
+        },
+        {
+          id: 'settings',
+          label: t('buildingPortal.nav.settings', 'Settings'),
+          icon: Settings,
+          isVisible: () => true,
+        },
+      ],
+    },
+  ];
+
   const isAuthenticated = !hasPortalError && portalData;
   const needsLogin = hasPortalError || (!isLoadingPortal && !portalData);
 
-  if (isLoadingPortal) {
+  // Redirect to unified login if not authenticated
+  useEffect(() => {
+    if (needsLogin && !isLoadingPortal) {
+      setLocation("/login");
+    }
+  }, [needsLogin, isLoadingPortal, setLocation]);
+
+  if (isLoadingPortal || needsLogin) {
     return (
       <div className="min-h-screen page-gradient flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -441,1185 +453,732 @@ export default function BuildingPortal() {
     );
   }
 
-  if (needsLogin) {
-    return (
-      <div className="min-h-screen page-gradient flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md mb-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => setLocation("/")}
-            className="gap-2"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Button>
-        </div>
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center space-y-4">
-            <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Building2 className="h-8 w-8 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-2xl">Building Portal</CardTitle>
-              <CardDescription>
-                Access your building's maintenance history
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="strataPlanNumber">Strata Plan / Job Number</Label>
-                <div className="relative">
-                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="strataPlanNumber"
-                    type="text"
-                    placeholder={t('buildingPortal.strataPlaceholder', 'Enter your strata or job number')}
-                    value={strataPlanNumber}
-                    onChange={(e) => setStrataPlanNumber(e.target.value)}
-                    className="pl-10 h-12"
-                    autoComplete="username"
-                    data-testid="input-strata-number"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  You can enter with or without spaces (e.g., LMS1000 or LMS 1000)
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder={t('buildingPortal.passwordPlaceholder', 'Enter your password')}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 h-12"
-                    autoComplete="current-password"
-                    data-testid="input-password"
-                  />
-                </div>
-              </div>
-              <Button 
-                type="submit" 
-                className="w-full h-12"
-                disabled={loginMutation.isPending}
-                data-testid="button-login"
-              >
-                {loginMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  <>
-                    <Building2 className="mr-2 h-4 w-4" />
-                    Access Building Portal
-                  </>
-                )}
-              </Button>
-            </form>
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Your strata plan number is your username. Contact your property manager if you need assistance.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const building = portalData?.building;
-  const projectHistory = portalData?.projectHistory || [];
-  const workNotices = portalData?.workNotices || [];
-  const stats = portalData?.stats;
-
-  // PDF Download function for work notices
-  const downloadNoticePdf = async (notice: WorkNoticeItem) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
-    const contentWidth = pageWidth - margin * 2;
-    let yPos = 25;
-
-    // Header with logo if available
-    if (notice.logoUrl) {
-      try {
-        const logoData = await loadLogoAsBase64(notice.logoUrl);
-        if (logoData) {
-          const logoHeight = 15;
-          const logoWidth = logoHeight * logoData.aspectRatio;
-          doc.addImage(logoData.base64, 'PNG', margin, yPos, logoWidth, logoHeight);
-          yPos += logoHeight + 10;
-        }
-      } catch (e) {
-        console.error('Failed to load logo for PDF:', e);
-      }
-    }
-
-    // Title banner
-    doc.setFillColor(51, 65, 85); // Slate-700
-    doc.rect(margin, yPos, contentWidth, 16, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text('OFFICIAL NOTICE', margin + 5, yPos + 11);
-    yPos += 22;
-
-    // Notice title
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    const titleLines = doc.splitTextToSize(notice.title, contentWidth);
-    doc.text(titleLines, margin, yPos);
-    yPos += titleLines.length * 8 + 5;
-
-    // Building name
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 100, 100);
-    doc.text(notice.buildingName, margin, yPos);
-    yPos += 10;
-
-    // Dates banner
-    doc.setFillColor(254, 243, 199); // Amber-100
-    doc.rect(margin, yPos, contentWidth, 20, 'F');
-    doc.setDrawColor(217, 119, 6); // Amber-600
-    doc.rect(margin, yPos, contentWidth, 20, 'S');
-    
-    doc.setTextColor(146, 64, 14); // Amber-800
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('WORK PERIOD:', margin + 5, yPos + 8);
-    doc.setFont('helvetica', 'normal');
-    
-    const startDate = notice.workStartDate ? new Date(notice.workStartDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
-    const endDate = notice.workEndDate ? new Date(notice.workEndDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD';
-    doc.text(`${startDate} - ${endDate}`, margin + 35, yPos + 8);
-    
-    // Job type
-    doc.setFont('helvetica', 'bold');
-    doc.text('SERVICE TYPE:', margin + 5, yPos + 16);
-    doc.setFont('helvetica', 'normal');
-    doc.text(notice.jobType.replace(/_/g, ' ').toUpperCase(), margin + 35, yPos + 16);
-    yPos += 28;
-
-    // Notice content
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    const contentLines = doc.splitTextToSize(notice.content, contentWidth);
-    
-    // Check if we need a new page
-    const lineHeight = 5;
-    const remainingHeight = doc.internal.pageSize.getHeight() - yPos - 30;
-    const contentHeight = contentLines.length * lineHeight;
-    
-    if (contentHeight > remainingHeight) {
-      // Split content across pages
-      let currentLine = 0;
-      while (currentLine < contentLines.length) {
-        const linesPerPage = Math.floor((doc.internal.pageSize.getHeight() - yPos - 30) / lineHeight);
-        const pageLines = contentLines.slice(currentLine, currentLine + linesPerPage);
-        doc.text(pageLines, margin, yPos);
-        currentLine += linesPerPage;
-        
-        if (currentLine < contentLines.length) {
-          doc.addPage();
-          yPos = 25;
-        } else {
-          yPos += pageLines.length * lineHeight + 10;
-        }
-      }
-    } else {
-      doc.text(contentLines, margin, yPos);
-      yPos += contentLines.length * lineHeight + 10;
-    }
-
-    // Additional instructions if present
-    if (notice.additionalInstructions) {
-      yPos += 5;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text('ADDITIONAL INSTRUCTIONS:', margin, yPos);
-      yPos += 6;
-      doc.setFont('helvetica', 'normal');
-      const instructionLines = doc.splitTextToSize(notice.additionalInstructions, contentWidth);
-      doc.text(instructionLines, margin, yPos);
-      yPos += instructionLines.length * 5 + 10;
-    }
-
-    // Footer
-    doc.setDrawColor(200, 200, 200);
-    doc.line(margin, doc.internal.pageSize.getHeight() - 25, pageWidth - margin, doc.internal.pageSize.getHeight() - 25);
-    
-    doc.setFontSize(9);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Posted by: ${notice.companyName}`, margin, doc.internal.pageSize.getHeight() - 18);
-    if (notice.companyPhone) {
-      doc.text(`Contact: ${notice.companyPhone}`, margin, doc.internal.pageSize.getHeight() - 12);
-    }
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth - margin - 40, doc.internal.pageSize.getHeight() - 18);
-
-    // Download
-    const filename = `Notice-${notice.title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30)}.pdf`;
-    doc.save(filename);
-    
-    toast({
-      title: "PDF Downloaded",
-      description: "Notice has been downloaded. You can print it for elevator posting.",
-    });
+  // Create a mock user object for the sidebar/header components
+  const buildingUser = {
+    id: portalData.building.id,
+    name: portalData.building.buildingName || portalData.building.strataPlanNumber,
+    email: portalData.building.strataPlanNumber,
+    role: 'building_manager' as const,
   };
 
-  return (
-    <div className="min-h-screen page-gradient p-4 md:p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-              <Building2 className="h-7 w-7 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-foreground">
-                {building?.buildingName || `Building ${building?.strataPlanNumber}`}
-              </h1>
-              <p className="text-muted-foreground">
-                {building?.address ? `${building.address}, ${building.city || ""} ${building.province || ""}`.trim() : `Strata: ${building?.strataPlanNumber}`}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowChangePasswordDialog(true)}
-              data-testid="button-change-password"
-            >
-              <Lock className="mr-2 h-4 w-4" />
-              Change Password
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleLogout}
-              data-testid="button-logout"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          </div>
-        </div>
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      queryClient.clear();
+      toast({
+        title: t('buildingPortal.loggedOut', 'Logged Out'),
+        description: t('buildingPortal.loggedOutDesc', 'You have been successfully logged out.'),
+      });
+      setLocation("/login");
+    } catch (error) {
+      toast({
+        title: t('common.error', 'Error'),
+        description: t('buildingPortal.logoutError', 'An error occurred while logging out.'),
+        variant: "destructive",
+      });
+    }
+  };
 
-        {/* Password Change Warning Banner - shown until password is changed */}
-        {building && !building.passwordChangedAt && (
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700">
-            <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h4 className="font-medium text-amber-800 dark:text-amber-200">Security Notice: Please Change Your Password</h4>
-              <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                Your account is using the default password (your strata number). For security reasons, please change your password to something unique and secure.
-              </p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-3 border-amber-400 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300 dark:hover:bg-amber-900/50"
-                onClick={() => setShowChangePasswordDialog(true)}
-                data-testid="button-change-password-banner"
-              >
-                <Lock className="mr-2 h-4 w-4" />
-                Change Password Now
-              </Button>
+  // Password not changed warning
+  const showPasswordWarning = !portalData.building.passwordChangedAt;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      {/* Sidebar */}
+      <DashboardSidebar
+        currentUser={buildingUser}
+        activeTab={activeTab}
+        onTabChange={(tab) => setActiveTab(tab as BuildingTabType)}
+        variant="building-manager"
+        customNavigationGroups={buildingNavGroups}
+        showDashboardLink={false}
+        mobileOpen={mobileSidebarOpen}
+        onMobileOpenChange={setMobileSidebarOpen}
+      />
+
+      {/* Main content wrapper - offset for sidebar on desktop */}
+      <div className="lg:pl-60">
+        <UnifiedDashboardHeader
+          variant="building-manager"
+          currentUser={buildingUser}
+          onMobileMenuClick={() => setMobileSidebarOpen(true)}
+          showSearch={false}
+          showNotifications={false}
+          showLanguageDropdown={true}
+          showInstallPWA={true}
+          showProfile={true}
+          showLogout={true}
+          onLogout={handleLogout}
+        />
+
+        {/* Password Change Warning Banner */}
+        {showPasswordWarning && (
+          <div className="bg-amber-500/20 border-b border-amber-500/30" data-testid="banner-password-warning">
+            <div className="w-full px-4 md:px-6 xl:px-8 py-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-base text-amber-700 dark:text-amber-400">
+                    {t('buildingPortal.passwordWarningTitle', 'Security Notice')}
+                  </p>
+                  <p className="text-sm text-amber-600/80 dark:text-amber-400/80 mt-0.5">
+                    {t('buildingPortal.passwordWarningDesc', 'Your password has not been changed from the default. Please update it in Settings for security.')}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab('settings')}
+                  className="border-amber-500/50 text-amber-700 dark:text-amber-400"
+                  data-testid="button-change-password-banner"
+                >
+                  <Lock className="w-4 h-4 mr-2" />
+                  {t('buildingPortal.changePassword', 'Change Password')}
+                </Button>
+              </div>
             </div>
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-action-600/10 flex items-center justify-center">
-                  <History className="h-5 w-5 text-action-600 dark:text-action-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.totalProjects || 0}</p>
-                  <p className="text-sm text-muted-foreground">Total Projects</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-success-600/10 flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-success-600 dark:text-success-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.completedProjects || 0}</p>
-                  <p className="text-sm text-muted-foreground">Completed</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-warning-600/10 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-warning-600 dark:text-warning-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{stats?.activeProjects || 0}</p>
-                  <p className="text-sm text-muted-foreground">Active</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Building Instructions Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                <CardTitle>Building Instructions</CardTitle>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowInstructionsDialog(true)}
-                data-testid="button-edit-instructions"
-              >
-                <Pencil className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            </div>
-            <CardDescription>
-              Access information, contacts, and special instructions for contractors
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isLoadingInstructions ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : buildingInstructions && (
-              buildingInstructions.buildingAccess || 
-              buildingInstructions.keysAndFob || 
-              buildingInstructions.roofAccess ||
-              buildingInstructions.buildingManagerName ||
-              buildingInstructions.conciergeNames ||
-              buildingInstructions.maintenanceName ||
-              buildingInstructions.specialRequests
-            ) ? (
-              <div className="grid gap-4">
-                {/* Contact Information */}
-                {(buildingInstructions?.buildingManagerName || buildingInstructions?.conciergeNames || buildingInstructions?.maintenanceName) && (
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Contacts</h4>
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      {buildingInstructions?.buildingManagerName && (
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <User className="h-5 w-5 text-muted-foreground mt-0.5" />
-                          <div>
-                            <p className="font-medium text-sm text-foreground">Building Manager</p>
-                            <p className="text-sm text-foreground">{buildingInstructions.buildingManagerName}</p>
-                            {buildingInstructions.buildingManagerPhone && (
-                              <a href={`tel:${buildingInstructions.buildingManagerPhone}`} className="text-sm text-action-600 dark:text-action-400 hover:underline">
-                                {buildingInstructions.buildingManagerPhone}
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      {buildingInstructions?.conciergeNames && (
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
-                          <div>
-                            <p className="font-medium text-sm text-foreground">Concierge</p>
-                            <p className="text-sm text-foreground">{buildingInstructions.conciergeNames}</p>
-                            {buildingInstructions.conciergePhone && (
-                              <a href={`tel:${buildingInstructions.conciergePhone}`} className="text-sm text-action-600 dark:text-action-400 hover:underline">
-                                {buildingInstructions.conciergePhone}
-                              </a>
-                            )}
-                            {(buildingInstructions as any).conciergeHours && (
-                              <p className="text-xs text-muted-foreground mt-1">Hours: {(buildingInstructions as any).conciergeHours}</p>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      {buildingInstructions?.maintenanceName && (
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <Wrench className="h-5 w-5 text-muted-foreground mt-0.5" />
-                          <div>
-                            <p className="font-medium text-sm text-foreground">Maintenance</p>
-                            <p className="text-sm text-foreground">{buildingInstructions.maintenanceName}</p>
-                            {buildingInstructions.maintenancePhone && (
-                              <a href={`tel:${buildingInstructions.maintenancePhone}`} className="text-sm text-action-600 dark:text-action-400 hover:underline">
-                                {buildingInstructions.maintenancePhone}
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      {(buildingInstructions as any)?.councilMemberUnits && (
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <span className="material-icons text-muted-foreground mt-0.5" style={{ fontSize: '20px' }}>groups</span>
-                          <div>
-                            <p className="font-medium text-sm text-foreground">Council Member Units</p>
-                            <p className="text-sm text-foreground">{(buildingInstructions as any).councilMemberUnits}</p>
-                          </div>
-                        </div>
-                      )}
+        {/* Main Content */}
+        <main className="w-full px-4 md:px-6 xl:px-8 py-6 space-y-6 pb-24">
+          {/* OVERVIEW TAB */}
+          {activeTab === 'overview' && (
+            <>
+              {/* Building Info Card */}
+              <Card data-testid="card-building-info">
+                <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-lg bg-[#B89685]/10 flex items-center justify-center">
+                      <Building2 className="h-8 w-8 text-[#B89685]" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl" data-testid="text-building-name">
+                        {portalData.building.buildingName || portalData.building.strataPlanNumber}
+                      </CardTitle>
+                      <CardDescription className="flex items-center gap-2 mt-1">
+                        <Hash className="h-4 w-4" />
+                        {portalData.building.strataPlanNumber}
+                      </CardDescription>
                     </div>
                   </div>
-                )}
-
-                {/* Access Information */}
-                {(buildingInstructions?.buildingAccess || buildingInstructions?.keysAndFob || buildingInstructions?.roofAccess) && (
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Access Information</h4>
-                    <div className="grid gap-3">
-                      {buildingInstructions?.buildingAccess && (
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <DoorOpen className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-                          <div>
-                            <p className="font-medium text-sm text-foreground">Building Access</p>
-                            <p className="text-sm text-foreground whitespace-pre-wrap">{buildingInstructions.buildingAccess}</p>
-                          </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {portalData.building.address && (
+                      <div className="flex items-start gap-3">
+                        <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium">{t('buildingPortal.address', 'Address')}</p>
+                          <p className="text-sm text-muted-foreground" data-testid="text-building-address">
+                            {portalData.building.address}
+                            {portalData.building.city && `, ${portalData.building.city}`}
+                            {portalData.building.province && `, ${portalData.building.province}`}
+                            {portalData.building.postalCode && ` ${portalData.building.postalCode}`}
+                          </p>
                         </div>
-                      )}
-                      {buildingInstructions?.keysAndFob && (
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <KeyRound className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-                          <div>
-                            <p className="font-medium text-sm text-foreground">Keys / Fob</p>
-                            <p className="text-sm text-foreground whitespace-pre-wrap">{buildingInstructions.keysAndFob}</p>
-                            {(buildingInstructions as any).keysReturnPolicy && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Return: {
-                                  (buildingInstructions as any).keysReturnPolicy === 'end_of_day' ? 'End of Every Day' :
-                                  (buildingInstructions as any).keysReturnPolicy === 'end_of_week' ? 'End of Week' :
-                                  (buildingInstructions as any).keysReturnPolicy === 'end_of_project' ? 'End of Project' :
-                                  'Keep Until Work Complete'
-                                }
-                              </p>
-                            )}
-                          </div>
+                      </div>
+                    )}
+                    {portalData.building.totalUnits && (
+                      <div className="flex items-start gap-3">
+                        <Users className="h-5 w-5 text-muted-foreground mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium">{t('buildingPortal.totalUnits', 'Total Units')}</p>
+                          <p className="text-sm text-muted-foreground" data-testid="text-total-units">
+                            {portalData.building.totalUnits}
+                          </p>
                         </div>
-                      )}
-                      {buildingInstructions?.roofAccess && (
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                          <Building2 className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
-                          <div>
-                            <p className="font-medium text-sm text-foreground">Roof Access</p>
-                            <p className="text-sm text-foreground whitespace-pre-wrap">{buildingInstructions.roofAccess}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Trade Parking */}
-                {((buildingInstructions as any)?.tradeParkingInstructions || (buildingInstructions as any)?.tradeParkingSpots) && (
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Trade Parking</h4>
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                      <span className="material-icons text-muted-foreground mt-0.5 shrink-0" style={{ fontSize: '20px' }}>local_parking</span>
+                      </div>
+                    )}
+                    <div className="flex items-start gap-3">
+                      <History className="h-5 w-5 text-muted-foreground mt-0.5" />
                       <div>
-                        {(buildingInstructions as any).tradeParkingSpots && (
-                          <p className="text-sm font-medium text-foreground">{(buildingInstructions as any).tradeParkingSpots} spot(s) available</p>
-                        )}
-                        {(buildingInstructions as any).tradeParkingInstructions && (
-                          <p className="text-sm text-foreground whitespace-pre-wrap">{(buildingInstructions as any).tradeParkingInstructions}</p>
-                        )}
+                        <p className="text-sm font-medium">{t('buildingPortal.projectHistory', 'Project History')}</p>
+                        <p className="text-sm text-muted-foreground" data-testid="text-project-count">
+                          {portalData.stats.completedProjects} {t('buildingPortal.completed', 'completed')}, {portalData.stats.activeProjects} {t('buildingPortal.active', 'active')}
+                        </p>
                       </div>
                     </div>
                   </div>
-                )}
+                </CardContent>
+              </Card>
 
-                {/* Trade Washroom */}
-                {(buildingInstructions as any)?.tradeWashroomLocation && (
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Trade Washroom</h4>
-                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                      <span className="material-icons text-muted-foreground mt-0.5 shrink-0" style={{ fontSize: '20px' }}>wc</span>
-                      <p className="text-sm text-foreground whitespace-pre-wrap">{(buildingInstructions as any).tradeWashroomLocation}</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Special Requests */}
-                {buildingInstructions?.specialRequests && (
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Special Requests</h4>
-                    <div className="p-3 rounded-lg bg-muted/50">
-                      <p className="text-sm text-foreground whitespace-pre-wrap">{buildingInstructions.specialRequests}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <div className="mx-auto h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
-                  <FileText className="h-6 w-6 text-muted-foreground" />
-                </div>
-                <p className="text-muted-foreground mb-3">No building instructions added yet.</p>
-                <Button variant="outline" onClick={() => setShowInstructionsDialog(true)} data-testid="button-add-instructions">
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Add Instructions
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Work Notices Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Megaphone className="h-5 w-5 text-purple-600" />
-              Work Notices
-              {workNotices.length > 0 && (
-                <Badge variant="secondary" className="ml-2">{workNotices.length}</Badge>
-              )}
-            </CardTitle>
-            <CardDescription>
-              Active notices for upcoming or ongoing maintenance work - download and post in elevators
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {workNotices.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="mx-auto h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
-                  <Megaphone className="h-6 w-6 text-muted-foreground" />
-                </div>
-                <p className="text-muted-foreground">No active work notices at this time</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {workNotices.map((notice) => (
-                  <div 
-                    key={notice.id}
-                    className="border rounded-lg overflow-hidden"
-                    data-testid={`work-notice-${notice.id}`}
-                  >
-                    {/* Professional Header */}
-                    <div className="bg-gradient-to-r from-slate-800 to-slate-700 dark:from-slate-900 dark:to-slate-800 px-4 py-3 text-white">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          {notice.logoUrl ? (
-                            <div className="flex-shrink-0 bg-white rounded p-1.5">
-                              <img 
-                                src={notice.logoUrl} 
-                                alt="Company logo" 
-                                className="h-8 w-auto object-contain"
-                              />
-                            </div>
-                          ) : (
-                            <div className="flex-shrink-0 bg-white/10 rounded p-2">
-                              <Building2 className="h-5 w-5" />
-                            </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <span className="text-xs font-medium uppercase tracking-wider text-white/70">Official Notice</span>
-                            <h4 className="font-semibold truncate">{notice.title}</h4>
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => downloadNoticePdf(notice)}
-                          className="flex-shrink-0"
-                          data-testid={`button-download-notice-${notice.id}`}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          PDF
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Dates Banner */}
-                    <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 px-4 py-3">
-                      <div className="flex flex-wrap items-center gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-amber-700 dark:text-amber-400" />
-                          <span className="font-medium text-amber-900 dark:text-amber-100">
-                            {notice.workStartDate && notice.workEndDate ? (
-                              <>
-                                {new Date(notice.workStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} 
-                                {' - '}
-                                {new Date(notice.workEndDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                              </>
-                            ) : notice.workStartDate ? (
-                              <>Starting {new Date(notice.workStartDate).toLocaleDateString()}</>
-                            ) : (
-                              'Dates TBD'
-                            )}
-                          </span>
-                        </div>
-                        <Badge variant="outline" className="capitalize text-xs">
-                          {notice.jobType.replace(/_/g, ' ')}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    {/* Content Preview */}
-                    <div className="p-4">
-                      <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
-                        {notice.content}
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card data-testid="card-stat-total">
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-[#B89685]" data-testid="text-stat-total">
+                        {portalData.stats.totalProjects}
                       </p>
-                      <div className="mt-3 pt-3 border-t flex items-center justify-between text-xs text-muted-foreground">
-                        <span>From: {notice.companyName}</span>
-                        <span>Posted: {formatLocalDate(notice.createdAt)}</span>
-                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {t('buildingPortal.totalProjects', 'Total Projects')}
+                      </p>
                     </div>
-                  </div>
-                ))}
+                  </CardContent>
+                </Card>
+                <Card data-testid="card-stat-completed">
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-green-600" data-testid="text-stat-completed">
+                        {portalData.stats.completedProjects}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {t('buildingPortal.completedProjects', 'Completed')}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card data-testid="card-stat-active">
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-blue-600" data-testid="text-stat-active">
+                        {portalData.stats.activeProjects}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {t('buildingPortal.activeProjects', 'In Progress')}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            )}
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <History className="h-5 w-5" />
-              Maintenance History
-            </CardTitle>
-            <CardDescription>
-              All maintenance projects performed at this building across all service providers
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {projectHistory.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="mx-auto h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                  <History className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-medium mb-2">No Maintenance History</h3>
-                <p className="text-muted-foreground max-w-sm mx-auto">
-                  There are no recorded maintenance projects for this building yet.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {projectHistory.map((project, index) => {
-                  const progress = project.status === 'active' ? getProjectProgress(project) : null;
-                  const isActive = project.status === 'active';
-                  
-                  return (
-                    <div key={project.id}>
-                      {index > 0 && <Separator className="my-4" />}
-                      <div className={`${isActive ? 'p-4 rounded-lg border-2 border-action-600/30 dark:border-action-600/40 bg-action-600/5 dark:bg-action-600/10' : ''}`}>
-                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                          <div className="space-y-2 flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-medium text-foreground">{getJobTypeName(project)}</span>
+              {/* Active Projects with Progress */}
+              {portalData.projectHistory.filter(p => p.status === 'active' || p.status === 'in_progress').length > 0 && (
+                <Card data-testid="card-active-projects">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      {t('buildingPortal.activeProjectsTitle', 'Active Projects')}
+                    </CardTitle>
+                    <CardDescription>
+                      {t('buildingPortal.activeProjectsDesc', 'Current work in progress at your building')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {portalData.projectHistory
+                      .filter(p => p.status === 'active' || p.status === 'in_progress')
+                      .map((project) => {
+                        const progress = getProjectProgress(project);
+                        return (
+                          <div 
+                            key={project.id} 
+                            className="p-4 border rounded-lg cursor-pointer hover-elevate transition-all" 
+                            data-testid={`card-active-project-${project.id}`}
+                            onClick={() => setSelectedProject(project)}
+                          >
+                            <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+                              <div>
+                                <h4 className="font-semibold">{getJobTypeName(project)}</h4>
+                                <p className="text-sm text-muted-foreground">{project.companyName}</p>
+                              </div>
                               {getStatusBadge(project.status)}
                             </div>
-                            <p className="text-sm text-muted-foreground">
-                              by {project.companyName}
-                            </p>
-                            
-                            {/* Enhanced details for active projects */}
-                            {isActive && (
-                              <div className="mt-3 space-y-3">
-                                {/* Progress bar */}
-                                {progress && (
-                                  <div className="space-y-1">
-                                    <div className="flex justify-between text-xs text-muted-foreground">
-                                      <span>Progress</span>
-                                      {progress.hasProgress ? (
-                                        <span>{progress.completed} / {progress.total} {progress.label}</span>
-                                      ) : (
-                                        <span className="italic">Not yet configured</span>
-                                      )}
-                                    </div>
-                                    <Progress 
-                                      value={progress.hasProgress ? (progress.completed / progress.total) * 100 : 0} 
-                                      className="h-2" 
-                                    />
-                                  </div>
-                                )}
-                                
-                                {/* Resident Code - important for building manager */}
-                                {project.residentCode && (
-                                  <div className="flex items-center gap-2 p-2 rounded-md bg-background border">
-                                    <Users className="h-4 w-4 text-muted-foreground shrink-0" />
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs text-muted-foreground">Resident Feedback Code</p>
-                                      <p className="font-mono font-medium">{project.residentCode}</p>
-                                    </div>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => {
-                                        navigator.clipboard.writeText(project.residentCode!);
-                                        toast({
-                                          title: "Copied",
-                                          description: "Resident code copied to clipboard",
-                                        });
-                                      }}
-                                      data-testid={`button-copy-resident-code-${project.id}`}
-                                    >
-                                      <Copy className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                )}
-                                
-                                {/* Company contact info */}
-                                {(project.companyPhone || project.companyEmail) && (
-                                  <div className="flex flex-wrap gap-3 text-sm">
-                                    {project.companyPhone && (
-                                      <a href={`tel:${project.companyPhone}`} className="flex items-center gap-1 text-action-600 dark:text-action-400 hover:underline">
-                                        <Phone className="h-3 w-3" />
-                                        {project.companyPhone}
-                                      </a>
-                                    )}
-                                  </div>
-                                )}
-                                
-                                {/* Notes */}
-                                {project.notes && (
-                                  <p className="text-sm text-muted-foreground italic">
-                                    Note: {project.notes}
-                                  </p>
-                                )}
+                            {progress && progress.hasProgress && (
+                              <div className="space-y-2">
+                                <div className="flex justify-between text-sm">
+                                  <span>{t('buildingPortal.progress', 'Progress')}</span>
+                                  <span className="font-medium">
+                                    {progress.completed} / {progress.total} {progress.label}
+                                  </span>
+                                </div>
+                                <Progress 
+                                  value={(progress.completed / progress.total) * 100} 
+                                  className="h-2"
+                                />
+                              </div>
+                            )}
+                            {project.companyPhone && (
+                              <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
+                                <Phone className="h-4 w-4" />
+                                {project.companyPhone}
                               </div>
                             )}
                           </div>
-                          <div className="text-sm text-muted-foreground md:text-right shrink-0">
-                            {project.startDate ? (
-                              <>
-                                <span>{formatLocalDate(project.startDate)}</span>
-                                {project.endDate && project.startDate !== project.endDate && (
-                                  <span> - {formatLocalDate(project.endDate)}</span>
-                                )}
-                              </>
-                            ) : (
-                              <span>Created {formatLocalDate(project.createdAt)}</span>
+                        );
+                      })}
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+
+          {/* PROJECTS TAB */}
+          {activeTab === 'projects' && (
+            <Card data-testid="card-project-history">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5" />
+                  {t('buildingPortal.projectHistoryTitle', 'Project History')}
+                </CardTitle>
+                <CardDescription>
+                  {t('buildingPortal.projectHistoryDesc', 'All maintenance work performed at your building')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {portalData.projectHistory.length === 0 ? (
+                  <div className="text-center py-12">
+                    <History className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-lg font-semibold mb-2">{t('buildingPortal.noProjects', 'No Projects Yet')}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t('buildingPortal.noProjectsDesc', 'Project history will appear here once work is scheduled.')}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {portalData.projectHistory.map((project) => (
+                      <div key={project.id} className="p-4 border rounded-lg" data-testid={`card-project-${project.id}`}>
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div>
+                            <h4 className="font-semibold">{getJobTypeName(project)}</h4>
+                            <p className="text-sm text-muted-foreground">{project.companyName}</p>
+                            {project.startDate && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {formatLocalDate(project.startDate)}
+                                {project.endDate && ` - ${formatLocalDate(project.endDate)}`}
+                              </p>
                             )}
                           </div>
+                          {getStatusBadge(project.status)}
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-        <div className="text-center text-sm text-muted-foreground">
-          <p>Building Portal - Viewing maintenance history for {building?.strataPlanNumber}</p>
-        </div>
+          {/* NOTICES TAB */}
+          {activeTab === 'notices' && (
+            <Card data-testid="card-work-notices">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Megaphone className="h-5 w-5" />
+                  {t('buildingPortal.workNoticesTitle', 'Work Notices')}
+                </CardTitle>
+                <CardDescription>
+                  {t('buildingPortal.workNoticesDesc', 'Official notices about upcoming and ongoing work')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {(!portalData.workNotices || portalData.workNotices.length === 0) ? (
+                  <div className="text-center py-12">
+                    <Megaphone className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-lg font-semibold mb-2">{t('buildingPortal.noNotices', 'No Work Notices')}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t('buildingPortal.noNoticesDesc', 'Work notices will appear here when vendors schedule work.')}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {portalData.workNotices.map((notice) => (
+                      <div key={notice.id} className="p-4 border rounded-lg" data-testid={`card-notice-${notice.id}`}>
+                        <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                          <h4 className="font-semibold">{notice.title}</h4>
+                          {notice.workStartDate && (
+                            <Badge variant="outline">
+                              {formatLocalDate(notice.workStartDate)}
+                              {notice.workEndDate && ` - ${formatLocalDate(notice.workEndDate)}`}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">{notice.content}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t('buildingPortal.from', 'From')}: {notice.companyName}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* INSTRUCTIONS TAB */}
+          {activeTab === 'instructions' && (
+            <Card data-testid="card-building-instructions">
+              <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    {t('buildingPortal.instructionsTitle', 'Building Instructions')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('buildingPortal.instructionsDesc', 'Information for service providers working at your building')}
+                  </CardDescription>
+                </div>
+                <Button
+                  onClick={() => setShowInstructionsDialog(true)}
+                  data-testid="button-edit-instructions"
+                >
+                  <Pencil className="w-4 h-4 mr-2" />
+                  {t('buildingPortal.editInstructions', 'Edit Instructions')}
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {!buildingInstructions ? (
+                  <div className="text-center py-12">
+                    <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-lg font-semibold mb-2">{t('buildingPortal.noInstructions', 'No Instructions Set')}</p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {t('buildingPortal.noInstructionsDesc', 'Add building access information, contact details, and special instructions.')}
+                    </p>
+                    <Button onClick={() => setShowInstructionsDialog(true)} data-testid="button-add-instructions">
+                      <Pencil className="w-4 h-4 mr-2" />
+                      {t('buildingPortal.addInstructions', 'Add Instructions')}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {buildingInstructions.buildingAccess && (
+                      <div>
+                        <h4 className="font-medium mb-1">{t('buildingPortal.buildingAccess', 'Building Access')}</h4>
+                        <p className="text-sm text-muted-foreground">{buildingInstructions.buildingAccess}</p>
+                      </div>
+                    )}
+                    {buildingInstructions.keysAndFob && (
+                      <div>
+                        <h4 className="font-medium mb-1">{t('buildingPortal.keysAndFob', 'Keys & Fob')}</h4>
+                        <p className="text-sm text-muted-foreground">{buildingInstructions.keysAndFob}</p>
+                      </div>
+                    )}
+                    {buildingInstructions.roofAccess && (
+                      <div>
+                        <h4 className="font-medium mb-1">{t('buildingPortal.roofAccess', 'Roof Access')}</h4>
+                        <p className="text-sm text-muted-foreground">{buildingInstructions.roofAccess}</p>
+                      </div>
+                    )}
+                    {buildingInstructions.buildingManagerName && (
+                      <div>
+                        <h4 className="font-medium mb-1">{t('buildingPortal.buildingManager', 'Building Manager')}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {buildingInstructions.buildingManagerName}
+                          {buildingInstructions.buildingManagerPhone && ` - ${buildingInstructions.buildingManagerPhone}`}
+                        </p>
+                      </div>
+                    )}
+                    {buildingInstructions.conciergeNames && (
+                      <div>
+                        <h4 className="font-medium mb-1">{t('buildingPortal.concierge', 'Concierge')}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {buildingInstructions.conciergeNames}
+                          {buildingInstructions.conciergePhone && ` - ${buildingInstructions.conciergePhone}`}
+                        </p>
+                      </div>
+                    )}
+                    {buildingInstructions.specialRequests && (
+                      <div className="md:col-span-2">
+                        <h4 className="font-medium mb-1">{t('buildingPortal.specialRequests', 'Special Requests')}</h4>
+                        <p className="text-sm text-muted-foreground">{buildingInstructions.specialRequests}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* SETTINGS TAB */}
+          {activeTab === 'settings' && (
+            <Card data-testid="card-settings">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5" />
+                  {t('buildingPortal.settingsTitle', 'Settings')}
+                </CardTitle>
+                <CardDescription>
+                  {t('buildingPortal.settingsDesc', 'Manage your building portal account')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Password Section */}
+                <div className="p-4 border rounded-lg">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <Lock className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <h4 className="font-medium">{t('buildingPortal.password', 'Password')}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {showPasswordWarning 
+                            ? t('buildingPortal.passwordNotChanged', 'Using default password - please change for security')
+                            : t('buildingPortal.passwordChanged', 'Last changed: ') + (portalData.building.passwordChangedAt ? formatLocalDate(portalData.building.passwordChangedAt) : '')
+                          }
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant={showPasswordWarning ? "default" : "outline"}
+                      onClick={() => setShowChangePasswordDialog(true)}
+                      data-testid="button-change-password"
+                    >
+                      <KeyRound className="w-4 h-4 mr-2" />
+                      {t('buildingPortal.changePassword', 'Change Password')}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Account Info */}
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <Building2 className="h-5 w-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <h4 className="font-medium">{t('buildingPortal.accountInfo', 'Account Information')}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {t('buildingPortal.strataNumber', 'Strata Number')}: {portalData.building.strataPlanNumber}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('buildingPortal.accountCreated', 'Account Created')}: {formatLocalDate(portalData.building.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </main>
       </div>
 
-      {/* Edit Instructions Dialog */}
+      {/* Instructions Dialog */}
       <Dialog open={showInstructionsDialog} onOpenChange={setShowInstructionsDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Building Instructions</DialogTitle>
+            <DialogTitle>{t('buildingPortal.editInstructionsTitle', 'Edit Building Instructions')}</DialogTitle>
             <DialogDescription>
-              Add access information and contact details for contractors working at this building.
+              {t('buildingPortal.editInstructionsDesc', 'This information will be shared with service providers working at your building.')}
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            {/* Building Address Section */}
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Building Address
-              </h4>
+          <form onSubmit={(e) => { e.preventDefault(); saveInstructionsMutation.mutate(instructionsForm); }} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Address</Label>
-                <AddressAutocomplete
-                  value={addressForm.address}
-                  onChange={(value) => setAddressForm(prev => ({ ...prev, address: value }))}
-                  onSelect={(address, lat, lng) => {
-                    setAddressForm({ address, latitude: lat, longitude: lng });
-                  }}
-                  placeholder={t('buildingPortal.addressPlaceholder', 'Start typing to search...')}
-                  data-testid="input-building-address"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Select from suggestions to capture coordinates for map display
-                </p>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => saveAddressMutation.mutate(addressForm)}
-                  disabled={saveAddressMutation.isPending || !addressForm.address}
-                  data-testid="button-save-address"
-                >
-                  {saveAddressMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Save className="h-4 w-4 mr-2" />
-                  )}
-                  Save Address
-                </Button>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Contact Information Section */}
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
-                <Phone className="h-4 w-4" />
-                Contact Information
-              </h4>
-              
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="buildingManagerName">Building Manager Name</Label>
-                  <Input
-                    id="buildingManagerName"
-                    placeholder={t('buildingPortal.placeholders.managerName', 'e.g., John Smith')}
-                    value={instructionsForm.buildingManagerName}
-                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingManagerName: e.target.value }))}
-                    data-testid="input-manager-name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="buildingManagerPhone">Building Manager Phone</Label>
-                  <Input
-                    id="buildingManagerPhone"
-                    placeholder={t('common.placeholders.phone', 'e.g., (604) 555-1234')}
-                    value={instructionsForm.buildingManagerPhone}
-                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingManagerPhone: e.target.value }))}
-                    data-testid="input-manager-phone"
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="conciergeNames">Concierge Name(s)</Label>
-                  <Input
-                    id="conciergeNames"
-                    placeholder={t('buildingPortal.placeholders.conciergeNames', 'e.g., Jane Doe, Mike Wilson')}
-                    value={instructionsForm.conciergeNames}
-                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeNames: e.target.value }))}
-                    data-testid="input-concierge-names"
-                  />
-                  <p className="text-xs text-muted-foreground">Separate multiple names with commas</p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="conciergePhone">Concierge Phone</Label>
-                  <Input
-                    id="conciergePhone"
-                    placeholder={t('common.placeholders.phone', 'e.g., (604) 555-5678')}
-                    value={instructionsForm.conciergePhone}
-                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergePhone: e.target.value }))}
-                    data-testid="input-concierge-phone"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="conciergeHours">Concierge Hours of Operation</Label>
-                <Input
-                  id="conciergeHours"
-                  placeholder={t('buildingPortal.placeholders.conciergeHours', 'e.g., Mon-Fri 8am-8pm, Sat-Sun 9am-5pm')}
-                  value={instructionsForm.conciergeHours}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, conciergeHours: e.target.value }))}
-                  data-testid="input-concierge-hours"
-                />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="maintenanceName">Maintenance Contact Name</Label>
-                  <Input
-                    id="maintenanceName"
-                    placeholder={t('buildingPortal.placeholders.maintenanceName', 'e.g., Building Maintenance')}
-                    value={instructionsForm.maintenanceName}
-                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, maintenanceName: e.target.value }))}
-                    data-testid="input-maintenance-name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="maintenancePhone">Maintenance Phone</Label>
-                  <Input
-                    id="maintenancePhone"
-                    placeholder={t('common.placeholders.phone', 'e.g., (604) 555-9012')}
-                    value={instructionsForm.maintenancePhone}
-                    onChange={(e) => setInstructionsForm(prev => ({ ...prev, maintenancePhone: e.target.value }))}
-                    data-testid="input-maintenance-phone"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="councilMemberUnits">Council Member Units</Label>
-                <Input
-                  id="councilMemberUnits"
-                  placeholder={t('buildingPortal.placeholders.councilUnits', 'e.g., Unit 301, 502, 1205')}
-                  value={instructionsForm.councilMemberUnits}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, councilMemberUnits: e.target.value }))}
-                  data-testid="input-council-units"
-                />
-                <p className="text-xs text-muted-foreground">Floor/unit numbers where council members reside</p>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Access Information Section */}
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
-                <DoorOpen className="h-4 w-4" />
-                Access Information
-              </h4>
-              
-              <div className="space-y-2">
-                <Label htmlFor="buildingAccess">Building Access Instructions</Label>
+                <Label>{t('buildingPortal.buildingAccess', 'Building Access')}</Label>
                 <Textarea
-                  id="buildingAccess"
-                  placeholder={t('buildingPortal.placeholders.buildingAccess', 'e.g., Enter through main lobby, check in with concierge...')}
                   value={instructionsForm.buildingAccess}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, buildingAccess: e.target.value }))}
-                  rows={3}
-                  data-testid="textarea-building-access"
+                  onChange={(e) => setInstructionsForm({ ...instructionsForm, buildingAccess: e.target.value })}
+                  placeholder={t('buildingPortal.buildingAccessPlaceholder', 'How to access the building...')}
+                  data-testid="input-building-access"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="keysAndFob">Keys / Fob Pickup</Label>
+                <Label>{t('buildingPortal.keysAndFob', 'Keys & Fob')}</Label>
                 <Textarea
-                  id="keysAndFob"
-                  placeholder={t('buildingPortal.placeholders.keysAndFob', 'e.g., Pick up keys from concierge desk, return by 5pm...')}
                   value={instructionsForm.keysAndFob}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, keysAndFob: e.target.value }))}
-                  rows={3}
-                  data-testid="textarea-keys-fob"
+                  onChange={(e) => setInstructionsForm({ ...instructionsForm, keysAndFob: e.target.value })}
+                  placeholder={t('buildingPortal.keysPlaceholder', 'Key pickup location...')}
+                  data-testid="input-keys-fob"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="keysReturnPolicy">Keys / Fob Return Policy</Label>
-                <Select
-                  value={instructionsForm.keysReturnPolicy}
-                  onValueChange={(value) => setInstructionsForm(prev => ({ ...prev, keysReturnPolicy: value }))}
-                >
-                  <SelectTrigger data-testid="select-keys-return">
-                    <SelectValue placeholder={t('buildingPortal.keysReturnPlaceholder', 'Select when to return keys...')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="end_of_day">End of Every Day</SelectItem>
-                    <SelectItem value="end_of_week">End of Week</SelectItem>
-                    <SelectItem value="end_of_project">End of Project</SelectItem>
-                    <SelectItem value="keep_until_complete">Keep Until Work Complete</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="roofAccess">Roof Access Instructions</Label>
+                <Label>{t('buildingPortal.roofAccess', 'Roof Access')}</Label>
                 <Textarea
-                  id="roofAccess"
-                  placeholder={t('buildingPortal.placeholders.roofAccess', 'e.g., Roof access via penthouse level, key required...')}
                   value={instructionsForm.roofAccess}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, roofAccess: e.target.value }))}
-                  rows={3}
-                  data-testid="textarea-roof-access"
+                  onChange={(e) => setInstructionsForm({ ...instructionsForm, roofAccess: e.target.value })}
+                  placeholder={t('buildingPortal.roofAccessPlaceholder', 'Roof access instructions...')}
+                  data-testid="input-roof-access"
                 />
               </div>
-            </div>
-
-            <Separator />
-
-            {/* Trade Parking Section */}
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
-                <span className="material-icons text-base">local_parking</span>
-                Trade Parking
-              </h4>
-              
               <div className="space-y-2">
-                <Label htmlFor="tradeParkingSpots">Number of Trade Parking Spots</Label>
-                <Input
-                  id="tradeParkingSpots"
-                  type="number"
-                  min="0"
-                  placeholder={t('buildingPortal.placeholders.parkingSpots', 'e.g., 2')}
-                  value={instructionsForm.tradeParkingSpots}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingSpots: e.target.value }))}
-                  data-testid="input-trade-parking-spots"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tradeParkingInstructions">Trade Parking Instructions</Label>
+                <Label>{t('buildingPortal.specialRequests', 'Special Requests')}</Label>
                 <Textarea
-                  id="tradeParkingInstructions"
-                  placeholder={t('buildingPortal.placeholders.parkingInstructions', 'e.g., Visitor parking on P1, loading zone available...')}
-                  value={instructionsForm.tradeParkingInstructions}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeParkingInstructions: e.target.value }))}
-                  rows={3}
-                  data-testid="textarea-trade-parking"
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Trade Washroom Section */}
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
-                <span className="material-icons text-base">wc</span>
-                Trade Washroom
-              </h4>
-              
-              <div className="space-y-2">
-                <Label htmlFor="tradeWashroomLocation">Washroom Location</Label>
-                <Textarea
-                  id="tradeWashroomLocation"
-                  placeholder={t('buildingPortal.placeholders.washroomLocation', 'e.g., Main floor lobby, P1 parkade near elevator...')}
-                  value={instructionsForm.tradeWashroomLocation}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, tradeWashroomLocation: e.target.value }))}
-                  rows={2}
-                  data-testid="textarea-trade-washroom"
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Special Requests Section */}
-            <div className="space-y-4">
-              <h4 className="font-medium flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Special Requests
-              </h4>
-              
-              <div className="space-y-2">
-                <Label htmlFor="specialRequests">Additional Instructions or Requests</Label>
-                <Textarea
-                  id="specialRequests"
-                  placeholder={t('buildingPortal.placeholders.specialRequests', 'e.g., Quiet hours before 8am, no work on weekends...')}
                   value={instructionsForm.specialRequests}
-                  onChange={(e) => setInstructionsForm(prev => ({ ...prev, specialRequests: e.target.value }))}
-                  rows={4}
-                  data-testid="textarea-special-requests"
+                  onChange={(e) => setInstructionsForm({ ...instructionsForm, specialRequests: e.target.value })}
+                  placeholder={t('buildingPortal.specialRequestsPlaceholder', 'Any special requirements...')}
+                  data-testid="input-special-requests"
                 />
               </div>
             </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowInstructionsDialog(false)}>
-              Cancel
-            </Button>
-            <Button 
-              onClick={() => saveInstructionsMutation.mutate(instructionsForm)}
-              disabled={saveInstructionsMutation.isPending}
-              data-testid="button-save-instructions"
-            >
-              {saveInstructionsMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Instructions
-                </>
-              )}
-            </Button>
-          </DialogFooter>
+            <Separator />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>{t('buildingPortal.buildingManagerName', 'Building Manager Name')}</Label>
+                <Input
+                  value={instructionsForm.buildingManagerName}
+                  onChange={(e) => setInstructionsForm({ ...instructionsForm, buildingManagerName: e.target.value })}
+                  placeholder={t('buildingPortal.namePlaceholder', 'Name')}
+                  data-testid="input-manager-name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('buildingPortal.buildingManagerPhone', 'Building Manager Phone')}</Label>
+                <Input
+                  value={instructionsForm.buildingManagerPhone}
+                  onChange={(e) => setInstructionsForm({ ...instructionsForm, buildingManagerPhone: e.target.value })}
+                  placeholder={t('buildingPortal.phonePlaceholder', 'Phone number')}
+                  data-testid="input-manager-phone"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('buildingPortal.conciergeNames', 'Concierge Names')}</Label>
+                <Input
+                  value={instructionsForm.conciergeNames}
+                  onChange={(e) => setInstructionsForm({ ...instructionsForm, conciergeNames: e.target.value })}
+                  placeholder={t('buildingPortal.conciergeNamesPlaceholder', 'Concierge staff names')}
+                  data-testid="input-concierge-names"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('buildingPortal.conciergePhone', 'Concierge Phone')}</Label>
+                <Input
+                  value={instructionsForm.conciergePhone}
+                  onChange={(e) => setInstructionsForm({ ...instructionsForm, conciergePhone: e.target.value })}
+                  placeholder={t('buildingPortal.phonePlaceholder', 'Phone number')}
+                  data-testid="input-concierge-phone"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowInstructionsDialog(false)}>
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button type="submit" disabled={saveInstructionsMutation.isPending} data-testid="button-save-instructions">
+                {saveInstructionsMutation.isPending ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('common.saving', 'Saving...')}</>
+                ) : (
+                  <><Save className="w-4 h-4 mr-2" />{t('common.save', 'Save')}</>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
       {/* Change Password Dialog */}
       <Dialog open={showChangePasswordDialog} onOpenChange={setShowChangePasswordDialog}>
-        <DialogContent className="max-w-md" data-testid="dialog-change-password">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5" />
-              Change Password
-            </DialogTitle>
+            <DialogTitle>{t('buildingPortal.changePasswordTitle', 'Change Password')}</DialogTitle>
             <DialogDescription>
-              Enter your current password and choose a new secure password.
+              {t('buildingPortal.changePasswordDesc', 'Enter your current password and choose a new one.')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleChangePassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
+              <Label>{t('buildingPortal.currentPassword', 'Current Password')}</Label>
               <Input
-                id="currentPassword"
                 type="password"
                 value={passwordForm.currentPassword}
-                onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
-                placeholder={t('buildingPortal.currentPasswordPlaceholder', 'Enter your current password')}
+                onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                placeholder={t('buildingPortal.currentPasswordPlaceholder', 'Enter current password')}
                 data-testid="input-current-password"
               />
-              <p className="text-xs text-muted-foreground">
-                Your current password is your strata number if you haven't changed it before.
-              </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label>{t('buildingPortal.newPassword', 'New Password')}</Label>
               <Input
-                id="newPassword"
                 type="password"
                 value={passwordForm.newPassword}
-                onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                placeholder={t('buildingPortal.newPasswordPlaceholder', 'Enter new password (min 6 characters)')}
+                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                placeholder={t('buildingPortal.newPasswordPlaceholder', 'Enter new password')}
                 data-testid="input-new-password"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Label>{t('buildingPortal.confirmPassword', 'Confirm New Password')}</Label>
               <Input
-                id="confirmPassword"
                 type="password"
                 value={passwordForm.confirmPassword}
-                onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
                 placeholder={t('buildingPortal.confirmPasswordPlaceholder', 'Confirm new password')}
                 data-testid="input-confirm-password"
               />
             </div>
-            <DialogFooter className="gap-2 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => {
-                  setShowChangePasswordDialog(false);
-                  setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
-                }}
-              >
-                Cancel
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowChangePasswordDialog(false)}>
+                {t('common.cancel', 'Cancel')}
               </Button>
-              <Button 
-                type="submit"
-                disabled={changePasswordMutation.isPending}
-                data-testid="button-submit-password-change"
-              >
+              <Button type="submit" disabled={changePasswordMutation.isPending} data-testid="button-submit-password">
                 {changePasswordMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Changing...
-                  </>
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t('common.saving', 'Saving...')}</>
                 ) : (
-                  <>
-                    <Lock className="h-4 w-4 mr-2" />
-                    Change Password
-                  </>
+                  <><Lock className="w-4 h-4 mr-2" />{t('buildingPortal.updatePassword', 'Update Password')}</>
                 )}
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Project Progress Dialog */}
+      <Dialog open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5" />
+              {selectedProject && getJobTypeName(selectedProject)}
+            </DialogTitle>
+            <DialogDescription>
+              {t('buildingPortal.projectProgressDesc', 'Building elevation progress by direction')}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedProject && (() => {
+            const totalDrops = selectedProject.totalDrops || 0;
+            const totalDropsNorth = selectedProject.totalDropsNorth ?? Math.floor(totalDrops / 4) + (totalDrops % 4 > 0 ? 1 : 0);
+            const totalDropsEast = selectedProject.totalDropsEast ?? Math.floor(totalDrops / 4) + (totalDrops % 4 > 1 ? 1 : 0);
+            const totalDropsSouth = selectedProject.totalDropsSouth ?? Math.floor(totalDrops / 4) + (totalDrops % 4 > 2 ? 1 : 0);
+            const totalDropsWest = selectedProject.totalDropsWest ?? Math.floor(totalDrops / 4);
+            const completedDropsNorth = selectedProject.completedDropsNorth || 0;
+            const completedDropsEast = selectedProject.completedDropsEast || 0;
+            const completedDropsSouth = selectedProject.completedDropsSouth || 0;
+            const completedDropsWest = selectedProject.completedDropsWest || 0;
+            const totalCompleted = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
+            const totalAll = totalDropsNorth + totalDropsEast + totalDropsSouth + totalDropsWest;
+            const progressPercent = totalAll > 0 ? Math.round((totalCompleted / totalAll) * 100) : 0;
+            
+            return (
+              <div className="py-6 space-y-6">
+                <HighRiseBuilding
+                  floors={selectedProject.floorCount || 25}
+                  totalDropsNorth={totalDropsNorth}
+                  totalDropsEast={totalDropsEast}
+                  totalDropsSouth={totalDropsSouth}
+                  totalDropsWest={totalDropsWest}
+                  completedDropsNorth={completedDropsNorth}
+                  completedDropsEast={completedDropsEast}
+                  completedDropsSouth={completedDropsSouth}
+                  completedDropsWest={completedDropsWest}
+                  customColors={["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]}
+                  className="mb-4"
+                />
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{t('projectDetail.progress.title', 'Overall Progress')}</span>
+                    <span className="font-medium">{progressPercent}%</span>
+                  </div>
+                  <Progress value={progressPercent} className="h-2" />
+                  <p className="text-xs text-muted-foreground text-center">
+                    {totalCompleted} {t('common.of', 'of')} {totalAll} {t('projectDetail.progress.dropsCompleted', 'drops completed')}
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
+          
+          {selectedProject && (
+            <div className="border-t pt-4 space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span>{selectedProject.companyName}</span>
+              </div>
+              {selectedProject.companyPhone && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Phone className="h-4 w-4" />
+                  <span>{selectedProject.companyPhone}</span>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedProject(null)}>
+              {t('common.close', 'Close')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

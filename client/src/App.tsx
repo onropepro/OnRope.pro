@@ -110,6 +110,7 @@ import PropertyManagerInterfaceLanding from "@/pages/PropertyManagerInterfaceLan
 import CSRPropertyManagerLanding from "@/pages/CSRPropertyManagerLanding";
 import TechnicianLanding from "@/pages/TechnicianLanding";
 import GroundCrewLanding from "@/pages/GroundCrewLanding";
+import BuildingManagerLanding from "@/pages/BuildingManagerLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
@@ -178,6 +179,7 @@ function Router() {
     "/property-manager",
     "/technician",
     "/ground-crew",
+    "/building-manager",
     "/pricing",
     "/get-license",
     "/complete-registration",
@@ -209,6 +211,7 @@ function Router() {
           <Route path="/property-manager/company-safety-rating" component={CSRPropertyManagerLanding} />
           <Route path="/technician" component={TechnicianLanding} />
           <Route path="/ground-crew" component={GroundCrewLanding} />
+          <Route path="/building-manager" component={BuildingManagerLanding} />
           <Route path="/pricing" component={Pricing} />
           <Route path="/get-license" component={GetLicense} />
           <Route path="/complete-registration" component={CompleteRegistration} />
@@ -405,9 +408,9 @@ function Router() {
             </ProtectedRoute>
           </Route>
           <Route path="/manage-subscription">
-            <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+            <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
               <ManageSubscription />
-            </ProtectedRoute>
+            </WithDashboardLayout>
           </Route>
           <Route path="/harness-inspection">
             <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
