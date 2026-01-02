@@ -831,7 +831,7 @@ export default function HarnessInspectionForm() {
               <CardContent>
                 <Accordion type="multiple" className="w-full">
                   {(Object.keys(ROPE_ACCESS_EQUIPMENT_CATEGORIES) as RopeAccessEquipmentCategory[]).map((categoryKey) => {
-                    const categoryName = ROPE_ACCESS_EQUIPMENT_CATEGORIES[categoryKey];
+                    const categoryName = t(`inventory.equipmentCategories.${categoryKey}`, ROPE_ACCESS_EQUIPMENT_CATEGORIES[categoryKey]);
                     const items = ROPE_ACCESS_INSPECTION_ITEMS[categoryKey];
                     const categoryData = findings[categoryKey];
                     const categoryStatus = categoryData?.status || "pass";

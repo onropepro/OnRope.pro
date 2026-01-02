@@ -2574,6 +2574,19 @@
   "inventory": {
     "title": "Inventory",
     "subtitle": "Manage your equipment and gear",
+    "equipmentCategories": {
+      "harness": "Harness & Seat System",
+      "ropes": "Work Positioning & Backup Ropes",
+      "descenders": "Descenders",
+      "ascenders": "Ascenders",
+      "backupDevices": "Backup Devices & Fall Arrest",
+      "cowstails": "Cowstails & Positioning Lanyards",
+      "connectors": "Connectors & Karabiners",
+      "anchorsRigging": "Anchors & Rigging Hardware",
+      "helmet": "Helmet & Head Protection",
+      "edgeProtection": "Edge & Rope Protection",
+      "rescueKit": "Rescue Kit"
+    },
     "equipment": "Equipment",
     "gear": "Gear",
     "allItems": "All Items",
