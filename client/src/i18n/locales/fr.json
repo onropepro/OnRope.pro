@@ -1950,6 +1950,10 @@
     "projects": {
       "activeProjects": "Projets actifs",
       "noActiveProjects": "Aucun projet actif pour le moment",
+      "usageUnlimited": "{{used}} projets actifs",
+      "search": {
+        "placeholder": "Rechercher par numéro strata ou de travail..."
+      },
       "created": "Créé",
       "anchorInspection": "Inspection d'ancrage",
       "anchorInspectionUploaded": "Inspection d'ancrage téléversée",

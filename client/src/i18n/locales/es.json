@@ -2015,6 +2015,10 @@
     "projects": {
       "activeProjects": "Proyectos activos",
       "noActiveProjects": "Aún no hay proyectos activos",
+      "usageUnlimited": "{{used}} proyectos activos",
+      "search": {
+        "placeholder": "Buscar por número strata o de trabajo..."
+      },
       "created": "Creado",
       "anchorInspection": "Inspección de anclaje",
       "anchorInspectionUploaded": "Inspección de anclaje cargada",
