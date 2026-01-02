@@ -449,6 +449,7 @@ export default function Schedule() {
         allDay: true,
         backgroundColor: 'transparent',
         borderColor: color,
+        order: startDateStr,
         extendedProps: {
           job,
           jobColor: color,
@@ -484,6 +485,7 @@ export default function Schedule() {
         allDay: true,
         backgroundColor: 'transparent',
         borderColor: color,
+        order: startDateStr,
         extendedProps: {
           job,
           jobColor: color,
@@ -1455,7 +1457,7 @@ export default function Schedule() {
               displayEventTime={false}
               displayEventEnd={false}
               eventDisplay="block"
-              eventOrder="extendedProps.job.startDate,title"
+              eventOrder="order,title"
               eventOrderStrict={true}
               data-testid="calendar"
               eventDidMount={(info) => {
