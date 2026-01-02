@@ -2785,7 +2785,9 @@ function JobDetailDialog({
         description: t('schedule.assignmentCreated', 'Team member has been assigned to this job'),
       });
     },
-    onError: async (error: Error, _variables, context) => {
+    onError: (error: Error, _variables, context) => {
+      // DEBUG: Using alert to guarantee visibility
+      alert("onError called! Message: " + error.message.substring(0, 100));
       console.log("=== ASSIGN EMPLOYEE MUTATION onError CALLED ===");
       console.log("Error object:", error);
       console.log("Error message:", error.message);
@@ -2793,6 +2795,7 @@ function JobDetailDialog({
       
       // Check if this is a conflict error (409)
       if (error.message.startsWith('409:')) {
+        alert("409 conflict detected - opening dialog now");
         console.log("=== 409 CONFLICT DETECTED, OPENING DIALOG ===");
         try {
           // Error format is "409:{json_body}" (4 chars for "409:")
