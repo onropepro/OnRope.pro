@@ -4344,13 +4344,22 @@
         "missingSignaturesFrom": "Tous les participants doivent signer. Signatures manquantes de :"
       }
     },
-    "harnessInspection": "Inspection de Harnais",
+    "harnessInspection": {
+      "title": "Inspection du harnais",
+      "description": "Inspection quotidienne du harnais et des EPI de sécurité"
+    },
     "irataIcop": {
       "title": "IRATA / SPRAT ICOP",
       "description": "Code international de pratique (TC-102ENG)"
     },
-    "incidentReport": "Rapport d'Incident",
-    "methodStatement": "Declaration de Methode",
+    "incidentReport": {
+      "title": "Rapport d'incident",
+      "description": "Documenter les incidents et blessures au travail"
+    },
+    "methodStatement": {
+      "title": "Déclaration de méthode",
+      "description": "Procédures de travail sécuritaires et contrôles des risques"
+    },
     "compliance": {
       "title": "Conformité de sécurité",
       "description": "Tous les formulaires de sécurité sont enregistrés numériquement et peuvent être exportés en documents PDF à des fins de conformité et d'audit."
