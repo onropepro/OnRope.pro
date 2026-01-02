@@ -2767,6 +2767,8 @@ function JobDetailDialog({
     onSuccess: async () => {
       setConflictDialogOpen(false);
       setConflictInfo({ conflicts: [], pendingAssignment: null });
+      setSelectedEmployees([]);
+      setShowAssignEmployees(false);
       // Use refetchQueries to wait for fresh data before updating dialog
       await queryClient.refetchQueries({ queryKey: ["/api/schedule"] });
       // Update the job in parent state for immediate UI refresh
@@ -2920,49 +2922,17 @@ function JobDetailDialog({
     });
   };
 
-  const handleSaveAssignment = async () => {
+  const handleSaveAssignment = () => {
     if (!job || selectedEmployees.length === 0) return;
     
-    setIsAssigningMultiple(true);
-    let successCount = 0;
-    let conflictDetected = false;
-    
-    // Assign all selected employees sequentially
-    for (const employee of selectedEmployees) {
-      try {
-        await assignEmployeeMutation.mutateAsync({
-          jobId: job.id,
-          employeeId: employee.id,
-          startDate: assignmentDates.startDate,
-          endDate: assignmentDates.endDate,
-        });
-        successCount++;
-      } catch (error: any) {
-        // Check if this is a conflict error - the mutation's onError will show the dialog
-        if (error?.message?.startsWith('409:')) {
-          conflictDetected = true;
-          break; // Stop processing, let the conflict dialog handle it
-        }
-        // For other errors, continue to next employee
-      }
-    }
-    
-    setIsAssigningMultiple(false);
-    
-    // Don't reset state if conflict dialog is being shown
-    if (conflictDetected) {
-      return; // The conflict dialog will handle the user's next action
-    }
-    
-    setSelectedEmployees([]);
-    setShowAssignEmployees(false);
-    
-    if (successCount > 0) {
-      toast({
-        title: t('schedule.assignmentsCreated', 'Employees assigned'),
-        description: t('schedule.multipleAssigned', '{{count}} team member(s) have been assigned to this job', { count: successCount }),
-      });
-    }
+    // Assign the first selected employee - onSuccess will handle the rest
+    const employee = selectedEmployees[0];
+    assignEmployeeMutation.mutate({
+      jobId: job.id,
+      employeeId: employee.id,
+      startDate: assignmentDates.startDate,
+      endDate: assignmentDates.endDate,
+    });
   };
 
   if (!job) return null;
