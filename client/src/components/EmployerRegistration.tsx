@@ -124,6 +124,53 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
       progressIntervalRef.current = null;
     }
 
+    // Helper function to delay execution
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Helper function to attempt registration with retries
+    const attemptRegistration = async (retries: number = 3): Promise<{ ok: boolean; result: any }> => {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          // Wait a bit before first attempt to let Stripe finalize session
+          if (attempt === 1) {
+            await delay(1500);
+          }
+
+          console.log(`[Registration] Attempt ${attempt}/${retries} for session: ${checkoutSessionId}`);
+          
+          const response = await fetch(`/api/stripe/complete-registration/${checkoutSessionId}`, {
+            credentials: "include",
+          });
+
+          const result = await response.json();
+
+          // If successful or already processed, return immediately
+          if (response.ok && result.success) {
+            return { ok: true, result };
+          }
+
+          // If the session isn't complete yet, retry after delay
+          if (result.message?.includes('not completed') || result.message?.includes('Status:')) {
+            console.log(`[Registration] Session not ready, retrying in ${attempt * 1500}ms...`);
+            await delay(attempt * 1500);
+            continue;
+          }
+
+          // For other errors, return the error response
+          return { ok: false, result };
+        } catch (fetchErr) {
+          console.error(`[Registration] Fetch error on attempt ${attempt}:`, fetchErr);
+          if (attempt < retries) {
+            await delay(attempt * 1500);
+            continue;
+          }
+          throw fetchErr;
+        }
+      }
+      
+      return { ok: false, result: { message: "Registration timed out. Please contact support." } };
+    };
+
     try {
       setStep("processing");
       setProcessingStatus({ step: 0, message: PROCESSING_STEPS[0] });
@@ -135,13 +182,9 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
         });
       }, 2500);
 
-      const response = await fetch(`/api/stripe/complete-registration/${checkoutSessionId}`, {
-        credentials: "include",
-      });
+      const { ok, result } = await attemptRegistration(3);
 
-      const result = await response.json();
-
-      if (response.ok && result.success) {
+      if (ok && result.success) {
         setRegistrationResult({
           companyName: result.companyName || data.companyName,
           trialEnd: result.trialEnd,
@@ -159,11 +202,12 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
       }
     } catch (err: any) {
       console.error("[Registration] Error completing registration:", err);
-      setError(err.message || "Failed to complete registration");
-      setStep("payment");
+      // Stay on processing step with error message instead of going back to payment
+      // Going back to payment causes a loop where new checkout sessions are created
+      setError(err.message || "Failed to complete registration. Please contact support.");
       toast({
         title: t('employerReg.toast.registrationError', 'Registration Error'),
-        description: err.message || t('employerReg.toast.failedToComplete', 'Failed to complete registration. Please try again.'),
+        description: err.message || t('employerReg.toast.failedToComplete', 'Failed to complete registration. Please contact support.'),
         variant: "destructive",
       });
     } finally {
