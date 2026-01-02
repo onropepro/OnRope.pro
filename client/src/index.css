@@ -664,48 +664,44 @@
   z-index: 2 !important;
 }
 
-/* FullCalendar Grid Styling - More visible grid lines */
+/* FullCalendar Grid Styling - Strong visible grid lines */
 .fc {
-  --fc-border-color: hsl(var(--border));
+  --fc-border-color: #d1d5db;
 }
 
-/* Make grid lines more visible */
+/* Force solid borders on the main grid */
 .fc .fc-scrollgrid {
-  border-width: 1px;
-  border-color: hsl(var(--border));
+  border: 1px solid #d1d5db !important;
 }
 
+/* Strong borders on every cell */
+.fc .fc-scrollgrid td,
+.fc .fc-scrollgrid th {
+  border: 1px solid #d1d5db !important;
+}
+
+/* Day cells with solid borders */
 .fc .fc-daygrid-day {
-  border-width: 1px;
-  border-color: hsl(var(--border) / 0.8);
+  border: 1px solid #d1d5db !important;
 }
 
-/* Stronger vertical lines between days */
-.fc .fc-scrollgrid td {
-  border-color: hsl(var(--border) / 0.6);
-}
-
-/* Even more visible row separators */
-.fc .fc-scrollgrid tr {
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
-}
-
-/* Subtle background alternation for better readability */
+/* Weekend shading */
 .fc .fc-daygrid-day.fc-day-sat,
 .fc .fc-daygrid-day.fc-day-sun {
-  background-color: hsl(var(--muted) / 0.3);
+  background-color: #f9fafb;
 }
 
 /* Today's cell highlight */
 .fc .fc-daygrid-day.fc-day-today {
-  background-color: hsl(var(--primary) / 0.08);
-  border: 2px solid hsl(var(--primary) / 0.4);
+  background-color: hsl(var(--primary) / 0.1);
+  border: 2px solid hsl(var(--primary) / 0.5) !important;
 }
 
 /* Header row styling */
 .fc .fc-col-header-cell {
-  background-color: hsl(var(--muted) / 0.5);
-  border-bottom: 2px solid hsl(var(--border));
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db !important;
+  border-bottom: 2px solid #9ca3af !important;
   padding: 0.5rem;
   font-weight: 600;
 }
@@ -719,22 +715,22 @@
 
 /* Dark mode adjustments */
 .dark .fc {
-  --fc-border-color: hsl(var(--border));
+  --fc-border-color: #4b5563;
 }
 
+.dark .fc .fc-scrollgrid,
+.dark .fc .fc-scrollgrid td,
+.dark .fc .fc-scrollgrid th,
 .dark .fc .fc-daygrid-day {
-  border-color: hsl(var(--border) / 0.5);
-}
-
-.dark .fc .fc-scrollgrid td {
-  border-color: hsl(var(--border) / 0.4);
+  border-color: #4b5563 !important;
 }
 
 .dark .fc .fc-daygrid-day.fc-day-sat,
 .dark .fc .fc-daygrid-day.fc-day-sun {
-  background-color: hsl(var(--muted) / 0.15);
+  background-color: hsl(var(--muted) / 0.2);
 }
 
 .dark .fc .fc-col-header-cell {
-  background-color: hsl(var(--muted) / 0.3);
+  background-color: hsl(var(--muted) / 0.4);
+  border-bottom-color: #6b7280 !important;
 }
