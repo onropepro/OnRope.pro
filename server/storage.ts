@@ -1420,7 +1420,7 @@ export class Storage {
       dropsCompletedEast: workSessions.dropsCompletedEast,
       dropsCompletedSouth: workSessions.dropsCompletedSouth,
       dropsCompletedWest: workSessions.dropsCompletedWest,
-      notes: workSessions.notes,
+      shortfallReason: workSessions.shortfallReason,
       employeeName: users.name,
       employeeRole: users.role,
       projectName: projects.buildingName,

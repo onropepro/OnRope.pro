@@ -49,7 +49,7 @@ interface WorkSession {
   dropsCompletedEast: number | null;
   dropsCompletedSouth: number | null;
   dropsCompletedWest: number | null;
-  notes: string | null;
+  shortfallReason: string | null;
   employeeName: string | null;
   employeeRole: string | null;
   projectName: string | null;
