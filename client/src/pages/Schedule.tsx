@@ -1455,6 +1455,8 @@ export default function Schedule() {
               displayEventTime={false}
               displayEventEnd={false}
               eventDisplay="block"
+              eventOrder="extendedProps.job.startDate,title"
+              eventOrderStrict={true}
               data-testid="calendar"
               eventDidMount={(info) => {
                 if (info.event.extendedProps.isTimeOff) {
