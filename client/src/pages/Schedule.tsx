@@ -2786,8 +2786,14 @@ function JobDetailDialog({
       });
     },
     onError: async (error: Error, _variables, context) => {
+      console.log("=== ASSIGN EMPLOYEE MUTATION onError CALLED ===");
+      console.log("Error object:", error);
+      console.log("Error message:", error.message);
+      console.log("Context:", context);
+      
       // Check if this is a conflict error (409)
       if (error.message.startsWith('409:')) {
+        console.log("=== 409 CONFLICT DETECTED, OPENING DIALOG ===");
         try {
           // Error format is "409:{json_body}" (4 chars for "409:")
           const jsonStr = error.message.substring(4).trim();
