@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -13,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Building2, Users, Briefcase, Check, ChevronRight, Rocket, Building, UserPlus } from "lucide-react";
+import { Building2, Users, Briefcase, Check, ChevronRight, Building, UserPlus, Search, Mail, Award, ArrowLeft, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 
 const TIMEZONES = [
   { value: "America/Vancouver", label: "Pacific Time (Vancouver)" },
@@ -72,6 +73,22 @@ interface OnboardingWizardProps {
 }
 
 type Step = "welcome" | "company" | "client" | "employee" | "project" | "complete";
+type EmployeeMode = "select" | "search" | "create";
+type SearchType = "irata" | "sprat" | "email";
+
+interface FoundTechnician {
+  id: string;
+  name: string;
+  email: string;
+  irataLevel?: number;
+  irataLicenseNumber?: string;
+  spratLevel?: number;
+  spratLicenseNumber?: string;
+  employeeCity?: string;
+  employeeProvinceState?: string;
+  hasPlusAccess?: boolean;
+  isAlreadyLinked?: boolean;
+}
 
 const STEPS: Step[] = ["welcome", "company", "client", "employee", "project", "complete"];
 
@@ -81,6 +98,16 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<Step>("welcome");
   const [createdClientId, setCreatedClientId] = useState<string | null>(null);
+  
+  // Employee step state
+  const [employeeMode, setEmployeeMode] = useState<EmployeeMode>("select");
+  const [searchType, setSearchType] = useState<SearchType>("email");
+  const [searchValue, setSearchValue] = useState("");
+  const [foundTechnician, setFoundTechnician] = useState<FoundTechnician | null>(null);
+  const [searchMessage, setSearchMessage] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isLinking, setIsLinking] = useState(false);
+  const [employeeAdded, setEmployeeAdded] = useState(false);
 
   const stepIndex = STEPS.indexOf(currentStep);
   const progress = (stepIndex / (STEPS.length - 1)) * 100;
@@ -167,14 +194,29 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      setEmployeeAdded(true);
+      toast({
+        title: t("onboarding.success", "Success"),
+        description: t("onboarding.employeeCreated", "Team member added successfully"),
+      });
       setCurrentStep("project");
     },
-    onError: () => {
-      toast({
-        title: t("onboarding.error", "Error"),
-        description: t("onboarding.employeeCreateFailed", "Failed to create employee"),
-        variant: "destructive",
-      });
+    onError: (error: any) => {
+      const message = error?.message || "Failed to create employee";
+      if (message.includes("email") || message.includes("already")) {
+        toast({
+          title: t("onboarding.error", "Error"),
+          description: t("onboarding.employeeEmailExists", "An account with this email already exists. Try searching for them instead."),
+          variant: "destructive",
+        });
+        setEmployeeMode("select");
+      } else {
+        toast({
+          title: t("onboarding.error", "Error"),
+          description: t("onboarding.employeeCreateFailed", "Failed to create employee"),
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -224,7 +266,6 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
   };
 
   const handleSkipStep = () => {
-    // Normal flow - advance to next step
     const nextStepIndex = stepIndex + 1;
     if (nextStepIndex < STEPS.length - 1) {
       setCurrentStep(STEPS[nextStepIndex]);
@@ -233,8 +274,98 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
     }
   };
   
-  // Check if project creation is available (requires a client)
   const canCreateProject = !!createdClientId;
+
+  // Reset form state when entering certain steps
+  useEffect(() => {
+    if (currentStep === "client") {
+      // Reset client form to prevent browser autofill contamination
+      clientForm.reset({
+        firstName: "",
+        lastName: "",
+        company: "",
+        phoneNumber: "",
+        email: "",
+      });
+    } else if (currentStep === "employee") {
+      setEmployeeMode("select");
+      setSearchType("email");
+      setSearchValue("");
+      setFoundTechnician(null);
+      setSearchMessage(null);
+    }
+  }, [currentStep, clientForm]);
+
+  // Search for existing technician
+  const searchTechnician = async () => {
+    if (!searchValue.trim()) return;
+    
+    setIsSearching(true);
+    setFoundTechnician(null);
+    setSearchMessage(null);
+    
+    try {
+      const response = await fetch(`/api/technicians/search?searchType=${searchType}&searchValue=${encodeURIComponent(searchValue.trim())}`);
+      const data = await response.json();
+      
+      if (data.found && data.technician) {
+        setFoundTechnician(data.technician);
+        if (data.warning) {
+          setSearchMessage(data.warning);
+        }
+      } else {
+        setSearchMessage(data.message || "No technician found with that information");
+      }
+    } catch (error) {
+      setSearchMessage("Error searching for technician");
+      toast({
+        title: t("onboarding.error", "Error"),
+        description: t("onboarding.searchFailed", "Failed to search for technician. Please try again."),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Link/invite existing technician
+  const linkTechnician = async () => {
+    if (!foundTechnician) return;
+    
+    setIsLinking(true);
+    try {
+      const response = await apiRequest("POST", `/api/technicians/${foundTechnician.id}/link`, {
+        hourlyRate: 0,
+        isSalary: false,
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      setEmployeeAdded(true);
+      toast({
+        title: t("onboarding.success", "Success"),
+        description: t("onboarding.invitationSent", "Team invitation sent successfully"),
+      });
+      setCurrentStep("project");
+    } catch (error: any) {
+      const errorMessage = error?.message || t("onboarding.linkFailed", "Failed to send team invitation");
+      toast({
+        title: t("onboarding.error", "Error"),
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLinking(false);
+    }
+  };
+
+  // Reset employee step state
+  const resetEmployeeState = () => {
+    setEmployeeMode("select");
+    setSearchType("email");
+    setSearchValue("");
+    setFoundTechnician(null);
+    setSearchMessage(null);
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -368,7 +499,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                     <FormItem>
                       <FormLabel>{t("onboarding.client.firstName", "First Name")}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="John" data-testid="input-client-first-name" />
+                        <Input {...field} placeholder="John" autoComplete="given-name" data-testid="input-client-first-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -381,7 +512,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                     <FormItem>
                       <FormLabel>{t("onboarding.client.lastName", "Last Name")}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Smith" data-testid="input-client-last-name" />
+                        <Input {...field} placeholder="Smith" autoComplete="family-name" data-testid="input-client-last-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -395,7 +526,14 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                   <FormItem>
                     <FormLabel>{t("onboarding.client.company", "Company (Optional)")}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="ABC Property Management" data-testid="input-client-company" />
+                      <Input 
+                        {...field} 
+                        placeholder="ABC Property Management" 
+                        autoComplete="off" 
+                        data-1p-ignore="true" 
+                        data-lpignore="true" 
+                        data-testid="input-client-company"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -429,76 +567,257 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
 
       case "employee":
         return (
-          <Form {...employeeForm}>
-            <form onSubmit={employeeForm.handleSubmit((data) => createEmployeeMutation.mutate(data))} className="space-y-4 py-4">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <UserPlus className="w-8 h-8 text-primary" />
+          <div className="space-y-4 py-4">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-primary/10 rounded-full">
+                <UserPlus className="w-8 h-8 text-primary" />
+              </div>
+            </div>
+            <div className="text-center mb-4">
+              <h3 className="text-xl font-semibold">{t("onboarding.employee.title", "Add Your First Team Member")}</h3>
+              <p className="text-sm text-muted-foreground">{t("onboarding.employee.description", "Search for existing technicians or create a new account")}</p>
+            </div>
+
+            {/* Mode Selection */}
+            {employeeMode === "select" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <Card 
+                    className="shadow-sm cursor-pointer hover:shadow-md transition-shadow border-primary/30 bg-primary/5"
+                    onClick={() => setEmployeeMode("search")}
+                    data-testid="button-search-existing"
+                  >
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className="p-2 bg-primary/10 rounded-full">
+                        <Search className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium">{t("onboarding.employee.searchExisting", "Find Existing Technician")}</div>
+                        <div className="text-sm text-muted-foreground">{t("onboarding.employee.searchDesc", "Search by email or IRATA/SPRAT license")}</div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </CardContent>
+                  </Card>
+                  
+                  <Card 
+                    className="shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => setEmployeeMode("create")}
+                    data-testid="button-create-new"
+                  >
+                    <CardContent className="flex items-center gap-4 p-4">
+                      <div className="p-2 bg-muted rounded-full">
+                        <UserPlus className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium">{t("onboarding.employee.createNew", "Create New Account")}</div>
+                        <div className="text-sm text-muted-foreground">{t("onboarding.employee.createDesc", "Enter details for a new team member")}</div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button type="button" variant="ghost" onClick={handleSkipStep} className="flex-1" data-testid="button-skip-employee">
+                    {t("common.skip", "Skip for now")}
+                  </Button>
                 </div>
               </div>
-              <div className="text-center mb-4">
-                <h3 className="text-xl font-semibold">{t("onboarding.employee.title", "Add Your First Team Member")}</h3>
-                <p className="text-sm text-muted-foreground">{t("onboarding.employee.description", "They'll receive login credentials via email")}</p>
+            )}
+
+            {/* Search Mode */}
+            {employeeMode === "search" && (
+              <div className="space-y-4">
+                {/* Search Type Selection */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t("onboarding.employee.searchBy", "Search by")}</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: 'email' as SearchType, label: 'Email', icon: Mail },
+                      { value: 'irata' as SearchType, label: 'IRATA', icon: Award },
+                      { value: 'sprat' as SearchType, label: 'SPRAT', icon: Award },
+                    ].map((option) => (
+                      <Button
+                        key={option.value}
+                        type="button"
+                        variant={searchType === option.value ? "default" : "outline"}
+                        className="flex-col gap-1 h-auto py-3"
+                        onClick={() => { setSearchType(option.value); setFoundTechnician(null); setSearchValue(''); setSearchMessage(null); }}
+                        data-testid={`button-search-type-${option.value}`}
+                      >
+                        <option.icon className="w-4 h-4" />
+                        <span className="text-xs">{option.label}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search Input */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    {searchType === 'email' ? t("onboarding.employee.emailAddress", "Email Address") :
+                     searchType === 'irata' ? t("onboarding.employee.irataLicense", "IRATA License Number") :
+                     t("onboarding.employee.spratLicense", "SPRAT License Number")}
+                  </label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder={
+                        searchType === 'email' ? 'technician@email.com' :
+                        searchType === 'irata' ? 'e.g., 123456' :
+                        'e.g., SP-12345'
+                      }
+                      value={searchValue}
+                      onChange={(e) => { setSearchValue(e.target.value); setFoundTechnician(null); setSearchMessage(null); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); searchTechnician(); }}}
+                      data-testid="input-search-value"
+                    />
+                    <Button 
+                      type="button"
+                      onClick={searchTechnician}
+                      disabled={isSearching || !searchValue.trim()}
+                      data-testid="button-search"
+                    >
+                      {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Search Results */}
+                {searchMessage && !foundTechnician && (
+                  <Card className="shadow-sm bg-muted/50">
+                    <CardContent className="flex items-center gap-3 p-4">
+                      <AlertCircle className="w-5 h-5 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">{searchMessage}</span>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {foundTechnician && (
+                  <Card className="shadow-sm border-primary/30">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-primary" />
+                        <span className="font-medium">{t("onboarding.employee.technicianFound", "Technician Found")}</span>
+                      </div>
+                      <div className="pl-8 space-y-1">
+                        <div className="font-medium">{foundTechnician.name}</div>
+                        <div className="text-sm text-muted-foreground">{foundTechnician.email}</div>
+                        {foundTechnician.irataLicenseNumber && (
+                          <div className="text-sm text-muted-foreground">IRATA Level {foundTechnician.irataLevel}: {foundTechnician.irataLicenseNumber}</div>
+                        )}
+                        {foundTechnician.spratLicenseNumber && (
+                          <div className="text-sm text-muted-foreground">SPRAT Level {foundTechnician.spratLevel}: {foundTechnician.spratLicenseNumber}</div>
+                        )}
+                        {foundTechnician.employeeCity && (
+                          <div className="text-sm text-muted-foreground">{foundTechnician.employeeCity}, {foundTechnician.employeeProvinceState}</div>
+                        )}
+                      </div>
+                      {searchMessage && (
+                        <div className="text-sm text-amber-600 dark:text-amber-400 pl-8">{searchMessage}</div>
+                      )}
+                      <Button 
+                        onClick={linkTechnician} 
+                        disabled={isLinking}
+                        className="w-full mt-2"
+                        data-testid="button-send-invitation"
+                      >
+                        {isLinking ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {t("onboarding.employee.sending", "Sending...")}
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="w-4 h-4 mr-2" />
+                            {t("onboarding.employee.sendInvitation", "Send Team Invitation")}
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Navigation */}
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button type="button" variant="ghost" onClick={resetEmployeeState} data-testid="button-back-to-select">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    {t("common.back", "Back")}
+                  </Button>
+                  <Button type="button" variant="ghost" onClick={handleSkipStep} className="flex-1" data-testid="button-skip-employee">
+                    {t("common.skip", "Skip")}
+                  </Button>
+                </div>
               </div>
-              <FormField
-                control={employeeForm.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("onboarding.employee.name", "Full Name")}</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Alex Johnson" data-testid="input-employee-name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={employeeForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("onboarding.employee.email", "Email")}</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="email" placeholder="alex@example.com" data-testid="input-employee-email" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={employeeForm.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("onboarding.employee.role", "Role")}</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-employee-role">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="rope_access_tech">{t("roles.ropeAccessTech", "Rope Access Technician")}</SelectItem>
-                        <SelectItem value="supervisor">{t("roles.supervisor", "Supervisor")}</SelectItem>
-                        <SelectItem value="ground_crew">{t("roles.groundCrew", "Ground Crew")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="flex gap-2 pt-4">
-                <Button type="button" variant="ghost" onClick={handleSkipStep} data-testid="button-skip-employee">
-                  {t("common.skip", "Skip")}
-                </Button>
-                <Button type="submit" className="flex-1" disabled={createEmployeeMutation.isPending} data-testid="button-save-employee">
-                  {createEmployeeMutation.isPending ? t("common.saving", "Saving...") : t("common.continue", "Continue")}
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </form>
-          </Form>
+            )}
+
+            {/* Create Mode */}
+            {employeeMode === "create" && (
+              <Form {...employeeForm}>
+                <form onSubmit={employeeForm.handleSubmit((data) => createEmployeeMutation.mutate(data))} className="space-y-4">
+                  <FormField
+                    control={employeeForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("onboarding.employee.name", "Full Name")}</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Alex Johnson" data-testid="input-employee-name" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={employeeForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("onboarding.employee.email", "Email")}</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="email" placeholder="alex@example.com" data-testid="input-employee-email" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={employeeForm.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("onboarding.employee.role", "Role")}</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-employee-role">
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="rope_access_tech">{t("roles.ropeAccessTech", "Rope Access Technician")}</SelectItem>
+                            <SelectItem value="supervisor">{t("roles.supervisor", "Supervisor")}</SelectItem>
+                            <SelectItem value="ground_crew">{t("roles.groundCrew", "Ground Crew")}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <p className="text-sm text-muted-foreground">{t("onboarding.employee.credentialsNote", "They'll receive login credentials via email")}</p>
+                  
+                  <div className="flex gap-2 pt-4 border-t">
+                    <Button type="button" variant="ghost" onClick={resetEmployeeState} data-testid="button-back-to-select">
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      {t("common.back", "Back")}
+                    </Button>
+                    <Button type="submit" className="flex-1" disabled={createEmployeeMutation.isPending} data-testid="button-save-employee">
+                      {createEmployeeMutation.isPending ? t("common.saving", "Saving...") : t("common.continue", "Continue")}
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            )}
+          </div>
         );
 
       case "project":
@@ -521,8 +840,8 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                   {t("onboarding.project.noClientTip", "Tip: Add clients from the Clients section, then create projects to start tracking work.")}
                 </CardContent>
               </Card>
-              <Button onClick={() => completeOnboardingMutation.mutate()} className="w-full" data-testid="button-finish-without-project">
-                {t("common.finish", "Finish Setup")}
+              <Button onClick={() => completeOnboardingMutation.mutate()} className="w-full" disabled={completeOnboardingMutation.isPending} data-testid="button-finish-without-project">
+                {completeOnboardingMutation.isPending ? t("common.saving", "Finishing...") : t("common.finish", "Finish Setup")}
                 <Check className="w-4 h-4 ml-2" />
               </Button>
             </div>
@@ -547,7 +866,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                   <FormItem>
                     <FormLabel>{t("onboarding.project.address", "Building Address")}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="123 Main Street, Vancouver, BC" data-testid="input-project-address" />
+                      <Input {...field} placeholder="123 Main St, Vancouver, BC" data-testid="input-building-address" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -558,9 +877,9 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                 name="strataPlanNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("onboarding.project.strata", "Strata/Building Number (Optional)")}</FormLabel>
+                    <FormLabel>{t("onboarding.project.strata", "Strata Plan Number (Optional)")}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="LMS1234" data-testid="input-project-strata" />
+                      <Input {...field} placeholder="BCS1234" data-testid="input-strata-number" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -579,9 +898,9 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {JOB_TYPES.map((jt) => (
-                          <SelectItem key={jt.value} value={jt.value}>
-                            {jt.label}
+                        {JOB_TYPES.map((job) => (
+                          <SelectItem key={job.value} value={job.value}>
+                            {job.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -607,8 +926,8 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
         return (
           <div className="space-y-6 py-4">
             <div className="flex justify-center">
-              <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-full">
-                <Check className="w-12 h-12 text-green-600 dark:text-green-400" />
+              <div className="p-4 bg-primary/10 rounded-full">
+                <Check className="w-12 h-12 text-primary" />
               </div>
             </div>
             <div className="text-center space-y-2">
@@ -616,21 +935,19 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                 {t("onboarding.complete.title", "You're All Set!")}
               </h3>
               <p className="text-muted-foreground">
-                {t("onboarding.complete.description", "Your account is ready. Start exploring your dashboard to manage projects, track time, and keep your team safe.")}
+                {t("onboarding.complete.description", "Your account is ready. Start exploring the platform to manage your rope access operations.")}
               </p>
             </div>
-            <div className="space-y-3">
-              <Card className="shadow-sm bg-muted/50">
-                <CardContent className="p-4">
-                  <h4 className="font-medium mb-2">{t("onboarding.complete.nextSteps", "Recommended Next Steps")}</h4>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>{t("onboarding.complete.tip1", "Add more team members from the Employees section")}</li>
-                    <li>{t("onboarding.complete.tip2", "Set up your equipment inventory")}</li>
-                    <li>{t("onboarding.complete.tip3", "Configure safety forms and document templates")}</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="shadow-sm bg-muted/50">
+              <CardContent className="p-4">
+                <h4 className="font-medium mb-2">{t("onboarding.complete.nextSteps", "Recommended Next Steps")}</h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>{t("onboarding.complete.tip1", "Add more team members from the Employees section")}</li>
+                  <li>{t("onboarding.complete.tip2", "Set up your company branding")}</li>
+                  <li>{t("onboarding.complete.tip3", "Explore the scheduling calendar")}</li>
+                </ul>
+              </CardContent>
+            </Card>
             <Button onClick={onComplete} className="w-full" data-testid="button-go-to-dashboard">
               {t("onboarding.complete.goToDashboard", "Go to Dashboard")}
               <ChevronRight className="w-4 h-4 ml-2" />
@@ -646,26 +963,25 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent 
-        className="max-w-md" 
+        className="sm:max-w-md max-h-[90vh] overflow-y-auto [&>button]:hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.preventDefault()}
       >
+        <VisuallyHidden>
+          <DialogTitle>Onboarding Wizard</DialogTitle>
+          <DialogDescription>Complete the onboarding steps to set up your account</DialogDescription>
+        </VisuallyHidden>
         <DialogHeader>
-          <DialogTitle className="sr-only">{t("onboarding.title", "Account Setup")}</DialogTitle>
-          <DialogDescription className="sr-only">
-            {t("onboarding.description", "Complete these steps to set up your account")}
-          </DialogDescription>
-        </DialogHeader>
-        {currentStep !== "welcome" && currentStep !== "complete" && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>{t("onboarding.step", "Step")} {stepIndex} / {STEPS.length - 2}</span>
-              <span>{Math.round(progress)}%</span>
+          {currentStep !== "welcome" && currentStep !== "complete" && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>Step {stepIndex} / {STEPS.length - 2}</span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <Progress value={progress} className="h-2" />
             </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-        )}
+          )}
+        </DialogHeader>
         {renderStepContent()}
       </DialogContent>
     </Dialog>

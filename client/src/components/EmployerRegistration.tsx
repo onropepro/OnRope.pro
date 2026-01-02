@@ -194,11 +194,13 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
         }),
         credentials: "include",
       });
+      
+      const result = await response.json();
+      
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Registration failed");
+        throw new Error(result.message || "Registration failed");
       }
-      return response.json();
+      return result;
     },
     onSuccess: () => {
       setStep("success");
@@ -492,12 +494,6 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                   <h2 className="text-xl font-bold mb-1">{t('employerReg.companyDetails.title', 'Account Details')}</h2>
                   <p className="text-sm text-muted-foreground mb-6">{t('employerReg.companyDetails.step', 'Tell us about your rope access business')}</p>
 
-                  {error && (
-                    <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
-                      {error}
-                    </div>
-                  )}
-
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="companyName">{t('employerReg.companyDetails.companyName', 'Company Name')}</Label>
@@ -602,12 +598,6 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
                     <ArrowLeft className="w-4 h-4" />
                     {t('employerReg.buttons.back', 'Back')}
                   </button>
-
-                  {error && (
-                    <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md mb-4">
-                      {error}
-                    </div>
-                  )}
 
                   {/* Stripe Embedded Checkout */}
                   <div className="border rounded-lg overflow-hidden">

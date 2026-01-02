@@ -1,7 +1,7 @@
 # Dashboard Documentation Series
 **System**: OnRopePro - Rope Access Management Platform  
 **Version**: 1.0  
-**Last Updated**: December 25, 2024  
+**Last Updated**: January 1, 2026  
 **Status**: ACTIVE
 
 ---
@@ -27,7 +27,7 @@ This directory contains comprehensive documentation for all stakeholder-specific
 | **Dashboard** | Company work dashboard accessed when connected to an employer. Uses employer's blue branding and navigation. Shows projects, safety forms, clock-in/out. | `/dashboard` |
 
 ### Technician Experience
-- **Unlinked**: Passport only (rust-colored sidebar)
+- **Unlinked**: Passport only (blue-gray sidebar)
 - **Linked**: Passport (personal) + Dashboard (employer's blue sidebar)
 
 ### Ground Crew Experience
@@ -78,6 +78,7 @@ Users create a single portable account that connects to multiple entities:
 | [resident-dashboard-instructions-v1.0.md](./resident-dashboard-instructions-v1.0.md) | Building Residents | PRODUCTION-READY | Feedback submission and project tracking |
 | [ground-crew-passport-instructions-v1.0.md](./ground-crew-passport-instructions-v1.0.md) | Ground Crew Workers | PRODUCTION-READY | Passport (personal) - similar to technician but distinct role |
 | [property-manager-dashboard-instructions-v1.0.md](./property-manager-dashboard-instructions-v1.0.md) | Property Managers | PRODUCTION-READY | Vendor oversight and building management |
+| [building-manager-dashboard-instructions-v1.0.md](./building-manager-dashboard-instructions-v1.0.md) | Building Managers | PRODUCTION-READY | Building portal with project progress and building instructions |
 
 **Note**: SuperUser dashboard documentation is out of scope for this series (internal platform management only).
 
@@ -96,12 +97,13 @@ Each stakeholder type has a distinct brand color used throughout their dashboard
 | Stakeholder | Brand Color | Hex Code | CSS Variable |
 |-------------|-------------|----------|--------------|
 | Employer | Blue | `#0B64A3` | `--brand-employer` |
-| Technician | Rust | `#AB4521` | `--brand-technician` |
+| Technician | Blue-Gray | `#5C7A84` | `--brand-technician` |
 | Ground Crew | Forest Green | `#5D7B6F` | `--brand-ground-crew` |
 | Property Manager | Sage | `#6E9075` | `--brand-pm` |
 | Resident | Teal | `#86A59C` | `--brand-resident` |
 | Building Manager | Taupe | `#B89685` | `--brand-bm` |
-| Safety (SuperUser) | Deep Red | `#8B0000` | `--brand-safety` |
+| SuperUser | Purple | `#6B21A8` | `--brand-superuser` |
+| CSR | Blue | `#0B64A3` | `--brand-csr` |
 
 ---
 
@@ -144,9 +146,20 @@ See [technician-passport-instructions-v1.0.md](./technician-passport-instruction
 
 1. **Shared components when possible**: Use the unified sidebar/layout for most dashboards
 2. **Permission checks at item level**: Each nav item checks user permissions via `isVisible()`
-3. **Consistent header patterns**: Most dashboards share similar header elements (search, user profile, logout)
+3. **Unified header component**: `UnifiedDashboardHeader.tsx` serves 8 role variants (employer, technician, ground-crew, resident, property-manager, building-manager, superuser, csr)
 4. **Mobile-first with desktop sidebar**: Mobile uses bottom nav or full-screen menus
 5. **Linked workers share employer navigation**: When accessing Work Dashboard, technicians/ground crew see employer's sidebar
+
+### UnifiedDashboardHeader Component
+
+The `UnifiedDashboardHeader` component (639 lines) provides a consistent header experience across dashboards:
+
+- **8 Supported Variants**: employer, technician, ground-crew, resident, property-manager, building-manager, superuser, csr
+- **Runtime Type Validation**: Uses `getSafeVariant()` for safe variant resolution
+- **Features**: Profile dropdown, notifications, language selection, PWA install, license expiry warnings
+- **Custom Handlers**: TechnicianPortal and GroundCrewPortal use `useInlineActions` hook for tab-based navigation
+
+**Intentional Exceptions**: ResidentDashboard and PropertyManagerDashboard use custom headers showing project/vendor context.
 
 ---
 
@@ -169,16 +182,15 @@ See [technician-passport-instructions-v1.0.md](./technician-passport-instruction
 
 ## Quick Reference: Dashboard Entry Points
 
-| Stakeholder | Route | File Location |
-|-------------|-------|---------------|
-| Employer | `/dashboard` | `client/src/pages/Dashboard.tsx` |
-| Technician | `/technician-portal` | `client/src/pages/TechnicianPortal.tsx` |
-| Ground Crew | `/ground-crew-portal` | `client/src/pages/GroundCrewPortal.tsx` |
-| Resident | `/resident-dashboard` | `client/src/pages/ResidentDashboard.tsx` |
-| Property Manager | `/property-manager` | `client/src/pages/PropertyManager.tsx` |
-| SuperUser | `/superuser` | `client/src/pages/SuperUser.tsx` |
-
-**Note**: Building Manager currently uses integrated features within Property Manager or other dashboards rather than a separate dedicated page.
+| Stakeholder | Route | File Location | Approx. Lines |
+|-------------|-------|---------------|---------------|
+| Employer | `/dashboard` | `client/src/pages/Dashboard.tsx` | ~12,734 |
+| Technician | `/technician-portal` | `client/src/pages/TechnicianPortal.tsx` | ~6,588 |
+| Ground Crew | `/ground-crew-portal` | `client/src/pages/GroundCrewPortal.tsx` | ~2,381 |
+| Resident | `/resident-dashboard` | `client/src/pages/ResidentDashboard.tsx` | ~2,089 |
+| Property Manager | `/property-manager` | `client/src/pages/PropertyManager.tsx` | ~2,794 |
+| Building Manager | `/building-portal` | `client/src/pages/BuildingPortal.tsx` | ~1,627 |
+| SuperUser | `/superuser` | `client/src/pages/SuperUser.tsx` | - |
 
 ---
 

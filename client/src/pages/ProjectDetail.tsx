@@ -3478,6 +3478,7 @@ export default function ProjectDetail() {
                   buildingHeight: formData.get('buildingHeight') || undefined,
                   startDate: formData.get('startDate') || undefined,
                   endDate: formData.get('endDate') || undefined,
+                  calendarColor: formData.get('calendarColor') || undefined,
                   // Include coordinates from address autocomplete - convert to strings for drizzle numeric type
                   latitude: editAddressCoords.latitude !== null ? String(editAddressCoords.latitude) : undefined,
                   longitude: editAddressCoords.longitude !== null ? String(editAddressCoords.longitude) : undefined,
@@ -3928,6 +3929,23 @@ export default function ProjectDetail() {
                       defaultValue={project.endDate || ""}
                       data-testid="input-edit-end-date"
                     />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="calendarColor">{t('projectDetail.dialogs.editProject.calendarColor', 'Calendar Color')}</Label>
+                  <div className="flex items-center gap-3 mt-1">
+                    <Input 
+                      id="calendarColor"
+                      name="calendarColor"
+                      type="color" 
+                      defaultValue={project.calendarColor?.startsWith('#') ? project.calendarColor : "#3b82f6"}
+                      data-testid="input-edit-calendar-color"
+                      className="h-12 w-20 cursor-pointer"
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {t('projectDetail.dialogs.editProject.calendarColorDesc', 'Choose the color this project appears on the calendar and project cards')}
+                    </span>
                   </div>
                 </div>
               </div>

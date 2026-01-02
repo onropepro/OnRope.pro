@@ -2,7 +2,7 @@
 **System**: OnRopePro - Rope Access Management Platform  
 **Domain**: Technician Passport & Employment  
 **Version**: 1.0  
-**Last Updated**: December 27, 2024  
+**Last Updated**: January 1, 2026  
 **Status**: PRODUCTION-READY  
 **Safety Critical**: Indirect - Tracks certifications and safety documentation
 
@@ -12,7 +12,7 @@
 
 | Term | Definition |
 |------|------------|
-| **Passport** | The personal portable profile view (`/technician-portal`). Contains profile, certifications, documents, job board, and employer connections. Uses rust-colored branding. |
+| **Passport** | The personal portable profile view (`/technician-portal`). Contains profile, certifications, documents, job board, and employer connections. Uses blue-gray branding (#5C7A84). |
 | **Dashboard** | The company work dashboard (`/dashboard`) accessed when linked to an employer. Uses employer's blue branding. |
 
 ---
@@ -73,7 +73,7 @@ The Technician **Passport** is the personal portable profile for rope access tec
 
 | Experience | Route | Component | Sidebar Variant | Brand Color |
 |------------|-------|-----------|-----------------|-------------|
-| **Passport** | `/technician-portal` | `TechnicianPortal.tsx` | `variant="technician"` | Rust `#AB4521` |
+| **Passport** | `/technician-portal` | `TechnicianPortal.tsx` | `variant="technician"` | Blue-Gray `#5C7A84` |
 | **Dashboard** | `/dashboard` | `Dashboard.tsx` via `DashboardLayout` | `variant="employer"` | Blue `#0B64A3` |
 
 #### 1. UNLINKED State
@@ -110,7 +110,7 @@ LINKED TECHNICIAN HAS TWO EXPERIENCES:
 │  /technician-portal                │  /dashboard                 │
 │  TechnicianPortal.tsx              │  Dashboard.tsx              │
 │  variant="technician"              │  variant="employer"         │
-│  Brand: #AB4521 (Rust)             │  Brand: #0B64A3 (Blue)      │
+│  Brand: #5C7A84 (Blue-Gray)        │  Brand: #0B64A3 (Blue)      │
 │                                    │                             │
 │  Personal profile management       │  Employer's projects        │
 │  Certifications & documents        │  Safety forms               │
@@ -228,7 +228,7 @@ users.irataVerifiedData // Extracted verification data (JSON)
 
 ### Primary File
 ```
-client/src/pages/TechnicianPortal.tsx (~6,400 lines)
+client/src/pages/TechnicianPortal.tsx (~6,588 lines)
 ```
 
 ### State Determination
@@ -373,9 +373,28 @@ team_invitations       // Pending connection requests
 ## User Experience
 
 ### Desktop Layout
-- **Fixed sidebar** (left): Technician-branded (#AB4521)
-- **Header bar** (top): Search, PLUS badge, language selector
+- **Fixed sidebar** (left): Technician-branded (#5C7A84 blue-gray)
+- **Header bar** (top): Uses `UnifiedDashboardHeader` with `variant="technician"`, includes search, PLUS badge, language selector
 - **Main content area**: Tab-specific content
+
+### useInlineActions Pattern
+
+TechnicianPortal uses the `useInlineActions` hook to provide custom navigation handlers to `UnifiedDashboardHeader`:
+
+```typescript
+// Custom handlers for header profile dropdown
+const { inlineActions } = useInlineActions({
+  onProfileClick: () => setActiveTab('profile'),
+  onSettingsClick: () => setActiveTab('more'),
+});
+
+<UnifiedDashboardHeader
+  variant="technician"
+  inlineActions={inlineActions}
+/>
+```
+
+This pattern allows the header dropdown to navigate to internal tabs rather than external routes.
 
 ### Mobile Layout
 - **Bottom navigation**: Key tabs as bottom bar icons
@@ -473,3 +492,4 @@ describe('Team Invitations', () => {
 
 - **v1.0** (December 25, 2024): Initial documentation
 - **v1.1** (December 26, 2024): Added suspendedAt field documentation, Active/Inactive terminology, updated state determination logic
+- **v1.2** (January 1, 2026): Updated brand color (#AB4521 → #5C7A84 blue-gray), updated file line count (~6,588), documented useInlineActions pattern for UnifiedDashboardHeader

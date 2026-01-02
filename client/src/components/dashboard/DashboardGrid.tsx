@@ -28,6 +28,7 @@ interface DashboardGridProps {
   harnessInspections: any[];
   onNavigate: (tab: string) => void;
   onRouteNavigate: (path: string) => void;
+  onCreateProject?: () => void;
   branding?: any;
 }
 
@@ -53,6 +54,7 @@ export function DashboardGrid({
   harnessInspections,
   onNavigate,
   onRouteNavigate,
+  onCreateProject,
   branding,
 }: DashboardGridProps) {
   const { t } = useTranslation();
@@ -373,6 +375,7 @@ export function DashboardGrid({
                               harnessInspections,
                               onNavigate,
                               onRouteNavigate,
+                              onCreateProject,
                               branding,
                             })}
                           </DashboardCard>

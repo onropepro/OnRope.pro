@@ -2,7 +2,7 @@
 **System**: OnRopePro - Rope Access Management Platform  
 **Domain**: Company Operations & Management  
 **Version**: 1.0  
-**Last Updated**: December 25, 2024  
+**Last Updated**: January 1, 2026  
 **Status**: PRODUCTION-READY  
 **Safety Critical**: Indirect - Manages safety documentation and compliance tracking
 
@@ -39,7 +39,7 @@ The Employer Dashboard is the central command center for rope access company own
 |                                                                          |
 |  +------------------+     +--------------------+     +----------------+  |
 |  | DashboardSidebar |     | DashboardLayout    |     | Dashboard.tsx  |  |
-|  | (variant=employer)|     | (wrapper)          |     | (~12K lines)   |  |
+|  | (variant=employer)|     | (wrapper)          |     | (~12.7K lines) |  |
 |  +------------------+     +--------------------+     +----------------+  |
 |         |                         |                         |            |
 |         v                         v                         v            |
@@ -146,7 +146,7 @@ const companyBranding = user.role === 'company' ? {
 
 ### Primary File
 ```
-client/src/pages/Dashboard.tsx (~12,000+ lines)
+client/src/pages/Dashboard.tsx (~12,734 lines)
 ```
 
 ### Key Permission Flags
@@ -326,3 +326,4 @@ describe('Data Isolation', () => {
 ## Version History
 
 - **v1.0** (December 25, 2024): Initial documentation
+- **v1.1** (January 1, 2026): Updated Dashboard.tsx line count (~12,734)

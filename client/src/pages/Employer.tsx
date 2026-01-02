@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { PublicHeader } from "@/components/PublicHeader";
 import { EmployerRegistration } from "@/components/EmployerRegistration";
+import { FreeTrialButton } from "@/components/FreeTrialButton";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 import { 
   ArrowRight, 
@@ -750,15 +751,11 @@ export default function Employer() {
             30-day free trial. Full access to every feature. Cancel anytime.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
+            <FreeTrialButton 
               className="bg-white text-[#0B64A3] hover:bg-blue-50" 
-              onClick={() => setLocation('/get-license')}
-              data-testid="button-cta-start-trial"
-            >
-              Start Your Free Trial
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
+              href="/get-license"
+              testId="button-cta-start-trial"
+            />
             <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" asChild data-testid="button-cta-view-pricing">
               <Link href="/pricing">
                 View Full Pricing

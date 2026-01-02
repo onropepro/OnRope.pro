@@ -30,7 +30,7 @@ export default function Login() {
   const { openRegister } = useAuthPortal();
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginMethod, setLoginMethod] = useState<"email" | "license">("email");
+  const [loginMethod, setLoginMethod] = useState<"email" | "license" | "strata">("email");
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -41,7 +41,7 @@ export default function Login() {
   });
 
   const handleLoginMethodChange = (method: string) => {
-    setLoginMethod(method as "email" | "license");
+    setLoginMethod(method as "email" | "license" | "strata");
     form.setValue("identifier", "");
     form.clearErrors("identifier");
   };
@@ -60,6 +60,16 @@ export default function Login() {
       redirectBasedOnRole(userData.user.role);
     }
   }, [userData, isCheckingAuth, authError]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "strata" || tab === "license" || tab === "email") {
+      setLoginMethod(tab);
+      form.setValue("identifier", "");
+      form.clearErrors();
+    }
+  }, []);
 
   const redirectBasedOnRole = (role: string) => {
     switch (role) {
@@ -90,6 +100,39 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
+      // Building login uses a different endpoint
+      if (loginMethod === "strata") {
+        const response = await fetch("/api/building/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            strataPlanNumber: data.identifier, 
+            password: data.password 
+          }),
+          credentials: "include",
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          form.setError("identifier", { message: result.message || "Invalid strata number or password" });
+          setIsSubmitting(false);
+          return;
+        }
+
+        trackLogin("strata");
+        
+        toast({
+          title: t('login.welcomeBack', 'Welcome back!'),
+          description: t('buildingPortal.welcomePortal', 'Welcome to your building portal.'),
+        });
+
+        setLocation("/building-portal");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Standard login for email/license
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -185,16 +228,21 @@ export default function Login() {
             <CardContent className="pt-4">
               {/* Login Method Tabs */}
               <Tabs value={loginMethod} onValueChange={handleLoginMethodChange} className="mb-6">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="email" className="gap-2" data-testid="tab-login-email">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="email" className="gap-1" data-testid="tab-login-email">
                     <Mail className="w-4 h-4" />
                     <span className="hidden sm:inline">{t('login.emailTab', 'Email')}</span>
                     <span className="sm:hidden">Email</span>
                   </TabsTrigger>
-                  <TabsTrigger value="license" className="gap-2" data-testid="tab-login-license">
+                  <TabsTrigger value="license" className="gap-1" data-testid="tab-login-license">
                     <HardHat className="w-4 h-4" />
                     <span className="hidden sm:inline">{t('login.licenseTab', 'License #')}</span>
                     <span className="sm:hidden">License</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="strata" className="gap-1" data-testid="tab-login-strata">
+                    <Building2 className="w-4 h-4" />
+                    <span className="hidden sm:inline">{t('login.strataTab', 'Strata #')}</span>
+                    <span className="sm:hidden">Strata</span>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -209,22 +257,28 @@ export default function Login() {
                         <FormLabel>
                           {loginMethod === "email" 
                             ? t('login.emailLabel', 'Email Address')
-                            : t('login.licenseLabel', 'IRATA / SPRAT License Number')
+                            : loginMethod === "license"
+                            ? t('login.licenseLabel', 'IRATA / SPRAT License Number')
+                            : t('login.strataLabel', 'Strata Plan Number')
                           }
                         </FormLabel>
                         <FormControl>
                           <div className="relative">
                             {loginMethod === "email" ? (
                               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            ) : (
+                            ) : loginMethod === "license" ? (
                               <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            ) : (
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             )}
                             <Input 
                               {...field} 
                               type={loginMethod === "email" ? "email" : "text"}
                               placeholder={loginMethod === "email" 
                                 ? "you@company.com" 
-                                : "e.g., IRATA-12345"
+                                : loginMethod === "license"
+                                ? "e.g., IRATA-12345"
+                                : "e.g., LMS1234 or BCS5678"
                               }
                               autoComplete={loginMethod === "email" ? "email" : "username"}
                               className="pl-10"
@@ -345,7 +399,7 @@ export default function Login() {
                 <Button 
                   variant="outline" 
                   className="gap-2"
-                  onClick={() => setLocation("/building-portal")}
+                  onClick={() => setLocation("/building-manager")}
                   data-testid="button-building-portal"
                 >
                   <Building2 className="w-4 h-4" />

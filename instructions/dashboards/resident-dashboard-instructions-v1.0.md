@@ -2,7 +2,7 @@
 **System**: Rope Access Management System  
 **Domain**: Resident Communication & Feedback  
 **Version**: 1.0  
-**Last Updated**: December 19, 2024  
+**Last Updated**: January 1, 2026  
 **Status**: PRODUCTION-READY  
 **Safety Critical**: No - Communication system, not direct worker safety
 
@@ -545,3 +545,4 @@ AND resident_code = 'XXXXXXXXXX';
 ## Version History
 
 - **v1.0** (December 19, 2024): Initial release with resilient photo upload queue system, exponential backoff retry logic, and dedicated RESIDENT_PHOTOS_BUCKET storage
+- **v1.1** (January 1, 2026): Noted intentional exception for custom header (does not use UnifiedDashboardHeader), updated file line count (~2,089 lines)

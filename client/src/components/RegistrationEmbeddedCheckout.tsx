@@ -38,17 +38,21 @@ export function RegistrationEmbeddedCheckout({
       setError(null);
       setLoading(true);
       
-      const response = await apiRequest("POST", "/api/stripe/create-registration-checkout", {
-        companyName,
-        ownerName,
-        email,
-        password,
-        billingFrequency,
+      const response = await fetch("/api/stripe/create-registration-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName,
+          ownerName,
+          email,
+          password,
+          billingFrequency,
+        }),
       });
       
       const data = await response.json();
 
-      if (!data.clientSecret) {
+      if (!response.ok) {
         throw new Error(data.message || "Failed to create checkout session");
       }
 

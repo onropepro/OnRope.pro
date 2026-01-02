@@ -49,18 +49,38 @@ export function SignInModal({
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await fetch("/api/login", {
+      let response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
         credentials: "include",
       });
-
-      const result = await response.json();
+      
+      let result = await response.json();
 
       if (!response.ok) {
-        form.setError("identifier", { message: result.message || t("signIn.loginFailed", "Login failed") });
-        return;
+        // Try building login as fallback for strata numbers
+        try {
+          const buildingResponse = await fetch("/api/building/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ strataPlanNumber: data.identifier.toUpperCase().replace(/\s+/g, ''), password: data.password }),
+            credentials: "include",
+          });
+          
+          const buildingResult = await buildingResponse.json();
+          
+          if (!buildingResponse.ok) {
+            form.setError("identifier", { message: buildingResult.message || result.message || t("signIn.loginFailed", "Login failed") });
+            return;
+          }
+          
+          response = buildingResponse;
+          result = buildingResult;
+        } catch (buildingError) {
+          form.setError("identifier", { message: result.message || t("signIn.loginFailed", "Login failed") });
+          return;
+        }
       }
 
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
@@ -162,8 +182,8 @@ export function SignInModal({
                             <FormControl>
                               <Input
                                 {...field}
-                                type="email"
-                                placeholder={t("signIn.emailPlaceholder", "you@example.com")}
+                                type="text"
+                                placeholder={t("signIn.emailPlaceholder", "email or strata #")}
                                 data-testid="input-signin-email"
                               />
                             </FormControl>

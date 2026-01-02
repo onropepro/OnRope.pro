@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface HighRiseBuildingProps {
   floors: number;
@@ -30,6 +31,7 @@ export function HighRiseBuilding({
   customColor = null,
   customColors = []
 }: HighRiseBuildingProps) {
+  const { t } = useTranslation();
   // Calculate progress for each elevation
   const northProgress = totalDropsNorth > 0 ? Math.min(100, (completedDropsNorth / totalDropsNorth) * 100) : 0;
   const eastProgress = totalDropsEast > 0 ? Math.min(100, (completedDropsEast / totalDropsEast) * 100) : 0;
@@ -49,10 +51,10 @@ export function HighRiseBuilding({
   }, [floors]);
 
   const elevations = [
-    { name: "North", progress: northProgress, completed: completedDropsNorth, total: totalDropsNorth, exceeded: completedDropsNorth > totalDropsNorth && totalDropsNorth > 0 },
-    { name: "East", progress: eastProgress, completed: completedDropsEast, total: totalDropsEast, exceeded: completedDropsEast > totalDropsEast && totalDropsEast > 0 },
-    { name: "South", progress: southProgress, completed: completedDropsSouth, total: totalDropsSouth, exceeded: completedDropsSouth > totalDropsSouth && totalDropsSouth > 0 },
-    { name: "West", progress: westProgress, completed: completedDropsWest, total: totalDropsWest, exceeded: completedDropsWest > totalDropsWest && totalDropsWest > 0 },
+    { name: t('directions.north', 'North'), key: "north", progress: northProgress, completed: completedDropsNorth, total: totalDropsNorth, exceeded: completedDropsNorth > totalDropsNorth && totalDropsNorth > 0 },
+    { name: t('directions.east', 'East'), key: "east", progress: eastProgress, completed: completedDropsEast, total: totalDropsEast, exceeded: completedDropsEast > totalDropsEast && totalDropsEast > 0 },
+    { name: t('directions.south', 'South'), key: "south", progress: southProgress, completed: completedDropsSouth, total: totalDropsSouth, exceeded: completedDropsSouth > totalDropsSouth && totalDropsSouth > 0 },
+    { name: t('directions.west', 'West'), key: "west", progress: westProgress, completed: completedDropsWest, total: totalDropsWest, exceeded: completedDropsWest > totalDropsWest && totalDropsWest > 0 },
   ];
   
   const hasAnyExceeded = elevations.some(e => e.exceeded);
@@ -62,12 +64,12 @@ export function HighRiseBuilding({
       {/* Header */}
       <div className="text-center mb-8">
         <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-          {completedDrops} of {totalDrops} Total Drops Complete
+          {completedDrops} {t('common.of', 'of')} {totalDrops} {t('highRiseBuilding.totalDropsComplete', 'Total Drops Complete')}
         </div>
         {hasAnyExceeded && (
           <div className="inline-flex items-center justify-center gap-2 mt-3 px-4 py-2 bg-amber-100 dark:bg-amber-900/40 border border-amber-400 dark:border-amber-600 rounded-lg">
             <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">Some elevations have more drops than planned</span>
+            <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">{t('highRiseBuilding.exceededWarning', 'Some elevations have more drops than planned')}</span>
           </div>
         )}
       </div>
@@ -90,7 +92,7 @@ export function HighRiseBuilding({
               <div 
                 className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out rounded-3xl bg-gradient-to-t from-primary/90 via-primary/70 to-primary/50"
                 style={{ height: `${elevation.progress}%` }}
-                data-testid={`${elevation.name.toLowerCase()}-progress-fill`}
+                data-testid={`${elevation.key}-progress-fill`}
               >
                 {/* Subtle shine effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>

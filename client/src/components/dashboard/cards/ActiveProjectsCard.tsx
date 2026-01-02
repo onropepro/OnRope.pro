@@ -2,10 +2,19 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Briefcase, ChevronRight } from "lucide-react";
+import { Briefcase, ChevronRight, Plus } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/hooks/use-language";
 import type { CardProps } from "../cardRegistry";
+
+function isReadOnly(user: any): boolean {
+  if (!user) return true;
+  const role = user.role?.toLowerCase();
+  // Company owners, owners, and superusers can always create
+  if (role === 'company' || role === 'owner' || role === 'superuser') return false;
+  const permissions = user.permissions || [];
+  return permissions.includes('read_only') || permissions.length === 0;
+}
 
 function calculateProjectProgress(project: any): number {
   const jobType = project.jobType || '';
@@ -37,9 +46,10 @@ function calculateProjectProgress(project: any): number {
   }
 }
 
-export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps) {
+export function ActiveProjectsCard({ projects, onNavigate, onCreateProject, currentUser, branding }: CardProps) {
   const { t } = useLanguage();
   const accentColor = branding?.primaryColor || "#0B64A3";
+  const canCreate = !isReadOnly(currentUser);
 
   const activeProjects = projects?.filter(
     (p: any) => p.status === "active" || p.status === "in_progress"
@@ -55,9 +65,22 @@ export function ActiveProjectsCard({ projects, onNavigate, branding }: CardProps
             <Briefcase className="w-5 h-5" style={{ color: accentColor }} />
             {t("dashboardCards.activeProjects.title", "Active Projects")}
           </CardTitle>
-          <Badge variant="secondary" className="text-xs" data-testid="badge-active-project-count">
-            {activeProjects.length}
-          </Badge>
+          <div className="flex items-center gap-2">
+            {canCreate && onCreateProject && (
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={onCreateProject}
+                data-testid="button-quick-create-project"
+                title={t("dashboardCards.activeProjects.createNew", "Create new project")}
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            )}
+            <Badge variant="secondary" className="text-xs" data-testid="badge-active-project-count">
+              {activeProjects.length}
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="px-4 pb-4 flex-1 min-h-0 overflow-auto">

@@ -28,6 +28,7 @@ export interface CardProps {
   harnessInspections: any[];
   onNavigate: (tab: string) => void;
   onRouteNavigate: (path: string) => void;
+  onCreateProject?: () => void;
   branding?: any;
 }
 

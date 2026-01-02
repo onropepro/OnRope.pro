@@ -2,7 +2,7 @@
 **System**: OnRopePro - Rope Access Management Platform  
 **Domain**: Unified Dashboard Architecture  
 **Version**: 1.0  
-**Last Updated**: December 25, 2024  
+**Last Updated**: January 1, 2026  
 **Status**: PRODUCTION-READY  
 **Safety Critical**: No - UI infrastructure components
 
@@ -176,7 +176,7 @@ export type DashboardVariant = "employer" | "technician" | "property-manager" | 
 
 export const STAKEHOLDER_COLORS: Record<DashboardVariant, string> = {
   employer: "#0B64A3",          // Blue
-  technician: "#AB4521",        // Rust
+  technician: "#5C7A84",        // Blue-gray
   "property-manager": "#6E9075", // Sage
   resident: "#86A59C",          // Teal
   "building-manager": "#B89685", // Taupe
@@ -391,11 +391,13 @@ Brand colors are used in different contexts with WCAG-compliant text colors:
 | Stakeholder | Brand Color | Light BG Text | Dark BG Text |
 |-------------|-------------|---------------|--------------|
 | Employer | `#0B64A3` | Light (white) | Light (white) |
-| Technician | `#AB4521` | Light (white) | Light (white) |
-| Safety | `#8B0000` | Light (white) | Light (white) |
+| Technician | `#5C7A84` | Light (white) | Light (white) |
+| Ground Crew | `#5D7B6F` | Light (white) | Light (white) |
 | Resident | `#86A59C` | Dark (slate-900) | Light (white) |
 | Property Manager | `#6E9075` | Dark (slate-900) | Light (white) |
 | Building Manager | `#B89685` | Dark (slate-900) | Light (white) |
+| SuperUser | `#6B21A8` | Light (white) | Light (white) |
+| CSR | `#0B64A3` | Light (white) | Light (white) |
 
 ### Implementation Pattern
 
@@ -519,6 +521,88 @@ describe('DashboardSidebar', () => {
 
 ---
 
+## UnifiedDashboardHeader Component
+
+### Overview
+
+The `UnifiedDashboardHeader` component (`client/src/components/UnifiedDashboardHeader.tsx`, ~639 lines) provides a consistent header experience across all dashboard types. Unlike `DashboardSidebar` which has 6 variants, the header supports **8 variants** including superuser and CSR roles.
+
+### Header Variants
+
+```typescript
+export type HeaderVariant = 'employer' | 'technician' | 'ground-crew' | 'resident' | 'property-manager' | 'building-manager' | 'superuser' | 'csr';
+
+const AVATAR_COLORS: Record<HeaderVariant, string> = {
+  employer: '#0B64A3',
+  technician: '#5C7A84',       // Blue-gray (matches sidebar)
+  'ground-crew': '#5D7B6F',    // Forest green
+  resident: '#86A59C',         // Teal
+  'property-manager': '#6E9075', // Sage
+  'building-manager': '#B89685', // Taupe
+  superuser: '#6B21A8',        // Purple
+  csr: '#0B64A3',              // Blue (same as employer)
+};
+```
+
+### Safe Variant Resolution
+
+The header includes runtime type validation to handle invalid or undefined variants:
+
+```typescript
+export function isValidVariant(variant: string): variant is HeaderVariant {
+  return ['employer', 'technician', 'ground-crew', 'resident', 'property-manager', 'building-manager', 'superuser', 'csr'].includes(variant);
+}
+
+export function getSafeVariant(variant: string | undefined): HeaderVariant {
+  if (!variant) return 'employer';
+  return isValidVariant(variant) ? variant : 'employer';
+}
+```
+
+**Usage Pattern**: Always use `getSafeVariant()` when passing variant props from external sources.
+
+### Header Features
+
+The header includes:
+- **Profile dropdown**: User avatar with role display, logout
+- **Notification bell**: `NotificationBell` component
+- **Language selection**: `LanguageDropdown` component
+- **PWA install**: `InstallPWAButton` component
+- **License expiry warnings**: `LicenseExpiryWarningBanner` for employer variant
+- **Subscription renewal**: `SubscriptionRenewalBadge` component
+
+### useInlineActions Hook Pattern
+
+TechnicianPortal and GroundCrewPortal use the `useInlineActions` hook for tab-based navigation within the header:
+
+```typescript
+// From TechnicianPortal.tsx
+const { inlineActions } = useInlineActions({
+  onProfileClick: () => setActiveTab('profile'),
+  onSettingsClick: () => setActiveTab('more'),
+  // ... other handlers
+});
+
+<UnifiedDashboardHeader
+  variant="technician"
+  inlineActions={inlineActions}
+/>
+```
+
+This pattern allows the header's profile dropdown to navigate to tabs within the portal rather than external routes.
+
+### Intentional Exceptions
+
+**ResidentDashboard and PropertyManagerDashboard** do NOT use `UnifiedDashboardHeader`. They implement custom headers that show:
+- Project/building context for residents
+- Vendor connection context for property managers
+
+**BuildingPortal** (`/building-portal`) uses a **standalone layout** with no sidebar. It has its own login flow using strata plan number credentials. See [building-manager-dashboard-instructions-v1.0.md](./building-manager-dashboard-instructions-v1.0.md) for details.
+
+These are **intentional architectural decisions** documented here as SSOT.
+
+---
+
 ## Related Documentation
 
 - [employer-dashboard-instructions-v1.0.md](./employer-dashboard-instructions-v1.0.md) - Uses these components
@@ -531,3 +615,4 @@ describe('DashboardSidebar', () => {
 ## Version History
 
 - **v1.0** (December 25, 2024): Initial documentation
+- **v1.1** (January 1, 2026): Updated technician color (#AB4521 → #5C7A84), added UnifiedDashboardHeader documentation with 8 variants, documented useInlineActions pattern
