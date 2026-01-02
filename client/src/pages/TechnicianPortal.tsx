@@ -4391,10 +4391,19 @@ export default function TechnicianPortal() {
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {user.resumeDocuments.filter((u: string) => u && u.trim()).map((doc: string, index: number) => (
-                          <Badge key={index} variant="outline" className="gap-1" data-testid={`badge-resume-${index}`}>
-                            <FileText className="w-3 h-3" />
-                            Resume {index + 1}
-                          </Badge>
+                          <a 
+                            key={index}
+                            href={doc} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="cursor-pointer"
+                            data-testid={`link-resume-${index}`}
+                          >
+                            <Badge variant="outline" className="gap-1 cursor-pointer hover-elevate" data-testid={`badge-resume-${index}`}>
+                              <FileText className="w-3 h-3" />
+                              Resume {index + 1}
+                            </Badge>
+                          </a>
                         ))}
                       </div>
                     </div>
