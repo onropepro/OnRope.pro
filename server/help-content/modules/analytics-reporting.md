@@ -64,6 +64,47 @@ The Analytics module transforms your operational data into actionable business i
 - Bid accuracy improvement
 - Historical benchmarks
 
+### Work Sessions Explorer
+
+The Sessions tab in the Performance page provides a powerful way to browse, search, and export detailed work session records.
+
+#### Browsing Work Sessions
+- **Hierarchical View**: Sessions organized by Year, Month, and Project for easy navigation
+- **Accordion Navigation**: Click to expand/collapse years, months, and projects
+- **Summary Statistics**: Each level shows total sessions and hours at a glance
+
+#### Filtering Options
+- **Employee Filter**: Search and select specific employees, or choose "All Employees" to view everyone's sessions
+- **Date Range**: Set custom from/to dates to narrow your search
+- **Quick Presets**: One-click filters for common ranges:
+  - This Month
+  - Last Month
+  - Last 3 Months
+  - This Year
+  - Clear Filters
+
+#### Including Archived Employees
+The employee filter includes both active and archived (terminated) employees, allowing you to view historical work sessions from team members who are no longer with the company. Archived employees are clearly marked with a badge.
+
+#### Session Details
+Each work session displays:
+- Date and time (clock in/out)
+- Employee name
+- Project name and address
+- Hours breakdown (regular, overtime, double-time)
+- Drops completed (for applicable job types)
+
+#### PDF Export
+Generate professional PDF reports of your work sessions:
+- Branded with your company logo and colors
+- Hierarchical organization (Year → Month → Project → Sessions)
+- Includes employee names, clock times, hours, and drops completed
+- Filter summary shows applied filters
+- Total sessions and hours summary
+
+#### Print Function
+Print the current view directly from your browser with optimized formatting for paper output.
+
 ## How It Works
 
 ### Viewing Analytics
@@ -78,6 +119,14 @@ The Analytics module transforms your operational data into actionable business i
 2. Click Export
 3. Choose format (CSV, PDF)
 4. Download file
+
+### Using Work Sessions Explorer
+1. Navigate to Performance from the sidebar
+2. Click the "Sessions" tab
+3. Use the Employee dropdown to filter by employee (or select "All Employees")
+4. Set date range using the From/To date pickers or quick preset buttons
+5. Click on years, months, and projects to expand and view sessions
+6. Click "Export PDF" or "Print" to generate reports
 
 ### Setting Up Dashboards
 1. Access Dashboard Configuration
@@ -119,6 +168,12 @@ A: Access controlled by permissions; typically owners and managers.
 
 **Q: Can I compare across time periods?**
 A: Yes, comparative analysis is available for trend identification.
+
+**Q: How do I view work sessions for employees who left the company?**
+A: The Sessions tab in Performance includes archived employees in the employee filter dropdown. They are marked with an "Archived" badge. Select the archived employee to view their historical work sessions.
+
+**Q: Can I export work sessions to PDF?**
+A: Yes, use the "Export PDF" button in the Sessions tab. The PDF includes your company branding, session details organized by project, employee hours, and drops completed.
 
 ## Related Modules
 
