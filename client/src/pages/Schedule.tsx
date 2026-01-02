@@ -2747,13 +2747,26 @@ function JobDetailDialog({
         }
       }
       // For non-conflict errors, show a clean message (not raw JSON)
-      let errorMessage = error.message || t('schedule.error', 'Failed to assign employee');
-      // Remove any JSON or status code prefixes for cleaner display
-      if (errorMessage.includes('{')) {
-        errorMessage = t('schedule.error', 'Failed to assign employee');
+      let errorMessage = error.message || '';
+      
+      // Parse common error formats
+      if (errorMessage.startsWith('400:') || errorMessage.startsWith('500:') || errorMessage.startsWith('404:')) {
+        try {
+          const jsonStr = errorMessage.substring(4).trim();
+          const errorData = JSON.parse(jsonStr);
+          errorMessage = errorData.message || errorData.error || 'Failed to assign employee';
+        } catch {
+          errorMessage = 'Failed to assign employee';
+        }
+      } else if (errorMessage.includes('{')) {
+        // Remove any JSON for cleaner display
+        errorMessage = 'Failed to assign employee';
+      } else if (!errorMessage || errorMessage === 'Error') {
+        errorMessage = 'Failed to assign employee. Please try again.';
       }
+      
       toast({
-        title: t('schedule.error', 'Error'),
+        title: t('schedule.assignmentError', 'Assignment Failed'),
         description: errorMessage,
         variant: "destructive",
       });
