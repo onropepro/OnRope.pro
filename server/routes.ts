@@ -3784,7 +3784,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
    * using data stored in session metadata. Billing address becomes company address.
    * License key stored on company record, never exposed to user.
    */
-   */
   app.get("/api/stripe/complete-registration/:sessionId", async (req: Request, res: Response) => {
     try {
       const { sessionId } = req.params;
