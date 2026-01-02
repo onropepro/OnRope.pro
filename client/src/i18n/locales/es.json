@@ -4466,19 +4466,34 @@
   "safetyForms": {
     "title": "Formularios de seguridad",
     "subtitle": "Seleccione un formulario de seguridad para completar o ver registros",
-    "toolboxMeeting": "Reunión de seguridad",
-    "harnessInspection": "Inspección de arnés",
+    "toolboxMeeting": {
+      "title": "Reunión de seguridad",
+      "description": "Briefing diario de seguridad y evaluación de peligros"
+    },
+    "flha": {
+      "title": "Evaluación de peligros a nivel de campo",
+      "description": "FLHA integral para operaciones de acceso por cuerda"
+    },
+    "harnessInspection": {
+      "title": "Inspección de arnés",
+      "description": "Inspección diaria de arnés y EPP de seguridad"
+    },
     "irataIcop": {
       "title": "IRATA / SPRAT ICOP",
       "description": "Código Internacional de Prácticas (TC-102ENG)"
     },
-    "incidentReport": "Reporte de incidente",
-    "methodStatement": "Declaración de método",
+    "incidentReport": {
+      "title": "Reporte de incidente",
+      "description": "Documentar incidentes y lesiones laborales"
+    },
+    "methodStatement": {
+      "title": "Declaración de método",
+      "description": "Procedimientos de trabajo seguro y controles de riesgo"
+    },
     "compliance": {
       "title": "Cumplimiento de seguridad",
       "description": "Todos los formularios de seguridad se registran digitalmente y pueden exportarse como documentos PDF para fines de cumplimiento y auditoría."
     },
-    "flha": "FLHA",
     "toolbox": {
       "title": "Reunión diaria de seguridad",
       "icopTitle": "Código Internacional de Prácticas IRATA / SPRAT (ICOP)",

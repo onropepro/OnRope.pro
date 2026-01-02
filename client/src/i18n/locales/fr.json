@@ -4230,8 +4230,34 @@
   "safetyForms": {
     "title": "Formulaires de Securite",
     "subtitle": "Sélectionnez un formulaire de sécurité à compléter ou consulter",
-    "toolboxMeeting": "Reunion de Securite",
-    "flha": "FLHA",
+    "toolboxMeeting": {
+      "title": "Réunion de sécurité",
+      "description": "Briefing quotidien sur la sécurité et évaluation des dangers"
+    },
+    "flha": {
+      "title": "Évaluation des dangers sur le terrain",
+      "description": "FLHA complet pour les opérations d'accès sur corde"
+    },
+    "harnessInspection": {
+      "title": "Inspection du harnais",
+      "description": "Inspection quotidienne du harnais et des EPI de sécurité"
+    },
+    "irataIcop": {
+      "title": "IRATA / SPRAT ICOP",
+      "description": "Code international de pratique (TC-102ENG)"
+    },
+    "incidentReport": {
+      "title": "Rapport d'incident",
+      "description": "Documenter les incidents et blessures au travail"
+    },
+    "methodStatement": {
+      "title": "Déclaration de méthode",
+      "description": "Procédures de travail sécuritaires et contrôles des risques"
+    },
+    "compliance": {
+      "title": "Conformité de sécurité",
+      "description": "Tous les formulaires de sécurité sont enregistrés numériquement et peuvent être exportés en PDF pour la conformité et l'audit."
+    },
     "toolbox": {
       "title": "Réunion de sécurité quotidienne",
       "icopTitle": "Code de pratique international IRATA / SPRAT (ICOP)",
