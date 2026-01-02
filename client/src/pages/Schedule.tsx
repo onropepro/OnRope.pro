@@ -34,7 +34,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { BrandingContext } from "@/App";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export default function Schedule() {
   const { t, i18n } = useTranslation();
@@ -101,18 +100,24 @@ export default function Schedule() {
   const jobCalendarRef = useRef<FullCalendar>(null);
   const timelineCalendarRef = useRef<FullCalendar>(null);
   
-  // Get sidebar state to trigger calendar resize
-  const { open: sidebarOpen } = useSidebar();
+  // Mobile detection for calendar view
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
-  // Trigger FullCalendar resize when sidebar opens/closes
+  // Listen for window resize to update mobile state and trigger calendar resize
   useEffect(() => {
-    // Small delay to allow CSS transition to complete
-    const timeout = setTimeout(() => {
-      jobCalendarRef.current?.getApi().updateSize();
-      timelineCalendarRef.current?.getApi().updateSize();
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [sidebarOpen]);
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Trigger calendar resize after layout change
+      setTimeout(() => {
+        jobCalendarRef.current?.getApi().updateSize();
+        timelineCalendarRef.current?.getApi().updateSize();
+      }, 300);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Time off dialog state
   const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
@@ -1457,18 +1462,22 @@ export default function Schedule() {
             `}</style>
             <FullCalendar
               ref={jobCalendarRef}
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+              initialView={isMobile ? "listWeek" : "dayGridMonth"}
               locale={calendarLocale}
-              headerToolbar={{
+              headerToolbar={isMobile ? {
+                left: "prev,next",
+                center: "title",
+                right: "listWeek,dayGridMonth",
+              } : {
                 left: "prev,next today",
                 center: "title",
                 right: "dayGridDay,dayGridWeek,dayGridMonth",
               }}
-              editable={true}
-              selectable={true}
+              editable={!isMobile}
+              selectable={!isMobile}
               selectMirror={true}
-              dayMaxEvents={3}
+              dayMaxEvents={isMobile ? 2 : 3}
               weekends={true}
               events={allCalendarEvents}
               select={handleDateSelect}
@@ -1527,6 +1536,44 @@ export default function Schedule() {
                 const currentlyAssigned = job.assignedEmployees?.some(e => e.id === activeEmployeeId);
                 const isDropTarget = dropTargetJobId === job.id;
                 
+                // Simplified mobile view - just show job name with employee count
+                if (isMobile) {
+                  const employeeCount = employeesForThisDay.length;
+                  return (
+                    <div 
+                      className="fc-event-main-frame" 
+                      style={{ 
+                        padding: '6px 10px', 
+                        overflow: 'hidden',
+                        backgroundColor: 'hsl(var(--card))',
+                        borderLeft: `4px solid ${jobColor}`,
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                        <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.9rem', color: 'hsl(var(--foreground))' }}>
+                          {job.project?.buildingName || job.title}
+                        </div>
+                        {employeeCount > 0 && (
+                          <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            fontSize: '0.8rem',
+                            color: 'hsl(var(--muted-foreground))',
+                            flexShrink: 0,
+                          }}>
+                            <UserIcon style={{ width: '14px', height: '14px', color: jobColor }} />
+                            <span>{employeeCount}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+                
+                // Desktop view with full employee cards
                 return (
                   <div 
                     className="fc-event-main-frame" 
