@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { PlusRequiredGate } from "@/components/PlusRequiredGate";
 import { UnifiedDashboardHeader } from "@/components/UnifiedDashboardHeader";
 import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
 
@@ -4073,33 +4074,10 @@ export default function TechnicianPortal() {
           <>
             {/* Plus Access Required Gate */}
             {!user.hasPlusAccess ? (
-              <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-8">
-                <div className="flex flex-col items-center text-center max-w-md mx-auto py-8">
-                  <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-                    <Eye className="w-8 h-8 text-primary" />
-                  </div>
-                  <Badge className="mb-4">{t.proBadge}</Badge>
-                  <h2 className="text-2xl font-bold mb-2">{t.plusLockedFeature}</h2>
-                  <p className="text-muted-foreground mb-6">
-                    {language === 'en' 
-                      ? "My Visibility is a PLUS feature that lets employers discover your profile. Get PLUS access to make yourself visible to potential employers."
-                      : language === 'es'
-                      ? "Mi Visibilidad es una función PLUS que permite a los empleadores descubrir tu perfil. Obtén acceso PLUS para hacerte visible a posibles empleadores."
-                      : "Ma Visibilité est une fonctionnalité PLUS qui permet aux employeurs de découvrir votre profil. Obtenez l'accès PLUS pour vous rendre visible aux employeurs potentiels."}
-                  </p>
-                  <div className="bg-muted/50 rounded-lg p-4 mb-6 w-full">
-                    <h3 className="font-semibold mb-2">{t.plusBenefitsTitle}</h3>
-                    <ul className="text-sm text-muted-foreground space-y-1 text-left">
-                      <li>{t.plusBenefit6}</li>
-                      <li>{t.plusBenefit1}</li>
-                      <li>{t.plusBenefit2}</li>
-                    </ul>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {t.plusUnlockInfo}
-                  </p>
-                </div>
-              </div>
+              <PlusRequiredGate 
+                referralCode={user?.referralCode} 
+                language={language as 'en' | 'fr' | 'es'} 
+              />
             ) : (
             /* Employer Profile - Glass-morphism container matching Resident Profile style */
             (user.role === 'rope_access_tech' || user.role === 'company') && (

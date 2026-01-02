@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { PlusRequiredGate } from "@/components/PlusRequiredGate";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { getTechnicianNavGroups } from "@/lib/technicianNavigation";
@@ -386,11 +387,10 @@ export default function TechnicianResume() {
                   </Button>
                 </>
               ) : (
-                <div className="p-6 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 text-center">
-                  <Lock className="w-8 h-8 mx-auto text-muted-foreground mb-3" />
-                  <p className="font-medium text-muted-foreground">{t.plusLockedFeature}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{t.plusLockedDesc}</p>
-                </div>
+                <PlusRequiredGate 
+                  referralCode={user?.referralCode} 
+                  language={language as 'en' | 'fr' | 'es'} 
+                />
               )}
             </CardContent>
           </Card>
