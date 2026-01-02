@@ -2738,11 +2738,24 @@ function JobDetailDialog({
           }
         } catch (e) {
           console.error("Failed to parse conflict response:", e);
+          // Show user-friendly message for conflict even if parsing fails
+          toast({
+            title: t('schedule.conflict', 'Schedule Conflict'),
+            description: t('schedule.employeeAlreadyAssigned', 'This employee is already assigned to another job during this time period.'),
+            variant: "destructive",
+          });
+          return;
         }
+      }
+      // For non-conflict errors, show a clean message (not raw JSON)
+      let errorMessage = error.message || t('schedule.error', 'Failed to assign employee');
+      // Remove any JSON or status code prefixes for cleaner display
+      if (errorMessage.includes('{')) {
+        errorMessage = t('schedule.error', 'Failed to assign employee');
       }
       toast({
         title: t('schedule.error', 'Error'),
-        description: error.message || t('schedule.error', 'Failed to assign employee'),
+        description: errorMessage,
         variant: "destructive",
       });
     },
