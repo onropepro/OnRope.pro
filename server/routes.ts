@@ -3738,12 +3738,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
+   * Check Stripe session status for polling
+   * GET /api/stripe/session-status/:sessionId
+   * 
+   * Lightweight endpoint for frontend to poll until session is fully ready.
+   * Returns ready:true only when status='complete' AND customer/subscription exist.
+   */
+  app.get("/api/stripe/session-status/:sessionId", async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['subscription', 'customer'],
+      });
+
+      if (!session) {
+        return res.status(404).json({ ready: false, message: "Session not found" });
+      }
+
+      const stripeCustomerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+      const subscription = session.subscription as Stripe.Subscription;
+      const stripeSubscriptionId = typeof subscription === 'string' ? subscription : subscription?.id;
+
+      const isReady = session.status === 'complete' && !!stripeCustomerId && !!stripeSubscriptionId;
+
+      console.log(`[Session Status] Session ${sessionId}: status=${session.status}, hasCustomer=${!!stripeCustomerId}, hasSubscription=${!!stripeSubscriptionId}, ready=${isReady}`);
+
+      res.json({
+        ready: isReady,
+        status: session.status,
+        hasCustomer: !!stripeCustomerId,
+        hasSubscription: !!stripeSubscriptionId,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Session status check error:', error);
+      res.status(500).json({ ready: false, message: error.message || "Failed to check session status" });
+    }
+  });
+
+  /**
    * Complete employer registration after embedded checkout
    * GET /api/stripe/complete-registration/:sessionId
    * 
    * New flow: Validates completed checkout session, creates company account
    * using data stored in session metadata. Billing address becomes company address.
    * License key stored on company record, never exposed to user.
+   */
    */
   app.get("/api/stripe/complete-registration/:sessionId", async (req: Request, res: Response) => {
     try {
