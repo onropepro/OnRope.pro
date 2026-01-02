@@ -2787,12 +2787,19 @@ function JobDetailDialog({
       // Check if this is a conflict error (409)
       if (error.message.startsWith('409:')) {
         try {
-          // Error format is "409: {json_body}"
-          const jsonStr = error.message.substring(5).trim();
+          // Error format is "409:{json_body}" (4 chars for "409:")
+          const jsonStr = error.message.substring(4).trim();
+          console.log("Parsing conflict response:", jsonStr);
           const errorData = JSON.parse(jsonStr);
+          console.log("Parsed conflict data:", errorData);
           if (errorData?.conflicts && errorData.conflicts.length > 0) {
             setConflictInfo({
-              conflicts: errorData.conflicts,
+              conflicts: errorData.conflicts.map((c: any) => ({
+                employeeId: c.employeeId,
+                employeeName: c.employeeName,
+                conflictingJob: c.conflictingJobTitle || c.conflictingJob || 'Unknown',
+                conflictType: c.conflictType || 'job',
+              })),
               pendingAssignment: context ? {
                 jobId: context.jobId,
                 employeeId: context.employeeId,
@@ -2804,14 +2811,26 @@ function JobDetailDialog({
             return;
           }
         } catch (e) {
-          console.error("Failed to parse conflict response:", e);
-          // Show user-friendly message for conflict even if parsing fails
-          toast({
-            title: t('schedule.conflict', 'Schedule Conflict'),
-            description: t('schedule.employeeAlreadyAssigned', 'This employee is already assigned to another job during this time period.'),
-            variant: "destructive",
-          });
-          return;
+          console.error("Failed to parse conflict response:", e, "Raw message:", error.message);
+          // Even if parsing fails, still show the conflict dialog with basic info
+          if (context) {
+            setConflictInfo({
+              conflicts: [{
+                employeeId: context.employeeId,
+                employeeName: 'Selected employee',
+                conflictingJob: 'another job',
+                conflictType: 'job',
+              }],
+              pendingAssignment: {
+                jobId: context.jobId,
+                employeeId: context.employeeId,
+                startDate: context.startDate || '',
+                endDate: context.endDate || '',
+              },
+            });
+            setConflictDialogOpen(true);
+            return;
+          }
         }
       }
       // For non-conflict errors, show a clean message (not raw JSON)
