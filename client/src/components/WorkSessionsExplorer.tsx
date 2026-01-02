@@ -444,6 +444,19 @@ export function WorkSessionsExplorer({ branding }: WorkSessionsExplorerProps) {
                     <CommandInput placeholder={t('performance.searchEmployee', 'Search employee...')} />
                     <CommandList>
                       <CommandEmpty>{t('common.noResults', 'No results found.')}</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem
+                          value="all-employees"
+                          onSelect={() => {
+                            setSelectedEmployee(null);
+                            setEmployeeSearchOpen(false);
+                          }}
+                          data-testid="employee-option-all"
+                        >
+                          <Users className="mr-2 h-4 w-4" />
+                          {t('performance.allEmployees', 'All Employees')}
+                        </CommandItem>
+                      </CommandGroup>
                       <CommandGroup heading={t('performance.activeEmployees', 'Active Employees')}>
                         {employees.filter(e => e.status === 'active').map((employee) => (
                           <CommandItem
