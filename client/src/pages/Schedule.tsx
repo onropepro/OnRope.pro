@@ -447,10 +447,11 @@ export default function Schedule() {
         start: startDateStr,
         end: nextDateOnly(startDateStr),
         allDay: true,
-        backgroundColor: color,
+        backgroundColor: 'transparent',
         borderColor: color,
         extendedProps: {
           job,
+          jobColor: color,
           employeesForThisDay,
         },
       }];
@@ -481,10 +482,11 @@ export default function Schedule() {
         start: currentDateStr,
         end: nextDateOnly(currentDateStr),
         allDay: true,
-        backgroundColor: color,
+        backgroundColor: 'transparent',
         borderColor: color,
         extendedProps: {
           job,
+          jobColor: color,
           employeesForThisDay,
         },
       });
@@ -1402,11 +1404,12 @@ export default function Schedule() {
               }
               
               .schedule-calendar-wrapper .fc-event {
-                border-radius: 6px;
-                border: none;
-                padding: 4px 8px;
+                border-radius: 4px;
+                border: 1px solid hsl(var(--border));
+                background: transparent;
+                padding: 0;
                 font-size: 0.875rem;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
               }
               
               .schedule-calendar-wrapper .fc-event-title {
@@ -1493,6 +1496,7 @@ export default function Schedule() {
                 }
 
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+                const jobColor = eventInfo.event.extendedProps.jobColor || job.color || job.project?.calendarColor || defaultJobColor;
                 const employeesForThisDay = eventInfo.event.extendedProps.employeesForThisDay || [];
                 const isHighlighted = activeEmployeeId !== null;
                 const currentlyAssigned = job.assignedEmployees?.some(e => e.id === activeEmployeeId);
@@ -1502,20 +1506,22 @@ export default function Schedule() {
                   <div 
                     className="fc-event-main-frame" 
                     style={{ 
-                      padding: '2px 4px', 
+                      padding: '2px 4px 2px 8px', 
                       overflow: 'hidden',
                       backgroundColor: isDropTarget 
-                        ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.3)' : 'rgba(34, 197, 94, 0.3)')
+                        ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.15)' : 'rgba(34, 197, 94, 0.15)')
                         : isHighlighted 
-                          ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)')
-                          : undefined,
+                          ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.08)' : 'rgba(34, 197, 94, 0.08)')
+                          : 'hsl(var(--card))',
+                      borderLeft: `4px solid ${jobColor}`,
+                      borderRadius: '4px',
                       outline: isDropTarget ? '3px solid rgba(14, 165, 233, 1)' : isHighlighted ? '2px dashed rgba(14, 165, 233, 0.5)' : undefined,
                       outlineOffset: '-2px',
-                      cursor: isHighlighted ? 'pointer' : 'pointer',
+                      cursor: 'pointer',
                     }}
                   >
                     <div className="fc-event-title-container">
-                      <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.8rem' }}>
+                      <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.8rem', color: 'hsl(var(--foreground))' }}>
                         {job.project?.buildingName || job.title}
                       </div>
                       {employeesForThisDay && employeesForThisDay.length > 0 && (
@@ -1523,7 +1529,8 @@ export default function Schedule() {
                           {employeesForThisDay.map((assignment: any, idx: number) => (
                             <div key={idx} style={{ 
                               fontWeight: 500, 
-                              backgroundColor: 'rgba(255,255,255,0.25)',
+                              backgroundColor: jobColor,
+                              color: 'white',
                               padding: '1px 5px',
                               borderRadius: '3px',
                               marginTop: '2px',
