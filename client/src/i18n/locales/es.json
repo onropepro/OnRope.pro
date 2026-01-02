@@ -1895,7 +1895,8 @@
       "clockIn": "Entrada",
       "clockOut": "Salida",
       "hours": "Horas",
-      "drops": "Bajadas"
+      "drops": "Bajadas",
+      "ofSessions": "{{count}} de {{total}}"
     },
     "feedback": {
       "allFeedback": "Todos los comentarios",

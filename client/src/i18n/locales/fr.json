@@ -1830,7 +1830,8 @@
       "clockIn": "Pointage entrée",
       "clockOut": "Pointage sortie",
       "hours": "Heures",
-      "drops": "Descentes"
+      "drops": "Descentes",
+      "ofSessions": "{{count}} sur {{total}}"
     },
     "feedback": {
       "allFeedback": "Tous les commentaires",

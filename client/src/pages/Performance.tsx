@@ -276,8 +276,13 @@ export default function Performance() {
                 <Card data-testid="card-target-met">
                   <CardContent className="p-4 text-center">
                     <CheckCircle className="w-8 h-8 mx-auto text-primary mb-2" />
-                    <div className="text-3xl font-bold text-primary">{targetMetCount}</div>
+                    <div className="text-3xl font-bold text-primary">
+                      {completedSessions.length > 0 ? Math.round((targetMetCount / completedSessions.length) * 100) : 0}%
+                    </div>
                     <div className="text-sm text-muted-foreground">{t('performance.targetMet', 'Target Met')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {t('performance.ofSessions', '{{count}} of {{total}}', { count: targetMetCount, total: completedSessions.length })}
+                    </div>
                   </CardContent>
                 </Card>
                 <Card data-testid="card-valid-reason">
@@ -290,8 +295,13 @@ export default function Performance() {
                 <Card data-testid="card-below-target">
                   <CardContent className="p-4 text-center">
                     <XCircle className="w-8 h-8 mx-auto text-destructive mb-2" />
-                    <div className="text-3xl font-bold text-destructive">{belowTargetCount}</div>
+                    <div className="text-3xl font-bold text-destructive">
+                      {completedSessions.length > 0 ? Math.round((belowTargetCount / completedSessions.length) * 100) : 0}%
+                    </div>
                     <div className="text-sm text-muted-foreground">{t('performance.belowTarget', 'Below Target')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {t('performance.ofSessions', '{{count}} of {{total}}', { count: belowTargetCount, total: completedSessions.length })}
+                    </div>
                   </CardContent>
                 </Card>
                 <Card data-testid="card-billable-rate">

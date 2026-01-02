@@ -1777,7 +1777,8 @@
       "clockIn": "Clock In",
       "clockOut": "Clock Out",
       "hours": "Hours",
-      "drops": "Drops"
+      "drops": "Drops",
+      "ofSessions": "{{count}} of {{total}}"
     },
     "feedback": {
       "allFeedback": "All Feedback",
