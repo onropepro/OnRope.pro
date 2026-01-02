@@ -663,3 +663,78 @@
 .leaflet-control {
   z-index: 2 !important;
 }
+
+/* FullCalendar Grid Styling - More visible grid lines */
+.fc {
+  --fc-border-color: hsl(var(--border));
+}
+
+/* Make grid lines more visible */
+.fc .fc-scrollgrid {
+  border-width: 1px;
+  border-color: hsl(var(--border));
+}
+
+.fc .fc-daygrid-day {
+  border-width: 1px;
+  border-color: hsl(var(--border) / 0.8);
+}
+
+/* Stronger vertical lines between days */
+.fc .fc-scrollgrid td {
+  border-color: hsl(var(--border) / 0.6);
+}
+
+/* Even more visible row separators */
+.fc .fc-scrollgrid tr {
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+}
+
+/* Subtle background alternation for better readability */
+.fc .fc-daygrid-day.fc-day-sat,
+.fc .fc-daygrid-day.fc-day-sun {
+  background-color: hsl(var(--muted) / 0.3);
+}
+
+/* Today's cell highlight */
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: hsl(var(--primary) / 0.08);
+  border: 2px solid hsl(var(--primary) / 0.4);
+}
+
+/* Header row styling */
+.fc .fc-col-header-cell {
+  background-color: hsl(var(--muted) / 0.5);
+  border-bottom: 2px solid hsl(var(--border));
+  padding: 0.5rem;
+  font-weight: 600;
+}
+
+/* Day number styling */
+.fc .fc-daygrid-day-number {
+  padding: 0.5rem;
+  font-weight: 500;
+  color: hsl(var(--foreground) / 0.8);
+}
+
+/* Dark mode adjustments */
+.dark .fc {
+  --fc-border-color: hsl(var(--border));
+}
+
+.dark .fc .fc-daygrid-day {
+  border-color: hsl(var(--border) / 0.5);
+}
+
+.dark .fc .fc-scrollgrid td {
+  border-color: hsl(var(--border) / 0.4);
+}
+
+.dark .fc .fc-daygrid-day.fc-day-sat,
+.dark .fc .fc-daygrid-day.fc-day-sun {
+  background-color: hsl(var(--muted) / 0.15);
+}
+
+.dark .fc .fc-col-header-cell {
+  background-color: hsl(var(--muted) / 0.3);
+}
