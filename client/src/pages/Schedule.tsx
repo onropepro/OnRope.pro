@@ -2804,7 +2804,12 @@ function JobDetailDialog({
     console.log("Setting dates:", startDate, endDate);
     setAssignmentDates({ startDate, endDate });
     console.log("Opening dialog");
-    setAssignDialogOpen(true);
+    // Close the job detail dialog first so the sheet appears on top
+    onOpenChange(false);
+    // Use setTimeout to ensure dialog closes before sheet opens
+    setTimeout(() => {
+      setAssignDialogOpen(true);
+    }, 100);
   };
 
   const handleSaveAssignment = () => {
