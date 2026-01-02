@@ -259,8 +259,8 @@ export function WorkSessionsExplorer({ branding }: WorkSessionsExplorerProps) {
             doc.text(`${projectData.projectName} (${projectData.sessions.length} sessions, ${formatDuration(projectData.totalHours)})`, margin + 5, yPos);
             yPos += 6;
 
-            const headers = ['Date', 'Employee', 'Clock In', 'Clock Out', 'Hours'];
-            const colWidths = [30, 50, 30, 30, 25];
+            const headers = ['Date', 'Employee', 'Clock In', 'Clock Out', 'Hours', 'Drops'];
+            const colWidths = [25, 45, 25, 25, 22, 23];
 
             doc.setFillColor(240, 240, 240);
             doc.rect(margin, yPos - 4, pageWidth - margin * 2, 7, 'F');
@@ -291,12 +291,18 @@ export function WorkSessionsExplorer({ branding }: WorkSessionsExplorerProps) {
               const clockIn = session.startTime ? format(new Date(session.startTime), 'HH:mm') : '-';
               const clockOut = session.endTime ? format(new Date(session.endTime), 'HH:mm') : 'Active';
               
+              // Calculate total drops for this session
+              const totalDrops = (session.dropsCompletedNorth || 0) + 
+                                 (session.dropsCompletedEast || 0) + 
+                                 (session.dropsCompletedSouth || 0) + 
+                                 (session.dropsCompletedWest || 0);
+              
               xPos = margin + 2;
               doc.text(workDate, xPos, yPos);
               xPos += colWidths[0];
               
               const employeeName = session.employeeName || 'Unknown';
-              doc.text(employeeName.substring(0, 20), xPos, yPos);
+              doc.text(employeeName.substring(0, 18), xPos, yPos);
               xPos += colWidths[1];
               
               doc.text(clockIn, xPos, yPos);
@@ -306,6 +312,9 @@ export function WorkSessionsExplorer({ branding }: WorkSessionsExplorerProps) {
               xPos += colWidths[3];
               
               doc.text(formatDuration(sessionHours), xPos, yPos);
+              xPos += colWidths[4];
+              
+              doc.text(totalDrops > 0 ? totalDrops.toString() : '-', xPos, yPos);
               yPos += 5;
             }
 
