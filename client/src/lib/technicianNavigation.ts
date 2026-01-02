@@ -81,7 +81,8 @@ export function getTechnicianNavGroups(
           label: language === 'en' ? "My Visibility" : language === 'es' ? "Mi Visibilidad" : "Ma Visibilité",
           icon: Eye,
           href: "/technician-portal?tab=visibility",
-          isVisible: () => hasPlusAccess,
+          isVisible: () => true,
+          requiresPlus: !hasPlusAccess,
         },
         {
           id: "invitations",

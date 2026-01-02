@@ -69,6 +69,7 @@ export interface NavItem {
   badgeType?: "alert" | "info";
   useProfilePhoto?: boolean;
   isVisible: (user: User | null | undefined) => boolean;
+  requiresPlus?: boolean;
 }
 
 export interface NavGroup {
@@ -701,6 +702,14 @@ export function DashboardSidebar({
                                 data-testid={`badge-${item.id}-count`}
                               >
                                 {item.badge}
+                              </span>
+                            )}
+                            {item.requiresPlus && (
+                              <span
+                                className="flex items-center justify-center rounded-full text-[10px] font-semibold h-4 px-1.5 bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 border border-amber-200 dark:border-amber-700/50"
+                                data-testid={`badge-${item.id}-plus-required`}
+                              >
+                                PLUS
                               </span>
                             )}
                           </button>
