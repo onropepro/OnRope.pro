@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown, Maximize2, Minimize2, X } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, User as UserIcon, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown, Maximize2, Minimize2, X, Check } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { ScheduledJobWithAssignments, User, EmployeeTimeOff } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
@@ -2642,11 +2642,12 @@ function JobDetailDialog({
   const { toast } = useToast();
   const [showAssignEmployees, setShowAssignEmployees] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
+  const [selectedEmployees, setSelectedEmployees] = useState<User[]>([]);
   const [assignmentDates, setAssignmentDates] = useState<{ startDate: string; endDate: string }>({
     startDate: "",
     endDate: "",
   });
+  const [isAssigningMultiple, setIsAssigningMultiple] = useState(false);
   const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
   const [conflictInfo, setConflictInfo] = useState<{
     conflicts: Array<{ employeeId: string; employeeName: string; conflictingJob: string; conflictType?: 'job' | 'time_off' }>;
@@ -2713,8 +2714,6 @@ function JobDetailDialog({
         title: t('schedule.assignmentCreated', 'Employee assigned'),
         description: t('schedule.assignmentCreated', 'Team member has been assigned to this job'),
       });
-      setSelectedEmployee(null);
-      setShowAssignEmployees(false);
     },
     onError: async (error: Error, _variables, context) => {
       // Check if this is a conflict error (409)
@@ -2802,41 +2801,64 @@ function JobDetailDialog({
     },
   });
 
-  const handleAssignEmployee = (employee: User) => {
-    console.log("handleAssignEmployee called", employee);
-    if (!job) {
-      console.log("No job available");
-      return;
-    }
-    setSelectedEmployee(employee);
-    // Set default dates to job's date range (timezone-safe extraction)
-    const startDate = String(job.startDate).split('T')[0];
-    const endDate = String(job.endDate).split('T')[0];
-    console.log("Setting dates:", startDate, endDate);
-    setAssignmentDates({ startDate, endDate });
-    // Keep inline - no dialog/sheet needed
+  const handleToggleEmployee = (employee: User) => {
+    if (!job) return;
+    
+    setSelectedEmployees(prev => {
+      const isSelected = prev.some(e => e.id === employee.id);
+      if (isSelected) {
+        return prev.filter(e => e.id !== employee.id);
+      } else {
+        // Set default dates if this is the first selection
+        if (prev.length === 0) {
+          const startDate = String(job.startDate).split('T')[0];
+          const endDate = String(job.endDate).split('T')[0];
+          setAssignmentDates({ startDate, endDate });
+        }
+        return [...prev, employee];
+      }
+    });
   };
 
-  const handleSaveAssignment = () => {
-    console.log("handleSaveAssignment called");
-    console.log("job:", job);
-    console.log("selectedEmployee:", selectedEmployee);
-    console.log("assignmentDates:", assignmentDates);
+  const handleSaveAssignment = async () => {
+    if (!job || selectedEmployees.length === 0) return;
     
-    if (!job || !selectedEmployee) {
-      console.log("Missing job or selectedEmployee");
-      return;
+    setIsAssigningMultiple(true);
+    let successCount = 0;
+    let errorCount = 0;
+    
+    // Assign all selected employees sequentially
+    for (const employee of selectedEmployees) {
+      try {
+        await assignEmployeeMutation.mutateAsync({
+          jobId: job.id,
+          employeeId: employee.id,
+          startDate: assignmentDates.startDate,
+          endDate: assignmentDates.endDate,
+        });
+        successCount++;
+      } catch (error) {
+        errorCount++;
+        // Individual errors are handled by the mutation's onError
+      }
     }
     
-    const payload = {
-      jobId: job.id,
-      employeeId: selectedEmployee.id,
-      startDate: assignmentDates.startDate,
-      endDate: assignmentDates.endDate,
-    };
+    setIsAssigningMultiple(false);
+    setSelectedEmployees([]);
+    setShowAssignEmployees(false);
     
-    console.log("Calling mutation with payload:", payload);
-    assignEmployeeMutation.mutate(payload);
+    if (successCount > 0 && errorCount === 0) {
+      toast({
+        title: t('schedule.assignmentsCreated', 'Employees assigned'),
+        description: t('schedule.multipleAssigned', '{{count}} team member(s) have been assigned to this job', { count: successCount }),
+      });
+    } else if (successCount > 0 && errorCount > 0) {
+      toast({
+        title: t('schedule.partialSuccess', 'Partial success'),
+        description: t('schedule.someAssigned', '{{success}} assigned, {{errors}} failed', { success: successCount, errors: errorCount }),
+        variant: "destructive",
+      });
+    }
   };
 
   if (!job) return null;
@@ -2891,7 +2913,7 @@ function JobDetailDialog({
                 variant={showAssignEmployees ? "outline" : "default"}
                 size="default"
                 onClick={() => {
-                  setSelectedEmployee(null); // Reset selection when toggling
+                  setSelectedEmployees([]); // Reset selection when toggling
                   setShowAssignEmployees(!showAssignEmployees);
                 }}
                 data-testid="button-assign-employees"
@@ -2937,26 +2959,64 @@ function JobDetailDialog({
               </div>
             )}
             
-            {/* Inline employee assignment section */}
+            {/* Inline employee assignment section - Multi-select */}
             {showAssignEmployees && (
               <div className="space-y-3 border rounded-md p-4">
-                {selectedEmployee ? (
-                  /* Show date selection for selected employee */
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium text-sm">
-                        {t('schedule.assigningEmployee', 'Assigning')}: {selectedEmployee.name}
-                      </div>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onClick={() => setSelectedEmployee(null)}
-                        data-testid="button-cancel-employee-selection"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
+                {/* Employee selection list with checkboxes */}
+                <div>
+                  <h4 className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                    {t('schedule.selectEmployees', 'Select Employees to Assign')}
+                    {selectedEmployees.length > 0 && (
+                      <span className="ml-2 text-foreground">({selectedEmployees.length} {t('common.selected', 'selected')})</span>
+                    )}
+                  </h4>
+                  {(() => {
+                    if (employees.length === 0) {
+                      return <p className="text-sm text-muted-foreground">{t('schedule.noEmployeesAvailable', 'No employees available')}</p>;
+                    }
                     
+                    const unassignedEmployees = employees.filter(emp => {
+                      const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
+                                        job.assignedEmployees?.some(assigned => assigned.id === emp.id);
+                      return !isAssigned;
+                    });
+                    
+                    if (unassignedEmployees.length === 0) {
+                      return <p className="text-sm text-muted-foreground">{t('schedule.allAssigned', 'All employees are already assigned to this job')}</p>;
+                    }
+                    
+                    return (
+                      <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+                        {unassignedEmployees.map((employee) => {
+                          const isSelected = selectedEmployees.some(e => e.id === employee.id);
+                          return (
+                            <Button
+                              key={employee.id}
+                              variant={isSelected ? "default" : "outline"}
+                              className="w-full justify-start"
+                              onClick={() => handleToggleEmployee(employee)}
+                              data-testid={`button-select-employee-${employee.id}`}
+                            >
+                              {isSelected ? (
+                                <Check className="w-4 h-4 mr-2" />
+                              ) : (
+                                <UserCheck className="w-4 h-4 mr-2" />
+                              )}
+                              {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+                
+                {/* Date selection - only show when employees are selected */}
+                {selectedEmployees.length > 0 && (
+                  <div className="space-y-4 pt-3 border-t">
+                    <div className="text-sm text-muted-foreground">
+                      {t('schedule.assignDatesToAll', 'These dates will apply to all selected employees')}
+                    </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <Label htmlFor="inline-start-date" className="text-xs">{t('schedule.startDate', 'Start Date')}</Label>
@@ -2988,49 +3048,16 @@ function JobDetailDialog({
                     
                     <Button
                       onClick={handleSaveAssignment}
-                      disabled={assignEmployeeMutation.isPending}
+                      disabled={isAssigningMultiple || assignEmployeeMutation.isPending}
                       className="w-full"
                       data-testid="button-confirm-assignment"
                     >
-                      {assignEmployeeMutation.isPending ? t('schedule.assigning', 'Assigning...') : t('schedule.confirmAssignment', 'Confirm Assignment')}
+                      {isAssigningMultiple ? (
+                        t('schedule.assigningMultiple', 'Assigning {{count}} employees...', { count: selectedEmployees.length })
+                      ) : (
+                        t('schedule.confirmAssignments', 'Assign {{count}} Employee(s)', { count: selectedEmployees.length })
+                      )}
                     </Button>
-                  </div>
-                ) : (
-                  /* Show list of available employees to assign */
-                  <div>
-                    <h4 className="text-xs text-muted-foreground uppercase tracking-wide mb-2">{t('schedule.selectEmployee', 'Select Employee to Assign')}</h4>
-                    {(() => {
-                      if (employees.length === 0) {
-                        return <p className="text-sm text-muted-foreground">{t('schedule.noEmployeesAvailable', 'No employees available')}</p>;
-                      }
-                      
-                      const unassignedEmployees = employees.filter(emp => {
-                        const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
-                                          job.assignedEmployees?.some(assigned => assigned.id === emp.id);
-                        return !isAssigned;
-                      });
-                      
-                      if (unassignedEmployees.length === 0) {
-                        return <p className="text-sm text-muted-foreground">{t('schedule.allAssigned', 'All employees are already assigned to this job')}</p>;
-                      }
-                      
-                      return (
-                        <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
-                          {unassignedEmployees.map((employee) => (
-                            <Button
-                              key={employee.id}
-                              variant="outline"
-                              className="w-full justify-start"
-                              onClick={() => handleAssignEmployee(employee)}
-                              data-testid={`button-select-employee-${employee.id}`}
-                            >
-                              <UserCheck className="w-4 h-4 mr-2" />
-                              {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
-                            </Button>
-                          ))}
-                        </div>
-                      );
-                    })()}
                   </div>
                 )}
               </div>
