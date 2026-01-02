@@ -165,6 +165,13 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      clientForm.reset({
+        firstName: "",
+        lastName: "",
+        company: "",
+        phoneNumber: "",
+        email: "",
+      });
       setCurrentStep("client");
     },
     onError: () => {
@@ -286,25 +293,10 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
   
   const canCreateProject = !!createdClientId;
 
-  // Initialize step state only on FIRST entry to prevent clearing user input on re-entry
-  // Uses a ref to track which steps have been initialized, avoiding dependency array issues
+  // Initialize employee step state only on FIRST entry
+  // Client form reset is now handled in the transition (updateCompanyMutation.onSuccess)
   useEffect(() => {
-    // Guard: Only run initialization once per step
-    if (stepsInitializedRef.current.has(currentStep)) {
-      return;
-    }
-    
-    if (currentStep === "client") {
-      // Reset client form to prevent browser autofill contamination - only on first entry
-      clientForm.reset({
-        firstName: "",
-        lastName: "",
-        company: "",
-        phoneNumber: "",
-        email: "",
-      });
-      stepsInitializedRef.current.add("client");
-    } else if (currentStep === "employee") {
+    if (currentStep === "employee" && !stepsInitializedRef.current.has("employee")) {
       setEmployeeMode("select");
       setSearchType("email");
       setSearchValue("");
@@ -312,7 +304,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
       setSearchMessage(null);
       stepsInitializedRef.current.add("employee");
     }
-  }, [currentStep, clientForm]);
+  }, [currentStep]);
 
   // Search for existing technician
   const searchTechnician = async () => {
@@ -544,16 +536,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                   <FormItem>
                     <FormLabel>{t("onboarding.client.company", "Company (Optional)")}</FormLabel>
                     <FormControl>
-                      <Input 
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                        name={field.name}
-                        ref={field.ref}
-                        placeholder="ABC Property Management" 
-                        autoComplete="new-password"
-                        data-testid="input-client-company"
-                      />
+                      <Input {...field} placeholder="ABC Property Management" data-testid="input-client-company" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
