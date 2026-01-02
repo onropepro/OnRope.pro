@@ -2704,6 +2704,8 @@
     "addInventoryItem": "Agregar artículo de inventario",
     "addInventoryItemDesc": "Agregar nuevo equipo al sistema de inventario",
     "searchInventory": "Buscar por marca, modelo o tipo...",
+    "teamEquipmentOverview": "Resumen de equipo del equipo",
+    "teamEquipmentDescription": "Ver y gestionar equipo asignado a todos los empleados",
     "each": "cada uno",
     "total": "Total",
     "brand": "Marca",
