@@ -54,6 +54,7 @@ import { useTechnicianContext } from "@/hooks/use-technician-context";
 import { CarabinerIcon } from "./icons/CarabinerIcon";
 
 interface SidebarPreferencesResponse {
+  groupOrder?: string[];
   preferences: Record<string, { itemId: string; position: number }[]>;
   variant: string;
   isDefault: boolean;
@@ -492,7 +493,7 @@ export function DashboardSidebar({
   
   // Apply custom ordering from preferences
   const filteredGroups = useMemo(() => {
-    const groups = activeNavigationGroups
+    let groups = activeNavigationGroups
       .map((group) => ({
         ...group,
         items: group.items.filter((item) => item.isVisible(currentUser)),
@@ -500,31 +501,53 @@ export function DashboardSidebar({
       .filter((group) => group.items.length > 0);
 
     // If we have saved preferences, apply the custom ordering (with defensive guards)
-    if (sidebarPreferences && !sidebarPreferences.isDefault && sidebarPreferences.preferences) {
-      return groups.map((group) => {
-        const savedOrder = sidebarPreferences.preferences[group.id];
-        if (!savedOrder || !Array.isArray(savedOrder) || savedOrder.length === 0) return group;
+    if (sidebarPreferences && !sidebarPreferences.isDefault) {
+      // Apply group order if available
+      if (sidebarPreferences.groupOrder && Array.isArray(sidebarPreferences.groupOrder) && sidebarPreferences.groupOrder.length > 0) {
+        const groupMap = new Map(groups.map(g => [g.id, g]));
+        const orderedGroups: typeof groups = [];
+        
+        // First add groups in saved order
+        sidebarPreferences.groupOrder.forEach((groupId) => {
+          const group = groupMap.get(groupId);
+          if (group) {
+            orderedGroups.push(group);
+            groupMap.delete(groupId);
+          }
+        });
+        
+        // Add any remaining groups that weren't in saved preferences
+        groupMap.forEach((group) => orderedGroups.push(group));
+        groups = orderedGroups;
+      }
+      
+      // Apply item ordering within each group
+      if (sidebarPreferences.preferences) {
+        groups = groups.map((group) => {
+          const savedOrder = sidebarPreferences.preferences[group.id];
+          if (!savedOrder || !Array.isArray(savedOrder) || savedOrder.length === 0) return group;
 
-        // Create a map of items for quick lookup
-        const itemMap = new Map(group.items.map((item) => [item.id, item]));
-        const orderedItems: NavItem[] = [];
+          // Create a map of items for quick lookup
+          const itemMap = new Map(group.items.map((item) => [item.id, item]));
+          const orderedItems: NavItem[] = [];
 
-        // First add items in saved order
-        savedOrder
-          .sort((a, b) => a.position - b.position)
-          .forEach(({ itemId }) => {
-            const item = itemMap.get(itemId);
-            if (item) {
-              orderedItems.push(item);
-              itemMap.delete(itemId);
-            }
-          });
+          // First add items in saved order
+          savedOrder
+            .sort((a, b) => a.position - b.position)
+            .forEach(({ itemId }) => {
+              const item = itemMap.get(itemId);
+              if (item) {
+                orderedItems.push(item);
+                itemMap.delete(itemId);
+              }
+            });
 
-        // Add any remaining items that weren't in saved preferences
-        itemMap.forEach((item) => orderedItems.push(item));
+          // Add any remaining items that weren't in saved preferences
+          itemMap.forEach((item) => orderedItems.push(item));
 
-        return { ...group, items: orderedItems };
-      });
+          return { ...group, items: orderedItems };
+        });
+      }
     }
 
     return groups;

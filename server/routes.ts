@@ -4492,6 +4492,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await db.delete(dashboardPreferences)
         .where(eq(dashboardPreferences.userId, userId));
 
+      // Insert group order preferences (stored with special groupId)
+      if (groupOrder && Array.isArray(groupOrder)) {
+        groupOrder.forEach((groupId: string, index: number) => {
+          inserts.push({
+            userId,
+            dashboardVariant: variant,
+            groupId: '__group_order__',
+            itemId: groupId,
+            position: index,
+          });
+        });
+      }
+
       // Insert new preferences
       if (cards.length > 0) {
         const inserts = cards.map((cardId: string, idx: number) => ({
@@ -4542,7 +4555,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Group by groupId for easier frontend consumption
       const grouped: Record<string, { itemId: string; position: number }[]> = {};
+      const groupOrderEntries: { itemId: string; position: number }[] = [];
+      
       for (const pref of prefs) {
+        // Handle group order (stored with special groupId)
+        if (pref.groupId === '__group_order__') {
+          groupOrderEntries.push({ itemId: pref.itemId, position: pref.position });
+          continue;
+        }
+        
         if (!grouped[pref.groupId]) {
           grouped[pref.groupId] = [];
         }
@@ -4551,9 +4572,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           position: pref.position,
         });
       }
+      
+      // Extract sorted group order
+      const groupOrder = groupOrderEntries
+        .sort((a, b) => a.position - b.position)
+        .map(e => e.itemId);
 
       res.json({ 
         preferences: grouped,
+        groupOrder: groupOrder.length > 0 ? groupOrder : undefined,
         variant,
         isDefault: prefs.length === 0,
       });
@@ -4567,7 +4594,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/sidebar/preferences", requireAuth, async (req: Request, res: Response) => {
     try {
       const userId = req.session.userId!;
-      const { variant, groups } = req.body;
+      const { variant, groups, groupOrder } = req.body;
 
       if (!variant || typeof variant !== 'string') {
         return res.status(400).json({ message: "variant is required" });
@@ -4608,6 +4635,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           eq(sidebarPreferences.userId, userId),
           eq(sidebarPreferences.dashboardVariant, variant)
         ));
+
+      // Insert group order preferences (stored with special groupId)
+      if (groupOrder && Array.isArray(groupOrder)) {
+        groupOrder.forEach((groupId: string, index: number) => {
+          inserts.push({
+            userId,
+            dashboardVariant: variant,
+            groupId: '__group_order__',
+            itemId: groupId,
+            position: index,
+          });
+        });
+      }
 
       // Insert new preferences
       if (inserts.length > 0) {
