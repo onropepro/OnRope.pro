@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from "react";
+import { useState, useEffect, useMemo, useContext, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -33,6 +33,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { BrandingContext } from "@/App";
 import { DoubleBookingWarningDialog } from "@/components/DoubleBookingWarningDialog";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export default function Schedule() {
   const { t, i18n } = useTranslation();
@@ -94,6 +95,23 @@ export default function Schedule() {
   // Fullscreen calendar mode
   const [isCalendarFullscreen, setIsCalendarFullscreen] = useState(false);
   const [isTimelineFullscreen, setIsTimelineFullscreen] = useState(false);
+  
+  // Calendar refs for resize on sidebar toggle
+  const jobCalendarRef = useRef<FullCalendar>(null);
+  const timelineCalendarRef = useRef<FullCalendar>(null);
+  
+  // Get sidebar state to trigger calendar resize
+  const { open: sidebarOpen } = useSidebar();
+  
+  // Trigger FullCalendar resize when sidebar opens/closes
+  useEffect(() => {
+    // Small delay to allow CSS transition to complete
+    const timeout = setTimeout(() => {
+      jobCalendarRef.current?.getApi().updateSize();
+      timelineCalendarRef.current?.getApi().updateSize();
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [sidebarOpen]);
   
   // Time off dialog state
   const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
@@ -998,6 +1016,7 @@ export default function Schedule() {
               </div>
             ) : (
               <FullCalendar
+                ref={timelineCalendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, resourceTimelinePlugin]}
                 initialView="dayGridMonth"
                 locale={calendarLocale}
@@ -1436,6 +1455,7 @@ export default function Schedule() {
               }
             `}</style>
             <FullCalendar
+              ref={jobCalendarRef}
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
               locale={calendarLocale}
