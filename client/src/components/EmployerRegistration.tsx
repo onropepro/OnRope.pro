@@ -124,39 +124,75 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
       progressIntervalRef.current = null;
     }
 
-    // Helper function to delay execution
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-    // Helper function to attempt registration with retries
+    // Safe JSON parsing helper - handles non-JSON responses gracefully
+    const safeJsonParse = async (response: Response): Promise<any> => {
+      const text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch {
+        console.error('[Registration] Failed to parse response as JSON:', text.substring(0, 200));
+        return { message: text || 'Unknown server error' };
+      }
+    };
+
+    // Phase 1: Poll session-status until Stripe has fully hydrated customer/subscription
+    const waitForSessionReady = async (maxAttempts: number = 15): Promise<boolean> => {
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          const backoffMs = Math.min(1000 * Math.pow(1.5, attempt - 1), 5000);
+          console.log(`[Registration] Polling session status, attempt ${attempt}/${maxAttempts}...`);
+          
+          const response = await fetch(`/api/stripe/session-status/${checkoutSessionId}`, {
+            credentials: "include",
+          });
+          
+          const result = await safeJsonParse(response);
+          
+          if (result.ready === true) {
+            console.log('[Registration] Session is ready, proceeding with registration');
+            return true;
+          }
+          
+          console.log(`[Registration] Session not ready yet: status=${result.status}, hasCustomer=${result.hasCustomer}, hasSubscription=${result.hasSubscription}`);
+          
+          if (attempt < maxAttempts) {
+            await delay(backoffMs);
+          }
+        } catch (err) {
+          console.error(`[Registration] Session status check error on attempt ${attempt}:`, err);
+          if (attempt < maxAttempts) {
+            await delay(2000);
+          }
+        }
+      }
+      return false;
+    };
+
+    // Phase 2: Complete registration after session is confirmed ready
     const attemptRegistration = async (retries: number = 3): Promise<{ ok: boolean; result: any }> => {
       for (let attempt = 1; attempt <= retries; attempt++) {
         try {
-          // Wait a bit before first attempt to let Stripe finalize session
-          if (attempt === 1) {
-            await delay(1500);
-          }
-
-          console.log(`[Registration] Attempt ${attempt}/${retries} for session: ${checkoutSessionId}`);
+          console.log(`[Registration] Completing registration, attempt ${attempt}/${retries}`);
           
           const response = await fetch(`/api/stripe/complete-registration/${checkoutSessionId}`, {
             credentials: "include",
           });
 
-          const result = await response.json();
+          const result = await safeJsonParse(response);
 
-          // If successful or already processed, return immediately
           if (response.ok && result.success) {
             return { ok: true, result };
           }
 
-          // If the session isn't complete yet, retry after delay
-          if (result.message?.includes('not completed') || result.message?.includes('Status:')) {
-            console.log(`[Registration] Session not ready, retrying in ${attempt * 1500}ms...`);
+          // If session not ready (shouldn't happen after Phase 1), retry
+          if (result.message?.includes('Missing customer') || result.message?.includes('not completed')) {
+            console.log(`[Registration] Metadata not ready, retrying in ${attempt * 1500}ms...`);
             await delay(attempt * 1500);
             continue;
           }
 
-          // For other errors, return the error response
           return { ok: false, result };
         } catch (fetchErr) {
           console.error(`[Registration] Fetch error on attempt ${attempt}:`, fetchErr);
@@ -164,7 +200,7 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
             await delay(attempt * 1500);
             continue;
           }
-          throw fetchErr;
+          return { ok: false, result: { message: "Network error during registration. Please try again." } };
         }
       }
       
@@ -182,6 +218,13 @@ export function EmployerRegistration({ open, onOpenChange }: EmployerRegistratio
         });
       }, 2500);
 
+      // Phase 1: Wait for Stripe session to be fully ready
+      const sessionReady = await waitForSessionReady(15);
+      if (!sessionReady) {
+        throw new Error("Payment session timed out. Please contact support if you were charged.");
+      }
+
+      // Phase 2: Complete the registration
       const { ok, result } = await attemptRegistration(3);
 
       if (ok && result.success) {
