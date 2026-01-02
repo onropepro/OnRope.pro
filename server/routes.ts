@@ -27626,6 +27626,174 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+
+  // =====================================================
+  // WORK SESSIONS EXPORT ENDPOINTS
+  // =====================================================
+  
+  // Get work sessions for export with hierarchical grouping
+  app.get("/api/performance/work-sessions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Check permissions
+      const hasPermission = currentUser.role === "company" || 
+                            currentUser.role === "operations_manager" || 
+                            currentUser.role === "supervisor" || 
+                            currentUser.role === "general_supervisor" ||
+                            currentUser.permissions?.includes("view_financial_data");
+      
+      if (!hasPermission) {
+        return res.status(403).json({ message: "Insufficient permissions" });
+      }
+      
+      // Parse query params
+      const { employeeId, from, to } = req.query;
+      
+      const filters: { employeeId?: string; fromDate?: Date; toDate?: Date } = {};
+      
+      if (employeeId && typeof employeeId === 'string') {
+        filters.employeeId = employeeId;
+      }
+      if (from && typeof from === 'string') {
+        filters.fromDate = new Date(from);
+      }
+      if (to && typeof to === 'string') {
+        filters.toDate = new Date(to);
+      }
+      
+      const sessions = await storage.getWorkSessionsForExport(companyId, filters);
+      
+      // Group sessions hierarchically by year -> month -> project
+      const hierarchy: Record<number, {
+        year: number;
+        months: Record<number, {
+          month: number;
+          monthName: string;
+          projects: Record<string, {
+            projectId: string;
+            projectName: string;
+            sessions: typeof sessions;
+            totalHours: number;
+          }>;
+          totalHours: number;
+        }>;
+        totalHours: number;
+      }> = {};
+      
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+      
+      for (const session of sessions) {
+        const date = new Date(session.workDate);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const projectId = session.projectId;
+        const projectName = session.projectName || 'Unknown Project';
+        
+        // Calculate session hours
+        const regular = parseFloat(session.regularHours) || 0;
+        const overtime = parseFloat(session.overtimeHours) || 0;
+        const doubleTime = parseFloat(session.doubleTimeHours) || 0;
+        const sessionHours = regular + overtime + doubleTime;
+        
+        // Initialize year
+        if (!hierarchy[year]) {
+          hierarchy[year] = { year, months: {}, totalHours: 0 };
+        }
+        
+        // Initialize month
+        if (!hierarchy[year].months[month]) {
+          hierarchy[year].months[month] = { 
+            month, 
+            monthName: monthNames[month], 
+            projects: {},
+            totalHours: 0 
+          };
+        }
+        
+        // Initialize project
+        if (!hierarchy[year].months[month].projects[projectId]) {
+          hierarchy[year].months[month].projects[projectId] = {
+            projectId,
+            projectName,
+            sessions: [],
+            totalHours: 0
+          };
+        }
+        
+        // Add session
+        hierarchy[year].months[month].projects[projectId].sessions.push(session);
+        hierarchy[year].months[month].projects[projectId].totalHours += sessionHours;
+        hierarchy[year].months[month].totalHours += sessionHours;
+        hierarchy[year].totalHours += sessionHours;
+      }
+      
+      // Convert to arrays and sort
+      const result = Object.values(hierarchy)
+        .sort((a, b) => b.year - a.year)
+        .map(yearData => ({
+          ...yearData,
+          months: Object.values(yearData.months)
+            .sort((a, b) => b.month - a.month)
+            .map(monthData => ({
+              ...monthData,
+              projects: Object.values(monthData.projects).sort((a, b) => 
+                a.projectName.localeCompare(b.projectName)
+              )
+            }))
+        }));
+      
+      res.json({ 
+        hierarchy: result,
+        totalSessions: sessions.length,
+        sessions: sessions // Also include flat list for export
+      });
+    } catch (error) {
+      console.error("Get work sessions for export error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get employees including terminated for work session filtering
+  app.get("/api/performance/work-sessions/employees", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Check permissions
+      const hasPermission = currentUser.role === "company" || 
+                            currentUser.role === "operations_manager" || 
+                            currentUser.role === "supervisor" || 
+                            currentUser.role === "general_supervisor" ||
+                            currentUser.permissions?.includes("view_financial_data");
+      
+      if (!hasPermission) {
+        return res.status(403).json({ message: "Insufficient permissions" });
+      }
+      
+      const employees = await storage.getAllEmployeesIncludingTerminated(companyId);
+      res.json({ employees });
+    } catch (error) {
+      console.error("Get employees for work sessions error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   app.patch("/api/company/profile", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
     try {
       const user = await storage.getUserById(req.session.userId!);

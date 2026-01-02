@@ -1382,6 +1382,120 @@ export class Storage {
       .orderBy(desc(workSessions.workDate), desc(workSessions.startTime));
   }
 
+  // Get work sessions with full details for export/browsing
+  async getWorkSessionsForExport(
+    companyId: string,
+    filters: {
+      employeeId?: string;
+      fromDate?: Date;
+      toDate?: Date;
+    }
+  ): Promise<any[]> {
+    const conditions = [eq(workSessions.companyId, companyId)];
+    
+    if (filters.employeeId) {
+      conditions.push(eq(workSessions.employeeId, filters.employeeId));
+    }
+    
+    if (filters.fromDate) {
+      conditions.push(gte(workSessions.workDate, filters.fromDate.toISOString().split('T')[0]));
+    }
+    
+    if (filters.toDate) {
+      conditions.push(lte(workSessions.workDate, filters.toDate.toISOString().split('T')[0]));
+    }
+    
+    const result = await db.select({
+      id: workSessions.id,
+      projectId: workSessions.projectId,
+      employeeId: workSessions.employeeId,
+      companyId: workSessions.companyId,
+      workDate: workSessions.workDate,
+      startTime: workSessions.startTime,
+      endTime: workSessions.endTime,
+      regularHours: workSessions.regularHours,
+      overtimeHours: workSessions.overtimeHours,
+      doubleTimeHours: workSessions.doubleTimeHours,
+      dropsCompletedNorth: workSessions.dropsCompletedNorth,
+      dropsCompletedEast: workSessions.dropsCompletedEast,
+      dropsCompletedSouth: workSessions.dropsCompletedSouth,
+      dropsCompletedWest: workSessions.dropsCompletedWest,
+      notes: workSessions.notes,
+      employeeName: users.name,
+      employeeRole: users.role,
+      projectName: projects.buildingName,
+      projectAddress: projects.buildingAddress,
+    })
+      .from(workSessions)
+      .leftJoin(users, eq(workSessions.employeeId, users.id))
+      .leftJoin(projects, eq(workSessions.projectId, projects.id))
+      .where(and(...conditions))
+      .orderBy(desc(workSessions.workDate), desc(workSessions.startTime));
+    
+    return result;
+  }
+
+  // Get all employees including terminated ones for work session export
+  async getAllEmployeesIncludingTerminated(companyId: string): Promise<any[]> {
+    // Get all unique employee IDs from work sessions for this company
+    const sessionEmployeeIds = await db.selectDistinct({
+      employeeId: workSessions.employeeId,
+    })
+      .from(workSessions)
+      .where(eq(workSessions.companyId, companyId));
+    
+    const employeeIds = sessionEmployeeIds.map(s => s.employeeId);
+    
+    if (employeeIds.length === 0) {
+      return [];
+    }
+    
+    // Get user details for all these employees
+    const employees = await db.select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+    })
+      .from(users)
+      .where(inArray(users.id, employeeIds))
+      .orderBy(users.name);
+    
+    // Check which ones are still active vs terminated
+    const activeConnections = await db.select({
+      technicianId: technicianEmployerConnections.technicianId,
+      status: technicianEmployerConnections.status,
+    })
+      .from(technicianEmployerConnections)
+      .where(
+        and(
+          eq(technicianEmployerConnections.companyId, companyId),
+          inArray(technicianEmployerConnections.technicianId, employeeIds)
+        )
+      );
+    
+    const connectionMap = new Map(activeConnections.map(c => [c.technicianId, c.status]));
+    
+    // Also check primary employees
+    const primaryEmployees = await db.select({
+      id: users.id,
+    })
+      .from(users)
+      .where(
+        and(
+          eq(users.companyId, companyId),
+          inArray(users.id, employeeIds)
+        )
+      );
+    
+    const primaryIds = new Set(primaryEmployees.map(e => e.id));
+    
+    return employees.map(emp => ({
+      ...emp,
+      status: primaryIds.has(emp.id) ? 'active' : (connectionMap.get(emp.id) || 'terminated'),
+    }));
+  }
+
   // Non-billable work session operations
   async createNonBillableWorkSession(session: any): Promise<any> {
     const result = await db.insert(nonBillableWorkSessions).values(session).returning();

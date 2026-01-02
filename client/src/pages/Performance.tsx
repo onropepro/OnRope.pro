@@ -18,7 +18,9 @@ import {
   XCircle,
   BarChart3,
   Activity,
+  FileText,
 } from "lucide-react";
+import { WorkSessionsExplorer } from "@/components/WorkSessionsExplorer";
 import { canViewPerformance } from "@/lib/permissions";
 
 interface WorkSession {
@@ -250,7 +252,7 @@ export default function Performance() {
           </div>
         ) : (
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsList className="grid w-full grid-cols-4 mb-4">
               <TabsTrigger value="overview" data-testid="tab-overview">
                 <Activity className="w-4 h-4 mr-2" />
                 {t('performance.tabs.overview', 'Overview')}
@@ -262,6 +264,10 @@ export default function Performance() {
               <TabsTrigger value="hours" data-testid="tab-hours">
                 <Clock className="w-4 h-4 mr-2" />
                 {t('performance.tabs.hours', 'Hours')}
+              </TabsTrigger>
+              <TabsTrigger value="sessions" data-testid="tab-sessions">
+                <FileText className="w-4 h-4 mr-2" />
+                {t('performance.tabs.sessions', 'Sessions')}
               </TabsTrigger>
             </TabsList>
 
@@ -641,6 +647,10 @@ export default function Performance() {
                   </div>
                 </CardHeader>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="sessions" className="space-y-4">
+              <WorkSessionsExplorer />
             </TabsContent>
           </Tabs>
         )}
