@@ -3014,6 +3014,13 @@ function JobDetailDialog({
                 size="default"
                 onClick={() => {
                   setSelectedEmployees([]); // Reset selection when toggling
+                  // Pre-fill dates with job dates when opening assignment section
+                  if (!showAssignEmployees && job) {
+                    setAssignmentDates({
+                      startDate: String(job.startDate).split('T')[0],
+                      endDate: String(job.endDate).split('T')[0],
+                    });
+                  }
                   setShowAssignEmployees(!showAssignEmployees);
                 }}
                 data-testid="button-assign-employees"
@@ -3062,8 +3069,43 @@ function JobDetailDialog({
             {/* Inline employee assignment section - Multi-select */}
             {showAssignEmployees && (
               <div className="space-y-3 border rounded-md p-4">
+                {/* Date range selection - shown at top */}
+                <div className="space-y-2">
+                  <h4 className="text-xs text-muted-foreground uppercase tracking-wide">
+                    {t('schedule.assignmentDateRange', 'Assignment Date Range')}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="inline-start-date" className="text-xs">{t('schedule.startDate', 'Start Date')}</Label>
+                      <Input
+                        id="inline-start-date"
+                        type="date"
+                        value={assignmentDates.startDate}
+                        onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
+                        min={String(job.startDate).split('T')[0]}
+                        max={String(job.endDate).split('T')[0]}
+                        data-testid="input-assignment-start-date"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="inline-end-date" className="text-xs">{t('schedule.endDate', 'End Date')}</Label>
+                      <Input
+                        id="inline-end-date"
+                        type="date"
+                        value={assignmentDates.endDate}
+                        onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
+                        min={assignmentDates.startDate || String(job.startDate).split('T')[0]}
+                        max={String(job.endDate).split('T')[0]}
+                        data-testid="input-assignment-end-date"
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
                 {/* Employee selection list with checkboxes */}
-                <div>
+                <div className="pt-3 border-t">
                   <h4 className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
                     {t('schedule.selectEmployees', 'Select Employees to Assign')}
                     {selectedEmployees.length > 0 && (
@@ -3111,41 +3153,9 @@ function JobDetailDialog({
                   })()}
                 </div>
                 
-                {/* Date selection - only show when employees are selected */}
+                {/* Assign button - only show when employees are selected */}
                 {selectedEmployees.length > 0 && (
-                  <div className="space-y-4 pt-3 border-t">
-                    <div className="text-sm text-muted-foreground">
-                      {t('schedule.assignDatesToAll', 'These dates will apply to all selected employees')}
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="inline-start-date" className="text-xs">{t('schedule.startDate', 'Start Date')}</Label>
-                        <Input
-                          id="inline-start-date"
-                          type="date"
-                          value={assignmentDates.startDate}
-                          onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
-                          min={String(job.startDate).split('T')[0]}
-                          max={String(job.endDate).split('T')[0]}
-                          data-testid="input-assignment-start-date"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="inline-end-date" className="text-xs">{t('schedule.endDate', 'End Date')}</Label>
-                        <Input
-                          id="inline-end-date"
-                          type="date"
-                          value={assignmentDates.endDate}
-                          onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
-                          min={assignmentDates.startDate || String(job.startDate).split('T')[0]}
-                          max={String(job.endDate).split('T')[0]}
-                          data-testid="input-assignment-end-date"
-                          className="mt-1"
-                        />
-                      </div>
-                    </div>
-                    
+                  <div className="pt-3 border-t">
                     <Button
                       onClick={handleSaveAssignment}
                       disabled={isAssigningMultiple || assignEmployeeMutation.isPending}
