@@ -2240,6 +2240,7 @@ function DateRangeExport({
   documentType: string;
   colorClass: string;
 }) {
+  const { t } = useTranslation();
   const [dateRange, setDateRange] = useState<DateRangeState>({
     from: undefined,
     to: undefined,
