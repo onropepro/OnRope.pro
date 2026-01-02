@@ -6,10 +6,19 @@ async function throwIfResNotOk(res: Response) {
     // Try to parse JSON and extract the message for user-friendly errors
     try {
       const json = JSON.parse(text);
+      // For 409 conflict responses, include the full JSON in the error message
+      // so the frontend can parse conflict details
+      if (res.status === 409) {
+        throw new Error(`409:${text}`);
+      }
       if (json.message) {
         throw new Error(json.message);
       }
-    } catch {
+    } catch (e) {
+      // If parsing failed but we have error already, rethrow it
+      if (e instanceof Error && e.message.startsWith('409:')) {
+        throw e;
+      }
       // If not JSON or no message, use the raw text
     }
     throw new Error(text || res.statusText);
