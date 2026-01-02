@@ -522,16 +522,51 @@ Radix Dialog components REQUIRE hidden accessibility elements to prevent focus t
 
 ### Form State Management
 
-**Pattern: Reset on Step Entry**
+**Pattern: Guarded Step Initialization (RECOMMENDED)**
 ```typescript
+// Track which steps have been initialized to prevent clearing user input on re-entry
+const stepsInitializedRef = useRef<Set<Step>>(new Set());
+
+// CRITICAL: Reset tracking when wizard opens/reopens for fresh session
 useEffect(() => {
+  if (open) {
+    stepsInitializedRef.current.clear();
+  }
+}, [open]);
+
+useEffect(() => {
+  // Guard: Only run initialization once per step per session
+  if (stepsInitializedRef.current.has(currentStep)) {
+    return;
+  }
+  
   if (currentStep === "client") {
     clientForm.reset({ /* default values */ });
+    stepsInitializedRef.current.add("client");
   }
-}, [currentStep]);
+}, [currentStep, clientForm]);
 ```
 
-**Why**: Prevents browser autofill contamination between steps
+**Why This Pattern**:
+1. Prevents browser autofill contamination on **first entry** to each step
+2. Preserves user input if they go **back** to a previous step
+3. Preserves user input on **validation errors** (step doesn't change)
+4. Uses a ref so the guard doesn't trigger re-renders
+5. No eslint-disable needed - dependency array includes clientForm safely
+
+**CRITICAL BUG WARNING - DO NOT USE THIS PATTERN**:
+```typescript
+// BROKEN - DO NOT USE
+useEffect(() => {
+  if (currentStep === "client") {
+    clientForm.reset({ ... });
+  }
+}, [currentStep, clientForm]);  // <-- clientForm here = BUG!
+```
+- Form objects from `useForm()` create **new references on every render**
+- Without the ref guard, the effect fires on **every keystroke**
+- This causes `form.reset()` to immediately clear user input
+- Result: Users cannot type anything - characters disappear instantly
 
 **Pattern: Stable Form Attributes**
 ```tsx

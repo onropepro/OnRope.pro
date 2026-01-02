@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
@@ -98,6 +98,16 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<Step>("welcome");
   const [createdClientId, setCreatedClientId] = useState<string | null>(null);
+  
+  // Track which steps have had their forms reset to prevent re-clearing on step re-entry
+  const stepsInitializedRef = useRef<Set<Step>>(new Set());
+  
+  // Reset initialization tracking when wizard opens/reopens for fresh session
+  useEffect(() => {
+    if (open) {
+      stepsInitializedRef.current.clear();
+    }
+  }, [open]);
   
   // Employee step state
   const [employeeMode, setEmployeeMode] = useState<EmployeeMode>("select");
@@ -276,10 +286,16 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
   
   const canCreateProject = !!createdClientId;
 
-  // Reset form state when entering certain steps
+  // Initialize step state only on FIRST entry to prevent clearing user input on re-entry
+  // Uses a ref to track which steps have been initialized, avoiding dependency array issues
   useEffect(() => {
+    // Guard: Only run initialization once per step
+    if (stepsInitializedRef.current.has(currentStep)) {
+      return;
+    }
+    
     if (currentStep === "client") {
-      // Reset client form to prevent browser autofill contamination
+      // Reset client form to prevent browser autofill contamination - only on first entry
       clientForm.reset({
         firstName: "",
         lastName: "",
@@ -287,12 +303,14 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
         phoneNumber: "",
         email: "",
       });
+      stepsInitializedRef.current.add("client");
     } else if (currentStep === "employee") {
       setEmployeeMode("select");
       setSearchType("email");
       setSearchValue("");
       setFoundTechnician(null);
       setSearchMessage(null);
+      stepsInitializedRef.current.add("employee");
     }
   }, [currentStep, clientForm]);
 
