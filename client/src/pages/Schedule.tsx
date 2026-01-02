@@ -3070,7 +3070,7 @@ function JobDetailDialog({
 
     {job && (
       <Sheet open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
-        <SheetContent>
+        <SheetContent className="z-[60]">
           <SheetHeader>
             <SheetTitle>{t('schedule.assignEmployee', 'Assign Employee to Job')}</SheetTitle>
             <SheetDescription>
