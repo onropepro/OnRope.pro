@@ -55,6 +55,10 @@ import SuperUserFutureIdeas from "@/pages/SuperUserFutureIdeas";
 import SuperUserStaffAccounts from "@/pages/SuperUserStaffAccounts";
 import SuperUserNetwork from "@/pages/SuperUserNetwork";
 import SuperUserSafety from "@/pages/SuperUserSafety";
+import CrmDashboard from "@/pages/CrmDashboard";
+import CrmPipeline from "@/pages/CrmPipeline";
+import CrmContacts from "@/pages/CrmContacts";
+import CrmCompanies from "@/pages/CrmCompanies";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -302,6 +306,26 @@ function Router() {
           <Route path="/superuser/future-ideas">
             <ProtectedRoute allowedRoles={["superuser", "staff"]}>
               <SuperUserFutureIdeas />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/crm/companies">
+            <ProtectedRoute allowedRoles={["superuser"]}>
+              <CrmCompanies />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/crm/contacts">
+            <ProtectedRoute allowedRoles={["superuser"]}>
+              <CrmContacts />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/crm/pipeline">
+            <ProtectedRoute allowedRoles={["superuser"]}>
+              <CrmPipeline />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/crm">
+            <ProtectedRoute allowedRoles={["superuser"]}>
+              <CrmDashboard />
             </ProtectedRoute>
           </Route>
           <Route path="/superuser/staff-accounts">

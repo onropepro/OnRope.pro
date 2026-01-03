@@ -33,6 +33,7 @@ import rateLimit from "express-rate-limit";
 import OpenAI from "openai";
 import { generateQuizFromDocument } from "./gemini";
 import helpRouter from "./routes/help";
+import { registerCrmRoutes } from "./crm-routes";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
 import { sendQuoteNotificationSMS } from "./services/twilio";
@@ -28491,6 +28492,9 @@ Do not include any other text, just the JSON object.`
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Register CRM routes (SuperUser only)
+  registerCrmRoutes(app, requireAuth);
 
   const httpServer = createServer(app);
   

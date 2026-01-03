@@ -144,6 +144,42 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
+    label: "SALES CRM",
+    items: [
+      {
+        title: "CRM Dashboard",
+        icon: "speed",
+        path: "/superuser/crm",
+        exact: true,
+      },
+      {
+        title: "Pipeline",
+        icon: "view_kanban",
+        path: "/superuser/crm/pipeline",
+      },
+      {
+        title: "Companies",
+        icon: "domain",
+        path: "/superuser/crm/companies",
+      },
+      {
+        title: "Contacts",
+        icon: "contacts",
+        path: "/superuser/crm/contacts",
+      },
+      {
+        title: "Tasks",
+        icon: "task_alt",
+        path: "/superuser/crm/tasks",
+      },
+      {
+        title: "Email Templates",
+        icon: "mail",
+        path: "/superuser/crm/templates",
+      },
+    ],
+  },
+  {
     label: "ANALYTICS",
     items: [
       {
@@ -191,6 +227,7 @@ function SidebarContents() {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     MAIN: true,
     MANAGEMENT: true,
+    "SALES CRM": true,
     ANALYTICS: true,
     RESOURCES: true,
   });

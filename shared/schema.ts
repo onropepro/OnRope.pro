@@ -3,10 +3,12 @@ import { relations } from "drizzle-orm";
 import { isDropBasedJobType, isSuiteBasedJobType, isStallBasedJobType, getAllJobTypeValues, getCategoryForJobType } from './jobTypes';
 import {
   pgTable,
+  pgEnum,
   varchar,
   text,
   timestamp,
   integer,
+  serial,
   boolean,
   date,
   index,
@@ -3568,3 +3570,303 @@ export const insertEarlyAccessSignupSchema = createInsertSchema(earlyAccessSignu
 
 export type EarlyAccessSignup = typeof earlyAccessSignups.$inferSelect;
 export type InsertEarlyAccessSignup = z.infer<typeof insertEarlyAccessSignupSchema>;
+
+// ============================================
+// SALES CRM (SuperUser Only)
+// Internal CRM for lead generation and outreach
+// ============================================
+
+export const crmPipelineStageEnum = pgEnum('crm_pipeline_stage', [
+  'lead_captured',
+  'contacted',
+  'demo_scheduled',
+  'trial',
+  'paid_subscriber',
+  'churned',
+  'lost'
+]);
+
+export const crmActivityTypeEnum = pgEnum('crm_activity_type', [
+  'email_sent',
+  'email_received',
+  'email_opened',
+  'email_clicked',
+  'call_made',
+  'call_received',
+  'note',
+  'demo_completed',
+  'stage_change',
+  'task_completed'
+]);
+
+export const crmLeadSourceEnum = pgEnum('crm_lead_source', [
+  'brightdata_scrape',
+  'sprat_directory',
+  'irata_directory',
+  'website_signup',
+  'referral',
+  'linkedin',
+  'cold_outreach',
+  'inbound_inquiry',
+  'conference',
+  'manual'
+]);
+
+export const crmConsentTypeEnum = pgEnum('crm_consent_type', [
+  'none',
+  'implied_published',
+  'implied_business',
+  'express'
+]);
+
+export const crmCompanies = pgTable('crm_companies', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }).notNull(),
+  website: varchar('website', { length: 500 }),
+  phone: varchar('phone', { length: 50 }),
+  email: varchar('email', { length: 255 }),
+  address: varchar('address', { length: 500 }),
+  city: varchar('city', { length: 100 }),
+  stateProvince: varchar('state_province', { length: 100 }),
+  country: varchar('country', { length: 2 }).default('CA'),
+  postalCode: varchar('postal_code', { length: 20 }),
+  serviceRegion: text('service_region'),
+  serviceType: varchar('service_type', { length: 255 }),
+  certifications: text('certifications').array(),
+  estimatedSize: varchar('estimated_size', { length: 50 }),
+  linkedinUrl: varchar('linkedin_url', { length: 500 }),
+  instagramUrl: varchar('instagram_url', { length: 500 }),
+  facebookUrl: varchar('facebook_url', { length: 500 }),
+  source: crmLeadSourceEnum('source').default('manual'),
+  brightdataId: varchar('brightdata_id', { length: 255 }),
+  lastEnrichedAt: timestamp('last_enriched_at'),
+  convertedUserId: varchar('converted_user_id').references(() => users.id),
+  convertedAt: timestamp('converted_at'),
+  notes: text('notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('IDX_crm_companies_country').on(table.country),
+  index('IDX_crm_companies_source').on(table.source),
+  index('IDX_crm_companies_created').on(table.createdAt),
+]);
+
+export const insertCrmCompanySchema = createInsertSchema(crmCompanies).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CrmCompany = typeof crmCompanies.$inferSelect;
+export type InsertCrmCompany = z.infer<typeof insertCrmCompanySchema>;
+
+export const crmContacts = pgTable('crm_contacts', {
+  id: serial('id').primaryKey(),
+  companyId: integer('company_id').references(() => crmCompanies.id, { onDelete: 'cascade' }),
+  firstName: varchar('first_name', { length: 100 }).notNull(),
+  lastName: varchar('last_name', { length: 100 }),
+  email: varchar('email', { length: 255 }),
+  phone: varchar('phone', { length: 50 }),
+  jobTitle: varchar('job_title', { length: 100 }),
+  linkedinUrl: varchar('linkedin_url', { length: 500 }),
+  instagramUrl: varchar('instagram_url', { length: 500 }),
+  facebookUrl: varchar('facebook_url', { length: 500 }),
+  stage: crmPipelineStageEnum('stage').default('lead_captured').notNull(),
+  leadScore: integer('lead_score').default(0),
+  consentType: crmConsentTypeEnum('consent_type').default('none'),
+  consentDate: timestamp('consent_date'),
+  consentSource: varchar('consent_source', { length: 255 }),
+  doNotContact: boolean('do_not_contact').default(false),
+  unsubscribedAt: timestamp('unsubscribed_at'),
+  source: crmLeadSourceEnum('source').default('manual'),
+  utmSource: varchar('utm_source', { length: 100 }),
+  utmMedium: varchar('utm_medium', { length: 100 }),
+  utmCampaign: varchar('utm_campaign', { length: 100 }),
+  lastContactedAt: timestamp('last_contacted_at'),
+  lastRespondedAt: timestamp('last_responded_at'),
+  emailOpenCount: integer('email_open_count').default(0),
+  emailClickCount: integer('email_click_count').default(0),
+  notes: text('notes'),
+  tags: text('tags').array(),
+  convertedUserId: varchar('converted_user_id').references(() => users.id),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('IDX_crm_contacts_email').on(table.email),
+  index('IDX_crm_contacts_stage').on(table.stage),
+  index('IDX_crm_contacts_score').on(table.leadScore),
+  index('IDX_crm_contacts_company').on(table.companyId),
+]);
+
+export const insertCrmContactSchema = createInsertSchema(crmContacts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CrmContact = typeof crmContacts.$inferSelect;
+export type InsertCrmContact = z.infer<typeof insertCrmContactSchema>;
+
+export const crmActivities = pgTable('crm_activities', {
+  id: serial('id').primaryKey(),
+  contactId: integer('contact_id').references(() => crmContacts.id, { onDelete: 'cascade' }).notNull(),
+  companyId: integer('company_id').references(() => crmCompanies.id, { onDelete: 'cascade' }),
+  type: crmActivityTypeEnum('type').notNull(),
+  subject: varchar('subject', { length: 255 }),
+  description: text('description'),
+  emailMessageId: varchar('email_message_id', { length: 500 }),
+  emailStatus: varchar('email_status', { length: 50 }),
+  previousStage: crmPipelineStageEnum('previous_stage'),
+  newStage: crmPipelineStageEnum('new_stage'),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('IDX_crm_activities_contact').on(table.contactId),
+  index('IDX_crm_activities_created').on(table.createdAt),
+]);
+
+export const insertCrmActivitySchema = createInsertSchema(crmActivities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CrmActivity = typeof crmActivities.$inferSelect;
+export type InsertCrmActivity = z.infer<typeof insertCrmActivitySchema>;
+
+export const crmEmailTemplates = pgTable('crm_email_templates', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  subject: varchar('subject', { length: 255 }).notNull(),
+  bodyHtml: text('body_html').notNull(),
+  bodyText: text('body_text'),
+  category: varchar('category', { length: 50 }),
+  isActive: boolean('is_active').default(true),
+  sentCount: integer('sent_count').default(0),
+  openCount: integer('open_count').default(0),
+  clickCount: integer('click_count').default(0),
+  replyCount: integer('reply_count').default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const insertCrmEmailTemplateSchema = createInsertSchema(crmEmailTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CrmEmailTemplate = typeof crmEmailTemplates.$inferSelect;
+export type InsertCrmEmailTemplate = z.infer<typeof insertCrmEmailTemplateSchema>;
+
+export const crmSequences = pgTable('crm_sequences', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  description: text('description'),
+  status: varchar('status', { length: 20 }).default('draft'),
+  sendOnWeekends: boolean('send_on_weekends').default(false),
+  sendStartHour: integer('send_start_hour').default(9),
+  sendEndHour: integer('send_end_hour').default(17),
+  timezone: varchar('timezone', { length: 50 }).default('America/Vancouver'),
+  enrolledCount: integer('enrolled_count').default(0),
+  completedCount: integer('completed_count').default(0),
+  repliedCount: integer('replied_count').default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const insertCrmSequenceSchema = createInsertSchema(crmSequences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type CrmSequence = typeof crmSequences.$inferSelect;
+export type InsertCrmSequence = z.infer<typeof insertCrmSequenceSchema>;
+
+export const crmSequenceSteps = pgTable('crm_sequence_steps', {
+  id: serial('id').primaryKey(),
+  sequenceId: integer('sequence_id').references(() => crmSequences.id, { onDelete: 'cascade' }).notNull(),
+  stepNumber: integer('step_number').notNull(),
+  delayDays: integer('delay_days').notNull(),
+  templateId: integer('template_id').references(() => crmEmailTemplates.id),
+  subject: varchar('subject', { length: 255 }),
+  bodyHtml: text('body_html'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const insertCrmSequenceStepSchema = createInsertSchema(crmSequenceSteps).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CrmSequenceStep = typeof crmSequenceSteps.$inferSelect;
+export type InsertCrmSequenceStep = z.infer<typeof insertCrmSequenceStepSchema>;
+
+export const crmSequenceEnrollments = pgTable('crm_sequence_enrollments', {
+  id: serial('id').primaryKey(),
+  sequenceId: integer('sequence_id').references(() => crmSequences.id, { onDelete: 'cascade' }).notNull(),
+  contactId: integer('contact_id').references(() => crmContacts.id, { onDelete: 'cascade' }).notNull(),
+  status: varchar('status', { length: 20 }).default('active'),
+  currentStep: integer('current_step').default(1),
+  nextSendAt: timestamp('next_send_at'),
+  pauseReason: varchar('pause_reason', { length: 255 }),
+  enrolledAt: timestamp('enrolled_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'),
+});
+
+export const insertCrmSequenceEnrollmentSchema = createInsertSchema(crmSequenceEnrollments).omit({
+  id: true,
+  enrolledAt: true,
+});
+
+export type CrmSequenceEnrollment = typeof crmSequenceEnrollments.$inferSelect;
+export type InsertCrmSequenceEnrollment = z.infer<typeof insertCrmSequenceEnrollmentSchema>;
+
+export const crmTasks = pgTable('crm_tasks', {
+  id: serial('id').primaryKey(),
+  contactId: integer('contact_id').references(() => crmContacts.id, { onDelete: 'cascade' }),
+  companyId: integer('company_id').references(() => crmCompanies.id, { onDelete: 'cascade' }),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  dueDate: timestamp('due_date'),
+  priority: varchar('priority', { length: 20 }).default('medium'),
+  status: varchar('status', { length: 20 }).default('pending'),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('IDX_crm_tasks_contact').on(table.contactId),
+  index('IDX_crm_tasks_due').on(table.dueDate),
+  index('IDX_crm_tasks_status').on(table.status),
+]);
+
+export const insertCrmTaskSchema = createInsertSchema(crmTasks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CrmTask = typeof crmTasks.$inferSelect;
+export type InsertCrmTask = z.infer<typeof insertCrmTaskSchema>;
+
+export const crmBrightdataImports = pgTable('crm_brightdata_imports', {
+  id: serial('id').primaryKey(),
+  country: varchar('country', { length: 2 }).notNull(),
+  stateProvince: varchar('state_province', { length: 100 }),
+  city: varchar('city', { length: 100 }),
+  searchQuery: varchar('search_query', { length: 255 }),
+  status: varchar('status', { length: 20 }).default('pending'),
+  recordsFound: integer('records_found').default(0),
+  recordsImported: integer('records_imported').default(0),
+  recordsDuplicate: integer('records_duplicate').default(0),
+  brightdataJobId: varchar('brightdata_job_id', { length: 255 }),
+  errorMessage: text('error_message'),
+  startedAt: timestamp('started_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'),
+});
+
+export const insertCrmBrightdataImportSchema = createInsertSchema(crmBrightdataImports).omit({
+  id: true,
+  startedAt: true,
+});
+
+export type CrmBrightdataImport = typeof crmBrightdataImports.$inferSelect;
+export type InsertCrmBrightdataImport = z.infer<typeof insertCrmBrightdataImportSchema>;
