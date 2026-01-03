@@ -38,6 +38,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024, // 15 MB limit as safety net after chunking
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\./i,
@@ -78,52 +80,14 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            if (id.includes('@fullcalendar')) {
-              return 'vendor-fullcalendar';
-            }
-            if (id.includes('leaflet') || id.includes('react-leaflet')) {
-              return 'vendor-leaflet';
-            }
-            if (id.includes('apexcharts') || id.includes('react-apexcharts')) {
-              return 'vendor-apexcharts';
-            }
-            if (id.includes('recharts')) {
-              return 'vendor-recharts';
-            }
-            if (id.includes('framer-motion')) {
-              return 'vendor-framer';
-            }
-            if (id.includes('@radix-ui')) {
-              return 'vendor-radix';
-            }
-            if (id.includes('@tanstack')) {
-              return 'vendor-tanstack';
-            }
-            if (id.includes('lucide-react') || id.includes('react-icons')) {
-              return 'vendor-icons';
-            }
-            if (id.includes('date-fns')) {
-              return 'vendor-datefns';
-            }
-            if (id.includes('zod') || id.includes('react-hook-form') || id.includes('@hookform')) {
-              return 'vendor-forms';
-            }
-            if (id.includes('i18next')) {
-              return 'vendor-i18n';
-            }
-            if (id.includes('@stripe')) {
-              return 'vendor-stripe';
-            }
-            if (id.includes('xlsx') || id.includes('jspdf') || id.includes('jszip')) {
-              return 'vendor-documents';
-            }
-            if (id.includes('@hello-pangea') || id.includes('@dnd-kit')) {
-              return 'vendor-dnd';
-            }
-            return 'vendor-common';
-          }
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'wouter'],
+          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover', '@radix-ui/react-select', '@radix-ui/react-tabs', '@radix-ui/react-tooltip'],
+          'vendor-charts': ['recharts', 'apexcharts', 'react-apexcharts'],
+          'vendor-calendar': ['@fullcalendar/core', '@fullcalendar/react', '@fullcalendar/daygrid', '@fullcalendar/timegrid'],
+          'vendor-maps': ['leaflet', 'react-leaflet'],
+          'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'vendor-utils': ['date-fns', 'date-fns-tz', 'clsx', 'tailwind-merge']
         }
       }
     }
