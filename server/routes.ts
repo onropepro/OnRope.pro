@@ -1216,10 +1216,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dedicated resident registration endpoint - SECURITY: Rate limited
   app.post("/api/register/resident", registrationRateLimiter, async (req: Request, res: Response) => {
     try {
-      const { name, email, phone, strataPlanNumber, unitNumber, parkingStallNumber, password } = req.body;
+      const { firstName, lastName, email, phone, strataPlanNumber, unitNumber, parkingStallNumber, password } = req.body;
 
       // Validate required fields
-      if (!name || !email || !password || !strataPlanNumber || !unitNumber) {
+      if (!firstName || !lastName || !email || !password || !strataPlanNumber || !unitNumber) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
@@ -1263,10 +1263,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Split name into first and last name
-      const nameParts = name.trim().split(/\s+/);
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
 
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -1668,7 +1664,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create the technician user (pending company approval)
       const user = await storage.createUser({
-        name: `${firstName} ${lastName}`,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`, // Legacy field
         email,
         role: 'rope_access_tech',
         passwordHash: password, // storage.createUser will hash this
@@ -1829,7 +1827,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create the ground crew user (pending company approval)
       const user = await storage.createUser({
-        name: `${firstName} ${lastName}`,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`, // Legacy field
         email,
         role: 'ground_crew',
         passwordHash: password, // storage.createUser will hash this
@@ -5834,7 +5834,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const {
-        name,
+        firstName,
+        lastName,
         email,
         employeePhoneNumber,
         smsNotificationsEnabled,
@@ -5867,8 +5868,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } = req.body;
 
       // Validate required fields
-      if (!name || !email || !employeePhoneNumber) {
-        return res.status(400).json({ message: "Name, email, and phone are required" });
+      if (!firstName || !lastName || !email || !employeePhoneNumber) {
+        return res.status(400).json({ message: "First name, last name, email, and phone are required" });
       }
 
       if (!emergencyContactName || !emergencyContactPhone) {
@@ -5886,7 +5887,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Build update object - storage.updateUser handles encryption automatically
       // via encryptSensitiveFields for SIN, bank info, and medical conditions
       const updateData: any = {
-        name,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`.trim(), // Keep legacy name field in sync
         email,
         employeePhoneNumber,
         smsNotificationsEnabled,
@@ -10671,7 +10674,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       }
       
       const { 
-        name, email, password, role, techLevel, hourlyRate, isSalary, salary, permissions,
+        firstName, lastName, email, password, role, techLevel, hourlyRate, isSalary, salary, permissions,
         startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
         homeAddress, employeeCity, employeeProvinceState, employeeCountry, employeePostalCode, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, irataExpirationDate
@@ -10686,7 +10689,9 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       // Create employee account linked to company
       // Storage will hash the password
       const employee = await storage.createUser({
-        name,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`.trim(), // Legacy field
         email,
         role,
         techLevel: role === "rope_access_tech" ? techLevel : null,
