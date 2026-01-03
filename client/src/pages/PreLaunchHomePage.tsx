@@ -189,9 +189,7 @@ export default function PreLaunchHomePage() {
               can finally see what sets you apart.
             </h1>
 
-            <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Built by a Level 3 tech and operations manager who got tired of the same chaos you're dealing with.
-            </p>
+            <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">Urban Rope Access Software Built by a Level 3 Tech and Operations Manager Who Got Tired of the Same Chaos You're Dealing With.</p>
 
             <p className="text-blue-100">
               OnRopePro launches January 2026. Early access list now open.
@@ -260,7 +258,6 @@ export default function PreLaunchHomePage() {
           </svg>
         </div>
       </section>
-
       <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
         <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
           <Card className="shadow-xl border-0 relative z-20 -mt-20">
@@ -287,7 +284,6 @@ export default function PreLaunchHomePage() {
           </Card>
         </div>
       </section>
-
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -340,7 +336,6 @@ export default function PreLaunchHomePage() {
           </div>
         </div>
       </section>
-
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -382,7 +377,6 @@ export default function PreLaunchHomePage() {
           </div>
         </div>
       </section>
-
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
@@ -424,7 +418,6 @@ export default function PreLaunchHomePage() {
           </Card>
         </div>
       </section>
-
       <section
         className="py-16 md:py-20 px-4 text-white"
         style={{ backgroundImage: "linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)" }}
@@ -450,7 +443,6 @@ export default function PreLaunchHomePage() {
           </p>
         </div>
       </section>
-
       <PreLaunchFooter />
     </div>
   );
