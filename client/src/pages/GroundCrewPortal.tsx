@@ -1830,7 +1830,10 @@ export default function GroundCrewPortal() {
                                     onChange={field.onChange}
                                     onBlur={field.onBlur}
                                     onSelect={(address) => {
-                                      field.onChange(address.formatted);
+                                      const streetAddress = address.houseNumber 
+                                        ? `${address.houseNumber} ${address.street || ''}`.trim()
+                                        : address.street || address.formatted;
+                                      field.onChange(streetAddress);
                                       form.setValue('employeeCity', address.city || '');
                                       form.setValue('employeeProvinceState', address.state || '');
                                       form.setValue('employeeCountry', address.country || '');

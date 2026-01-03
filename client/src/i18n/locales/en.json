@@ -862,6 +862,16 @@
     },
     "language": "Language"
   },
+  "address": {
+    "searchLabel": "Search Address",
+    "searchPlaceholder": "Search for an address...",
+    "streetAddress": "Street Address",
+    "city": "City",
+    "provinceState": "Province/State",
+    "country": "Country",
+    "postalCode": "Postal/ZIP Code",
+    "noAddressProvided": "No address provided"
+  },
   "common": {
     "helpMeGetStarted": "Help me get started",
     "startFreeTrial": "Start Your Free 30-Day Trial",

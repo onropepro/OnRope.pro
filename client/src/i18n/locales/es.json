@@ -936,6 +936,16 @@
     "changelog": "Registro de Cambios",
     "safetyRating": "Calificacion de Seguridad"
   },
+  "address": {
+    "searchLabel": "Buscar dirección",
+    "searchPlaceholder": "Buscar una dirección...",
+    "streetAddress": "Dirección",
+    "city": "Ciudad",
+    "provinceState": "Provincia/Estado",
+    "country": "País",
+    "postalCode": "Código postal",
+    "noAddressProvided": "No se proporcionó dirección"
+  },
   "common": {
     "helpMeGetStarted": "Ayúdame a empezar",
     "startFreeTrial": "Comienza tu prueba gratuita de 30 días",

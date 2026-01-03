@@ -873,6 +873,16 @@
     },
     "language": "Langue"
   },
+  "address": {
+    "searchLabel": "Rechercher une adresse",
+    "searchPlaceholder": "Rechercher une adresse...",
+    "streetAddress": "Adresse",
+    "city": "Ville",
+    "provinceState": "Province/État",
+    "country": "Pays",
+    "postalCode": "Code postal",
+    "noAddressProvided": "Aucune adresse fournie"
+  },
   "common": {
     "helpMeGetStarted": "Aidez-moi à commencer",
     "startFreeTrial": "Commencer votre essai gratuit de 30 jours",
