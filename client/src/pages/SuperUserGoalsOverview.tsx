@@ -467,7 +467,7 @@ export default function SuperUserGoalsOverview() {
 
   if (isLoading) {
     return (
-      <SuperUserLayout title="Goals & KPIs">
+      <SuperUserLayout>
         <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <Skeleton className="h-32 w-full" />
@@ -481,7 +481,7 @@ export default function SuperUserGoalsOverview() {
   }
 
   return (
-    <SuperUserLayout title="Goals & KPIs">
+    <SuperUserLayout>
       <div className="p-6">
         <div className="max-w-7xl mx-auto space-y-8">
           

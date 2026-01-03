@@ -961,7 +961,7 @@ export default function SuperUserNetwork() {
 
   if (error) {
     return (
-      <SuperUserLayout title="Network Effects">
+      <SuperUserLayout>
         <div className="p-6">
           <Card className="border-destructive">
             <CardContent className="py-12">
@@ -980,7 +980,7 @@ export default function SuperUserNetwork() {
   }
 
   return (
-    <SuperUserLayout title="Network Effects">
+    <SuperUserLayout>
       <div className="p-6 space-y-6">
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-bold flex items-center gap-2">

@@ -202,7 +202,7 @@ export default function SuperUserMetrics() {
 
   if (error) {
     return (
-      <SuperUserLayout title={t('superuser.metrics.title', 'Platform Metrics')}>
+      <SuperUserLayout>
         <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <BackButton to="/superuser" label={t('common.backToDashboard', 'Back to Dashboard')} />
@@ -291,7 +291,7 @@ export default function SuperUserMetrics() {
   };
 
   return (
-    <SuperUserLayout title={t('superuser.metrics.title', 'Platform Metrics')}>
+    <SuperUserLayout>
       <div className="p-4 md:p-6">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Back Button */}
