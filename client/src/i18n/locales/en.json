@@ -8895,7 +8895,7 @@
       "description3": "When both are visible, the entire industry gets safer.",
       "ctaButton": "Start Building Your Safety Record",
       "signInButton": "Sign In",
-      "freeNote": "Free for technicians. Always. 14-day trial for companies."
+      "freeNote": "Free for technicians. Always. 30-day trial for companies."
     },
     "stats": {
       "measured": "Measured",
@@ -9044,7 +9044,7 @@
       "getStarted": "Get Started Free",
       "learnCsr": "Learn About CSR",
       "learnPsr": "Learn About PSR",
-      "freeNote": "Free for technicians. Always. 14-day trial for companies. No credit card required."
+      "freeNote": "Free for technicians. Always. 30-day trial for companies. No credit card required."
     }
   },
   "signIn": {
