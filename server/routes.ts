@@ -8705,7 +8705,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       ] = await Promise.all([
         db.select({ count: sql<number>`count(*)` }).from(harnessInspections),
         db.select({ count: sql<number>`count(*)` }).from(toolboxMeetings),
-        db.select({ sum: sql`COALESCE(SUM(hours), 0)` }).from(irataTaskLogs),
+        db.select({ sum: sql`COALESCE(SUM(hours_worked), 0)` }).from(irataTaskLogs),
         db.select({ count: sql<number>`count(*)` }).from(incidentReports),
         db.select().from(csrRatingHistory).orderBy(desc(csrRatingHistory.createdAt)).limit(100),
         db.select({ count: sql<number>`count(*)` }).from(workSessions),
