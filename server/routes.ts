@@ -9477,7 +9477,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       try {
         // Get user details for phone numbers
         const recipientUsers = await Promise.all(
-          recipientIds.map(id => storage.getUser(id))
+          recipientIds.map(id => storage.getUserById(id))
         );
         
         const smsRecipients = recipientUsers
