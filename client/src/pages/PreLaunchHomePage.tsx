@@ -186,7 +186,7 @@ export default function PreLaunchHomePage() {
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
               2026: The year property & strata managers<br className="hidden md:block" />
-              can finally see <span className="text-[#AB4521]">what sets you apart.</span>
+              can finally see <span className="text-emerald-300">what sets you apart.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">Intelligent Urban Rope Access Software Built by a Level 3 Tech and Operations Manager Who Got Tired of the Same Chaos You're Dealing With.</p>
@@ -245,7 +245,7 @@ export default function PreLaunchHomePage() {
 
             <div className="text-blue-100 text-sm pt-4 space-y-1">
               <p className="text-[16px]">
-                There are <span className="text-[#AB4521] font-semibold">86 urban rope access companies</span> in Canada. We're onboarding 10 of them in January.
+                There are 86 urban rope access companies in Canada. We're onboarding 10 of them in January.
               </p>
               <p className="font-bold text-[16px]">
                 Will you be one of them?
