@@ -1486,8 +1486,8 @@
       "rope_access_supervisor": "Rope Access Supervisor",
       "manager": "Manager",
       "rope_access_tech": "Rope Access Technician",
-      "ground_crew_supervisor": "Ground Crew Supervisor",
-      "ground_crew": "Ground Crew",
+      "ground_crew_supervisor": "Personal de Apoyo Supervisor",
+      "ground_crew": "Personal de Apoyo",
       "labourer": "Labourer",
       "categories": {
         "management": "Management",

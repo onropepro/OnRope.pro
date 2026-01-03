@@ -646,7 +646,7 @@ const changelogData: ChangelogSection[] = [
     description: "Secure multi-tenant authentication with role-based access control",
     features: [
       "Session-based authentication with secure HTTP-only cookies",
-      "Multi-role support: Company Owner, Operations Manager, Supervisor, Rope Access Tech, Ground Crew",
+      "Multi-role support: Company Owner, Operations Manager, Supervisor, Rope Access Tech, Support Staff",
       "Separate registration flows for Companies, Employees, Residents, and Property Managers",
       "Unique resident codes and property manager codes for secure account linking",
       "Password change and account deletion capabilities",

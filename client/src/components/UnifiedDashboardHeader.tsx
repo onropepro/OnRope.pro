@@ -72,8 +72,8 @@ const roleKeys: Record<string, string> = {
 const roleDefaults: Record<string, string> = {
   company: 'Admin',
   rope_access_tech: 'Technician',
-  ground_crew: 'Ground Crew',
-  ground_crew_supervisor: 'Ground Crew Supervisor',
+  ground_crew: 'Support Staff',
+  ground_crew_supervisor: 'Support Staff Supervisor',
   operations_manager: 'Operations Manager',
   office_admin: 'Office Admin',
   safety_officer: 'Safety Officer',

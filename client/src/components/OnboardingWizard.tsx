@@ -798,7 +798,7 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
                           <SelectContent>
                             <SelectItem value="rope_access_tech">{t("roles.ropeAccessTech", "Rope Access Technician")}</SelectItem>
                             <SelectItem value="supervisor">{t("roles.supervisor", "Supervisor")}</SelectItem>
-                            <SelectItem value="ground_crew">{t("roles.groundCrew", "Ground Crew")}</SelectItem>
+                            <SelectItem value="ground_crew">{t("roles.groundCrew", "Support Staff")}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

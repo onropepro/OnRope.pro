@@ -610,7 +610,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
               >
                 <span className="flex flex-col items-center leading-tight">
                   <span>Rope Access Technician</span>
-                  <span className="text-xs text-muted-foreground font-normal">& Ground Crew</span>
+                  <span className="text-xs text-muted-foreground font-normal">& Support Staff</span>
                 </span>
                 <ChevronDown className="w-3 h-3" />
               </Button>
@@ -1001,7 +1001,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                 onClick={() => setMobileTechnicianExpanded(!mobileTechnicianExpanded)}
                 data-testid="nav-mobile-technician"
               >
-                <span>{t('navigation.technician', 'Rope Access Technician / Ground Crew')}</span>
+                <span>{t('navigation.technician', 'Rope Access Technician & Support Staff')}</span>
                 <ChevronDown className={`w-5 h-5 transition-transform ${mobileTechnicianExpanded ? "rotate-180" : ""}`} />
               </button>
               

@@ -47,7 +47,7 @@ export const EXPERIENCE_OPTIONS = [
 
 export const POSITION_TYPES = [
   { value: "rope_access", label: "Rope Access Technician" },
-  { value: "ground_crew", label: "Ground Crew" },
+  { value: "ground_crew", label: "Support Staff" },
 ];
 
 export type JobPostingFormData = {

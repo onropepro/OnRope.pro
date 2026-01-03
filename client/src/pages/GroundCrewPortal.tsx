@@ -90,7 +90,7 @@ type Language = 'en' | 'fr' | 'es';
 
 const translations = {
   en: {
-    groundCrewPortal: "Ground Crew Portal",
+    groundCrewPortal: "Support Staff Portal",
     signOut: "Sign Out",
     editProfile: "Edit Profile",
     cancel: "Cancel",
@@ -245,13 +245,13 @@ const translations = {
     tabInvitations: "Invites",
     tabMore: "More",
     welcome: "Welcome",
-    groundCrewMember: "Ground Crew Member",
+    groundCrewMember: "Support Staff Member",
     quickActions: "Quick Actions",
     yourStatus: "Your Status",
     employmentStatus: "Employment Status",
     notActive: "Not Active",
     referralProgram: "Referral Program",
-    referralDesc: "Share your referral code with other ground crew workers",
+    referralDesc: "Share your referral code with other support staff workers",
     yourReferralCode: "Your Referral Code",
     copyCode: "Copy Code",
     shareCode: "Share Code",
@@ -273,7 +273,7 @@ const translations = {
     more: "more",
   },
   fr: {
-    groundCrewPortal: "Portail Équipe au Sol",
+    groundCrewPortal: "Portail Personnel de Soutien",
     signOut: "Déconnexion",
     editProfile: "Modifier le Profil",
     cancel: "Annuler",

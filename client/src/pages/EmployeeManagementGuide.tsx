@@ -1043,11 +1043,11 @@ export default function EmployeeManagementGuide() {
                   <p className="text-base text-muted-foreground">Site or project manager</p>
                 </div>
                 <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
-                  <Badge className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 shrink-0">Ground Crew</Badge>
+                  <Badge className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 shrink-0">Support Staff</Badge>
                   <p className="text-base text-muted-foreground">Ground-level support</p>
                 </div>
                 <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
-                  <Badge className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 shrink-0">Ground Crew Supervisor</Badge>
+                  <Badge className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200 shrink-0">Support Staff Supervisor</Badge>
                   <p className="text-base text-muted-foreground">Ground team lead</p>
                 </div>
                 <div className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
@@ -1444,7 +1444,7 @@ export default function EmployeeManagementGuide() {
                 <span className="font-semibold">Can I use this for employees who aren't rope access technicians?</span>
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground">
-                Yes. While the certification tracking is designed for rope access (IRATA/SPRAT), the module supports roles like Labourer, Ground Crew, and general support staff who may not have rope access certifications. Simply leave certification fields empty for non-certified staff.
+                Yes. While the certification tracking is designed for rope access (IRATA/SPRAT), the module supports roles like Labourer, Support Staff, and general support personnel who may not have rope access certifications. Simply leave certification fields empty for non-certified staff.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

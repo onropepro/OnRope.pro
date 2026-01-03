@@ -40,12 +40,12 @@ type Language = 'en' | 'fr' | 'es';
 
 const translations = {
   en: {
-    title: "Ground Crew Job Board",
-    subtitle: "Browse ground crew opportunities",
+    title: "Support Staff Job Board",
+    subtitle: "Browse support staff opportunities",
     backToPortal: "Back to Portal",
     activeJobs: "Active Opportunities",
-    noJobsTitle: "No Ground Crew Jobs",
-    noJobsDesc: "There are no ground crew job postings available at the moment. Check back later!",
+    noJobsTitle: "No Support Staff Jobs",
+    noJobsDesc: "There are no support staff job postings available at the moment. Check back later!",
     loading: "Loading job postings...",
     viewDetails: "View Details",
     jobDetails: "Job Details",
@@ -221,7 +221,7 @@ export default function GroundCrewJobBoard() {
   const t = translations[language];
   
   // Header role label
-  const roleLabel = language === 'en' ? 'Ground Crew' : language === 'es' ? 'Equipo de Tierra' : 'Equipe au sol';
+  const roleLabel = language === 'en' ? 'Support Staff' : language === 'es' ? 'Personal de Apoyo' : 'Personnel de Soutien';
 
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
   const [showApplyDialog, setShowApplyDialog] = useState(false);

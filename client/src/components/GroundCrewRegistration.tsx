@@ -693,7 +693,7 @@ export function GroundCrewRegistration({ open, onOpenChange }: GroundCrewRegistr
                     <CheckCircle className="w-10 h-10" style={{ color: GROUND_CREW_COLOR }} />
                   </div>
                   <h2 className="text-2xl font-bold mb-2">{t('groundCrewReg.success.welcomeTitle', 'Welcome to OnRope.Pro!')}</h2>
-                  <p className="text-muted-foreground mb-6">{t('groundCrewReg.success.welcomeMessage', 'Your Ground Crew account is ready. Head to your portal to get started.')}</p>
+                  <p className="text-muted-foreground mb-6">{t('groundCrewReg.success.welcomeMessage', 'Your Support Staff account is ready. Head to your portal to get started.')}</p>
                   <Button 
                     onClick={handleGoToPortal}
                     className="gap-2 text-white"

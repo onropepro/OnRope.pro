@@ -7001,7 +7001,7 @@ export default function Dashboard() {
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="font-medium">{inv.technician.name}</span>
                                   <Badge variant="outline" className="text-xs">
-                                    {inv.technician.role === 'ground_crew' ? t('dashboard.employees.groundCrew', 'Ground Crew') : t('dashboard.employees.ropeAccessTech', 'Rope Access Tech')}
+                                    {inv.technician.role === 'ground_crew' ? t('dashboard.employees.groundCrew', 'Support Staff') : t('dashboard.employees.ropeAccessTech', 'Rope Access Tech')}
                                   </Badge>
                                 </div>
                                 <div className="text-sm text-muted-foreground mt-1">
