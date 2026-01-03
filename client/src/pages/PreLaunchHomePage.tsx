@@ -189,7 +189,7 @@ export default function PreLaunchHomePage() {
               can finally see what sets you apart.
             </h1>
 
-            <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">Urban Rope Access Software Built by a Level 3 Tech and Operations Manager Who Got Tired of the Same Chaos You're Dealing With.</p>
+            <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">Intelligent Urban Rope Access Software Built by a Level 3 Tech and Operations Manager Who Got Tired of the Same Chaos You're Dealing With.</p>
 
             <p className="text-blue-100">
               OnRopePro launches January 2026. Early access list now open.
