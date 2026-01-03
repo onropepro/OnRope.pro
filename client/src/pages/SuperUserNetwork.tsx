@@ -178,49 +178,42 @@ function MetricCard({
   trendValue?: string;
   variant?: "default" | "success" | "warning" | "danger";
 }) {
-  const variantStyles = {
-    default: "border-border",
-    success: "border-emerald-500/30 dark:border-emerald-500/20",
-    warning: "border-amber-500/30 dark:border-amber-500/20",
-    danger: "border-red-500/30 dark:border-red-500/20"
-  };
-
-  const iconBg = {
-    default: "bg-muted",
-    success: "bg-emerald-100 dark:bg-emerald-500/20",
-    warning: "bg-amber-100 dark:bg-amber-500/20",
-    danger: "bg-red-100 dark:bg-red-500/20"
+  const iconStyles = {
+    default: "bg-blue-50 dark:bg-blue-500/10 text-blue-500",
+    success: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500",
+    warning: "bg-amber-50 dark:bg-amber-500/10 text-amber-500",
+    danger: "bg-red-50 dark:bg-red-500/10 text-red-500",
   };
 
   return (
-    <Card className={`${variantStyles[variant]}`}>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-muted-foreground truncate">{title}</p>
-            <p className="text-2xl font-bold mt-1">{value}</p>
-            {subtitle && (
-              <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-            )}
-            {trend && trendValue && (
-              <div className={`flex items-center gap-1 mt-2 text-xs ${
-                trend === "up" ? "text-emerald-600 dark:text-emerald-400" : 
-                trend === "down" ? "text-red-600 dark:text-red-400" : 
-                "text-muted-foreground"
-              }`}>
-                {trend === "up" ? <ArrowUpRight className="h-3 w-3" /> : 
-                 trend === "down" ? <ArrowDownRight className="h-3 w-3" /> : 
-                 <Minus className="h-3 w-3" />}
-                <span>{trendValue}</span>
-              </div>
-            )}
-          </div>
-          <div className={`p-2 rounded-lg ${iconBg[variant]}`}>
-            <Icon className="h-5 w-5 text-muted-foreground" />
-          </div>
+    <div className="su-metric-card" data-testid={`metric-card-${title.toLowerCase().replace(/\s+/g, '-')}`}>
+      <div className="flex items-center justify-between gap-4">
+        <div className="space-y-1">
+          <p className="su-metric-label">{title}</p>
+          <p className="su-metric-value">{value}</p>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground">{subtitle}</p>
+          )}
         </div>
-      </CardContent>
-    </Card>
+        <div className={`su-metric-icon ${iconStyles[variant]}`}>
+          <Icon className="h-6 w-6" />
+        </div>
+      </div>
+      {trend && trendValue && (
+        <div className="mt-4 flex items-center gap-1 text-xs">
+          {trend === "up" && <ArrowUpRight className="h-3 w-3 text-emerald-500" />}
+          {trend === "down" && <ArrowDownRight className="h-3 w-3 text-red-500" />}
+          {trend === "neutral" && <Minus className="h-3 w-3 text-muted-foreground" />}
+          <span className={
+            trend === "up" ? "text-emerald-500" : 
+            trend === "down" ? "text-red-500" : 
+            "text-muted-foreground"
+          }>
+            {trendValue}
+          </span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -471,7 +464,7 @@ function CrossSideTab({ data }: { data: NetworkMetrics }) {
                   options={{
                     chart: { type: "donut" },
                     labels: ["Verified", "Pending"],
-                    colors: ["#22c55e", "#94a3b8"],
+                    colors: ["#10B981", "#94a3b8"],
                     legend: { 
                       position: "bottom",
                       labels: { colors: "hsl(var(--foreground))" },
@@ -721,7 +714,7 @@ function DataMoatTab({ data }: { data: NetworkMetrics }) {
                   yaxis: {
                     labels: { style: { colors: "hsl(var(--muted-foreground))" } },
                   },
-                  colors: ["hsl(var(--primary))", "#22c55e"],
+                  colors: ["#3B82F6", "#10B981"],
                   grid: { borderColor: "hsl(var(--border))" },
                   dataLabels: { enabled: true },
                 } as ApexOptions}
@@ -749,7 +742,7 @@ function DataMoatTab({ data }: { data: NetworkMetrics }) {
                 options={{
                   chart: { type: "donut" },
                   labels: ["Interacted", "Ignored"],
-                  colors: ["#22c55e", "#94a3b8"],
+                  colors: ["#10B981", "#94a3b8"],
                   legend: { 
                     position: "bottom",
                     labels: { colors: "hsl(var(--foreground))" },
@@ -916,7 +909,7 @@ function InvestorTab({ data }: { data: NetworkMetrics }) {
                     formatter: (val) => `${val}%`,
                   },
                 },
-                colors: ["#22c55e"],
+                colors: ["#10B981"],
                 grid: { borderColor: "hsl(var(--border))" },
                 markers: { size: 4 },
                 tooltip: {
@@ -1015,19 +1008,23 @@ export default function SuperUserNetwork() {
             <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {[...Array(4)].map((_, i) => (
-                  <Card key={i}>
-                    <CardContent className="pt-6">
-                      <Skeleton className="h-4 w-24 mb-2" />
-                      <Skeleton className="h-8 w-16" />
-                    </CardContent>
-                  </Card>
+                  <div key={i} className="su-metric-card">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-8 w-28" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                    </div>
+                  </div>
                 ))}
               </div>
-              <Card>
-                <CardContent className="pt-6">
+              <div className="su-card">
+                <div className="su-card-body">
                   <Skeleton className="h-64 w-full" />
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           ) : (
             <>
