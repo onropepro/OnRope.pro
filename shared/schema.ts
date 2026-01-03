@@ -3462,6 +3462,53 @@ export const insertNotificationInteractionSchema = createInsertSchema(notificati
 export type NotificationInteraction = typeof notificationInteractions.$inferSelect;
 export type InsertNotificationInteraction = z.infer<typeof insertNotificationInteractionSchema>;
 
+// Platform Notifications - SuperUser broadcast notifications to companies and technicians
+export const platformNotifications = pgTable("platform_notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  targetType: varchar("target_type").notNull(), // single_company | selected_companies | all_companies | single_tech | selected_techs | all_techs
+  targetIds: text("target_ids").array(), // array of user IDs when targeting specific users
+  createdBy: varchar("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_platform_notifications_created_by").on(table.createdBy),
+  index("IDX_platform_notifications_target_type").on(table.targetType),
+  index("IDX_platform_notifications_created_at").on(table.createdAt),
+]);
+
+export const insertPlatformNotificationSchema = createInsertSchema(platformNotifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type PlatformNotification = typeof platformNotifications.$inferSelect;
+export type InsertPlatformNotification = z.infer<typeof insertPlatformNotificationSchema>;
+
+// Platform Notification Recipients - Tracks delivery and read status per user
+export const platformNotificationRecipients = pgTable("platform_notification_recipients", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  notificationId: varchar("notification_id").notNull().references(() => platformNotifications.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  openedAt: timestamp("opened_at"),
+  deletedByRecipient: boolean("deleted_by_recipient").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_platform_notification_recipients_notification").on(table.notificationId),
+  index("IDX_platform_notification_recipients_user").on(table.userId),
+  index("IDX_platform_notification_recipients_opened").on(table.openedAt),
+]);
+
+export const insertPlatformNotificationRecipientSchema = createInsertSchema(platformNotificationRecipients).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type PlatformNotificationRecipient = typeof platformNotificationRecipients.$inferSelect;
+export type InsertPlatformNotificationRecipient = z.infer<typeof insertPlatformNotificationRecipientSchema>;
+
 // ============================================
 // API RESPONSE TYPES
 // Used for typing React Query hooks and API responses
