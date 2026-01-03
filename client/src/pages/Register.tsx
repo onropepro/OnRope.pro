@@ -24,7 +24,8 @@ import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { useAuthPortal } from "@/hooks/use-auth-portal";
 
 const residentSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -39,7 +40,8 @@ const residentSchema = z.object({
 
 const companySchema = z.object({
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
-  name: z.string().min(2, "Owner name must be at least 2 characters"),
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   hourlyRate: z.string().optional().refine((val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), {
     message: "Hourly rate must be a valid number",
@@ -113,7 +115,8 @@ export default function Register() {
   const residentForm = useForm<ResidentFormData>({
     resolver: zodResolver(residentSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phoneNumber: "",
       password: "",
@@ -128,7 +131,8 @@ export default function Register() {
     resolver: zodResolver(companySchema),
     defaultValues: {
       companyName: "",
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       hourlyRate: "",
       streetAddress: "",
@@ -309,19 +313,34 @@ export default function Register() {
             <TabsContent value="resident">
               <Form {...residentForm}>
                 <form onSubmit={residentForm.handleSubmit(onResidentSubmit)} className="space-y-4">
-                  <FormField
-                    control={residentForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('register.resident.fullName', 'Full Name')}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t('register.resident.fullNamePlaceholder', 'John Doe')} {...field} data-testid="input-name" className="h-12" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={residentForm.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('register.resident.firstName', 'First Name')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('register.resident.firstNamePlaceholder', 'John')} {...field} data-testid="input-firstName" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={residentForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('register.resident.lastName', 'Last Name')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('register.resident.lastNamePlaceholder', 'Doe')} {...field} data-testid="input-lastName" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                   <FormField
                     control={residentForm.control}
@@ -445,19 +464,34 @@ export default function Register() {
                     )}
                   />
 
-                  <FormField
-                    control={companyForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('register.employer.ownerName', 'Owner Name')}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t('register.employer.ownerNamePlaceholder', 'John Smith')} {...field} data-testid="input-owner-name" className="h-12" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={companyForm.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('register.employer.firstName', 'First Name')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('register.employer.firstNamePlaceholder', 'John')} {...field} data-testid="input-owner-firstName" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={companyForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('register.employer.lastName', 'Last Name')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('register.employer.lastNamePlaceholder', 'Smith')} {...field} data-testid="input-owner-lastName" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                   <FormField
                     control={companyForm.control}
