@@ -309,9 +309,9 @@ function ComplianceGauge({ label, rate, target, description }: {
   };
 
   return (
-    <div className="su-card text-center" data-testid={`gauge-${label.toLowerCase().replace(/\s+/g, '-')}`}>
+    <div className="su-card text-center min-h-[280px] flex flex-col justify-center py-4" data-testid={`gauge-${label.toLowerCase().replace(/\s+/g, '-')}`}>
       <Chart options={options} series={[rate]} type="radialBar" height={200} />
-      <div className="-mt-8 space-y-1">
+      <div className="space-y-1 pt-2">
         <h4 className="font-semibold text-sm">{label}</h4>
         <p className="text-xs text-muted-foreground">{description}</p>
         <p className="text-xs text-muted-foreground">Target: {target}%</p>
@@ -1191,7 +1191,7 @@ function PartnershipReportsTab({ data }: { data: SafetyMetrics }) {
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2">
             {reports.map((report, idx) => (
-              <div key={idx} className="su-card hover-elevate" data-testid={`report-card-${idx}`}>
+              <div key={idx} className="su-card hover-elevate min-h-[280px] flex flex-col" data-testid={`report-card-${idx}`}>
                 <div className="flex items-start gap-3 mb-4">
                   <div className={`p-2 rounded-lg ${colorClasses[report.color]}`}>
                     <report.icon className="h-5 w-5" />
@@ -1201,15 +1201,15 @@ function PartnershipReportsTab({ data }: { data: SafetyMetrics }) {
                     <p className="text-sm text-muted-foreground">{report.description}</p>
                   </div>
                 </div>
-                <div className="space-y-1 mb-4">
+                <div className="space-y-2 mb-4 flex-1">
                   {report.includes.map((item, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                      <CheckCircle2 className="h-3 w-3 text-emerald-500 flex-shrink-0" />
                       {item}
                     </div>
                   ))}
                 </div>
-                <Button variant="outline" className="w-full" data-testid={`button-generate-report-${idx}`}>
+                <Button variant="outline" className="w-full mt-auto" data-testid={`button-generate-report-${idx}`}>
                   <Download className="h-4 w-4 mr-2" />
                   Generate Report
                 </Button>
