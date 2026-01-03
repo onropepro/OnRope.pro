@@ -363,7 +363,7 @@ export default function SuperUserNotifications() {
                   <SelectTrigger data-testid="select-target-type">
                     <SelectValue placeholder="Select target audience" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="z-[9999]">
                     {TARGET_TYPE_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
