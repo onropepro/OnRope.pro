@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, quoteMessages, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue, staffAccounts } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, quoteMessages, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue, staffAccounts, userCertifications, referrals, platformSearches, vendorVerifications, notificationInteractions, notifications } from "@shared/schema";
 import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, QuoteMessage, InsertQuoteMessage, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile, ResidentFeedbackPhotoQueue, InsertResidentFeedbackPhotoQueue, StaffAccount, InsertStaffAccount } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
@@ -5153,6 +5153,444 @@ export class Storage {
       .where(eq(staffAccounts.id, account.id));
     
     return account;
+  }
+
+  // ============================================
+  // NETWORK EFFECTS METRICS
+  // ============================================
+
+  /**
+   * Get comprehensive network effects metrics for investor dashboard
+   */
+  async getNetworkEffectsMetrics(): Promise<{
+    accountCounts: {
+      techs: { total: number; active: number };
+      employers: { total: number; active: number };
+      propertyManagers: { total: number; active: number };
+      buildingManagers: { total: number; active: number };
+      residents: { total: number; active: number };
+    };
+    monthlyGrowth: Array<{
+      month: string;
+      techs: number;
+      employers: number;
+      propertyManagers: number;
+      buildingManagers: number;
+    }>;
+    connections: {
+      techEmployerConnections: number;
+      avgConnectionsPerTech: number;
+      avgEmployeesPerEmployer: number;
+      pmCompanyLinks: number;
+    };
+    activity: {
+      totalWorkSessions: number;
+      totalProjects: number;
+      totalBuildings: number;
+      avgSessionsPerTech: number;
+      avgProjectsPerCompany: number;
+    };
+    invitations: {
+      total: number;
+      accepted: number;
+      pending: number;
+      acceptanceRate: number;
+    };
+    dataMoat: {
+      totalDocuments: number;
+      totalCertifications: number;
+      totalSafetyForms: number;
+      avgRecordsPerBuilding: number;
+    };
+    referrals: {
+      total: number;
+      converted: number;
+      conversionRate: number;
+      viralCoefficient: number;
+    };
+    searches: {
+      total: number;
+      avgEngagementRate: number;
+      matchRate: number;
+    };
+  }> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+    // Account counts by role
+    const allUsers = await db.select().from(users);
+    
+    const techRoles = ['rope_access_tech', 'ground_crew', 'ground_crew_supervisor'];
+    const techs = allUsers.filter(u => techRoles.includes(u.role));
+    const employers = allUsers.filter(u => u.role === 'company');
+    const pms = allUsers.filter(u => u.role === 'property_manager');
+    const bms = allUsers.filter(u => u.role === 'building_manager');
+    const residents = allUsers.filter(u => u.role === 'resident');
+
+    // Active users (logged in or had activity in last 30 days)
+    const activeTechs = techs.filter(u => u.lastLoginAt && new Date(u.lastLoginAt) > thirtyDaysAgo).length;
+    const activeEmployers = employers.filter(u => u.lastLoginAt && new Date(u.lastLoginAt) > thirtyDaysAgo).length;
+    const activePms = pms.filter(u => u.lastLoginAt && new Date(u.lastLoginAt) > thirtyDaysAgo).length;
+    const activeBms = bms.filter(u => u.lastLoginAt && new Date(u.lastLoginAt) > thirtyDaysAgo).length;
+    const activeResidents = residents.filter(u => u.lastLoginAt && new Date(u.lastLoginAt) > thirtyDaysAgo).length;
+
+    // Monthly growth data
+    const usersByMonth: Record<string, { techs: number; employers: number; pms: number; bms: number }> = {};
+    const monthNames = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      monthNames.push(key);
+      usersByMonth[key] = { techs: 0, employers: 0, pms: 0, bms: 0 };
+    }
+
+    allUsers.forEach(u => {
+      if (!u.createdAt) return;
+      const created = new Date(u.createdAt);
+      if (created < twelveMonthsAgo) return;
+      const key = `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(2, '0')}`;
+      if (!usersByMonth[key]) return;
+      
+      if (techRoles.includes(u.role)) usersByMonth[key].techs++;
+      else if (u.role === 'company') usersByMonth[key].employers++;
+      else if (u.role === 'property_manager') usersByMonth[key].pms++;
+      else if (u.role === 'building_manager') usersByMonth[key].bms++;
+    });
+
+    const monthlyGrowth = monthNames.map(month => ({
+      month,
+      techs: usersByMonth[month]?.techs || 0,
+      employers: usersByMonth[month]?.employers || 0,
+      propertyManagers: usersByMonth[month]?.pms || 0,
+      buildingManagers: usersByMonth[month]?.bms || 0,
+    }));
+
+    // Connections data
+    const techConnections = await db.select().from(technicianEmployerConnections).where(eq(technicianEmployerConnections.status, 'active'));
+    const pmLinks = await db.select().from(propertyManagerCompanyLinks);
+    
+    // Calculate averages
+    const techsWithConnections = new Set(techConnections.map(c => c.technicianId)).size;
+    const employersWithEmployees = new Set(techConnections.map(c => c.companyId)).size;
+
+    // Activity metrics
+    const allWorkSessions = await db.select().from(workSessions);
+    const allProjects = await db.select().from(projects);
+    const allBuildings = await db.select().from(buildings);
+
+    // Invitations
+    const allInvitations = await db.select().from(teamInvitations);
+    const acceptedInvitations = allInvitations.filter(i => i.status === 'accepted').length;
+    const pendingInvitations = allInvitations.filter(i => i.status === 'pending').length;
+
+    // Data moat - documents and safety records
+    const allDocuments = await db.select().from(companyDocuments);
+    const allCertifications = await db.select().from(userCertifications);
+    const harnessCount = (await db.select().from(harnessInspections)).length;
+    const toolboxCount = (await db.select().from(toolboxMeetings)).length;
+    const flhaCount = (await db.select().from(flhaForms)).length;
+    const incidentCount = (await db.select().from(incidentReports)).length;
+    const totalSafetyForms = harnessCount + toolboxCount + flhaCount + incidentCount;
+
+    // Referrals (from new table - will be empty initially)
+    let referralData = { total: 0, converted: 0, conversionRate: 0, viralCoefficient: 0 };
+    try {
+      const allReferrals = await db.select().from(referrals);
+      const convertedReferrals = allReferrals.filter(r => r.status === 'converted').length;
+      referralData = {
+        total: allReferrals.length,
+        converted: convertedReferrals,
+        conversionRate: allReferrals.length > 0 ? Math.round((convertedReferrals / allReferrals.length) * 100) / 100 : 0,
+        viralCoefficient: allUsers.length > 0 ? Math.round((convertedReferrals / allUsers.length) * 100) / 100 : 0,
+      };
+    } catch (e) {
+      // Table might not exist yet
+    }
+
+    // Searches (from new table - will be empty initially)
+    let searchData = { total: 0, avgEngagementRate: 0, matchRate: 0 };
+    try {
+      const allSearches = await db.select().from(platformSearches);
+      const totalEngagement = allSearches.reduce((sum, s) => sum + (s.engagementCount || 0), 0);
+      const totalResults = allSearches.reduce((sum, s) => sum + (s.resultsCount || 0), 0);
+      searchData = {
+        total: allSearches.length,
+        avgEngagementRate: allSearches.length > 0 ? Math.round((totalEngagement / allSearches.length) * 100) / 100 : 0,
+        matchRate: totalResults > 0 ? Math.round((totalEngagement / totalResults) * 100) / 100 : 0,
+      };
+    } catch (e) {
+      // Table might not exist yet
+    }
+
+    return {
+      accountCounts: {
+        techs: { total: techs.length, active: activeTechs },
+        employers: { total: employers.length, active: activeEmployers },
+        propertyManagers: { total: pms.length, active: activePms },
+        buildingManagers: { total: bms.length, active: activeBms },
+        residents: { total: residents.length, active: activeResidents },
+      },
+      monthlyGrowth,
+      connections: {
+        techEmployerConnections: techConnections.length,
+        avgConnectionsPerTech: techsWithConnections > 0 ? Math.round((techConnections.length / techsWithConnections) * 10) / 10 : 0,
+        avgEmployeesPerEmployer: employersWithEmployees > 0 ? Math.round((techConnections.length / employersWithEmployees) * 10) / 10 : 0,
+        pmCompanyLinks: pmLinks.length,
+      },
+      activity: {
+        totalWorkSessions: allWorkSessions.length,
+        totalProjects: allProjects.length,
+        totalBuildings: allBuildings.length,
+        avgSessionsPerTech: techs.length > 0 ? Math.round((allWorkSessions.length / techs.length) * 10) / 10 : 0,
+        avgProjectsPerCompany: employers.length > 0 ? Math.round((allProjects.length / employers.length) * 10) / 10 : 0,
+      },
+      invitations: {
+        total: allInvitations.length,
+        accepted: acceptedInvitations,
+        pending: pendingInvitations,
+        acceptanceRate: allInvitations.length > 0 ? Math.round((acceptedInvitations / allInvitations.length) * 100) / 100 : 0,
+      },
+      dataMoat: {
+        totalDocuments: allDocuments.length,
+        totalCertifications: allCertifications.length,
+        totalSafetyForms,
+        avgRecordsPerBuilding: allBuildings.length > 0 ? Math.round(((allDocuments.length + totalSafetyForms + allProjects.length) / allBuildings.length) * 10) / 10 : 0,
+      },
+      referrals: referralData,
+      searches: searchData,
+    };
+  }
+
+  /**
+   * Calculate network health score (0-100)
+   */
+  async calculateNetworkHealthScore(): Promise<{
+    score: number;
+    components: {
+      crossSide: number;
+      sameSide: number;
+      lockIn: number;
+      dataMoat: number;
+    };
+    status: 'Strong' | 'Building' | 'Weak';
+  }> {
+    const metrics = await this.getNetworkEffectsMetrics();
+    
+    // Cross-Side Score (0-25): Based on connections and activity
+    const connectionScore = Math.min(10, (metrics.connections.techEmployerConnections / 50) * 10);
+    const activityScore = Math.min(10, (metrics.activity.totalProjects / 100) * 10);
+    const pmLinkScore = Math.min(5, (metrics.connections.pmCompanyLinks / 20) * 5);
+    const crossSide = Math.round(connectionScore + activityScore + pmLinkScore);
+    
+    // Same-Side Score (0-25): Based on invitations and viral growth
+    const invitationScore = Math.min(10, metrics.invitations.acceptanceRate * 10);
+    const viralScore = Math.min(15, metrics.referrals.viralCoefficient * 15);
+    const sameSide = Math.round(invitationScore + viralScore);
+    
+    // Lock-in Score (0-25): Based on data depth and retention
+    const sessionsScore = Math.min(10, (metrics.activity.avgSessionsPerTech / 50) * 10);
+    const projectsScore = Math.min(10, (metrics.activity.avgProjectsPerCompany / 20) * 10);
+    const certScore = Math.min(5, (metrics.dataMoat.totalCertifications / 100) * 5);
+    const lockIn = Math.round(sessionsScore + projectsScore + certScore);
+    
+    // Data Moat Score (0-25): Based on accumulated data
+    const docScore = Math.min(10, (metrics.dataMoat.totalDocuments / 200) * 10);
+    const safetyScore = Math.min(10, (metrics.dataMoat.totalSafetyForms / 500) * 10);
+    const buildingScore = Math.min(5, (metrics.dataMoat.avgRecordsPerBuilding / 20) * 5);
+    const dataMoat = Math.round(docScore + safetyScore + buildingScore);
+    
+    const score = Math.min(100, crossSide + sameSide + lockIn + dataMoat);
+    const status = score >= 70 ? 'Strong' : score >= 40 ? 'Building' : 'Weak';
+    
+    return {
+      score,
+      components: { crossSide, sameSide, lockIn, dataMoat },
+      status,
+    };
+  }
+
+  /**
+   * Get lock-in metrics by account type
+   */
+  async getAccountLockInMetrics(): Promise<{
+    tech: { avgCertifications: number; avgWorkSessions: number; avgConnections: number; profileCompleteness: number };
+    employer: { avgEmployees: number; avgProjects: number; avgDocuments: number; dataDepthMonths: number };
+    propertyManager: { avgVerifications: number; avgBuildingsManaged: number; avgVendorLinks: number };
+    buildingManager: { avgBuildings: number; avgRecordsPerBuilding: number };
+  }> {
+    const allUsers = await db.select().from(users);
+    const techRoles = ['rope_access_tech', 'ground_crew', 'ground_crew_supervisor'];
+    const techs = allUsers.filter(u => techRoles.includes(u.role));
+    const employers = allUsers.filter(u => u.role === 'company');
+    const pms = allUsers.filter(u => u.role === 'property_manager');
+    const bms = allUsers.filter(u => u.role === 'building_manager');
+
+    // Tech metrics
+    const allCertifications = await db.select().from(userCertifications);
+    const allWorkSessions = await db.select().from(workSessions);
+    const techConnections = await db.select().from(technicianEmployerConnections).where(eq(technicianEmployerConnections.status, 'active'));
+
+    // Calculate tech profile completeness (based on key fields)
+    let totalCompleteness = 0;
+    techs.forEach(t => {
+      let complete = 0;
+      if (t.name) complete++;
+      if (t.email) complete++;
+      if (t.irataLevel || t.spratLevel) complete++;
+      if (t.photoUrl) complete++;
+      if (t.employeePhoneNumber) complete++;
+      totalCompleteness += (complete / 5) * 100;
+    });
+
+    // Employer metrics
+    const allProjects = await db.select().from(projects);
+    const allDocuments = await db.select().from(companyDocuments);
+    
+    // Calculate data depth (months since first project)
+    let avgDataDepth = 0;
+    if (allProjects.length > 0) {
+      const oldestProject = allProjects.reduce((oldest, p) => {
+        if (!oldest.createdAt) return p;
+        if (!p.createdAt) return oldest;
+        return new Date(p.createdAt) < new Date(oldest.createdAt) ? p : oldest;
+      });
+      if (oldestProject.createdAt) {
+        const months = Math.floor((Date.now() - new Date(oldestProject.createdAt).getTime()) / (1000 * 60 * 60 * 24 * 30));
+        avgDataDepth = months;
+      }
+    }
+
+    // PM metrics
+    const pmLinks = await db.select().from(propertyManagerCompanyLinks);
+    let verificationCount = 0;
+    try {
+      const verifications = await db.select().from(vendorVerifications);
+      verificationCount = verifications.length;
+    } catch (e) {
+      // Table might not exist yet
+    }
+
+    // BM metrics
+    const allBuildings = await db.select().from(buildings);
+    const totalRecords = allDocuments.length + allProjects.length;
+
+    return {
+      tech: {
+        avgCertifications: techs.length > 0 ? Math.round((allCertifications.length / techs.length) * 10) / 10 : 0,
+        avgWorkSessions: techs.length > 0 ? Math.round((allWorkSessions.length / techs.length) * 10) / 10 : 0,
+        avgConnections: techs.length > 0 ? Math.round((techConnections.length / techs.length) * 10) / 10 : 0,
+        profileCompleteness: techs.length > 0 ? Math.round(totalCompleteness / techs.length) : 0,
+      },
+      employer: {
+        avgEmployees: employers.length > 0 ? Math.round((techConnections.length / employers.length) * 10) / 10 : 0,
+        avgProjects: employers.length > 0 ? Math.round((allProjects.length / employers.length) * 10) / 10 : 0,
+        avgDocuments: employers.length > 0 ? Math.round((allDocuments.length / employers.length) * 10) / 10 : 0,
+        dataDepthMonths: avgDataDepth,
+      },
+      propertyManager: {
+        avgVerifications: pms.length > 0 ? Math.round((verificationCount / pms.length) * 10) / 10 : 0,
+        avgBuildingsManaged: pms.length > 0 ? Math.round((allBuildings.filter(b => b.propertyManagerId).length / pms.length) * 10) / 10 : 0,
+        avgVendorLinks: pms.length > 0 ? Math.round((pmLinks.length / pms.length) * 10) / 10 : 0,
+      },
+      buildingManager: {
+        avgBuildings: bms.length > 0 ? Math.round((allBuildings.length / bms.length) * 10) / 10 : 0,
+        avgRecordsPerBuilding: allBuildings.length > 0 ? Math.round((totalRecords / allBuildings.length) * 10) / 10 : 0,
+      },
+    };
+  }
+
+  /**
+   * Get cohort analysis data for investor view
+   */
+  async getCohortAnalysis(): Promise<{
+    monthlyRetention: Array<{
+      cohort: string;
+      month0: number;
+      month1: number;
+      month2: number;
+      month3: number;
+      month6: number;
+    }>;
+    ltv: {
+      avgMonthsActive: number;
+      projectedLtv: number;
+    };
+  }> {
+    const allUsers = await db.select().from(users).where(eq(users.role, 'company'));
+    const now = new Date();
+    
+    // Build cohorts by signup month (last 6 months)
+    const cohorts: Array<{ cohort: string; month0: number; month1: number; month2: number; month3: number; month6: number }> = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const cohortDate = new Date();
+      cohortDate.setMonth(cohortDate.getMonth() - i);
+      const cohortKey = `${cohortDate.getFullYear()}-${String(cohortDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      // Users who signed up in this month
+      const cohortUsers = allUsers.filter(u => {
+        if (!u.createdAt) return false;
+        const created = new Date(u.createdAt);
+        return created.getFullYear() === cohortDate.getFullYear() && created.getMonth() === cohortDate.getMonth();
+      });
+      
+      const total = cohortUsers.length;
+      if (total === 0) {
+        cohorts.push({ cohort: cohortKey, month0: 0, month1: 0, month2: 0, month3: 0, month6: 0 });
+        continue;
+      }
+      
+      // Calculate retention for each period
+      const retainedAt = (months: number) => {
+        const checkDate = new Date(cohortDate);
+        checkDate.setMonth(checkDate.getMonth() + months);
+        if (checkDate > now) return 100; // Future month, assume retained
+        
+        return Math.round((cohortUsers.filter(u => {
+          if (!u.lastLoginAt) return false;
+          return new Date(u.lastLoginAt) >= checkDate;
+        }).length / total) * 100);
+      };
+      
+      cohorts.push({
+        cohort: cohortKey,
+        month0: 100,
+        month1: retainedAt(1),
+        month2: retainedAt(2),
+        month3: retainedAt(3),
+        month6: retainedAt(6),
+      });
+    }
+    
+    // Calculate average months active and projected LTV
+    let totalMonthsActive = 0;
+    let usersWithActivity = 0;
+    
+    allUsers.forEach(u => {
+      if (!u.createdAt || !u.lastLoginAt) return;
+      const created = new Date(u.createdAt);
+      const lastLogin = new Date(u.lastLoginAt);
+      const monthsActive = Math.max(1, Math.floor((lastLogin.getTime() - created.getTime()) / (1000 * 60 * 60 * 24 * 30)));
+      totalMonthsActive += monthsActive;
+      usersWithActivity++;
+    });
+    
+    const avgMonthsActive = usersWithActivity > 0 ? Math.round((totalMonthsActive / usersWithActivity) * 10) / 10 : 0;
+    
+    // Projected LTV = ARPU * avg months * churn adjustment
+    const arpu = 200; // Approximate based on pricing model
+    const projectedLtv = Math.round(arpu * avgMonthsActive * 1.2); // 20% uplift for expansion
+    
+    return {
+      monthlyRetention: cohorts,
+      ltv: {
+        avgMonthsActive,
+        projectedLtv,
+      },
+    };
   }
 }
 

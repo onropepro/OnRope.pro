@@ -3356,6 +3356,106 @@ export const insertDatabaseCostSchema = createInsertSchema(databaseCosts).omit({
 });
 
 // ============================================
+// NETWORK EFFECTS TRACKING TABLES
+// Used for tracking platform network effects and lock-in metrics
+// ============================================
+
+// Referrals - Track user referral chains for viral coefficient
+export const referrals = pgTable("referrals", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  referrerId: varchar("referrer_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  referrerType: varchar("referrer_type").notNull(), // tech | employer | property_manager | building_manager
+  referredEmail: varchar("referred_email").notNull(),
+  referredUserId: varchar("referred_user_id").references(() => users.id, { onDelete: "set null" }), // After signup
+  status: varchar("status").notNull().default("pending"), // pending | signed_up | converted | expired
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  convertedAt: timestamp("converted_at"),
+}, (table) => [
+  index("IDX_referrals_referrer").on(table.referrerId),
+  index("IDX_referrals_status").on(table.status),
+  index("IDX_referrals_referred_user").on(table.referredUserId),
+]);
+
+export const insertReferralSchema = createInsertSchema(referrals).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type Referral = typeof referrals.$inferSelect;
+export type InsertReferral = z.infer<typeof insertReferralSchema>;
+
+// Platform Searches - Track search activity for match rate metrics
+export const platformSearches = pgTable("platform_searches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  searcherId: varchar("searcher_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  searcherType: varchar("searcher_type").notNull(), // employer | property_manager | building_manager | tech
+  searchType: varchar("search_type").notNull(), // tech_search | vendor_search | building_search | job_search
+  queryParams: jsonb("query_params").$type<Record<string, unknown>>(), // JSON of search criteria
+  resultsCount: integer("results_count").default(0),
+  engagementCount: integer("engagement_count").default(0), // How many results were clicked/contacted
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_platform_searches_searcher").on(table.searcherId),
+  index("IDX_platform_searches_type").on(table.searchType),
+  index("IDX_platform_searches_date").on(table.createdAt),
+]);
+
+export const insertPlatformSearchSchema = createInsertSchema(platformSearches).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type PlatformSearch = typeof platformSearches.$inferSelect;
+export type InsertPlatformSearch = z.infer<typeof insertPlatformSearchSchema>;
+
+// Vendor Verifications - PM compliance checks on vendors
+export const vendorVerifications = pgTable("vendor_verifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyManagerId: varchar("property_manager_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  vendorCompanyId: varchar("vendor_company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  verificationType: varchar("verification_type").notNull(), // insurance | certification | safety_record | license
+  status: varchar("status").notNull().default("pending"), // pending | verified | failed | expired
+  verifiedAt: timestamp("verified_at"),
+  expiresAt: timestamp("expires_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_vendor_verifications_pm").on(table.propertyManagerId),
+  index("IDX_vendor_verifications_vendor").on(table.vendorCompanyId),
+  index("IDX_vendor_verifications_status").on(table.status),
+]);
+
+export const insertVendorVerificationSchema = createInsertSchema(vendorVerifications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type VendorVerification = typeof vendorVerifications.$inferSelect;
+export type InsertVendorVerification = z.infer<typeof insertVendorVerificationSchema>;
+
+// Notification Interactions - Track notification engagement
+export const notificationInteractions = pgTable("notification_interactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  notificationId: varchar("notification_id").references(() => notifications.id, { onDelete: "cascade" }),
+  notificationType: varchar("notification_type").notNull(), // project_update | safety_reminder | payment | invitation | etc
+  action: varchar("action").notNull(), // viewed | clicked | dismissed | actioned
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_notification_interactions_user").on(table.userId),
+  index("IDX_notification_interactions_notification").on(table.notificationId),
+  index("IDX_notification_interactions_type").on(table.notificationType),
+]);
+
+export const insertNotificationInteractionSchema = createInsertSchema(notificationInteractions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type NotificationInteraction = typeof notificationInteractions.$inferSelect;
+export type InsertNotificationInteraction = z.infer<typeof insertNotificationInteractionSchema>;
+
+// ============================================
 // API RESPONSE TYPES
 // Used for typing React Query hooks and API responses
 // ============================================

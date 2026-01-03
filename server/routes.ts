@@ -8595,6 +8595,32 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
 
+
+  // SuperUser: Get network effects metrics
+  app.get("/api/superuser/network-effects", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'view_metrics')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const [metrics, healthScore, lockInMetrics, cohortData] = await Promise.all([
+        storage.getNetworkEffectsMetrics(),
+        storage.calculateNetworkHealthScore(),
+        storage.getAccountLockInMetrics(),
+        storage.getCohortAnalysis(),
+      ]);
+
+      res.json({
+        ...metrics,
+        healthScore,
+        lockIn: lockInMetrics,
+        cohorts: cohortData,
+      });
+    } catch (error) {
+      console.error('[SuperUser] Get network effects error:', error);
+      res.status(500).json({ message: "Failed to fetch network effects metrics" });
+    }
+  });
   // SuperUser: Get all feature requests with messages
   app.get("/api/superuser/feature-requests", requireAuth, async (req: Request, res: Response) => {
     try {
