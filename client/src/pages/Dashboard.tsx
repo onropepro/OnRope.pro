@@ -292,7 +292,8 @@ const handlePermissionChange = (
 };
 
 const employeeSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["owner_ceo", "operations_manager", "human_resources", "accounting", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew", "labourer"]),
@@ -325,7 +326,8 @@ const employeeSchema = z.object({
 });
 
 const editEmployeeSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   role: z.enum(["owner_ceo", "operations_manager", "human_resources", "accounting", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew", "labourer"]),
   hourlyRate: z.string().optional(),
@@ -1893,7 +1895,8 @@ export default function Dashboard() {
   const employeeForm = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       role: "rope_access_tech",
@@ -1930,7 +1933,8 @@ export default function Dashboard() {
   const editEmployeeForm = useForm<EditEmployeeFormData>({
     resolver: zodResolver(editEmployeeSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       role: "rope_access_tech",
       hourlyRate: "",
@@ -2513,7 +2517,9 @@ export default function Dashboard() {
   const editEmployeeMutation = useMutation({
     mutationFn: async (data: EditEmployeeFormData & { id: string }) => {
       const response = await apiRequest("PATCH", `/api/employees/${data.id}`, {
-        name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        name: `${data.firstName} ${data.lastName}`.trim(), // Legacy field
         email: data.email,
         role: data.role,
         hourlyRate: data.hourlyRate,
@@ -2757,7 +2763,8 @@ export default function Dashboard() {
   const handleEditEmployee = (employee: any) => {
     setEmployeeToEdit(employee);
     editEmployeeForm.reset({
-      name: employee.name ?? "",
+      firstName: employee.firstName ?? "",
+      lastName: employee.lastName ?? "",
       email: employee.email ?? "",
       role: employee.role,
       hourlyRate: employee.hourlyRate != null ? String(employee.hourlyRate) : "",
@@ -6352,19 +6359,34 @@ export default function Dashboard() {
                       <form onSubmit={employeeForm.handleSubmit(onEmployeeSubmit)} className="space-y-4">
                       {employeeFormStep === 1 && (
                         <>
-                      <FormField
-                        control={employeeForm.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('dashboard.employeeForm.fullName', 'Full Name')}</FormLabel>
-                            <FormControl>
-                              <Input placeholder={t('dashboard.employeeForm.namePlaceholder', 'John Doe')} {...field} data-testid="input-employee-name" className="h-12" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={employeeForm.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.employeeForm.firstName', 'First Name')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder={t('dashboard.employeeForm.firstNamePlaceholder', 'John')} {...field} data-testid="input-employee-firstName" className="h-12" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={employeeForm.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.employeeForm.lastName', 'Last Name')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder={t('dashboard.employeeForm.lastNamePlaceholder', 'Doe')} {...field} data-testid="input-employee-lastName" className="h-12" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       <FormField
                         control={employeeForm.control}
@@ -7635,7 +7657,8 @@ export default function Dashboard() {
                                         e.stopPropagation();
                                         setEmployeeToEdit(employee);
                                         editEmployeeForm.reset({
-                                          name: employee.name ?? "",
+                                          firstName: employee.firstName ?? "",
+                                          lastName: employee.lastName ?? "",
                                           email: employee.email ?? "",
                                           role: employee.role,
                                           hourlyRate: employee.hourlyRate != null ? String(employee.hourlyRate) : "",
@@ -12429,7 +12452,7 @@ export default function Dashboard() {
                         <span className="material-icons text-primary">person</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">{employeeForm.watch("name")}</p>
+                        <p className="font-semibold text-lg">{`${employeeForm.watch("firstName")} ${employeeForm.watch("lastName")}`.trim()}</p>
                         <p className="text-sm text-muted-foreground">{employeeForm.watch("email")}</p>
                       </div>
                     </div>

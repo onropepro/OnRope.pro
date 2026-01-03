@@ -25,7 +25,8 @@ import { Switch } from "@/components/ui/switch";
 import { COMMON_TIMEZONES } from "@/lib/timezoneUtils";
 
 const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address").optional(),
   unitNumber: z.string().optional(),
   parkingStallNumber: z.string().optional(),
@@ -875,7 +876,8 @@ export default function Profile() {
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     values: {
-      name: user?.name || "",
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
       email: user?.email || "",
       unitNumber: user?.unitNumber || "",
       parkingStallNumber: user?.parkingStallNumber || "",
@@ -1091,15 +1093,33 @@ export default function Profile() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={profileForm.control}
-                      name="name"
+                      name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('common.name', 'Name')}</FormLabel>
+                          <FormLabel>{t('common.firstName', 'First Name')}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder={t('profile.yourName', 'Your name')}
+                              placeholder={t('profile.firstName', 'First name')}
                               {...field}
-                              data-testid="input-name"
+                              data-testid="input-firstName"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('common.lastName', 'Last Name')}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={t('profile.lastName', 'Last name')}
+                              {...field}
+                              data-testid="input-lastName"
                               className="h-12"
                             />
                           </FormControl>
@@ -1950,24 +1970,44 @@ export default function Profile() {
           <CardContent>
             <Form {...profileForm}>
               <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
-                <FormField
-                  control={profileForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={t('profile.yourName', 'Your name')}
-                          {...field}
-                          data-testid="input-name"
-                          className="h-12"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={profileForm.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('common.firstName', 'First Name')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('profile.firstName', 'First name')}
+                            {...field}
+                            data-testid="input-firstName"
+                            className="h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={profileForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('common.lastName', 'Last Name')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={t('profile.lastName', 'Last name')}
+                            {...field}
+                            data-testid="input-lastName"
+                            className="h-12"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={profileForm.control}

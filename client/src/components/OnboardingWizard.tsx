@@ -54,7 +54,8 @@ const clientSchema = z.object({
 });
 
 const employeeSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email is required"),
   role: z.enum(["supervisor", "rope_access_tech", "ground_crew"]),
 });
@@ -144,7 +145,8 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
   const employeeForm = useForm({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       role: "rope_access_tech" as const,
     },
@@ -757,19 +759,34 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
             {employeeMode === "create" && (
               <Form {...employeeForm}>
                 <form onSubmit={employeeForm.handleSubmit((data) => createEmployeeMutation.mutate(data))} className="space-y-4">
-                  <FormField
-                    control={employeeForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("onboarding.employee.name", "Full Name")}</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Alex Johnson" data-testid="input-employee-name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={employeeForm.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("onboarding.employee.firstName", "First Name")}</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Alex" data-testid="input-employee-firstName" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={employeeForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("onboarding.employee.lastName", "Last Name")}</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Johnson" data-testid="input-employee-lastName" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <FormField
                     control={employeeForm.control}
                     name="email"
