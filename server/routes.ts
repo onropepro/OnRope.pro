@@ -34,6 +34,7 @@ import OpenAI from "openai";
 import { generateQuizFromDocument } from "./gemini";
 import helpRouter from "./routes/help";
 import { registerCrmRoutes } from "./crm-routes";
+import { crmContacts, crmCompanies, crmActivities, type CrmContact } from "@shared/schema";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
 import { sendQuoteNotificationSMS } from "./services/twilio";
@@ -28464,10 +28465,11 @@ Do not include any other text, just the JSON object.`
     }
   });
 
-    // Early access signups for pre-launch landing pages
+  // Early access signups for pre-launch landing pages
+  // Also creates CRM contacts for lead tracking
   app.post("/api/early-access", async (req: Request, res: Response) => {
     try {
-      const { companyName, email, stakeholderType, source } = req.body;
+      const { companyName, email, stakeholderType, source, irataLevel, buildingsManaged } = req.body;
       
       if (!companyName || !email || !stakeholderType) {
         return res.status(400).json({ message: "Company name, email, and stakeholder type are required" });
@@ -28479,12 +28481,100 @@ Do not include any other text, just the JSON object.`
         return res.status(400).json({ message: "Please provide a valid email address" });
       }
       
+      // Store in early access signups (existing functionality)
       await storage.createEarlyAccessSignup({
         companyName,
         email,
         stakeholderType,
         source: source || "unknown",
       });
+      
+      // Also create or update CRM contact for lead tracking
+      try {
+        // Check if contact already exists by email
+        const existingContact = await db.select().from(crmContacts).where(eq(crmContacts.email, email)).limit(1);
+        
+        // Map stakeholderType to tags
+        const stakeholderTags: string[] = [];
+        if (stakeholderType === 'company') stakeholderTags.push('company_owner', 'waitlist');
+        else if (stakeholderType === 'technician') stakeholderTags.push('technician', 'waitlist');
+        else if (stakeholderType === 'property_manager') stakeholderTags.push('property_manager', 'waitlist');
+        else stakeholderTags.push('unknown', 'waitlist');
+        
+        // Add source page as tag
+        if (source) stakeholderTags.push(`source_${source}`);
+        
+        // Build notes with additional info
+        const notesParts: string[] = [];
+        if (irataLevel) notesParts.push(`IRATA Level: ${irataLevel}`);
+        if (buildingsManaged) notesParts.push(`Buildings Managed: ${buildingsManaged}`);
+        const notes = notesParts.length > 0 ? notesParts.join('\n') : null;
+        
+        if (existingContact.length > 0) {
+          // Update existing contact with new tags
+          const existingTags = existingContact[0].tags || [];
+          const mergedTags = [...new Set([...existingTags, ...stakeholderTags])];
+          
+          await db.update(crmContacts)
+            .set({
+              tags: mergedTags,
+              notes: existingContact[0].notes 
+                ? existingContact[0].notes + '\n---\n' + (notes || `Repeat waitlist signup from ${source || 'unknown'}`)
+                : notes,
+              updatedAt: new Date(),
+            })
+            .where(eq(crmContacts.id, existingContact[0].id));
+          
+          // Log activity
+          await db.insert(crmActivities).values({
+            contactId: existingContact[0].id,
+            type: 'note',
+            subject: 'Repeat waitlist signup',
+            description: `Contact signed up again from ${source || 'unknown'} page. Stakeholder type: ${stakeholderType}`,
+          });
+        } else {
+          // Create new CRM contact
+          let companyId: number | null = null;
+          if (companyName && stakeholderType === 'company') {
+            const existingCompany = await db.select().from(crmCompanies)
+              .where(eq(crmCompanies.name, companyName)).limit(1);
+            
+            if (existingCompany.length > 0) {
+              companyId = existingCompany[0].id;
+            } else {
+              const [newCompany] = await db.insert(crmCompanies).values({
+                name: companyName,
+                source: 'website_signup',
+                country: 'CA',
+              }).returning();
+              companyId = newCompany.id;
+            }
+          }
+          
+          const [newContact] = await db.insert(crmContacts).values({
+            firstName: companyName,
+            email: email,
+            stage: 'lead_captured',
+            source: 'website_signup',
+            companyId: companyId,
+            consentType: 'explicit_opt_in',
+            consentDate: new Date(),
+            consentSource: `Waitlist form on ${source || 'unknown'} page`,
+            tags: stakeholderTags,
+            notes: notes,
+          }).returning();
+          
+          await db.insert(crmActivities).values({
+            contactId: newContact.id,
+            companyId: companyId,
+            type: 'note',
+            subject: 'Waitlist signup',
+            description: `New lead from ${source || 'unknown'} page. Stakeholder type: ${stakeholderType}`,
+          });
+        }
+      } catch (crmError) {
+        console.error("CRM contact creation error (non-blocking):", crmError);
+      }
       
       res.status(201).json({ success: true, message: "Successfully signed up for early access" });
     } catch (error) {
