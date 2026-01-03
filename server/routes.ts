@@ -9326,18 +9326,19 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
   app.patch("/api/buildings/:buildingId/address", async (req: Request, res: Response) => {
     try {
       const { buildingId } = req.params;
-      const { address, latitude, longitude } = req.body;
+      const { address, city, province, country, postalCode, latitude, longitude } = req.body;
+      const addressData = { address, city, province, country, postalCode, latitude, longitude };
 
       // SuperUser can update any building
       if (req.session.userId === 'superuser') {
-        await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+        await storage.updateBuildingAddress(buildingId, addressData);
         return res.json({ success: true });
       }
 
       // Building manager session (uses buildingId, not userId)
       if (req.session.role === 'building' && req.session.buildingId) {
         if (req.session.buildingId === buildingId) {
-          await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+          await storage.updateBuildingAddress(buildingId, addressData);
           return res.json({ success: true });
         }
         return res.status(403).json({ message: "Access denied" });
@@ -9361,7 +9362,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         );
         const building = await storage.getBuildingById(buildingId);
         if (building && allStrataNums.includes(building.strataPlanNumber.toUpperCase().replace(/\s/g, ''))) {
-          await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+          await storage.updateBuildingAddress(buildingId, addressData);
           return res.json({ success: true });
         }
       }
@@ -9377,7 +9378,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
             building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
           );
           if (hasProjectForBuilding) {
-            await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+            await storage.updateBuildingAddress(buildingId, addressData);
             return res.json({ success: true });
           }
         }

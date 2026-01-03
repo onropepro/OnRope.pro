@@ -75,41 +75,40 @@ When adding guided tours to dialogs or forms, follow this exact implementation p
 - Each step should have: `fieldSelector`, `title`, `explanation`, and `appContext`
 
 ### Address Input Standardization Pattern
-All address inputs use Geoapify autocomplete (`AddressAutocomplete` component). Two distinct patterns:
+**ALL address inputs use Geoapify autocomplete with structured fields.** This is a universal pattern with no exceptions.
 
-**Personal Addresses (Employees, Technicians, Support Staff):**
-- Use structured fields: street address, city, province/state, country, postal code
+**Universal Structured Address Fields:**
+- Street address, city, province/state, country, postal code
 - Street address extracted as `houseNumber + street` (NOT full formatted address)
 - Autofill populates all structured fields from Geoapify selection
-- Database fields: `employeeStreetAddress`, `employeeCity`, `employeeProvinceState`, `employeeCountry`, `employeePostalCode`
-- Reference implementations: TechnicianPortal.tsx, GroundCrewPortal.tsx, Dashboard.tsx employee form
+- For building/business addresses: also captures latitude/longitude for map display
 
-**Building/Business Addresses (Projects, Clients, Quotes):**
-- Use single formatted address string for simplicity
-- Full `address.formatted` is appropriate for location/geocoding purposes
-- Captures latitude/longitude for map display
-- Database fields: `buildingAddress`, `address`, `billingAddress`
-- Reference implementations: Dashboard.tsx project creation, client forms, Quotes.tsx
+**Database Field Naming Conventions:**
+- Employees/Technicians: `employeeStreetAddress`, `employeeCity`, `employeeProvinceState`, `employeeCountry`, `employeePostalCode`
+- Clients: `address`, `city`, `provinceState`, `country`, `postalCode`, `billingAddress`, `billingCity`, `billingProvinceState`, `billingCountry`, `billingPostalCode`
+- Buildings: `buildingAddress`, `city`, `province`, `country`, `postalCode`, `latitude`, `longitude`
+
+**Reference Implementations:**
+- Employee forms: TechnicianPortal.tsx, GroundCrewPortal.tsx, Dashboard.tsx employee form
+- Client forms: Dashboard.tsx client creation/edit forms
+- Building forms: PropertyManager.tsx building address form
+- Registration: GroundCrewRegistration.tsx
 
 **Implementation Pattern:**
 ```tsx
-// Personal address - extract street only
+// Universal address pattern - extract street, populate all structured fields
 onSelect={(address) => {
   const streetAddress = address.houseNumber 
     ? `${address.houseNumber} ${address.street || ''}`.trim()
     : address.street || address.formatted;
   field.onChange(streetAddress);
-  form.setValue('employeeCity', address.city || '');
-  form.setValue('employeeProvinceState', address.state || '');
-  form.setValue('employeeCountry', address.country || '');
-  form.setValue('employeePostalCode', address.postcode || '');
-}}
-
-// Building address - use full formatted
-onSelect={(address) => {
-  field.onChange(address.formatted);
-  form.setValue('latitude', address.latitude);
-  form.setValue('longitude', address.longitude);
+  form.setValue('city', address.city || '');
+  form.setValue('provinceState', address.state || '');
+  form.setValue('country', address.country || '');
+  form.setValue('postalCode', address.postcode || '');
+  // For building addresses, also capture coordinates:
+  // form.setValue('latitude', address.latitude);
+  // form.setValue('longitude', address.longitude);
 }}
 ```
 
