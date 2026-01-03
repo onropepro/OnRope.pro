@@ -1251,8 +1251,10 @@ export default function Profile() {
                                 placeholder="10-character code for residents"
                                 {...field}
                                 data-testid="input-resident-code"
-                                className="h-12 font-mono"
+                                className="h-12 font-mono bg-muted/50 cursor-not-allowed"
                                 maxLength={10}
+                                readOnly
+                                disabled
                               />
                             </FormControl>
                             <FormMessage />
