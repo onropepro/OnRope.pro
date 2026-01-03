@@ -9481,11 +9481,13 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         );
         
         const smsRecipients = recipientUsers
-          .filter(user => user && user.phone)
+          .filter(user => user && (user.employeePhoneNumber || user.phoneNumber))
           .map(user => ({
-            phoneNumber: user.phone,
+            phoneNumber: user.employeePhoneNumber || user.phoneNumber || '',
             name: user.name || user.email
           }));
+        
+        console.log(`[SuperUser] Found ${recipientUsers.length} recipients, ${smsRecipients.length} have phone numbers`);
 
         if (smsRecipients.length > 0) {
           const smsResult = await sendBulkPlatformNotificationSMS(smsRecipients, validatedData.title);
