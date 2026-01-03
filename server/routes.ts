@@ -36,7 +36,7 @@ import helpRouter from "./routes/help";
 import { startPhotoUploadWorker, runBucketHealthCheck } from "./residentPhotoWorker";
 import { queryAssistant } from "./services/assistantService";
 import { sendQuoteNotificationSMS } from "./services/twilio";
-import { sendTeamInvitationSMS, sendInvitationAcceptedSMS } from "./services/twilioService";
+import { sendTeamInvitationSMS, sendInvitationAcceptedSMS, sendBulkPlatformNotificationSMS } from "./services/twilioService";
 import convert from "heic-convert";
 
 // SECURITY: Rate limiting for login endpoint to prevent brute force attacks
@@ -9471,9 +9471,38 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         });
       }
 
+      // Send SMS notifications to recipients with phone numbers
+      let smsSent = 0;
+      let smsFailed = 0;
+      try {
+        // Get user details for phone numbers
+        const recipientUsers = await Promise.all(
+          recipientIds.map(id => storage.getUser(id))
+        );
+        
+        const smsRecipients = recipientUsers
+          .filter(user => user && user.phone)
+          .map(user => ({
+            phoneNumber: user.phone,
+            name: user.name || user.email
+          }));
+
+        if (smsRecipients.length > 0) {
+          const smsResult = await sendBulkPlatformNotificationSMS(smsRecipients, validatedData.title);
+          smsSent = smsResult.sent;
+          smsFailed = smsResult.failed;
+          console.log(`[SuperUser] Notification SMS: ${smsSent} sent, ${smsFailed} failed`);
+        }
+      } catch (smsError) {
+        console.error('[SuperUser] SMS sending error:', smsError);
+        // Don't fail the whole request if SMS fails
+      }
+
       res.json({ 
         notification,
-        recipientCount: recipientIds.length 
+        recipientCount: recipientIds.length,
+        smsSent,
+        smsFailed
       });
     } catch (error) {
       if (error instanceof z.ZodError) {

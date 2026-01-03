@@ -102,7 +102,7 @@ export async function sendSMS(to: string, body: string): Promise<{ success: bool
     });
 
     console.log(`[Twilio] SMS sent successfully to ${formattedNumber}, SID: ${message.sid}, status: ${message.status}`);
-    return { success: true, messageId: message.sid, formattedTo: formattedNumber, status: message.status };
+    return { success: true, messageId: message.sid };
   } catch (error: any) {
     console.error('[Twilio] Failed to send SMS:', error.message);
     return { success: false, error: error.message };
@@ -142,4 +142,53 @@ export async function sendInvitationAcceptedSMS(
   }
   
   return result;
+}
+
+export async function sendPlatformNotificationSMS(
+  phoneNumber: string,
+  notificationTitle: string
+): Promise<{ success: boolean; error?: string; messageId?: string }> {
+  // Twilio compliant: Sender ID + clear message + opt-out
+  // Keep message short for SMS - just notify them to check the app
+  const message = `OnRopePro: New announcement - "${notificationTitle}". Log in to view details. Reply STOP to opt out.`;
+  
+  const result = await sendSMS(phoneNumber, message);
+  
+  if (result.success) {
+    console.log(`[Twilio] Platform notification SMS sent to ${phoneNumber} for: ${notificationTitle}`);
+  }
+  
+  return result;
+}
+
+export async function sendBulkPlatformNotificationSMS(
+  recipients: { phoneNumber: string; name?: string }[],
+  notificationTitle: string
+): Promise<{ sent: number; failed: number; errors: string[] }> {
+  let sent = 0;
+  let failed = 0;
+  const errors: string[] = [];
+
+  console.log(`[Twilio] Sending platform notification SMS to ${recipients.length} recipients...`);
+
+  for (const recipient of recipients) {
+    if (!recipient.phoneNumber) {
+      continue; // Skip recipients without phone numbers
+    }
+
+    const result = await sendPlatformNotificationSMS(recipient.phoneNumber, notificationTitle);
+    
+    if (result.success) {
+      sent++;
+    } else {
+      failed++;
+      errors.push(`${recipient.name || recipient.phoneNumber}: ${result.error}`);
+    }
+
+    // Small delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  console.log(`[Twilio] Bulk SMS complete: ${sent} sent, ${failed} failed`);
+  return { sent, failed, errors };
 }
