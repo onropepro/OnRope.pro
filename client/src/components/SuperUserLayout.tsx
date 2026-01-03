@@ -156,6 +156,11 @@ const menuGroups: MenuGroup[] = [
         icon: "hub",
         path: "/superuser/network",
       },
+      {
+        title: "Safety Metrics",
+        icon: "shield",
+        path: "/superuser/safety",
+      },
     ],
   },
   {
