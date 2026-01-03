@@ -205,7 +205,6 @@ export default function SuperUserMetrics() {
       <SuperUserLayout>
         <div className="p-6">
           <div className="max-w-7xl mx-auto space-y-6">
-            <BackButton to="/superuser" label={t('common.backToDashboard', 'Back to Dashboard')} />
             <Card className="p-8 text-center">
               <p className="text-destructive">{t('superuser.metrics.error', 'Failed to load metrics. Please try again.')}</p>
               <Button 
@@ -294,9 +293,6 @@ export default function SuperUserMetrics() {
     <SuperUserLayout>
       <div className="p-4 md:p-6">
         <div className="max-w-7xl mx-auto space-y-8">
-          {/* Back Button */}
-          <BackButton to="/superuser" label={t('common.backToDashboard', 'Back to Dashboard')} />
-
           {/* Header Description */}
           <p className="text-muted-foreground">
             {t('superuser.metrics.subtitle', 'Real-time business intelligence for OnRopePro')}
