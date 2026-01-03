@@ -170,7 +170,7 @@ export default function PreLaunchHomePage() {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <section
         className="relative text-white pb-[120px]"
-        style={{ backgroundImage: "linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)" }}
+        style={{ backgroundImage: "linear-gradient(135deg, #0F1629 0%, #0F1629 100%)" }}
       >
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnY0em0wLTZoLTJ2LTRoMnY0em0tNiA2aC0ydi00aDJ2NHptMC02aC0ydi00aDJ2NHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
 
@@ -425,7 +425,7 @@ export default function PreLaunchHomePage() {
       </section>
       <section
         className="py-16 md:py-20 px-4 text-white"
-        style={{ backgroundImage: "linear-gradient(135deg, #0B64A3 0%, #0369A1 100%)" }}
+        style={{ backgroundImage: "linear-gradient(135deg, #0F1629 0%, #0F1629 100%)" }}
       >
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
