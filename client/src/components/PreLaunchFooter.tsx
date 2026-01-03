@@ -37,10 +37,10 @@ export function PreLaunchFooter() {
           </div>
 
           <div className="text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               © {currentYear} OnRopePro. Built in Vancouver, BC.
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Questions?{" "}
               <a href="mailto:hello@onrope.pro" className="underline hover:text-foreground">
                 hello@onrope.pro
@@ -57,7 +57,7 @@ export function PreLaunchFooter() {
               placeholder="PIN"
               value={pin}
               onChange={(e) => handlePinChange(e.target.value)}
-              className="w-16 text-center text-xs"
+              className="w-16 text-center text-base"
               data-testid="input-bypass-pin"
             />
           </div>

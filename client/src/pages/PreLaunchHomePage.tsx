@@ -238,16 +238,16 @@ export default function PreLaunchHomePage() {
                 {signupMutation.isPending ? "Submitting..." : "Get Early Access"}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <p className="text-xs text-blue-100/80">
+              <p className="text-base text-blue-100/80">
                 Be first to see it. No spam. Unsubscribe anytime.
               </p>
             </form>
 
-            <div className="text-blue-100 text-sm pt-4 space-y-1">
-              <p className="text-[16px]">
+            <div className="text-blue-100 text-base pt-4 space-y-1">
+              <p className="text-base">
                 There are <span className="text-[#fa7315] font-bold">86 urban rope access companies</span> in Canada. We're onboarding 10 of them in January.
               </p>
-              <p className="font-bold text-[16px]">
+              <p className="font-bold text-base">
                 Will you be one of them?
               </p>
             </div>
@@ -270,19 +270,19 @@ export default function PreLaunchHomePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-blue-700">19</div>
-                  <div className="text-sm text-muted-foreground mt-1">Connected Modules</div>
+                  <div className="text-base text-muted-foreground mt-1">Connected Modules</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-emerald-600">87%</div>
-                  <div className="text-sm text-muted-foreground mt-1">Payroll Time Saved</div>
+                  <div className="text-base text-muted-foreground mt-1">Payroll Time Saved</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-orange-600">10+ hrs</div>
-                  <div className="text-sm text-muted-foreground mt-1">Weekly Admin Saved</div>
+                  <div className="text-base text-muted-foreground mt-1">Weekly Admin Saved</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-violet-600">1 Platform</div>
-                  <div className="text-sm text-muted-foreground mt-1">Replaces 5-10 Tools</div>
+                  <div className="text-base text-muted-foreground mt-1">Replaces 5-10 Tools</div>
                 </div>
               </div>
             </CardContent>
@@ -306,7 +306,7 @@ export default function PreLaunchHomePage() {
                   <Shield className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Company Safety Rating</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-base">
                   A real-time score that reflects your safety documentation, toolbox meetings, and compliance.
                   Property & strata managers see it. Your competitors probably don't have one.
                 </p>
@@ -319,7 +319,7 @@ export default function PreLaunchHomePage() {
                   <BarChart3 className="w-6 h-6 text-emerald-600" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Property Manager Portal</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-base">
                   They log in and see your project progress, safety documentation, and response metrics.
                   No calls asking for updates. Your professionalism speaks for itself.
                 </p>
@@ -332,7 +332,7 @@ export default function PreLaunchHomePage() {
                   <MessageSquare className="w-6 h-6 text-violet-600" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Resident Portal</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-base">
                   Residents see progress on their building and submit feedback directly to you.
                   Property managers stay out of the loop. Fewer complaints, faster resolution.
                 </p>
@@ -360,7 +360,7 @@ export default function PreLaunchHomePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold">{stakeholder.role}</h3>
-                      <p className="text-sm text-muted-foreground">{stakeholder.tagline}</p>
+                      <p className="text-base text-muted-foreground">{stakeholder.tagline}</p>
                     </div>
                   </div>
                 </div>
@@ -370,8 +370,8 @@ export default function PreLaunchHomePage() {
                       <div key={idx} className="flex gap-3">
                         <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
                         <div>
-                          <p className="font-medium text-sm">{benefit.headline}</p>
-                          <p className="text-xs text-muted-foreground">{benefit.metric}</p>
+                          <p className="font-medium text-base">{benefit.headline}</p>
+                          <p className="text-sm text-muted-foreground">{benefit.metric}</p>
                         </div>
                       </div>
                     ))}
@@ -401,7 +401,7 @@ export default function PreLaunchHomePage() {
                   </h3>
                   <ul className="space-y-2">
                     {category.modules.map((module) => (
-                      <li key={module} className="flex items-center gap-2 text-sm">
+                      <li key={module} className="flex items-center gap-2 text-base">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                         {module}
                       </li>
@@ -414,7 +414,7 @@ export default function PreLaunchHomePage() {
 
           <Card className="mt-8 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
             <CardContent className="p-6 text-center">
-              <p className="text-blue-800 dark:text-blue-200">
+              <p className="text-blue-800 dark:text-blue-200 text-base">
                 <strong>Every module talks to every other module.</strong> A work session updates payroll,
                 progress tracking, performance analytics, and safety compliance automatically.
                 Information flows where it needs to go, when it needs to get there.
@@ -443,7 +443,7 @@ export default function PreLaunchHomePage() {
             Get Early Access
             <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
-          <p className="text-blue-100/80 text-sm mt-6">
+          <p className="text-blue-100/80 text-base mt-6">
             Built by a Level 3 tech and operations manager. For rope access professionals.
           </p>
         </div>

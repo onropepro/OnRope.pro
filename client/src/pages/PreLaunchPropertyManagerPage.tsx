@@ -189,7 +189,7 @@ export default function PreLaunchPropertyManagerPage() {
                 {signupMutation.isPending ? "Submitting..." : "Get Notified at Launch"}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <p className="text-xs text-green-100/80">
+              <p className="text-base text-green-100/80">
                 Free for property managers. No spam. Unsubscribe anytime.
               </p>
             </form>
@@ -213,19 +213,19 @@ export default function PreLaunchPropertyManagerPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-blue-700">Real-time</div>
-                  <div className="text-sm text-muted-foreground mt-1">Project Visibility</div>
+                  <div className="text-base text-muted-foreground mt-1">Project Visibility</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-emerald-600">20+ hrs</div>
-                  <div className="text-sm text-muted-foreground mt-1">Monthly Saved</div>
+                  <div className="text-base text-muted-foreground mt-1">Monthly Saved</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-orange-600">1-Click</div>
-                  <div className="text-sm text-muted-foreground mt-1">Safety Doc Access</div>
+                  <div className="text-base text-muted-foreground mt-1">Safety Doc Access</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl md:text-3xl font-bold text-violet-600">Free</div>
-                  <div className="text-sm text-muted-foreground mt-1">For Property Managers</div>
+                  <div className="text-base text-muted-foreground mt-1">For Property Managers</div>
                 </div>
               </div>
             </CardContent>
@@ -252,8 +252,8 @@ export default function PreLaunchPropertyManagerPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold mb-1">{benefit.headline}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">{benefit.detail}</p>
-                      <Badge variant="secondary" className="text-xs">
+                      <p className="text-base text-muted-foreground mb-2">{benefit.detail}</p>
+                      <Badge variant="secondary" className="text-sm">
                         {benefit.metric}
                       </Badge>
                     </div>
@@ -282,7 +282,7 @@ export default function PreLaunchPropertyManagerPage() {
                     <Shield className="w-5 h-5 text-[#6E9075]" />
                     What CSR Measures
                   </h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="space-y-2 text-base text-muted-foreground">
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                       Safety documentation completion rate
@@ -306,7 +306,7 @@ export default function PreLaunchPropertyManagerPage() {
                     <FileText className="w-5 h-5 text-[#6E9075]" />
                     Documentation Access
                   </h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="space-y-2 text-base text-muted-foreground">
                     <li className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                       Anchor inspection certificates
