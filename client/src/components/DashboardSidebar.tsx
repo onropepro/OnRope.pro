@@ -409,13 +409,6 @@ export function DashboardSidebar({
           href: "/documents",
           isVisible: () => true,
         },
-        {
-          id: "training",
-          label: t("dashboard.sidebar.training", "Training"),
-          icon: Award,
-          href: "/help",
-          isVisible: () => true,
-        },
       ],
     },
     {
