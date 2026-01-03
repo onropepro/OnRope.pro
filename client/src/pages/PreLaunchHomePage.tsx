@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { PreLaunchFooter } from "@/components/PreLaunchFooter";
+import { PreLaunchFooter } from "../components/PreLaunchFooter";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 import {
   ArrowRight,
@@ -195,36 +195,38 @@ export default function PreLaunchHomePage() {
               OnRopePro launches January 2026. Early access list now open.
             </p>
 
-            <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label htmlFor="companyName" className="text-white text-left block">
-                  Company Name
-                </Label>
-                <Input
-                  id="companyName"
-                  type="text"
-                  placeholder="Your company name"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
-                  data-testid="input-company-name"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-white text-left block">
-                  Email Address
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@company.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
-                  data-testid="input-email"
-                  required
-                />
+            <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName" className="text-white text-left block">
+                    Company Name
+                  </Label>
+                  <Input
+                    id="companyName"
+                    type="text"
+                    placeholder="Your company name"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
+                    data-testid="input-company-name"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-white text-left block">
+                    Email Address
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
+                    data-testid="input-email"
+                    required
+                  />
+                </div>
               </div>
               <Button
                 type="submit"
