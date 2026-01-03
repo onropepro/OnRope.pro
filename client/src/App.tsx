@@ -51,6 +51,7 @@ import SuperUserTasks from "@/pages/SuperUserTasks";
 import SuperUserJobBoard from "@/pages/SuperUserJobBoard";
 import SuperUserFutureIdeas from "@/pages/SuperUserFutureIdeas";
 import SuperUserStaffAccounts from "@/pages/SuperUserStaffAccounts";
+import SuperUserNetwork from "@/pages/SuperUserNetwork";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -244,6 +245,11 @@ function Router() {
           <Route path="/superuser/goals">
             <ProtectedRoute allowedRoles={["superuser", "staff"]}>
               <SuperUserGoalsOverview />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/network">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserNetwork />
             </ProtectedRoute>
           </Route>
           <Route path="/superuser/companies">

@@ -5223,11 +5223,18 @@ export class Storage {
     const allUsers = await db.select().from(users);
     
     const techRoles = ['rope_access_tech', 'ground_crew', 'ground_crew_supervisor'];
+    const groundCrewRoles = ['ground_crew', 'ground_crew_supervisor'];
     const techs = allUsers.filter(u => techRoles.includes(u.role));
+    const groundCrew = allUsers.filter(u => groundCrewRoles.includes(u.role));
+
     const employers = allUsers.filter(u => u.role === 'company');
     const pms = allUsers.filter(u => u.role === 'property_manager');
     const bms = allUsers.filter(u => u.role === 'building_manager');
     const residents = allUsers.filter(u => u.role === 'resident');
+
+    // White-label branding counts
+    const companiesWithWhiteLabel = employers.filter(c => c.whitelabelBrandingActive === true).length;
+    const companiesWithCustomBranding = employers.filter(c => c.brandingLogoUrl || (c.brandingColors && c.brandingColors.length > 0)).length;
 
     // Active users (logged in or had activity in last 30 days)
     const activeTechs = techs.filter(u => u.lastLoginAt && new Date(u.lastLoginAt) > thirtyDaysAgo).length;
@@ -5279,6 +5286,21 @@ export class Storage {
     // Activity metrics
     const allWorkSessions = await db.select().from(workSessions);
     const allProjects = await db.select().from(projects);
+
+    // Multi-vendor building calculation
+    const buildingVendorMap = new Map<string, Set<string>>();
+    allProjects.forEach(p => {
+      if (p.buildingId && p.companyId) {
+        if (!buildingVendorMap.has(p.buildingId)) {
+          buildingVendorMap.set(p.buildingId, new Set());
+        }
+        buildingVendorMap.get(p.buildingId)!.add(p.companyId);
+      }
+    });
+    const buildingsWithMultipleVendors = Array.from(buildingVendorMap.values()).filter(vendors => vendors.size > 1).length;
+    const totalBuildingsWithVendors = buildingVendorMap.size;
+    const totalUniqueVendors = Array.from(buildingVendorMap.values()).reduce((sum, vendors) => sum + vendors.size, 0);
+    const avgVendorsPerBuilding = totalBuildingsWithVendors > 0 ? Math.round((totalUniqueVendors / totalBuildingsWithVendors) * 10) / 10 : 0;
     const allBuildings = await db.select().from(buildings);
 
     // Invitations
@@ -5311,15 +5333,51 @@ export class Storage {
     }
 
     // Searches (from new table - will be empty initially)
-    let searchData = { total: 0, avgEngagementRate: 0, matchRate: 0 };
+    let searchData: { total: number; avgEngagementRate: number; matchRate: number; byType: { contractors: number; buildings: number; technicians: number; jobs: number } } = { total: 0, avgEngagementRate: 0, matchRate: 0, byType: { contractors: 0, buildings: 0, technicians: 0, jobs: 0 } };
     try {
       const allSearches = await db.select().from(platformSearches);
       const totalEngagement = allSearches.reduce((sum, s) => sum + (s.engagementCount || 0), 0);
       const totalResults = allSearches.reduce((sum, s) => sum + (s.resultsCount || 0), 0);
+      const techSearches = allSearches.filter(s => s.searchType === 'tech_search').length;
+      const vendorSearches = allSearches.filter(s => s.searchType === 'vendor_search').length;
+      const buildingSearches = allSearches.filter(s => s.searchType === 'building_search').length;
+      const jobSearches = allSearches.filter(s => s.searchType === 'job_search').length;
       searchData = {
         total: allSearches.length,
         avgEngagementRate: allSearches.length > 0 ? Math.round((totalEngagement / allSearches.length) * 100) / 100 : 0,
         matchRate: totalResults > 0 ? Math.round((totalEngagement / totalResults) * 100) / 100 : 0,
+        byType: { contractors: vendorSearches, buildings: buildingSearches, technicians: techSearches, jobs: jobSearches },
+      };
+    } catch (e) {
+      // Table might not exist yet
+    }
+
+    // Vendor verifications (from new table - will be empty initially)
+    let verificationData = { total: 0, verified: 0, pending: 0, verificationRate: 0 };
+    try {
+      const allVerifications = await db.select().from(vendorVerifications);
+      const verifiedCount = allVerifications.filter(v => v.status === 'verified').length;
+      const pendingCount = allVerifications.filter(v => v.status === 'pending').length;
+      verificationData = {
+        total: allVerifications.length,
+        verified: verifiedCount,
+        pending: pendingCount,
+        verificationRate: allVerifications.length > 0 ? Math.round((verifiedCount / allVerifications.length) * 100) / 100 : 0,
+      };
+    } catch (e) {
+      // Table might not exist yet
+    }
+
+    // Notification interactions (from new table - will be empty initially)
+    let notificationData = { sent: 0, interacted: 0, engagementRate: 0 };
+    try {
+      const allNotifications = await db.select().from(notifications);
+      const allInteractions = await db.select().from(notificationInteractions);
+      const interactedCount = allInteractions.filter(i => i.interactionType === 'clicked' || i.interactionType === 'actioned').length;
+      notificationData = {
+        sent: allNotifications.length,
+        interacted: interactedCount,
+        engagementRate: allNotifications.length > 0 ? Math.round((interactedCount / allNotifications.length) * 100) / 100 : 0,
       };
     } catch (e) {
       // Table might not exist yet
@@ -5332,6 +5390,7 @@ export class Storage {
         propertyManagers: { total: pms.length, active: activePms },
         buildingManagers: { total: bms.length, active: activeBms },
         residents: { total: residents.length, active: activeResidents },
+        groundCrew: { total: groundCrew.length, active: groundCrew.filter(u => u.lastLoginAt && new Date(u.lastLoginAt) > thirtyDaysAgo).length },
       },
       monthlyGrowth,
       connections: {
@@ -5339,6 +5398,7 @@ export class Storage {
         avgConnectionsPerTech: techsWithConnections > 0 ? Math.round((techConnections.length / techsWithConnections) * 10) / 10 : 0,
         avgEmployeesPerEmployer: employersWithEmployees > 0 ? Math.round((techConnections.length / employersWithEmployees) * 10) / 10 : 0,
         pmCompanyLinks: pmLinks.length,
+        companiesWithLinkedTechs: employersWithEmployees,
       },
       activity: {
         totalWorkSessions: allWorkSessions.length,
@@ -5360,7 +5420,17 @@ export class Storage {
         avgRecordsPerBuilding: allBuildings.length > 0 ? Math.round(((allDocuments.length + totalSafetyForms + allProjects.length) / allBuildings.length) * 10) / 10 : 0,
       },
       referrals: referralData,
+      verifications: verificationData,
+      notifications: notificationData,
       searches: searchData,
+      multiVendor: {
+        buildingsWithMultipleVendors,
+        avgVendorsPerBuilding,
+      },
+      whiteLabel: {
+        companiesWithWhiteLabel,
+        companiesWithCustomBranding,
+      },
     };
   }
 
@@ -5423,7 +5493,9 @@ export class Storage {
   }> {
     const allUsers = await db.select().from(users);
     const techRoles = ['rope_access_tech', 'ground_crew', 'ground_crew_supervisor'];
+    const groundCrewRoles = ['ground_crew', 'ground_crew_supervisor'];
     const techs = allUsers.filter(u => techRoles.includes(u.role));
+    const groundCrew = allUsers.filter(u => groundCrewRoles.includes(u.role));
     const employers = allUsers.filter(u => u.role === 'company');
     const pms = allUsers.filter(u => u.role === 'property_manager');
     const bms = allUsers.filter(u => u.role === 'building_manager');

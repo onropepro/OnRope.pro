@@ -151,6 +151,11 @@ const menuGroups: MenuGroup[] = [
         icon: "flag",
         path: "/superuser/goals",
       },
+      {
+        title: "Network Effects",
+        icon: "hub",
+        path: "/superuser/network",
+      },
     ],
   },
   {

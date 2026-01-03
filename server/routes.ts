@@ -8610,18 +8610,82 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         storage.getCohortAnalysis(),
       ]);
 
-      res.json({
-        ...metrics,
-        healthScore,
-        lockIn: lockInMetrics,
-        cohorts: cohortData,
-      });
+      // Transform backend data to match frontend interface
+      const response = {
+        platformSearches: {
+          total: metrics.searches?.total || 0,
+          byType: {
+            contractors: metrics.searches?.byType?.contractors || 0,
+            buildings: metrics.searches?.byType?.buildings || 0,
+            technicians: metrics.searches?.byType?.technicians || 0,
+          },
+          searchToMatchRate: metrics.searches?.matchRate || 0,
+        },
+        vendorVerifications: {
+          total: metrics.verifications?.total || 0,
+          verified: metrics.verifications?.verified || 0,
+          pending: metrics.verifications?.pending || 0,
+          verificationRate: metrics.verifications?.verificationRate || 0,
+        },
+        referrals: {
+          total: metrics.referrals?.total || 0,
+          successful: metrics.referrals?.converted || 0,
+          successRate: metrics.referrals?.conversionRate || 0,
+          viralCoefficient: metrics.referrals?.viralCoefficient || 0,
+        },
+        notificationEngagement: {
+          sent: metrics.notifications?.sent || 0,
+          interacted: metrics.notifications?.interacted || 0,
+          engagementRate: metrics.notifications?.engagementRate || 0,
+        },
+        crossSideMetrics: {
+          techsLinkedToCompanies: metrics.connections?.techEmployerConnections || 0,
+          companiesWithLinkedTechs: metrics.connections?.companiesWithLinkedTechs || 0,
+          buildingsWithMultipleVendors: metrics.multiVendor?.buildingsWithMultipleVendors || 0,
+          avgVendorsPerBuilding: metrics.multiVendor?.avgVendorsPerBuilding || 0,
+        },
+        accountCounts: {
+          companies: metrics.accountCounts?.employers?.total || 0,
+          technicians: metrics.accountCounts?.techs?.total || 0,
+          residents: metrics.accountCounts?.residents?.total || 0,
+          propertyManagers: metrics.accountCounts?.propertyManagers?.total || 0,
+          buildingManagers: metrics.accountCounts?.buildingManagers?.total || 0,
+          groundCrew: metrics.accountCounts?.groundCrew?.total || 0,
+        },
+        healthScore: {
+          overall: healthScore?.score || 0,
+          components: {
+            crossSideActivity: healthScore?.components?.crossSide || 0,
+            dataDepth: healthScore?.components?.dataMoat || 0,
+            userEngagement: healthScore?.components?.lockIn || 0,
+            viralGrowth: healthScore?.components?.sameSide || 0,
+          },
+        },
+        lockIn: {
+          avgProjectsPerCompany: lockInMetrics?.employer?.avgProjects || 0,
+          avgEmployeesPerCompany: lockInMetrics?.employer?.avgEmployees || 0,
+          avgCertificationsPerTech: lockInMetrics?.tech?.avgCertifications || 0,
+          avgBuildingsPerCompany: (metrics.accountCounts?.employers?.total || 0) > 0 ? Math.round((metrics.activity?.totalBuildings || 0) / (metrics.accountCounts?.employers?.total || 1) * 10) / 10 : 0,
+          avgWorkSessionsPerCompany: lockInMetrics?.tech?.avgWorkSessions || 0,
+          avgSafetyFormsPerCompany: (metrics.accountCounts?.employers?.total || 0) > 0 ? Math.round((metrics.dataMoat?.totalSafetyForms || 0) / (metrics.accountCounts?.employers?.total || 1) * 10) / 10 : 0,
+          companiesWithWhiteLabel: metrics.whiteLabel?.companiesWithWhiteLabel || 0,
+          companiesWithCustomBranding: metrics.whiteLabel?.companiesWithCustomBranding || 0,
+        },
+        cohorts: cohortData?.monthlyRetention?.map(c => ({
+          month: c.cohort,
+          signups: c.month0 || 0,
+          retained: Math.round((c.month0 || 0) * (c.month1 || 0) / 100),
+          retentionRate: (c.month1 || 0) / 100,
+          avgMrr: 0,
+        })) || [],
+      };
+
+      res.json(response);
     } catch (error) {
       console.error('[SuperUser] Get network effects error:', error);
       res.status(500).json({ message: "Failed to fetch network effects metrics" });
     }
   });
-  // SuperUser: Get all feature requests with messages
   app.get("/api/superuser/feature-requests", requireAuth, async (req: Request, res: Response) => {
     try {
       if (!isSuperuserOrHasPermission(req, 'view_feature_requests')) {
