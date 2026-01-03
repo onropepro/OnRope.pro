@@ -74,57 +74,79 @@ const moduleCategories = [
 
 const stakeholderBenefits = [
   {
-    role: "Company Owners",
+    role: "For Company Owners",
     icon: Briefcase,
     tagline: "Run your business, not your spreadsheets",
     benefits: [
       { headline: "Create quotes in minutes, not hours", metric: "15-20% more accurate bids" },
       { headline: "See every project's status without site visits", metric: "10-15 hrs/week saved" },
       { headline: "Payroll runs itself", metric: "87-93% time reduction" },
+      { headline: "Stop the 3 AM anxiety", metric: "60-70% cognitive load reduction" },
       { headline: "Win contracts with your safety score", metric: "10-20% insurance discount" },
+      { headline: "Know which techs are performing", metric: "Zero he-said disputes" },
+      { headline: "Never lose job history again", metric: "Data-driven future quotes" },
+      { headline: "Equipment tracking that prevents surprises", metric: "$4K+ emergency costs avoided" },
     ],
   },
   {
-    role: "Operations Managers",
+    role: "For Operations Managers",
     icon: Users,
     tagline: "Coordinate crews without the chaos",
     benefits: [
       { headline: "Spot double-bookings before they happen", metric: "Zero scheduling disasters" },
       { headline: "Prove who's performing, who's coasting", metric: "Objective performance data" },
       { headline: "Batch deficiency visits efficiently", metric: "Half-day trips eliminated" },
+      { headline: "Stop playing phone tag for updates", metric: "Real-time visibility" },
+      { headline: "Balance workloads across crews", metric: "Prevent burnout" },
       { headline: "Generate safety docs automatically", metric: "30+ min per project saved" },
     ],
   },
   {
-    role: "Rope Access Technicians",
+    role: "For Rope Access Technicians",
     icon: HardHat,
     tagline: "Log your work, prove your value",
     benefits: [
       { headline: "Your portable professional profile", metric: "Career follows you" },
       { headline: "Log drops from your phone in seconds", metric: "10 seconds per entry" },
+      { headline: "Know your daily target", metric: "Clear expectations" },
       { headline: "Paycheck accuracy you can trust", metric: "Zero payroll errors" },
+      { headline: "See your schedule, plan your life", metric: "Work-life visibility" },
       { headline: "Build your reputation with data", metric: "Objective career progression" },
     ],
   },
   {
-    role: "Property Managers",
+    role: "For Property Managers",
     icon: Building2,
     tagline: "Verify vendor performance, reduce your liability",
     benefits: [
       { headline: "See vendor safety compliance at a glance", metric: "Due diligence documented" },
       { headline: "Answer owner questions instantly", metric: "Instant status visibility" },
       { headline: "Get out of the complaint loop", metric: "20+ hrs/month saved" },
+      { headline: "Evaluate vendors with data, not gut feel", metric: "Data-driven decisions" },
+      { headline: "Download safety docs without asking", metric: "Self-service access" },
       { headline: "Protect yourself when accidents happen", metric: "Liability protection" },
     ],
   },
   {
-    role: "Building Residents",
+    role: "For Building Managers",
+    icon: Building2,
+    tagline: "Stop fielding resident calls about contractor work",
+    benefits: [
+      { headline: "Residents stop calling you for updates", metric: "70% fewer calls" },
+      { headline: "Upload anchor inspections directly", metric: "Centralized compliance" },
+      { headline: "Track vendor performance across jobs", metric: "Objective recommendations" },
+      { headline: "Complaints routed directly to vendors", metric: "Out of the middle" },
+    ],
+  },
+  {
+    role: "For Building Residents",
     icon: Home,
     tagline: "See what's happening outside your window",
     benefits: [
       { headline: "Know when they'll reach your floor", metric: "Plan around the work" },
       { headline: "Submit complaints with photos", metric: "Visible accountability" },
       { headline: "See real-time progress on your building", metric: "Transparent progress" },
+      { headline: "Your account moves with you", metric: "Portable profile" },
     ],
   },
 ];
@@ -184,14 +206,13 @@ export default function PreLaunchHomePage() {
               LAUNCHING JANUARY 2026
             </Badge>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-              2026: The year property & strata managers<br className="hidden md:block" />
-              can finally see <span className="text-[#fa7315]">what sets you apart.</span>
+            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+              2026: The year property & strata managers can finally see <span className="text-[#fa7315]">what sets you apart.</span>
             </h1>
-
-            <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">Intelligent Urban Rope Access Software Built by a Level 3 Tech and Operations Manager Who Got Tired of the Same Chaos You're Dealing With.</p>
-
-            <p className="text-blue-100">
+            <p className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto mb-4">
+              Built by a Level 3 tech and operations manager who got tired of the same chaos you're dealing with.
+            </p>
+            <p className="text-lg text-blue-100/80 italic mb-10">
               OnRopePro launches January 2026. Early access list now open.
             </p>
 
@@ -382,7 +403,68 @@ export default function PreLaunchHomePage() {
           </div>
         </div>
       </section>
-      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
+      <section className="py-16 md:py-20 px-4 bg-[#0F1629] text-white">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Problems You Won't Have Anymore
+          </h2>
+          <p className="text-center text-slate-400 text-lg mb-12 max-w-2xl mx-auto">
+            Every feature exists because a rope access company told us about a real problem.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { 
+                before: "I'm juggling Excel, Google Sheets, text messages, and a whiteboard",
+                after: "One platform replaces 5-10 scattered tools. Everything connected, nothing lost."
+              },
+              {
+                before: "Payroll takes 7+ hours every two weeks and there's always errors",
+                after: "Work sessions auto-populate timesheets. Export to QuickBooks. 45 minutes max."
+              },
+              {
+                before: "I have no idea how long this type of job should take",
+                after: "Searchable archive shows average days and crew size for every past job type."
+              },
+              {
+                before: "Building managers call me 10 times a week asking for updates",
+                after: "They log in and see the same dashboard you do. Calls drop 80%."
+              },
+              {
+                before: "Residents complain to property managers who complain to me",
+                after: "Direct resident portal routes complaints to you. Property managers out of the loop."
+              },
+              {
+                before: "When WorkSafe shows up, I scramble for documentation",
+                after: "One-click PDF export of all safety docs with signatures and timestamps."
+              },
+              {
+                before: "I wake at 3 AM remembering something I forgot",
+                after: "Automated reminders for COI renewals, pending feedback, and overdue tasks."
+              },
+              {
+                before: "I can't prove which techs are actually performing",
+                after: "Objective data: drops per day, efficiency trends, comparative performance."
+              }
+            ].map((problem, i) => (
+              <Card key={i} className="bg-slate-900/50 border-slate-800">
+                <CardContent className="p-6 space-y-4">
+                  <div>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Before</p>
+                    <p className="text-base text-slate-300">"{problem.before}"</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-[#fa7315] rotate-90" />
+                  <div>
+                    <p className="text-base text-emerald-400 font-medium">{problem.after}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-20 px-4 bg-white dark:bg-slate-950">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             19 Modules. One Platform. All Connected.
@@ -392,32 +474,41 @@ export default function PreLaunchHomePage() {
             and every drop in between. Complex operations made simple through absolute transparency.
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {moduleCategories.map((category) => (
-              <Card key={category.name}>
-                <CardContent className="p-6">
-                  <h3 className={`font-semibold text-lg mb-4 ${category.color}`}>
-                    {category.name} ({category.modules.length})
-                  </h3>
-                  <ul className="space-y-2">
-                    {category.modules.map((module) => (
-                      <li key={module} className="flex items-center gap-2 text-base">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        {module}
-                      </li>
-                    ))}
-                  </ul>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { name: "Project Management", detail: "4-elevation tracking with visual progress bars and crew assignment" },
+              { name: "Work Sessions", detail: "GPS clock-in, drop tracking, automatic hour aggregation" },
+              { name: "Scheduling", detail: "Drag-and-drop calendar with conflict detection and weather delays" },
+              { name: "Gear Inventory", detail: "Serial number tracking, assignment history, retirement workflows" },
+              { name: "White Label", detail: "Custom branding for client-facing portals and exports" },
+              { name: "Safety Compliance", detail: "Digital forms, PDF plans, and audit-ready documentation" },
+              { name: "Company Safety Rating", detail: "Real-time company safety score based on inspections and compliance" },
+              { name: "Personal Safety Rating", detail: "Portable technician safety score that follows you across employers" },
+              { name: "IRATA/SPRAT Logging", detail: "Same-day hour logging with OCR import and career-portable records" },
+              { name: "Documents", detail: "Digital signatures, immutable audit trails, compliance reporting" },
+              { name: "Employee Management", detail: "Portable identities, certification tracking, role-based permissions" },
+              { name: "Technician Passport", detail: "Portable work history and certifications across employers" },
+              { name: "Job Board", detail: "Talent browser with unlimited postings and direct offers" },
+              { name: "User Access", detail: "Granular permissions and audit trails for every action" },
+              { name: "Payroll", detail: "Automatic hour aggregation with overtime calculation and exports" },
+              { name: "Quoting", detail: "Multi-service quotes with photo documentation and historical data" },
+              { name: "CRM", detail: "Client relationship management with contact history and notes" },
+              { name: "Resident Portal", detail: "Progress tracking and feedback submission for building residents" },
+              { name: "Property Manager Portal", detail: "Real-time dashboards and compliance exports for property managers" }
+            ].map((mod, i) => (
+              <Card key={i} className="bg-slate-50/50 dark:bg-slate-900/50 border-0">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-base mb-1">{mod.name}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{mod.detail}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          <Card className="mt-8 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
-            <CardContent className="p-6 text-center">
-              <p className="text-blue-800 dark:text-blue-200 text-base">
-                <strong>Every module talks to every other module.</strong> A work session updates payroll,
-                progress tracking, performance analytics, and safety compliance automatically.
-                Information flows where it needs to go, when it needs to get there.
+          <Card className="mt-12 bg-slate-900 text-white border-0">
+            <CardContent className="p-8 text-center">
+              <p className="text-lg">
+                <span className="text-[#fa7315] font-bold">Every module talks to every other module.</span> A work session updates payroll, tracking, performance analytics, and safety compliance automatically. Create a project once, it pulls from your history. Information flows where it needs to go, when it needs to get there.
               </p>
             </CardContent>
           </Card>
@@ -425,25 +516,44 @@ export default function PreLaunchHomePage() {
       </section>
       <section
         className="py-16 md:py-20 px-4 text-white"
-        style={{ backgroundImage: "linear-gradient(135deg, #193A63 0%, #193A63 100%)" }}
+        style={{ backgroundImage: "linear-gradient(135deg, #fa7315 0%, #fa7315 100%)" }}
       >
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             January 2026. Limited slots.
           </h2>
-          <p className="text-blue-100 text-lg mb-8">
+          <p className="text-white text-lg mb-8">
             Early adopters get hands-on onboarding and direct input on the roadmap. Get in line.
           </p>
-          <Button
-            size="lg"
-            className="bg-white text-[#0B64A3] hover:bg-blue-50"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            data-testid="button-final-cta"
-          >
-            Get Early Access
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
-          <p className="text-blue-100/80 text-base mt-6">
+          
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto mb-6">
+            <Input
+              type="text"
+              placeholder="Company name"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              className="bg-white text-black h-12"
+              required
+            />
+            <Input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-white text-black h-12"
+              required
+            />
+            <Button
+              type="submit"
+              size="lg"
+              className="bg-slate-900 text-white hover:bg-slate-800 h-12 px-8"
+              disabled={signupMutation.isPending}
+            >
+              Get Early Access
+            </Button>
+          </form>
+
+          <p className="text-white font-medium text-base mt-6">
             Built by a Level 3 tech and operations manager. For rope access professionals.
           </p>
         </div>
