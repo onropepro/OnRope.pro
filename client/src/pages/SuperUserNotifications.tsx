@@ -37,7 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { BackButton } from "@/components/BackButton";
-import { Bell, Send, Eye, Trash2, Edit, Users, Building2, Wrench, BarChart3 } from "lucide-react";
+import { Bell, Send, Eye, Trash2, Edit, Users, Building2, Wrench, BarChart3, Search } from "lucide-react";
 
 type TargetType = 'single_company' | 'selected_companies' | 'all_companies' | 'single_tech' | 'selected_techs' | 'all_techs';
 
@@ -105,6 +105,7 @@ export default function SuperUserNotifications() {
     targetType: "all_companies" as TargetType,
     targetIds: [] as string[],
   });
+  const [recipientSearch, setRecipientSearch] = useState("");
 
   const { data: notificationsData, isLoading: notificationsLoading, refetch } = useQuery<{ notifications: PlatformNotification[] }>({
     queryKey: ["/api/superuser/notifications"],
@@ -358,7 +359,10 @@ export default function SuperUserNotifications() {
                 <Label htmlFor="targetType">Target Audience</Label>
                 <Select
                   value={formData.targetType}
-                  onValueChange={(value) => setFormData({ ...formData, targetType: value as TargetType, targetIds: [] })}
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, targetType: value as TargetType, targetIds: [] });
+                    setRecipientSearch("");
+                  }}
                 >
                   <SelectTrigger data-testid="select-target-type">
                     <SelectValue placeholder="Select target audience" />
@@ -381,12 +385,34 @@ export default function SuperUserNotifications() {
                   <Label>
                     Select Recipients ({formData.targetIds.length} selected)
                   </Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={isCompanyTarget ? "Search companies..." : "Search technicians..."}
+                      value={recipientSearch}
+                      onChange={(e) => setRecipientSearch(e.target.value)}
+                      className="pl-9"
+                      data-testid="input-recipient-search"
+                    />
+                  </div>
                   <ScrollArea className="h-48 border rounded-md p-2">
                     {recipientList.length === 0 ? (
                       <div className="text-center py-4 text-muted-foreground">No recipients available</div>
                     ) : (
                       <div className="space-y-2">
-                        {recipientList.map((recipient: any) => {
+                        {recipientList
+                          .filter((recipient: any) => {
+                            if (!recipientSearch.trim()) return true;
+                            const searchLower = recipientSearch.toLowerCase();
+                            const name = isCompanyTarget
+                              ? recipient.companyName
+                              : recipient.firstName && recipient.lastName
+                                ? `${recipient.firstName} ${recipient.lastName}`
+                                : recipient.name || '';
+                            const email = recipient.email || '';
+                            return name.toLowerCase().includes(searchLower) || email.toLowerCase().includes(searchLower);
+                          })
+                          .map((recipient: any) => {
                           const id = recipient.id;
                           const name = isCompanyTarget
                             ? recipient.companyName
