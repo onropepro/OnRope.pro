@@ -1612,21 +1612,23 @@ export default function Profile() {
                 </div>
 
                 <div className="space-y-3">
-                  {/* My Logged Hours */}
-                  <div 
-                    className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover-elevate active-elevate-2 cursor-pointer border border-border/50" 
-                    onClick={() => setLocation("/my-logged-hours")} 
-                    data-testid="card-my-logged-hours"
-                  >
-                    <div className="p-3 bg-violet-500/10 rounded-xl">
-                      <span className="material-icons text-violet-500">assignment</span>
+                  {/* My Logged Hours - only show for rope_access_tech, not company owners */}
+                  {user?.role === 'rope_access_tech' && (
+                    <div 
+                      className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover-elevate active-elevate-2 cursor-pointer border border-border/50" 
+                      onClick={() => setLocation("/my-logged-hours")} 
+                      data-testid="card-my-logged-hours"
+                    >
+                      <div className="p-3 bg-violet-500/10 rounded-xl">
+                        <span className="material-icons text-violet-500">assignment</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</p>
+                        <p className="text-sm text-muted-foreground">{t('dashboard.cards.myLoggedHours.description', 'IRATA logbook')}</p>
+                      </div>
+                      <span className="material-icons text-muted-foreground">chevron_right</span>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</p>
-                      <p className="text-sm text-muted-foreground">{t('dashboard.cards.myLoggedHours.description', 'IRATA logbook')}</p>
-                    </div>
-                    <span className="material-icons text-muted-foreground">chevron_right</span>
-                  </div>
+                  )}
 
                 </div>
               </div>
