@@ -237,7 +237,9 @@ export default function PreLaunchHomePage() {
             </Badge>
 
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-              2026: The year property & strata managers can finally see <span className="text-[#fa7315]">what sets you apart.</span>
+              2026: The year property &<br />
+              strata managers can finally see<br />
+              <span className="text-[#fa7315]">what sets you apart.</span>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto mb-4">
               Built by a Level 3 tech and operations manager who got tired of the same chaos you're dealing with.
