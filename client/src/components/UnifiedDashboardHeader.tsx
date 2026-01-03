@@ -20,7 +20,6 @@ import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { SubscriptionRenewalBadge } from "@/components/SubscriptionRenewalBadge";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
-import { NotificationBell } from "@/components/NotificationBell";
 import { PlatformNotificationBell } from "@/components/PlatformNotificationBell";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { canManageEmployees } from "@/lib/permissions";
@@ -495,10 +494,7 @@ export function UnifiedDashboardHeader({
             )}
             
             {showNotifications && !isSuperUser && (
-              <>
-                <PlatformNotificationBell />
-                <NotificationBell />
-              </>
+              <PlatformNotificationBell />
             )}
             
             {showLanguageDropdown && (
