@@ -149,7 +149,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
 
   const navItems = [
     { id: "employer", label: t('navigation.employer', 'Employer'), href: "/employer" },
-    { id: "technician", label: t('navigation.technician', 'Rope Access Technician / Ground Crew'), href: "/technician" },
+    { id: "technician", label: t('navigation.technician', 'Rope Access Technician & Support Staff'), href: "/technician" },
     { id: "property-manager", label: t('navigation.propertyManager', 'Property Manager'), href: "/property-manager" },
     { id: "resident", label: t('navigation.resident', 'Resident'), href: "/resident" },
     { id: "building-manager", label: t('navigation.buildingManager', 'Building Manager'), href: "/building-manager" },
@@ -665,7 +665,7 @@ export function PublicHeader({ activeNav, onSignInClick, stakeholderColor: propS
                           <HardHat className="w-5 h-5" style={{ color: "#5D7B6F" }} />
                         </div>
                         <div>
-                          <div className="font-semibold text-sm">{t('navigation.modules.groundCrew.title', 'Ground Crew')}</div>
+                          <div className="font-semibold text-sm">{t('navigation.modules.groundCrew.title', 'Support Staff')}</div>
                           <div className="text-xs text-muted-foreground mt-0.5">{t('navigation.modules.groundCrew.description', 'Support techs from the ground, no heights required')}</div>
                         </div>
                       </button>
