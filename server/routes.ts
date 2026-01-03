@@ -1216,10 +1216,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dedicated resident registration endpoint - SECURITY: Rate limited
   app.post("/api/register/resident", registrationRateLimiter, async (req: Request, res: Response) => {
     try {
-      const { name, email, phone, strataPlanNumber, unitNumber, parkingStallNumber, password } = req.body;
+      const { firstName, lastName, email, phone, strataPlanNumber, unitNumber, parkingStallNumber, password } = req.body;
 
       // Validate required fields
-      if (!name || !email || !password || !strataPlanNumber || !unitNumber) {
+      if (!firstName || !lastName || !email || !password || !strataPlanNumber || !unitNumber) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
@@ -1263,10 +1263,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Split name into first and last name
-      const nameParts = name.trim().split(/\s+/);
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
 
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -1668,7 +1664,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create the technician user (pending company approval)
       const user = await storage.createUser({
-        name: `${firstName} ${lastName}`,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`, // Legacy field
         email,
         role: 'rope_access_tech',
         passwordHash: password, // storage.createUser will hash this
@@ -1829,7 +1827,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create the ground crew user (pending company approval)
       const user = await storage.createUser({
-        name: `${firstName} ${lastName}`,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`, // Legacy field
         email,
         role: 'ground_crew',
         passwordHash: password, // storage.createUser will hash this
@@ -5834,7 +5834,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const {
-        name,
+        firstName,
+        lastName,
         email,
         employeePhoneNumber,
         smsNotificationsEnabled,
@@ -5867,8 +5868,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } = req.body;
 
       // Validate required fields
-      if (!name || !email || !employeePhoneNumber) {
-        return res.status(400).json({ message: "Name, email, and phone are required" });
+      if (!firstName || !lastName || !email || !employeePhoneNumber) {
+        return res.status(400).json({ message: "First name, last name, email, and phone are required" });
       }
 
       if (!emergencyContactName || !emergencyContactPhone) {
@@ -5886,7 +5887,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Build update object - storage.updateUser handles encryption automatically
       // via encryptSensitiveFields for SIN, bank info, and medical conditions
       const updateData: any = {
-        name,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`.trim(), // Keep legacy name field in sync
         email,
         employeePhoneNumber,
         smsNotificationsEnabled,
@@ -9599,18 +9602,19 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
   app.patch("/api/buildings/:buildingId/address", async (req: Request, res: Response) => {
     try {
       const { buildingId } = req.params;
-      const { address, latitude, longitude } = req.body;
+      const { address, city, province, country, postalCode, latitude, longitude } = req.body;
+      const addressData = { address, city, province, country, postalCode, latitude, longitude };
 
       // SuperUser can update any building
       if (req.session.userId === 'superuser') {
-        await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+        await storage.updateBuildingAddress(buildingId, addressData);
         return res.json({ success: true });
       }
 
       // Building manager session (uses buildingId, not userId)
       if (req.session.role === 'building' && req.session.buildingId) {
         if (req.session.buildingId === buildingId) {
-          await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+          await storage.updateBuildingAddress(buildingId, addressData);
           return res.json({ success: true });
         }
         return res.status(403).json({ message: "Access denied" });
@@ -9634,7 +9638,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         );
         const building = await storage.getBuildingById(buildingId);
         if (building && allStrataNums.includes(building.strataPlanNumber.toUpperCase().replace(/\s/g, ''))) {
-          await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+          await storage.updateBuildingAddress(buildingId, addressData);
           return res.json({ success: true });
         }
       }
@@ -9650,7 +9654,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
             building.strataPlanNumber.toUpperCase().replace(/\s/g, '')
           );
           if (hasProjectForBuilding) {
-            await storage.updateBuildingAddress(buildingId, address, latitude, longitude);
+            await storage.updateBuildingAddress(buildingId, addressData);
             return res.json({ success: true });
           }
         }
@@ -10943,9 +10947,9 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       }
       
       const { 
-        name, email, password, role, techLevel, hourlyRate, isSalary, salary, permissions,
+        firstName, lastName, email, password, role, techLevel, hourlyRate, isSalary, salary, permissions,
         startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
-        homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
+        homeAddress, employeeCity, employeeProvinceState, employeeCountry, employeePostalCode, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, irataExpirationDate
       } = req.body;
       
@@ -10958,7 +10962,9 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       // Create employee account linked to company
       // Storage will hash the password
       const employee = await storage.createUser({
-        name,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`.trim(), // Legacy field
         email,
         role,
         techLevel: role === "rope_access_tech" ? techLevel : null,
@@ -10974,6 +10980,10 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         driversLicenseProvince: driversLicenseProvince || null,
         driversLicenseDocuments: driversLicenseDocuments || [],
         homeAddress: homeAddress || null,
+        employeeCity: employeeCity || null,
+        employeeProvinceState: employeeProvinceState || null,
+        employeeCountry: employeeCountry || null,
+        employeePostalCode: employeePostalCode || null,
         employeePhoneNumber: employeePhoneNumber || null,
         emergencyContactName: emergencyContactName || null,
         emergencyContactPhone: emergencyContactPhone || null,
@@ -11027,7 +11037,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       const { 
         name, email, role, techLevel, hourlyRate, isSalary, salary, permissions,
         startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
-        homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
+        homeAddress, employeeCity, employeeProvinceState, employeeCountry, employeePostalCode, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, 
         irataExpirationDate, terminatedDate, terminationReason, terminationNotes
       } = req.body;
@@ -11051,33 +11061,56 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       }
       
       // Update employee (for primary connections or non-termination updates)
-      const updatedEmployee = await storage.updateUser(req.params.id, {
-        name,
-        email,
-        role,
-        techLevel: role === "rope_access_tech" ? techLevel : null,
-        hourlyRate: hourlyRate ? hourlyRate : null,
-        isSalary: isSalary !== undefined ? isSalary : undefined,
-        salary: salary !== undefined ? (salary ? salary : null) : undefined,
-        permissions: permissions || [],
-        startDate: startDate !== undefined ? (startDate || null) : undefined,
-        birthday: birthday !== undefined ? (birthday || null) : undefined,
-        driversLicenseNumber: driversLicenseNumber !== undefined ? (driversLicenseNumber || null) : undefined,
-        driversLicenseProvince: driversLicenseProvince !== undefined ? (driversLicenseProvince || null) : undefined,
-        driversLicenseDocuments: driversLicenseDocuments !== undefined ? (driversLicenseDocuments || []) : undefined,
-        homeAddress: homeAddress !== undefined ? (homeAddress || null) : undefined,
-        employeePhoneNumber: employeePhoneNumber !== undefined ? (employeePhoneNumber || null) : undefined,
-        emergencyContactName: emergencyContactName !== undefined ? (emergencyContactName || null) : undefined,
-        emergencyContactPhone: emergencyContactPhone !== undefined ? (emergencyContactPhone || null) : undefined,
-        specialMedicalConditions: specialMedicalConditions !== undefined ? (specialMedicalConditions || null) : undefined,
-        irataLevel: irataLevel !== undefined ? (irataLevel || null) : undefined,
-        irataLicenseNumber: irataLicenseNumber !== undefined ? (irataLicenseNumber || null) : undefined,
-        irataIssuedDate: irataIssuedDate !== undefined ? (irataIssuedDate || null) : undefined,
-        irataExpirationDate: irataExpirationDate !== undefined ? (irataExpirationDate || null) : undefined,
-        terminatedDate: terminatedDate !== undefined ? (terminatedDate || null) : undefined,
-        terminationReason: terminationReason !== undefined ? (terminationReason || null) : undefined,
-        terminationNotes: terminationNotes !== undefined ? (terminationNotes || null) : undefined,
-      });
+      // SECURITY: Employers can only update role, pay rate, permissions, and termination
+      // Personal details are owned by the employee and can only be updated from their passport
+      const updateData = isOwnProfile 
+        ? {
+            // Employee editing their own profile - allow all personal details
+            name,
+            email,
+            role,
+            techLevel: role === "rope_access_tech" ? techLevel : null,
+            hourlyRate: hourlyRate ? hourlyRate : null,
+            isSalary: isSalary !== undefined ? isSalary : undefined,
+            salary: salary !== undefined ? (salary ? salary : null) : undefined,
+            permissions: permissions || [],
+            startDate: startDate !== undefined ? (startDate || null) : undefined,
+            birthday: birthday !== undefined ? (birthday || null) : undefined,
+            driversLicenseNumber: driversLicenseNumber !== undefined ? (driversLicenseNumber || null) : undefined,
+            driversLicenseProvince: driversLicenseProvince !== undefined ? (driversLicenseProvince || null) : undefined,
+            driversLicenseDocuments: driversLicenseDocuments !== undefined ? (driversLicenseDocuments || []) : undefined,
+            homeAddress: homeAddress !== undefined ? (homeAddress || null) : undefined,
+            employeeCity: employeeCity !== undefined ? (employeeCity || null) : undefined,
+            employeeProvinceState: employeeProvinceState !== undefined ? (employeeProvinceState || null) : undefined,
+            employeeCountry: employeeCountry !== undefined ? (employeeCountry || null) : undefined,
+            employeePostalCode: employeePostalCode !== undefined ? (employeePostalCode || null) : undefined,
+            employeePhoneNumber: employeePhoneNumber !== undefined ? (employeePhoneNumber || null) : undefined,
+            emergencyContactName: emergencyContactName !== undefined ? (emergencyContactName || null) : undefined,
+            emergencyContactPhone: emergencyContactPhone !== undefined ? (emergencyContactPhone || null) : undefined,
+            specialMedicalConditions: specialMedicalConditions !== undefined ? (specialMedicalConditions || null) : undefined,
+            irataLevel: irataLevel !== undefined ? (irataLevel || null) : undefined,
+            irataLicenseNumber: irataLicenseNumber !== undefined ? (irataLicenseNumber || null) : undefined,
+            irataIssuedDate: irataIssuedDate !== undefined ? (irataIssuedDate || null) : undefined,
+            irataExpirationDate: irataExpirationDate !== undefined ? (irataExpirationDate || null) : undefined,
+            terminatedDate: terminatedDate !== undefined ? (terminatedDate || null) : undefined,
+            terminationReason: terminationReason !== undefined ? (terminationReason || null) : undefined,
+            terminationNotes: terminationNotes !== undefined ? (terminationNotes || null) : undefined,
+          }
+        : {
+            // Employer editing employee - only allow role, pay rate, permissions, termination
+            // Personal details are read-only and managed by the employee's passport
+            role,
+            techLevel: role === "rope_access_tech" ? techLevel : null,
+            hourlyRate: hourlyRate ? hourlyRate : null,
+            isSalary: isSalary !== undefined ? isSalary : undefined,
+            salary: salary !== undefined ? (salary ? salary : null) : undefined,
+            permissions: permissions || [],
+            terminatedDate: terminatedDate !== undefined ? (terminatedDate || null) : undefined,
+            terminationReason: terminationReason !== undefined ? (terminationReason || null) : undefined,
+            terminationNotes: terminationNotes !== undefined ? (terminationNotes || null) : undefined,
+          };
+      
+      const updatedEmployee = await storage.updateUser(req.params.id, updateData);
       
       // Send real-time notifications for permission/role changes or termination
       if (isBeingTerminated) {

@@ -70,12 +70,10 @@ export const users = pgTable("users", {
   zipCode: varchar("zip_code"), // for company role - postal/zip code
   timezone: varchar("timezone").default("America/Vancouver"), // IANA timezone for company (e.g., "America/Vancouver", "America/Toronto")
   
-  // Shared fields
-  name: varchar("name"), // for resident and employee roles
-  
-  // Property Manager-specific fields
-  firstName: varchar("first_name"), // for property_manager role
-  lastName: varchar("last_name"), // for property_manager role
+  // Shared name fields (used for ALL roles - standardized to separate first/last)
+  firstName: varchar("first_name"), // First name for all user roles
+  lastName: varchar("last_name"), // Last name for all user roles
+  name: varchar("name"), // DEPRECATED: Legacy combined name field, kept for backward compatibility
   propertyManagementCompany: varchar("property_management_company"), // for property_manager role
   propertyManagerPhoneNumber: varchar("property_manager_phone_number"), // for property_manager role - SMS notifications
   propertyManagerSmsOptIn: boolean("property_manager_sms_opt_in").default(true), // for property_manager role - opt-in to receive SMS notifications for new quotes (defaults to true for better UX)
@@ -259,6 +257,7 @@ export const buildings = pgTable("buildings", {
   buildingAddress: text("building_address"),
   city: varchar("city"),
   province: varchar("province"),
+  country: varchar("country"),
   postalCode: varchar("postal_code"),
   
   // Geolocation for map display
@@ -368,10 +367,18 @@ export const clients = pgTable("clients", {
   lastName: varchar("last_name").notNull(),
   company: varchar("company"),
   email: varchar("email"), // Client's email address
-  address: text("address"),
+  address: text("address"), // Street address (legacy field, now used for street only)
+  city: varchar("city"),
+  provinceState: varchar("province_state"),
+  country: varchar("country"),
+  postalCode: varchar("postal_code"),
   phoneNumber: varchar("phone_number"),
   lmsNumbers: jsonb("lms_numbers").$type<Array<{ number: string; buildingName?: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>().default(sql`'[]'::jsonb`), // Array of objects with strata number, building name, address, building details, daily drop target, and elevation drops
-  billingAddress: text("billing_address"),
+  billingAddress: text("billing_address"), // Billing street address
+  billingCity: varchar("billing_city"),
+  billingProvinceState: varchar("billing_province_state"),
+  billingCountry: varchar("billing_country"),
+  billingPostalCode: varchar("billing_postal_code"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

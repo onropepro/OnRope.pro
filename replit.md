@@ -74,6 +74,81 @@ When adding guided tours to dialogs or forms, follow this exact implementation p
 - Source tour content from actual documentation files in `server/help-content/modules/`
 - Each step should have: `fieldSelector`, `title`, `explanation`, and `appContext`
 
+### User Name Field Standardization Pattern
+**ALL user name inputs use separate firstName and lastName fields.** This is a universal pattern for all user roles.
+
+**Universal Name Fields:**
+- `firstName` and `lastName` are separate database columns and form fields
+- Legacy `name` field is maintained for backward compatibility: `${firstName} ${lastName}`
+- Database: `first_name`, `last_name` (snake_case) maps to `firstName`, `lastName` (camelCase) in TypeScript
+
+**Affected Components:**
+- TechnicianPortal.tsx, GroundCrewPortal.tsx (profile forms)
+- Register.tsx (technician and resident registration)
+- Dashboard.tsx (employee invite forms)
+- Profile.tsx (user profile editing)
+- OnboardingWizard.tsx (employee creation during onboarding)
+- GroundCrewRegistration.tsx (ground crew self-registration)
+
+**Implementation Pattern:**
+```tsx
+// Schema definition
+const userSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  // ... other fields
+});
+
+// Form default values
+const form = useForm({
+  defaultValues: {
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+  }
+});
+
+// Submission - combine for legacy 'name' field
+const name = `${data.firstName} ${data.lastName}`.trim();
+```
+
+### Address Input Standardization Pattern
+**ALL address inputs use Geoapify autocomplete with structured fields.** This is a universal pattern with no exceptions.
+
+**Universal Structured Address Fields:**
+- Street address, city, province/state, country, postal code
+- Street address extracted as `houseNumber + street` (NOT full formatted address)
+- Autofill populates all structured fields from Geoapify selection
+- For building/business addresses: also captures latitude/longitude for map display
+
+**Database Field Naming Conventions:**
+- Employees/Technicians: `employeeStreetAddress`, `employeeCity`, `employeeProvinceState`, `employeeCountry`, `employeePostalCode`
+- Clients: `address`, `city`, `provinceState`, `country`, `postalCode`, `billingAddress`, `billingCity`, `billingProvinceState`, `billingCountry`, `billingPostalCode`
+- Buildings: `buildingAddress`, `city`, `province`, `country`, `postalCode`, `latitude`, `longitude`
+
+**Reference Implementations:**
+- Employee forms: TechnicianPortal.tsx, GroundCrewPortal.tsx, Dashboard.tsx employee form
+- Client forms: Dashboard.tsx client creation/edit forms
+- Building forms: PropertyManager.tsx building address form
+- Registration: GroundCrewRegistration.tsx
+
+**Implementation Pattern:**
+```tsx
+// Universal address pattern - extract street, populate all structured fields
+onSelect={(address) => {
+  const streetAddress = address.houseNumber 
+    ? `${address.houseNumber} ${address.street || ''}`.trim()
+    : address.street || address.formatted;
+  field.onChange(streetAddress);
+  form.setValue('city', address.city || '');
+  form.setValue('provinceState', address.state || '');
+  form.setValue('country', address.country || '');
+  form.setValue('postalCode', address.postcode || '');
+  // For building addresses, also capture coordinates:
+  // form.setValue('latitude', address.latitude);
+  // form.setValue('longitude', address.longitude);
+}}
+```
+
 ## External Dependencies
 *   **Database:** PostgreSQL
 *   **Frontend Framework:** React 18

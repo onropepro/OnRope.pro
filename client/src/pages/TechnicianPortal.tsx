@@ -145,7 +145,8 @@ const translations = {
     saveChanges: "Save Changes",
     saving: "Saving...",
     personalInfo: "Personal Information",
-    fullName: "Full Name",
+    firstName: "First Name",
+    lastName: "Last Name",
     email: "Email",
     phoneNumber: "Phone Number",
     smsNotifications: "SMS Notifications",
@@ -309,7 +310,8 @@ const translations = {
     spratVerificationExplanation: "Employers require verified SPRAT certification status to ensure compliance with safety regulations and insurance requirements.",
     privacyNotice: "Privacy Notice",
     privacyText: "Your personal information is securely stored and used only by your employer for HR and payroll purposes. We never share your data externally.",
-    errorNameRequired: "Name is required",
+    errorFirstNameRequired: "First name is required",
+    errorLastNameRequired: "Last name is required",
     errorInvalidEmail: "Invalid email",
     errorPhoneRequired: "Phone is required",
     errorInvalidPhone: "Please enter a valid phone number: (xxx) xxx-xxxx",
@@ -548,7 +550,8 @@ const translations = {
     saveChanges: "Enregistrer",
     saving: "Enregistrement...",
     personalInfo: "Informations personnelles",
-    fullName: "Nom complet",
+    firstName: "Prénom",
+    lastName: "Nom de famille",
     email: "Courriel",
     phoneNumber: "Numéro de téléphone",
     smsNotifications: "Notifications SMS",
@@ -719,7 +722,8 @@ const translations = {
     spratVerificationExplanation: "Les employeurs exigent que le statut de certification SPRAT soit vérifié pour assurer la conformité aux réglementations de sécurité et aux exigences d'assurance.",
     privacyNotice: "Avis de confidentialité",
     privacyText: "Vos informations personnelles sont stockées en toute sécurité et utilisées uniquement par votre employeur à des fins de RH et de paie. Nous ne partageons jamais vos données à l'externe.",
-    errorNameRequired: "Le nom est requis",
+    errorFirstNameRequired: "Le prénom est requis",
+    errorLastNameRequired: "Le nom de famille est requis",
     errorInvalidEmail: "Courriel invalide",
     errorPhoneRequired: "Le téléphone est requis",
     errorInvalidPhone: "Veuillez entrer un numéro valide: (xxx) xxx-xxxx",
@@ -958,7 +962,8 @@ const translations = {
     saveChanges: "Guardar Cambios",
     saving: "Guardando...",
     personalInfo: "Informacion Personal",
-    fullName: "Nombre Completo",
+    firstName: "Nombre",
+    lastName: "Apellido",
     email: "Correo Electronico",
     phoneNumber: "Numero de Telefono",
     smsNotifications: "Notificaciones SMS",
@@ -1399,7 +1404,8 @@ const translations = {
     profileUpdated: "Perfil Actualizado",
     profileUpdatedDesc: "Su perfil ha sido guardado exitosamente",
     profileUpdateFailed: "Error al actualizar el perfil",
-    errorNameRequired: "El nombre es requerido",
+    errorFirstNameRequired: "El nombre es requerido",
+    errorLastNameRequired: "El apellido es requerido",
     errorInvalidEmail: "Direccion de correo invalida",
     errorPhoneRequired: "El telefono es requerido",
     errorInvalidPhone: "Ingrese un numero valido: (xxx) xxx-xxxx",
@@ -1424,7 +1430,8 @@ const formatPhoneNumber = (phone: string | null | undefined): string | null => {
 };
 
 const createProfileSchema = (t: typeof translations['en']) => z.object({
-  name: z.string().min(1, t.errorNameRequired),
+  firstName: z.string().min(1, t.errorFirstNameRequired),
+  lastName: z.string().min(1, t.errorLastNameRequired),
   email: z.string().email(t.errorInvalidEmail),
   employeePhoneNumber: z.string()
     .min(1, t.errorPhoneRequired)
@@ -1686,7 +1693,8 @@ export default function TechnicianPortal() {
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       employeePhoneNumber: "",
       smsNotificationsEnabled: false,
@@ -2677,7 +2685,8 @@ export default function TechnicianPortal() {
   const startEditing = () => {
     if (user) {
       form.reset({
-        name: user.name || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
         email: user.email || "",
         employeePhoneNumber: user.employeePhoneNumber || "",
         smsNotificationsEnabled: user.smsNotificationsEnabled ?? false,
@@ -3223,14 +3232,24 @@ export default function TechnicianPortal() {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {isEditing && (
-              <EditableField
-                isEditing={true}
-                name="name"
-                label={t.fullName}
-                value={form.watch("name")}
-                control={form.control}
-                testId="name"
-              />
+              <>
+                <EditableField
+                  isEditing={true}
+                  name="firstName"
+                  label={t.firstName}
+                  value={form.watch("firstName")}
+                  control={form.control}
+                  testId="input-firstName"
+                />
+                <EditableField
+                  isEditing={true}
+                  name="lastName"
+                  label={t.lastName}
+                  value={form.watch("lastName")}
+                  control={form.control}
+                  testId="input-lastName"
+                />
+              </>
             )}
             <EditableField
               isEditing={isEditing}
@@ -3320,7 +3339,10 @@ export default function TechnicianPortal() {
                         onChange={field.onChange}
                         onBlur={field.onBlur}
                         onSelect={(address) => {
-                          field.onChange(address.formatted);
+                          const streetAddress = address.houseNumber 
+                            ? `${address.houseNumber} ${address.street || ''}`.trim()
+                            : address.street || address.formatted;
+                          field.onChange(streetAddress);
                           form.setValue('employeeCity', address.city || '');
                           form.setValue('employeeProvinceState', address.state || '');
                           form.setValue('employeeCountry', address.country || '');

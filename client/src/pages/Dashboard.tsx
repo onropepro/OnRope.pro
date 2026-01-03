@@ -292,7 +292,8 @@ const handlePermissionChange = (
 };
 
 const employeeSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["owner_ceo", "operations_manager", "human_resources", "accounting", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew", "labourer"]),
@@ -325,7 +326,8 @@ const employeeSchema = z.object({
 });
 
 const editEmployeeSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   role: z.enum(["owner_ceo", "operations_manager", "human_resources", "accounting", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew", "labourer"]),
   hourlyRate: z.string().optional(),
@@ -387,9 +389,17 @@ const clientSchema = z.object({
   company: z.string().optional(),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   address: z.string().optional(),
+  city: z.string().optional(),
+  provinceState: z.string().optional(),
+  country: z.string().optional(),
+  postalCode: z.string().optional(),
   phoneNumber: z.string().optional(),
   lmsNumbers: z.array(z.string()).default([]),
   billingAddress: z.string().optional(),
+  billingCity: z.string().optional(),
+  billingProvinceState: z.string().optional(),
+  billingCountry: z.string().optional(),
+  billingPostalCode: z.string().optional(),
   sameAsAddress: z.boolean().optional(),
 });
 
@@ -1885,7 +1895,8 @@ export default function Dashboard() {
   const employeeForm = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       role: "rope_access_tech",
@@ -1900,6 +1911,10 @@ export default function Dashboard() {
       driversLicenseProvince: "",
       driversLicenseDocuments: [],
       homeAddress: "",
+      employeeCity: "",
+      employeeProvinceState: "",
+      employeeCountry: "",
+      employeePostalCode: "",
       employeePhoneNumber: "",
       emergencyContactName: "",
       emergencyContactPhone: "",
@@ -1918,7 +1933,8 @@ export default function Dashboard() {
   const editEmployeeForm = useForm<EditEmployeeFormData>({
     resolver: zodResolver(editEmployeeSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       role: "rope_access_tech",
       hourlyRate: "",
@@ -1932,6 +1948,10 @@ export default function Dashboard() {
       driversLicenseProvince: "",
       driversLicenseDocuments: [],
       homeAddress: "",
+      employeeCity: "",
+      employeeProvinceState: "",
+      employeeCountry: "",
+      employeePostalCode: "",
       employeePhoneNumber: "",
       emergencyContactName: "",
       emergencyContactPhone: "",
@@ -1988,9 +2008,17 @@ export default function Dashboard() {
       lastName: "",
       company: "",
       address: "",
+      city: "",
+      provinceState: "",
+      country: "",
+      postalCode: "",
       phoneNumber: "",
       lmsNumbers: [""],
       billingAddress: "",
+      billingCity: "",
+      billingProvinceState: "",
+      billingCountry: "",
+      billingPostalCode: "",
       sameAsAddress: false,
     },
   });
@@ -2002,9 +2030,17 @@ export default function Dashboard() {
       lastName: "",
       company: "",
       address: "",
+      city: "",
+      provinceState: "",
+      country: "",
+      postalCode: "",
       phoneNumber: "",
       lmsNumbers: [""],
       billingAddress: "",
+      billingCity: "",
+      billingProvinceState: "",
+      billingCountry: "",
+      billingPostalCode: "",
       sameAsAddress: false,
     },
   });
@@ -2481,7 +2517,9 @@ export default function Dashboard() {
   const editEmployeeMutation = useMutation({
     mutationFn: async (data: EditEmployeeFormData & { id: string }) => {
       const response = await apiRequest("PATCH", `/api/employees/${data.id}`, {
-        name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        name: `${data.firstName} ${data.lastName}`.trim(), // Legacy field
         email: data.email,
         role: data.role,
         hourlyRate: data.hourlyRate,
@@ -2725,7 +2763,8 @@ export default function Dashboard() {
   const handleEditEmployee = (employee: any) => {
     setEmployeeToEdit(employee);
     editEmployeeForm.reset({
-      name: employee.name ?? "",
+      firstName: employee.firstName ?? "",
+      lastName: employee.lastName ?? "",
       email: employee.email ?? "",
       role: employee.role,
       hourlyRate: employee.hourlyRate != null ? String(employee.hourlyRate) : "",
@@ -2739,6 +2778,10 @@ export default function Dashboard() {
       driversLicenseProvince: employee.driversLicenseProvince ?? "",
       driversLicenseDocuments: employee.driversLicenseDocuments || [],
       homeAddress: employee.homeAddress ?? "",
+      employeeCity: employee.employeeCity ?? "",
+      employeeProvinceState: employee.employeeProvinceState ?? "",
+      employeeCountry: employee.employeeCountry ?? "",
+      employeePostalCode: employee.employeePostalCode ?? "",
       employeePhoneNumber: employee.employeePhoneNumber ?? "",
       emergencyContactName: employee.emergencyContactName ?? "",
       emergencyContactPhone: employee.emergencyContactPhone ?? "",
@@ -2987,8 +3030,16 @@ export default function Dashboard() {
       company: client.company || "",
       email: client.email || "",
       address: client.address || "",
+      city: (client as any).city || "",
+      provinceState: (client as any).provinceState || "",
+      country: (client as any).country || "",
+      postalCode: (client as any).postalCode || "",
       phoneNumber: client.phoneNumber || "",
       billingAddress: client.billingAddress || "",
+      billingCity: (client as any).billingCity || "",
+      billingProvinceState: (client as any).billingProvinceState || "",
+      billingCountry: (client as any).billingCountry || "",
+      billingPostalCode: (client as any).billingPostalCode || "",
       sameAsAddress: false,
     });
     setEditLmsNumbers(client.lmsNumbers && client.lmsNumbers.length > 0 ? client.lmsNumbers : [{ number: "", address: "" }]);
@@ -6308,19 +6359,34 @@ export default function Dashboard() {
                       <form onSubmit={employeeForm.handleSubmit(onEmployeeSubmit)} className="space-y-4">
                       {employeeFormStep === 1 && (
                         <>
-                      <FormField
-                        control={employeeForm.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('dashboard.employeeForm.fullName', 'Full Name')}</FormLabel>
-                            <FormControl>
-                              <Input placeholder={t('dashboard.employeeForm.namePlaceholder', 'John Doe')} {...field} data-testid="input-employee-name" className="h-12" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={employeeForm.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.employeeForm.firstName', 'First Name')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder={t('dashboard.employeeForm.firstNamePlaceholder', 'John')} {...field} data-testid="input-employee-firstName" className="h-12" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={employeeForm.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.employeeForm.lastName', 'Last Name')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder={t('dashboard.employeeForm.lastNamePlaceholder', 'Doe')} {...field} data-testid="input-employee-lastName" className="h-12" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       <FormField
                         control={employeeForm.control}
@@ -6563,12 +6629,86 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.employeeForm.homeAddress', 'Home Address')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder={t('dashboard.employeeForm.streetAddressPlaceholder', 'Street address')} {...field} data-testid="input-employee-address" className="h-12" />
+                                  <AddressAutocomplete
+                                    data-testid="input-employee-address"
+                                    placeholder={t('dashboard.employeeForm.streetAddressPlaceholder', 'Street address')}
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    onBlur={field.onBlur}
+                                    onSelect={(address) => {
+                                      const streetAddress = address.houseNumber 
+                                        ? `${address.houseNumber} ${address.street || ''}`.trim()
+                                        : address.street || address.formatted;
+                                      field.onChange(streetAddress);
+                                      employeeForm.setValue('employeeCity', address.city || '');
+                                      employeeForm.setValue('employeeProvinceState', address.state || '');
+                                      employeeForm.setValue('employeeCountry', address.country || '');
+                                      employeeForm.setValue('employeePostalCode', address.postcode || '');
+                                    }}
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={employeeForm.control}
+                              name="employeeCity"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('address.city', 'City')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder={t('address.cityPlaceholder', 'City')} {...field} data-testid="input-employee-city" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={employeeForm.control}
+                              name="employeeProvinceState"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('address.province', 'Province/State')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder={t('address.provincePlaceholder', 'Province/State')} {...field} data-testid="input-employee-province" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={employeeForm.control}
+                              name="employeeCountry"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('address.country', 'Country')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder={t('address.countryPlaceholder', 'Country')} {...field} data-testid="input-employee-country" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={employeeForm.control}
+                              name="employeePostalCode"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('address.postalCode', 'Postal Code')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder={t('address.postalCodePlaceholder', 'Postal Code')} {...field} data-testid="input-employee-postal" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
 
                           <FormField
                             control={employeeForm.control}
@@ -7001,7 +7141,7 @@ export default function Dashboard() {
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="font-medium">{inv.technician.name}</span>
                                   <Badge variant="outline" className="text-xs">
-                                    {inv.technician.role === 'ground_crew' ? t('dashboard.employees.groundCrew', 'Ground Crew') : t('dashboard.employees.ropeAccessTech', 'Rope Access Tech')}
+                                    {inv.technician.role === 'ground_crew' ? t('dashboard.employees.groundCrew', 'Support Staff') : t('dashboard.employees.ropeAccessTech', 'Rope Access Tech')}
                                   </Badge>
                                 </div>
                                 <div className="text-sm text-muted-foreground mt-1">
@@ -7517,7 +7657,8 @@ export default function Dashboard() {
                                         e.stopPropagation();
                                         setEmployeeToEdit(employee);
                                         editEmployeeForm.reset({
-                                          name: employee.name ?? "",
+                                          firstName: employee.firstName ?? "",
+                                          lastName: employee.lastName ?? "",
                                           email: employee.email ?? "",
                                           role: employee.role,
                                           hourlyRate: employee.hourlyRate != null ? String(employee.hourlyRate) : "",
@@ -8011,22 +8152,30 @@ export default function Dashboard() {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('dashboard.clientForm.addressOptional', 'Address (Optional)')}</FormLabel>
+                            <FormLabel>{t('dashboard.clientForm.streetAddress', 'Street Address (Optional)')}</FormLabel>
                             <FormControl>
                               <AddressAutocomplete
-                                placeholder="123 Main St, Vancouver, BC"
+                                placeholder="123 Main St"
                                 value={field.value || ""}
                                 data-testid="input-client-address"
                                 onChange={(value) => {
                                   field.onChange(value);
-                                  if (sameAsAddress) {
-                                    clientForm.setValue("billingAddress", value);
-                                  }
                                 }}
                                 onSelect={(address) => {
-                                  field.onChange(address.formatted);
+                                  const streetAddress = address.houseNumber 
+                                    ? `${address.houseNumber} ${address.street || ''}`.trim()
+                                    : address.street || address.formatted;
+                                  field.onChange(streetAddress);
+                                  clientForm.setValue("city", address.city || "");
+                                  clientForm.setValue("provinceState", address.state || "");
+                                  clientForm.setValue("country", address.country || "");
+                                  clientForm.setValue("postalCode", address.postcode || "");
                                   if (sameAsAddress) {
-                                    clientForm.setValue("billingAddress", address.formatted);
+                                    clientForm.setValue("billingAddress", streetAddress);
+                                    clientForm.setValue("billingCity", address.city || "");
+                                    clientForm.setValue("billingProvinceState", address.state || "");
+                                    clientForm.setValue("billingCountry", address.country || "");
+                                    clientForm.setValue("billingPostalCode", address.postcode || "");
                                   }
                                 }}
                               />
@@ -8035,6 +8184,64 @@ export default function Dashboard() {
                           </FormItem>
                         )}
                       />
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={clientForm.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.clientForm.city', 'City')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Vancouver" {...field} className="h-12" data-testid="input-client-city" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={clientForm.control}
+                          name="provinceState"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.clientForm.provinceState', 'Province/State')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="BC" {...field} className="h-12" data-testid="input-client-province" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={clientForm.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.clientForm.country', 'Country')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Canada" {...field} className="h-12" data-testid="input-client-country" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={clientForm.control}
+                          name="postalCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.clientForm.postalCode', 'Postal Code')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="V6B 2W2" {...field} className="h-12" data-testid="input-client-postal" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       <div className="space-y-3">
                         <label className="text-sm font-medium">{t('dashboard.clientForm.strataPlanNumbers', 'Strata Plan Numbers & Addresses')}</label>
@@ -8286,19 +8493,88 @@ export default function Dashboard() {
                           name="billingAddress"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('dashboard.clientForm.billingAddressOptional', 'Billing Address (Optional)')}</FormLabel>
+                              <FormLabel>{t('dashboard.clientForm.billingStreetAddress', 'Billing Street Address')}</FormLabel>
                               <FormControl>
-                                <Textarea 
-                                  placeholder="456 Billing Ave, Vancouver, BC" 
-                                  {...field} 
-                                  disabled={sameAsAddress}
+                                <AddressAutocomplete
+                                  placeholder="456 Billing Ave"
+                                  value={field.value || ""}
                                   data-testid="input-client-billing-address"
+                                  disabled={sameAsAddress}
+                                  onChange={(value) => field.onChange(value)}
+                                  onSelect={(address) => {
+                                    const streetAddress = address.houseNumber 
+                                      ? `${address.houseNumber} ${address.street || ''}`.trim()
+                                      : address.street || address.formatted;
+                                    field.onChange(streetAddress);
+                                    clientForm.setValue("billingCity", address.city || "");
+                                    clientForm.setValue("billingProvinceState", address.state || "");
+                                    clientForm.setValue("billingCountry", address.country || "");
+                                    clientForm.setValue("billingPostalCode", address.postcode || "");
+                                  }}
                                 />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <FormField
+                            control={clientForm.control}
+                            name="billingCity"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.clientForm.city', 'City')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Vancouver" {...field} className="h-12" disabled={sameAsAddress} data-testid="input-client-billing-city" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={clientForm.control}
+                            name="billingProvinceState"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.clientForm.provinceState', 'Province/State')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="BC" {...field} className="h-12" disabled={sameAsAddress} data-testid="input-client-billing-province" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <FormField
+                            control={clientForm.control}
+                            name="billingCountry"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.clientForm.country', 'Country')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Canada" {...field} className="h-12" disabled={sameAsAddress} data-testid="input-client-billing-country" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={clientForm.control}
+                            name="billingPostalCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.clientForm.postalCode', 'Postal Code')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="V6B 2W2" {...field} className="h-12" disabled={sameAsAddress} data-testid="input-client-billing-postal" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
 
                       <Button type="submit" className="w-full h-12" disabled={createClientMutation.isPending} data-testid="button-submit-client">
@@ -9007,22 +9283,28 @@ export default function Dashboard() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('dashboard.clientForm.addressOptional', 'Address (Optional)')}</FormLabel>
+                    <FormLabel>{t('dashboard.clientForm.streetAddress', 'Street Address (Optional)')}</FormLabel>
                     <FormControl>
                       <AddressAutocomplete
-                        placeholder="123 Main St, Vancouver, BC"
+                        placeholder="123 Main St"
                         value={field.value || ""}
                         data-testid="input-edit-client-address"
-                        onChange={(value) => {
-                          field.onChange(value);
-                          if (editSameAsAddress) {
-                            editClientForm.setValue("billingAddress", value);
-                          }
-                        }}
+                        onChange={(value) => field.onChange(value)}
                         onSelect={(address) => {
-                          field.onChange(address.formatted);
+                          const streetAddress = address.houseNumber 
+                            ? `${address.houseNumber} ${address.street || ''}`.trim()
+                            : address.street || address.formatted;
+                          field.onChange(streetAddress);
+                          editClientForm.setValue("city", address.city || "");
+                          editClientForm.setValue("provinceState", address.state || "");
+                          editClientForm.setValue("country", address.country || "");
+                          editClientForm.setValue("postalCode", address.postcode || "");
                           if (editSameAsAddress) {
-                            editClientForm.setValue("billingAddress", address.formatted);
+                            editClientForm.setValue("billingAddress", streetAddress);
+                            editClientForm.setValue("billingCity", address.city || "");
+                            editClientForm.setValue("billingProvinceState", address.state || "");
+                            editClientForm.setValue("billingCountry", address.country || "");
+                            editClientForm.setValue("billingPostalCode", address.postcode || "");
                           }
                         }}
                       />
@@ -9031,6 +9313,64 @@ export default function Dashboard() {
                   </FormItem>
                 )}
               />
+
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  control={editClientForm.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('dashboard.clientForm.city', 'City')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Vancouver" {...field} className="h-12" data-testid="input-edit-client-city" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editClientForm.control}
+                  name="provinceState"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('dashboard.clientForm.provinceState', 'Province/State')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="BC" {...field} className="h-12" data-testid="input-edit-client-province" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  control={editClientForm.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('dashboard.clientForm.country', 'Country')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Canada" {...field} className="h-12" data-testid="input-edit-client-country" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editClientForm.control}
+                  name="postalCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('dashboard.clientForm.postalCode', 'Postal Code')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="V6B 2W2" {...field} className="h-12" data-testid="input-edit-client-postal" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="space-y-3">
                 <label className="text-sm font-medium">{t('dashboard.clientForm.strataPlanNumbers', 'Strata Plan Numbers & Addresses')}</label>
@@ -9282,19 +9622,88 @@ export default function Dashboard() {
                   name="billingAddress"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('dashboard.clientForm.billingAddressOptional', 'Billing Address (Optional)')}</FormLabel>
+                      <FormLabel>{t('dashboard.clientForm.billingStreetAddress', 'Billing Street Address')}</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="456 Billing Ave, Vancouver, BC" 
-                          {...field} 
-                          disabled={editSameAsAddress}
+                        <AddressAutocomplete
+                          placeholder="456 Billing Ave"
+                          value={field.value || ""}
                           data-testid="input-edit-client-billing-address"
+                          disabled={editSameAsAddress}
+                          onChange={(value) => field.onChange(value)}
+                          onSelect={(address) => {
+                            const streetAddress = address.houseNumber 
+                              ? `${address.houseNumber} ${address.street || ''}`.trim()
+                              : address.street || address.formatted;
+                            field.onChange(streetAddress);
+                            editClientForm.setValue("billingCity", address.city || "");
+                            editClientForm.setValue("billingProvinceState", address.state || "");
+                            editClientForm.setValue("billingCountry", address.country || "");
+                            editClientForm.setValue("billingPostalCode", address.postcode || "");
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={editClientForm.control}
+                    name="billingCity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.clientForm.city', 'City')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Vancouver" {...field} className="h-12" disabled={editSameAsAddress} data-testid="input-edit-client-billing-city" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editClientForm.control}
+                    name="billingProvinceState"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.clientForm.provinceState', 'Province/State')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="BC" {...field} className="h-12" disabled={editSameAsAddress} data-testid="input-edit-client-billing-province" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={editClientForm.control}
+                    name="billingCountry"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.clientForm.country', 'Country')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Canada" {...field} className="h-12" disabled={editSameAsAddress} data-testid="input-edit-client-billing-country" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editClientForm.control}
+                    name="billingPostalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.clientForm.postalCode', 'Postal Code')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="V6B 2W2" {...field} className="h-12" disabled={editSameAsAddress} data-testid="input-edit-client-billing-postal" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <Button type="submit" className="w-full h-12" disabled={editClientMutation.isPending} data-testid="button-submit-edit-client">
@@ -9451,33 +9860,23 @@ export default function Dashboard() {
             <Form {...editEmployeeForm}>
               <form id="edit-employee-form" onSubmit={editEmployeeForm.handleSubmit(onEditEmployeeSubmit)} className="space-y-4">
               <div className={editEmployeeFormStep === 1 ? "block" : "hidden pointer-events-none"}>
-                <FormField
-                  control={editEmployeeForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('dashboard.employeeForm.fullName', 'Full Name')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t('dashboard.employeeForm.namePlaceholder', 'John Doe')} {...field} className="h-12" data-testid="input-edit-employee-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={editEmployeeForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('dashboard.employeeForm.emailAddress', 'Email Address')}</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder={t('common.placeholders.email', 'john@example.com')} {...field} className="h-12" data-testid="input-edit-employee-email" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Read-only employee information from their passport */}
+                <div className="rounded-lg border bg-muted/30 p-4 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="material-icons text-muted-foreground text-base">person</span>
+                    <span className="text-sm font-medium text-muted-foreground">{t('dashboard.employeeForm.employeePassportInfo', 'Employee Passport Info (Read-Only)')}</span>
+                  </div>
+                  <div className="grid gap-3">
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.fullName', 'Full Name')}</span>
+                      <p className="font-medium" data-testid="text-edit-employee-name">{employeeToEdit?.name || '-'}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.emailAddress', 'Email Address')}</span>
+                      <p className="font-medium" data-testid="text-edit-employee-email">{employeeToEdit?.email || '-'}</p>
+                    </div>
+                  </div>
+                </div>
 
                 <FormField
                   control={editEmployeeForm.control}
@@ -9622,305 +10021,114 @@ export default function Dashboard() {
                   />
                 )}
 
+                {/* Read-only Personal Details from employee passport */}
                 <div className="border-t pt-4 mt-6">
-                  <h3 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.personalDetails', 'Personal Details (Optional)')}</h3>
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="material-icons text-muted-foreground text-base">badge</span>
+                    <h3 className="text-sm font-medium">{t('dashboard.employeeForm.personalDetailsReadOnly', 'Personal Details (Managed by Employee)')}</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    {t('dashboard.employeeForm.personalDetailsReadOnlyDesc', 'These details are managed by the employee in their Passport profile.')}
+                  </p>
                   
-                  <div className="space-y-4">
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="startDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.startDate', 'Start Date')}</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} data-testid="input-edit-employee-start-date" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="birthday"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.birthday', 'Birthday')}</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} data-testid="input-edit-employee-birthday" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="socialInsuranceNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.socialInsuranceNumber', 'Social Insurance Number')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('common.placeholders.sin', 'XXX-XXX-XXX')} {...field} data-testid="input-edit-employee-sin" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="driversLicenseNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.driversLicenseNumber', "Driver's License Number")}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-employee-dl-number" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="driversLicenseProvince"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.driversLicenseProvince', "Driver's License Province/State")}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('common.placeholders.province', 'BC, AB, etc.')} {...field} data-testid="input-edit-employee-dl-province" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <DocumentUploader
-                      documents={editEmployeeForm.watch("driversLicenseDocuments") || []}
-                      onDocumentsChange={(docs) => editEmployeeForm.setValue("driversLicenseDocuments", docs)}
-                      maxDocuments={5}
-                      label={t('dashboard.employeeForm.driversLicenseDocuments', "Driver's License Documents")}
-                      description={t('dashboard.employeeForm.driversLicenseDocsDescription', 'Upload driver\'s license photos, abstracts, or related documents')}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="homeAddress"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.homeAddress', 'Home Address')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('dashboard.employeeForm.streetAddressPlaceholder', 'Street address')} {...field} data-testid="input-edit-employee-address" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="employeePhoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.phoneNumber', 'Phone Number')}</FormLabel>
-                          <FormControl>
-                            <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-edit-employee-phone" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="emergencyContactName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.emergencyContactName', 'Emergency Contact Name')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('dashboard.employeeForm.contactNamePlaceholder', 'Contact name')} {...field} data-testid="input-edit-employee-emergency-name" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="emergencyContactPhone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.emergencyContactPhone', 'Emergency Contact Phone')}</FormLabel>
-                          <FormControl>
-                            <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-edit-employee-emergency-phone" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="specialMedicalConditions"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.specialMedicalConditions', 'Special Medical Conditions')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('dashboard.employeeForm.medicalConditionsPlaceholder', 'Medical conditions to be aware of')} {...field} data-testid="input-edit-employee-medical" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="border-t pt-4 mt-4">
-                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification (Optional)')}</h4>
-                      <div className="space-y-4">
-                        <FormField
-                          control={editEmployeeForm.control}
-                          name="irataLevel"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-12" data-testid="select-edit-irata-level">
-                                    <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Level 1">Level 1</SelectItem>
-                                  <SelectItem value="Level 2">Level 2</SelectItem>
-                                  <SelectItem value="Level 3">Level 3</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {editEmployeeForm.watch("irataLevel") && (
-                          <>
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="irataLicenseNumber"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-irata-license" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="irataIssuedDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'IRATA Issued Date')}</FormLabel>
-                                  <FormControl>
-                                    <Input type="date" {...field} data-testid="input-edit-irata-issued" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="irataExpirationDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'IRATA Expiration Date')}</FormLabel>
-                                  <FormControl>
-                                    <Input type="date" {...field} data-testid="input-edit-irata-expiration" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </>
-                        )}
+                  <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.startDate', 'Start Date')}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.startDate ? new Date(employeeToEdit.startDate).toLocaleDateString() : '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.birthday', 'Birthday')}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.birthday ? new Date(employeeToEdit.birthday).toLocaleDateString() : '-'}</p>
                       </div>
                     </div>
-
-                    <div className="border-t pt-4 mt-4">
-                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.spratCertification', 'SPRAT Certification (Optional)')}</h4>
-                      <div className="space-y-4">
-                        <FormField
-                          control={editEmployeeForm.control}
-                          name="spratLevel"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('dashboard.employeeForm.spratLevel', 'SPRAT Level')}</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-12" data-testid="select-edit-sprat-level">
-                                    <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Level 1">Level 1</SelectItem>
-                                  <SelectItem value="Level 2">Level 2</SelectItem>
-                                  <SelectItem value="Level 3">Level 3</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {editEmployeeForm.watch("spratLevel") && (
-                          <>
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="spratLicenseNumber"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.spratLicenseNumber', 'SPRAT License Number')}</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-sprat-license" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="spratIssuedDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.spratIssuedDate', 'SPRAT Issued Date')}</FormLabel>
-                                  <FormControl>
-                                    <Input type="date" {...field} data-testid="input-edit-sprat-issued" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="spratExpirationDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.spratExpirationDate', 'SPRAT Expiration Date')}</FormLabel>
-                                  <FormControl>
-                                    <Input type="date" {...field} data-testid="input-edit-sprat-expiration" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </>
-                        )}
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.socialInsuranceNumber', 'Social Insurance Number')}</span>
+                      <p className="font-medium text-sm">{employeeToEdit?.socialInsuranceNumber || '-'}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.driversLicenseNumber', "Driver's License Number")}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.driversLicenseNumber || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.driversLicenseProvince', "Driver's License Province/State")}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.driversLicenseProvince || '-'}</p>
                       </div>
                     </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.homeAddress', 'Home Address')}</span>
+                      <p className="font-medium text-sm">{employeeToEdit?.homeAddress || '-'}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.phoneNumber', 'Phone Number')}</span>
+                      <p className="font-medium text-sm">{employeeToEdit?.employeePhoneNumber || '-'}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.emergencyContactName', 'Emergency Contact Name')}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.emergencyContactName || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.emergencyContactPhone', 'Emergency Contact Phone')}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.emergencyContactPhone || '-'}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.specialMedicalConditions', 'Special Medical Conditions')}</span>
+                      <p className="font-medium text-sm">{employeeToEdit?.specialMedicalConditions || '-'}</p>
+                    </div>
+
+                    {/* IRATA Certification - Read Only */}
+                    {employeeToEdit?.irataLevel && (
+                      <div className="border-t pt-3 mt-3">
+                        <span className="text-xs font-medium text-muted-foreground">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification')}</span>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.irataLevel', 'Level')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.irataLevel || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.irataLicenseNumber', 'License Number')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.irataLicenseNumber || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.irataIssuedDate', 'Issued Date')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.irataIssuedDate ? new Date(employeeToEdit.irataIssuedDate).toLocaleDateString() : '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.irataExpirationDate', 'Expiration Date')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.irataExpirationDate ? new Date(employeeToEdit.irataExpirationDate).toLocaleDateString() : '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SPRAT Certification - Read Only */}
+                    {employeeToEdit?.spratLevel && (
+                      <div className="border-t pt-3 mt-3">
+                        <span className="text-xs font-medium text-muted-foreground">{t('dashboard.employeeForm.spratCertification', 'SPRAT Certification')}</span>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.spratLevel', 'Level')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.spratLevel || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.spratLicenseNumber', 'License Number')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.spratLicenseNumber || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.spratIssuedDate', 'Issued Date')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.spratIssuedDate ? new Date(employeeToEdit.spratIssuedDate).toLocaleDateString() : '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.spratExpirationDate', 'Expiration Date')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.spratExpirationDate ? new Date(employeeToEdit.spratExpirationDate).toLocaleDateString() : '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                     <div className="border-t pt-4 mt-4">
                       <FormField
@@ -9940,7 +10148,6 @@ export default function Dashboard() {
                         )}
                       />
                     </div>
-                  </div>
                 </div>
 
                 <Button 
@@ -12245,7 +12452,7 @@ export default function Dashboard() {
                         <span className="material-icons text-primary">person</span>
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">{employeeForm.watch("name")}</p>
+                        <p className="font-semibold text-lg">{`${employeeForm.watch("firstName")} ${employeeForm.watch("lastName")}`.trim()}</p>
                         <p className="text-sm text-muted-foreground">{employeeForm.watch("email")}</p>
                       </div>
                     </div>

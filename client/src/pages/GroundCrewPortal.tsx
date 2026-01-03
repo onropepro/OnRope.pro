@@ -90,14 +90,15 @@ type Language = 'en' | 'fr' | 'es';
 
 const translations = {
   en: {
-    groundCrewPortal: "Ground Crew Portal",
+    groundCrewPortal: "Support Staff Portal",
     signOut: "Sign Out",
     editProfile: "Edit Profile",
     cancel: "Cancel",
     saveChanges: "Save Changes",
     saving: "Saving...",
     personalInfo: "Personal Information",
-    fullName: "Full Name",
+    firstName: "First Name",
+    lastName: "Last Name",
     email: "Email",
     phoneNumber: "Phone Number",
     smsNotifications: "SMS Notifications",
@@ -187,7 +188,8 @@ const translations = {
     deleteDocument: "Delete",
     privacyNotice: "Privacy Notice",
     privacyText: "Your personal information is securely stored and used only by your employer for HR and payroll purposes. We never share your data externally.",
-    errorNameRequired: "Name is required",
+    errorFirstNameRequired: "First name is required",
+    errorLastNameRequired: "Last name is required",
     errorInvalidEmail: "Invalid email",
     errorPhoneRequired: "Phone is required",
     errorInvalidPhone: "Please enter a valid phone number: (xxx) xxx-xxxx",
@@ -245,13 +247,13 @@ const translations = {
     tabInvitations: "Invites",
     tabMore: "More",
     welcome: "Welcome",
-    groundCrewMember: "Ground Crew Member",
+    groundCrewMember: "Support Staff Member",
     quickActions: "Quick Actions",
     yourStatus: "Your Status",
     employmentStatus: "Employment Status",
     notActive: "Not Active",
     referralProgram: "Referral Program",
-    referralDesc: "Share your referral code with other ground crew workers",
+    referralDesc: "Share your referral code with other support staff workers",
     yourReferralCode: "Your Referral Code",
     copyCode: "Copy Code",
     shareCode: "Share Code",
@@ -273,14 +275,15 @@ const translations = {
     more: "more",
   },
   fr: {
-    groundCrewPortal: "Portail Équipe au Sol",
+    groundCrewPortal: "Portail Personnel de Soutien",
     signOut: "Déconnexion",
     editProfile: "Modifier le Profil",
     cancel: "Annuler",
     saveChanges: "Enregistrer",
     saving: "Enregistrement...",
     personalInfo: "Informations Personnelles",
-    fullName: "Nom Complet",
+    firstName: "Prénom",
+    lastName: "Nom de famille",
     email: "Email",
     phoneNumber: "Numéro de Téléphone",
     smsNotifications: "Notifications SMS",
@@ -370,7 +373,8 @@ const translations = {
     deleteDocument: "Supprimer",
     privacyNotice: "Avis de Confidentialité",
     privacyText: "Vos informations personnelles sont stockées de manière sécurisée et utilisées uniquement par votre employeur pour les RH et la paie. Nous ne partageons jamais vos données à l'extérieur.",
-    errorNameRequired: "Le nom est requis",
+    errorFirstNameRequired: "Le prénom est requis",
+    errorLastNameRequired: "Le nom de famille est requis",
     errorInvalidEmail: "Email invalide",
     errorPhoneRequired: "Le téléphone est requis",
     errorInvalidPhone: "Veuillez entrer un numéro valide: (xxx) xxx-xxxx",
@@ -463,7 +467,8 @@ const translations = {
     saveChanges: "Guardar",
     saving: "Guardando...",
     personalInfo: "Información Personal",
-    fullName: "Nombre Completo",
+    firstName: "Nombre",
+    lastName: "Apellido",
     email: "Email",
     phoneNumber: "Número de Teléfono",
     smsNotifications: "Notificaciones SMS",
@@ -553,7 +558,8 @@ const translations = {
     deleteDocument: "Eliminar",
     privacyNotice: "Aviso de Privacidad",
     privacyText: "Su información personal se almacena de forma segura y solo la utiliza su empleador para RH y nómina. Nunca compartimos sus datos externamente.",
-    errorNameRequired: "El nombre es requerido",
+    errorFirstNameRequired: "El nombre es requerido",
+    errorLastNameRequired: "El apellido es requerido",
     errorInvalidEmail: "Email inválido",
     errorPhoneRequired: "El teléfono es requerido",
     errorInvalidPhone: "Ingrese un numero valido: (xxx) xxx-xxxx",
@@ -655,7 +661,8 @@ const formatPhoneNumber = (phone: string | null | undefined): string | null => {
 };
 
 const createProfileSchema = (t: typeof translations['en']) => z.object({
-  name: z.string().min(1, t.errorNameRequired),
+  firstName: z.string().min(1, t.errorFirstNameRequired),
+  lastName: z.string().min(1, t.errorLastNameRequired),
   email: z.string().email(t.errorInvalidEmail),
   employeePhoneNumber: z.string()
     .min(1, t.errorPhoneRequired)
@@ -816,7 +823,8 @@ export default function GroundCrewPortal() {
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       employeePhoneNumber: "",
       smsNotificationsEnabled: false,
@@ -846,7 +854,8 @@ export default function GroundCrewPortal() {
   useEffect(() => {
     if (user) {
       form.reset({
-        name: user.name || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
         email: user.email || "",
         employeePhoneNumber: user.employeePhoneNumber || "",
         smsNotificationsEnabled: user.smsNotificationsEnabled ?? false,
@@ -1182,7 +1191,8 @@ export default function GroundCrewPortal() {
   const startEditing = () => {
     if (user) {
       form.reset({
-        name: user.name || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
         email: user.email || "",
         employeePhoneNumber: user.employeePhoneNumber || "",
         smsNotificationsEnabled: user.smsNotificationsEnabled ?? false,
@@ -1724,12 +1734,25 @@ export default function GroundCrewPortal() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
-                        name="name"
+                        name="firstName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t.fullName}</FormLabel>
+                            <FormLabel>{t.firstName}</FormLabel>
                             <FormControl>
-                              <Input {...field} disabled={!isEditing} data-testid="input-name" />
+                              <Input {...field} disabled={!isEditing} data-testid="input-firstName" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t.lastName}</FormLabel>
+                            <FormControl>
+                              <Input {...field} disabled={!isEditing} data-testid="input-lastName" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -1830,7 +1853,10 @@ export default function GroundCrewPortal() {
                                     onChange={field.onChange}
                                     onBlur={field.onBlur}
                                     onSelect={(address) => {
-                                      field.onChange(address.formatted);
+                                      const streetAddress = address.houseNumber 
+                                        ? `${address.houseNumber} ${address.street || ''}`.trim()
+                                        : address.street || address.formatted;
+                                      field.onChange(streetAddress);
                                       form.setValue('employeeCity', address.city || '');
                                       form.setValue('employeeProvinceState', address.state || '');
                                       form.setValue('employeeCountry', address.country || '');

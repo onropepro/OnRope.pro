@@ -936,6 +936,16 @@
     "changelog": "Registro de Cambios",
     "safetyRating": "Calificacion de Seguridad"
   },
+  "address": {
+    "searchLabel": "Buscar dirección",
+    "searchPlaceholder": "Buscar una dirección...",
+    "streetAddress": "Dirección",
+    "city": "Ciudad",
+    "provinceState": "Provincia/Estado",
+    "country": "País",
+    "postalCode": "Código postal",
+    "noAddressProvided": "No se proporcionó dirección"
+  },
   "common": {
     "helpMeGetStarted": "Ayúdame a empezar",
     "startFreeTrial": "Comienza tu prueba gratuita de 30 días",
@@ -1486,8 +1496,8 @@
       "rope_access_supervisor": "Rope Access Supervisor",
       "manager": "Manager",
       "rope_access_tech": "Rope Access Technician",
-      "ground_crew_supervisor": "Ground Crew Supervisor",
-      "ground_crew": "Ground Crew",
+      "ground_crew_supervisor": "Personal de Apoyo Supervisor",
+      "ground_crew": "Personal de Apoyo",
       "labourer": "Labourer",
       "categories": {
         "management": "Management",

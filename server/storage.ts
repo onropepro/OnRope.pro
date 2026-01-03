@@ -4469,14 +4469,26 @@ export class Storage {
   }
 
   /**
-   * Update building address with coordinates for map display
+   * Update building address with structured fields and coordinates for map display
    */
-  async updateBuildingAddress(id: string, address: string, latitude?: number | null, longitude?: number | null): Promise<Building | undefined> {
+  async updateBuildingAddress(id: string, addressData: {
+    address: string;
+    city?: string;
+    province?: string;
+    country?: string;
+    postalCode?: string;
+    latitude?: number | null;
+    longitude?: number | null;
+  }): Promise<Building | undefined> {
     const result = await db.update(buildings)
       .set({ 
-        buildingAddress: address,
-        latitude: latitude ?? null,
-        longitude: longitude ?? null,
+        buildingAddress: addressData.address,
+        city: addressData.city ?? null,
+        province: addressData.province ?? null,
+        country: addressData.country ?? null,
+        postalCode: addressData.postalCode ?? null,
+        latitude: addressData.latitude ?? null,
+        longitude: addressData.longitude ?? null,
         updatedAt: new Date() 
       })
       .where(eq(buildings.id, id))

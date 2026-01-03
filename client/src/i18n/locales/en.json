@@ -546,7 +546,7 @@
     "changelog": "Changelog",
     "safetyRating": "Safety Rating",
     "employer": "Employer",
-    "technician": "Rope Access Technician / Ground Crew",
+    "technician": "Rope Access Technician & Support Staff",
     "resident": "Resident",
     "buildingManager": "Building Manager",
     "modules": {
@@ -861,6 +861,16 @@
       }
     },
     "language": "Language"
+  },
+  "address": {
+    "searchLabel": "Search Address",
+    "searchPlaceholder": "Search for an address...",
+    "streetAddress": "Street Address",
+    "city": "City",
+    "provinceState": "Province/State",
+    "country": "Country",
+    "postalCode": "Postal/ZIP Code",
+    "noAddressProvided": "No address provided"
   },
   "common": {
     "helpMeGetStarted": "Help me get started",
@@ -1367,8 +1377,8 @@
       "rope_access_supervisor": "Rope Access Supervisor",
       "manager": "Manager",
       "rope_access_tech": "Rope Access Technician",
-      "ground_crew_supervisor": "Ground Crew Supervisor",
-      "ground_crew": "Ground Crew",
+      "ground_crew_supervisor": "Support Staff Supervisor",
+      "ground_crew": "Support Staff",
       "labourer": "Labourer",
       "categories": {
         "management": "Management",
@@ -9609,8 +9619,8 @@
   "roles": {
     "admin": "Admin",
     "technician": "Technician",
-    "groundCrew": "Ground Crew",
-    "groundCrewSupervisor": "Ground Crew Supervisor",
+    "groundCrew": "Support Staff",
+    "groundCrewSupervisor": "Support Staff Supervisor",
     "operationsManager": "Operations Manager",
     "officeAdmin": "Office Admin",
     "safetyOfficer": "Safety Officer",
@@ -9859,7 +9869,7 @@
       "passportLogbook": "Passport & Logbook",
       "jobBoard": "Job Board",
       "personalSafetyRating": "Personal Safety Rating",
-      "groundCrew": "Ground Crew",
+      "groundCrew": "Support Staff",
       "irataTaskLogging": "IRATA Task Logging"
     },
     "stakeholders": {

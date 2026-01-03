@@ -139,6 +139,10 @@ export default function BuildingPortal() {
   });
   const [addressForm, setAddressForm] = useState({
     address: "",
+    city: "",
+    province: "",
+    country: "",
+    postalCode: "",
     latitude: null as number | null,
     longitude: null as number | null,
   });
@@ -197,8 +201,12 @@ export default function BuildingPortal() {
     if (portalData?.building) {
       setAddressForm({
         address: portalData.building.address || "",
-        latitude: null,
-        longitude: null,
+        city: (portalData.building as any).city || "",
+        province: (portalData.building as any).province || "",
+        country: (portalData.building as any).country || "",
+        postalCode: (portalData.building as any).postalCode || "",
+        latitude: (portalData.building as any).latitude || null,
+        longitude: (portalData.building as any).longitude || null,
       });
     }
   }, [portalData?.building]);

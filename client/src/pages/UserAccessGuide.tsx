@@ -700,7 +700,7 @@ export default function UserAccessGuide() {
                     <span className="text-xs text-muted-foreground">Rope operations mgmt</span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-muted rounded">
-                    <span className="font-medium">Ground Crew Supervisor</span>
+                    <span className="font-medium">Support Staff Supervisor</span>
                     <span className="text-xs text-muted-foreground">Ground operations</span>
                   </div>
                 </div>
@@ -721,7 +721,7 @@ export default function UserAccessGuide() {
                     <span className="text-xs text-muted-foreground">Certified rope work</span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-muted rounded">
-                    <span className="font-medium">Ground Crew</span>
+                    <span className="font-medium">Support Staff</span>
                     <span className="text-xs text-muted-foreground">Ground-level support</span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-muted rounded">

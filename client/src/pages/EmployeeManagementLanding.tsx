@@ -862,7 +862,7 @@ export default function EmployeeManagementLanding() {
                 {t('modules.employees.faqs.q6.question', "Can I use this for employees who aren't rope access technicians?")}
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground">
-                {t('modules.employees.faqs.q6.answer', 'Yes. While certification tracking is designed for rope access (IRATA/SPRAT), the module supports roles like Labourer, Ground Crew, and general support staff who may not have rope access certifications. Leave certification fields empty for non-certified staff.')}
+                {t('modules.employees.faqs.q6.answer', 'Yes. While certification tracking is designed for rope access (IRATA/SPRAT), the module supports roles like Labourer, Support Staff, and general support personnel who may not have rope access certifications. Leave certification fields empty for non-certified staff.')}
               </AccordionContent>
             </AccordionItem>
             
