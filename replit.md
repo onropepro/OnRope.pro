@@ -74,6 +74,45 @@ When adding guided tours to dialogs or forms, follow this exact implementation p
 - Source tour content from actual documentation files in `server/help-content/modules/`
 - Each step should have: `fieldSelector`, `title`, `explanation`, and `appContext`
 
+### Address Input Standardization Pattern
+All address inputs use Geoapify autocomplete (`AddressAutocomplete` component). Two distinct patterns:
+
+**Personal Addresses (Employees, Technicians, Support Staff):**
+- Use structured fields: street address, city, province/state, country, postal code
+- Street address extracted as `houseNumber + street` (NOT full formatted address)
+- Autofill populates all structured fields from Geoapify selection
+- Database fields: `employeeStreetAddress`, `employeeCity`, `employeeProvinceState`, `employeeCountry`, `employeePostalCode`
+- Reference implementations: TechnicianPortal.tsx, GroundCrewPortal.tsx, Dashboard.tsx employee form
+
+**Building/Business Addresses (Projects, Clients, Quotes):**
+- Use single formatted address string for simplicity
+- Full `address.formatted` is appropriate for location/geocoding purposes
+- Captures latitude/longitude for map display
+- Database fields: `buildingAddress`, `address`, `billingAddress`
+- Reference implementations: Dashboard.tsx project creation, client forms, Quotes.tsx
+
+**Implementation Pattern:**
+```tsx
+// Personal address - extract street only
+onSelect={(address) => {
+  const streetAddress = address.houseNumber 
+    ? `${address.houseNumber} ${address.street || ''}`.trim()
+    : address.street || address.formatted;
+  field.onChange(streetAddress);
+  form.setValue('employeeCity', address.city || '');
+  form.setValue('employeeProvinceState', address.state || '');
+  form.setValue('employeeCountry', address.country || '');
+  form.setValue('employeePostalCode', address.postcode || '');
+}}
+
+// Building address - use full formatted
+onSelect={(address) => {
+  field.onChange(address.formatted);
+  form.setValue('latitude', address.latitude);
+  form.setValue('longitude', address.longitude);
+}}
+```
+
 ## External Dependencies
 *   **Database:** PostgreSQL
 *   **Frontend Framework:** React 18
