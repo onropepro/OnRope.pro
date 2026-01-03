@@ -37,7 +37,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB limit for large bundles
+        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024, // 15 MB limit as safety net after chunking
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\./i,
@@ -76,6 +78,19 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'wouter'],
+          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover', '@radix-ui/react-select', '@radix-ui/react-tabs', '@radix-ui/react-tooltip'],
+          'vendor-charts': ['recharts', 'apexcharts', 'react-apexcharts'],
+          'vendor-calendar': ['@fullcalendar/core', '@fullcalendar/react', '@fullcalendar/daygrid', '@fullcalendar/timegrid'],
+          'vendor-maps': ['leaflet', 'react-leaflet'],
+          'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'vendor-utils': ['date-fns', 'date-fns-tz', 'clsx', 'tailwind-merge']
+        }
+      }
+    }
   },
   server: {
     fs: {
