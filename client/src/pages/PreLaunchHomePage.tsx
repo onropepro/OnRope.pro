@@ -247,51 +247,49 @@ export default function PreLaunchHomePage() {
             <p className="text-blue-100/80 italic text-[16px] mt-[14px] mb-[14px]">OnRopePro launches January 2026. Get on the waitlist before your competitors do.</p>
 
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4 pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="companyName" className="text-white text-left block">
-                    Company Name
-                  </Label>
-                  <Input
-                    id="companyName"
-                    type="text"
-                    placeholder="Your company name"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
-                    data-testid="input-company-name"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-white text-left block">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@company.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
-                    data-testid="input-email"
-                    required
-                  />
-                </div>
-              </div>
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-white text-[#0B64A3] hover:bg-blue-50"
-                disabled={signupMutation.isPending}
-                data-testid="button-early-access"
-              >
-                {signupMutation.isPending ? "Submitting..." : "Get Early Access"}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <p className="text-base text-blue-100/80">
-                Be first to see it. No spam. Unsubscribe anytime.
-              </p>
+              <Card className="bg-white/10 border-white/20 backdrop-blur-sm shadow-2xl">
+                <CardContent className="p-6 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Input
+                        id="companyName"
+                        type="text"
+                        placeholder="Company Name"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        className="bg-white/10 border-white/30 text-white placeholder:text-white/70 h-12"
+                        data-testid="input-company-name"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Email Address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="bg-white/10 border-white/30 text-white placeholder:text-white/70 h-12"
+                        data-testid="input-email"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full bg-[#fa7315] hover:bg-[#e66a13] text-white h-12 text-lg font-bold shadow-lg"
+                    disabled={signupMutation.isPending}
+                    data-testid="button-early-access"
+                  >
+                    {signupMutation.isPending ? "Submitting..." : "Get Early Access"}
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                  <p className="text-base text-blue-100/80 text-center">
+                    Be first to see it. No spam. Unsubscribe anytime.
+                  </p>
+                </CardContent>
+              </Card>
             </form>
 
             <div className="text-blue-100 text-base pt-4 space-y-1">
