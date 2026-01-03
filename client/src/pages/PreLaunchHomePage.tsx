@@ -241,7 +241,7 @@ export default function PreLaunchHomePage() {
               strata managers can finally see<br />
               <span className="text-[#fa7315]">what sets you apart.</span>
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto mb-4">
+            <p className="md:text-2xl text-blue-100 max-w-2xl mx-auto mb-4 text-[20px]">
               Built by a Level 3 tech and operations manager who got tired of the same chaos you're dealing with.
             </p>
             <p className="text-lg text-blue-100/80 italic mb-10">
