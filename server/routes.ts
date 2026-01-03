@@ -9415,6 +9415,256 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
     }
   });
 
+
+  // ==================== SUPERUSER PLATFORM NOTIFICATIONS ====================
+
+  // Create a new platform notification
+  app.post("/api/superuser/notifications", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_notifications')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const schema = z.object({
+        title: z.string().min(1).max(255),
+        message: z.string().min(1),
+        targetType: z.enum(['single_company', 'selected_companies', 'all_companies', 'single_tech', 'selected_techs', 'all_techs']),
+        targetIds: z.array(z.string()).optional(),
+      });
+
+      const validatedData = schema.parse(req.body);
+      
+      // For single/selected, require targetIds
+      if (['single_company', 'selected_companies', 'single_tech', 'selected_techs'].includes(validatedData.targetType)) {
+        if (!validatedData.targetIds || validatedData.targetIds.length === 0) {
+          return res.status(400).json({ message: "targetIds required for targeted notifications" });
+        }
+      }
+
+      const notification = await storage.createPlatformNotification({
+        title: validatedData.title,
+        message: validatedData.message,
+        targetType: validatedData.targetType,
+        targetIds: validatedData.targetIds || null,
+        createdBy: req.session.userId!,
+      });
+
+      // Determine recipients based on target type
+      let recipientIds: string[] = [];
+
+      if (validatedData.targetType === 'all_companies') {
+        const companies = await storage.getAllCompanies();
+        recipientIds = companies.map(c => c.id);
+      } else if (validatedData.targetType === 'all_techs') {
+        const techsResult = await storage.getAllTechnicians({});
+        const techs = techsResult.technicians;
+        recipientIds = techs.map(t => t.id);
+      } else if (validatedData.targetIds) {
+        recipientIds = validatedData.targetIds;
+      }
+
+      // Create recipient records
+      for (const userId of recipientIds) {
+        await storage.createPlatformNotificationRecipient({
+          notificationId: notification.id,
+          userId,
+        });
+      }
+
+      res.json({ 
+        notification,
+        recipientCount: recipientIds.length 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      console.error('[SuperUser] Create notification error:', error);
+      res.status(500).json({ message: "Failed to create notification" });
+    }
+  });
+
+  // Get all platform notifications (for SuperUser management)
+  app.get("/api/superuser/notifications", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_notifications')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const notifications = await storage.getAllPlatformNotifications();
+      
+      // Add analytics for each notification
+      const notificationsWithStats = await Promise.all(
+        notifications.map(async (notification) => {
+          const stats = await storage.getPlatformNotificationStats(notification.id);
+          return {
+            ...notification,
+            stats,
+          };
+        })
+      );
+
+      res.json({ notifications: notificationsWithStats });
+    } catch (error) {
+      console.error('[SuperUser] Get notifications error:', error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  // Get single notification with full analytics
+  app.get("/api/superuser/notifications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_notifications')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const notification = await storage.getPlatformNotificationById(req.params.id);
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+
+      const stats = await storage.getPlatformNotificationStats(notification.id);
+      const recipients = await storage.getPlatformNotificationRecipients(notification.id);
+
+      // Get user details for recipients
+      const recipientsWithDetails = await Promise.all(
+        recipients.map(async (r) => {
+          const user = await storage.getUserById(r.userId);
+          return {
+            ...r,
+            userName: user?.name || user?.companyName || 'Unknown',
+            userEmail: user?.email || 'Unknown',
+            userRole: user?.role || 'Unknown',
+          };
+        })
+      );
+
+      res.json({ 
+        notification,
+        stats,
+        recipients: recipientsWithDetails,
+      });
+    } catch (error) {
+      console.error('[SuperUser] Get notification error:', error);
+      res.status(500).json({ message: "Failed to fetch notification" });
+    }
+  });
+
+  // Update platform notification
+  app.patch("/api/superuser/notifications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_notifications')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const notification = await storage.getPlatformNotificationById(req.params.id);
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+
+      const schema = z.object({
+        title: z.string().min(1).max(255).optional(),
+        message: z.string().min(1).optional(),
+      });
+
+      const validatedData = schema.parse(req.body);
+      
+      const updated = await storage.updatePlatformNotification(req.params.id, validatedData);
+      res.json({ notification: updated });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
+      console.error('[SuperUser] Update notification error:', error);
+      res.status(500).json({ message: "Failed to update notification" });
+    }
+  });
+
+  // Delete platform notification
+  app.delete("/api/superuser/notifications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (!isSuperuserOrHasPermission(req, 'manage_notifications')) {
+        return res.status(403).json({ message: "Access denied. Insufficient permissions." });
+      }
+
+      const notification = await storage.getPlatformNotificationById(req.params.id);
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
+      }
+
+      await storage.deletePlatformNotification(req.params.id);
+      res.json({ message: "Notification deleted" });
+    } catch (error) {
+      console.error('[SuperUser] Delete notification error:', error);
+      res.status(500).json({ message: "Failed to delete notification" });
+    }
+  });
+
+  // ==================== USER PLATFORM NOTIFICATIONS ====================
+
+  // Get notifications for current user (companies and technicians)
+  app.get("/api/platform-notifications", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      const notifications = await storage.getUserPlatformNotifications(user.id);
+      res.json({ notifications });
+    } catch (error) {
+      console.error('[Notifications] Get user notifications error:', error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  // Get unread notification count for badge
+  app.get("/api/platform-notifications/unread-count", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      const count = await storage.getUnreadPlatformNotificationCount(user.id);
+      res.json({ count });
+    } catch (error) {
+      console.error('[Notifications] Get unread count error:', error);
+      res.status(500).json({ message: "Failed to fetch unread count" });
+    }
+  });
+
+  // Mark notification as read
+  app.patch("/api/platform-notifications/:id/read", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      await storage.markPlatformNotificationAsRead(req.params.id, user.id);
+      res.json({ message: "Notification marked as read" });
+    } catch (error) {
+      console.error('[Notifications] Mark read error:', error);
+      res.status(500).json({ message: "Failed to mark notification as read" });
+    }
+  });
+
+  // Delete notification from user's list (soft delete)
+  app.delete("/api/platform-notifications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      await storage.deletePlatformNotificationForUser(req.params.id, user.id);
+      res.json({ message: "Notification removed" });
+    } catch (error) {
+      console.error('[Notifications] Delete for user error:', error);
+      res.status(500).json({ message: "Failed to remove notification" });
+    }
+  });
   // ==================== BUILDING INSTRUCTIONS ====================
 
   // Get building with instructions by strata plan number (for project detail page)

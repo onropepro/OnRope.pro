@@ -41,6 +41,7 @@ import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
 import ViewAsCompany from "@/pages/ViewAsCompany";
 import SuperUserFeatureRequests from "@/pages/SuperUserFeatureRequests";
+import SuperUserNotifications from "@/pages/SuperUserNotifications";
 import SuperUserMetrics from "@/pages/SuperUserMetrics";
 import SuperUserGoalsOverview from "@/pages/SuperUserGoalsOverview";
 import FounderResources from "@/pages/FounderResources";
@@ -236,6 +237,11 @@ function Router() {
           <Route path="/superuser/feature-requests">
             <ProtectedRoute allowedRoles={["superuser", "staff"]}>
               <SuperUserFeatureRequests />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/superuser/notifications">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserNotifications />
             </ProtectedRoute>
           </Route>
           <Route path="/superuser/metrics">

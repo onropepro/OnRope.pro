@@ -132,6 +132,11 @@ const menuGroups: MenuGroup[] = [
         path: "/superuser/feature-requests",
       },
       {
+        title: "Notifications",
+        icon: "notifications",
+        path: "/superuser/notifications",
+      },
+      {
         title: "Future Ideas",
         icon: "auto_awesome",
         path: "/superuser/future-ideas",

@@ -21,6 +21,7 @@ import { InstallPWAButton } from "@/components/InstallPWAButton";
 import { SubscriptionRenewalBadge } from "@/components/SubscriptionRenewalBadge";
 import { LanguageDropdown } from "@/components/LanguageDropdown";
 import { NotificationBell } from "@/components/NotificationBell";
+import { PlatformNotificationBell } from "@/components/PlatformNotificationBell";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { canManageEmployees } from "@/lib/permissions";
 import { trackLogout } from "@/lib/analytics";
@@ -494,7 +495,10 @@ export function UnifiedDashboardHeader({
             )}
             
             {showNotifications && !isSuperUser && (
-              <NotificationBell />
+              <>
+                <PlatformNotificationBell />
+                <NotificationBell />
+              </>
             )}
             
             {showLanguageDropdown && (

@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, quoteMessages, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue, staffAccounts, userCertifications, referrals, platformSearches, vendorVerifications, notificationInteractions, notifications } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, QuoteMessage, InsertQuoteMessage, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile, ResidentFeedbackPhotoQueue, InsertResidentFeedbackPhotoQueue, StaffAccount, InsertStaffAccount } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, quoteMessages, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, buildingInstructions, normalizeStrataPlan, teamInvitations, historicalHours, technicianEmployerConnections, csrRatingHistory, documentQuizzes, quizAttempts, technicianDocumentRequests, technicianDocumentRequestFiles, residentFeedbackPhotoQueue, staffAccounts, userCertifications, referrals, platformSearches, vendorVerifications, notificationInteractions, notifications, platformNotifications, platformNotificationRecipients } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, QuoteMessage, InsertQuoteMessage, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, BuildingInstructions, InsertBuildingInstructions, TeamInvitation, InsertTeamInvitation, HistoricalHours, InsertHistoricalHours, CsrRatingHistory, InsertCsrRatingHistory, DocumentQuiz, InsertDocumentQuiz, QuizAttempt, InsertQuizAttempt, TechnicianDocumentRequest, InsertTechnicianDocumentRequest, TechnicianDocumentRequestFile, InsertTechnicianDocumentRequestFile, ResidentFeedbackPhotoQueue, InsertResidentFeedbackPhotoQueue, StaffAccount, InsertStaffAccount, PlatformNotification, InsertPlatformNotification, PlatformNotificationRecipient, InsertPlatformNotificationRecipient } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -5675,6 +5675,103 @@ export class Storage {
         projectedLtv,
       },
     };
+  }
+
+  // Platform Notification operations
+  async createPlatformNotification(data: InsertPlatformNotification): Promise<PlatformNotification> {
+    const result = await db.insert(platformNotifications).values(data).returning();
+    return result[0];
+  }
+
+  async getAllPlatformNotifications(): Promise<PlatformNotification[]> {
+    return await db.select().from(platformNotifications).orderBy(desc(platformNotifications.createdAt));
+  }
+
+  async getPlatformNotificationById(id: string): Promise<PlatformNotification | undefined> {
+    const result = await db.select().from(platformNotifications).where(eq(platformNotifications.id, id)).limit(1);
+    return result[0];
+  }
+
+  async updatePlatformNotification(id: string, data: Partial<PlatformNotification>): Promise<PlatformNotification | undefined> {
+    const result = await db.update(platformNotifications)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(platformNotifications.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deletePlatformNotification(id: string): Promise<void> {
+    await db.delete(platformNotifications).where(eq(platformNotifications.id, id));
+  }
+
+  async createPlatformNotificationRecipient(data: InsertPlatformNotificationRecipient): Promise<PlatformNotificationRecipient> {
+    const result = await db.insert(platformNotificationRecipients).values(data).returning();
+    return result[0];
+  }
+
+  async getPlatformNotificationRecipients(notificationId: string): Promise<PlatformNotificationRecipient[]> {
+    return await db.select().from(platformNotificationRecipients)
+      .where(eq(platformNotificationRecipients.notificationId, notificationId));
+  }
+
+  async getPlatformNotificationStats(notificationId: string): Promise<{ totalRecipients: number; openedCount: number; openRate: number }> {
+    const recipients = await db.select().from(platformNotificationRecipients)
+      .where(eq(platformNotificationRecipients.notificationId, notificationId));
+    
+    const totalRecipients = recipients.length;
+    const openedCount = recipients.filter(r => r.openedAt !== null).length;
+    const openRate = totalRecipients > 0 ? Math.round((openedCount / totalRecipients) * 100) : 0;
+    
+    return { totalRecipients, openedCount, openRate };
+  }
+
+  async getUserPlatformNotifications(userId: string): Promise<(PlatformNotificationRecipient & { notification: PlatformNotification })[]> {
+    const recipients = await db.select().from(platformNotificationRecipients)
+      .where(and(
+        eq(platformNotificationRecipients.userId, userId),
+        eq(platformNotificationRecipients.deletedByRecipient, false)
+      ))
+      .orderBy(desc(platformNotificationRecipients.createdAt));
+    
+    const result = await Promise.all(
+      recipients.map(async (r) => {
+        const notification = await this.getPlatformNotificationById(r.notificationId);
+        return {
+          ...r,
+          notification: notification!,
+        };
+      })
+    );
+    
+    return result.filter(r => r.notification);
+  }
+
+  async getUnreadPlatformNotificationCount(userId: string): Promise<number> {
+    const recipients = await db.select().from(platformNotificationRecipients)
+      .where(and(
+        eq(platformNotificationRecipients.userId, userId),
+        eq(platformNotificationRecipients.deletedByRecipient, false),
+        isNull(platformNotificationRecipients.openedAt)
+      ));
+    return recipients.length;
+  }
+
+  async markPlatformNotificationAsRead(notificationId: string, userId: string): Promise<void> {
+    await db.update(platformNotificationRecipients)
+      .set({ openedAt: new Date() })
+      .where(and(
+        eq(platformNotificationRecipients.notificationId, notificationId),
+        eq(platformNotificationRecipients.userId, userId)
+      ));
+  }
+
+  async deletePlatformNotificationForUser(notificationId: string, userId: string): Promise<void> {
+    await db.update(platformNotificationRecipients)
+      .set({ deletedByRecipient: true })
+      .where(and(
+        eq(platformNotificationRecipients.notificationId, notificationId),
+        eq(platformNotificationRecipients.userId, userId)
+      ));
   }
 }
 
