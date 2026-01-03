@@ -236,7 +236,7 @@ export default function PreLaunchHomePage() {
               LAUNCHING JANUARY 2026
             </Badge>
 
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+            <h1 className="md:text-6xl font-extrabold tracking-tight mb-6 text-[46px]">
               2026: The year property &<br />
               strata managers can finally see<br />
               <span className="text-[#fa7315]">what sets you apart.</span>
@@ -493,7 +493,6 @@ export default function PreLaunchHomePage() {
           </div>
         </div>
       </section>
-
       <section className="py-16 md:py-20 px-4 bg-white dark:bg-slate-950">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
