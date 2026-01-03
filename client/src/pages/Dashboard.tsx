@@ -9451,33 +9451,23 @@ export default function Dashboard() {
             <Form {...editEmployeeForm}>
               <form id="edit-employee-form" onSubmit={editEmployeeForm.handleSubmit(onEditEmployeeSubmit)} className="space-y-4">
               <div className={editEmployeeFormStep === 1 ? "block" : "hidden pointer-events-none"}>
-                <FormField
-                  control={editEmployeeForm.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('dashboard.employeeForm.fullName', 'Full Name')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t('dashboard.employeeForm.namePlaceholder', 'John Doe')} {...field} className="h-12" data-testid="input-edit-employee-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={editEmployeeForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('dashboard.employeeForm.emailAddress', 'Email Address')}</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder={t('common.placeholders.email', 'john@example.com')} {...field} className="h-12" data-testid="input-edit-employee-email" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Read-only employee information from their passport */}
+                <div className="rounded-lg border bg-muted/30 p-4 mb-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="material-icons text-muted-foreground text-base">person</span>
+                    <span className="text-sm font-medium text-muted-foreground">{t('dashboard.employeeForm.employeePassportInfo', 'Employee Passport Info (Read-Only)')}</span>
+                  </div>
+                  <div className="grid gap-3">
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.fullName', 'Full Name')}</span>
+                      <p className="font-medium" data-testid="text-edit-employee-name">{employeeToEdit?.name || '-'}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.emailAddress', 'Email Address')}</span>
+                      <p className="font-medium" data-testid="text-edit-employee-email">{employeeToEdit?.email || '-'}</p>
+                    </div>
+                  </div>
+                </div>
 
                 <FormField
                   control={editEmployeeForm.control}
@@ -9622,305 +9612,114 @@ export default function Dashboard() {
                   />
                 )}
 
+                {/* Read-only Personal Details from employee passport */}
                 <div className="border-t pt-4 mt-6">
-                  <h3 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.personalDetails', 'Personal Details (Optional)')}</h3>
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="material-icons text-muted-foreground text-base">badge</span>
+                    <h3 className="text-sm font-medium">{t('dashboard.employeeForm.personalDetailsReadOnly', 'Personal Details (Managed by Employee)')}</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    {t('dashboard.employeeForm.personalDetailsReadOnlyDesc', 'These details are managed by the employee in their Passport profile.')}
+                  </p>
                   
-                  <div className="space-y-4">
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="startDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.startDate', 'Start Date')}</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} data-testid="input-edit-employee-start-date" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="birthday"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.birthday', 'Birthday')}</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} data-testid="input-edit-employee-birthday" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="socialInsuranceNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.socialInsuranceNumber', 'Social Insurance Number')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('common.placeholders.sin', 'XXX-XXX-XXX')} {...field} data-testid="input-edit-employee-sin" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="driversLicenseNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.driversLicenseNumber', "Driver's License Number")}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-employee-dl-number" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="driversLicenseProvince"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.driversLicenseProvince', "Driver's License Province/State")}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('common.placeholders.province', 'BC, AB, etc.')} {...field} data-testid="input-edit-employee-dl-province" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <DocumentUploader
-                      documents={editEmployeeForm.watch("driversLicenseDocuments") || []}
-                      onDocumentsChange={(docs) => editEmployeeForm.setValue("driversLicenseDocuments", docs)}
-                      maxDocuments={5}
-                      label={t('dashboard.employeeForm.driversLicenseDocuments', "Driver's License Documents")}
-                      description={t('dashboard.employeeForm.driversLicenseDocsDescription', 'Upload driver\'s license photos, abstracts, or related documents')}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="homeAddress"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.homeAddress', 'Home Address')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('dashboard.employeeForm.streetAddressPlaceholder', 'Street address')} {...field} data-testid="input-edit-employee-address" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="employeePhoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.phoneNumber', 'Phone Number')}</FormLabel>
-                          <FormControl>
-                            <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-edit-employee-phone" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="emergencyContactName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.emergencyContactName', 'Emergency Contact Name')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('dashboard.employeeForm.contactNamePlaceholder', 'Contact name')} {...field} data-testid="input-edit-employee-emergency-name" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="emergencyContactPhone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.emergencyContactPhone', 'Emergency Contact Phone')}</FormLabel>
-                          <FormControl>
-                            <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-edit-employee-emergency-phone" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={editEmployeeForm.control}
-                      name="specialMedicalConditions"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('dashboard.employeeForm.specialMedicalConditions', 'Special Medical Conditions')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('dashboard.employeeForm.medicalConditionsPlaceholder', 'Medical conditions to be aware of')} {...field} data-testid="input-edit-employee-medical" className="h-12" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="border-t pt-4 mt-4">
-                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification (Optional)')}</h4>
-                      <div className="space-y-4">
-                        <FormField
-                          control={editEmployeeForm.control}
-                          name="irataLevel"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-12" data-testid="select-edit-irata-level">
-                                    <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Level 1">Level 1</SelectItem>
-                                  <SelectItem value="Level 2">Level 2</SelectItem>
-                                  <SelectItem value="Level 3">Level 3</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {editEmployeeForm.watch("irataLevel") && (
-                          <>
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="irataLicenseNumber"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-irata-license" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="irataIssuedDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'IRATA Issued Date')}</FormLabel>
-                                  <FormControl>
-                                    <Input type="date" {...field} data-testid="input-edit-irata-issued" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="irataExpirationDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'IRATA Expiration Date')}</FormLabel>
-                                  <FormControl>
-                                    <Input type="date" {...field} data-testid="input-edit-irata-expiration" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </>
-                        )}
+                  <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.startDate', 'Start Date')}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.startDate ? new Date(employeeToEdit.startDate).toLocaleDateString() : '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.birthday', 'Birthday')}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.birthday ? new Date(employeeToEdit.birthday).toLocaleDateString() : '-'}</p>
                       </div>
                     </div>
-
-                    <div className="border-t pt-4 mt-4">
-                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.spratCertification', 'SPRAT Certification (Optional)')}</h4>
-                      <div className="space-y-4">
-                        <FormField
-                          control={editEmployeeForm.control}
-                          name="spratLevel"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('dashboard.employeeForm.spratLevel', 'SPRAT Level')}</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-12" data-testid="select-edit-sprat-level">
-                                    <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Level 1">Level 1</SelectItem>
-                                  <SelectItem value="Level 2">Level 2</SelectItem>
-                                  <SelectItem value="Level 3">Level 3</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {editEmployeeForm.watch("spratLevel") && (
-                          <>
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="spratLicenseNumber"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.spratLicenseNumber', 'SPRAT License Number')}</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder={t('dashboard.employeeForm.licenseNumberPlaceholder', 'License number')} {...field} data-testid="input-edit-sprat-license" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="spratIssuedDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.spratIssuedDate', 'SPRAT Issued Date')}</FormLabel>
-                                  <FormControl>
-                                    <Input type="date" {...field} data-testid="input-edit-sprat-issued" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={editEmployeeForm.control}
-                              name="spratExpirationDate"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('dashboard.employeeForm.spratExpirationDate', 'SPRAT Expiration Date')}</FormLabel>
-                                  <FormControl>
-                                    <Input type="date" {...field} data-testid="input-edit-sprat-expiration" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </>
-                        )}
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.socialInsuranceNumber', 'Social Insurance Number')}</span>
+                      <p className="font-medium text-sm">{employeeToEdit?.socialInsuranceNumber || '-'}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.driversLicenseNumber', "Driver's License Number")}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.driversLicenseNumber || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.driversLicenseProvince', "Driver's License Province/State")}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.driversLicenseProvince || '-'}</p>
                       </div>
                     </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.homeAddress', 'Home Address')}</span>
+                      <p className="font-medium text-sm">{employeeToEdit?.homeAddress || '-'}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.phoneNumber', 'Phone Number')}</span>
+                      <p className="font-medium text-sm">{employeeToEdit?.employeePhoneNumber || '-'}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.emergencyContactName', 'Emergency Contact Name')}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.emergencyContactName || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.emergencyContactPhone', 'Emergency Contact Phone')}</span>
+                        <p className="font-medium text-sm">{employeeToEdit?.emergencyContactPhone || '-'}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.specialMedicalConditions', 'Special Medical Conditions')}</span>
+                      <p className="font-medium text-sm">{employeeToEdit?.specialMedicalConditions || '-'}</p>
+                    </div>
+
+                    {/* IRATA Certification - Read Only */}
+                    {employeeToEdit?.irataLevel && (
+                      <div className="border-t pt-3 mt-3">
+                        <span className="text-xs font-medium text-muted-foreground">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification')}</span>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.irataLevel', 'Level')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.irataLevel || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.irataLicenseNumber', 'License Number')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.irataLicenseNumber || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.irataIssuedDate', 'Issued Date')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.irataIssuedDate ? new Date(employeeToEdit.irataIssuedDate).toLocaleDateString() : '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.irataExpirationDate', 'Expiration Date')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.irataExpirationDate ? new Date(employeeToEdit.irataExpirationDate).toLocaleDateString() : '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SPRAT Certification - Read Only */}
+                    {employeeToEdit?.spratLevel && (
+                      <div className="border-t pt-3 mt-3">
+                        <span className="text-xs font-medium text-muted-foreground">{t('dashboard.employeeForm.spratCertification', 'SPRAT Certification')}</span>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.spratLevel', 'Level')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.spratLevel || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.spratLicenseNumber', 'License Number')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.spratLicenseNumber || '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.spratIssuedDate', 'Issued Date')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.spratIssuedDate ? new Date(employeeToEdit.spratIssuedDate).toLocaleDateString() : '-'}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">{t('dashboard.employeeForm.spratExpirationDate', 'Expiration Date')}</span>
+                            <p className="font-medium text-sm">{employeeToEdit?.spratExpirationDate ? new Date(employeeToEdit.spratExpirationDate).toLocaleDateString() : '-'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                     <div className="border-t pt-4 mt-4">
                       <FormField

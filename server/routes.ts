@@ -10778,33 +10778,52 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       }
       
       // Update employee (for primary connections or non-termination updates)
-      const updatedEmployee = await storage.updateUser(req.params.id, {
-        name,
-        email,
-        role,
-        techLevel: role === "rope_access_tech" ? techLevel : null,
-        hourlyRate: hourlyRate ? hourlyRate : null,
-        isSalary: isSalary !== undefined ? isSalary : undefined,
-        salary: salary !== undefined ? (salary ? salary : null) : undefined,
-        permissions: permissions || [],
-        startDate: startDate !== undefined ? (startDate || null) : undefined,
-        birthday: birthday !== undefined ? (birthday || null) : undefined,
-        driversLicenseNumber: driversLicenseNumber !== undefined ? (driversLicenseNumber || null) : undefined,
-        driversLicenseProvince: driversLicenseProvince !== undefined ? (driversLicenseProvince || null) : undefined,
-        driversLicenseDocuments: driversLicenseDocuments !== undefined ? (driversLicenseDocuments || []) : undefined,
-        homeAddress: homeAddress !== undefined ? (homeAddress || null) : undefined,
-        employeePhoneNumber: employeePhoneNumber !== undefined ? (employeePhoneNumber || null) : undefined,
-        emergencyContactName: emergencyContactName !== undefined ? (emergencyContactName || null) : undefined,
-        emergencyContactPhone: emergencyContactPhone !== undefined ? (emergencyContactPhone || null) : undefined,
-        specialMedicalConditions: specialMedicalConditions !== undefined ? (specialMedicalConditions || null) : undefined,
-        irataLevel: irataLevel !== undefined ? (irataLevel || null) : undefined,
-        irataLicenseNumber: irataLicenseNumber !== undefined ? (irataLicenseNumber || null) : undefined,
-        irataIssuedDate: irataIssuedDate !== undefined ? (irataIssuedDate || null) : undefined,
-        irataExpirationDate: irataExpirationDate !== undefined ? (irataExpirationDate || null) : undefined,
-        terminatedDate: terminatedDate !== undefined ? (terminatedDate || null) : undefined,
-        terminationReason: terminationReason !== undefined ? (terminationReason || null) : undefined,
-        terminationNotes: terminationNotes !== undefined ? (terminationNotes || null) : undefined,
-      });
+      // SECURITY: Employers can only update role, pay rate, permissions, and termination
+      // Personal details are owned by the employee and can only be updated from their passport
+      const updateData = isOwnProfile 
+        ? {
+            // Employee editing their own profile - allow all personal details
+            name,
+            email,
+            role,
+            techLevel: role === "rope_access_tech" ? techLevel : null,
+            hourlyRate: hourlyRate ? hourlyRate : null,
+            isSalary: isSalary !== undefined ? isSalary : undefined,
+            salary: salary !== undefined ? (salary ? salary : null) : undefined,
+            permissions: permissions || [],
+            startDate: startDate !== undefined ? (startDate || null) : undefined,
+            birthday: birthday !== undefined ? (birthday || null) : undefined,
+            driversLicenseNumber: driversLicenseNumber !== undefined ? (driversLicenseNumber || null) : undefined,
+            driversLicenseProvince: driversLicenseProvince !== undefined ? (driversLicenseProvince || null) : undefined,
+            driversLicenseDocuments: driversLicenseDocuments !== undefined ? (driversLicenseDocuments || []) : undefined,
+            homeAddress: homeAddress !== undefined ? (homeAddress || null) : undefined,
+            employeePhoneNumber: employeePhoneNumber !== undefined ? (employeePhoneNumber || null) : undefined,
+            emergencyContactName: emergencyContactName !== undefined ? (emergencyContactName || null) : undefined,
+            emergencyContactPhone: emergencyContactPhone !== undefined ? (emergencyContactPhone || null) : undefined,
+            specialMedicalConditions: specialMedicalConditions !== undefined ? (specialMedicalConditions || null) : undefined,
+            irataLevel: irataLevel !== undefined ? (irataLevel || null) : undefined,
+            irataLicenseNumber: irataLicenseNumber !== undefined ? (irataLicenseNumber || null) : undefined,
+            irataIssuedDate: irataIssuedDate !== undefined ? (irataIssuedDate || null) : undefined,
+            irataExpirationDate: irataExpirationDate !== undefined ? (irataExpirationDate || null) : undefined,
+            terminatedDate: terminatedDate !== undefined ? (terminatedDate || null) : undefined,
+            terminationReason: terminationReason !== undefined ? (terminationReason || null) : undefined,
+            terminationNotes: terminationNotes !== undefined ? (terminationNotes || null) : undefined,
+          }
+        : {
+            // Employer editing employee - only allow role, pay rate, permissions, termination
+            // Personal details are read-only and managed by the employee's passport
+            role,
+            techLevel: role === "rope_access_tech" ? techLevel : null,
+            hourlyRate: hourlyRate ? hourlyRate : null,
+            isSalary: isSalary !== undefined ? isSalary : undefined,
+            salary: salary !== undefined ? (salary ? salary : null) : undefined,
+            permissions: permissions || [],
+            terminatedDate: terminatedDate !== undefined ? (terminatedDate || null) : undefined,
+            terminationReason: terminationReason !== undefined ? (terminationReason || null) : undefined,
+            terminationNotes: terminationNotes !== undefined ? (terminationNotes || null) : undefined,
+          };
+      
+      const updatedEmployee = await storage.updateUser(req.params.id, updateData);
       
       // Send real-time notifications for permission/role changes or termination
       if (isBeingTerminated) {
