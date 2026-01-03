@@ -28432,6 +28432,35 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+    // Early access signups for pre-launch landing pages
+  app.post("/api/early-access", async (req: Request, res: Response) => {
+    try {
+      const { companyName, email, stakeholderType, source } = req.body;
+      
+      if (!companyName || !email || !stakeholderType) {
+        return res.status(400).json({ message: "Company name, email, and stakeholder type are required" });
+      }
+      
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Please provide a valid email address" });
+      }
+      
+      await storage.createEarlyAccessSignup({
+        companyName,
+        email,
+        stakeholderType,
+        source: source || "unknown",
+      });
+      
+      res.status(201).json({ success: true, message: "Successfully signed up for early access" });
+    } catch (error) {
+      console.error("Early access signup error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
   
   // Start background workers

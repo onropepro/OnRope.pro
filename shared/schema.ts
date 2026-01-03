@@ -3543,3 +3543,28 @@ export type ProjectsResponse = {
 export type ClientsResponse = {
   clients: Client[];
 };
+
+// ============================================
+// PRE-LAUNCH EARLY ACCESS SIGNUPS
+// Captures interest before official launch
+// ============================================
+
+export const earlyAccessSignups = pgTable("early_access_signups", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyName: varchar("company_name").notNull(),
+  email: varchar("email").notNull(),
+  stakeholderType: varchar("stakeholder_type").notNull(), // 'company' | 'technician' | 'property_manager'
+  source: varchar("source"), // which page they signed up from
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_early_access_signups_email").on(table.email),
+  index("IDX_early_access_signups_created_at").on(table.createdAt),
+]);
+
+export const insertEarlyAccessSignupSchema = createInsertSchema(earlyAccessSignups).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type EarlyAccessSignup = typeof earlyAccessSignups.$inferSelect;
+export type InsertEarlyAccessSignup = z.infer<typeof insertEarlyAccessSignupSchema>;

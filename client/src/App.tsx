@@ -9,6 +9,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { AuthPortalProvider } from "@/contexts/AuthPortalContext";
 import { usePWAUpdateCheck } from "@/hooks/usePWAUpdateCheck";
+import { PreLaunchProvider, usePreLaunch } from "@/contexts/PreLaunchContext";
 
 // Pages
 import Login from "@/pages/Login";
@@ -113,6 +114,9 @@ import PropertyManagerInterfaceLanding from "@/pages/PropertyManagerInterfaceLan
 import CSRPropertyManagerLanding from "@/pages/CSRPropertyManagerLanding";
 import TechnicianLanding from "@/pages/TechnicianLanding";
 import GroundCrewLanding from "@/pages/GroundCrewLanding";
+import PreLaunchHomePage from "@/pages/PreLaunchHomePage";
+import PreLaunchTechnicianPage from "@/pages/PreLaunchTechnicianPage";
+import PreLaunchPropertyManagerPage from "@/pages/PreLaunchPropertyManagerPage";
 import BuildingManagerLanding from "@/pages/BuildingManagerLanding";
 import JobBoardGuide from "@/pages/JobBoardGuide";
 import Pricing from "@/pages/Pricing";
@@ -165,14 +169,15 @@ import { SiteFooter } from "@/components/SiteFooter";
 
 function Router() {
   const [location] = useLocation();
+  const { isPreLaunchActive, isBypassed } = usePreLaunch();
   
   useEffect(() => {
     console.log("🛣️ Router: Current location changed to:", location);
-    // Scroll to top when navigating to a new page
     window.scrollTo(0, 0);
   }, [location]);
   
-  // Public routes that should show the footer
+  const showPreLaunch = isPreLaunchActive && !isBypassed;
+  
   const publicRoutes = [
     "/",
     "/login",
@@ -193,7 +198,7 @@ function Router() {
     "/changelog"
   ];
 
-  const showFooter = publicRoutes.some(route => 
+  const showFooter = !showPreLaunch && publicRoutes.some(route => 
     location === route || 
     location.startsWith("/modules/") || 
     location.startsWith("/help/") ||
@@ -204,15 +209,15 @@ function Router() {
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
         <Switch>
-          <Route path="/" component={HomePage} />
+          <Route path="/">{showPreLaunch ? <PreLaunchHomePage /> : <HomePage />}</Route>
           <Route path="/register">{() => { window.location.replace('/?signup=true'); return null; }}</Route>
           <Route path="/login" component={Login} />
           <Route path="/employer" component={Employer} />
           <Route path="/resident" component={ResidentLanding} />
           <Route path="/reset-password" component={ResetPassword} />
-          <Route path="/property-manager" component={PropertyManagerLanding} />
+          <Route path="/property-manager">{showPreLaunch ? <PreLaunchPropertyManagerPage /> : <PropertyManagerLanding />}</Route>
           <Route path="/property-manager/company-safety-rating" component={CSRPropertyManagerLanding} />
-          <Route path="/technician" component={TechnicianLanding} />
+          <Route path="/technician">{showPreLaunch ? <PreLaunchTechnicianPage /> : <TechnicianLanding />}</Route>
           <Route path="/ground-crew" component={GroundCrewLanding} />
           <Route path="/building-manager" component={BuildingManagerLanding} />
           <Route path="/pricing" component={Pricing} />
@@ -859,12 +864,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ErrorBoundary>
-          <AuthPortalProvider>
-            <BrandingProvider>
-              <Router />
-              <Toaster />
-            </BrandingProvider>
-          </AuthPortalProvider>
+          <PreLaunchProvider>
+            <AuthPortalProvider>
+              <BrandingProvider>
+                <Router />
+                <Toaster />
+              </BrandingProvider>
+            </AuthPortalProvider>
+          </PreLaunchProvider>
         </ErrorBoundary>
       </TooltipProvider>
     </QueryClientProvider>
