@@ -8707,7 +8707,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         db.select({ count: sql<number>`count(*)` }).from(toolboxMeetings),
         db.select({ sum: sql`COALESCE(SUM(hours), 0)` }).from(irataTaskLogs),
         db.select({ count: sql<number>`count(*)` }).from(incidentReports),
-        db.select().from(csrRatingHistory).orderBy(desc(csrRatingHistory.calculatedAt)).limit(100),
+        db.select().from(csrRatingHistory).orderBy(desc(csrRatingHistory.createdAt)).limit(100),
         db.select({ count: sql<number>`count(*)` }).from(workSessions),
       ]);
 
@@ -8732,7 +8732,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         : 0;
 
       // CSR distribution
-      const csrScores = csrHistory.map((r: any) => Number(r.rating) || 0);
+      const csrScores = csrHistory.map((r: any) => Number(r.newScore) || 0);
       const avgCSR = csrScores.length > 0 
         ? csrScores.reduce((a: number, b: number) => a + b, 0) / csrScores.length 
         : 85;
