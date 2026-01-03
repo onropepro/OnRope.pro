@@ -4,10 +4,11 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "react-i18next";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { BackButton } from "@/components/BackButton";
+import Chart from "react-apexcharts";
+import type { ApexOptions } from "apexcharts";
 import {
   TrendingUp,
   TrendingDown,
@@ -39,6 +40,21 @@ interface DatabaseCostSummary {
 interface MetricsSummary {
   mrr: number;
   arr: number;
+  byComponent: {
+    baseFees: number;
+    employeeFees: number;
+    whiteLabel: number;
+  };
+  bySize: {
+    solo: number;
+    small: number;
+    medium: number;
+    large: number;
+  };
+  averages: {
+    employeesPerCompany: number;
+    mrrPerCustomer: number;
+  };
   byTier: {
     basic: number;
     starter: number;
@@ -47,14 +63,17 @@ interface MetricsSummary {
   };
   byAddon: {
     extraSeats: number;
-        whiteLabel: number;
+    whiteLabel: number;
   };
   customerCounts: {
     total: number;
-    basic: number;
-    starter: number;
-    premium: number;
-    enterprise: number;
+    monthly: number;
+    annual: number;
+    solo: number;
+    small: number;
+    medium: number;
+    large: number;
+    withWhiteLabel: number;
   };
   customers: {
     totalCustomers: number;
@@ -203,18 +222,72 @@ export default function SuperUserMetrics() {
     );
   }
 
-  const tierColors: Record<string, string> = {
-    basic: 'bg-blue-500',
-    starter: 'bg-green-500',
-    premium: 'bg-purple-500',
-    enterprise: 'bg-amber-500',
+  const sizeColors: Record<string, string> = {
+    solo: 'bg-blue-500',
+    small: 'bg-green-500',
+    medium: 'bg-purple-500',
+    large: 'bg-amber-500',
   };
 
-  const tierLabels: Record<string, string> = {
-    basic: 'Basic ($79)',
-    starter: 'Starter ($299)',
-    premium: 'Premium ($499)',
-    enterprise: 'Enterprise ($899)',
+  const sizeLabels: Record<string, string> = {
+    solo: 'Solo (1-3 employees)',
+    small: 'Small (4-9 employees)',
+    medium: 'Medium (10-29 employees)',
+    large: 'Large (30+ employees)',
+  };
+
+  const componentColors = ['#3B82F6', '#10B981', '#F59E0B'];
+  const sizeChartColors = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B'];
+
+  const mrrDonutOptions: ApexOptions = {
+    chart: { type: 'donut', height: 280 },
+    labels: ['Base Fees ($99/mo)', 'Employee Fees', 'White Label ($49)'],
+    colors: componentColors,
+    legend: { position: 'bottom' },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '60%',
+          labels: {
+            show: true,
+            name: { show: true },
+            value: { 
+              show: true, 
+              formatter: (val: string) => formatCurrency(parseFloat(val)) 
+            },
+            total: {
+              show: true,
+              label: 'Total MRR',
+              formatter: () => formatCurrency(metrics?.mrr || 0)
+            }
+          }
+        }
+      }
+    },
+    tooltip: {
+      y: { formatter: (val: number) => formatCurrency(val) }
+    }
+  };
+
+  const customerSizeBarOptions: ApexOptions = {
+    chart: { type: 'bar', height: 280, toolbar: { show: false } },
+    plotOptions: {
+      bar: { horizontal: true, barHeight: '60%', borderRadius: 6, distributed: true }
+    },
+    colors: sizeChartColors,
+    xaxis: {
+      categories: ['Solo (1-3)', 'Small (4-9)', 'Medium (10-29)', 'Large (30+)'],
+      labels: { formatter: (val: string) => formatCurrency(parseFloat(val)) }
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: (val: number) => formatCurrency(val),
+      style: { fontSize: '12px' }
+    },
+    legend: { show: false },
+    tooltip: {
+      y: { formatter: (val: number) => formatCurrency(val) }
+    }
   };
 
   return (
@@ -274,105 +347,110 @@ export default function SuperUserMetrics() {
 
         {/* Revenue Breakdown Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* MRR by Tier */}
-          <Card data-testid="card-mrr-by-tier">
+          {/* MRR by Component - Donut Chart */}
+          <Card data-testid="card-mrr-by-component">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
-                {t('superuser.metrics.mrrByTier', 'MRR by Subscription Tier')}
+                {t('superuser.metrics.mrrByComponent', 'MRR Breakdown')}
               </CardTitle>
               <CardDescription>
-                {t('superuser.metrics.mrrByTierDesc', 'Revenue breakdown by pricing tier')}
+                {t('superuser.metrics.mrrByComponentDesc', 'Revenue by pricing component')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="flex items-center justify-center h-64">
+                  <Skeleton className="h-48 w-48 rounded-full" />
+                </div>
+              ) : metrics?.byComponent ? (
+                <div>
+                  <Chart
+                    options={mrrDonutOptions}
+                    series={[
+                      metrics.byComponent.baseFees,
+                      metrics.byComponent.employeeFees,
+                      metrics.byComponent.whiteLabel
+                    ]}
+                    type="donut"
+                    height={280}
+                  />
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+                    <div className="p-2 rounded-md bg-blue-50 dark:bg-blue-500/10">
+                      <div className="font-semibold text-blue-600 dark:text-blue-400">
+                        {metrics.customerCounts?.total || 0}
+                      </div>
+                      <div className="text-muted-foreground">Customers</div>
+                    </div>
+                    <div className="p-2 rounded-md bg-green-50 dark:bg-green-500/10">
+                      <div className="font-semibold text-green-600 dark:text-green-400">
+                        {metrics.averages?.employeesPerCompany || 0}
+                      </div>
+                      <div className="text-muted-foreground">Avg Employees</div>
+                    </div>
+                    <div className="p-2 rounded-md bg-amber-50 dark:bg-amber-500/10">
+                      <div className="font-semibold text-amber-600 dark:text-amber-400">
+                        {formatCurrency(metrics.averages?.mrrPerCustomer || 0)}
+                      </div>
+                      <div className="text-muted-foreground">ARPU</div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          {/* MRR by Company Size - Horizontal Bar Chart */}
+          <Card data-testid="card-mrr-by-size">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-green-500" />
+                {t('superuser.metrics.mrrBySize', 'MRR by Company Size')}
+              </CardTitle>
+              <CardDescription>
+                {t('superuser.metrics.mrrBySizeDesc', 'Revenue distribution by customer segment')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading ? (
                 <div className="space-y-4">
                   {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-2 w-full" />
-                    </div>
+                    <Skeleton key={i} className="h-8 w-full" />
                   ))}
                 </div>
-              ) : metrics ? (
-                <div className="space-y-4">
-                  {Object.entries(metrics.byTier).map(([tier, amount]) => {
-                    const customerCount = metrics.customerCounts[tier as keyof typeof metrics.customerCounts] || 0;
-                    const percentage = metrics.mrr > 0 ? (amount / metrics.mrr) * 100 : 0;
-                    
-                    return (
-                      <div key={tier} className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="capitalize">
-                              {tierLabels[tier] || tier}
-                            </Badge>
-                            <span className="text-muted-foreground">
-                              {customerCount} {t('superuser.metrics.customers', 'customers')}
-                            </span>
-                          </div>
-                          <span className="font-medium">{formatCurrency(amount)}</span>
-                        </div>
-                        <Progress 
-                          value={percentage} 
-                          className="h-2"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : null}
-            </CardContent>
-          </Card>
-
-          {/* MRR by Add-ons */}
-          <Card data-testid="card-mrr-by-addons">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-green-500" />
-                {t('superuser.metrics.addonRevenue', 'Add-on Revenue')}
-              </CardTitle>
-              <CardDescription>
-                {t('superuser.metrics.addonRevenueDesc', 'Additional revenue from optional features')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="space-y-4">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="flex items-center justify-between">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-4 w-16" />
+              ) : metrics?.bySize ? (
+                <div>
+                  <Chart
+                    options={customerSizeBarOptions}
+                    series={[{
+                      name: 'MRR',
+                      data: [
+                        metrics.bySize.solo,
+                        metrics.bySize.small,
+                        metrics.bySize.medium,
+                        metrics.bySize.large
+                      ]
+                    }]}
+                    type="bar"
+                    height={280}
+                  />
+                  <div className="mt-4 grid grid-cols-4 gap-2 text-center text-xs">
+                    <div className="p-2 rounded-md bg-blue-50 dark:bg-blue-500/10">
+                      <div className="font-semibold">{metrics.customerCounts?.solo || 0}</div>
+                      <div className="text-muted-foreground">Solo</div>
                     </div>
-                  ))}
-                </div>
-              ) : metrics ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between py-2 border-b">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-blue-500" />
-                      <span>{t('superuser.metrics.extraSeats', 'Extra Seats')}</span>
+                    <div className="p-2 rounded-md bg-green-50 dark:bg-green-500/10">
+                      <div className="font-semibold">{metrics.customerCounts?.small || 0}</div>
+                      <div className="text-muted-foreground">Small</div>
                     </div>
-                    <span className="font-medium">{formatCurrency(metrics.byAddon.extraSeats)}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between py-2 border-b">
-                    <div className="flex items-center gap-2">
-                      <Building className="h-4 w-4 text-amber-500" />
-                      <span>{t('superuser.metrics.whiteLabel', 'White Label Branding')}</span>
+                    <div className="p-2 rounded-md bg-purple-50 dark:bg-purple-500/10">
+                      <div className="font-semibold">{metrics.customerCounts?.medium || 0}</div>
+                      <div className="text-muted-foreground">Medium</div>
                     </div>
-                    <span className="font-medium">{formatCurrency(metrics.byAddon.whiteLabel)}</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 font-medium">
-                    <span>{t('superuser.metrics.totalAddons', 'Total Add-on Revenue')}</span>
-                    <span className="text-green-600 dark:text-green-400">
-                      {formatCurrency(
-                        metrics.byAddon.extraSeats + 
-                         
-                        metrics.byAddon.whiteLabel
-                      )}
-                    </span>
+                    <div className="p-2 rounded-md bg-amber-50 dark:bg-amber-500/10">
+                      <div className="font-semibold">{metrics.customerCounts?.large || 0}</div>
+                      <div className="text-muted-foreground">Large</div>
+                    </div>
                   </div>
                 </div>
               ) : null}
@@ -423,7 +501,7 @@ export default function SuperUserMetrics() {
             </CardContent>
           </Card>
 
-          {/* Customer Tier Distribution */}
+          {/* Customer Size Distribution */}
           <Card data-testid="card-customer-distribution">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -431,7 +509,7 @@ export default function SuperUserMetrics() {
                 {t('superuser.metrics.customerDistribution', 'Customer Distribution')}
               </CardTitle>
               <CardDescription>
-                {t('superuser.metrics.customerDistributionDesc', 'Breakdown by subscription tier')}
+                {t('superuser.metrics.customerDistributionDesc', 'Breakdown by company size')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -446,25 +524,31 @@ export default function SuperUserMetrics() {
                 </div>
               ) : metrics ? (
                 <div className="space-y-3">
-                  {Object.entries(metrics.customerCounts)
-                    .filter(([key]) => key !== 'total')
-                    .map(([tier, count]) => {
-                      const percentage = metrics.customerCounts.total > 0 
-                        ? Math.round((count / metrics.customerCounts.total) * 100)
-                        : 0;
-                      return (
-                        <div key={tier} className="flex items-center justify-between py-2 border-b last:border-0">
-                          <div className="flex items-center gap-2">
-                            <div className={`h-3 w-3 rounded-full ${tierColors[tier] || 'bg-gray-400'}`} />
-                            <span className="text-sm capitalize">{tier}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline">{count}</Badge>
-                            <span className="text-xs text-muted-foreground w-12 text-right">{percentage}%</span>
-                          </div>
+                  {(['solo', 'small', 'medium', 'large'] as const).map((size) => {
+                    const count = metrics.customerCounts[size] || 0;
+                    const total = metrics.customerCounts.total || 1;
+                    const percentage = Math.round((count / total) * 100);
+                    return (
+                      <div key={size} className="flex items-center justify-between py-2 border-b last:border-0">
+                        <div className="flex items-center gap-2">
+                          <div className={`h-3 w-3 rounded-full ${sizeColors[size]}`} />
+                          <span className="text-sm">{sizeLabels[size]}</span>
                         </div>
-                      );
-                    })}
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{count}</Badge>
+                          <span className="text-xs text-muted-foreground w-12 text-right">{percentage}%</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="flex items-center justify-between pt-2 font-medium border-t">
+                    <span className="text-sm">{t('superuser.metrics.total', 'Total Customers')}</span>
+                    <Badge variant="default">{metrics.customerCounts?.total || 0}</Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>White Label Active</span>
+                    <Badge variant="secondary">{metrics.customerCounts?.withWhiteLabel || 0}</Badge>
+                  </div>
                 </div>
               ) : null}
             </CardContent>

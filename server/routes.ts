@@ -8501,6 +8501,9 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       res.json({
         mrr: mrrMetrics.totalMrr,
         arr,
+        byComponent: mrrMetrics.byComponent,
+        bySize: mrrMetrics.bySize,
+        averages: mrrMetrics.averages,
         byTier: mrrMetrics.byTier,
         byAddon: mrrMetrics.byAddon,
         customerCounts: mrrMetrics.customerCounts,
@@ -8574,6 +8577,9 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       res.json({
         mrr: mrrMetrics.totalMrr,
         arr: mrrMetrics.totalMrr * 12,
+        byComponent: mrrMetrics.byComponent,
+        bySize: mrrMetrics.bySize,
+        averages: mrrMetrics.averages,
         byTier: mrrMetrics.byTier,
         byAddon: mrrMetrics.byAddon,
         customerCounts: mrrMetrics.customerCounts,

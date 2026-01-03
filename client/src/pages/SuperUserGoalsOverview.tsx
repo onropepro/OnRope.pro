@@ -5,6 +5,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Chart from "react-apexcharts";
+import type { ApexOptions } from "apexcharts";
 import { 
   Users, Target, Building2, TrendingUp, TrendingDown, DollarSign,
   Activity, AlertCircle, CheckCircle2, Clock, Share2, 
@@ -371,6 +373,83 @@ const reviewCadence = [
   { frequency: "Quarterly", review: "Strategic review, goal reset" }
 ];
 
+interface GoalGaugeProps {
+  label: string;
+  actual: number;
+  goal: number;
+  format?: 'number' | 'currency' | 'percent';
+}
+
+function GoalProgressGauge({ label, actual, goal, format = 'number' }: GoalGaugeProps) {
+  const percent = Math.min((actual / goal) * 100, 100);
+  const status = percent >= 100 ? 'on-track' : percent >= 80 ? 'at-risk' : 'behind';
+  const color = status === 'on-track' ? '#10B981' : status === 'at-risk' ? '#F59E0B' : '#EF4444';
+  
+  const formatValue = (val: number) => {
+    if (format === 'currency') return `$${val.toLocaleString()}`;
+    if (format === 'percent') return `${val}%`;
+    return val.toLocaleString();
+  };
+
+  const options: ApexOptions = {
+    chart: { 
+      type: 'radialBar', 
+      height: 200,
+      sparkline: { enabled: true },
+    },
+    colors: [color],
+    plotOptions: {
+      radialBar: {
+        startAngle: -90,
+        endAngle: 90,
+        hollow: { size: '60%' },
+        track: { 
+          background: '#E5E7EB',
+          strokeWidth: '100%',
+        },
+        dataLabels: {
+          name: { 
+            show: true, 
+            fontSize: '12px', 
+            color: '#6B7280',
+            offsetY: 20,
+          },
+          value: { 
+            show: true, 
+            fontSize: '24px', 
+            fontWeight: 'bold',
+            color: '#111827',
+            offsetY: -15,
+            formatter: () => formatValue(actual),
+          },
+        },
+      },
+    },
+    labels: [`Goal: ${formatValue(goal)}`],
+  };
+
+  const statusConfig = getStatusConfig(status);
+
+  return (
+    <div className="su-card p-4">
+      <div className="flex justify-between items-center mb-2 gap-2 flex-wrap">
+        <h4 className="font-medium text-foreground">{label}</h4>
+        <Badge className={statusConfig.badge}>
+          {statusConfig.label}
+        </Badge>
+      </div>
+      <Chart options={options} series={[Math.round(percent)]} type="radialBar" height={200} />
+    </div>
+  );
+}
+
+const pricingModelData = {
+  base: { monthly: 99, annual: 82.17 },
+  seat: { standard: 34.95, volume: 29.95 },
+  whiteLabel: 49,
+  volumeThreshold: 30,
+};
+
 export default function SuperUserGoalsOverview() {
   const { data: metrics, isLoading } = useQuery<MetricsSummary>({
     queryKey: ["/api/superuser/metrics/summary"],
@@ -436,6 +515,42 @@ export default function SuperUserGoalsOverview() {
             </TabsList>
 
             <TabsContent value="summary" className="space-y-6">
+              {/* Visual Goal Progress Gauges */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" data-testid="goal-gauges">
+                <GoalProgressGauge 
+                  label="Tech Accounts" 
+                  actual={currentTechAccounts} 
+                  goal={500} 
+                />
+                <GoalProgressGauge 
+                  label="Viral Coefficient" 
+                  actual={0.90} 
+                  goal={1.0} 
+                />
+                <GoalProgressGauge 
+                  label="Trial Starts/Mo" 
+                  actual={6} 
+                  goal={10} 
+                />
+                <GoalProgressGauge 
+                  label="Conversion Rate" 
+                  actual={36} 
+                  goal={40} 
+                  format="percent"
+                />
+                <GoalProgressGauge 
+                  label="Paying Customers" 
+                  actual={currentEmployers} 
+                  goal={25} 
+                />
+                <GoalProgressGauge 
+                  label="MRR" 
+                  actual={currentMRR} 
+                  goal={19700} 
+                  format="currency"
+                />
+              </div>
+
               <div className="su-card" data-testid="card-summary-dashboard">
                 <div className="su-card-header">
                   <h3 className="font-semibold text-foreground">At-a-Glance View</h3>
@@ -650,19 +765,42 @@ export default function SuperUserGoalsOverview() {
               <div className="su-card" data-testid="card-pricing-model">
                 <div className="su-card-header">
                   <h3 className="font-semibold text-foreground">Pricing Model</h3>
-                  <p className="text-sm text-muted-foreground">Current subscription structure</p>
+                  <p className="text-sm text-muted-foreground">Current employee-based subscription structure</p>
                 </div>
                 <div className="su-card-body">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30">
-                      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Base Fee</p>
+                      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Base Fee (Monthly)</p>
                       <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">$99/month</p>
                       <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Per account</p>
                     </div>
-                    <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30">
-                      <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">Per Employee</p>
-                      <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">$34.95/month</p>
-                      <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1">Per active employee</p>
+                    <div className="p-4 rounded-lg bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30">
+                      <p className="text-sm text-green-600 dark:text-green-400 font-medium">Base Fee (Annual)</p>
+                      <p className="text-2xl font-bold text-green-700 dark:text-green-300">$82.17/month</p>
+                      <p className="text-xs text-green-500 dark:text-green-400 mt-1">17% discount</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-cyan-50 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/30">
+                      <p className="text-sm text-cyan-600 dark:text-cyan-400 font-medium">Per Employee (1-29)</p>
+                      <p className="text-2xl font-bold text-cyan-700 dark:text-cyan-300">$34.95/month</p>
+                      <p className="text-xs text-cyan-500 dark:text-cyan-400 mt-1">Standard rate</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30">
+                      <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Per Employee (30+)</p>
+                      <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">$29.95/month</p>
+                      <p className="text-xs text-purple-500 dark:text-purple-400 mt-1">Volume discount</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-lg bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/30">
+                      <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">White Label Branding</p>
+                      <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">$49/month</p>
+                      <p className="text-xs text-orange-500 dark:text-orange-400 mt-1">Custom branding add-on</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-500/10 border border-gray-200 dark:border-gray-500/30">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">Weighted Average ARPU</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">$788/month</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Based on customer mix distribution</p>
                     </div>
                   </div>
                 </div>

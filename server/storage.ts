@@ -3948,15 +3948,32 @@ export class Storage {
 
   /**
    * Calculate live MRR metrics from current subscription data
-   * Uses existing user subscription fields without new tables for real-time calculation
-   * License key format: COMPANY-XXXXX-XXXXX-XXXXX-N or GIFT-XXXXX-XXXXX-XXXXX-N
-   * Where N is tier: 1=Basic, 2=Starter, 3=Premium, 4=Enterprise
+   * Uses employee-based pricing model:
+   * - Base Fee (Monthly): $99/month | Annual: $82.17/month (17% discount)
+   * - Per Employee (1-29): $34.95/month
+   * - Per Employee (30+): $29.95/month (volume discount)
+   * - White Label Add-on: $49/month
    */
   async calculateLiveMrrMetrics(): Promise<{
     totalMrr: number;
+    byComponent: { baseFees: number; employeeFees: number; whiteLabel: number };
+    bySize: { solo: number; small: number; medium: number; large: number };
+    customerCounts: { 
+      total: number; 
+      monthly: number; 
+      annual: number; 
+      solo: number; 
+      small: number; 
+      medium: number; 
+      large: number;
+      withWhiteLabel: number;
+    };
+    averages: {
+      employeesPerCompany: number;
+      mrrPerCustomer: number;
+    };
     byTier: { basic: number; starter: number; premium: number; enterprise: number };
     byAddon: { extraSeats: number; whiteLabel: number };
-    customerCounts: { total: number; basic: number; starter: number; premium: number; enterprise: number };
   }> {
     // Get all company users with active subscriptions (have license key)
     const companies = await db.select().from(users).where(
@@ -3966,63 +3983,129 @@ export class Storage {
       )
     );
 
-    // Tier pricing (monthly) - map tier number to tier name and price
-    const tierMap: Record<string, { name: string; price: number }> = {
-      '1': { name: 'basic', price: 79 },
-      '2': { name: 'starter', price: 299 },
-      '3': { name: 'premium', price: 499 },
-      '4': { name: 'enterprise', price: 899 },
+    // New pricing model
+    const pricing = {
+      base: { monthly: 99, annual: 82.17 },
+      seat: { standard: 34.95, volume: 29.95 },
+      whiteLabel: 49,
+      volumeThreshold: 30,
     };
 
-    // Add-on pricing (monthly)
-    const addonPricing = {
-      extraSeats: 19,  // Per 2 seats package (additionalSeatsCount is number of packs)
-            whiteLabel: 49,  // Flat rate
+    const byComponent = { baseFees: 0, employeeFees: 0, whiteLabel: 0 };
+    const bySize = { solo: 0, small: 0, medium: 0, large: 0 };
+    const customerCounts = { 
+      total: 0, 
+      monthly: 0, 
+      annual: 0, 
+      solo: 0, 
+      small: 0, 
+      medium: 0, 
+      large: 0,
+      withWhiteLabel: 0,
     };
-
-    const byTier = { basic: 0, starter: 0, premium: 0, enterprise: 0 };
-    const byAddon = { extraSeats: 0, whiteLabel: 0 };
-    const customerCounts = { total: 0, basic: 0, starter: 0, premium: 0, enterprise: 0 };
+    
+    let totalEmployees = 0;
 
     for (const company of companies) {
-      // Extract tier from license key - format: COMPANY-XXXXX-XXXXX-XXXXX-N or GIFT-XXXXX-XXXXX-XXXXX-N
-      // Split on '-' and get the last segment which is the tier number (1-4)
-      if (company.licenseKey) {
-        const segments = company.licenseKey.split('-');
-        const lastSegment = segments[segments.length - 1];
-        // Normalize: take only the first character in case there are extra digits
-        const tierNumber = lastSegment?.charAt(0) || '1';
-        const tierInfo = tierMap[tierNumber];
-        
-        if (tierInfo) {
-          const tier = tierInfo.name as keyof typeof byTier;
-          byTier[tier] += tierInfo.price;
-          customerCounts[tier]++;
-          customerCounts.total++;
-        } else {
-          // Default to basic if tier not recognized
-          byTier.basic += tierMap['1'].price;
-          customerCounts.basic++;
-          customerCounts.total++;
-        }
+      if (!company.licenseKey) continue;
+      
+      customerCounts.total++;
+      
+      // Determine billing cycle - check for annual pattern in subscription or default to monthly
+      const isAnnual = company.stripeSubscriptionId?.includes('annual') || false;
+      if (isAnnual) {
+        customerCounts.annual++;
+      } else {
+        customerCounts.monthly++;
       }
-
-      // Calculate add-on MRR using actual stored add-on counts
-      // additionalSeatsCount = number of seat packs purchased (each pack = 2 seats, $19/mo)
-      if (company.additionalSeatsCount && company.additionalSeatsCount > 0) {
-        byAddon.extraSeats += company.additionalSeatsCount * addonPricing.extraSeats;
+      
+      // Calculate base fee
+      const baseFee = isAnnual ? pricing.base.annual : pricing.base.monthly;
+      byComponent.baseFees += baseFee;
+      
+      // Get employee count for this company
+      // Employees are stored in users table with companyId reference
+      const companyEmployees = await db.select().from(users).where(
+        and(
+          eq(users.companyId, company.id),
+          not(eq(users.role, "company")),
+          not(eq(users.role, "resident"))
+        )
+      );
+      const employeeCount = companyEmployees.length;
+      totalEmployees += employeeCount;
+      
+      // Calculate employee fee using tiered pricing
+      const seatRate = employeeCount >= pricing.volumeThreshold 
+        ? pricing.seat.volume 
+        : pricing.seat.standard;
+      const employeeFee = employeeCount * seatRate;
+      byComponent.employeeFees += employeeFee;
+      
+      // Calculate total MRR for this customer (for size categorization)
+      const customerMrr = baseFee + employeeFee + (company.whitelabelBrandingActive ? pricing.whiteLabel : 0);
+      
+      // Categorize by company size based on employee count
+      if (employeeCount <= 3) {
+        bySize.solo += customerMrr;
+        customerCounts.solo++;
+      } else if (employeeCount <= 9) {
+        bySize.small += customerMrr;
+        customerCounts.small++;
+      } else if (employeeCount <= 29) {
+        bySize.medium += customerMrr;
+        customerCounts.medium++;
+      } else {
+        bySize.large += customerMrr;
+        customerCounts.large++;
       }
-
-      // whitelabelBrandingActive = white label branding subscription ($49/mo)
+      
+      // White label add-on
       if (company.whitelabelBrandingActive) {
-        byAddon.whiteLabel += addonPricing.whiteLabel;
+        byComponent.whiteLabel += pricing.whiteLabel;
+        customerCounts.withWhiteLabel++;
       }
     }
 
-    const totalMrr = Object.values(byTier).reduce((a, b) => a + b, 0) +
-                     Object.values(byAddon).reduce((a, b) => a + b, 0);
+    // Round all monetary values to 2 decimal places
+    const roundMoney = (val: number) => Math.round(val * 100) / 100;
+    
+    byComponent.baseFees = roundMoney(byComponent.baseFees);
+    byComponent.employeeFees = roundMoney(byComponent.employeeFees);
+    byComponent.whiteLabel = roundMoney(byComponent.whiteLabel);
+    bySize.solo = roundMoney(bySize.solo);
+    bySize.small = roundMoney(bySize.small);
+    bySize.medium = roundMoney(bySize.medium);
+    bySize.large = roundMoney(bySize.large);
+    
+    const totalMrr = roundMoney(byComponent.baseFees + byComponent.employeeFees + byComponent.whiteLabel);
+    
+    // Calculate averages with safe defaults
+    const averages = {
+      employeesPerCompany: customerCounts.total > 0 
+        ? Math.round((totalEmployees / customerCounts.total) * 10) / 10 
+        : 0,
+      mrrPerCustomer: customerCounts.total > 0 
+        ? roundMoney(totalMrr / customerCounts.total)
+        : 0,
+    };
 
-    return { totalMrr, byTier, byAddon, customerCounts };
+    // Legacy format for backward compatibility
+    const byTier = { basic: 0, starter: 0, premium: 0, enterprise: 0 };
+    const byAddon = { 
+      extraSeats: byComponent.employeeFees, 
+      whiteLabel: byComponent.whiteLabel 
+    };
+
+    return { 
+      totalMrr: totalMrr || 0, 
+      byComponent, 
+      bySize, 
+      customerCounts, 
+      averages,
+      byTier, 
+      byAddon 
+    };
   }
 
   /**
