@@ -4,259 +4,418 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { PreLaunchFooter } from "../components/PreLaunchFooter";
 import onRopeProLogo from "@assets/OnRopePro-logo-white_1767469623033.png";
 import {
   ArrowRight,
-  CheckCircle2,
-  Shield,
+  BarChart3,
+  Building2,
+  MessageSquare,
   Eye,
   Clock,
+  FileCheck,
+  Upload,
+  Check,
+  Users,
+  Layers,
   FileText,
-  BarChart3,
-  Scale,
-  Download,
-  MessageSquare,
 } from "lucide-react";
 
-const pmBenefits = [
+const problemsData = [
   {
-    icon: Shield,
-    headline: "See vendor safety compliance at a glance",
-    detail: "Company Safety Rating (CSR) shows documentation completion, toolbox meetings, and harness inspections. Compare vendors objectively before signing contracts.",
-    metric: "Due diligence documented",
+    before: "I have no way to verify if my vendors are actually following safety protocols",
+    after: "Company Safety Rating shows documentation completion, toolbox meetings, and harness inspections. Objective data, not sales pitches.",
   },
   {
-    icon: Eye,
-    headline: "Answer owner questions instantly",
-    detail: "'How's the window washing going?' Log in, check progress: '68% complete, ahead of schedule.' No calling the contractor.",
-    metric: "Instant status visibility",
+    before: "I spend hours chasing vendor insurance certificates before they expire",
+    after: "All certificates visible in your portal. System alerts vendors before expiration. You just verify, not chase.",
   },
   {
-    icon: MessageSquare,
-    headline: "Get out of the complaint loop",
-    detail: "Residents submit feedback directly to vendors through the portal. You see resolution status without being the middleman.",
-    metric: "20+ hrs/month saved",
+    before: "Residents complain to me about window washing, and I have to relay it to the vendor",
+    after: "Residents submit feedback directly to vendors. You see resolution status without playing telephone.",
   },
   {
+    before: "When the building owner asks how the project is going, I have to call the contractor",
+    after: "Log in and check: \"68% complete, ahead of schedule.\" Answer instantly without calling anyone.",
+  },
+  {
+    before: "I have no data to justify why I chose one vendor over another",
+    after: "CSR scores, response times, and resolution rates give you objective criteria for vendor selection and renewal decisions.",
+  },
+  {
+    before: "If there's an accident, I can't prove I did due diligence on vendor safety",
+    after: "Your portal shows documented history of CSR reviews, safety compliance monitoring, and certificate verification. Due diligence, documented.",
+  },
+];
+
+const featuresData = [
+  {
+    title: "Company Safety Rating Visibility",
+    description: "See each vendor's CSR score before and during contracts. Compare vendors objectively.",
     icon: BarChart3,
-    headline: "Evaluate vendors with data, not gut feel",
-    detail: "Average response time, resolution rates, and CSR trends over time. Contract renewal decisions backed by objective performance metrics.",
-    metric: "Data-driven decisions",
   },
   {
-    icon: Download,
-    headline: "Download safety docs without asking",
-    detail: "Anchor inspection certificates, insurance docs, and rope access plans available in your portal. No email requests, no waiting.",
-    metric: "Self-service access",
+    title: "Real-Time Project Dashboards",
+    description: "Progress by elevation, crew assignments, expected completion. No status calls required.",
+    icon: Eye,
   },
   {
-    icon: Scale,
-    headline: "Protect yourself when accidents happen",
-    detail: "'What due diligence did you perform?' Show documented vendor CSR review, safety compliance tracking, and contract requirements.",
-    metric: "Liability protection",
+    title: "Self-Service Document Access",
+    description: "Download insurance certificates, anchor inspections, and safety plans without asking.",
+    icon: FileCheck,
+  },
+  {
+    title: "Resident Feedback Routing",
+    description: "Complaints go directly to vendors. You monitor resolution without managing the conversation.",
+    icon: MessageSquare,
+  },
+  {
+    title: "Response Time Metrics",
+    description: "Average response and resolution times per vendor. Data for contract renewal decisions.",
+    icon: Clock,
+  },
+  {
+    title: "Anchor Inspection Upload",
+    description: "Upload your building's annual anchor inspection certificates. Vendors see them automatically.",
+    icon: Upload,
+  },
+];
+
+const howItWorksSteps = [
+  {
+    step: 1,
+    title: "Your Vendor Joins OnRopePro",
+    description: "A rope access company you contract with subscribes to OnRopePro and adds your building to their system.",
+  },
+  {
+    step: 2,
+    title: "You Get Invited",
+    description: "You receive an invitation to create your free property manager account. One account works across all your OnRopePro vendors.",
+  },
+  {
+    step: 3,
+    title: "See Everything",
+    description: "Log in to see project progress, safety documentation, response metrics, and Company Safety Ratings for all your connected vendors.",
+  },
+  {
+    step: 4,
+    title: "Residents Connect (Optional)",
+    description: "Give residents access to see progress and submit feedback directly. Complaints route to vendors, not you.",
+  },
+  {
+    step: 5,
+    title: "Make Better Decisions",
+    description: "Use objective data for vendor evaluations, contract renewals, and due diligence documentation.",
+  },
+];
+
+const portfolioBenefits = [
+  {
+    title: "Multi-Building View",
+    description: "See all active projects across your portfolio in one dashboard",
+  },
+  {
+    title: "Vendor Comparison",
+    description: "Compare CSR scores and response times across all your rope access vendors",
+  },
+  {
+    title: "Building History",
+    description: "Maintenance history accumulates over time, even when vendors change",
+  },
+  {
+    title: "Team Access",
+    description: "Add colleagues with appropriate permissions for different buildings",
+  },
+  {
+    title: "Compliance Reporting",
+    description: "Generate reports for building owners showing vendor safety compliance",
+  },
+];
+
+const faqData = [
+  {
+    question: "Is this really free for property managers?",
+    answer: "Yes. Rope access companies pay for OnRopePro. Property managers get free portal access when their vendors use the platform.",
+  },
+  {
+    question: "What if my current vendor doesn't use OnRopePro?",
+    answer: "You can tell them about it. When they join and add your building, you'll get invited to the portal. Or when you switch to a vendor who uses it, you'll see the difference immediately.",
+  },
+  {
+    question: "Can I see vendors' safety records before hiring them?",
+    answer: "If a vendor is on OnRopePro, you can request to view their Company Safety Rating as part of your RFP process. Vendors can share their CSR with prospective clients.",
+  },
+  {
+    question: "What data do I have access to?",
+    answer: "You see project progress, safety documentation, Company Safety Rating, response time metrics, and resident feedback for buildings you manage. You don't see vendor financials, employee details, or other clients' data.",
+  },
+  {
+    question: "Can I upload documents like anchor inspections?",
+    answer: "Yes. You can upload your building's annual anchor inspection certificates. Vendors see them automatically when they work on your building.",
+  },
+  {
+    question: "Does this replace my property management software?",
+    answer: "No. OnRopePro focuses specifically on rope access vendor management. It complements your existing property management systems.",
+  },
+  {
+    question: "When does this launch?",
+    answer: "January 2026. Join the waitlist to be notified when your vendors can invite you to the portal.",
   },
 ];
 
 export default function PreLaunchPropertyManagerPage() {
   const { toast } = useToast();
   const [fullName, setFullName] = useState("");
-  const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [buildingsManaged, setBuildingsManaged] = useState("");
+  const [bottomFullName, setBottomFullName] = useState("");
+  const [bottomEmail, setBottomEmail] = useState("");
+  const [bottomCompanyName, setBottomCompanyName] = useState("");
 
   const signupMutation = useMutation({
-    mutationFn: async (data: { companyName: string; email: string; stakeholderType: string; source: string }) => {
+    mutationFn: async (data: { companyName: string; email: string; stakeholderType: string; source: string; buildingsManaged?: string }) => {
       return apiRequest("POST", "/api/early-access", data);
     },
     onSuccess: () => {
       toast({
         title: "You're on the list!",
-        description: "We'll let you know when the property manager portal launches.",
+        description: "We'll notify you when your vendors can invite you to the portal.",
       });
       setFullName("");
-      setCompany("");
       setEmail("");
+      setCompanyName("");
+      setBuildingsManaged("");
+      setBottomFullName("");
+      setBottomEmail("");
+      setBottomCompanyName("");
     },
     onError: () => {
       toast({
         title: "Something went wrong",
-        description: "Please try again or email hello@onrope.pro",
+        description: "Please try again later.",
         variant: "destructive",
       });
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !email.trim()) return;
     signupMutation.mutate({
-      companyName: company.trim() ? `${fullName.trim()} - ${company.trim()}` : fullName.trim(),
-      email: email.trim(),
-      stakeholderType: "property_manager",
-      source: "property-manager-landing",
+      companyName: `${fullName} - ${companyName}`,
+      email,
+      stakeholderType: "property-manager",
+      source: "pm-prelaunch-hero",
+      buildingsManaged,
+    });
+  };
+
+  const handleBottomSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    signupMutation.mutate({
+      companyName: `${bottomFullName} - ${bottomCompanyName}`,
+      email: bottomEmail,
+      stakeholderType: "property-manager",
+      source: "pm-prelaunch-bottom",
     });
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950">
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
       <section
-        className="relative text-white pb-[120px]"
-        style={{ backgroundImage: "linear-gradient(135deg, #6E9075 0%, #5A7A60 100%)" }}
+        className="relative min-h-[90vh] flex flex-col justify-center px-4 py-16 md:py-24"
+        style={{ backgroundImage: "linear-gradient(135deg, #0F1629 0%, #193A63 100%)" }}
       >
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnY0em0wLTZoLTJ2LTRoMnY0em0tNiA2aC0ydi00aDJ2NHptMC02aC0ydi00aDJ2NHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
-
-        <div className="relative max-w-6xl mx-auto px-4 py-4 md:py-12">
-          <div className="flex justify-center pt-8 pb-4">
-            <img src={onRopeProLogo} alt="OnRopePro" className="h-12 md:h-16" />
-          </div>
-
-          <div className="text-center space-y-6 pt-8">
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1">
-              FOR PROPERTY & STRATA MANAGERS
-            </Badge>
-
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-              Verify vendor performance.<br className="hidden md:block" />
-              <span className="text-green-100">Reduce your liability.</span>
-            </h1>
-
-            <p className="text-lg md:text-xl text-green-100 max-w-3xl mx-auto leading-relaxed">
-              See real-time project progress, safety compliance scores, and response metrics
-              for your rope access vendors. No more phone calls for updates.
-            </p>
-
-            <p className="text-green-100">
-              Launching January 2026. Get notified when we go live.
-            </p>
-
-            <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-4 pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-white text-left block">
-                    Your Name
-                  </Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    placeholder="Your full name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
-                    data-testid="input-pm-name"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="company" className="text-white text-left block">
-                    Management Company (optional)
-                  </Label>
-                  <Input
-                    id="company"
-                    type="text"
-                    placeholder="Your management company"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
-                    data-testid="input-pm-company"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-white text-left block">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
-                    data-testid="input-pm-email"
-                    required
-                  />
-                </div>
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-white">
+              <div className="mb-6">
+                <img
+                  src={onRopeProLogo}
+                  alt="OnRopePro"
+                  className="h-10 md:h-12 w-auto"
+                />
               </div>
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-white text-[#6E9075] hover:bg-green-50"
-                disabled={signupMutation.isPending}
-                data-testid="button-pm-early-access"
-              >
-                {signupMutation.isPending ? "Submitting..." : "Get Notified at Launch"}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <p className="text-base text-green-100/80">
-                Free for property managers. No spam. Unsubscribe anytime.
+              
+              <Badge className="mb-6 bg-[#fa7315] text-white border-0 px-4 py-1.5 text-sm font-medium">
+                LAUNCHING JANUARY 2026
+              </Badge>
+              
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                2026: The year you can finally see which vendors are worth renewing.
+              </h1>
+              
+              <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed">
+                Company Safety Ratings. Response time metrics. Real-time project dashboards. Stop guessing which rope access vendors are actually safe.
               </p>
-            </form>
+
+              <p className="text-slate-400 text-base">
+                Property managers across North America are tired of chasing vendor certificates. We built something better.
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 md:p-8">
+              <h2 className="text-white text-xl font-semibold mb-6">
+                Get Early Access
+              </h2>
+              
+              <form onSubmit={handleHeroSubmit} className="space-y-4">
+                <Input
+                  type="text"
+                  placeholder="Full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 h-12"
+                  data-testid="input-pm-hero-name"
+                  required
+                />
+                <Input
+                  type="email"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 h-12"
+                  data-testid="input-pm-hero-email"
+                  required
+                />
+                <Input
+                  type="text"
+                  placeholder="Company name"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-slate-400 h-12"
+                  data-testid="input-pm-hero-company"
+                  required
+                />
+                <Select value={buildingsManaged} onValueChange={setBuildingsManaged}>
+                  <SelectTrigger 
+                    className="bg-white/10 border-white/20 text-white h-12"
+                    data-testid="select-pm-buildings"
+                  >
+                    <SelectValue placeholder="Number of buildings managed" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1-5">1-5 buildings</SelectItem>
+                    <SelectItem value="6-15">6-15 buildings</SelectItem>
+                    <SelectItem value="16-50">16-50 buildings</SelectItem>
+                    <SelectItem value="50+">50+ buildings</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full bg-[#fa7315] hover:bg-[#e56610] text-white h-12 text-base font-semibold"
+                  disabled={signupMutation.isPending}
+                  data-testid="button-pm-hero-cta"
+                >
+                  Get Early Access
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </form>
+              
+              <p className="text-slate-400 text-sm mt-4 text-center">
+                Free for property managers. Your vendors pay for the platform.
+              </p>
+            </div>
           </div>
         </div>
+      </section>
 
-        <div className="absolute bottom-0 left-0 right-0 z-10">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block">
-            <path
-              d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-              className="fill-white dark:fill-slate-950"
-            />
-          </svg>
+      {/* Answer Section */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Vendor compliance, finally visible.
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              OnRopePro gives you a window into your rope access vendors' operations. Safety documentation, project progress, response metrics. The data you need to make informed decisions and protect yourself from liability.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="border-slate-200 dark:border-slate-700">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-lg bg-[#fa7315]/10 flex items-center justify-center mb-4">
+                  <BarChart3 className="w-6 h-6 text-[#fa7315]" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Company Safety Rating</h3>
+                <p className="text-muted-foreground text-sm">
+                  A real-time score reflecting each vendor's safety documentation, toolbox meetings, and compliance. Compare vendors objectively before signing contracts.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200 dark:border-slate-700">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-lg bg-[#fa7315]/10 flex items-center justify-center mb-4">
+                  <Building2 className="w-6 h-6 text-[#fa7315]" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Your Vendor Dashboard</h3>
+                <p className="text-muted-foreground text-sm">
+                  See all your rope access vendors in one place. Project progress, safety docs, insurance certificates. No more email chains asking for updates.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200 dark:border-slate-700">
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-lg bg-[#fa7315]/10 flex items-center justify-center mb-4">
+                  <MessageSquare className="w-6 h-6 text-[#fa7315]" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Direct Resident Feedback</h3>
+                <p className="text-muted-foreground text-sm">
+                  Residents submit complaints directly to vendors through the portal. You see resolution status without being the middleman.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
-      <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
-        <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
-          <Card className="shadow-xl border-0 relative z-20 -mt-20">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-blue-700">Real-time</div>
-                  <div className="text-base text-muted-foreground mt-1">Project Visibility</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-emerald-600">20+ hrs</div>
-                  <div className="text-base text-muted-foreground mt-1">Monthly Saved</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-orange-600">1-Click</div>
-                  <div className="text-base text-muted-foreground mt-1">Safety Doc Access</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-violet-600">Free</div>
-                  <div className="text-base text-muted-foreground mt-1">For Property Managers</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What OnRopePro Does For You
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Get out of the middle. Let the data do the talking.
-          </p>
+      {/* Problems Solved Section */}
+      <section
+        className="py-16 md:py-24 px-4"
+        style={{ backgroundImage: "linear-gradient(135deg, #0F1629 0%, #193A63 100%)" }}
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Problems You Won't Have Anymore
+            </h2>
+            <p className="text-slate-300 text-lg">
+              Every feature exists because a property manager told us about a real frustration.
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {pmBenefits.map((benefit, idx) => (
-              <Card key={idx}>
+            {problemsData.map((problem, i) => (
+              <Card key={i} className="bg-white/5 border-white/10 backdrop-blur-sm">
                 <CardContent className="p-6">
-                  <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
-                      <benefit.icon className="w-6 h-6 text-[#6E9075]" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-1">{benefit.headline}</h3>
-                      <p className="text-base text-muted-foreground mb-2">{benefit.detail}</p>
-                      <Badge variant="secondary" className="text-sm">
-                        {benefit.metric}
-                      </Badge>
-                    </div>
+                  <div className="mb-4">
+                    <p className="text-slate-400 text-sm font-medium mb-2">Before:</p>
+                    <p className="text-slate-300 text-sm italic">"{problem.before}"</p>
+                  </div>
+                  <div>
+                    <p className="text-[#fa7315] text-sm font-medium mb-2">After:</p>
+                    <p className="text-white text-sm">{problem.after}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -265,92 +424,165 @@ export default function PreLaunchPropertyManagerPage() {
         </div>
       </section>
 
-      <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Company Safety Rating (CSR)
-          </h2>
-          <p className="text-center text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-            Finally, an objective way to compare rope access vendors.
-          </p>
+      {/* What You Get Section */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Everything You Need to Manage Rope Access Vendors
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              All free. Your vendors pay for the platform.
+            </p>
+          </div>
 
-          <Card>
-            <CardContent className="p-8">
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-[#6E9075]" />
-                    What CSR Measures
-                  </h3>
-                  <ul className="space-y-2 text-base text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Safety documentation completion rate
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Toolbox meeting frequency
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Harness inspection compliance
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Incident history and response
-                    </li>
-                  </ul>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuresData.map((feature, i) => (
+              <div key={i} className="flex gap-4">
+                <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                  <feature.icon className="w-5 h-5 text-[#fa7315]" />
                 </div>
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-[#6E9075]" />
-                    Documentation Access
-                  </h3>
-                  <ul className="space-y-2 text-base text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Anchor inspection certificates
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Insurance documents (COI)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Rope access plans
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Method statements
-                    </li>
-                  </ul>
+                <div>
+                  <h3 className="font-semibold text-base mb-1">{feature.title}</h3>
+                  <p className="text-muted-foreground text-sm">{feature.description}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-16 md:py-24 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Your Vendors Join. You Get Access.
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              When a rope access company you work with uses OnRopePro, you get free portal access.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {howItWorksSteps.map((step, i) => (
+              <div key={i} className="flex gap-4 md:gap-6">
+                <div className="w-10 h-10 rounded-full bg-[#fa7315] text-white flex items-center justify-center flex-shrink-0 font-bold">
+                  {step.step}
+                </div>
+                <div className="pt-1">
+                  <h3 className="font-semibold text-lg mb-1">{step.title}</h3>
+                  <p className="text-muted-foreground">{step.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* For Your Buildings Section */}
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              One Portal. All Your Buildings. Every Vendor.
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Whether you manage 5 buildings or 50, your OnRopePro dashboard scales with you.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {portfolioBenefits.map((benefit, i) => (
+              <div key={i} className="flex items-start gap-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800">
+                <Check className="w-5 h-5 text-[#fa7315] flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-base">{benefit.title}</h3>
+                  <p className="text-muted-foreground text-sm">{benefit.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 md:py-24 px-4 bg-slate-50 dark:bg-slate-900">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Frequently Asked Questions
+          </h2>
+
+          <Accordion type="single" collapsible className="w-full">
+            {faqData.map((faq, i) => (
+              <AccordionItem key={i} value={`item-${i}`}>
+                <AccordionTrigger className="text-left text-base font-medium">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
       <section
         className="py-16 md:py-20 px-4 text-white"
-        style={{ backgroundImage: "linear-gradient(135deg, #6E9075 0%, #5A7A60 100%)" }}
+        style={{ backgroundImage: "linear-gradient(135deg, #fa7315 0%, #fa7315 100%)" }}
       >
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to see vendor performance clearly?
+            Stop chasing. Start verifying.
           </h2>
-          <p className="text-green-100 text-lg mb-8">
-            Join the waitlist. We'll notify you the moment the property manager portal goes live.
+          <p className="text-white text-lg mb-8">
+            Join the waitlist. Be ready when your vendors join OnRopePro.
           </p>
-          <Button
-            size="lg"
-            className="bg-white text-[#6E9075] hover:bg-green-50"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            data-testid="button-pm-final-cta"
-          >
-            Get Notified at Launch
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
+
+          <form onSubmit={handleBottomSubmit} className="flex flex-col gap-4 max-w-lg mx-auto mb-6">
+            <Input
+              type="text"
+              placeholder="Full name"
+              value={bottomFullName}
+              onChange={(e) => setBottomFullName(e.target.value)}
+              className="bg-white text-black h-12"
+              data-testid="input-pm-bottom-name"
+              required
+            />
+            <Input
+              type="email"
+              placeholder="Email address"
+              value={bottomEmail}
+              onChange={(e) => setBottomEmail(e.target.value)}
+              className="bg-white text-black h-12"
+              data-testid="input-pm-bottom-email"
+              required
+            />
+            <Input
+              type="text"
+              placeholder="Company name"
+              value={bottomCompanyName}
+              onChange={(e) => setBottomCompanyName(e.target.value)}
+              className="bg-white text-black h-12"
+              data-testid="input-pm-bottom-company"
+              required
+            />
+            <Button
+              type="submit"
+              size="lg"
+              className="bg-slate-900 text-white hover:bg-slate-800 h-12 px-8"
+              disabled={signupMutation.isPending}
+              data-testid="button-pm-bottom-cta"
+            >
+              Get Early Access
+            </Button>
+          </form>
+
+          <p className="text-white font-medium text-base mt-6">
+            Free for property managers. Built by building maintenance professionals.
+          </p>
         </div>
       </section>
 
