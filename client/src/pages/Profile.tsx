@@ -922,7 +922,12 @@ export default function Profile() {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
-      return apiRequest("PATCH", "/api/user/profile", data);
+      // Include legacy 'name' field for backward compatibility
+      const payload = {
+        ...data,
+        name: `${data.firstName} ${data.lastName}`.trim(),
+      };
+      return apiRequest("PATCH", "/api/user/profile", payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });

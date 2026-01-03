@@ -206,8 +206,10 @@ export function OnboardingWizard({ open, onClose, onComplete, currentUser }: Onb
 
   const createEmployeeMutation = useMutation({
     mutationFn: async (data: z.infer<typeof employeeSchema>) => {
+      // Include legacy 'name' field for backward compatibility
       return apiRequest("POST", "/api/employees", {
         ...data,
+        name: `${data.firstName} ${data.lastName}`.trim(),
         isTempPassword: true,
       });
     },
