@@ -241,7 +241,7 @@ export default function PreLaunchHomePage() {
               strata managers can finally see<br />
               <span className="text-[#fa7315]">what sets you apart.</span>
             </h1>
-            <p className="md:text-2xl text-blue-100 max-w-2xl mx-auto text-[20px] mt-[12px] mb-[12px]">Intelligent Urban Rope Access Software Built by a Level 3 tech and operations manager who got tired of the same chaos you're dealing with.</p>
+            <p className="md:text-2xl text-blue-100 max-w-2xl mx-auto text-[20px] mt-[12px] mb-[12px]">Intelligent Urban Rope Access Software Built by a Level 3 Tech & Operations Manager Who Got Tired of the Same Chaos You're Dealing With.</p>
             <p className="text-blue-100/80 italic text-[16px] mt-[14px] mb-[14px]">OnRopePro launches January 2026. Get on the waitlist before your competitors do.</p>
 
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4 pt-4">
@@ -342,7 +342,7 @@ export default function PreLaunchHomePage() {
             Your professionalism, finally visible.
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Company Safety Rating. Real-time project dashboards. Response time metrics.
+            Company Safety Rating. Real-time project dashboards that track drops and scheduling. Response time metrics.
             OnRopePro makes the things you're already doing well visible to the people deciding who gets the contract.
           </p>
 
