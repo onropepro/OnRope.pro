@@ -94,22 +94,58 @@ const howItWorksSteps = [
   },
 ];
 
-const standardFeatures = [
-  "Technician Passport (portable profile)",
-  "IRATA/SPRAT hour logging",
-  "Certification tracking",
-  "Work history across employers",
-  "Basic performance stats",
-  "Mobile app access",
+const freeFeatures = [
+  {
+    title: "Portable Profile",
+    description: "Your certifications, contact info, and work history in one place - owned by you",
+  },
+  {
+    title: "Logbook Photo Import",
+    description: "Snap a photo of your physical logbook pages. The app reads and imports your historical data automatically.",
+  },
+  {
+    title: "Instant Employer Connection",
+    description: "When connected to an employer on OnRopePro: 10 seconds to onboard, not 60 minutes of paperwork",
+  },
+  {
+    title: "Automatic Hour Tracking",
+    description: "Every work session, building, height, and task logged automatically (when employer uses OnRopePro)",
+  },
+  {
+    title: "Personal Safety Rating",
+    description: "Your compliance score based on inspections and document acknowledgments",
+  },
+  {
+    title: "Data Export Anytime",
+    description: "Download your complete work history. You own your data, period.",
+  },
+  {
+    title: "One Employer Connection",
+    description: "Connect with one company at a time",
+  },
 ];
 
 const plusFeatures = [
-  "Personal Safety Rating badge",
-  "Advanced performance analytics",
-  "Priority job board visibility",
-  "Shareable verified profile link",
-  "Historical trend reports",
-  "Early access to new features",
+  {
+    title: "Certification Expiry Alerts",
+    description: "60-day yellow warning, 30-day red alert. Never miss a renewal.",
+  },
+  {
+    title: "Multi-Employer Connections",
+    description: "Work your main job Monday-Thursday, pick up side gigs Friday-Sunday.",
+  },
+  {
+    title: "Job Board Access",
+    description: "See and apply to urban rope tech positions posted by companies on the platform",
+  },
+  {
+    title: "Enhanced Profile Visibility",
+    description: "Employers searching for techs see your profile first",
+  },
+  {
+    title: "Level Progression Tracking",
+    description: "Visual display of hours toward your next IRATA level (L1 to L2 to L3)",
+  },
 ];
 
 const faqData = [
@@ -396,53 +432,63 @@ export default function PreLaunchTechnicianPage() {
       </section>
 
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Free Forever. Upgrade If You Want.
+            Crystal Clear: What's Free, What's PLUS
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Standard accounts are free for all technicians. Plus adds advanced features for those who want more.
+            Your free account is yours forever. PLUS adds premium features - or get it free with one referral.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-2 border-slate-200 dark:border-slate-700">
+            <Card className="border border-slate-200 dark:border-slate-700">
               <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <h3 className="font-bold text-xl">Standard</h3>
-                  <Badge variant="secondary">Free</Badge>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-bold text-xl">FREE Account</h3>
                 </div>
-                <ul className="space-y-3">
-                  {standardFeatures.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-base">
-                      <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                      <span>{feature}</span>
+                <p className="text-muted-foreground text-sm mb-6">Always free. Never expires.</p>
+                <ul className="space-y-4">
+                  {freeFeatures.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-base">{feature.title}</p>
+                        <p className="text-sm text-muted-foreground">{feature.description}</p>
+                      </div>
                     </li>
                   ))}
                 </ul>
+                <p className="text-sm text-muted-foreground mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                  This is yours. Forever. No strings.
+                </p>
               </CardContent>
             </Card>
 
             <Card className="border-2 border-[#fa7315]">
               <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <h3 className="font-bold text-xl">Plus</h3>
-                  <Badge className="bg-[#fa7315] text-white border-0">Coming Soon</Badge>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-bold text-xl">PLUS Account</h3>
+                  <Badge className="bg-[#fa7315] text-white border-0">PRO</Badge>
                 </div>
-                <ul className="space-y-3">
+                <p className="text-muted-foreground text-sm mb-6">or FREE with one referral</p>
+                <p className="text-sm font-medium text-muted-foreground mb-4 italic">Everything in Free, plus...</p>
+                <ul className="space-y-4">
                   {plusFeatures.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-base">
-                      <Check className="w-5 h-5 text-[#fa7315] flex-shrink-0" />
-                      <span>{feature}</span>
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-[#fa7315] flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-base">{feature.title}</p>
+                        <p className="text-sm text-muted-foreground">{feature.description}</p>
+                      </div>
                     </li>
                   ))}
                 </ul>
+                <p className="text-sm text-muted-foreground mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                  <span className="font-medium">How to get PLUS:</span> Refer one other technician who creates an account. They get a free account. You both win.
+                </p>
               </CardContent>
             </Card>
           </div>
-
-          <p className="text-center text-muted-foreground text-base mt-8">
-            Plus pricing announced at launch. Early waitlist members get founding member rates.
-          </p>
         </div>
       </section>
 
