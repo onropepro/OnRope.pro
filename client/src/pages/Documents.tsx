@@ -14,7 +14,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle, GraduationCap, ArrowRight, ChevronLeft, Trophy, XCircle } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, ShieldCheck, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle, GraduationCap, ArrowRight, ChevronLeft, Trophy, XCircle } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CardDescription } from "@/components/ui/card";
 import { hasFinancialAccess, canViewSafetyDocuments, canViewSensitiveDocuments } from "@/lib/permissions";
@@ -5496,6 +5496,19 @@ export default function Documents() {
               {canViewSensitive && (
                 <button
                   type="button"
+                  onClick={() => navigate('/inventory?tab=daily-harness')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate border-border bg-card`}
+                  data-testid="option-daily-harness"
+                >
+                  <ShieldCheck className={`h-6 w-6 text-muted-foreground`} />
+                  <span className={`text-sm font-medium text-center`}>
+                    {t('documents.dailyHarness', 'Daily Harness')}
+                  </span>
+                </button>
+              )}
+              {canViewSensitive && (
+                <button
+                  type="button"
                   onClick={() => setActiveTab('damage-reports')}
                   className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'damage-reports' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
                   data-testid="option-damage-reports"
@@ -6631,6 +6644,17 @@ export default function Documents() {
                   <div className="flex-1">
                     <CardTitle className="text-xl mb-1">Equipment Inspection Records</CardTitle>
                     <p className="text-sm text-muted-foreground">Rope access gear and safety equipment</p>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="px-0 h-auto mt-1 text-primary"
+                      onClick={() => navigate("/inventory?tab=daily-harness")}
+                      data-testid="link-daily-harness-inspection"
+                    >
+                      <ShieldCheck className="h-4 w-4 mr-1" />
+                      View Daily Harness Inspection Tracking
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
                   </div>
                   <Badge variant="secondary" className="text-base font-semibold px-3">
                     {inspections.length}

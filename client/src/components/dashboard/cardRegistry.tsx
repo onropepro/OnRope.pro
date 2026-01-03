@@ -7,6 +7,7 @@ import { MyTimeCard } from "./cards/MyTimeCard";
 import { PayPeriodCard } from "./cards/PayPeriodCard";
 import { OvertimeAlertCard } from "./cards/OvertimeAlertCard";
 import { HarnessStatusCard } from "./cards/HarnessStatusCard";
+import { DailyHarnessTrackingCard } from "./cards/DailyHarnessTrackingCard";
 import { ToolboxCoverageCard } from "./cards/ToolboxCoverageCard";
 import { OutstandingQuotesCard } from "./cards/OutstandingQuotesCard";
 import { MyScheduleCard } from "./cards/MyScheduleCard";
@@ -52,6 +53,8 @@ export function getCardComponent(cardId: string, props: CardProps): React.ReactN
       return <OvertimeAlertCard {...props} />;
     case "safe-harness":
       return <HarnessStatusCard {...props} />;
+    case "safe-daily-harness":
+      return <DailyHarnessTrackingCard {...props} />;
     case "safe-toolbox":
       return <ToolboxCoverageCard {...props} />;
     case "quote-pending":

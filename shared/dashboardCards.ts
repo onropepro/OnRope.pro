@@ -32,6 +32,7 @@ export const CARD_REGISTRY: CardDefinition[] = [
   // SAFETY
   { id: 'safe-csr', name: 'Safety Rating', description: 'CSR score + trend', category: 'SAFETY', permission: null, size: 'single' },
   { id: 'safe-harness', name: 'Harness Status', description: 'Due/overdue today', category: 'SAFETY', permission: 'viewSafetyDocuments', size: 'single' },
+  { id: 'safe-daily-harness', name: 'Daily Harness Tracking', description: 'Team inspection compliance', category: 'SAFETY', permission: 'viewSafetyDocuments', size: 'single' },
   { id: 'safe-toolbox', name: 'Toolbox Coverage', description: 'Missing 7-day meeting', category: 'SAFETY', permission: 'viewSafetyDocuments', size: 'single' },
   { id: 'safe-certs', name: 'Expiring Certs', description: 'Within 60 days', category: 'SAFETY', permission: 'viewSafetyDocuments', size: 'single' },
 

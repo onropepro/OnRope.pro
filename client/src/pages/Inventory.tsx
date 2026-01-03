@@ -276,10 +276,17 @@ export default function Inventory() {
     }] : [])
   ];
 
-  // Set default tab based on user role - company owners go directly to manage gear
+  // Set default tab based on URL param or user role - company owners go directly to manage gear
   useEffect(() => {
     if (currentUser && !activeTab) {
-      if (currentUser.role === 'company') {
+      // Check for URL tab parameter first
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      const validTabs = ['my-gear', 'team-gear', 'manage', 'retired', 'inspections', 'daily-harness', 'report-damage'];
+      
+      if (tabParam && validTabs.includes(tabParam)) {
+        setActiveTab(tabParam);
+      } else if (currentUser.role === 'company') {
         setActiveTab("manage");
       } else {
         setActiveTab("my-gear");
