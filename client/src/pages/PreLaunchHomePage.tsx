@@ -244,7 +244,7 @@ export default function PreLaunchHomePage() {
             </form>
 
             <div className="text-blue-100 text-sm pt-4 space-y-1">
-              <p>
+              <p className="text-[16px]">
                 There are 86 urban rope access companies in Canada. We're onboarding 10 of them in January.
               </p>
               <p className="font-bold">
