@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { usePreLaunch } from "@/contexts/PreLaunchContext";
 import { useToast } from "@/hooks/use-toast";
-import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import onRopeProLogo from "@assets/OnRopePro-logo-white_1767469623033.png";
 
 export function PreLaunchFooter() {
   const { attemptBypass } = usePreLaunch();

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { PreLaunchFooter } from "../components/PreLaunchFooter";
-import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
+import onRopeProLogo from "@assets/OnRopePro-logo-white_1767469623033.png";
 import {
   ArrowRight,
   CheckCircle2,
