@@ -6563,12 +6563,86 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>{t('dashboard.employeeForm.homeAddress', 'Home Address')}</FormLabel>
                                 <FormControl>
-                                  <Input placeholder={t('dashboard.employeeForm.streetAddressPlaceholder', 'Street address')} {...field} data-testid="input-employee-address" className="h-12" />
+                                  <AddressAutocomplete
+                                    data-testid="input-employee-address"
+                                    placeholder={t('dashboard.employeeForm.streetAddressPlaceholder', 'Street address')}
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    onBlur={field.onBlur}
+                                    onSelect={(address) => {
+                                      const streetAddress = address.houseNumber 
+                                        ? `${address.houseNumber} ${address.street || ''}`.trim()
+                                        : address.street || address.formatted;
+                                      field.onChange(streetAddress);
+                                      employeeForm.setValue('employeeCity', address.city || '');
+                                      employeeForm.setValue('employeeProvinceState', address.state || '');
+                                      employeeForm.setValue('employeeCountry', address.country || '');
+                                      employeeForm.setValue('employeePostalCode', address.postcode || '');
+                                    }}
+                                  />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={employeeForm.control}
+                              name="employeeCity"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('address.city', 'City')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder={t('address.cityPlaceholder', 'City')} {...field} data-testid="input-employee-city" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={employeeForm.control}
+                              name="employeeProvinceState"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('address.province', 'Province/State')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder={t('address.provincePlaceholder', 'Province/State')} {...field} data-testid="input-employee-province" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={employeeForm.control}
+                              name="employeeCountry"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('address.country', 'Country')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder={t('address.countryPlaceholder', 'Country')} {...field} data-testid="input-employee-country" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={employeeForm.control}
+                              name="employeePostalCode"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>{t('address.postalCode', 'Postal Code')}</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder={t('address.postalCodePlaceholder', 'Postal Code')} {...field} data-testid="input-employee-postal" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
 
                           <FormField
                             control={employeeForm.control}
