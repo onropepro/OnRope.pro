@@ -4,61 +4,175 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { PreLaunchFooter } from "../components/PreLaunchFooter";
 import onRopeProLogo from "@assets/OnRopePro-logo-white_1767469623033.png";
 import {
   ArrowRight,
-  CheckCircle2,
-  Ticket,
-  BarChart3,
-  Rocket,
+  IdCard,
+  Star,
   Clock,
+  Users,
+  Link2,
   Smartphone,
-  Award,
-  Calendar,
-  Wallet,
   TrendingUp,
+  Share2,
+  Check,
+  AlertTriangle,
 } from "lucide-react";
 
-const technicianBenefits = [
+const problemsData = [
   {
-    icon: Ticket,
-    headline: "Your portable professional profile",
-    detail: "IRATA/SPRAT certifications, work history, and performance stats travel with you. New employer? They see your verified track record instantly.",
-    metric: "Career follows you",
+    before: "I switched companies and had to prove my experience all over again",
+    after: "Your Technician Passport travels with you. New employer sees your verified history instantly.",
   },
   {
+    before: "My paper logbook got damaged and I lost years of hours",
+    after: "Digital backup of every hour logged. OCR import for existing logbooks. Never lose your records again.",
+  },
+  {
+    before: "I have no idea if I'm performing well compared to other techs",
+    after: "Personal performance dashboard shows your drops per day, efficiency trends, and growth over time.",
+  },
+  {
+    before: "Payroll disputes because my hours don't match what they have",
+    after: "Every work session timestamped and recorded. Your data matches theirs. Zero disputes.",
+  },
+  {
+    before: "I don't know my schedule until the night before",
+    after: "See your upcoming assignments in the app. Plan your life around your work, not the other way around.",
+  },
+  {
+    before: "When I apply for jobs, I have no way to prove my track record",
+    after: "Shareable profile link shows verified certifications, hours, and performance data to prospective employers.",
+  },
+];
+
+const howItWorksSteps = [
+  {
+    step: 1,
+    title: "Create Your Free Account",
+    description: "Sign up with your email. Add your IRATA/SPRAT certifications. Import your existing logbook hours via OCR.",
+    icon: Users,
+  },
+  {
+    step: 2,
+    title: "Connect to Your Employer",
+    description: "When your company uses OnRopePro, link your account. Your profile pre-populates their system. No re-entering your info.",
+    icon: Link2,
+  },
+  {
+    step: 3,
+    title: "Log Your Work",
+    description: "Clock in, log drops, upload photos. 10 seconds per entry. Your hours automatically sync to your permanent record.",
     icon: Smartphone,
-    headline: "Log drops from your phone in seconds",
-    detail: "Tap to start work session, tap to end. Drop count, hours, and photos captured. No paper timesheets to fill out at end of day.",
-    metric: "10 seconds per entry",
   },
   {
-    icon: BarChart3,
-    headline: "Know your daily target",
-    detail: "See exactly what's expected. 'Marina Towers: 5 drops/day target. Yesterday you did 4.' No more guessing if you're meeting standards.",
-    metric: "Clear expectations",
-  },
-  {
-    icon: Wallet,
-    headline: "Paycheck accuracy you can trust",
-    detail: "Every work session timestamped and recorded. Piece-work rates calculated automatically. No more disputes over hours or drops.",
-    metric: "Zero payroll errors",
-  },
-  {
-    icon: Calendar,
-    headline: "See your schedule, plan your life",
-    detail: "Upcoming assignments visible in your app. Know where you're working next week. Request time off directly through the system.",
-    metric: "Work-life visibility",
-  },
-  {
+    step: 4,
+    title: "Build Your Reputation",
+    description: "Performance data accumulates. Personal Safety Rating builds. Your professional identity grows with every job.",
     icon: TrendingUp,
-    headline: "Build your reputation with data",
-    detail: "Performance trends show your growth over time. High performers stand out. When promotions happen, the data supports you.",
-    metric: "Objective career progression",
+  },
+  {
+    step: 5,
+    title: "Take It With You",
+    description: "Switch employers? Your account stays yours. New company sees your verified history. No starting over.",
+    icon: Share2,
+  },
+];
+
+const freeFeatures = [
+  {
+    title: "Portable Profile",
+    description: "Your certifications, contact info, and work history in one place - owned by you",
+  },
+  {
+    title: "Logbook Photo Import",
+    description: "Snap a photo of your physical logbook pages. The app reads and imports your historical data automatically.",
+  },
+  {
+    title: "Instant Employer Connection",
+    description: "When connected to an employer on OnRopePro: 10 seconds to onboard, not 60 minutes of paperwork",
+  },
+  {
+    title: "Automatic Hour Tracking",
+    description: "Every work session, building, height, and task logged automatically (when employer uses OnRopePro)",
+  },
+  {
+    title: "Personal Safety Rating",
+    description: "Your compliance score based on inspections and document acknowledgments",
+  },
+  {
+    title: "Data Export Anytime",
+    description: "Download your complete work history. You own your data, period.",
+  },
+  {
+    title: "One Employer Connection",
+    description: "Connect with one company at a time",
+  },
+];
+
+const plusFeatures = [
+  {
+    title: "Certification Expiry Alerts",
+    description: "60-day yellow warning, 30-day red alert. Never miss a renewal.",
+  },
+  {
+    title: "Multi-Employer Connections",
+    description: "Work your main job Monday-Thursday, pick up side gigs Friday-Sunday.",
+  },
+  {
+    title: "Job Board Access",
+    description: "See and apply to urban rope tech positions posted by companies on the platform",
+  },
+  {
+    title: "Enhanced Profile Visibility",
+    description: "Employers searching for techs see your profile first",
+  },
+  {
+    title: "Level Progression Tracking",
+    description: "Visual display of hours toward your next IRATA level (L1 to L2 to L3)",
+  },
+];
+
+const faqData = [
+  {
+    question: "Is this really free for technicians?",
+    answer: "Yes. Technicians never pay for Standard accounts. Employers pay for the platform. Your career data belongs to you.",
+  },
+  {
+    question: "What if my employer doesn't use OnRopePro?",
+    answer: "You can still create your account and log your hours manually. When they join (or you switch to an employer who uses it), your history is already there.",
+  },
+  {
+    question: "Can I import my existing IRATA/SPRAT logbook?",
+    answer: "Yes. Our OCR import lets you photograph your existing logbook pages and digitize your hours automatically.",
+  },
+  {
+    question: "What happens to my data if I leave an employer?",
+    answer: "Your Technician Passport stays with you. Your work history, certifications, and performance data are yours permanently. Employers only see data from the time you worked for them.",
+  },
+  {
+    question: "Can employers see my data without permission?",
+    answer: "No. You control who sees your profile. Employers can only see data from projects you worked on for them. Your complete history is only visible to you (and anyone you choose to share it with).",
+  },
+  {
+    question: "When does this launch?",
+    answer: "January 2026. Early waitlist members get priority onboarding and founding member benefits.",
   },
 ];
 
@@ -66,18 +180,24 @@ export default function PreLaunchTechnicianPage() {
   const { toast } = useToast();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [irataLevel, setIrataLevel] = useState("");
+  const [bottomFullName, setBottomFullName] = useState("");
+  const [bottomEmail, setBottomEmail] = useState("");
 
   const signupMutation = useMutation({
-    mutationFn: async (data: { companyName: string; email: string; stakeholderType: string; source: string }) => {
+    mutationFn: async (data: { companyName: string; email: string; stakeholderType: string; source: string; irataLevel?: string }) => {
       return apiRequest("POST", "/api/early-access", data);
     },
     onSuccess: () => {
       toast({
         title: "You're on the list!",
-        description: "We'll let you know when the technician portal launches.",
+        description: "We'll reach out before launch.",
       });
       setFullName("");
       setEmail("");
+      setIrataLevel("");
+      setBottomFullName("");
+      setBottomEmail("");
     },
     onError: () => {
       toast({
@@ -88,14 +208,26 @@ export default function PreLaunchTechnicianPage() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleHeroSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim() || !email.trim()) return;
     signupMutation.mutate({
       companyName: fullName.trim(),
       email: email.trim(),
       stakeholderType: "technician",
-      source: "technician-landing",
+      source: "technician-landing-hero",
+      irataLevel: irataLevel || undefined,
+    });
+  };
+
+  const handleBottomSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bottomFullName.trim() || !bottomEmail.trim()) return;
+    signupMutation.mutate({
+      companyName: bottomFullName.trim(),
+      email: bottomEmail.trim(),
+      stakeholderType: "technician",
+      source: "technician-landing-footer",
     });
   };
 
@@ -103,7 +235,7 @@ export default function PreLaunchTechnicianPage() {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <section
         className="relative text-white pb-[120px]"
-        style={{ backgroundImage: "linear-gradient(135deg, #5C7A84 0%, #4A656E 100%)" }}
+        style={{ backgroundImage: "linear-gradient(135deg, #0F1629 0%, #1a2744 100%)" }}
       >
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnY0em0wLTZoLTJ2LTRoMnY0em0tNiA2aC0ydi00aDJ2NHptMC02aC0ydi00aDJ2NHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
 
@@ -113,71 +245,71 @@ export default function PreLaunchTechnicianPage() {
           </div>
 
           <div className="text-center space-y-6 pt-8">
-            <Badge className="bg-white/20 text-white border-white/30 text-sm px-4 py-1">
-              FOR ROPE ACCESS TECHNICIANS
+            <Badge className="bg-[#fa7315] text-white border-0 text-sm px-4 py-1">
+              LAUNCHING JANUARY 2026
             </Badge>
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-              Log your work. Prove your value.<br className="hidden md:block" />
-              <span className="text-slate-200">Own your career.</span>
+              2026: The year your work history<br className="hidden md:block" />
+              <span className="text-slate-300">finally belongs to you.</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-200 max-w-3xl mx-auto leading-relaxed">
-              Your certifications, work history, and performance data in one portable profile.
-              When you change employers, your reputation comes with you.
+            <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+              Every drop. Every certification. Every employer. One portable profile that follows your career, not theirs.
             </p>
 
-            <p className="text-slate-200">
-              Launching January 2026. Get notified when we go live.
-            </p>
-
-            <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4 pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-white text-left block">
-                    Your Name
-                  </Label>
+            <div className="max-w-xl mx-auto pt-4">
+              <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20 shadow-xl">
+                <form onSubmit={handleHeroSubmit} className="space-y-4">
                   <Input
-                    id="fullName"
                     type="text"
-                    placeholder="Your full name"
+                    placeholder="Full name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
+                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60 h-12"
                     data-testid="input-tech-name"
                     required
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-white text-left block">
-                    Email Address
-                  </Label>
                   <Input
-                    id="email"
                     type="email"
-                    placeholder="you@email.com"
+                    placeholder="Email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60"
+                    className="bg-white/10 border-white/30 text-white placeholder:text-white/60 h-12"
                     data-testid="input-tech-email"
                     required
                   />
-                </div>
+                  <Select value={irataLevel} onValueChange={setIrataLevel}>
+                    <SelectTrigger className="bg-white/10 border-white/30 text-white h-12" data-testid="select-tech-level">
+                      <SelectValue placeholder="Current IRATA/SPRAT Level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="level1">Level 1</SelectItem>
+                      <SelectItem value="level2">Level 2</SelectItem>
+                      <SelectItem value="level3">Level 3</SelectItem>
+                      <SelectItem value="not-certified">Not Yet Certified</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full bg-[#fa7315] text-white hover:bg-[#e5680f] h-12"
+                    disabled={signupMutation.isPending}
+                    data-testid="button-tech-early-access"
+                  >
+                    {signupMutation.isPending ? "Submitting..." : "Join the Waitlist"}
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </form>
+                <p className="text-sm text-slate-300 mt-4 text-center">
+                  Free for technicians. Always.
+                </p>
               </div>
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-white text-[#5C7A84] hover:bg-slate-100"
-                disabled={signupMutation.isPending}
-                data-testid="button-tech-early-access"
-              >
-                {signupMutation.isPending ? "Submitting..." : "Get Notified at Launch"}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <p className="text-base text-slate-200/80">
-                Free for technicians. No spam. Unsubscribe anytime.
-              </p>
-            </form>
+            </div>
+
+            <p className="text-base text-slate-400 pt-4">
+              500+ rope access techs across North America. The ones who join early build their verified history first.
+            </p>
           </div>
         </div>
 
@@ -191,56 +323,106 @@ export default function PreLaunchTechnicianPage() {
         </div>
       </section>
 
-      <section className="relative bg-white dark:bg-slate-950 -mt-px overflow-visible">
-        <div className="max-w-3xl mx-auto px-4 pt-4 pb-12">
-          <Card className="shadow-xl border-0 relative z-20 -mt-20">
-            <CardContent className="p-8">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-blue-700">10 sec</div>
-                  <div className="text-base text-muted-foreground mt-1">To Log a Drop</div>
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Your career, finally documented.
+          </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            IRATA/SPRAT hours logged automatically. Performance data that proves your value. A professional profile that moves when you move. No more starting from zero with every new employer.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
+                  <IdCard className="w-6 h-6 text-blue-600" />
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-emerald-600">100%</div>
-                  <div className="text-base text-muted-foreground mt-1">Payroll Accuracy</div>
+                <h3 className="font-semibold text-lg mb-2">Technician Passport</h3>
+                <p className="text-muted-foreground text-base">
+                  Your certifications, work history, and safety record in one portable profile. Switch employers without losing your professional identity.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center mb-4">
+                  <Star className="w-6 h-6 text-amber-600" />
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-orange-600">Portable</div>
-                  <div className="text-base text-muted-foreground mt-1">Career Profile</div>
+                <h3 className="font-semibold text-lg mb-2">Personal Safety Rating</h3>
+                <p className="text-muted-foreground text-base">
+                  A score that follows you across employers and proves your professionalism. High performers stand out.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mb-4">
+                  <Clock className="w-6 h-6 text-emerald-600" />
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-violet-600">Free</div>
-                  <div className="text-base text-muted-foreground mt-1">For Technicians</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                <h3 className="font-semibold text-lg mb-2">Verified Hours</h3>
+                <p className="text-muted-foreground text-base">
+                  Same-day IRATA/SPRAT logging with OCR import from existing logbooks. Your hours, always current, always verified.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-20 px-4 bg-[#0F1629] text-white">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Problems You Won't Have Anymore
+          </h2>
+          <p className="text-center text-slate-400 text-lg mb-12 max-w-2xl mx-auto">
+            Every feature exists because a rope access tech told us about a real frustration.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {problemsData.map((problem, i) => (
+              <Card key={i} className="bg-slate-900/50 border-slate-800">
+                <CardContent className="p-6 space-y-4">
+                  <div>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Before</p>
+                    <p className="text-base text-slate-300">"{problem.before}"</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-[#fa7315] rotate-90" />
+                  <div>
+                    <p className="text-base text-emerald-400 font-medium">{problem.after}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            What OnRopePro Does For You
+            One Account. Every Employer. Your Entire Career.
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
-            Built for technicians who want their work to speak for itself.
+            Your OnRopePro account belongs to you, not your employer.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {technicianBenefits.map((benefit, idx) => (
-              <Card key={idx}>
+          <div className="space-y-6">
+            {howItWorksSteps.map((step) => (
+              <Card key={step.step} className="border border-slate-200 dark:border-slate-800">
                 <CardContent className="p-6">
-                  <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
-                      <benefit.icon className="w-6 h-6 text-[#5C7A84]" />
+                  <div className="flex gap-4 items-start">
+                    <div className="w-12 h-12 rounded-full bg-[#fa7315] flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-lg">{step.step}</span>
                     </div>
-                    <div>
-                      <h3 className="font-semibold mb-1">{benefit.headline}</h3>
-                      <p className="text-base text-muted-foreground mb-2">{benefit.detail}</p>
-                      <Badge variant="secondary" className="text-sm">
-                        {benefit.metric}
-                      </Badge>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <step.icon className="w-5 h-5 text-[#fa7315]" />
+                        <h3 className="font-semibold text-lg">{step.title}</h3>
+                      </div>
+                      <p className="text-muted-foreground text-base">{step.description}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -251,83 +433,174 @@ export default function PreLaunchTechnicianPage() {
       </section>
 
       <section className="py-16 md:py-20 px-4 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            Your Technician Passport
+            Crystal Clear: What's Free, What's PLUS
           </h2>
-          <p className="text-center text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-            Everything that makes you valuable as a rope access professional, documented and portable.
+          <p className="text-center text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+            Your free account is yours forever. PLUS adds premium features - or get it free with one referral.
           </p>
 
-          <Card>
-            <CardContent className="p-8">
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Award className="w-5 h-5 text-[#5C7A84]" />
-                    Certifications
-                  </h3>
-                  <ul className="space-y-2 text-base text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      IRATA/SPRAT levels with expiry tracking
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Verified logged hours (same-day logging)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Supporting certifications (first aid, fall arrest)
-                    </li>
-                  </ul>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="border border-slate-200 dark:border-slate-700">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-bold text-xl">FREE Account</h3>
                 </div>
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-[#5C7A84]" />
-                    Performance Data
-                  </h3>
-                  <ul className="space-y-2 text-base text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Average drops per day
+                <p className="text-muted-foreground text-sm mb-6">Always free. Never expires.</p>
+                <ul className="space-y-4">
+                  {freeFeatures.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-base">{feature.title}</p>
+                        <p className="text-sm text-muted-foreground">{feature.description}</p>
+                      </div>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Job completion rates
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                      Personal Safety Rating (PSR)
-                    </li>
-                  </ul>
+                  ))}
+                </ul>
+                <p className="text-sm text-muted-foreground mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                  This is yours. Forever. No strings.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-[#fa7315]">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-bold text-xl">PLUS Account</h3>
+                  <Badge className="bg-[#fa7315] text-white border-0">PRO</Badge>
                 </div>
+                <p className="text-muted-foreground text-sm mb-6">or FREE with one referral</p>
+                <p className="text-sm font-medium text-muted-foreground mb-4 italic">Everything in Free, plus...</p>
+                <ul className="space-y-4">
+                  {plusFeatures.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-[#fa7315] flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-base">{feature.title}</p>
+                        <p className="text-sm text-muted-foreground">{feature.description}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-sm text-muted-foreground mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                  <span className="font-medium">How to get PLUS:</span> Refer one other technician who creates an account. They get a free account. You both win.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-20 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Frequently Asked Questions
+          </h2>
+
+          <Accordion type="single" collapsible className="w-full">
+            {faqData.map((faq, i) => (
+              <AccordionItem key={i} value={`item-${i}`}>
+                <AccordionTrigger className="text-left text-base font-medium">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-base">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
+      {/* Physical Logbook Disclaimer */}
+      <section className="py-12 md:py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-6 md:p-8">
+            <div className="flex items-start gap-3 mb-4">
+              <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+              <h3 className="font-bold text-lg uppercase tracking-wide">
+                This Does Not Replace Your Physical Logbook
+              </h3>
+            </div>
+            
+            <p className="mb-4">
+              <span className="font-semibold">Your IRATA/SPRAT physical logbook is still required.</span>{" "}
+              OnRopePro is a digital assistant that gives you accurate data to transfer into your official logbook - it does not replace it.
+            </p>
+            
+            <p className="text-muted-foreground mb-6">
+              IRATA and SPRAT certification bodies require you to maintain your physical logbook. That requirement hasn't changed. What has changed is how accurate your entries can be.
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-white dark:bg-slate-800 rounded-md p-4 border border-slate-200 dark:border-slate-700">
+                <p className="font-semibold mb-2">Before:</p>
+                <p className="text-muted-foreground text-sm">
+                  You guess at hours and details when filling your logbook weeks later
+                </p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="bg-white dark:bg-slate-800 rounded-md p-4 border border-slate-200 dark:border-slate-700">
+                <p className="font-semibold mb-2">After:</p>
+                <p className="text-muted-foreground text-sm">
+                  You copy precise, timestamped data from OnRopePro into your logbook
+                </p>
+              </div>
+            </div>
+            
+            <p className="text-muted-foreground text-sm mt-6">
+              Your assessor still checks your physical book. OnRopePro just makes sure the data in that book is right.
+            </p>
+          </div>
         </div>
       </section>
 
       <section
         className="py-16 md:py-20 px-4 text-white"
-        style={{ backgroundImage: "linear-gradient(135deg, #5C7A84 0%, #4A656E 100%)" }}
+        style={{ backgroundImage: "linear-gradient(135deg, #fa7315 0%, #fa7315 100%)" }}
       >
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to own your career data?
+            Your hours are your proof. Start documenting them.
           </h2>
-          <p className="text-slate-200 text-lg mb-8">
-            Join the waitlist. We'll notify you the moment the technician portal goes live.
+          <p className="text-white text-lg mb-8">
+            Join the waitlist. Be first to claim your Technician Passport.
           </p>
-          <Button
-            size="lg"
-            className="bg-white text-[#5C7A84] hover:bg-slate-100"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            data-testid="button-tech-final-cta"
-          >
-            Get Notified at Launch
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
+
+          <form onSubmit={handleBottomSubmit} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto mb-6">
+            <Input
+              type="text"
+              placeholder="Full name"
+              value={bottomFullName}
+              onChange={(e) => setBottomFullName(e.target.value)}
+              className="bg-white text-black h-12"
+              data-testid="input-tech-bottom-name"
+              required
+            />
+            <Input
+              type="email"
+              placeholder="Email address"
+              value={bottomEmail}
+              onChange={(e) => setBottomEmail(e.target.value)}
+              className="bg-white text-black h-12"
+              data-testid="input-tech-bottom-email"
+              required
+            />
+            <Button
+              type="submit"
+              size="lg"
+              className="bg-slate-900 text-white hover:bg-slate-800 h-12 px-8"
+              disabled={signupMutation.isPending}
+              data-testid="button-tech-bottom-cta"
+            >
+              Join the Waitlist
+            </Button>
+          </form>
+
+          <p className="text-white font-medium text-base mt-6">
+            Free for technicians. Built by rope access professionals.
+          </p>
         </div>
       </section>
 
