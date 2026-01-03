@@ -99,18 +99,18 @@ const featuresData = [
 const howItWorksSteps = [
   {
     step: 1,
-    title: "Your Vendor Joins OnRopePro",
-    description: "A rope access company you contract with subscribes to OnRopePro and adds your building to their system.",
+    title: "Create Your Free Account",
+    description: "Sign up in minutes. No vendor invitation required. Your account is ready to use immediately.",
   },
   {
     step: 2,
-    title: "You Get Invited",
-    description: "You receive an invitation to create your free property manager account. One account works across all your OnRopePro vendors.",
+    title: "Add Your Buildings",
+    description: "Register the buildings in your portfolio. Upload anchor inspection certificates and set up building profiles.",
   },
   {
     step: 3,
-    title: "See Everything",
-    description: "Log in to see project progress, safety documentation, response metrics, and Company Safety Ratings for all your connected vendors.",
+    title: "Connect With Vendors",
+    description: "When a rope access company using OnRopePro works on your building, you automatically see their project data, safety docs, and CSR scores.",
   },
   {
     step: 4,
@@ -174,7 +174,7 @@ const faqData = [
   },
   {
     question: "When does this launch?",
-    answer: "January 2026. Join the waitlist to be notified when your vendors can invite you to the portal.",
+    answer: "January 2026. Join the waitlist to be notified when the property manager portal goes live. You'll be able to create your free account immediately at launch.",
   },
 ];
 
@@ -195,7 +195,7 @@ export default function PreLaunchPropertyManagerPage() {
     onSuccess: () => {
       toast({
         title: "You're on the list!",
-        description: "We'll notify you when your vendors can invite you to the portal.",
+        description: "We'll notify you when the property manager portal goes live.",
       });
       setFullName("");
       setEmail("");
@@ -457,10 +457,10 @@ export default function PreLaunchPropertyManagerPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Your Vendors Join. You Get Access.
+              Sign Up Free. See Your Vendors Clearly.
             </h2>
             <p className="text-lg text-muted-foreground">
-              When a rope access company you work with uses OnRopePro, you get free portal access.
+              Create your free property manager account in minutes. No vendor invitation required.
             </p>
           </div>
 
