@@ -294,12 +294,12 @@ function AddCompanyDialog() {
 
 export default function CrmCompanies() {
   const [search, setSearch] = useState("");
-  const [source, setSource] = useState<string>("");
-  const [country, setCountry] = useState<string>("");
+  const [source, setSource] = useState<string>("all");
+  const [country, setCountry] = useState<string>("all");
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery<CompaniesResponse>({
-    queryKey: ["/api/crm/companies", { search, source, country, page }],
+    queryKey: ["/api/crm/companies", { search, source: source === "all" ? "" : source, country: country === "all" ? "" : country, page }],
   });
 
   return (
@@ -342,7 +342,7 @@ export default function CrmCompanies() {
               <SelectValue placeholder="All Sources" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Sources</SelectItem>
+              <SelectItem value="all">All Sources</SelectItem>
               <SelectItem value="manual">Manual</SelectItem>
               <SelectItem value="brightdata_scrape">BrightData Scrape</SelectItem>
               <SelectItem value="sprat_directory">SPRAT Directory</SelectItem>
@@ -364,7 +364,7 @@ export default function CrmCompanies() {
               <SelectValue placeholder="All Countries" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Countries</SelectItem>
+              <SelectItem value="all">All Countries</SelectItem>
               <SelectItem value="CA">Canada</SelectItem>
               <SelectItem value="US">United States</SelectItem>
               <SelectItem value="UK">United Kingdom</SelectItem>
@@ -393,7 +393,7 @@ export default function CrmCompanies() {
               </span>
               <p className="text-lg font-medium mb-2">No companies found</p>
               <p className="text-muted-foreground mb-4">
-                {search || source || country ? "Try adjusting your filters" : "Add your first company to get started"}
+                {search || source !== "all" || country !== "all" ? "Try adjusting your filters" : "Add your first company to get started"}
               </p>
             </CardContent>
           </Card>

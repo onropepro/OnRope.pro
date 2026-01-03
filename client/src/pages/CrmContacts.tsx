@@ -349,12 +349,12 @@ function ContactRow({ contact }: { contact: CrmContact }) {
 
 export default function CrmContacts() {
   const [search, setSearch] = useState("");
-  const [stage, setStage] = useState<string>("");
+  const [stage, setStage] = useState<string>("all");
   const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
 
   const { data, isLoading, error } = useQuery<ContactsResponse>({
-    queryKey: ["/api/crm/contacts", { search, stage, page }],
+    queryKey: ["/api/crm/contacts", { search, stage: stage === "all" ? "" : stage, page }],
   });
 
   const { data: companiesData } = useQuery<CompaniesResponse>({
@@ -421,7 +421,7 @@ export default function CrmContacts() {
               <SelectValue placeholder="All Stages" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Stages</SelectItem>
+              <SelectItem value="all">All Stages</SelectItem>
               <SelectItem value="lead_captured">Lead Captured</SelectItem>
               <SelectItem value="contacted">Contacted</SelectItem>
               <SelectItem value="demo_scheduled">Demo Scheduled</SelectItem>
@@ -453,7 +453,7 @@ export default function CrmContacts() {
               </span>
               <p className="text-lg font-medium mb-2">No contacts found</p>
               <p className="text-muted-foreground mb-4">
-                {search || stage ? "Try adjusting your filters" : "Add your first contact to get started"}
+                {search || stage !== "all" ? "Try adjusting your filters" : "Add your first contact to get started"}
               </p>
             </CardContent>
           </Card>
