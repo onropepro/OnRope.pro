@@ -107,14 +107,14 @@ const stakeholderBenefits = [
     icon: Briefcase,
     tagline: "Run your business, not your spreadsheets",
     benefits: [
-      { headline: "Create quotes in minutes, not hours", metric: "15-20% more accurate bids" },
-      { headline: "See every project's status without site visits", metric: "10-15 hrs/week saved" },
-      { headline: "Payroll runs itself", metric: "87-93% time reduction" },
-      { headline: "Stop the 3 AM anxiety", metric: "60-70% cognitive load reduction" },
-      { headline: "Win contracts with your safety score", metric: "10-20% insurance discount" },
-      { headline: "Know which techs are performing", metric: "Zero he-said disputes" },
-      { headline: "Never lose job history again", metric: "Data-driven future quotes" },
-      { headline: "Equipment tracking that prevents surprises", metric: "$4K+ emergency costs avoided" },
+      { headline: "Create quotes in minutes, not hours", detail: "Pull historical data from similar jobs. Know exactly how many drops per day your crew averages. Send professional quotes directly to property managers.", metric: "15-20% more accurate bids" },
+      { headline: "See every project's status without site visits", detail: "Real-time dashboard shows progress percentage, days remaining, assigned crew, and completion forecast. Filter by building, technician, or status.", metric: "10-15 hrs/week saved" },
+      { headline: "Payroll runs itself", detail: "Work sessions logged by technicians auto-populate timesheets. Piece-work rates, hourly rates, and overtime calculated automatically. Export to QuickBooks.", metric: "87-93% time reduction" },
+      { headline: "Stop the 3 AM anxiety", detail: "Everything lives in one system with automated reminders. COI expiring? System alerts you. Feedback awaiting response? Dashboard shows it. Mental bandwidth freed.", metric: "60-70% cognitive load reduction" },
+      { headline: "Win contracts with your safety score", detail: "Company Safety Rating (CSR) visible to property managers. Document your toolbox meetings, harness inspections, and safety compliance. Stand out from competitors.", metric: "10-20% insurance discount" },
+      { headline: "Know which techs are performing", detail: "Objective data on drops per day, job completion rates, and efficiency trends. Coach underperformers with facts, not feelings. Reward top performers fairly.", metric: "Zero he-said disputes" },
+      { headline: "Never lose job history again", detail: "Searchable archive of every project completed. How long did that 15-story building take last year? What was the crew composition? Instant answers.", metric: "Data-driven future quotes" },
+      { headline: "Equipment tracking that prevents surprises", detail: "Track rope service life, harness inspection dates, and gear assignments. Know when replacements are needed before equipment fails in the field.", metric: "$4K+ emergency costs avoided" },
     ],
   },
   {
@@ -122,12 +122,12 @@ const stakeholderBenefits = [
     icon: Users,
     tagline: "Coordinate crews without the chaos",
     benefits: [
-      { headline: "Spot double-bookings before they happen", metric: "Zero scheduling disasters" },
-      { headline: "Prove who's performing, who's coasting", metric: "Objective performance data" },
-      { headline: "Batch deficiency visits efficiently", metric: "Half-day trips eliminated" },
-      { headline: "Stop playing phone tag for updates", metric: "Real-time visibility" },
-      { headline: "Balance workloads across crews", metric: "Prevent burnout" },
-      { headline: "Generate safety docs automatically", metric: "30+ min per project saved" },
+      { headline: "Spot double-bookings before they happen", detail: "Visual calendar shows all crew assignments at a glance. Drag and drop to reassign. Conflict detection alerts you before mistakes cost time.", metric: "Zero scheduling disasters" },
+      { headline: "Prove who's performing, who's coasting", detail: "Compare technician efficiency across similar job types. See who consistently beats estimates and who falls short. Performance reviews backed by data.", metric: "Objective performance data" },
+      { headline: "Batch deficiency visits efficiently", detail: "Group outstanding deficiencies by building location. Generate optimized routes for follow-up work. Turn scattered callbacks into single efficient trips.", metric: "Half-day trips eliminated" },
+      { headline: "Stop playing phone tag for updates", detail: "Technicians log progress from the field. You see it instantly. Property managers see their portal. Everyone informed, no calls required.", metric: "Real-time visibility" },
+      { headline: "Balance workloads across crews", detail: "See total assigned hours per technician per week. Identify who's overloaded and who has capacity. Distribute work fairly and prevent burnout.", metric: "Prevent burnout" },
+      { headline: "Generate safety docs automatically", detail: "Toolbox meeting templates pre-populated with project details. Harness inspection reminders automated. FLHA forms digitized and signed on-site.", metric: "30+ min per project saved" },
     ],
   },
   {
@@ -135,12 +135,12 @@ const stakeholderBenefits = [
     icon: HardHat,
     tagline: "Log your work, prove your value",
     benefits: [
-      { headline: "Your portable professional profile", metric: "Career follows you" },
-      { headline: "Log drops from your phone in seconds", metric: "10 seconds per entry" },
-      { headline: "Know your daily target", metric: "Clear expectations" },
-      { headline: "Paycheck accuracy you can trust", metric: "Zero payroll errors" },
-      { headline: "See your schedule, plan your life", metric: "Work-life visibility" },
-      { headline: "Build your reputation with data", metric: "Objective career progression" },
+      { headline: "Your portable professional profile", detail: "IRATA/SPRAT hours, certifications, and work history travel with you. When you change employers, your verified record comes along. No more re-proving yourself.", metric: "Career follows you" },
+      { headline: "Log drops from your phone in seconds", detail: "GPS-verified clock-in, simple drop counter, photo documentation. Takes 10 seconds. Your work is recorded accurately without paperwork.", metric: "10 seconds per entry" },
+      { headline: "Know your daily target", detail: "See exactly how many drops are expected for this elevation. Compare your pace to the estimate. Know if you're ahead or behind before the day ends.", metric: "Clear expectations" },
+      { headline: "Paycheck accuracy you can trust", detail: "Every hour and piece-work item logged in real-time. Review your timesheet before submission. Dispute discrepancies with timestamped evidence.", metric: "Zero payroll errors" },
+      { headline: "See your schedule, plan your life", detail: "View your assigned projects weeks in advance. Know when you're working which building. Plan appointments and commitments with confidence.", metric: "Work-life visibility" },
+      { headline: "Build your reputation with data", detail: "Your Personal Safety Rating (PSR) shows your compliance record. Efficiency metrics demonstrate your value. When applying for new positions, your profile speaks for you.", metric: "Objective career progression" },
     ],
   },
   {
@@ -148,12 +148,12 @@ const stakeholderBenefits = [
     icon: Building2,
     tagline: "Verify vendor performance, reduce your liability",
     benefits: [
-      { headline: "See vendor safety compliance at a glance", metric: "Due diligence documented" },
-      { headline: "Answer owner questions instantly", metric: "Instant status visibility" },
-      { headline: "Get out of the complaint loop", metric: "20+ hrs/month saved" },
-      { headline: "Evaluate vendors with data, not gut feel", metric: "Data-driven decisions" },
-      { headline: "Download safety docs without asking", metric: "Self-service access" },
-      { headline: "Protect yourself when accidents happen", metric: "Liability protection" },
+      { headline: "See vendor safety compliance at a glance", detail: "Company Safety Rating (CSR) shows documentation completion, toolbox meetings, and harness inspections. Compare vendors objectively before signing contracts.", metric: "Due diligence documented" },
+      { headline: "Answer owner questions instantly", detail: "'How's the window washing going?' Log in, check progress: '68% complete, ahead of schedule.' No calling the contractor.", metric: "Instant status visibility" },
+      { headline: "Get out of the complaint loop", detail: "Residents submit feedback directly to vendors through the portal. You see resolution status without being the middleman.", metric: "20+ hrs/month saved" },
+      { headline: "Evaluate vendors with data, not gut feel", detail: "Average response time, resolution rates, and CSR trends over time. Contract renewal decisions backed by objective performance metrics.", metric: "Data-driven decisions" },
+      { headline: "Download safety docs without asking", detail: "Anchor inspection certificates, insurance docs, and rope access plans available in your portal. No email requests, no waiting.", metric: "Self-service access" },
+      { headline: "Protect yourself when accidents happen", detail: "'What due diligence did you perform?' Show documented vendor CSR review, safety compliance tracking, and contract requirements.", metric: "Liability protection" },
     ],
   },
   {
@@ -161,21 +161,21 @@ const stakeholderBenefits = [
     icon: Building2,
     tagline: "Stop fielding resident calls about contractor work",
     benefits: [
-      { headline: "Residents stop calling you for updates", metric: "70% fewer calls" },
-      { headline: "Upload anchor inspections directly", metric: "Centralized compliance" },
-      { headline: "Track vendor performance across jobs", metric: "Objective recommendations" },
-      { headline: "Complaints routed directly to vendors", metric: "Out of the middle" },
+      { headline: "Residents stop calling you for updates", detail: "Point them to the resident portal. They see real-time progress on their building. You're no longer the information relay.", metric: "70% fewer calls" },
+      { headline: "Upload anchor inspections directly", detail: "Your building's anchor certification documents stored in one place. Vendors see them when planning work. No hunting for paperwork.", metric: "Centralized compliance" },
+      { headline: "Track vendor performance across jobs", detail: "See which rope access companies consistently deliver on time with fewer complaints. Make informed recommendations to your property management company.", metric: "Objective recommendations" },
+      { headline: "Complaints routed directly to vendors", detail: "Resident feedback goes straight to the company doing the work. You're copied for awareness but don't need to manage the resolution.", metric: "Out of the middle" },
     ],
   },
   {
     role: "For Building Residents",
-    icon: Home,
+    icon: HomeIcon,
     tagline: "See what's happening outside your window",
     benefits: [
-      { headline: "Know when they'll reach your floor", metric: "Plan around the work" },
-      { headline: "Submit complaints with photos", metric: "Visible accountability" },
-      { headline: "See real-time progress on your building", metric: "Transparent progress" },
-      { headline: "Your account moves with you", metric: "Portable profile" },
+      { headline: "Know when they'll reach your floor", detail: "Visual progress tracker shows which elevations are complete and which are upcoming. Plan around the work instead of guessing.", metric: "Plan around the work" },
+      { headline: "Submit complaints with photos", detail: "See a streak on your window? Snap a photo, submit through the portal. The company sees it immediately with your unit number.", metric: "Visible accountability" },
+      { headline: "See real-time progress on your building", detail: "Progress bars show overall completion. No more wondering 'are they still working on this building?' Clear visibility into the work.", metric: "Transparent progress" },
+      { headline: "Your account moves with you", detail: "Move to a new building with OnRopePro-connected vendors? Your account transfers. Continuous visibility across properties.", metric: "Portable profile" },
     ],
   },
 ];
@@ -393,7 +393,7 @@ export default function PreLaunchHomePage() {
         </div>
       </section>
       <section className="py-16 md:py-20 px-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
             What It Does For Everyone In Your Operation
           </h2>
@@ -401,34 +401,32 @@ export default function PreLaunchHomePage() {
             Different roles, different problems. Here's exactly how the platform helps each person.
           </p>
 
-          <div className="space-y-8">
+          <div className="space-y-16">
             {stakeholderBenefits.map((stakeholder) => (
-              <Card key={stakeholder.role} className="overflow-hidden">
-                <div className="bg-slate-50 dark:bg-slate-800 border-b px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                      <stakeholder.icon className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{stakeholder.role}</h3>
-                      <p className="text-base text-muted-foreground">{stakeholder.tagline}</p>
-                    </div>
+              <div key={stakeholder.role}>
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <stakeholder.icon className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">{stakeholder.role}</h3>
+                    <p className="text-base text-muted-foreground">{stakeholder.tagline}</p>
                   </div>
                 </div>
-                <CardContent className="p-6">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {stakeholder.benefits.map((benefit, idx) => (
-                      <div key={idx} className="flex gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <p className="font-medium text-base">{benefit.headline}</p>
-                          <p className="text-sm text-muted-foreground">{benefit.metric}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {stakeholder.benefits.map((benefit, idx) => (
+                    <Card key={idx} className="border border-slate-200 dark:border-slate-800">
+                      <CardContent className="p-5 flex flex-col h-full">
+                        <h4 className="font-semibold text-base mb-2">{benefit.headline}</h4>
+                        <p className="text-base text-muted-foreground flex-1 mb-4">{benefit.detail}</p>
+                        <Badge className="w-fit bg-[#fa7315] text-white border-0 font-medium">
+                          {benefit.metric}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
