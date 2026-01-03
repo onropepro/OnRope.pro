@@ -228,6 +228,10 @@ export default function PropertyManager() {
   });
   const [buildingAddressForm, setBuildingAddressForm] = useState({
     address: "",
+    city: "",
+    province: "",
+    country: "",
+    postalCode: "",
     latitude: null as number | null,
     longitude: null as number | null,
   });
@@ -626,8 +630,12 @@ export default function PropertyManager() {
     if (projectDetailsData?.project) {
       setBuildingAddressForm({
         address: projectDetailsData.project.buildingAddress || "",
-        latitude: null,
-        longitude: null,
+        city: (projectDetailsData.project as any).buildingCity || "",
+        province: (projectDetailsData.project as any).buildingProvince || "",
+        country: (projectDetailsData.project as any).buildingCountry || "",
+        postalCode: (projectDetailsData.project as any).buildingPostalCode || "",
+        latitude: (projectDetailsData.project as any).latitude || null,
+        longitude: (projectDetailsData.project as any).longitude || null,
       });
     }
   }, [projectDetailsData]);
@@ -2530,16 +2538,55 @@ export default function PropertyManager() {
                   <MapPin className="h-4 w-4" />
                   {t('propertyManager.buildingInstructions.buildingAddress', 'Building Address')}
                 </h4>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <AddressAutocomplete
                     value={buildingAddressForm.address}
                     onChange={(value) => setBuildingAddressForm(prev => ({ ...prev, address: value }))}
-                    onSelect={(address, lat, lng) => {
-                      setBuildingAddressForm({ address, latitude: lat, longitude: lng });
+                    onSelect={(address) => {
+                      const streetAddr = address.houseNumber 
+                        ? `${address.houseNumber} ${address.street || ''}`.trim()
+                        : address.street || address.formatted;
+                      setBuildingAddressForm({
+                        address: streetAddr,
+                        city: address.city || "",
+                        province: address.state || "",
+                        country: address.country || "",
+                        postalCode: address.postcode || "",
+                        latitude: address.latitude,
+                        longitude: address.longitude,
+                      });
                     }}
                     placeholder={t('propertyManager.buildingInstructions.addressPlaceholder', 'Start typing to search...')}
                     data-testid="input-pm-building-address"
                   />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input
+                      placeholder={t('common.city', 'City')}
+                      value={buildingAddressForm.city}
+                      onChange={(e) => setBuildingAddressForm(prev => ({ ...prev, city: e.target.value }))}
+                      data-testid="input-pm-building-city"
+                    />
+                    <Input
+                      placeholder={t('common.province', 'Province/State')}
+                      value={buildingAddressForm.province}
+                      onChange={(e) => setBuildingAddressForm(prev => ({ ...prev, province: e.target.value }))}
+                      data-testid="input-pm-building-province"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input
+                      placeholder={t('common.country', 'Country')}
+                      value={buildingAddressForm.country}
+                      onChange={(e) => setBuildingAddressForm(prev => ({ ...prev, country: e.target.value }))}
+                      data-testid="input-pm-building-country"
+                    />
+                    <Input
+                      placeholder={t('common.postalCode', 'Postal Code')}
+                      value={buildingAddressForm.postalCode}
+                      onChange={(e) => setBuildingAddressForm(prev => ({ ...prev, postalCode: e.target.value }))}
+                      data-testid="input-pm-building-postal"
+                    />
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {t('propertyManager.buildingInstructions.addressHint', 'Select from suggestions to capture coordinates for map display')}
                   </p>

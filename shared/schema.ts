@@ -259,6 +259,7 @@ export const buildings = pgTable("buildings", {
   buildingAddress: text("building_address"),
   city: varchar("city"),
   province: varchar("province"),
+  country: varchar("country"),
   postalCode: varchar("postal_code"),
   
   // Geolocation for map display
