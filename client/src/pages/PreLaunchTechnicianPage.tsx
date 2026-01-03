@@ -32,6 +32,7 @@ import {
   TrendingUp,
   Share2,
   Check,
+  AlertTriangle,
 } from "lucide-react";
 
 const problemsData = [
@@ -510,6 +511,48 @@ export default function PreLaunchTechnicianPage() {
               </AccordionItem>
             ))}
           </Accordion>
+        </div>
+      </section>
+
+      {/* Physical Logbook Disclaimer */}
+      <section className="py-12 md:py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-6 md:p-8">
+            <div className="flex items-start gap-3 mb-4">
+              <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+              <h3 className="font-bold text-lg uppercase tracking-wide">
+                This Does Not Replace Your Physical Logbook
+              </h3>
+            </div>
+            
+            <p className="mb-4">
+              <span className="font-semibold">Your IRATA/SPRAT physical logbook is still required.</span>{" "}
+              OnRopePro is a digital assistant that gives you accurate data to transfer into your official logbook - it does not replace it.
+            </p>
+            
+            <p className="text-muted-foreground mb-6">
+              IRATA and SPRAT certification bodies require you to maintain your physical logbook. That requirement hasn't changed. What has changed is how accurate your entries can be.
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-white dark:bg-slate-800 rounded-md p-4 border border-slate-200 dark:border-slate-700">
+                <p className="font-semibold mb-2">Before:</p>
+                <p className="text-muted-foreground text-sm">
+                  You guess at hours and details when filling your logbook weeks later
+                </p>
+              </div>
+              <div className="bg-white dark:bg-slate-800 rounded-md p-4 border border-slate-200 dark:border-slate-700">
+                <p className="font-semibold mb-2">After:</p>
+                <p className="text-muted-foreground text-sm">
+                  You copy precise, timestamped data from OnRopePro into your logbook
+                </p>
+              </div>
+            </div>
+            
+            <p className="text-muted-foreground text-sm mt-6">
+              Your assessor still checks your physical book. OnRopePro just makes sure the data in that book is right.
+            </p>
+          </div>
         </div>
       </section>
 
