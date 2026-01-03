@@ -6020,7 +6020,7 @@ export default function Dashboard() {
                 </Card>
               )}
               
-              {/* Employee Action Buttons */}
+              {/* Employee Action Button */}
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button 
                   className="flex-1 h-12 gap-2" 
@@ -6036,17 +6036,6 @@ export default function Dashboard() {
                 >
                   <span className="material-icons">person_add</span>
                   {t('dashboard.employeeSeats.addNewEmployee', 'Add New Employee')}
-                </Button>
-                
-                <Button 
-                  variant="outline"
-                  className="flex-1 h-12 gap-2" 
-                  data-testid="button-get-more-seats"
-                  disabled={userIsReadOnly}
-                  onClick={() => setShowPurchaseSeatsDialog(true)}
-                >
-                  <span className="material-icons">add_circle</span>
-                  {t('dashboard.employeeSeats.getMoreSeats', 'Get More Seats')}
                 </Button>
               </div>
               
