@@ -70,12 +70,10 @@ export const users = pgTable("users", {
   zipCode: varchar("zip_code"), // for company role - postal/zip code
   timezone: varchar("timezone").default("America/Vancouver"), // IANA timezone for company (e.g., "America/Vancouver", "America/Toronto")
   
-  // Shared fields
-  name: varchar("name"), // for resident and employee roles
-  
-  // Property Manager-specific fields
-  firstName: varchar("first_name"), // for property_manager role
-  lastName: varchar("last_name"), // for property_manager role
+  // Shared name fields (used for ALL roles - standardized to separate first/last)
+  firstName: varchar("first_name"), // First name for all user roles
+  lastName: varchar("last_name"), // Last name for all user roles
+  name: varchar("name"), // DEPRECATED: Legacy combined name field, kept for backward compatibility
   propertyManagementCompany: varchar("property_management_company"), // for property_manager role
   propertyManagerPhoneNumber: varchar("property_manager_phone_number"), // for property_manager role - SMS notifications
   propertyManagerSmsOptIn: boolean("property_manager_sms_opt_in").default(true), // for property_manager role - opt-in to receive SMS notifications for new quotes (defaults to true for better UX)
