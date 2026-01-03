@@ -5496,6 +5496,19 @@ export default function Documents() {
               {canViewSensitive && (
                 <button
                   type="button"
+                  onClick={() => navigate('/inventory?tab=daily-harness')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate border-border bg-card`}
+                  data-testid="option-daily-harness"
+                >
+                  <ShieldCheck className={`h-6 w-6 text-muted-foreground`} />
+                  <span className={`text-sm font-medium text-center`}>
+                    {t('documents.dailyHarness', 'Daily Harness')}
+                  </span>
+                </button>
+              )}
+              {canViewSensitive && (
+                <button
+                  type="button"
                   onClick={() => setActiveTab('damage-reports')}
                   className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover-elevate ${activeTab === 'damage-reports' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
                   data-testid="option-damage-reports"
