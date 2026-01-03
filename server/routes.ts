@@ -10672,7 +10672,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       const { 
         name, email, password, role, techLevel, hourlyRate, isSalary, salary, permissions,
         startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
-        homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
+        homeAddress, employeeCity, employeeProvinceState, employeeCountry, employeePostalCode, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, irataExpirationDate
       } = req.body;
       
@@ -10701,6 +10701,10 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         driversLicenseProvince: driversLicenseProvince || null,
         driversLicenseDocuments: driversLicenseDocuments || [],
         homeAddress: homeAddress || null,
+        employeeCity: employeeCity || null,
+        employeeProvinceState: employeeProvinceState || null,
+        employeeCountry: employeeCountry || null,
+        employeePostalCode: employeePostalCode || null,
         employeePhoneNumber: employeePhoneNumber || null,
         emergencyContactName: emergencyContactName || null,
         emergencyContactPhone: emergencyContactPhone || null,
@@ -10754,7 +10758,7 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       const { 
         name, email, role, techLevel, hourlyRate, isSalary, salary, permissions,
         startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
-        homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
+        homeAddress, employeeCity, employeeProvinceState, employeeCountry, employeePostalCode, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, 
         irataExpirationDate, terminatedDate, terminationReason, terminationNotes
       } = req.body;
@@ -10797,6 +10801,10 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
             driversLicenseProvince: driversLicenseProvince !== undefined ? (driversLicenseProvince || null) : undefined,
             driversLicenseDocuments: driversLicenseDocuments !== undefined ? (driversLicenseDocuments || []) : undefined,
             homeAddress: homeAddress !== undefined ? (homeAddress || null) : undefined,
+            employeeCity: employeeCity !== undefined ? (employeeCity || null) : undefined,
+            employeeProvinceState: employeeProvinceState !== undefined ? (employeeProvinceState || null) : undefined,
+            employeeCountry: employeeCountry !== undefined ? (employeeCountry || null) : undefined,
+            employeePostalCode: employeePostalCode !== undefined ? (employeePostalCode || null) : undefined,
             employeePhoneNumber: employeePhoneNumber !== undefined ? (employeePhoneNumber || null) : undefined,
             emergencyContactName: emergencyContactName !== undefined ? (emergencyContactName || null) : undefined,
             emergencyContactPhone: emergencyContactPhone !== undefined ? (emergencyContactPhone || null) : undefined,
