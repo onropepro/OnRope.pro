@@ -244,9 +244,7 @@ export default function PreLaunchHomePage() {
             <p className="md:text-2xl text-blue-100 max-w-2xl mx-auto mb-4 text-[20px]">
               Built by a Level 3 tech and operations manager who got tired of the same chaos you're dealing with.
             </p>
-            <p className="text-lg text-blue-100/80 italic mb-10">
-              OnRopePro launches January 2026. Early access list now open.
-            </p>
+            <p className="text-blue-100/80 italic text-[16px] mt-[14px] mb-[14px]">OnRopePro launches January 2026. Get on the waitlist before your competitors do.</p>
 
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4 pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
