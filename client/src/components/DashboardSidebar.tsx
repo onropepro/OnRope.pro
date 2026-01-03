@@ -740,8 +740,8 @@ export function DashboardSidebar({
           {/* Footer - Settings and Help */}
           <div className="border-t border-slate-100 dark:border-slate-800 px-3 py-3">
             <div className="space-y-0.5">
-              {/* Go to My Passport - shown in Work Dashboard for technicians */}
-              {variant !== "technician" && (currentUser?.role === 'rope_access_tech' || currentUser?.role === 'ground_crew') && (
+              {/* Go to My Passport - shown in Work Dashboard for technicians and company owners */}
+              {variant !== "technician" && (currentUser?.role === 'rope_access_tech' || currentUser?.role === 'ground_crew' || currentUser?.role === 'company') && (
                 <button
                   onClick={() => { setLocation("/technician-portal"); setIsOpen(false); }}
                   data-testid="sidebar-nav-my-passport"
