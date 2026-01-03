@@ -387,9 +387,17 @@ const clientSchema = z.object({
   company: z.string().optional(),
   email: z.string().email("Invalid email address").optional().or(z.literal("")),
   address: z.string().optional(),
+  city: z.string().optional(),
+  provinceState: z.string().optional(),
+  country: z.string().optional(),
+  postalCode: z.string().optional(),
   phoneNumber: z.string().optional(),
   lmsNumbers: z.array(z.string()).default([]),
   billingAddress: z.string().optional(),
+  billingCity: z.string().optional(),
+  billingProvinceState: z.string().optional(),
+  billingCountry: z.string().optional(),
+  billingPostalCode: z.string().optional(),
   sameAsAddress: z.boolean().optional(),
 });
 
@@ -1996,9 +2004,17 @@ export default function Dashboard() {
       lastName: "",
       company: "",
       address: "",
+      city: "",
+      provinceState: "",
+      country: "",
+      postalCode: "",
       phoneNumber: "",
       lmsNumbers: [""],
       billingAddress: "",
+      billingCity: "",
+      billingProvinceState: "",
+      billingCountry: "",
+      billingPostalCode: "",
       sameAsAddress: false,
     },
   });
@@ -2010,9 +2026,17 @@ export default function Dashboard() {
       lastName: "",
       company: "",
       address: "",
+      city: "",
+      provinceState: "",
+      country: "",
+      postalCode: "",
       phoneNumber: "",
       lmsNumbers: [""],
       billingAddress: "",
+      billingCity: "",
+      billingProvinceState: "",
+      billingCountry: "",
+      billingPostalCode: "",
       sameAsAddress: false,
     },
   });
@@ -2999,8 +3023,16 @@ export default function Dashboard() {
       company: client.company || "",
       email: client.email || "",
       address: client.address || "",
+      city: (client as any).city || "",
+      provinceState: (client as any).provinceState || "",
+      country: (client as any).country || "",
+      postalCode: (client as any).postalCode || "",
       phoneNumber: client.phoneNumber || "",
       billingAddress: client.billingAddress || "",
+      billingCity: (client as any).billingCity || "",
+      billingProvinceState: (client as any).billingProvinceState || "",
+      billingCountry: (client as any).billingCountry || "",
+      billingPostalCode: (client as any).billingPostalCode || "",
       sameAsAddress: false,
     });
     setEditLmsNumbers(client.lmsNumbers && client.lmsNumbers.length > 0 ? client.lmsNumbers : [{ number: "", address: "" }]);
@@ -8097,22 +8129,30 @@ export default function Dashboard() {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('dashboard.clientForm.addressOptional', 'Address (Optional)')}</FormLabel>
+                            <FormLabel>{t('dashboard.clientForm.streetAddress', 'Street Address (Optional)')}</FormLabel>
                             <FormControl>
                               <AddressAutocomplete
-                                placeholder="123 Main St, Vancouver, BC"
+                                placeholder="123 Main St"
                                 value={field.value || ""}
                                 data-testid="input-client-address"
                                 onChange={(value) => {
                                   field.onChange(value);
-                                  if (sameAsAddress) {
-                                    clientForm.setValue("billingAddress", value);
-                                  }
                                 }}
                                 onSelect={(address) => {
-                                  field.onChange(address.formatted);
+                                  const streetAddress = address.houseNumber 
+                                    ? `${address.houseNumber} ${address.street || ''}`.trim()
+                                    : address.street || address.formatted;
+                                  field.onChange(streetAddress);
+                                  clientForm.setValue("city", address.city || "");
+                                  clientForm.setValue("provinceState", address.state || "");
+                                  clientForm.setValue("country", address.country || "");
+                                  clientForm.setValue("postalCode", address.postcode || "");
                                   if (sameAsAddress) {
-                                    clientForm.setValue("billingAddress", address.formatted);
+                                    clientForm.setValue("billingAddress", streetAddress);
+                                    clientForm.setValue("billingCity", address.city || "");
+                                    clientForm.setValue("billingProvinceState", address.state || "");
+                                    clientForm.setValue("billingCountry", address.country || "");
+                                    clientForm.setValue("billingPostalCode", address.postcode || "");
                                   }
                                 }}
                               />
@@ -8121,6 +8161,64 @@ export default function Dashboard() {
                           </FormItem>
                         )}
                       />
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={clientForm.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.clientForm.city', 'City')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Vancouver" {...field} className="h-12" data-testid="input-client-city" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={clientForm.control}
+                          name="provinceState"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.clientForm.provinceState', 'Province/State')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="BC" {...field} className="h-12" data-testid="input-client-province" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField
+                          control={clientForm.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.clientForm.country', 'Country')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Canada" {...field} className="h-12" data-testid="input-client-country" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={clientForm.control}
+                          name="postalCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.clientForm.postalCode', 'Postal Code')}</FormLabel>
+                              <FormControl>
+                                <Input placeholder="V6B 2W2" {...field} className="h-12" data-testid="input-client-postal" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       <div className="space-y-3">
                         <label className="text-sm font-medium">{t('dashboard.clientForm.strataPlanNumbers', 'Strata Plan Numbers & Addresses')}</label>
@@ -8372,19 +8470,88 @@ export default function Dashboard() {
                           name="billingAddress"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>{t('dashboard.clientForm.billingAddressOptional', 'Billing Address (Optional)')}</FormLabel>
+                              <FormLabel>{t('dashboard.clientForm.billingStreetAddress', 'Billing Street Address')}</FormLabel>
                               <FormControl>
-                                <Textarea 
-                                  placeholder="456 Billing Ave, Vancouver, BC" 
-                                  {...field} 
-                                  disabled={sameAsAddress}
+                                <AddressAutocomplete
+                                  placeholder="456 Billing Ave"
+                                  value={field.value || ""}
                                   data-testid="input-client-billing-address"
+                                  disabled={sameAsAddress}
+                                  onChange={(value) => field.onChange(value)}
+                                  onSelect={(address) => {
+                                    const streetAddress = address.houseNumber 
+                                      ? `${address.houseNumber} ${address.street || ''}`.trim()
+                                      : address.street || address.formatted;
+                                    field.onChange(streetAddress);
+                                    clientForm.setValue("billingCity", address.city || "");
+                                    clientForm.setValue("billingProvinceState", address.state || "");
+                                    clientForm.setValue("billingCountry", address.country || "");
+                                    clientForm.setValue("billingPostalCode", address.postcode || "");
+                                  }}
                                 />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <FormField
+                            control={clientForm.control}
+                            name="billingCity"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.clientForm.city', 'City')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Vancouver" {...field} className="h-12" disabled={sameAsAddress} data-testid="input-client-billing-city" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={clientForm.control}
+                            name="billingProvinceState"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.clientForm.provinceState', 'Province/State')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="BC" {...field} className="h-12" disabled={sameAsAddress} data-testid="input-client-billing-province" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <FormField
+                            control={clientForm.control}
+                            name="billingCountry"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.clientForm.country', 'Country')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Canada" {...field} className="h-12" disabled={sameAsAddress} data-testid="input-client-billing-country" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={clientForm.control}
+                            name="billingPostalCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.clientForm.postalCode', 'Postal Code')}</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="V6B 2W2" {...field} className="h-12" disabled={sameAsAddress} data-testid="input-client-billing-postal" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
 
                       <Button type="submit" className="w-full h-12" disabled={createClientMutation.isPending} data-testid="button-submit-client">
@@ -9093,22 +9260,28 @@ export default function Dashboard() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('dashboard.clientForm.addressOptional', 'Address (Optional)')}</FormLabel>
+                    <FormLabel>{t('dashboard.clientForm.streetAddress', 'Street Address (Optional)')}</FormLabel>
                     <FormControl>
                       <AddressAutocomplete
-                        placeholder="123 Main St, Vancouver, BC"
+                        placeholder="123 Main St"
                         value={field.value || ""}
                         data-testid="input-edit-client-address"
-                        onChange={(value) => {
-                          field.onChange(value);
-                          if (editSameAsAddress) {
-                            editClientForm.setValue("billingAddress", value);
-                          }
-                        }}
+                        onChange={(value) => field.onChange(value)}
                         onSelect={(address) => {
-                          field.onChange(address.formatted);
+                          const streetAddress = address.houseNumber 
+                            ? `${address.houseNumber} ${address.street || ''}`.trim()
+                            : address.street || address.formatted;
+                          field.onChange(streetAddress);
+                          editClientForm.setValue("city", address.city || "");
+                          editClientForm.setValue("provinceState", address.state || "");
+                          editClientForm.setValue("country", address.country || "");
+                          editClientForm.setValue("postalCode", address.postcode || "");
                           if (editSameAsAddress) {
-                            editClientForm.setValue("billingAddress", address.formatted);
+                            editClientForm.setValue("billingAddress", streetAddress);
+                            editClientForm.setValue("billingCity", address.city || "");
+                            editClientForm.setValue("billingProvinceState", address.state || "");
+                            editClientForm.setValue("billingCountry", address.country || "");
+                            editClientForm.setValue("billingPostalCode", address.postcode || "");
                           }
                         }}
                       />
@@ -9117,6 +9290,64 @@ export default function Dashboard() {
                   </FormItem>
                 )}
               />
+
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  control={editClientForm.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('dashboard.clientForm.city', 'City')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Vancouver" {...field} className="h-12" data-testid="input-edit-client-city" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editClientForm.control}
+                  name="provinceState"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('dashboard.clientForm.provinceState', 'Province/State')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="BC" {...field} className="h-12" data-testid="input-edit-client-province" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  control={editClientForm.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('dashboard.clientForm.country', 'Country')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Canada" {...field} className="h-12" data-testid="input-edit-client-country" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editClientForm.control}
+                  name="postalCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('dashboard.clientForm.postalCode', 'Postal Code')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="V6B 2W2" {...field} className="h-12" data-testid="input-edit-client-postal" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <div className="space-y-3">
                 <label className="text-sm font-medium">{t('dashboard.clientForm.strataPlanNumbers', 'Strata Plan Numbers & Addresses')}</label>
@@ -9368,19 +9599,88 @@ export default function Dashboard() {
                   name="billingAddress"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('dashboard.clientForm.billingAddressOptional', 'Billing Address (Optional)')}</FormLabel>
+                      <FormLabel>{t('dashboard.clientForm.billingStreetAddress', 'Billing Street Address')}</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="456 Billing Ave, Vancouver, BC" 
-                          {...field} 
-                          disabled={editSameAsAddress}
+                        <AddressAutocomplete
+                          placeholder="456 Billing Ave"
+                          value={field.value || ""}
                           data-testid="input-edit-client-billing-address"
+                          disabled={editSameAsAddress}
+                          onChange={(value) => field.onChange(value)}
+                          onSelect={(address) => {
+                            const streetAddress = address.houseNumber 
+                              ? `${address.houseNumber} ${address.street || ''}`.trim()
+                              : address.street || address.formatted;
+                            field.onChange(streetAddress);
+                            editClientForm.setValue("billingCity", address.city || "");
+                            editClientForm.setValue("billingProvinceState", address.state || "");
+                            editClientForm.setValue("billingCountry", address.country || "");
+                            editClientForm.setValue("billingPostalCode", address.postcode || "");
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={editClientForm.control}
+                    name="billingCity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.clientForm.city', 'City')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Vancouver" {...field} className="h-12" disabled={editSameAsAddress} data-testid="input-edit-client-billing-city" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editClientForm.control}
+                    name="billingProvinceState"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.clientForm.provinceState', 'Province/State')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="BC" {...field} className="h-12" disabled={editSameAsAddress} data-testid="input-edit-client-billing-province" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={editClientForm.control}
+                    name="billingCountry"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.clientForm.country', 'Country')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Canada" {...field} className="h-12" disabled={editSameAsAddress} data-testid="input-edit-client-billing-country" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={editClientForm.control}
+                    name="billingPostalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.clientForm.postalCode', 'Postal Code')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="V6B 2W2" {...field} className="h-12" disabled={editSameAsAddress} data-testid="input-edit-client-billing-postal" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
               <Button type="submit" className="w-full h-12" disabled={editClientMutation.isPending} data-testid="button-submit-edit-client">
