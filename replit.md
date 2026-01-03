@@ -74,6 +74,43 @@ When adding guided tours to dialogs or forms, follow this exact implementation p
 - Source tour content from actual documentation files in `server/help-content/modules/`
 - Each step should have: `fieldSelector`, `title`, `explanation`, and `appContext`
 
+### User Name Field Standardization Pattern
+**ALL user name inputs use separate firstName and lastName fields.** This is a universal pattern for all user roles.
+
+**Universal Name Fields:**
+- `firstName` and `lastName` are separate database columns and form fields
+- Legacy `name` field is maintained for backward compatibility: `${firstName} ${lastName}`
+- Database: `first_name`, `last_name` (snake_case) maps to `firstName`, `lastName` (camelCase) in TypeScript
+
+**Affected Components:**
+- TechnicianPortal.tsx, GroundCrewPortal.tsx (profile forms)
+- Register.tsx (technician and resident registration)
+- Dashboard.tsx (employee invite forms)
+- Profile.tsx (user profile editing)
+- OnboardingWizard.tsx (employee creation during onboarding)
+- GroundCrewRegistration.tsx (ground crew self-registration)
+
+**Implementation Pattern:**
+```tsx
+// Schema definition
+const userSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  // ... other fields
+});
+
+// Form default values
+const form = useForm({
+  defaultValues: {
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+  }
+});
+
+// Submission - combine for legacy 'name' field
+const name = `${data.firstName} ${data.lastName}`.trim();
+```
+
 ### Address Input Standardization Pattern
 **ALL address inputs use Geoapify autocomplete with structured fields.** This is a universal pattern with no exceptions.
 
