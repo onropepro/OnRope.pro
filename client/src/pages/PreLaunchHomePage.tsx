@@ -22,53 +22,82 @@ import {
   MessageSquare,
   Building2,
   HardHat,
-  Home,
+  Home as HomeIcon,
   Briefcase,
   CheckCircle2,
+  Heart,
+  Settings,
+  Paintbrush,
+  ShieldAlert,
+  Search,
+  Award,
+  DollarSign,
 } from "lucide-react";
 
 const moduleCategories = [
   {
     name: "Operations",
+    icon: Settings,
     color: "text-blue-600",
+    bg: "bg-blue-50 dark:bg-blue-900/20",
+    count: 5,
     modules: [
-      "Project Management",
-      "Work Sessions",
-      "Scheduling",
-      "Gear Inventory",
-      "White Label",
+      { name: "Project Management", detail: "4-elevation tracking with visual progress bars and crew assignment", icon: Briefcase },
+      { name: "Work Sessions", detail: "GPS clock-in, drop tracking, automatic hour aggregation", icon: Clock },
+      { name: "Scheduling", detail: "Drag-and-drop calendar with conflict detection and weather delays", icon: Calendar },
+      { name: "Gear Inventory", detail: "Serial number tracking, assignment history, retirement workflows", icon: Package },
+      { name: "White Label", detail: "Custom branding for client-facing portals and exports", icon: Paintbrush },
     ],
   },
   {
     name: "Safety",
+    icon: Heart,
     color: "text-red-600",
+    bg: "bg-red-50 dark:bg-red-900/20",
+    count: 5,
     modules: [
-      "Safety Compliance",
-      "Company Safety Rating",
-      "Personal Safety Rating",
-      "IRATA/SPRAT Logging",
-      "Documents",
+      { name: "Safety Compliance", detail: "Digital forms, PDF plans, and audit-ready documentation", icon: Shield },
+      { name: "Company Safety Rating", detail: "Real-time company safety score based on inspections and compliance", icon: BarChart3 },
+      { name: "Personal Safety Rating", detail: "Portable technician safety score that follows you across employers", icon: Users },
+      { name: "IRATA/SPRAT Logging", detail: "Same-day hour logging with OCR import and career-portable records", icon: FileText },
+      { name: "Documents", detail: "Digital signatures, immutable audit trails, compliance reporting", icon: FileText },
     ],
   },
   {
     name: "Team",
+    icon: Users,
     color: "text-violet-600",
+    bg: "bg-violet-50 dark:bg-violet-900/20",
+    count: 4,
     modules: [
-      "Employee Management",
-      "Technician Passport",
-      "Job Board",
-      "User Access",
+      { name: "Employee Management", detail: "Portable identities, certification tracking, role-based permissions", icon: Users },
+      { name: "Technician Passport", detail: "Portable work history and certifications across employers", icon: Award },
+      { name: "Job Board", detail: "Talent browser with unlimited postings and direct offers", icon: Search },
+      { name: "User Access", detail: "Granular permissions and audit trails for every action", icon: ShieldAlert },
     ],
   },
   {
     name: "Financial",
+    icon: Wallet,
     color: "text-emerald-600",
-    modules: ["Payroll", "Quoting", "CRM"],
+    bg: "bg-emerald-50 dark:bg-emerald-900/20",
+    count: 3,
+    modules: [
+      { name: "Payroll", detail: "Automatic hour aggregation with overtime calculation and exports", icon: Wallet },
+      { name: "Quoting", detail: "Multi-service quotes with photo documentation and historical data", icon: FileText },
+      { name: "CRM", detail: "Client relationship management with contact history and notes", icon: Building2 },
+    ],
   },
   {
     name: "Communication",
+    icon: MessageSquare,
     color: "text-rose-600",
-    modules: ["Resident Portal", "Property Manager Portal"],
+    bg: "bg-rose-50 dark:bg-rose-900/20",
+    count: 2,
+    modules: [
+      { name: "Resident Portal", detail: "Progress tracking and feedback submission for building residents", icon: HomeIcon },
+      { name: "Property Manager Portal", detail: "Real-time dashboards and compliance exports for property managers", icon: Building2 },
+    ],
   },
 ];
 
@@ -155,6 +184,7 @@ export default function PreLaunchHomePage() {
   const { toast } = useToast();
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
 
   const signupMutation = useMutation({
     mutationFn: async (data: { companyName: string; email: string; stakeholderType: string; source: string }) => {
@@ -465,44 +495,56 @@ export default function PreLaunchHomePage() {
       </section>
 
       <section className="py-16 md:py-20 px-4 bg-white dark:bg-slate-950">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-            19 Modules. One Platform. All Connected.
+            19 Modules. One Platform. All Connected. All Included.
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 max-w-3xl mx-auto">
             Everything you need to run a profitable rope access company, from first quote to final payment
-            and every drop in between. Complex operations made simple through absolute transparency.
+            and every drop in between.
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { name: "Project Management", detail: "4-elevation tracking with visual progress bars and crew assignment" },
-              { name: "Work Sessions", detail: "GPS clock-in, drop tracking, automatic hour aggregation" },
-              { name: "Scheduling", detail: "Drag-and-drop calendar with conflict detection and weather delays" },
-              { name: "Gear Inventory", detail: "Serial number tracking, assignment history, retirement workflows" },
-              { name: "White Label", detail: "Custom branding for client-facing portals and exports" },
-              { name: "Safety Compliance", detail: "Digital forms, PDF plans, and audit-ready documentation" },
-              { name: "Company Safety Rating", detail: "Real-time company safety score based on inspections and compliance" },
-              { name: "Personal Safety Rating", detail: "Portable technician safety score that follows you across employers" },
-              { name: "IRATA/SPRAT Logging", detail: "Same-day hour logging with OCR import and career-portable records" },
-              { name: "Documents", detail: "Digital signatures, immutable audit trails, compliance reporting" },
-              { name: "Employee Management", detail: "Portable identities, certification tracking, role-based permissions" },
-              { name: "Technician Passport", detail: "Portable work history and certifications across employers" },
-              { name: "Job Board", detail: "Talent browser with unlimited postings and direct offers" },
-              { name: "User Access", detail: "Granular permissions and audit trails for every action" },
-              { name: "Payroll", detail: "Automatic hour aggregation with overtime calculation and exports" },
-              { name: "Quoting", detail: "Multi-service quotes with photo documentation and historical data" },
-              { name: "CRM", detail: "Client relationship management with contact history and notes" },
-              { name: "Resident Portal", detail: "Progress tracking and feedback submission for building residents" },
-              { name: "Property Manager Portal", detail: "Real-time dashboards and compliance exports for property managers" }
-            ].map((mod, i) => (
-              <Card key={i} className="bg-slate-50/50 dark:bg-slate-900/50 border-0">
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-base mb-1">{mod.name}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{mod.detail}</p>
-                </CardContent>
-              </Card>
+          <div className="flex flex-wrap justify-center gap-2 mb-12">
+            <Button 
+              variant={activeCategory === 'all' ? 'default' : 'outline'}
+              onClick={() => setActiveCategory('all')}
+              className="gap-2"
+            >
+              <Package className="w-4 h-4" /> All Modules
+            </Button>
+            {moduleCategories.map((cat) => (
+              <Button
+                key={cat.name}
+                variant={activeCategory === cat.name ? 'default' : 'outline'}
+                onClick={() => setActiveCategory(cat.name)}
+                className="gap-2"
+              >
+                <cat.icon className={`w-4 h-4 ${cat.color}`} />
+                {cat.name}
+                <Badge variant="secondary" className="ml-1 h-5 min-w-5 flex items-center justify-center p-0">
+                  {cat.count}
+                </Badge>
+              </Button>
             ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {moduleCategories
+              .flatMap(cat => cat.modules.map(mod => ({ ...mod, category: cat.name })))
+              .filter(mod => activeCategory === 'all' || mod.category === activeCategory)
+              .map((mod, i) => (
+                <Card key={i} className="bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover-elevate transition-all duration-200">
+                  <CardContent className="p-5 flex gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-blue-100/50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                      <mod.icon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-base mb-1">{mod.name}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{mod.detail}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
           </div>
 
           <Card className="mt-12 bg-slate-900 text-white border-0">
