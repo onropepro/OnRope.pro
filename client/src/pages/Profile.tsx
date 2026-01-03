@@ -1598,44 +1598,6 @@ export default function Profile() {
               </div>
                 </div>
 
-                {/* Right Column - Quick Actions */}
-                <div className="space-y-6">
-              {/* Quick Actions - Glass-morphism container */}
-              <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6">
-                {/* Header with icon */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="h-12 w-12 rounded-full bg-violet-500/20 flex items-center justify-center">
-                    <span className="material-icons text-violet-500">apps</span>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">{t('profile.quickActions', 'Quick Actions')}</h2>
-                    <p className="text-sm text-muted-foreground">{t('profile.additionalSettings', 'Additional settings and tools')}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {/* My Logged Hours - only show for rope_access_tech, not company owners */}
-                  {user?.role === 'rope_access_tech' && (
-                    <div 
-                      className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover-elevate active-elevate-2 cursor-pointer border border-border/50" 
-                      onClick={() => setLocation("/my-logged-hours")} 
-                      data-testid="card-my-logged-hours"
-                    >
-                      <div className="p-3 bg-violet-500/10 rounded-xl">
-                        <span className="material-icons text-violet-500">assignment</span>
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-semibold">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</p>
-                        <p className="text-sm text-muted-foreground">{t('dashboard.cards.myLoggedHours.description', 'IRATA logbook')}</p>
-                      </div>
-                      <span className="material-icons text-muted-foreground">chevron_right</span>
-                    </div>
-                  )}
-
-                </div>
-              </div>
-
-                </div>
               </div>
             </TabsContent>
 
