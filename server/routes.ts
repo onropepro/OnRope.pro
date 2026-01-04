@@ -11540,24 +11540,38 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       }
       
       // Get the employee to verify they belong to this company
+      // Check if the employee belongs to this company (via primary or secondary connection)
+      const membership = await storage.checkEmployeeBelongsToCompany(req.params.id, companyId, true);
+      
+      if (!membership.belongs) {
+        return res.status(403).json({ message: "This employee does not belong to your company" });
+      }
+      
       const employee = await storage.getUserById(req.params.id);
       
       if (!employee) {
         return res.status(404).json({ message: "Employee not found" });
       }
       
-      if (employee.companyId !== companyId) {
-        return res.status(403).json({ message: "This employee does not belong to your company" });
+      // Handle unlinking based on connection type
+      if (membership.connectionType === "primary") {
+        // Primary connection - clear companyId
+        await storage.updateUser(req.params.id, { 
+          companyId: null,
+          terminatedDate: null,
+          terminationReason: null,
+          terminationNotes: null
+        });
+      } else if (membership.connectionType === "secondary" && membership.connectionId) {
+        // Secondary connection - update the connection status to terminated
+        await db
+          .update(technicianEmployerConnections)
+          .set({
+            status: "terminated",
+            terminatedAt: new Date(),
+          })
+          .where(eq(technicianEmployerConnections.id, membership.connectionId));
       }
-      
-      // IMPORTANT: Don't delete the user - just unlink them from the company
-      // Self-registered technicians keep their accounts and can be invited by other companies
-      await storage.updateUser(req.params.id, { 
-        companyId: null,
-        terminatedDate: null,
-        terminationReason: null,
-        terminationNotes: null
-      });
       
       console.log(`[Team] Employee ${employee.name} (${req.params.id}) unlinked from company ${companyId} - account preserved`);
       
