@@ -12175,8 +12175,27 @@ if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
       
       const requests = await storage.getDocumentRequestsByTechnician(user.id);
       
+      // Get all active employer connections for this technician
+      const activeConnections = await db.select()
+        .from(technicianEmployerConnections)
+        .where(and(
+          eq(technicianEmployerConnections.technicianId, user.id),
+          eq(technicianEmployerConnections.status, 'active')
+        ));
+      
+      // Build set of company IDs the technician is actively connected to
+      const activeCompanyIds = new Set(activeConnections.map(c => c.companyId));
+      
+      // Also include primary connection if exists
+      if (user.companyId) {
+        activeCompanyIds.add(user.companyId);
+      }
+      
+      // Filter requests to only show those from active employers
+      const activeRequests = requests.filter(request => activeCompanyIds.has(request.companyId));
+      
       // Fetch files and company info for each request
-      const requestsWithDetails = await Promise.all(requests.map(async (request) => {
+      const requestsWithDetails = await Promise.all(activeRequests.map(async (request) => {
         const files = await storage.getDocumentRequestFiles(request.id);
         const company = await storage.getUserById(request.companyId);
         return {
