@@ -88,7 +88,6 @@ When adding guided tours to dialogs or forms, follow this exact implementation p
 - Register.tsx (technician and resident registration)
 - Dashboard.tsx (employee invite forms)
 - Profile.tsx (user profile editing)
-- OnboardingWizard.tsx (employee creation during onboarding)
 - GroundCrewRegistration.tsx (ground crew self-registration)
 
 **Implementation Pattern:**

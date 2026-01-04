@@ -76,7 +76,6 @@ import { DashboardOverview } from "@/components/DashboardOverview";
 import { DocumentReviews } from "@/components/DocumentReviews";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { useSetHeaderConfig } from "@/components/DashboardLayout";
-import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { GuidedFormTour, PROJECT_CREATION_TOUR_STEPS } from "@/components/GuidedFormTour";
 
 import { JOB_CATEGORIES, JOB_TYPES, getJobTypesByCategory, getJobTypeConfig, getDefaultElevation, isElevationConfigurable, isDropBasedJobType, getAllJobTypeValues, getProgressType, getCategoryForJobType, type JobCategory } from "@shared/jobTypes";
@@ -1374,16 +1373,6 @@ export default function Dashboard() {
 
   // Extract user from userData for use throughout component
   const user = userData?.user;
-
-  // Onboarding wizard state - show for new companies that haven't completed onboarding
-  const [showOnboardingWizard, setShowOnboardingWizard] = useState(false);
-
-  // Show onboarding wizard for new company users who haven't completed or skipped it
-  useEffect(() => {
-    if (user?.role === "company" && user.onboardingCompleted === false && !user.onboardingSkippedAt) {
-      setShowOnboardingWizard(true);
-    }
-  }, [user]);
 
   // Get employer ID from URL for PLUS technicians switching between employers
   const urlParams = new URLSearchParams(window.location.search);
@@ -3859,14 +3848,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full">
-      {/* Onboarding Wizard for new employers */}
-      <OnboardingWizard
-        open={showOnboardingWizard}
-        onClose={() => setShowOnboardingWizard(false)}
-        onComplete={() => setShowOnboardingWizard(false)}
-        currentUser={user}
-      />
-      
       {/* Main Content - sidebar and header are now provided by DashboardLayout wrapper */}
       <div className="flex-1 flex flex-col page-gradient min-h-screen">
       {/* Read-Only Mode Banner - Shows on all tabs */}

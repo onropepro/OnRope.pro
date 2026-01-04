@@ -28255,46 +28255,6 @@ Do not include any other text, just the JSON object.`
   });
 
 
-  // Onboarding endpoints for new employers
-  app.post("/api/onboarding/complete", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
-    try {
-      const user = await storage.getUserById(req.session.userId!);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      await storage.updateUser(user.id, {
-        onboardingCompleted: true,
-        onboardingCompletedAt: new Date(),
-      });
-
-      res.json({ success: true, message: "Onboarding completed" });
-    } catch (error) {
-      console.error("Complete onboarding error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.post("/api/onboarding/skip", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
-    try {
-      const user = await storage.getUserById(req.session.userId!);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      await storage.updateUser(user.id, {
-        onboardingCompleted: true,
-        onboardingSkippedAt: new Date(),
-      });
-
-      res.json({ success: true, message: "Onboarding skipped" });
-    } catch (error) {
-      console.error("Skip onboarding error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-
   // =====================================================
   // WORK SESSIONS EXPORT ENDPOINTS
   // =====================================================
