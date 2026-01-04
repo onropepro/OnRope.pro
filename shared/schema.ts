@@ -3512,6 +3512,88 @@ export type PlatformNotificationRecipient = typeof platformNotificationRecipient
 export type InsertPlatformNotificationRecipient = z.infer<typeof insertPlatformNotificationRecipientSchema>;
 
 // ============================================
+// SUPPORT TICKETS - User support request system
+// Available to ALL authenticated users (technicians, residents, PMs, building managers, company owners)
+// ============================================
+
+export const supportTickets = pgTable("support_tickets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Request details
+  subject: varchar("subject").notNull(),
+  category: varchar("category").notNull(), // account | billing | technical | feature_question | bug_report | other
+  description: text("description").notNull(),
+  priority: varchar("priority").default('normal'), // low | normal | high | urgent
+  
+  // Status tracking
+  status: varchar("status").default('open').notNull(), // open | in_progress | waiting_on_user | resolved | closed
+  
+  // User context (captured at submission time for superuser reference)
+  userRole: varchar("user_role").notNull(), // User's role at time of submission
+  userEmail: varchar("user_email").notNull(),
+  userName: varchar("user_name").notNull(),
+  companyId: varchar("company_id").references(() => users.id), // If user belongs to a company
+  companyName: varchar("company_name"), // Company name if applicable
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+}, (table) => [
+  index("IDX_support_ticket_user").on(table.userId),
+  index("IDX_support_ticket_status").on(table.status),
+  index("IDX_support_ticket_category").on(table.category),
+  index("IDX_support_ticket_created").on(table.createdAt),
+]);
+
+export const insertSupportTicketSchema = createInsertSchema(supportTickets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  resolvedAt: true,
+});
+
+export type SupportTicket = typeof supportTickets.$inferSelect;
+export type InsertSupportTicket = z.infer<typeof insertSupportTicketSchema>;
+
+// Support Ticket Messages - two-way messaging between user and support staff
+export const supportTicketMessages = pgTable("support_ticket_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketId: varchar("ticket_id").notNull().references(() => supportTickets.id, { onDelete: "cascade" }),
+  
+  // Sender info
+  senderId: varchar("sender_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  senderRole: varchar("sender_role").notNull(), // user | superuser
+  senderName: varchar("sender_name").notNull(),
+  
+  // Message content
+  message: text("message").notNull(),
+  
+  // Read status (for the recipient)
+  isRead: boolean("is_read").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_support_msg_ticket").on(table.ticketId),
+  index("IDX_support_msg_sender").on(table.senderId),
+]);
+
+export const insertSupportTicketMessageSchema = createInsertSchema(supportTicketMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SupportTicketMessage = typeof supportTicketMessages.$inferSelect;
+export type InsertSupportTicketMessage = z.infer<typeof insertSupportTicketMessageSchema>;
+
+// Extended type for support ticket with messages
+export type SupportTicketWithMessages = SupportTicket & {
+  messages: SupportTicketMessage[];
+  unreadCount?: number;
+};
+
+// ============================================
 // API RESPONSE TYPES
 // Used for typing React Query hooks and API responses
 // ============================================
