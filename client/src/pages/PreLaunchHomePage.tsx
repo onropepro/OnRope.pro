@@ -242,7 +242,7 @@ export default function PreLaunchHomePage() {
               <span className="text-[#fa7315]">what sets you apart.</span>
             </h1>
             <p className="md:text-2xl text-blue-100 max-w-2xl mx-auto text-[20px] mt-[12px] mb-[12px]">Intelligent Urban Rope Access Software Built by a Level 3 Tech & Operations Manager Who Got Tired of the Same Chaos You're Dealing With.</p>
-            <p className="text-blue-100/80 italic text-[16px] mt-[14px] mb-[14px]">OnRopePro launches January 2026. Get on the waitlist before your competitors do.</p>
+            <p className="text-blue-100/80 italic text-[16px] mt-[14px] mb-[14px]">OnRopePro launches January 2026, with an emphasis on our Urban Rope Access Job Board and Inventory Modules.</p>
 
             <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4 pt-4">
               <Card className="bg-white/10 border-white/20 backdrop-blur-sm shadow-2xl">
