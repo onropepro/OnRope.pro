@@ -43,6 +43,8 @@ import CompanyDetail from "@/pages/CompanyDetail";
 import ViewAsCompany from "@/pages/ViewAsCompany";
 import SuperUserFeatureRequests from "@/pages/SuperUserFeatureRequests";
 import SuperUserNotifications from "@/pages/SuperUserNotifications";
+import MySupportTickets from "@/pages/MySupportTickets";
+import SuperUserSupportTickets from "@/pages/SuperUserSupportTickets";
 import SuperUserMetrics from "@/pages/SuperUserMetrics";
 import SuperUserGoalsOverview from "@/pages/SuperUserGoalsOverview";
 import FounderResources from "@/pages/FounderResources";
@@ -253,6 +255,11 @@ function Router() {
               <SuperUserNotifications />
             </ProtectedRoute>
           </Route>
+          <Route path="/superuser/support-tickets">
+            <ProtectedRoute allowedRoles={["superuser", "staff"]}>
+              <SuperUserSupportTickets />
+            </ProtectedRoute>
+          </Route>
           <Route path="/superuser/metrics">
             <ProtectedRoute allowedRoles={["superuser", "staff"]}>
               <SuperUserMetrics />
@@ -448,6 +455,9 @@ function Router() {
             <WithDashboardLayout allowedRoles={EMPLOYEE_ROLES}>
               <Profile />
             </WithDashboardLayout>
+          </Route>
+          <Route path="/my-support-tickets">
+            <MySupportTickets />
           </Route>
           <Route path="/property-manager-settings">
             <ProtectedRoute allowedRoles={["property_manager"]}>

@@ -28616,6 +28616,234 @@ Do not include any other text, just the JSON object.`
     }
   });
 
+
+  // =============================================================================
+  // SUPPORT TICKET ROUTES
+  // =============================================================================
+
+  // Create a new support ticket
+  app.post("/api/support-tickets", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { subject, description, category, priority } = req.body;
+
+      if (!subject || !description || !category) {
+        return res.status(400).json({ message: "Subject, description, and category are required" });
+      }
+
+      const ticket = await storage.createSupportTicket({
+        userId: user.id,
+        companyId: user.companyId || null,
+        subject,
+        description,
+        category,
+        priority: priority || 'medium',
+        status: 'open',
+      });
+
+      res.status(201).json({ ticket });
+    } catch (error) {
+      console.error("Create support ticket error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get all tickets for the logged-in user
+  app.get("/api/support-tickets", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const tickets = await storage.getSupportTicketsWithMessages(user.id);
+      
+      // Add unread count for each ticket
+      const ticketsWithUnread = await Promise.all(tickets.map(async (ticket) => {
+        const unreadMessages = ticket.messages.filter(
+          m => m.senderRole === 'superuser' && !m.isRead
+        );
+        return {
+          ...ticket,
+          unreadCount: unreadMessages.length,
+        };
+      }));
+
+      res.json({ tickets: ticketsWithUnread });
+    } catch (error) {
+      console.error("Get support tickets error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get unread message count for logged-in user
+  app.get("/api/support-tickets/unread-count", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const count = await storage.getUnreadSupportTicketMessageCount(user.id);
+      res.json({ unreadCount: count });
+    } catch (error) {
+      console.error("Get unread count error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get a specific ticket with messages
+  app.get("/api/support-tickets/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const ticket = await storage.getSupportTicketWithMessages(req.params.id);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+
+      // Only allow access to own tickets (unless superuser)
+      if (ticket.userId !== user.id && user.role !== 'superuser') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Mark messages as read
+      await storage.markSupportTicketMessagesAsRead(ticket.id, user.id);
+
+      res.json({ ticket });
+    } catch (error) {
+      console.error("Get support ticket error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Add a message to a ticket
+  app.post("/api/support-tickets/:id/messages", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const ticket = await storage.getSupportTicketById(req.params.id);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+
+      // Only allow access to own tickets (unless superuser)
+      if (ticket.userId !== user.id && user.role !== 'superuser') {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { message } = req.body;
+      if (!message || !message.trim()) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      const senderRole = user.role === 'superuser' ? 'superuser' : 'user';
+
+      const newMessage = await storage.createSupportTicketMessage({
+        ticketId: ticket.id,
+        senderId: user.id,
+        senderRole,
+        message: message.trim(),
+      });
+
+      // If user responded, update status from waiting_on_user to in_progress
+      if (senderRole === 'user' && ticket.status === 'waiting_on_user') {
+        await storage.updateSupportTicket(ticket.id, { status: 'in_progress' });
+      }
+
+      res.status(201).json({ message: newMessage });
+    } catch (error) {
+      console.error("Add support ticket message error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update ticket status (superuser only typically, but allow user to close)
+  app.patch("/api/support-tickets/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const ticket = await storage.getSupportTicketById(req.params.id);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+
+      const { status, priority } = req.body;
+
+      // Users can only close their own tickets
+      if (user.role !== 'superuser') {
+        if (ticket.userId !== user.id) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+        // Regular users can only close/reopen their tickets
+        if (status && !['closed', 'open'].includes(status)) {
+          return res.status(403).json({ message: "You can only close or reopen tickets" });
+        }
+      }
+
+      const updates: any = {};
+      if (status) {
+        updates.status = status;
+        if (status === 'resolved' || status === 'closed') {
+          updates.resolvedAt = new Date();
+        }
+      }
+      if (priority && user.role === 'superuser') {
+        updates.priority = priority;
+      }
+
+      const updatedTicket = await storage.updateSupportTicket(ticket.id, updates);
+      res.json({ ticket: updatedTicket });
+    } catch (error) {
+      console.error("Update support ticket error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // SuperUser: Get all support tickets
+  app.get("/api/superuser/support-tickets", requireAuth, requireRole('superuser'), async (req: Request, res: Response) => {
+    try {
+      const tickets = await storage.getSupportTicketsWithMessages();
+      
+      // Add user info and unread count
+      const ticketsWithDetails = await Promise.all(tickets.map(async (ticket) => {
+        const ticketUser = await storage.getUserById(ticket.userId);
+        const unreadMessages = ticket.messages.filter(
+          m => m.senderRole === 'user' && !m.isRead
+        );
+        return {
+          ...ticket,
+          user: ticketUser ? {
+            id: ticketUser.id,
+            name: ticketUser.name,
+            email: ticketUser.email,
+            role: ticketUser.role,
+            companyName: ticketUser.companyName,
+          } : null,
+          unreadCount: unreadMessages.length,
+        };
+      }));
+
+      res.json({ tickets: ticketsWithDetails });
+    } catch (error) {
+      console.error("Get all support tickets error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Register CRM routes (SuperUser only)
   registerCrmRoutes(app, requireAuth);
 
