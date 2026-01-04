@@ -343,7 +343,7 @@ export default function Login() {
                   {/* Quick Login Buttons for Testing */}
                   <div className="pt-4 border-t mt-4">
                     <p className="text-xs text-muted-foreground text-center mb-2">Quick Login (Testing)</p>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <Button
                         type="button"
                         variant="outline"
@@ -367,6 +367,18 @@ export default function Login() {
                         data-testid="button-quick-login-tech"
                       >
                         Tech
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          form.setValue("identifier", "info@rabm.com");
+                          form.setValue("password", "Rabm123");
+                        }}
+                        data-testid="button-quick-login-rabmltd"
+                      >
+                        RABMLTD
                       </Button>
                     </div>
                   </div>
